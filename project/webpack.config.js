@@ -1,7 +1,6 @@
 const { join, resolve } = require('path')
 const webpack = require('webpack')
 const glob = require('glob')
-var opn = require('opn')
 
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
@@ -134,7 +133,7 @@ const config = {
     noInfo: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8010',
+        target: 'http://127.0.0.1:8080',
         changeOrigin: true,
         pathRewrite: { '^/api': '' }
       }
