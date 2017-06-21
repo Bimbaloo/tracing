@@ -57,7 +57,7 @@
           this.activeKey = oData.tab;
       }
 
-      this.$ajax.get('static/data.json').then((res) => {
+      this.$ajax.get('../static/data.json').then((res) => {
         this.categories = res.data.categories.filter(o => o.url==="detail");
         this.categories.forEach(o => {
           if(oData && oData.tab == o.key) {

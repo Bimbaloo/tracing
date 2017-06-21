@@ -21,7 +21,7 @@
             }
         },
         created() {
-            this.$get('static/data.json').then((res) => {
+            this.$get('../static/data.json').then((res) => {
                 this.options = res.data[this.key];
             })
         },

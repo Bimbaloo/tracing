@@ -1,8 +1,9 @@
 import Vue from 'vue'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-green/index.css'
-import App from './app.vue'
+import App from './App'
 import axios from 'axios'
+
 
 import 'assets/css/reset.css'
 import 'assets/css/common.css'

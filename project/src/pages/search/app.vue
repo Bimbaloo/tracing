@@ -18,7 +18,8 @@
 
   export default {
     components: {
-      'v-panel': panel
+      'v-panel': panel,
+      logo
     },
     data() {
       return {
@@ -37,7 +38,7 @@
           this.activeKey = oData.tab;
       }
 
-      this.$ajax.get('static/data.json').then((res) => {
+      this.$ajax.get('../static/data.json').then((res) => {
         this.categories = res.data.categories;
         this.categories.forEach(o => {
           if(oData && oData.tab == o.key) {
