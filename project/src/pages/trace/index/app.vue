@@ -25,7 +25,7 @@
 	import tree from 'components/tree/tree.vue'
 	import catalog from 'components/catalog/catalog.vue'
 	
-	import {aoTest} from './data'
+	import {aoTestData} from './data'
 	
 	export default {
 		components: {
@@ -78,7 +78,7 @@
 		    	
 				this.$store.commit({
 					type: "updateData",
-					data: aoTest
+					data: aoTestData
 				});
 				
 				// 格式化数据。
