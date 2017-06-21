@@ -15,28 +15,49 @@
 			treeData: Object
 		},
 		data() {
-			return {			
+			return {
 				tree: null,
 				overview: null,
-				flag: true,
-				root: ""
+				flag: true
 			}
 		},
 		watch: {
-		    // 如果 question 发生改变，这个函数就会运行
-		    treeData: function () {			
-				this.tree && (this.tree.model = new go.GraphLinksModel(this.treeData.node, this.treeData.link));	
+		    // 如果 发生改变，这个函数就会运行
+		    treeData: function() {
+		    	this.data = Object.assign({}, this.treeData);
+		    },
+		    data: function () {	
+		    	if(this.tree) {		    		
+		    		this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    		
+		    	}				
 		    },
 		    key: function() {
-		    	console.log(this.key);
+		    	if(this.type == "catalog") {
+
+		    		this.$nextTick(function() {    		
+		    			this.setSelection();
+		    		})
+		    	}
+		    },
+		    root: function() {
+		    	this.redrawTree();
 		    }
 		},
 		computed: {
+			data () {
+				return Object.assign({}, this.treeData);
+			},
 		    key () {
 		      return this.$store.state.key
 		    },
 		    chrome () {
 		    	return this.$store.state.chrome
+		    },
+		    root () {
+		    	return this.$store.state.root
+		    },
+		    type () {
+		    	return this.$store.state.type
 		    }
 		},
 		mounted() {
@@ -102,7 +123,23 @@
 					$(go.Node, "Horizontal", {
 							selectionChanged: onNodeSelectionChange,
 							click: (e, node) => {
-								onClickNode(e, node, this.tree, this.catalog)
+//								onClickNode(e, node, this.tree, this.catalog)
+								this.$store.commit({
+									type: "updateType",
+									key: "tree"
+								});
+								this.$store.commit({
+									type: "updateKey",
+									key: node.data.key
+								});
+								
+								// 根据物料节点查询仓储信息。        
+          						this.$router.push({ 
+          							path: "/stock", 
+          							query: {
+          								"key": node.data.key
+          							}
+          						})
 							},
 							doubleClick: onDoubleClickNode,
 							contextClick: onContextClickNode,
@@ -128,7 +165,6 @@
 								new go.Binding("source", "type", s => s == 1 ? material : process)
 							)
 						),
-
 						$(go.TextBlock, {
 								name: "TB",
 								row: 1,
@@ -137,7 +173,7 @@
 								margin: 5,
 								//	                  	textValidation:onEditName
 							},
-							new go.Binding("text", "show_name").makeTwoWay() //
+							new go.Binding("text", "showName").makeTwoWay() //
 						),
 						//	              new go.Binding("editable","editable"),
 						$("TreeExpanderButton", {
@@ -149,6 +185,7 @@
 							"_buttonFillOver": "#b8b8b8",
 							"_buttonStrokeOver": null,
 							click: (e, button) => {
+		
 								let node = button.part;
 								if(node instanceof go.Adornment) node = node.adornedPart;
 								if(!(node instanceof go.Node)) return;
@@ -161,38 +198,13 @@
 									if(!cmd.canExpandTree(node)) return;
 								}
 								e.handled = true;
+								
+								let sGroup = node.data.group;
+								
 								if(node.isTreeExpanded) {
 									cmd.collapseTree(node);
-									if(node.data.childGroup) {
-										node.data.childGroup.split(",").forEach(sGroup => {
-											let oGroup = this.tree.findNodeForKey(sGroup);
-											oGroup.visible = false;
-										})
-									}
-									node.findTreeChildrenNodes().each(o => {
-										if(o.data.childGroup) {
-											o.data.childGroup.split(",").forEach(sGroup => {
-												let oGroup = this.tree.findNodeForKey(sGroup);
-												oGroup.visible = false;
-											})
-										}
-									})
 								} else {
 									cmd.expandTree(node);
-									if(node.data.childGroup) {
-										node.data.childGroup.split(",").forEach(sGroup => {
-											let oGroup = this.tree.findNodeForKey(sGroup);
-											oGroup.visible = true;
-										})
-									}
-									node.findTreeChildrenNodes().each(o => {
-										if(o.data.childGroup) {
-											o.data.childGroup.split(",").forEach(sGroup => {
-												let oGroup = this.tree.findNodeForKey(sGroup);
-												oGroup.visible = true;
-											})
-										}
-									})
 								}
 							}
 						})
@@ -231,7 +243,7 @@
 								stroke: "#333333",
 								margin: 5
 							},
-							new go.Binding("text", "show_name")
+							new go.Binding("text", "showName")
 						)
 					); // end Adornment
 
@@ -311,6 +323,23 @@
 							})
 						) // end Vertical Panel
 					); // end Group
+					
+					
+					this.tree.nodeTemplateMap.add("Comment",
+				      $(go.Node,  // this needs to act as a rectangular shape for BalloonLink,
+				        { background: "transparent" },  // which can be accomplished by setting the background.
+				        $(go.TextBlock,
+				          { stroke: "brown", margin: 3 },
+				          new go.Binding("text"))
+				      ));
+				
+				    this.tree.linkTemplateMap.add("Comment",
+				      // if the BalloonLink class has been loaded from the Extensions directory, use it
+				      $((typeof BalloonLink === "function" ? BalloonLink : go.Link),
+				        $(go.Shape,  // the Shape.geometry will be computed to surround the comment node and
+				                     // point all the way to the commented node
+				          { stroke: "brown", strokeWidth: 1, fill: "lightyellow" })
+				      ));
 
 			},
 
@@ -326,7 +355,57 @@
 				});
 			},
 			
-			
+			/**
+			 * 展开右侧节点。
+			 * @param {Object} oData
+			 * @return {void}
+			 */
+			redrawTree() {	
+				this.tree.nodes.each(o => {
+					if(!o.data.group) {				
+						o.visible = false
+					}
+				});
+				
+				let oRoot = this.tree.findNodeForKey(this.root);
+				oRoot.visible = true;
+				
+				oRoot.findTreeChildrenNodes().each(o => {
+					o.visible = true;
+				})
+				oRoot.findTreeParts().each(o => {
+					o.visible = true;
+				})
+			},
+//			设置选中。
+			setSelection() {
+				if(!this.data.node.some(o => o.key == this.key)) {
+					return;
+				}
+			    this.tree.nodes.each(obj => {
+			    	// 取消选中样式。
+			    	obj.isSelected = false;
+					obj.background = null;
+			    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
+			    });
+				
+				let oData = this.treeData.node.filter(o => o.key == this.key)[0],
+					oNode = this.tree.findNodeForKey(oData.key);
+				
+				if(oNode) {				
+					oNode.isSelected = true;
+					oNode.background = "white";
+					oNode.findObject("TB") && (oNode.findObject("TB").stroke = "#333");
+				}
+
+				if(oData.group) {
+					// 若节点在组合中。
+					if(!this.tree.findNodeForKey(oData.group).isSubGraphExpanded) {
+						this.tree.findNodeForKey(oData.group).expandSubGraph();
+					}
+				}
+			}
+	
 		}
 	}
 </script>

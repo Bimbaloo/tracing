@@ -1,8 +1,8 @@
 <!--查出库路由-->
 <template>
-    <div class="stock">
+    <div class="material-stock">
         <div class="router-path">
-            <span class="path-item" @click="checkStock">查出库</span>
+            <span class="path-item" @click="checkStock">仓储信息</span>
             <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
             <span class="path-item" v-if="restrainIf">>遏制</span>
         </div> 
@@ -19,7 +19,7 @@
         data () {
             return { 
                 key: this.$route.params.key,
-                storage: {},
+                material: {},
                 batch: {},
                 restrain: {},
                 batchIf: false,
@@ -38,7 +38,7 @@
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock/${this.key}`, query: this.storage})
+                this.$router.push({ path: `/stock`, query: this.material})
             },
             // 同批出入库
             checkBatch(event) {
@@ -46,7 +46,7 @@
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock/${this.key}/batch`, query: this.batch})
+                this.$router.push({ path: `/stock/batch`, query: this.batch})
             },
             setRouteQuery() {
                 let aHref = location.href.split("?")[0].split("/"),
@@ -57,7 +57,7 @@
                 }else if(sType == "restrain") {
                     this.restrain = this.$route.query;
                 }else {
-                    this.storage = this.$route.query;
+                    this.material = this.$route.query;
                 }
             },
             setPathVisible(to) {
@@ -107,7 +107,12 @@
 </script>
 
 <style lang="less">
-	.stock {		
+	.material-stock  {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		position: relative;
+		
 		.router-path {
 			flex: 0 50px;
 			height: 50px;
@@ -116,16 +121,16 @@
 			font-size: 16px;
 			box-sizing: border-box;
 		}
+		
 		.router-content {
 			flex: 1 1;
 			overflow: auto;
-			position: relative;
-			
+
 			.btn-restrain {
-				position: absolute;
 				right: 0;
 				top: 65px;
 			}
+			
 			.table {
 	    	    .batch {
 	    	    	cursor: pointer;
@@ -135,7 +140,7 @@
 		            } 
 		        }         
 	    	   
-	    	}
+	    	}    	
 		}
 	}
 </style>

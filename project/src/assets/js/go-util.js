@@ -115,7 +115,7 @@ function onDoubleClickNode(e, node) {
  * @return {String}
  */
 function tooltipTextConverter(data) {
-	return data.show_name;
+	return data.showName;
 }
 
 /**
@@ -126,7 +126,7 @@ function zoomDiagram(oTree, bFlag) {
 	if(bFlag) {
 		oTree.zoomToFit();		
 	}else {
-		let oDiagram = document.getElementById("tree").querySelector(".canvas"),
+		let oDiagram = document.getElementById("tree").querySelector("canvas"),
 			nHeight = oDiagram.clientHeight,
 			nWidth = oDiagram.clientWidth;
 

@@ -18,8 +18,8 @@ Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
 Vue.prototype.$post = axios.post;
 
-const Stock = r => require.ensure([], () => r(require('components/stock/stock.vue')), 'group-datail')
-const Storage = r => require.ensure([], () => r(require('components/stock/storage.vue')), 'group-datail')
+const Stock = r => require.ensure([], () => r(require('components/material/stock.vue')), 'group-datail')
+const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-datail')
 const Batch = r => require.ensure([], () => r(require('components/stock/batch.vue')), 'group-datail')
 const Suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-datail')
 const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-datail')
@@ -28,7 +28,7 @@ const Track = r => require.ensure([], () => r(require('components/track/track.vu
 Vue.use(VueRouter)
 // 定义路由
 const routes = [{ 
-    path: '/stock/:key', 
+    path: '/stock', 
     component: Stock,
     children: [{
       path: '',
@@ -54,21 +54,40 @@ const router = new VueRouter({
 Vue.use(Vuex) 
 // 定义统一状态。
 const store = new Vuex.Store({
-  state: {
-    key: "",
-    chrome: /chrome/i.test(navigator.userAgent)
-  },
-  mutations: {
-    updateTree (state, payload) {
-    	payload.tree.model = new go.GraphLinksModel(payload.data.node, payload.data.link);	
-    },
-    updateCatalog (state, payload) {
-    	payload.catalog.model = new go.TreeModel(payload.data);	
-    },    
-    updateCatalogKey (state, payload) {
-    	state.key = payload.key;
-    }
-  }
+  	state: {
+	    key: "",
+	    root: "",
+	    chrome: /chrome/i.test(navigator.userAgent),
+	    type: "",
+	    rawData: []
+  	},
+  	mutations: {
+	    updateTree (state, payload) {
+	    	payload.tree.model = new go.GraphLinksModel(payload.data.node, payload.data.link);	
+	    },
+	    updateCatalog (state, payload) {
+	    	payload.catalog.model = new go.TreeModel(payload.data);	
+	    },    
+	    updateKey (state, payload) {
+	    	state.key = payload.key;
+	    },
+	    updateRoot (state, payload) {
+	    	state.root = payload.key;
+	    },
+	    updateType (state, payload) {
+	    	state.type = payload.key;
+	    },
+	    updateData (state, payload) {
+	    	state.rawData = payload.data || [];
+	    }
+  	},
+  	actions: {
+	  updateRootAsync ({ commit }) {
+	    setTimeout(() => {
+	      commit('updateRoot')
+	    }, 1000)
+	  }
+	}
 })
 
 new Vue({

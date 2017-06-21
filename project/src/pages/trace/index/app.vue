@@ -25,7 +25,7 @@
 	import tree from 'components/tree/tree.vue'
 	import catalog from 'components/catalog/catalog.vue'
 	
-	import {aoTestData} from './data'
+	import {aoTest} from './data'
 	
 	export default {
 		components: {
@@ -39,14 +39,14 @@
 				// 侧栏是否收缩。
 				collapse: false,
 				url: "/trace/trace-main",
-				rawData: [],
+
 				treeData: {},
 				catalogData: [],
 				params: []
 			}
 		},
 		computed: {
-			query: function() {
+			query () {
 				let url = location.search; //获取url中"?"符后的字串 
 				let oRequest = {};
 				if(url.indexOf("?") != -1) {
@@ -57,7 +57,10 @@
 					}
 				}
 				return oRequest;
-			}
+			},		    
+			rawData () {
+		    	return this.$store.state.rawData
+		    }
 		},
 		created() {
 			// 组件创建完后获取数据
@@ -72,7 +75,12 @@
 			this.fullscreenLoading = true;
 		    setTimeout(() => {
 		    	this.fullscreenLoading = false;
-				this.rawData = aoTestData;
+		    	
+				this.$store.commit({
+					type: "updateData",
+					data: aoTest
+				});
+				
 				// 格式化数据。
 				this.treeData = this.parseTreeData();
 				this.catalogData = this.parseCatalogData();
@@ -89,7 +97,11 @@
 					.then((res) => {
 						this.fullscreenLoading = false;
 						if(!res.errorCode) {
-							this.rawData = res.data;
+//							this.rawData = res.data;
+							this.$store.commit({
+								type: "updateData",
+								data: res.data
+							});
 							if(!this.rawData.length) {
 								this.$message.warning('查无数据。');
 							} else {
@@ -116,87 +128,81 @@
 				let aoData = this.rawData,
 					aoDiagramData = [],
 					aoDiagramLinkData = [],
-					oTempData = {},
-					oData = {},
 					oGroup = {};
-
-				for(let i = aoData.length - 1; i >= 0; i--) {
-					oTempData = {};
-					oData = aoData[i];
-
-					oTempData.show_name = oData.show_name;
-					oTempData.name = oData.name;
-					oTempData.key = oData.name;
-					oTempData.code = oData.code;
-					oTempData.level = oData.level;
-					oTempData.parent = oData.parent;
-					oTempData.type = oData.type;
-
-					let sGroup = oData.remark;
-					oTempData.group = sGroup;
-
-					// 获取子组
-					aoData.forEach(oFilter => {
-						if(oFilter.remark && oFilter.parent == oData.name && oFilter.remark != sGroup) {
-							if(oTempData.childGroup) {
-								oTempData.childGroup += ",";
-							} else {
-								oTempData.childGroup = "";
+				
+				aoData.forEach(oData => {
+					if(oData.type != "1" && oData.subProcess && oData.subProcess.length) {
+						let oGroup = Object.assign({}, oData);
+						delete oGroup.subProcess;
+						oGroup.isGroup = true;
+						
+						aoDiagramData.push(oGroup);
+						aoDiagramLinkData.push({
+							from: oData.parent,
+							to: oData.name
+						})
+						
+						oData.subProcess.forEach(o => {
+							o.group = oData.key;
+							o.type = oData.type;
+							aoDiagramData.push(o);
+							
+							if(o.parent) {
+								aoDiagramLinkData.push({
+									from: o.parent,
+									to: o.name
+								})
 							}
-							oTempData.childGroup += oFilter.remark;
-						}
-					})
-					aoDiagramData.push(oTempData);
-
-					if(sGroup) {
-						// 产线型工序。
-						if(!oGroup[sGroup]) {
-							oGroup[sGroup] = [];
-							aoDiagramData.push({
-								show_name: sGroup,
-								name: sGroup,
-								key: sGroup,
-								type: "3",
-								isGroup: true
-							})
-						}
-
+						})
+					}else {
+						aoDiagramData.push(oData);
+						aoDiagramLinkData.push({
+							from: oData.parent,
+							to: oData.name
+						})
 					}
-
-					aoDiagramLinkData.push({
-						from: oData.parent,
-						to: oData.name
-					})
-				}
-		
+				})
+					
 				return {
 					node: aoDiagramData,
 					link: aoDiagramLinkData
 				};
 			},
-
+	
 			/**
-			 * 获取树形数据。
-			 * @param {Array} aoData
+			 * 获取左侧目录树数据。
 			 * @return {void}
 			 */
-			parseCatalogData() {
-			
-				let aoData = this.rawData,
-					aoCopyData = [],
-					aoCatalogData = [];
-
-				aoData.forEach(oData => {
-					aoCopyData.push({
-						"show_name": oData.show_name,
-						"name": oData.name,
-						"key": oData.name,
-						"type": oData.type,
-						"group": oData.remark,
-						"parent": oData.parent
-					})
+			parseCatalogData() {	
+				let aoCopyData = [],
+					aoCatalogData = [],
+					oGroup = {};
+				
+				Object.assign([], this.rawData).forEach(oData => {
+					if(oData.type != "1" && oData.subProcess && oData.subProcess.length) {
+						oData.subProcess.forEach(o => {
+							if(!o.parent) {
+								o.parent = oData.parent;
+							}
+							o.type = oData.type;
+							o.group = oData.key;
+							aoCopyData.push(o);
+							
+							if(oData.subProcess.every(sub => sub.parent != o.key)) {
+								oGroup[oData.key] = o.key;
+							}
+						})
+					}else {
+						aoCopyData.push(oData);
+					}
+				})
+				
+				aoCopyData.map(o => {					
+					if(oGroup[o.parent]) {
+						return o.parent = oGroup[o.parent];
+					}
 				});
-
+				
 				for(let i = aoCopyData.length - 1; i >= 0; i--) {
 					let oData = aoCopyData[i];
 
@@ -209,11 +215,6 @@
 				}
 
 				return aoCatalogData;
-//				this.$store.commit({
-//					type: "updateCatalog",
-//					catalog: this.catalog,
-//					data: this.catalogData
-//				});
 				
 				/**
 				 * 递归查找子节点。
@@ -318,6 +319,7 @@
 					box-sizing: border-box;
 					background-color: #fff;
 					flex: 1 1;
+					padding: 0 20px;
 				}
 			}
 		}

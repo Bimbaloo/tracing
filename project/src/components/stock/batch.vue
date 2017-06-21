@@ -1,26 +1,21 @@
+<!--同批出入库-->
 <template>
 	<div class="router-content">
 		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList">可疑品</el-button>
 		<div class="innner-content" :style="styleObject">
 			<h2 class="content-title">{{batch}}出库信息</h2>
-			<div class="loading" v-if="outstockData.loading">
-				Loading...
-			</div>
 			<div v-if="outstockData.error" class="error">
 				{{ outstockData.error }}
 			</div>
-			<div v-if="outstockData.data" class="content-table">
-				<v-table :table-data="outstockData"></v-table>
+			<div v-else class="content-table">
+				<v-table :table-data="outstockData" :loading="outstockData.loading"></v-table>
 			</div>
 			<h2 class="content-title">{{batch}}在库信息</h2>
-			<div class="loading" v-if="instockData.loading">
-				Loading...
-			</div>
 			<div v-if="instockData.error" class="error">
 				{{ instockData.error }}
 			</div>
-			<div v-if="instockData.data" class="content-table">
-				<v-table :table-data="instockData"></v-table>
+			<div v-else class="content-table">
+				<v-table :table-data="instockData" :loading="instockData.loading"></v-table>
 			</div>
 		</div>
 	</div>
@@ -195,22 +190,21 @@
 			},
 			// 可疑品列表。
 			showSuspiciousList() {
-                this.$router.push({ path: `/stock/${this.$route.params.key}/restrain`, query: this.$route.query})
+				let sKey = this.$route.params.key,
+					sPath = "";
+					
+				if(sKey != undefined && sKey !== "") {
+					sPath = `/stock/${sKey}/restrain`;
+					
+				}else {
+					sPath = "/stock/restrain"
+				}
+				
+				this.$router.push({ path: sPath, query: this.$route.query})
 			}
 		}
 	}
 </script>
 
-<style lang="less" scoped>
-	.router-content {
-		flex: 1 1;
-		overflow: auto;
-		
-		.btn-restrain {
-			position: absolute;
-			right: 0;
-			top: 65px;
-		}
-	}
-	
+<style lang="less">
 </style>

@@ -1,25 +1,20 @@
+<!--出入库-->
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
             <h2 class="content-title">出库信息</h2>
-            <div class="loading" v-if="outstockData.loading">
-                Loading...
-            </div>
             <div v-if="outstockData.error" class="error">
                 {{ outstockData.error }}
             </div>
-            <div v-if="outstockData.data" class="content-table">
-                <v-table :table-data="outstockData"></v-table>    
+            <div v-else" class="content-table">
+                <v-table :table-data="outstockData" :loading="outstockData.loading"></v-table>    
             </div>
             <h2 class="content-title">入库信息</h2>
-            <div class="loading" v-if="instockData.loading">
-                Loading...
-            </div>
             <div v-if="instockData.error" class="error">
                 {{ instockData.error }}
             </div>
-            <div v-if="instockData.data" class="content-table">
-                <v-table :table-data="instockData"></v-table>    
+            <div v-else class="content-table">
+                <v-table :table-data="instockData" :loading="instockData.loading"></v-table>    
             </div>
         </div>
     </div>      
@@ -220,21 +215,6 @@
 </script>
 
 <style lang="less">
- 
-    .router-content {
-    	flex: 1 1;
-    	overflow: auto;
-    	
-    	.table {
-    	    .batch {
-    	    	cursor: pointer;
-	            color: #f90;
-	            .cell {
-	                font-weight: 600;
-	            } 
-	        }         
-    	   
-    	}
-    }
+
     
 </style>
