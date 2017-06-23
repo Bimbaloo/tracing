@@ -9,7 +9,8 @@ import axios from 'axios'
 import Vuex from 'vuex'
 
 import 'assets/css/reset.css'
-import 'assets/css/common.css'
+import 'assets/css/common.less'
+import 'assets/css/icon.less'
 
 Vue.use(ElementUI)
 
@@ -22,6 +23,12 @@ const Stock = r => require.ensure([], () => r(require('components/material/stock
 const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-datail')
 const Batch = r => require.ensure([], () => r(require('components/stock/batch.vue')), 'group-datail')
 const Suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-datail')
+
+const Process = r => require.ensure([], () => r(require('components/process/stock.vue')), 'group-datail')
+const List = r => require.ensure([], () => r(require('components/process/list.vue')), 'group-datail')
+const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-datail')
+const Product = r => require.ensure([], () => r(require('components/process/product.vue')), 'group-datail')
+
 const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-datail')
 const Track = r => require.ensure([], () => r(require('components/track/track.vue')), 'group-datail')
 
@@ -36,6 +43,22 @@ const routes = [{
     },{
       path: 'batch',
       component: Batch
+    },{
+      path: 'restrain',
+      component: Suspicious
+    }]
+  },{ 
+    path: '/process', 
+    component: Process,
+    children: [{
+      path: '',
+      component: List
+    },{
+      path: 'detail',
+      component: Detail
+    },{
+      path: 'product',
+      component: Product
     },{
       path: 'restrain',
       component: Suspicious
@@ -59,15 +82,12 @@ const store = new Vuex.Store({
 	    root: "",
 	    chrome: /chrome/i.test(navigator.userAgent),
 	    type: "",
+			// 
+			fullscreen: false,
+			// 原始树数据。
 	    rawData: []
   	},
-  	mutations: {
-	    updateTree (state, payload) {
-	    	payload.tree.model = new go.GraphLinksModel(payload.data.node, payload.data.link);	
-	    },
-	    updateCatalog (state, payload) {
-	    	payload.catalog.model = new go.TreeModel(payload.data);	
-	    },    
+  	mutations: {  
 	    updateKey (state, payload) {
 	    	state.key = payload.key;
 	    },
@@ -79,7 +99,10 @@ const store = new Vuex.Store({
 	    },
 	    updateData (state, payload) {
 	    	state.rawData = payload.data || [];
-	    }
+	    },
+			updateFullscreen (state, payload) {
+				state.fullscreen = payload.key;
+			}
   	},
   	actions: {
 	  updateRootAsync ({ commit }) {

@@ -29,12 +29,12 @@
 </template>
 
 <script>
-    // import table from "components/basic/table.vue"
+    import table from "components/basic/table.vue"
 
     export default {
-        // components: {
-        //     'v-table': table
-        // },
+        components: {
+            'v-table': table
+        },
         data () {
             return {
                 key: this.$route.params.key,

@@ -130,6 +130,23 @@
 </script>
 
 <style lang="less">
+	.el-message-box {
+		.el-textarea__inner {
+			border-radius: 0;
+		}
+		.el-button {
+			border-radius: 0;
+			padding: 7px 15px;
+		}
+		.el-message-box__headerbtn {
+			padding: 0;
+			border: none;
+		}
+		.el-message-box__content {
+			padding: 0 20px;
+		}
+	}
+
 	.router-content {
 		flex: 1 1;
 		overflow: auto;

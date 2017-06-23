@@ -1,6 +1,10 @@
 <!--查出库路由-->
 <template>
-    <div class="material-stock">
+    <div class="material-stock" ref="stock">
+        <div class="view-icon">
+            <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick"  title="放大"></i>
+            <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
+        </div>
         <div class="router-path">
             <span class="path-item" @click="checkStock">仓储信息</span>
             <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
@@ -18,6 +22,7 @@
     export default {
         data () {
             return { 
+                // 右下详情内容区域全屏标识。
                 key: this.$route.params.key,
                 material: {},
                 batch: {},
@@ -26,6 +31,11 @@
                 restrainIf: false    
             }
         },
+        computed: {
+			fullscreen () {
+		    	return this.$store.state.fullscreen
+		    }
+		},
         created () {
             this.setRouteQuery();
         },
@@ -74,6 +84,20 @@
                     this.batchIf = false;
                     this.restrainIf = false;
                 }   
+            },
+            fullScreenClick() {
+                // 详情全屏按钮点击事件。
+				this.$store.commit({
+					type: "updateFullscreen",
+					key: true
+				});                
+            },
+            restoreScreenClick() {
+                // 详情还原按钮点击事件。
+  				this.$store.commit({
+					type: "updateFullscreen",
+					key: false
+				});                 
             }
         }, 
         // beforeRouteEnter (to, from, next) {
@@ -112,7 +136,15 @@
 		display: flex;
 		flex-direction: column;
 		position: relative;
-		
+							
+        .view-icon {
+            position: absolute;
+            cursor: pointer;
+            top: 15px;
+            right: 10px;
+            z-index: 10;
+        }
+
 		.router-path {
 			flex: 0 50px;
 			height: 50px;
@@ -127,8 +159,9 @@
 			overflow: auto;
 
 			.btn-restrain {
-				right: 0;
+				right: 10px;
 				top: 65px;
+                z-index: 10;
 			}
 			
 			.table {

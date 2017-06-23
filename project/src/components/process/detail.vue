@@ -8,33 +8,15 @@
             <div v-if="error" class="error">
                 {{ error }}
             </div>
-            <div v-else class="content-table">
-            	<table class="raw-table" v-loading.body="loading">
-            		<tr>
-            			<th v-for="column in materialData.columns" :style="{width: column.width}"  v-if="!column.hide">
-            				{{column.name}}
-            			</th>
-            		</tr>
-            		<tr v-for="row in materialData.data">
-            			<td v-for="column in materialData.columns" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-            				{{row[column.prop]}}
-            			</td>
-            		</tr>
-            	</table>
-                <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
-            </div>
+            <div v-else class="content-list" v-loading.body="loading">
+			</div>
 
         </div>
     </div>      
 </template>
 
 <script>
-    // import table from "components/basic/table.vue"
-
     export default {
-        // components: {
-        //     'v-table': table
-        // },
         data () {
             return {
                 key: this.$route.params.key,
@@ -230,36 +212,8 @@
     		margin-top: 20px;
     	}
     	
-    	.content-table {
-    		.raw-table {
-    			width: 100%;
-    			border-collapse: collapse;
-   	 			border-spacing: 0;
-    			
-    			th,td {
-    				text-align: center;
-    				vertical-align: middle;
-    				border: 1px solid #dfece9;
-    				box-sizing: border-box;
-    			}
-    			
-    			th {
-    				height: 36px;
-    				background-color: #42AF8F;
-    				color: #fff;
-    				font-weight: bold;
-    			}
-    			
-    			td {
-    				height: 30px;
-    			}
-    			
-    			.batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            font-weight: 600;
-		        }    
-    		}
+    	.content-list {
+    		
     	}
     }
 </style>

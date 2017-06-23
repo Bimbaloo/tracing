@@ -1,9 +1,14 @@
 <!--查出库路由-->
 <template>
-    <div class="stock">
+    <div class="material-stock" ref="stock">
+        <div class="view-icon">
+            <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick"  title="放大"></i>
+            <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
+        </div>
         <div class="router-path">
-            <span class="path-item" @click="checkStock">查出库</span>
-            <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
+            <span class="path-item" @click="checkEquipment">设备列表</span>
+            <span class="path-item" @click="checkDetail" v-if="detailIf">>设备详情</span>          
+            <span class="path-item" @click="checkProduction" v-if="productIf">>投产表</span>
             <span class="path-item" v-if="restrainIf">>遏制</span>
         </div> 
         <router-view></router-view>  
@@ -18,62 +23,102 @@
     export default {
         data () {
             return { 
+                // 右下详情内容区域全屏标识。
                 key: this.$route.params.key,
-                storage: {},
-                batch: {},
+                equipment: {},
+                detail: {},
                 restrain: {},
-                batchIf: false,
+                product: {},
+                detailIf: false,
+                productIf: false,
                 restrainIf: false    
             }
         },
+        computed: {
+			fullscreen () {
+		    	return this.$store.state.fullscreen
+		    }
+		},
         created () {
             this.setRouteQuery();
         },
         watch: {
         },
         methods: {
-            // 查出库
-            checkStock(event) {
+            // 查设备列表
+            checkEquipment(event) {
                 if(event.target.parentNode.lastElementChild == event.target) {
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock/${this.key}`, query: this.storage})
+                this.$router.push({ path: `/process`, query: this.equipment})
             },
-            // 同批出入库
-            checkBatch(event) {
+            // 单台设备详情
+            checkDetail(event) {
                 if(event.target.parentNode.lastElementChild == event.target) {
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock/${this.key}/batch`, query: this.batch})
+                this.$router.push({ path: `/process/detail`, query: this.detail})
+            },
+            // 投产表
+            checkProduction(event) {
+                if(event.target.parentNode.lastElementChild == event.target) {
+                    // 若为最后一个节点，则不可点击。
+                    return false;
+                }
+                this.$router.push({ path: `/process/detail/product`, query: this.product})
             },
             setRouteQuery() {
                 let aHref = location.href.split("?")[0].split("/"),
                     sType = aHref[aHref.length-1];
 
-                if(sType == "batch") {
-                    this.batch = this.$route.query;
+                if(sType == "detail") {
+                    this.detail = this.$route.query;
+                }else if(sType == "product") {
+                    this.product = this.$route.query;
                 }else if(sType == "restrain") {
                     this.restrain = this.$route.query;
                 }else {
-                    this.storage = this.$route.query;
-                }
+                    this.equipment = this.$route.query;
+                }  
+
             },
             setPathVisible(to) {
                 let aPath = to.path.split("/"),
                     sType = aPath[aPath.length - 1];
 
-                if(sType == "batch") {
-                    this.batchIf = true;
+                if(sType == "detail") {
+                    this.detailIf = true;
+                    this.productIf = fasle;
+                    this.restrainIf = false;
+                }else if(sType == "product") {
+                    this.detailIf = true;
+                    this.productIf = true;
                     this.restrainIf = false;
                 }else if(sType == "restrain") {
-                    this.batchIf = true;
+                    this.detailIf = true;
+                    // this.productIf = true;
                     this.restrainIf = true;
                 }else {
                     this.batchIf = false;
                     this.restrainIf = false;
+                    this.productIf = fasle;
                 }   
+            },
+            fullScreenClick() {
+                // 详情全屏按钮点击事件。
+				this.$store.commit({
+					type: "updateFullscreen",
+					key: true
+				});                
+            },
+            restoreScreenClick() {
+                // 详情还原按钮点击事件。
+  				this.$store.commit({
+					type: "updateFullscreen",
+					key: false
+				});                 
             }
         }, 
         // beforeRouteEnter (to, from, next) {
@@ -107,13 +152,21 @@
 </script>
 
 <style lang="less">
-	.stock {	
+	.material-stock  {
 		height: 100%;
 		display: flex;
 		flex-direction: column;
 		position: relative;
+							
+        .view-icon {
+            position: absolute;
+            cursor: pointer;
+            top: 15px;
+            right: 10px;
+            z-index: 10;
+        }
 
-        .router-path {
+		.router-path {
 			flex: 0 50px;
 			height: 50px;
 			line-height: 50px;
@@ -121,15 +174,17 @@
 			font-size: 16px;
 			box-sizing: border-box;
 		}
+		
 		.router-content {
 			flex: 1 1;
 			overflow: auto;
-			
+
 			.btn-restrain {
-				position: absolute;
-				right: 0;
+				right: 10px;
 				top: 65px;
+                z-index: 10;
 			}
+			
 			.table {
 	    	    .batch {
 	    	    	cursor: pointer;
@@ -139,7 +194,7 @@
 		            } 
 		        }         
 	    	   
-	    	}
+	    	}    	
 		}
 	}
 </style>

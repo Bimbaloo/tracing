@@ -133,13 +133,22 @@
 									key: node.data.key
 								});
 								
-								// 根据物料节点查询仓储信息。        
-          						this.$router.push({ 
-          							path: "/stock", 
-          							query: {
-          								"key": node.data.key
-          							}
-          						})
+								if(node.data.type == "1") {
+									// 根据物料节点查询仓储信息。        
+									this.$router.push({ 
+										path: "/stock", 
+										query: {
+											"key": node.data.key
+										}
+									})
+								}else {
+									this.$router.push({ 
+										path: "/process", 
+										query: {
+											"key": node.data.key
+										}
+									})
+								}
 							},
 							doubleClick: onDoubleClickNode,
 							contextClick: onContextClickNode,

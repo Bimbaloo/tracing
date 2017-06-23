@@ -6,7 +6,7 @@
             <div v-if="outstockData.error" class="error">
                 {{ outstockData.error }}
             </div>
-            <div v-else" class="content-table">
+            <div v-else class="content-table">
                 <v-table :table-data="outstockData" :loading="outstockData.loading"></v-table>    
             </div>
             <h2 class="content-title">入库信息</h2>

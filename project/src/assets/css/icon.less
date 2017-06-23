@@ -1,0 +1,119 @@
+// 图标样式管理
+
+// 引用基础定义。
+@import "base.less";
+
+/*
+ * 图标基础。
+ */
+.icon {
+	display: inline-block;
+	vertical-align: middle;
+	overflow: hidden;
+	background-repeat: no-repeat;
+}
+
+/*
+ * 20x20 图标。
+ */
+.icon.icon-20 {
+	width: @px20;
+	height: @px20;
+	background-image: url(../img/icon-20.png);
+
+    // 打印。
+	&.icon-print {
+		background-position: 0 0;
+	}
+	&.icon-print:hover {
+		background-position: -@px20 0;
+	}
+
+    // 导出。
+	&.icon-export {
+		background-position: 0 -@px20;
+	}
+	&.icon-export:hover {
+		background-position: -@px20 -@px20;
+	}
+
+    // 导出excel。
+	&.icon-excel {
+		background-position: 0 -2*@px20;
+	}
+	&.icon-excel:hover {
+		background-position: -@px20 -2*@px20;
+	}
+
+	// 全屏。
+	&.icon-fullScreen {
+		background-position: 0 -3*@px20;
+	}
+	&.icon-fullScreen:hover {
+		background-position: -@px20 -3*@px20;
+	}
+
+    // 缩小。
+	&.icon-restoreScreen {
+		background-position: 0 -4*@px20;
+	}
+	&.icon-restoreScreen:hover {
+		background-position: -@px20 -4*@px20;
+	}
+
+    // 编辑。
+	&.icon-edit {
+		background-position: 0 -5*@px20;
+	}
+	&.icon-edit:hover {
+		background-position: -@px20 -5*@px20;
+	}
+
+    // 过滤。
+	&.icon-filter {
+		background-position: 0 -6*@px20;
+	}
+	&.icon-filter:hover {
+		background-position: -@px20 -6*@px20;
+	}
+
+	// 下载
+	&.icon-download {
+		background-position: 0 -7*@px20;
+	}
+	&.icon-download:hover {
+		background-position: -@px20 -7*@px20;
+	}
+
+    // 上传。
+	&.icon-upload {
+		background-position: 0 -8*@px20;
+	}
+	&.icon-upload:hover {
+		background-position: -@px20 -8*@px20;
+	}
+
+    // 隐藏。
+	&.icon-hide {
+		background-position: 0 -9*@px20;
+	}
+	&.icon-hide:hover {
+		background-position: -@px20 -9*@px20;
+	}
+
+    // 显示。
+	&.icon-show {
+		background-position: 0 -10*@px20;
+	}
+	&.icon-show:hover {
+		background-position: -@px20 -10*@px20;
+	}
+
+    // 图片导出。
+	&.icon-exportImg {
+		background-position: 0 -11*@px20;
+	}
+	&.icon-exportImg:hover {
+		background-position: -@px20 -11*@px20;
+	}
+}

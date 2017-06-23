@@ -9,7 +9,7 @@
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData"></v-tree>
+					<v-tree :tree-data="treeData" :class="{hide: fullscreen}"></v-tree>
 					<div class="view">
 						<router-view></router-view>
 					</div>
@@ -35,6 +35,7 @@
 		},
 		data() {
 			return {
+				// 页面加载中动画。
 				fullscreenLoading: false,
 				// 侧栏是否收缩。
 				collapse: false,
@@ -60,6 +61,9 @@
 			},		    
 			rawData () {
 		    	return this.$store.state.rawData
+		    },
+			fullscreen () {
+		    	return this.$store.state.fullscreen
 		    }
 		},
 		created() {
@@ -246,8 +250,7 @@
 						}
 					}
 				}
-			},
-
+			}
 		}
 	}
 </script>
@@ -311,8 +314,12 @@
 					border: 1px solid #ccc;
 					box-sizing: border-box;
 					background-color: #fff;
-					flex: 1 1;
+					flex: 0 400px;
 					margin-bottom: 20px;
+
+					&.hide {
+						display: none;
+					}
 				}
 				.view {
 					border: 1px solid #ccc;
@@ -320,6 +327,9 @@
 					background-color: #fff;
 					flex: 1 1;
 					padding: 0 20px;
+					overflow: auto;
+					position: relative;
+
 				}
 			}
 		}
