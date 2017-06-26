@@ -8,6 +8,7 @@ import App from './app.vue'
 import axios from 'axios'
 import Vuex from 'vuex'
 
+import 'assets/js/global.js'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
 import 'assets/css/icon.less'

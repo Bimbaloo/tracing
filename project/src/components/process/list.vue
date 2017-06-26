@@ -34,64 +34,33 @@
 					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺参数</el-button>
 				</div>
 			</div>
-            <div v-if="error" class="error">
-                {{ error }}
-            </div>
-            <div v-else class="content-list" v-loading.body="loading">
-				<div class="handle">
-					<label>视窗时间：</label><el-input v-model="windowTime" class="time"></el-input><label>小时</label>
-					<div class="legend">
-						<span v-for="state in states" :key="state.key" style="{background-color: state.color}">{{state.name}}</span>
-					</div>
-				</div>
-				<div class="analysis"></div>
-				<div class="timeline"></div>
-			</div>
+			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension"></v-equipment>
         </div>
     </div>      
 </template>
 
 <script>
+	import equipment from "components/equipment/list"
 
     export default {
+		components: {
+			'v-equipment': equipment
+		},
         data () {
             return {
                 key: this.$route.params.key,
                 styleObject: {
                     "min-width": "1000px"
                 },
-                url: "/process/detail",
                 // 点击的工序节点信息。
                 node: {},
-				dimension: ["质量", "事件", "维护", "工具", "加工"],
-                loading: false,
-                error: null,
+				dimension: ["质量", "加工", "事件", "维护", "工具"],
 				checkboxIf: false,
 				checkAll: true,
-				checkedEquipments: [],
 				equipments: [],
+				checkedEquipments: [],
+				slectedDimension: "",			
 				isIndeterminate: false,
-				slectedDimension: "",
-				// 视窗时间，默认为2小时。
-				windowTime: 2,
-				// 设备状态。
-				states: [{
-					key: "run",
-					name: "加工",
-					color: "#72b733"
-				},{
-					key: "stop",
-					name: "停机",
-					color: "#fac41b"
-				},{
-					key: "debug",
-					name: "调试",
-					color: "#009aff"
-				},{
-					key: "close",
-					name: "关机",
-					color: "#cccccc"
-				}]
             }
         },
         computed: {
@@ -103,7 +72,6 @@
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
 			this.setEquipmentList();
-            this.fetchData();
         },
         mounted () {
 
@@ -127,33 +95,6 @@
 				this.equipments = this.node.outputInfo;
 				this.equipments.forEach(o => this.checkedEquipments.push(o.equipmentId));
 			},
-			/**
-			 * 获取数据。
-			 * @return {void}
-			 */
-            fetchData () {
-       
-                this.error = null;
-                this.loading = true;
-				this.loading = false;
-//              this.$get(this.url, {
-//              	materialCode: this.node.materialCode,
-//              	batchNo: this.node.batchNo,
-//              	barcode: this.node.barcode
-//              })
-//              .then((res) => {
-//                  this.loading = false;
-//                  if(!res.errorCode) {
-//                      oData.data = this.formatData(res.data);
-//                      this.styleObject.minWidth = "1200px";
-//                  }
-//              })
-//              .catch((err) => {
-//                  this.loading = false;
-//                  this.error = "查询出错。"
-//                  this.styleObject.minWidth = 0;          
-//              })
-           	},
 		   	handleCheckAllChange(event) {
 				this.checkedEquipments = [];
 				if(event.target.checked) {
@@ -259,6 +200,8 @@
 				box-sizing: border-box;
 				white-space: normal;
 				padding-bottom: 10px;
+				background-color: #fff;				
+				z-index: 10;
 
 				.el-checkbox {
 					margin: 10px 20px 0;
@@ -267,30 +210,46 @@
 			}	 
 		}    
    	
-    	.content-list {
-			padding-top: 30px;
-			.handle {
-				.time {
-					width: auto;
-				}
-				input {
-					width: 60px;
-					height: 30px;
-					text-align: center;
-					border-radius: 0;
-				}
-			}
-			.legend {
-				span {
-					display: inline-block;
-					width: 60px;
-					height: 30px;
-					line-height: 30px;
-					text-align: center;
-					color: #fff;
-					margin-right: 20px;
-				}
-			}
-    	}
+    	// .content-list {
+		// 	padding-top: 30px;
+
+		// 	.handle {
+		// 		padding: 0 170px 0 150px;
+		// 		.time {
+		// 			width: auto;
+		// 		}
+		// 		input {
+		// 			width: 60px;
+		// 			height: 30px;
+		// 			text-align: center;
+		// 			border-radius: 0;
+		// 		}
+
+		// 		.legend {
+		// 			float: right;
+		// 			span {
+		// 				display: inline-block;
+		// 				width: 60px;
+		// 				height: 30px;
+		// 				line-height: 30px;
+		// 				text-align: center;
+		// 				color: #fff;
+		// 				margin-left: 20px;
+		// 			}
+		// 		}
+		// 	}
+
+		// 	.timeline {
+		// 		.line {
+		// 			padding: 0 170px 0 150px;
+		// 			background: url(assets/img/line.png) repeat;
+
+		// 			.icon-end {
+		// 				float: right;
+		// 			}
+		// 		}
+		// 	}
+
+    	// }
     }
 </style>

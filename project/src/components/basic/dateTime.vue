@@ -15,7 +15,7 @@
         data() {
             return {
                 form: this.formData,
-                hint: this.placeholderData,
+                hint: this.placeholderData || '',
                 key: this.keyData
             }
         },
@@ -29,7 +29,7 @@
                     this.$refs.input.value = formattedValue
                 }
                 // 通过 input 事件发出数值
-                this.$emit('change', formattedValue)
+                this.$emit('change', formattedValue);
             }
         }
     }
