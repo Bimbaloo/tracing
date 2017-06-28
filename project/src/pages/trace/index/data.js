@@ -6,6 +6,11 @@ let aoTestData =
 	"name":"开始",
 	"key": "开始",
 	"type":"2",
+	"processa": '环化',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
 	"outputInfo": []
 },{
 	"parent":"开始",
@@ -28,6 +33,11 @@ let aoTestData =
 	"name":"产线工序2",
 	"key": "产线工序2",
 	"type":"2",
+	"processa": '装配',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
 	"outputInfo": [
 	{
       	"doCode": "D201603310017", 
@@ -72,6 +82,11 @@ let aoTestData =
 	"name":"产线工序",
 	"key": "产线工序",
 	"type":"2",
+	"processa": '装连干',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
 	"outputInfo": [],
 	"subProcess": [{
 		"parent":"",
@@ -102,6 +117,11 @@ let aoTestData =
 	"name":"结束工序",
 	"key": "结束工序",
 	"type":"2",
+	"processa": 'GP12',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
 	"outputInfo": []
 },{
 	"parent":"结束工序",

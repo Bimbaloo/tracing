@@ -6,6 +6,23 @@
 				<v-catalog :catalog-data="catalogData"></v-catalog>
 			</el-col>
 			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router">
+				<div v-on:mouseleave="unShowTable">
+					<img :src="logo" v-on:mouseenter="showTable" />
+					<transition name="slide-fade">
+						<el-table :data="tableData" border style="width:305px" id='table' v-if="show">
+							<el-table-column prop="processa" label="工序"     width="61">
+							</el-table-column>
+							<el-table-column prop="ok" label="合格数"   width="61">
+							</el-table-column>
+							<el-table-column prop="ng" label="不合格数" width="61">
+							</el-table-column>
+							<el-table-column prop="scrap" label="报废数"   width="60">
+							</el-table-column>
+							<el-table-column prop="delay" label="滞留数"   width="60">
+							</el-table-column>
+						</el-table>
+					</transition>
+				</div>
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
@@ -14,7 +31,6 @@
 						<router-view></router-view>
 					</div>
 				</div>
-
 			</el-col>
 		</el-row>
 	</div>
@@ -26,7 +42,7 @@
 	import catalog from 'components/catalog/catalog.vue'
 	
 	import {aoTestData} from './data'
-	
+	import logo from 'assets/img/logo.png'
 	export default {
 		components: {
 			'v-header': header,
@@ -42,7 +58,10 @@
 
 				treeData: {},
 				catalogData: [],
-				params: []
+				params: [],
+				show: false,
+				logo,
+                tableData: []
 			}
 		},
 		computed: {
@@ -80,10 +99,11 @@
 					type: "updateData",
 					data: aoTestData
 				});
-				
+
 				// 格式化数据。
 				this.treeData = this.parseTreeData();
 				this.catalogData = this.parseCatalogData();
+				this.tableData = this.parseTableData();
 		    }, 1000)
 		},
 		mounted() {
@@ -108,6 +128,7 @@
 								// 格式化数据。
 								this.treeData = this.parseTreeData();
 								this.catalogData = this.parseCatalogData();
+								this.tableData = this.parseTableData();
 							}
 						} else {
 							this.$message.error('查询出错！');
@@ -168,7 +189,27 @@
 					link: aoDiagramLinkData
 				};
 			},
+			
 	
+		parseTableData() {
+			
+				let aoData = this.rawData
+				let _rawData = []
+				aoData.forEach(oData => {
+					if(oData.type === "2") {
+						_rawData.push({
+							"processa":oData.processa,
+							"ok": oData.ok,
+							"ng": oData.ng,
+							"scrap": oData.scrap,
+							"delay": oData.delay,
+						})
+					}
+				})
+				return 	_rawData
+				
+			},
+
 			/**
 			 * 获取左侧目录树数据。
 			 * @return {void}
@@ -247,6 +288,14 @@
 					}
 				}
 			},
+			/* 是否展示 */
+			showTable(){
+					this.show = true
+			},
+			unShowTable(){
+				console.log(1)
+					this.show = false
+			}
 
 		}
 	}
@@ -272,6 +321,12 @@
 		flex-direction: column;
 		.content {
 			flex: 1;
+			img {
+				position: absolute;
+				left: 40px;
+				top: 35px;
+				z-index: 10
+			}
 			.nav {
 				border-right: 1px solid #ccc;
 				box-sizing: border-box;
@@ -324,4 +379,53 @@
 			}
 		}
 	}
+	#table {
+		font-size: 12px;
+		position: absolute;
+		left: 70px;
+		top: 40px;
+		z-index: 5;
+		.cell{
+			text-align: center;
+			padding-left: 0;
+			padding-right: 0;
+		}
+		th {
+			height: 24px;
+			border-color: #fff
+		}
+		td {
+			height: 24px;
+			border-color: #fff
+		}
+		thead {
+			.cell {
+				background-color: #ff9900;
+				color: #fff
+			}
+		}
+		tbody {
+			.cell {
+				background-color: #eaeef2;
+				color: #666
+			}
+		}
+		
+	}
+
+	.slide-fade-enter-active {
+		transition: all .3s ease;
+	}
+
+	.slide-fade-leave-active {
+		transition: all .8s cubic-bezier(1.0, 0.5, 0.8, 1.0);
+	}
+
+	.slide-fade-enter,
+	.slide-fade-leave-active {
+		transform: translateX(10px);
+		opacity: 0;
+	}
+
+	
 </style>
