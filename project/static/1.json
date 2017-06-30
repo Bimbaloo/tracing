@@ -1,0 +1,96 @@
+{
+    "outData": [
+        {
+            "eqipmentName": "装配线2.2线GP1",
+            "moldCode": "2331",
+            "doCode": "D201705050004",
+            "barcode": "UN654574375200",
+            "batchNo": "20170505A",
+            "materialCode": "1111",
+            "materialname": "半成品活塞",
+            "quantity": "50",
+            "qualifiedNum": "49",
+            "unqualifiedNum": "1",
+            "person": "王小虎",
+            "shiftName": "白天",
+            "outTime": "2017-06-2912: 24: 24",
+            "rows": "UN654574375200"
+        },
+        {
+            "eqipmentName": "装配线2.2线GP1",
+            "moldCode": "2331",
+            "doCode": "D201705050004",
+            "barcode": "UN654574375200",
+            "batchNo": "20170505A",
+            "materialCode": "1111",
+            "materialname": "半成品活塞",
+            "quantity": "50",
+            "qualifiedNum": "49",
+            "unqualifiedNum": "1",
+            "person": "王小虎",
+            "shiftName": "白天",
+            "outTime": "2017-06-2912: 24: 24",
+            "rows": "UN654574375200"
+        },
+        {
+            "eqipmentName": "装配线3",
+            "moldCode": "2331",
+            "doCode": "D201705050004",
+            "barcode": "UN654574375200",
+            "batchNo": "20170505A",
+            "materialCode": "1111",
+            "materialname": "半成品活塞",
+            "quantity": "50",
+            "qualifiedNum": "49",
+            "unqualifiedNum": "1",
+            "person": "王小虎",
+            "shiftName": "白天",
+            "outTime": "2017-06-2912: 24: 24",
+            "rows": "UN654574375200"
+        }
+    ],
+    "inData": [
+        {
+            "eqipment": "装配线2.2线GP1",
+            "moldCode": "2331",
+            "doCode": "D201705050004",
+            "barcode": "UN654574375200",
+            "batchNo": "20170505A",
+            "materialCode": "1111",
+            "materialName": "半成品活塞",
+            "quantity": "16",
+            "person": "王小虎",
+            "shiftName": "白天",
+            "inTime": "2017-06-2912: 24: 24",
+            "rows": "UN654574375200"
+        },
+        {
+            "eqipment": "装配线2.2线GP1",
+            "moldCode": "2331",
+            "doCode": "D201705050004",
+            "barcode": "UN654574375200",
+            "batchNo": "20170505A",
+            "materialCode": "1111",
+            "materialName": "半成品活塞",
+            "quantity": "16",
+            "person": "王小虎",
+            "shiftName": "白天",
+            "inTime": "2017-06-2912: 24: 24",
+            "rows": "UN654574375200"
+        },
+        {
+            "eqipment": "装配线2.2线GP3",
+            "moldCode": "2331",
+            "doCode": "D201705050004",
+            "barcode": "UN654574375200",
+            "batchNo": "20170505A",
+            "materialCode": "1111",
+            "materialName": "半成品活塞",
+            "quantity": "16",
+            "person": "王小虎",
+            "shiftName": "白天",
+            "inTime": "2017-06-2912: 24: 24",
+            "rows": "UN654574375200"
+        }
+    ]
+}
