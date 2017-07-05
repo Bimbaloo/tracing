@@ -6,6 +6,11 @@ let aoTestData =
 	"name":"开始",
 	"key": "开始",
 	"type":"2",
+	"processa": '环化',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
 	"outputInfo": []
 },{
 	"parent":"开始",
@@ -26,7 +31,37 @@ let aoTestData =
 	"name":"产线工序2",
 	"key": "产线工序2",
 	"type":"2",
+<<<<<<< HEAD
 	"outputInfo": [],
+=======
+	"processa": '装配',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
+	"outputInfo": [
+	{
+      	"doCode": "D201603310017", 
+      	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+      	"equipmentId": 128, 
+      	"equipmentName": "装配2.2线GP12", 
+      	"batchNo": "20160331A", 
+      	"quantity": 16, 
+      	"shiftDate": "2016-03-31", 
+      	"shiftName": "早班"
+    }, 
+    {
+      	"doCode": "D201603310017", 
+      	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+      	"equipmentId": 128, 
+      	"equipmentName": "装配2.2线GP12", 
+      	"batchNo": "20160331A", 
+      	"quantity": 16, 
+      	"shiftDate": "2016-03-31", 
+      	"shiftName": "早班"
+    }
+    ],
+>>>>>>> e3bc58f00de57933b4e8ddacfce13e486d5df378
 	"subProcess": [{
 		"parent":"",
 		"code":"007",	
@@ -49,6 +84,11 @@ let aoTestData =
 	"name":"产线工序",
 	"key": "产线工序",
 	"type":"2",
+	"processa": '装连干',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
 	"outputInfo": [],
 	"subProcess": [{
 		"parent":"",
@@ -79,6 +119,7 @@ let aoTestData =
 	"name":"结束工序",
 	"key": "结束工序",
 	"type":"2",
+<<<<<<< HEAD
 	"outputInfo": [{
       	"doCode": "D201603310017", 
       	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
@@ -126,6 +167,14 @@ let aoTestData =
 		"startTime": "2016-03-31 07:00:00",
 		"endTime": "2016-03-31 16:00:00"
     }]
+=======
+	"processa": 'GP12',
+	"ok": '500',
+	"ng": "0",
+	"scrap": "0",
+	"delay": "0",
+	"outputInfo": []
+>>>>>>> e3bc58f00de57933b4e8ddacfce13e486d5df378
 },{
 	"parent":"结束工序",
 	"code":"009",
