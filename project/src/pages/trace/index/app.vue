@@ -26,7 +26,7 @@
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
-					<!--<v-tree :tree-data="treeData"></v-tree>-->
+					<v-tree :tree-data="treeData"></v-tree>
 					<div class="view">
 						<router-view></router-view>
 					</div>
