@@ -5,10 +5,8 @@
 			<el-col :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']">
 				<v-catalog :catalog-data="catalogData"></v-catalog>
 			</el-col>
-<<<<<<< HEAD
 			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router">
-=======
-			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router">
+
 				<div v-on:mouseleave="unShowTable">
 					<img :src="logo" v-on:mouseenter="showTable" />
 					<transition name="slide-fade">
@@ -26,7 +24,6 @@
 						</el-table>
 					</transition>
 				</div>
->>>>>>> e3bc58f00de57933b4e8ddacfce13e486d5df378
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
