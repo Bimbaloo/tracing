@@ -22,4 +22,24 @@ Date.prototype.Format = function(fmt){
 	}
 	
 	return fmt;   
-}  
+} 
+
+// 全局变量，命名空间
+Rt = {};
+
+Rt.utils = {};
+
+Rt.utils.DateDiff = function(start, end) {
+	let dStart = start,
+		dEnd = end;
+
+	if(!(start instanceof Date)) {
+		dStart = new Date(start);
+	}
+
+	if(!(end instanceof Date)) {
+		dEnd = new Date(end);
+	}
+
+	return dEnd.getTime() - dStart.getTime();
+}

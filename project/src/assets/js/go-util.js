@@ -1,19 +1,3 @@
-//openNewWindow()为新开一个页面
-//openWindow()为弹窗
-
-var nTimer = 0,
-	oaLanguage = {
-		en: ["Barcode", "Warehouse", "Stock" , "In-out Stock Type", "Batch No.", "Quantity",
-		     "Handle Time", "Operator", "Customer", "Process Name", "Material Code", 
-		     "Material Name", "Equipment", "Mold Code", "Shift", "Completion Time", "Operate", "Do code",
-		     "In-out warehouse inventory of this batch.", "Incoming quality control.", "Query process parameters.",
-		     "Single Track", "Batch Track", "Incoming Inspection", "Quick-access Report", "QC", "FGB Inspection",
-		     "Submittal For Inspection", "No.", "Start time", "Cutter"],
-		ch: ["条码", "仓库", "库位", "出入库", "批次", "总量", "处理时间", "操作人", "供应商/客户", "工序名称","物料编码","物料名称", "生产设备", "模号",
-		     "班次", "完工时间", "操作", "工单号", "同批出入库", "查来料", "工艺参数", "单筐追踪", "批次追踪", "进货检验", "快速报告", "质检", "FGB检验",
-		     "送检", "序号", "开始时间", "刀具"]
-	};
-
 
 /**
  * 选中节点事件。

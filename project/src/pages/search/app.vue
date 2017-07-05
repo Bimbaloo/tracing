@@ -13,7 +13,7 @@
 </template>
 
 <script>
-  import logo from 'assets/img/logo-n.png'
+  import logo from 'assets/img/logo-w.png'
   import panel from 'components/panel/panel.vue'
 
   export default {
@@ -74,6 +74,8 @@
   body {
     background-color: #f2f2f2;
     display: table;
+    background-image: url("../../assets/img/bg.jpg");
+    background-size: cover;
   }
 
   #app {

@@ -9,7 +9,7 @@
                 {{ error }}
             </div>
             <div v-else class="content-table">
-            	<table class="raw-table" v-loading.body="loading">
+            	<table class="raw-table" v-loading="loading">
             		<tr>
             			<th v-for="column in materialData.columns" :style="{width: column.width}"  v-if="!column.hide">
             				{{column.name}}
@@ -132,8 +132,7 @@
 				this.node = {
 					materialCode: oNode.code || "",
 					materialName: oNode.name || "",
-					batchNo: oNode.batchNo || "",
-					barcode: oNode.barcode || ""
+					materialInfo: oNode.materialInfo || []
 				}
 
 			    setTimeout(() => {
@@ -167,11 +166,7 @@
 					oData.data = this.formatData(aoTest);
 			    }, 1000)
 
-//              this.$get(this.url, {
-//              	materialCode: this.node.materialCode,
-//              	batchNo: this.node.batchNo,
-//              	barcode: this.node.barcode
-//              })
+//              this.$get(this.url, this.node.materialInfo})
 //              .then((res) => {
 //                  this.loading = false;
 //                  if(!res.errorCode) {

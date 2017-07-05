@@ -28,10 +28,10 @@
 				<!-- 分析维度-->
 				<div class="dimension">
 					<el-radio-group v-model="slectedDimension" class="btn-group" >
-						<el-radio-button v-for="name in dimension" :key="name" :label="name"></el-radio-button>
+						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type">{{obj.name}}</el-radio-button>
 					</el-radio-group>
 					<!--el-button class="btn btn-plain" v-for="name in dimension" :key="name">{{name}}</el-button-->
-					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺参数</el-button>
+					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button>
 				</div>
 			</div>
 			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension"></v-equipment>
@@ -54,13 +54,28 @@
                 },
                 // 点击的工序节点信息。
                 node: {},
-				dimension: ["质量", "加工", "事件", "维护", "工具"],
+				dimension: [{
+					name: "质量",
+					type: "3"
+				}, {
+					name: "加工",
+					type: "2"
+				}, {
+					name: "事件",
+					type: "4"
+				}, {
+					name: "维护",
+					type: "5"
+				}, {
+					name: "工具",
+					type: "6"
+				}],
 				checkboxIf: false,
 				checkAll: true,
 				equipments: [],
 				checkedEquipments: [],
 				slectedDimension: "",			
-				isIndeterminate: false,
+				isIndeterminate: false
             }
         },
         computed: {
@@ -133,8 +148,15 @@
 			}
 			.parameter {
 				border-color: #ff9900;
+				display: inline-block;
+				vertical-align: middle;
+
 				&:hover {
 					background-color: #ff9900;
+				}
+				&:focus {
+					color: #fff;//#1f3d37;    
+					background-color: #ff9900;   
 				}
 			}
 
@@ -150,6 +172,9 @@
 					flex: 1 0;
 					white-space: nowrap;
 					overflow: hidden;
+					display: inline-block;
+					vertical-align: middle;
+
 					label {
 						margin-right: 20px;						
 					}
@@ -209,47 +234,6 @@
 
 			}	 
 		}    
-   	
-    	// .content-list {
-		// 	padding-top: 30px;
 
-		// 	.handle {
-		// 		padding: 0 170px 0 150px;
-		// 		.time {
-		// 			width: auto;
-		// 		}
-		// 		input {
-		// 			width: 60px;
-		// 			height: 30px;
-		// 			text-align: center;
-		// 			border-radius: 0;
-		// 		}
-
-		// 		.legend {
-		// 			float: right;
-		// 			span {
-		// 				display: inline-block;
-		// 				width: 60px;
-		// 				height: 30px;
-		// 				line-height: 30px;
-		// 				text-align: center;
-		// 				color: #fff;
-		// 				margin-left: 20px;
-		// 			}
-		// 		}
-		// 	}
-
-		// 	.timeline {
-		// 		.line {
-		// 			padding: 0 170px 0 150px;
-		// 			background: url(assets/img/line.png) repeat;
-
-		// 			.icon-end {
-		// 				float: right;
-		// 			}
-		// 		}
-		// 	}
-
-    	// }
     }
 </style>

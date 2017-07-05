@@ -90,7 +90,7 @@
 
                 if(sType == "detail") {
                     this.detailIf = true;
-                    this.productIf = fasle;
+                    this.productIf = false;
                     this.restrainIf = false;
                 }else if(sType == "product") {
                     this.detailIf = true;
@@ -101,9 +101,9 @@
                     // this.productIf = true;
                     this.restrainIf = true;
                 }else {
-                    this.batchIf = false;
+                    this.detailIf = false;
                     this.restrainIf = false;
-                    this.productIf = fasle;
+                    this.productIf = false;
                 }   
             },
             fullScreenClick() {

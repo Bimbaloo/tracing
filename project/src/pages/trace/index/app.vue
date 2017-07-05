@@ -5,12 +5,12 @@
 			<el-col :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']">
 				<v-catalog :catalog-data="catalogData"></v-catalog>
 			</el-col>
-			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router">
+			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router">
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
 					<v-tree :tree-data="treeData" :class="{hide: fullscreen}"></v-tree>
-					<div class="view">
+					<div class="view" ref="view">
 						<router-view></router-view>
 					</div>
 				</div>
@@ -40,7 +40,6 @@
 				// 侧栏是否收缩。
 				collapse: false,
 				url: "/trace/trace-main",
-
 				treeData: {},
 				catalogData: [],
 				params: []
@@ -91,9 +90,19 @@
 		    }, 1000)
 		},
 		mounted() {
-			
+			// this.$refs.view.style.height = this.$refs.view.clientHeight + "px"
 		},
 		methods: {
+			/**
+			 * 设置面板高度。
+			 * @return {void}
+			 */
+			setPanelHeight() {
+				let self = this;
+				
+				debugger
+				
+			},
 			fetchData() {
 				this.fullscreenLoading = true;
 				
@@ -323,13 +332,13 @@
 				}
 				.view {
 					border: 1px solid #ccc;
-					box-sizing: border-box;
+					// box-sizing: border-box;
 					background-color: #fff;
 					flex: 1 1;
 					padding: 0 20px;
 					overflow: auto;
 					position: relative;
-
+					height: 50px;
 				}
 			}
 		}

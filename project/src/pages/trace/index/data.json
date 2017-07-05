@@ -1,4 +1,3 @@
-let aoTestData = 
 [{
 	"parent":"",
 	"code":"001",
@@ -14,8 +13,10 @@ let aoTestData =
 	"name":"物料",
 	"key": "物料",
 	"type":"1",
-	"materialInfo": [{
-		"barcode": "1",
+	"barcode": "1",
+	"materialCode": "#1",
+	"batchNo": "20160331A",
+	"storageInfo": [{
 		"batchNo": "20160331A",
 		"quantity": 10
 	}]
@@ -133,10 +134,7 @@ let aoTestData =
 	"name":"产品",
 	"key": "产品",
 	"type":"1",
-	"materialInfo": []
+	"barcode": "2",
+	"batchNo": "20160331B",
+	"storageInfo": []
 }]
-
-
-export {
-	aoTestData
-}
