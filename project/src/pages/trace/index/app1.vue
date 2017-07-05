@@ -6,9 +6,8 @@
 				<v-catalog :catalog-data="catalogData"></v-catalog>
 			</el-col>
 			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router">
-
-				<div v-on:mouseleave="unShowTable">
-					<img :src="logo" v-on:mouseenter="showTable" />
+				<div  v-on:mouseleave="unShowTable" style="display:none">
+					<img :src="logo"  />
 					<transition name="slide-fade">
 						<el-table :data="tableData" border style="width:305px" id='table' v-if="show">
 							<el-table-column prop="processa" label="工序"     width="61">
