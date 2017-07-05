@@ -301,9 +301,6 @@
 						}
 					}
 				}
-<<<<<<< HEAD
-			}
-=======
 			},
 			/* 是否展示 */
 			showTable(){
@@ -313,8 +310,6 @@
 				console.log(1)
 					this.show = false
 			}
-
->>>>>>> e3bc58f00de57933b4e8ddacfce13e486d5df378
 		}
 	}
 </script>
