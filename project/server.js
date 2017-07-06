@@ -7,4 +7,4 @@ app.get('/', function (req, res) {
   res.send('Hello Vue')
 })
 
-app.listen(2333)
+app.listen(8088)
