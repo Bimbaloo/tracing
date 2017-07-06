@@ -2,6 +2,10 @@
     <header>
         <img :src="logo"/>
         ——&nbsp;&nbsp;追溯系统
+        <div class="header-icon">
+	        <i class="icon icon-back" @click="goToSearch"></i>
+	        <i v-if="bShow" class="icon el-icon-setting" @click="goToConfig"></i>
+        </div>
     </header>
 </template>
 <script>
@@ -10,8 +14,19 @@
     export default {
         data () {
             return {
-                logo
+                logo,
+                bShow: window.location.pathname.indexOf("config.html")<0
             }
+        },
+        methods: {
+        	// 跳转到搜索页。
+        	goToSearch() {
+        		window.open("search.html", "_self");
+        	},
+        	// 跳转到配置页面。
+        	goToConfig() {
+        		window.open("config.html", "_self");
+        	}
         }
     }
 </script>
@@ -20,7 +35,8 @@
         height: 68px;
         line-height: 68px;
         background-color: #333;
-        padding-left: 40px;
+        /*padding-left: 40px;*/
+        padding: 0 20px 0 40px;
         color: #fff;
         font-size: 16px;
         font-family: 微软雅黑;
@@ -28,5 +44,28 @@
     img {
         // height: 48px;
         vertical-align: middle;
+    }
+    .header-icon {
+    	float: right;
+    	
+	    .icon {
+	    	display: inline-block;
+	    	vertical-align: middle;
+	    	cursor: pointer;
+			
+	    	&.icon-back {
+		    	width: 24px;
+		    	height: 18px;
+		    	background: url(../../assets/img/icon-back.png) no-repeat 0 0;
+		    	
+		    	&:hover {
+		    		background-position: -24px 0;
+		    	}
+	    	}
+	    	
+	    	&.el-icon-setting {
+	    		margin-left: 10px;
+	    	}
+	    }
     }
 </style>

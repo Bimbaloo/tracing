@@ -29,9 +29,12 @@
 </template>
 
 <script>
-  import header from 'components/header/header.vue'
-  import panel from 'components/panel/panel.vue'
-
+  import header from "components/header/header.vue"
+  import panel from "components/panel/panel.vue"
+  import fnP from "assets/js/public.js"
+  
+	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+	
   export default {
     components: {
       'v-header': header,
@@ -46,35 +49,44 @@
         labelWidth: "70px",
         searchTab: "100%",
         tip: true,
-        handleSubmit: this._submitForm
+        handleSubmit: this._submitForm,
+        sErrorMessage: ""
       }
     },
     created() {
-      let oData = sessionStorage.getItem('searchConditions');
+      let oData = sessionStorage.getItem("searchConditions");
 
+			// session 中获取
       if(oData) {
           oData = JSON.parse(oData);
           this.activeKey = oData.tab;
+      }else if(window.location.hash.length > 2) {
+					// 清空了cookie后，或url中有参数。
+					location.assign("detail.html")
       }
-
-      this.$ajax.get('static/data.json').then((res) => {
-        this.categories = res.data.categories.filter(o => o.url==="detail");
-        this.categories.forEach(o => {
-          if(oData && oData.tab == o.key) {
-            o.active = oData;
-          }else {
-            o.active = {
-              radio: "1",
-              keys: {}
-            }            
-          }
-        })
-
-        this.$nextTick(() => {
-          if(oData) {
-            this._submitForm(oData);
-          }            
-        })
+			
+      this.$ajax.get(MODULE_ITEM_URL).then((res) => {
+      	this.judgeLoaderHandler(res,() => {
+	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+	       	console.log(this.categories)
+	       	this.categories.forEach(o => {
+	          if(oData && oData.tab == o.key) {
+	            o.active = oData;
+	          }else {
+	            o.active = {
+	              radio: "1",
+	              keys: {}
+	            }            
+	          }
+	        })
+      		
+      		this.$nextTick(() => {
+	          if(oData) {
+	            this._submitForm(oData);
+	          }            
+	        })
+      		
+      	});
       });
     },
     mounted() {
@@ -83,6 +95,43 @@
       }
     },
     methods: {
+    	query () {
+				let url = location.search; //获取url中"?"符后的字串 
+				let oRequest = {};
+				if(url.indexOf("?") != -1) {
+					let strs = url.substr(1).split("&");
+
+					for(let i = 0; i < strs.length; i++) {
+						oRequest[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]);
+					}
+				}
+				console.log(url)
+				console.log(oRequest)
+				return oRequest;
+			},
+    	// 判断调用接口是否成功。
+    	judgeLoaderHandler(param,fnSu,fnFail) {
+    		let bRight = param.data.errorCode;
+        	
+        	// 判断是否调用成功。
+        	if(bRight != "0") {
+        		// 提示信息。
+        		this.sErrorMessage = param.data.errorMsg.message;
+        		this.showMessage();
+        		// 失败后的回调函。
+        		fnFail && fnFail();
+        	}else {
+        		// 调用成功后的回调函数。
+        		fnSu && fnSu();
+        	}
+    	},
+    	// 显示提示信息。
+			showMessage() {
+				this.$message({
+					message: this.sErrorMessage,
+					duration: 3000
+				});
+			},
       getKeys(sKey) {
         return this.categories.filter(o => o.key==sKey)[0].active.keys;
       },

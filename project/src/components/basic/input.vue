@@ -1,15 +1,16 @@
 <template>
-    <el-input v-model="form[key]" :placeholder="hint" @blur="update"></el-input> 
+    <el-input v-model="form[key]" :placeholder="hint" @blur="update" :disabled="disabled"></el-input> 
 </template>
 
 <script>
     export default {
-        props: ['formData', 'placeholderData', 'keyData'],
+        props: ['formData', 'placeholderData', 'keyData','disabledData'],
         data() {
             return {
                 form: this.formData,
                 key: this.keyData,
-                hint: this.placeholderData
+                hint: this.placeholderData,
+                disabled: this.disabledData?true:false
             }
         },
         methods: {

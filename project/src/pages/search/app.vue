@@ -3,7 +3,7 @@
     <header>
         <img :src="logo"/>
     </header>
-    <el-tabs v-model="activeKey" type="border-card" class="search-tab"  @tab-click="handleClick">
+    <el-tabs v-loading="loading" element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab"  @tab-click="handleClick">
       <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
         <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
         <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
@@ -15,7 +15,10 @@
 <script>
   import logo from 'assets/img/logo-w.png'
   import panel from 'components/panel/panel.vue'
-
+	import fnP from "assets/js/public.js"
+	
+	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+	
   export default {
     components: {
       'v-panel': panel
@@ -23,35 +26,80 @@
     data() {
       return {
         logo,
-        activeKey: "trace",
+        activeKey: "stock",
         categories: [],
         labelWidth: "100px",
-        handleSubmit: this._submitForm
+        handleSubmit: this._submitForm,
+        sErrorMessage: "",
+        loading: false
       }
     },
     created() {
-      let oData = sessionStorage.getItem('searchConditions');
-
-      if(oData) {
-          oData = JSON.parse(oData);
-          this.activeKey = oData.tab;
-      }
-
-      this.$ajax.get('static/data.json').then((res) => {
-        this.categories = res.data.categories;
-        this.categories.forEach(o => {
-          if(oData && oData.tab == o.key) {
-            o.active = oData;
-          }else {
-            o.active = {
-              radio: "1",
-              keys: {}
-            }            
-          }
-        })
-      });    
+//    let oData = sessionStorage.getItem('searchConditions');
+//
+//    if(oData) {
+//        oData = JSON.parse(oData);
+//        this.activeKey = oData.tab;
+//    }
+//    this.$ajax.get("static/data.json").then((res) => {
+//      this.categories = res.data.categories.filter(o=>o.key!="restrain" && o.key!="chain");
+//      this.categories.forEach(o => {
+//        if(oData && oData.tab == o.key) {
+//          o.active = oData;
+//        }else {
+//          o.active = {
+//            radio: "1",
+//            keys: {}
+//          }            
+//        }
+//      })
+//    });   
+      this.loading = true;
+      this.$ajax.get(MODULE_ITEM_URL).then((res) => {
+      	this.loading = false;
+      	this.judgeLoaderHandler(res,() => {
+	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+	       	console.log(this.categories)
+	       this.categories.forEach(o => {
+//	          if(oData && oData.tab == o.key) {
+//	            o.active = oData;
+//	          }else {
+	            o.active = {
+	              radio: "1",
+	              keys: {}
+	            }            
+//	          }
+	        })
+      		
+      	});
+      });
+      
+      
     },
     methods: {
+    	// 判断调用接口是否成功。
+    	judgeLoaderHandler(param,fnSu,fnFail) {
+    		let bRight = param.data.errorCode;
+        	
+        	// 判断是否调用成功。
+        	if(bRight != "0") {
+        		// 提示信息。
+        		this.sErrorMessage = param.data.errorMsg.message;
+        		this.showMessage();
+        		// 失败后的回调函。
+        		fnFail && fnFail();
+        	}else {
+        		// 调用成功后的回调函数。
+        		fnSu && fnSu();
+        	}
+    	},
+    	// 显示提示信息。
+			showMessage() {
+				this.$message({
+					message: this.sErrorMessage,
+					duration: 3000
+				});
+			},
       handleClick(tab, event) {
 
       },
@@ -74,8 +122,6 @@
   body {
     background-color: #f2f2f2;
     display: table;
-    background-image: url("../../assets/img/bg.jpg");
-    background-size: cover;
   }
 
   #app {
@@ -134,7 +180,8 @@
         .el-tabs__item {
           height: 42px;
           line-height: 42px;     
-          width: 180px;
+          /*width: 180px;*/
+          width: 270px;
           text-align: center;
           font-size: 16px;
           border-top: 4px solid transparent;

@@ -1,265 +1,327 @@
-<!--出入库-->
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
-            <div class="content-message">
-            	<span>物料编码：{{node.materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.materialName}}</span>
-            </div>
-            <div v-if="error" class="error">
-                {{ error }}
-            </div>
-            <div v-else class="content-table">
-            	<table class="raw-table" v-loading.body="loading">
-            		<tr>
-            			<th v-for="column in materialData.columns" :style="{width: column.width}"  v-if="!column.hide">
-            				{{column.name}}
-            			</th>
-            		</tr>
-            		<tr v-for="row in materialData.data">
-            			<td v-for="column in materialData.columns" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-            				{{row[column.prop]}}
-            			</td>
-            		</tr>
-            	</table>
-                <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
-            </div>
+            <h2 class="content-title">
+            	产出
+            </h2>
+		
+			<div class="content-table">
+				<el-table :data="outData" border style="width: 100%" class="table">
+					<el-table-column v-for="(item, index) in outItems" align="center" :label="item.name" :width="item.width" :key="index">
+						<template scope="props">
+							<div class="cell" v-for="a in props.row[item.prop]">{{a}}</div>
+						</template>
+					</el-table-column>
+					<el-table-column label="操作" width="400">
+						<template scope="props">
+							<div v-for="code in props.row.rowNum" class="cell">
+								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
+								<el-button type="text" size="small">单件追踪</el-button>
+								<el-button @click="handleClick(code)" type="text" size="small">批次追踪</el-button>
+								<el-button type="text" size="small">链路修复</el-button>
+							</div>
 
+						</template>
+					</el-table-column>
+				</el-table> 
+			</div>
+			
+            <h2 class="content-title">
+            	投入
+            </h2>
+	
+			<div class="content-table">
+				<el-table :data="inDatas" border style="width: 100%" class="table">
+					<el-table-column v-for="(item,index) in inItems" align="center" :label="item.name" :width="item.width" :key="index">
+						<template scope="props">
+							<div class="cell" v-for=" a in props.row[item.prop]">{{a}}</div>
+						</template>
+					</el-table-column>
+					<el-table-column label="操作" width="400">
+						<template scope="props">
+							<div v-for="code in props.row.rowNum" class="cell">
+								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
+								<el-button type="text" size="small">单件追踪</el-button>
+								<el-button @click="handleClick(code)" type="text" size="small">批次追踪</el-button>
+								<el-button type="text" size="small">链路修复</el-button>
+							</div>
+
+						</template>
+					</el-table-column>
+				</el-table>
+			</div>			
+					
         </div>
-    </div>      
+    </div>  
 </template>
 
 <script>
-    import table from "components/basic/table.vue"
 
-    export default {
-        components: {
-            'v-table': table
+export default {
+    data() {
+        return {
+			styleObject: {
+				"min-width": "1000px"
+			},
+            outData: [{
+                eqipmentName: ['装配线2.2线GP1'],
+                moldCode: ['2331'],
+                doCode: ['D201705050004'],
+                barcode: ['UN654574375200'],
+                batchNo: ['20170505A'],
+                materialCode: ['1111'],
+                materialName: ['半成品活塞'],
+                quantity: ['50'],
+                qualifiedNum: ['49'],
+                unqualifiedNum: ['1',],
+                person: ['王小虎'],
+                shiftName: ['白天'],
+                outTime: ['2017-06-29 12:24:24'],
+                rowNum: ['UN654574375200']
+            }, {
+                eqipmentName: ['装配线2.2线GP1'],
+                moldCode: ['2331'],
+                doCode: ['D201705050004', 'D201705050003'],
+                barcode: ['UN654574375200', 'UN654574375201'],
+                batchNo: ['20170505A', '20170505B'],
+                materialCode: ['1111', '2222'],
+                materialName: ['半成品活塞', '配料'],
+                quantity: ['50', '200'],
+                qualifiedNum: ['49', '190'],
+                unqualifiedNum: ['1', '10'],
+                person: ['王小虎', '张三'],
+                shiftName: ['白天', '晚上'],
+                outTime: ['2017-06-29 12:24:24', ''],
+                rowNum: ['UN654574375200', '2222']
+            }],
+            inDatas: [{
+                eqipmentName: ['暂无数据'],
+                moldCode: ['暂无数据'],
+                doCode: ['暂无数据'],
+                barcode: ['暂无数据'],
+                batchNo: ['暂无数据'],
+                materialCode: ['暂无数据'],
+                materialName: ['暂无数据'],
+                quantity: ['暂无数据'],
+                person: ['暂无数据'],
+                shiftName: ['暂无数据'],
+                inTime: ['暂无数据'],
+                rowNum: ['暂无数据']
+            }],
+            outItems: [{
+                name: "设备名称",
+                prop: "eqipmentName",
+                width: "150"
+            }, {
+                name: "模号",
+                prop: "moldCode",
+                width: "120"
+            }, {
+                name: "派工单号",
+                prop: "doCode",
+                width: "200"
+            }, {
+                name: "条码",
+                prop: "barcode",
+                width: "200"
+            }, {
+                name: "批次号",
+                prop: "batchNo",
+                width: "200"
+            }, {
+                name: "物料编码",
+                prop: "materialCode",
+                width: "120"
+            }, {
+                name: "物料名称",
+                prop: "materialName",
+                width: "120"
+            }, {
+                name: "数量",
+                prop: "quantity",
+                width: "120"
+            }, {
+                name: "合格",
+                prop: "qualifiedNum",
+                width: "120"
+            }, {
+                name: "不合格",
+                prop: "unqualifiedNum",
+                width: "120"
+            }, {
+                name: "班次",
+                prop: "shiftName",
+                width: "300"
+            }, {
+                name: "时间",
+                prop: "outTime",
+                width: "300"
+            }]
+            ,
+            inItems: [{
+                name: "设备名称",
+                prop: "eqipmentName",
+                width: "150"
+            }, {
+                name: "模号",
+                prop: "moldCode",
+                width: "120"
+            }, {
+                name: "派工单号",
+                prop: "doCode",
+                width: "200"
+            }, {
+                name: "条码",
+                prop: "barcode",
+                width: "200"
+            }, {
+                name: "批次号",
+                prop: "batchNo",
+                width: "200"
+            }, {
+                name: "物料编码",
+                prop: "materialCode",
+                width: "120"
+            }, {
+                name: "物料名称",
+                prop: "materialName",
+                width: "120"
+            }, {
+                name: "数量",
+                prop: "quantity",
+                width: "120"
+            }, {
+                name: "班次",
+                prop: "shiftName",
+                width: "300"
+            }, {
+                name: "操作人",
+                prop: "person",
+                width: "300"
+            }, {
+                name: "产出时间",
+                prop: "inTime",
+                width: "300"
+            }]
+
+        }
+    },
+    created() {
+
+        this.$get('http://rapapi.org/mockjsdata/21533/a?').
+            then((response) => {
+                let _outDatas = response.data.out;
+
+                this.outData = this.dataChange(_outDatas)
+
+                let _inDatas = response.data.in;
+
+                this.inDatas = this.dataChange(_inDatas)
+
+            })
+    },
+    methods: {
+        handleClick(a) {
+            console.log(a);
         },
-        data () {
-            return {
-                key: this.$route.params.key,
-                styleObject: {
-                    "min-width": "1000px"
-                },
-                url: "/material/detail",
-                // 点击的物料节点信息。
-                node: {},
-                loading: false,
-                error: null,
-                materialData: {
-                    columns: [{
-                        prop: "index",
-                        name: "序号",
-                        width: "50px",
-                        merge: true,
-                    },{
-                        prop: "barcode",
-                        name: "条码",
-                        merge: true,
-                    },{
-                        prop: "batchNo",
-                        name: "批次号",
-                        class: {
-                        	batch: true
-                        },
-                        click: this.batchClick
-                    },{
-                        prop: "quantity",
-                        name: "数量",
-                        width: "50px"
-                    },{
-                        prop: "warehouse",
-                        name: "仓库"
-                    },{
-                        prop: "reservoir",
-                        name: "库位"
-                    },{
-                        prop: "opType",
-                        name: "出入库",
-                        width: "60px"
-                    },{
-                        prop: "createTime",
-                        name: "处理时间"
-                    },{
-                        prop: "personName",
-                        name: "操作人",
-                        width: "60px"
-                    },{
-                        prop: "vendorName",
-                        name: "供应商/客户"
-//                  },{
-//                      prop: "handle",
-//                      name: "操作",
-//                      condition: {
-//                      	materialType: "1"
-//                      }
-                    }],
-                    data: []
+        dataChange(Datas) {
+            /* 格式转化，转化为数组 */
+            Datas.forEach(o => {
+                for (var prop in o) {
+                    o[prop] = [o[prop]]
+                }
+            });
+            /* 相同id单元格合并 */
+            for (var i = 0; i < Datas.length; i++) {
+                for (var j = 0; j < Datas.length - i - 1; j++) {
+                    var a = Datas[i + j],
+                        b = Datas[i + j + 1];
+                    if (a.id[0] === b.id[0]) {
+                        if (a.moldCode[0] !== b.moldCode[0]) {
+                            for (var prop in b) {
+                                if (prop !== "eqipmentName") {
+                                    a[prop].push(b[prop][0])
+                                }
+                            }
+                        } else {
+                            for (var prop in b) {
+                                if (prop !== "eqipmentName" && prop !== "moldCode") {
+                                    a[prop].push(b[prop][0])
+                                }
+                            }
+                        }
+                        Datas.splice(i + j + 1, 1)
+                    }
                 }
             }
-        },
-        computed: {
-			rawData () {
-		    	return this.$store.state.rawData
-		   }
-        },
-        created () {
-            // 组件创建完后获取数据，
-            // 此时 data 已经被 observed 了
-            this.fetchData(this.materialData);
-        },
-        mounted () {
-
-        },
-        watch: {
-            // 如果路由有变化，会再次执行该方法
-            // '$route': 'fetchData'
-        },
-        methods: {
-            // 点击批次
-            batchClick (row) {
-                this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
-            },
-            fetchData (oData) {
-       
-                this.error = oData.data = null;
-                this.loading = true;
-				
-				let sKey = this.$route.query && this.$route.query.key,
-				// 提取选中的物料节点数据。
-					oNode = this.rawData.filter(o => o.key == sKey)[0] || {};
-					
-				this.node = {
-					materialCode: oNode.code || "",
-					materialName: oNode.name || "",
-					batchNo: oNode.batchNo || "",
-					barcode: oNode.barcode || ""
-				}
-
-			    setTimeout(() => {
-					this.loading = false;
-					let aoTest = [{
-				      "materialCode": "10000515", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "barcode": "UN65457437520007057", 
-				      "warehouse": "成品仓库", 
-				      "reservoir": "CPK0001", 
-				      "opType": "出库", 
-				      "batchNo": "20160331B", 
-				      "quantity": 16, 
-				      "createTime": "2016-03-31 16:32:44", 
-				      "personName": "周宇庭", 
-				      "vendorName": "上海通用"
-				    }, {
-				      "materialCode": "10000515", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "barcode": "UN65457437520007057", 
-				      "warehouse": "成品仓库", 
-				      "reservoir": "CPK0001", 
-				      "opType": "入库", 
-				      "batchNo": "20160331A", 
-				      "quantity": 16, 
-				      "createTime": "2016-03-31 16:32:44", 
-				      "personName": "周宇庭", 
-				      "vendorName": "上海通用"
-				    }]
-
-					oData.data = this.formatData(aoTest);
-			    }, 1000)
-
-//              this.$get(this.url, {
-//              	materialCode: this.node.materialCode,
-//              	batchNo: this.node.batchNo,
-//              	barcode: this.node.barcode
-//              })
-//              .then((res) => {
-//                  this.loading = false;
-//                  if(!res.errorCode) {
-//                      oData.data = this.formatData(res.data);
-//                      this.styleObject.minWidth = "1200px";
-//                  }
-//              })
-//              .catch((err) => {
-//                  this.loading = false;
-//                  this.error = "查询出错。"
-//                  this.styleObject.minWidth = 0;          
-//              })
-           },
-           /**
-            * 格式化数据。
-            * @param {Array} aoData
-            * @return {Array}
-            */
-           formatData (aoData) {
-           		// 按照条码进行排序。
-				aoData.sort((a, b) => a.barcode>b.barcode);
-				
-				let oBarcode = {},
-					nRow = 0,
-					nIndex = 1;
-				aoData.forEach((o, index) => {
-					if(oBarcode[o.barcode]) {							
-						oBarcode[o.barcode]++;
-						aoData[nRow].rowspan = oBarcode[o.barcode];
-						o.hide = true;
-					}else {
-						o.index = nIndex;
-						oBarcode[o.barcode] = 1;
-						nRow = index;
-						nIndex ++;
-						o.rowspan = oBarcode[o.barcode];
-					}
-				})   
-				
-				this.materialData.columns.forEach(column => {					
-					if(aoData.every(o => o[column.prop] === "" || o[column.prop] == undefined)) {
-					// 若每一行都为空，设置隐藏。
-						column.hide = true;
-					}
-				})
-			
-				return aoData;
-           }
+            return Datas
         }
-    }  
+    }
+}
 </script>
 
-<style lang="less">    
-	.material-stock  {	    	    	
-    	.content-message {
-    		margin-top: 20px;
-    	}
-    	
-    	.content-table {
-    		.raw-table {
-    			width: 100%;
-    			border-collapse: collapse;
-   	 			border-spacing: 0;
-    			
-    			th,td {
-    				text-align: center;
-    				vertical-align: middle;
-    				border: 1px solid #dfece9;
-    				box-sizing: border-box;
-    			}
-    			
-    			th {
-    				height: 36px;
-    				background-color: #42AF8F;
-    				color: #fff;
-    				font-weight: bold;
-    			}
-    			
-    			td {
-    				height: 30px;
-    			}
-    			
-    			.batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            font-weight: 600;
-		        }    
-    		}
-    	}
+<style lang="less">
+.content-title.table-title {
+    margin-top: 30px;
+    margin-bottom: 0;
+    color: #333;
+    font-size: 14px;
+    i {
+        color: #ccc;
+        float: right;
+        &:first-child {
+            transform: rotate(180deg);
+            margin-left: 20px
+        }
     }
+}
+
+.table {
+    th {
+        height: 36px;
+        background-color: #42af8f; // white-space: nowrap;
+        &>div {
+            background-color: #42af8f;
+            color: #fff;
+            font-weight: 600;
+
+            &.cell {
+                padding: 0;
+                white-space: nowrap;
+                text-align: center
+            }
+        }
+    }
+
+    td {
+        height: 30px;
+
+        .cell {
+            padding: 0;
+            text-align: center;
+            &.cell {
+                line-height: 30px;
+                min-height: 30px;
+                border-bottom: 1px solid rgb(223, 236, 233);
+                span {
+                    font-size: 14px;
+                    font-weight: bold;
+                    text-decoration: underline #ff9900;
+                    color: #ff9900;
+                }
+            }
+            &.ok {
+                font-weight: bold;
+                color: #31bc00;
+            }
+            &.ng {
+                font-weight: bold;
+                color: #f10000;
+            }
+            &.cell:last-child {
+                border-bottom: none
+            }
+        }
+    }
+}
 </style>

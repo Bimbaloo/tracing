@@ -13,8 +13,8 @@
 	            <div v-if="gridData.error" class="error">
 	                {{ gridData.error }}
 	            </div>
-	            <div v-if="gridData.data" class="content-table">
-	                <v-table :table-data="gridData" :loading="gridData.loading"></v-table>    
+	            <div v-if="!gridData.error" class="content-table">
+	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading"></v-table>    
 	            </div>     
 	       </div>   
     	</div> 
@@ -22,8 +22,11 @@
 </template>
 
 <script>
+	import $ from "jquery"
     import table from "components/basic/table.vue"
-
+	// 测试的地址。
+	const TEST = "http://192.168.20.181:8080";
+	
     export default {
         components: {
             'v-table': table
@@ -31,9 +34,10 @@
         data () {
             return {
                 gridData: {
-                    url: "/tracereverse/startpoint",
+                    url:  TEST + "/api/v1/trace/down/start-points",
                     loading: false,
                     error: null,
+                    height: "100%",
                     selected: [],
                     columns: [{
                         prop: "bucketNo",
@@ -68,7 +72,8 @@
                         name: "数量"
                     },{
                         prop: "happenTime",
-                        name: "加工时间"
+                        name: "加工时间",
+                        width: "160"
                     },{
                         prop: "personName",
                         name: "操作人"
@@ -127,21 +132,41 @@
         created () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
-            // this.fetchData(this.gridData);
+            this.fetchPage();
+        },
+        watch: {
+        	// 如果路由有变化，会再次执行该方法
+			'$route': 'fetchPage'
         },
         methods: {
+        	// 查询。
+            fetchPage() {
+            	this.fetchData(this.gridData);
+            },
+        	// 获取高度。
+            adjustHeight() {
+            	let jRouter = $(".router-content"),
+            		jTable = jRouter.find(".content-table"),
+            		nHeight = 0;
+            	
+            	nHeight = Math.floor(jRouter.height() - (jTable.outerHeight(true) - jTable.height()));
+            	
+            	return nHeight;
+            },
+        	// 获取数据。
             fetchData (oData) {
                 oData.error = oData.data = null;
                 oData.loading = true;
 
                 let sPath = oData.url;
 
-                this.$get(sPath, this.$route.query)
+                this.$ajax.post(sPath, this.$route.query)
                 .then((res) => {
                     oData.loading = false;
-                    if(!res.errorCode) {
-                        oData.data = res.data;
-//                      oData.data.map((o, index) => {o.index = index+1;})
+                    oData.height = this.adjustHeight();
+                    
+                    if(!res.data.errorCode) {
+                        oData.data = res.data.data;
 						if(oData.number > 1000) {
 							this.$alert("查询结果集包含" + oData.number + "条数据，页面显示其中1000条，如需查询全部，请缩小条件范围进行精确查詢。", "提示", {
 					          	confirmButtonText: "确定",
@@ -152,6 +177,8 @@
 					        	}
 					        });
 						}
+                    }else {
+                    	oData.error = res.data.errorMsg.message;
                     }
                 })
                 .catch((err) => {
@@ -159,7 +186,7 @@
                     oData.error = "查询出错。"
                 })
             },
-            onTrack (event) {
+            setSession () {
             	let aSelected = [];
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
@@ -168,28 +195,25 @@
             			
             		aSelected.push(oSelected);
             	})
-
-            	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
+                    
+                return {
+                    length: this.gridData.data.length,
+                    selected: aSelected,
+                    filters: this.$route.query
+                }
+            },
+            onTrack (event) {
+                // 保存参数。
+                let oReportFilter = this.setSession(),
+                    tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
             	            	
-            	sessionStorage.setItem("track_" + tag, JSON.stringify(aSelected));
+            	sessionStorage.setItem("track_" + tag, JSON.stringify(oReportFilter));
             	window.open("track/index.html?tag="+tag);  
             },
             onReport (event) {
-            	let aSelected = [];
-            	this.gridData.selected.forEach(o => {
-            		let oSelected = {};
-            		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-            			
-            		aSelected.push(oSelected);
-            	})
-
-            	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-            		oReportFilter = {
-            			length: this.gridData.data.length,
-            			selected: aSelected,
-            			filters: this.$route.query
-            		}
+                // 保存参数。
+                let oReportFilter = this.setSession(),
+                    tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
             	
             	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(oReportFilter));
             	window.open("track/report.html?tag="+tag);

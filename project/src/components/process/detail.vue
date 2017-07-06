@@ -24,7 +24,7 @@
 					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button>
 				</div>
 			</div>
-			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="selectedDimension"></v-equipment>
+			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="selectedDimension" :window-time="windowTime"></v-equipment>
         </div>
     </div>      
 </template>
@@ -46,6 +46,15 @@
                 node: {},
                 equipments: [],
                 checkedEquipments: [],
+				// 视窗时间，默认为2小时。
+				windowTime: {
+					interval: 2,
+					start: "",
+					end: "",
+					min: 2,
+					max: 2,
+					left: 0
+				},
 				dimension: [{
 					name: "质量",
 					type: "3",
@@ -53,15 +62,15 @@
                     list: [{
 						name: "质检",
 						path: "",
-						parameter: ["equipmentId", "startTime", "endTime"]  
+						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "送检",
 						path: "",
-						parameter: ["equipmentId", "startTime", "endTime"]  
+						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "FGB",
 						path: "",
-						parameter: ["equipmentId", "startTime", "endTime"]  
+						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     }]
 				}, {
 					name: "加工",
@@ -69,7 +78,7 @@
 					show: false,
 					list: [{
 						name: "投产表",
-						router: "",
+						router: "/process/product",
 						query: ["equipmentId", "startTime", "endTime"]  
                     }]
 				}, {
@@ -128,7 +137,35 @@
 			 * @return {void}
 			 */
 			listButtonClick(oData) {
-				
+				if(oData.router) {				
+					let oQuery = this.getParamter(oData.query);
+					this.$router.push({path: oData.router, query: oQuery});
+				}
+			},
+			/**
+			 * @param {Array}
+			 * @return {Object}
+			 */
+			getParamter (aQuery) {
+				let oParam = {};
+				aQuery.forEach(param => {
+					switch (param) {
+						case "equipmentId": 
+							oParam[param] = this.node[param];
+							break;
+						case "startTime":
+							oParam[param] = this.windowTime.start;
+							break;
+						case "endTime":
+							oParam[param] = this.windowTime.end;
+							break;
+						case "processCode":
+							oParam[param] = this.node.process;
+							break;
+						default:;
+					}
+				})
+				return oParam;
 			},
 			showButton(oData, event) {
 				oData.show = true;

@@ -57,7 +57,9 @@
 		props: {
 			equipments: Array,
 			checkedEquipments: Array,
-			dimensionData: [Array, String]
+			dimensionData: [Array, String],
+			windowTime: Object,
+			process: String
 		},
 		components: {
 			'v-datetime': DateTime,
@@ -157,16 +159,7 @@
 					}]
 				},
 				loading: false,
-                url: "api/v1/trace/equipments-events",
-				// 视窗时间，默认为2小时。
-				windowTime: {
-					interval: 2,
-					start: "",
-					end: "",
-					min: 2,
-					max: 2,
-					left: 0
-				},		
+                url: "api/v1/trace/equipments-events",		
 				// 比例。
 				ratio: 1,
 				// 设备状态。
@@ -513,7 +506,8 @@
 							equipmentId: oData.equipmentId,
 							equipmentName: oData.equipmentName,
 							startTime: oData.startTime,
-							endTime: oData.endTime
+							endTime: oData.endTime,
+							process: this.process
 						}
 					})
 				}

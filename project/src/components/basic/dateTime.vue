@@ -5,7 +5,7 @@
       :placeholder="hint" 
       format="yyyy-MM-dd HH:mm:ss"
       style="width: 100%;"
-      >
+      @change="dateChange">
     </el-date-picker>
 </template>
 
@@ -20,17 +20,9 @@
             }
         },
         methods: {
-            handleChange: function (value) {
-                // let value = event.target.value;
-                let formattedValue = value
-                    // 删除两侧的空格符
-                    .trim()
-                if (formattedValue !== value) {
-                    this.$refs.input.value = formattedValue
-                }
-                // 通过 input 事件发出数值
-                this.$emit('change', formattedValue);
-            }
+        	dateChange(sVal) {
+        		this.form[this.key] = sVal;
+        	}
         }
     }
 </script>

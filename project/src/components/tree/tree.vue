@@ -1,5 +1,7 @@
 <template>
 	<div class="diagram">
+		<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
+		<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
 		<div id="tree" style="height: 100%;"></div>
 		<div id="overview"></div>
 	</div>
@@ -60,6 +62,8 @@
 		    	return this.$store.state.type
 		    }
 		},
+		created() {
+		},		
 		mounted() {
 			this.drawTree();
 			this.createOverview();
@@ -413,11 +417,78 @@
 						this.tree.findNodeForKey(oData.group).expandSubGraph();
 					}
 				}
+			},
+
+			/**
+			* 生成图片。
+			* @param {Object} event
+			* @returns {void}
+			*/
+			onSvaeImgHandler(event) {
+				var oImage = this.tree.makeImage({
+					scale: 1,
+					maxSize: new go.Size(Infinity, Infinity),
+		//			  background: "rgb(248,248,240)"
+					}),
+					// 图片地址。
+					sImage = oImage.src;
+				
+				var w=window.open('about:blank','image from canvas');
+				w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
+			},	
+			/**
+			* 打印图片。
+			* @param {Object} event
+			* @returns {void}
+			*/
+			onPrintImgHandler(event) {
+				var oImage = this.tree.makeImage({
+					scale: 1,
+					maxSize: new go.Size(Infinity, Infinity),
+					background: "rgb(248,248,240)"
+					}),
+					// 图片地址。
+					sImage = oImage.src;
+				var w=window.open('about:blank','image from canvas');
+
+				w.document.write("<img src='"+sImage+"' alt='from canvas'/>");
+				setTimeout(function(){
+					// 判断是否为ie浏览器。
+					if(!!window.ActiveXObject || "ActiveXObject" in window) {
+						w.document.write('<OBJECT classid="CLSID:8856F961-340A-11D0-A96B-00C04FD705A2" height=0 id="wb" name="wb" width=0></OBJECT>');
+						var wb = w.document.getElementById("wb");
+						// 打印预览。
+						wb.execwb(7,1);
+					}else {
+						// 打印。
+						w.print();
+					}
+
+					// ie浏览器下打印必须要这行。			
+		//			w.document.close();
+		//			w.focus();
+					
+					// 关闭窗口。
+					w.close();
+				}, 200);
 			}
 	
 		}
 	}
 </script>
 
-<style>
+<style lang="less">
+	.diagram {
+		position: relative;
+	}
+	.icon-exportImg,.icon-print {
+		position: absolute;
+		top: 20px;
+		right: 20px;
+		z-index: 100;
+		cursor: pointer;
+	}
+	.icon-exportImg {
+		right: 60px;
+	}
 </style>

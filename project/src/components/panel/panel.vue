@@ -54,7 +54,10 @@
         methods: {            
             getKeys(oData) {
                 let oKey = {};
-                oData.items.forEach(o => oKey[o.key] = '');
+                
+                if(oData) {
+	                oData.items.forEach(o => oKey[o.key] = '');
+                }
 
                 return oKey;
             },

@@ -27,6 +27,10 @@ body {
   background-color: #42AF8F;
   color: #fff;
 }
+.btn-plain.actived {
+  background-color: #42AF8F;
+  color: #fff;
+}
 .btn-radio .el-radio-button__inner {
   padding: 8px 26px;
 }

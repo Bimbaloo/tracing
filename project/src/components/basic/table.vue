@@ -6,6 +6,7 @@
     @selection-change="selectionChange"
     @cell-click="cellClick"
     class="table"
+    :height="heights"
     v-loading="loading"
     element-loading-text="拼命加载中"
     style="width: 100%">
@@ -34,7 +35,11 @@
     export default {
         props: {
             tableData: Object,
-            loading: Boolean
+            loading: Boolean,
+            heights: {
+            	required: false,
+            	default: "100%"
+            }
         },
         data() {
             return {

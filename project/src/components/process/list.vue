@@ -34,7 +34,7 @@
 					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button>
 				</div>
 			</div>
-			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension"></v-equipment>
+			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
         </div>
     </div>      
 </template>
@@ -74,6 +74,15 @@
 				checkAll: true,
 				equipments: [],
 				checkedEquipments: [],
+				// 视窗时间，默认为2小时。
+				windowTime: {
+					interval: 2,
+					start: "",
+					end: "",
+					min: 2,
+					max: 2,
+					left: 0
+				},
 				slectedDimension: "",			
 				isIndeterminate: false
             }

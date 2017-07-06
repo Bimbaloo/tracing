@@ -8,14 +8,14 @@
 				{{ outstockData.error }}
 			</div>
 			<div v-else class="content-table">
-				<v-table :table-data="outstockData" :loading="outstockData.loading"></v-table>
+				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
 			</div>
-			<h2 class="content-title">{{batch}}在库信息</h2>
+			<h2 class="content-title">{{batch}}入库信息</h2>
 			<div v-if="instockData.error" class="error">
 				{{ instockData.error }}
 			</div>
 			<div v-else class="content-table">
-				<v-table :table-data="instockData" :loading="instockData.loading"></v-table>
+				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
 			</div>
 		</div>
 	</div>
@@ -23,8 +23,10 @@
 </template>
 
 <script>
+	import $ from "jquery"
 	import table from "components/basic/table.vue"
-
+	const TEST = "http://192.168.20.102:8080";
+	
 	export default {
 		components: {
 			'v-table': table
@@ -36,14 +38,15 @@
 				},
 				batch: this.$route.query.batchNo,
 				outstockData: {
-					url: "/outstock/bybatch",
+					url: TEST + "/api/v1/outstock/bybatch",
 					loading: false,
 					error: null,
+					height: "100%",
 					columns: [{
 						prop: "barcode",
 						name: "条码"
 					}, {
-						prop: "barcodeType", //1-单件条码 2-箱条码 3-流转框条码 999-其他
+						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
 						name: "条码类型"
 					}, {
 						prop: "batchNo",
@@ -79,7 +82,7 @@
 					}],
 					data: [{
 						"barcode": "单件条码",
-						"barcodeType": "箱条码",
+						"barcodeTypeName": "2",
 						"batchNo": "20160331A",
 						"materialCode": "021",
 						"materialName": "物料名字",
@@ -93,14 +96,15 @@
 					}]
 				},
 				instockData: {
-					url: "/stock/bybatch",
+					url: TEST + "/api/v1/instock/bybatch",
 					loading: false,
 					error: null,
+					height: "100%",
 					columns: [{
 						prop: "barcode",
 						name: "条码"
 					}, {
-						prop: "barcodeType", //1-单件条码 2-箱条码 3-流转框条码 999-其他
+						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
 						name: "条码类型"
 					}, {
 						prop: "batchNo",
@@ -139,7 +143,7 @@
 					}],
 					data: [{
 						"barcode": "单件条码",
-						"barcodeType": "箱条码",
+						"barcodeTypeName": "2",
 						"batchNo": "批次号",
 						"materialCode": "031",
 						"materialName": "物料名字",
@@ -158,32 +162,54 @@
 		created() {
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
-			// this.fetchData(this.outstockData);
-			// this.fetchData(this.instockData);
+			this.fetchPage();
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
-			// '$route': 'fetchData'
+			'$route': 'fetchPage'
 		},
 		methods: {
+			 // 查询。
+            fetchPage() {
+            	this.fetchData(this.outstockData);
+                this.fetchData(this.instockData);
+            },
+            // 获取高度。
+            adjustHeight() {
+            	let jRouter = $(".router-content"),
+            		jTitle = jRouter.find(".content-title"),
+            		jTable = jRouter.find(".content-table"),
+            		nHeight = 0;
+            	
+            	nHeight = Math.floor((jRouter.height()
+            						- jTitle.outerHeight(true)*jTitle.length
+            						- (jTable.outerHeight(true) - jTable.height()))/2);
+            	
+            	return nHeight;
+            },
+            // 获取参数。
 			fetchData(oData) {
 				oData.error = oData.data = null
 				oData.loading = true
 
 				let sPath = oData.url;
 
-				this.$get(sPath, this.$route.query)
+				this.$ajax.post(sPath, this.$route.query)
 					.then((res) => {
 						oData.loading = false;
-						if(!res.errorCode) {
-							oData.data = res.outStocks;
+						oData.height = this.adjustHeight();
+						
+						if(!res.data.errorCode) {
+							oData.data = res.data.data;
 							this.styleObject.minWidth = "1200px";
+						}else {
+							oData.error = res.data.errorMsg.message;
 						}
 					})
 					.catch((err) => {
 						oData.loading = false;
 						oData.error = "查询出错。"
-						if(this.outstockData.error && this.outstockData.error) {
+						if(this.outstockData.error && this.instockData.error) {
 							this.styleObject.minWidth = 0;
 						}
 					})
@@ -206,5 +232,22 @@
 	}
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+	.router-content {
+		flex: 1 1;
+		overflow: auto;
+		
+		.btn-restrain {
+			position: absolute;
+			right: 0;
+			top: 65px;
+		}
+	}
+	
+	.el-table {
+    	.el-table__body-wrapper {
+    		overflow-x: hidden;
+    	}
+    }
+	
 </style>
