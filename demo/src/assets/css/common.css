@@ -1,0 +1,75 @@
+html,
+body {
+  height: 100%;
+}
+body {
+  background-color: #F2F2F2;
+}
+.btn-wrapper {
+  font-size: 0;
+}
+.btn {
+  border-radius: 0;
+  width: 80px;
+  height: 30px;
+  padding: 0;
+  box-sizing: border-box;
+  font-size: 14px;
+}
+.btn + .btn {
+  margin-left: 20px;
+}
+.btn-plain {
+  background-color: #fff;
+  border: 2px solid #42AF8F;
+}
+.btn-plain:hover {
+  background-color: #42AF8F;
+  color: #fff;
+}
+.btn-plain.actived {
+  background-color: #42AF8F;
+  color: #fff;
+}
+.btn-radio .el-radio-button__inner {
+  padding: 8px 26px;
+}
+.title {
+  height: 16px;
+  line-height: 16px;
+  font-size: 16px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+.content-title {
+  height: 16px;
+  line-height: 16px;
+  text-indent: 10px;
+  border-left: 4px solid #42af8f;
+  font-size: 16px;
+  margin: 20px 0;
+}
+.content-table {
+  margin: 20px 0;
+}
+.content-table + .content-title {
+  margin-top: 30px;
+}
+.path-item {
+  cursor: pointer;
+}
+.path-item:hover {
+  color: #42af8f;
+}
+.path-item:last-child {
+  color: #42af8f;
+  cursor: default;
+}
+.el-checkbox__inner {
+  border-radius: 0;
+  width: 16px;
+  height: 16px;
+}
+.el-checkbox__inner::after {
+  left: 4px;
+}
