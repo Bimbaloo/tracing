@@ -12,7 +12,7 @@
 							<div class="cell" v-for="a in props.row[item.prop]">{{a}}</div>
 						</template>
 					</el-table-column>
-					<el-table-column label="操作" width="400">
+					<el-table-column label="操作" align="center" width="300">
 						<template scope="props">
 							<div v-for="code in props.row.rowNum" class="cell">
 								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
@@ -37,7 +37,7 @@
 							<div class="cell" v-for=" a in props.row[item.prop]">{{a}}</div>
 						</template>
 					</el-table-column>
-					<el-table-column label="操作" width="400">
+					<el-table-column label="操作" align="center" width="300">
 						<template scope="props">
 							<div v-for="code in props.row.rowNum" class="cell">
 								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
@@ -61,7 +61,7 @@ export default {
     data() {
         return {
 			styleObject: {
-				"min-width": "1000px"
+				"min-width": "2000px"
 			},
             outData: [{
                 eqipmentName: ['装配线2.2线GP1'],
@@ -69,29 +69,44 @@ export default {
                 doCode: ['D201705050004'],
                 barcode: ['UN654574375200'],
                 batchNo: ['20170505A'],
-                materialCode: ['1111'],
+                materialCode:['bbbbbbbbb'],
                 materialName: ['半成品活塞'],
-                quantity: ['50'],
-                qualifiedNum: ['49'],
+                qualifiedNum: ['69'],
+                scrapNum: ['10'],
                 unqualifiedNum: ['1',],
-                person: ['王小虎'],
                 shiftName: ['白天'],
-                outTime: ['2017-06-29 12:24:24'],
+                personName: ['王小虎'],
+                happenTime: ['2017-06-29 12:24:24'],
                 rowNum: ['UN654574375200']
             }, {
+                eqipmentName: ['装配线2.2线GP1'],
+                moldCode: ['2331'],
+                doCode: ['D201705050004'],
+                barcode: ['UN654574375200'],
+                batchNo: ['20170505A'],
+                materialCode:['aaaaaaaaa'],
+                materialName: ['半成品活塞'],
+                qualifiedNum: ['69'],
+                scrapNum: ['10'],
+                unqualifiedNum: ['1',],
+                shiftName: ['白天'],
+                personName: ['王小虎'],
+                happenTime: ['2017-06-29 12:24:24'],
+                rowNum: ['UN654574375200']
+            },{
                 eqipmentName: ['装配线2.2线GP1'],
                 moldCode: ['2331'],
                 doCode: ['D201705050004', 'D201705050003'],
                 barcode: ['UN654574375200', 'UN654574375201'],
                 batchNo: ['20170505A', '20170505B'],
-                materialCode: ['1111', '2222'],
+                materialCode:['aaaaaaaaa','bbbbbbbbb'],
                 materialName: ['半成品活塞', '配料'],
-                quantity: ['50', '200'],
                 qualifiedNum: ['49', '190'],
+                scrapNum: ['10','0'],
                 unqualifiedNum: ['1', '10'],
-                person: ['王小虎', '张三'],
                 shiftName: ['白天', '晚上'],
-                outTime: ['2017-06-29 12:24:24', ''],
+                personName: ['王小虎', '张三'], 
+                happenTime: ['2017-06-29 12:24:24', ''],
                 rowNum: ['UN654574375200', '2222']
             }],
             inDatas: [{
@@ -100,12 +115,12 @@ export default {
                 doCode: ['暂无数据'],
                 barcode: ['暂无数据'],
                 batchNo: ['暂无数据'],
-                materialCode: ['暂无数据'],
+                materialCode:['暂无数据'],
                 materialName: ['暂无数据'],
                 quantity: ['暂无数据'],
-                person: ['暂无数据'],
                 shiftName: ['暂无数据'],
-                inTime: ['暂无数据'],
+                personName: ['暂无数据'],
+                happenTime: ['暂无数据'],
                 rowNum: ['暂无数据']
             }],
             outItems: [{
@@ -137,25 +152,29 @@ export default {
                 prop: "materialName",
                 width: "120"
             }, {
-                name: "数量",
-                prop: "quantity",
-                width: "120"
-            }, {
-                name: "合格",
+                name: "合格数",
                 prop: "qualifiedNum",
-                width: "120"
+                width: ""
             }, {
-                name: "不合格",
+                name: "报废数",
+                prop: "scrapNum",
+                width: ""
+            }, {
+                name: "不合格数",
                 prop: "unqualifiedNum",
-                width: "120"
+                width: ""
             }, {
                 name: "班次",
                 prop: "shiftName",
-                width: "300"
+                width: ""
             }, {
-                name: "时间",
-                prop: "outTime",
-                width: "300"
+                name: "操作人",
+                prop: "personName",
+                width: ""
+            }, {
+                name: "产出时间",
+                prop: "happenTime",
+                width: "200"
             }]
             ,
             inItems: [{
@@ -189,19 +208,19 @@ export default {
             }, {
                 name: "数量",
                 prop: "quantity",
-                width: "120"
+                width: ""
             }, {
                 name: "班次",
                 prop: "shiftName",
-                width: "300"
+                width: ""
             }, {
                 name: "操作人",
-                prop: "person",
-                width: "300"
+                prop: "personName",
+                width: ""
             }, {
-                name: "产出时间",
-                prop: "inTime",
-                width: "300"
+                name: "投入时间",
+                prop: "happenTime",
+                width: "200"
             }]
 
         }
@@ -235,20 +254,20 @@ export default {
                 for (var j = 0; j < Datas.length - i - 1; j++) {
                     var a = Datas[i + j],
                         b = Datas[i + j + 1];
-                    if (a.id[0] === b.id[0]) {
-                        if (a.moldCode[0] !== b.moldCode[0]) {
-                            for (var prop in b) {
+                    if (a.equipmentId[0] === b.equipmentId[0]) {  //判断id是否相同，相同的则合并
+                        if (a.moldCode[0] !== b.moldCode[0]) {    //id相同的情况下判断模块号是否相同  
+                            for (var prop in b) {                 //模块号相同的时候
                                 if (prop !== "eqipmentName") {
                                     a[prop].push(b[prop][0])
                                 }
                             }
-                        } else {
+                        } else {                                  //模块号不相同的时候
                             for (var prop in b) {
                                 if (prop !== "eqipmentName" && prop !== "moldCode") {
                                     a[prop].push(b[prop][0])
                                 }
                             }
-                        }
+                        }                                         //合并完成后删除一行
                         Datas.splice(i + j + 1, 1)
                     }
                 }
@@ -259,7 +278,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less"  >
 .content-title.table-title {
     margin-top: 30px;
     margin-bottom: 0;

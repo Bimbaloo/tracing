@@ -5,15 +5,16 @@
 			<el-col class="router" ref="router">
 				<div @mouseenter="showTable" @mouseleave="unShowTable" v-if="!fullscreen">
 					<i class="icon icon-20 icon-balance"></i>
+					<div class="table-line" v-if="show"></div>
 					<transition name="slide-fade">
-						<el-table :data="tableData" border style="width:305px" id='table' v-if="show">
+						<el-table :data="tableData" border style="width:304px" id='table' v-if="show">
 							<el-table-column prop="process" label="工序" width="61">
 							</el-table-column>
 							<el-table-column prop="ok" label="合格数" width="61">
 							</el-table-column>
 							<el-table-column prop="ng" label="不合格数" width="61">
 							</el-table-column>
-							<el-table-column prop="scrap" label="报废数"   width="60">
+							<el-table-column prop="scrap" label="报废数"   width="61">
 							</el-table-column>
 							<el-table-column prop="delay" label="滞留数"   width="60">
 							</el-table-column>
@@ -323,13 +324,28 @@
 		right: 120px;
 		top: 40px;
 	}
-
+	.table-line {
+		position: absolute;
+		width: 20px;
+		height: 131px;
+		left: 60px;
+		top: 36px;
+		background-color: rgba(255,255,255,0);
+		z-index: 10
+	}
 	#table {
 		font-size: 12px;
 		position: absolute;
-		left: 70px;
-		top: 40px;
+		left: 80px;
+		top: 36px;
 		z-index: 5;
+		border: 0;
+		&::before {
+			height: 0
+		}
+		&::after {
+			width: 0
+		}
 		.cell{
 			text-align: center;
 			padding-left: 0;
