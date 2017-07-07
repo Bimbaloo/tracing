@@ -8,6 +8,16 @@
             </div>
             <div v-else class="content-table">
             	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
+                
+                <!--<el-dialog  :visible.sync="dialogTableVisible" top='20%' >
+                    <el-table :data="gridData" border width='100%'>
+                        <el-table-column property="batchNo" label="序号" align="center"></el-table-column>
+                        <el-table-column property="barcode" label="条码" align="center"></el-table-column>
+                    </el-table>                    
+                </el-dialog>-->
+
+                <v-dialogTable  :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="VisibleChange"></v-dialogTable>
+                
             </div>
             <h2 class="content-title">入库信息</h2>
             <div v-if="instockData.error" class="error">
@@ -23,12 +33,15 @@
 <script>
     import table from "components/basic/table.vue"
     import $ from "jquery"
+
+    import dialogTable from "components/basic/dialogTable.vue"
     
     const TEST = "http://192.168.20.102:8080";
     
     export default {
         components: {
-            'v-table': table
+            'v-table': table,
+            'v-dialogTable': dialogTable
         },
         data () {
             return {
@@ -147,7 +160,7 @@
                         width: "160"
                     }],
                     data: [{
-                        "barcode": "单件条码",
+                        "barcode": "箱码",
                         "barcodeTypeName": "2", 
                         "batchNo": "批次号", 
                         "materialCode": "0024", 
@@ -162,6 +175,41 @@
                         "instockTime": "2016-03-31 14:28:33"
                     }]
                 },
+                /* 模拟序号数据 */
+                
+                dialogData: {
+                    url: TEST + "/api/v1/instock",
+                    dialogVisible : false,
+                    height: "100%",
+                    columns: [{
+                        prop: "barcode",
+                        name: "条码"
+                    },{
+                        prop: "batchNo",
+                        name: "批次号",
+                        class: "batch"
+                    }],
+                    data: [{
+                        "barcode": "1",
+                        "batchNo": "saaasas", 
+                    }]
+                    
+                }
+
+                // gridData: [{
+                //         barcode: '2016-05-02',
+                //         batchNo: '王小虎',                    
+                //         }, {
+                //         barcode: '2016-05-04',
+                //         batchNo: '王小虎',
+                //         }, {
+                //         barcode: '2016-05-01',
+                //         batchNo: '王小虎',
+                //         }, {
+                //         barcode: '2016-05-03',
+                //         batchNo: '王小虎',
+                //         }],
+                // dialogTableVisible: false
             }
         },
         created () {
@@ -183,6 +231,10 @@
                 // 若为箱码。
                 if(row.barcodeTypeName == "2") {
                     console.log("2");
+                    debugger
+                    this.dialogData.dialogVisible  = true
+                   // console.log(this.dialogData.dialogVisible)
+                    
                 }
             },
             // 点击批次
@@ -252,6 +304,10 @@
                         this.styleObject.minWidth = 0;
                     }           
                 })
+            },
+            VisibleChange (){
+                debugger
+                this.dialogData.dialogVisible = !this.dialogData.dialogVisible
             }
         }
     }  
