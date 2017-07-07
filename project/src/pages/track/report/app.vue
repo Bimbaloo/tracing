@@ -172,10 +172,10 @@
 			let oConditions = sessionStorage.getItem("fastReport_" + this.query.tag);
 			
 			if(oConditions) {
-				oConditions = JSON.parse(oConditions);
-				
-				this.result.selected = oConditions.selected.length;
-				this.result.whole = oConditions.length;
+				oConditions = JSON.parse(oConditions);			
+				debugger
+				this.result.selected = (oConditions.selected && oConditions.selected.length) || 0;
+				this.result.whole = oConditions.length || 0;
 				this.result.filter = this.result.whole - this.result.selected;
 				this.filters = oConditions.filters;
 				this.selected = oConditions.selected;

@@ -932,8 +932,7 @@
 			},
 			// 打印功能。。
 			onPrintHandler() {
-//				alert("打印。");
-				
+//				alert("打印。");				
 				var jDown = $("#downloadImage"),
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),

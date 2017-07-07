@@ -224,7 +224,7 @@
             onReport (event) {
             	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。      	
             	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(this.filter));
-            	window.open("track/report.html?tag="+tag);
+            	window.open("report.html?tag="+tag);
             }
 		}
 	}

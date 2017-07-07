@@ -3,12 +3,12 @@
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
             <div class="content-message">
-            	<span>物料编码：{{node.materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.materialName}}</span>
+            	<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
             </div>
-            <div v-if="error" class="error">
+            <!--div v-if="error" class="error">
                 {{ error }}
-            </div>
-            <div v-else class="content-table">
+            </div-->
+            <div class="content-table">
             	<table class="raw-table" v-loading="loading">
             		<tr>
             			<th v-for="column in materialData.columns" :style="{width: column.width}"  v-if="!column.hide">
@@ -41,11 +41,12 @@
                 styleObject: {
                     "min-width": "1000px"
                 },
-                url: "/material/detail",
+                url: "/api/v1/trace/material-detail",
                 // 点击的物料节点信息。
                 node: {},
                 loading: false,
-                error: null,
+                // error: null,
+				sErrorMessage: "",
                 materialData: {
                     columns: [{
                         prop: "index",
@@ -116,6 +117,29 @@
             // '$route': 'fetchData'
         },
         methods: {
+			// 判断调用接口是否成功。
+			judgeLoaderHandler(param, fnSu, fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					this.sErrorMessage = param.data.errorMsg.message;
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu();
+				}
+			},	
+			// 显示提示信息。
+			showMessage() {
+				this.$message({
+					message: this.sErrorMessage,
+					duration: 3000
+				});
+			},		
             // 点击批次
             batchClick (row) {
                 this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
@@ -130,55 +154,64 @@
 					oNode = this.rawData.filter(o => o.key == sKey)[0] || {};
 					
 				this.node = {
-					materialCode: oNode.code || "",
-					materialName: oNode.name || "",
-					materialInfo: oNode.materialInfo || []
+					code: oNode.code || "",
+					name: oNode.name || "",
+					materialInfoList: oNode.materialInfoList || []
 				}
 
-			    setTimeout(() => {
-					this.loading = false;
-					let aoTest = [{
-				      "materialCode": "10000515", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "barcode": "UN65457437520007057", 
-				      "warehouse": "成品仓库", 
-				      "reservoir": "CPK0001", 
-				      "opType": "出库", 
-				      "batchNo": "20160331B", 
-				      "quantity": 16, 
-				      "createTime": "2016-03-31 16:32:44", 
-				      "personName": "周宇庭", 
-				      "vendorName": "上海通用"
-				    }, {
-				      "materialCode": "10000515", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "barcode": "UN65457437520007057", 
-				      "warehouse": "成品仓库", 
-				      "reservoir": "CPK0001", 
-				      "opType": "入库", 
-				      "batchNo": "20160331A", 
-				      "quantity": 16, 
-				      "createTime": "2016-03-31 16:32:44", 
-				      "personName": "周宇庭", 
-				      "vendorName": "上海通用"
-				    }]
+			    // setTimeout(() => {
+				// 	this.loading = false;
+				// 	let aoTest = [{
+				//       "materialCode": "10000515", 
+				//       "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+				//       "barcode": "UN65457437520007057", 
+				//       "warehouse": "成品仓库", 
+				//       "reservoir": "CPK0001", 
+				//       "opType": "出库", 
+				//       "batchNo": "20160331B", 
+				//       "quantity": 16, 
+				//       "createTime": "2016-03-31 16:32:44", 
+				//       "personName": "周宇庭", 
+				//       "vendorName": "上海通用"
+				//     }, {
+				//       "materialCode": "10000515", 
+				//       "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+				//       "barcode": "UN65457437520007057", 
+				//       "warehouse": "成品仓库", 
+				//       "reservoir": "CPK0001", 
+				//       "opType": "入库", 
+				//       "batchNo": "20160331A", 
+				//       "quantity": 16, 
+				//       "createTime": "2016-03-31 16:32:44", 
+				//       "personName": "周宇庭", 
+				//       "vendorName": "上海通用"
+				//     }]
 
-					oData.data = this.formatData(aoTest);
-			    }, 1000)
+				// 	oData.data = this.formatData(aoTest);
+			    // }, 1000)
 
-//              this.$get(this.url, this.node.materialInfo})
-//              .then((res) => {
-//                  this.loading = false;
-//                  if(!res.errorCode) {
-//                      oData.data = this.formatData(res.data);
-//                      this.styleObject.minWidth = "1200px";
-//                  }
-//              })
-//              .catch((err) => {
-//                  this.loading = false;
-//                  this.error = "查询出错。"
-//                  this.styleObject.minWidth = 0;          
-//              })
+             this.$post(this.url, {
+				 code: this.node.code,
+				 materialInfoList: this.node.materialInfoList
+			 })
+             .then((res) => {
+                 this.loading = false;
+				this.judgeLoaderHandler(res,() => {
+					// 保存数据。
+					oData.data = this.formatData(res.data.data);
+                    this.styleObject.minWidth = "1200px";						
+				});				 
+                 if(!res.errorCode) {
+                     
+                 }
+             })
+             .catch((err) => {
+                 this.loading = false;
+                //  this.error = "查询出错。"
+				this.sErrorMessage = "查询出错。"
+				this.showMessage();
+                this.styleObject.minWidth = 0;          
+             })
            },
            /**
             * 格式化数据。

@@ -217,7 +217,6 @@ export default {
                 let _inDatas = response.data.in;
 
                 this.inDatas = this.dataChange(_inDatas)
-
             })
     },
     methods: {

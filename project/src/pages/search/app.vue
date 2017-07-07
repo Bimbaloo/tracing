@@ -122,6 +122,8 @@
   body {
     background-color: #f2f2f2;
     display: table;
+    background: url(../../assets/img/bg.jpg);
+    background-size: cover;
   }
 
   #app {

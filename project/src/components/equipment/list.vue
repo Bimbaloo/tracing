@@ -159,7 +159,8 @@
 					}]
 				},
 				loading: false,
-                url: "api/v1/trace/equipments-events",		
+				sErrorMessage: "",
+                url: HOST + "/api/v1/trace/equipments-events",		
 				// 比例。
 				ratio: 1,
 				// 设备状态。
@@ -268,6 +269,29 @@
 			}
         },
         methods: {
+			// 判断调用接口是否成功。
+			judgeLoaderHandler(param,fnSu,fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					this.sErrorMessage = param.data.errorMsg.message;
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu();
+				}
+			},
+			// 显示提示信息。
+			showMessage() {
+				this.$message({
+					message: this.sErrorMessage,
+					duration: 3000
+				});
+			},
 			getDimensionData () {
 				if(typeof this.dimensionData == "string") {
 					// 设备列表，单维度查看。
@@ -288,35 +312,74 @@
 			fetchAllData() {
 				this.loading = true;	
 
-				setTimeout(() => {
-					this.loading = false;
-					
-					this.eventData = Object.assign({}, this.oTest);;
-					["1", "2", "3", "4", "5", "6"].forEach(type => this.formatEquipmentData(type, this.eventData[type]));
-					
-				}, 1000)
-
-				// this.$get(this.url, {
-				// 	equipmentIdList: this.checkedEquipments.join(","),
-				// 	startTime: this.datetime.start,
-				// 	endTime: this.datetime.end,
-				// 	type: 0
-				// })
-				// .then((res) => {
+				// setTimeout(() => {
 				// 	this.loading = false;
-				// 	if(!res.errorCode) {
-				// 		// 保存数据。
-				// 		this.eventData = res.data;	
-				//		["1", "2", "3", "4", "5", "6"].forEach(type => {
-				//			if(this.eventData[type]) {
-				//				this.formatEquipmentData(type, this.eventData[type])
-				//			}
-				//		});		
-				// 	}
-				// })
-				// .catch((err) => {
-				// 	this.loading = false;  
-				// })
+					
+				// 	this.eventData = Object.assign({}, this.oTest);;
+				// 	["1", "2", "3", "4", "5", "6"].forEach(type => this.formatEquipmentData(type, this.eventData[type]));
+					
+				// }, 1000)
+
+				this.$post(this.url, {
+					equipmentIdList: this.checkedEquipments.join(","),
+					startTime: this.datetime.start,
+					endTime: this.datetime.end,
+					type: 0
+				})
+				.then((res) => {
+					this.loading = false;
+					this.judgeLoaderHandler(res, () => {
+						// 保存数据。
+						let oData = res.data.data[0];
+
+						if(!oData) {
+							return;
+						}
+						this.eventData["1"] = oData.equipStatusList;
+
+						this.eventData["2"] = [{
+							equipmentId: oData.equipmentId,
+							startWorkList: oData.startWorkList,
+							finishWorkList: oData.finishWorkList,
+							poolInList: oData.poolInList,
+							poolOutList: oData.poolOutList
+						}];	
+
+						this.eventData["3"] = [{
+							equipmentId: oData.equipmentId,
+							qcList: oData.qcList,
+							submitQcList: oData.submitQcList
+						}];
+
+						this.eventData["4"] = [{
+							equipmentId: oData.equipmentId,
+							startEquipWarningList: oData.startEquipWarningList,
+							endEquipWarningList: oData.endEquipWarningList
+						}];
+
+						this.eventData["5"] = [{
+							equipmentId: oData.equipmentId,
+							spotCheckList: oData.spotCheckList,
+							startEquipRepairList: oData.startEquipRepairList,
+							endEquipRepairList: oData.endEquipRepairList
+						}];
+
+						this.eventData["6"] = [{
+							equipmentId: oData.equipmentId,
+							installToolList: oData.installToolList,
+							removeToolList: oData.removeToolList
+						}];
+				
+						["1", "2", "3", "4", "5", "6"].forEach(type => {
+							if(this.eventData[type]) {
+								this.formatEquipmentData(type, this.eventData[type])
+							}
+						});					
+					});
+				})
+				.catch((err) => {
+					this.loading = false;  
+				})
 			},
 			/**
 			 * 获取数据。
@@ -328,30 +391,30 @@
 					return;
 				}
 				this.loading = true;	
-
-				setTimeout(() => {
-					this.loading = false;
-					this.eventData[type] = Object.assign([], this.oTest[type]);
-					this.formatEquipmentData(type, this.eventData[type]);
-				}, 1000)
-
-				// this.$get(this.url, {
-				// 	equipmentIdList: this.checkedEquipments.join(","),
-				// 	startTime: this.datetime.start,
-				// 	endTime: this.datetime.end,
-				// 	type: type
-				// })
-				// .then((res) => {
+				// debugger
+				// setTimeout(() => {
 				// 	this.loading = false;
-				// 	if(!res.errorCode) {
-				// 		// 保存数据。
-				// 		this.eventData[type] = res.data;				
-				// 		this.formatEquipmentData(type, this.eventData[type]);		
-				// 	}
-				// })
-				// .catch((err) => {
-				// 	this.loading = false;  
-				// })
+				// 	this.eventData[type] = Object.assign([], this.oTest[type]);
+				// 	this.formatEquipmentData(type, this.eventData[type]);
+				// }, 1000)
+
+				this.$post(this.url, {
+					equipmentIdList: this.checkedEquipments.join(","),
+					startTime: this.datetime.start,
+					endTime: this.datetime.end,
+					type: type
+				})
+				.then((res) => {
+					this.loading = false;
+					this.judgeLoaderHandler(res,() => {
+						// 保存数据。
+						this.eventData[type] = res.data.data;				
+						this.formatEquipmentData(type, this.eventData[type]);						
+					});					
+				})
+				.catch((err) => {
+					this.loading = false;  
+				})
            	},
 			/**
 			 * 格式化设备数据。

@@ -43,14 +43,17 @@
                     height: "100%",
                     columns: [{
                         prop: "barcode",
-                        name: "条码"
+                        name: "条码",
+                        cellClick: this.barcodeClick
                     },{
                         prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
                         name: "条码类型"
                     },{
                         prop: "batchNo",
                         name: "批次号",
-                        class: "batch",
+                        class: {
+                            batch: true,
+                        },
                         cellClick: this.batchClick
                     },{
                         prop: "materialCode",
@@ -176,6 +179,13 @@
             }
         },
         methods: {
+            // 条码点击。
+            barcodeClick (row) {
+                // 若为箱码。
+                if(row.barcodeTypeName == "2") {
+
+                }
+            },
             // 点击批次
             batchClick (row) {
                 this.$router.push({ path: `/stock/${this.key}/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})

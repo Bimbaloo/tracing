@@ -124,6 +124,9 @@
                 
                 this.$refs.line.innerHTML = "";
 
+                if(!this.status) {
+                    return;
+                }
                 this.status.map(item => {
                     let MyComponent = Vue.extend({
                         render: function (createElement) {                    
@@ -176,6 +179,9 @@
                 let oWork = this.work,
                     aoSortData = [];
                 
+                if(!oWork) {
+                    return;
+                }
                 for(let p in oWork) {
                     if(p == "startWorkList") {
                         // 加工。
@@ -271,18 +277,22 @@
                 let oQuality = this.quality,
                     aoSortData = [];
 
+                if(!oQuality) {
+                    return;
+                }
+
                 for(let p in oQuality) {
-                    if(p == "shortQcList") {
+                    if(p == "qcList") {
                         // 质检。
                         oQuality[p].forEach(o => {
-                            o.type = "shortQcList";
+                            o.type = "qcList";
                         })
                         aoSortData = aoSortData.concat(oQuality[p]);
 
-                    }else if(p == "longQcList") {
+                    }else if(p == "submitQcList") {
                         // 送检。
                         oQuality[p].forEach(o => {
-                            o.type = "longQcList";
+                            o.type = "submitQcList";
                             o.startTime = o.happenTime;
                         })
                         aoSortData = aoSortData.concat(oQuality[p]);
@@ -295,7 +305,7 @@
                 });
 
                 aoSortData.map((o, index) => {
-                    if(o.type == "shortQcList") {
+                    if(o.type == "qcList") {
                         this._createNode(o, index, "quality", "质检", {
                             startTime: "开始时间",
                             endTime: "结束时间",                         
@@ -303,7 +313,7 @@
                             method: "三检类型",
                             result: "质检结果"
                         });
-                    }else if(o.type == "longQcList") {
+                    }else if(o.type == "submitQcList") {
                         this._createNode(o, index, "quality", "送检", {
                             happenTime: "送检时间",
                             checkTime: "检验时间",
@@ -439,6 +449,12 @@
 
                 if(this.$refs.event instanceof Array) {
                     oNode = oNode[0];
+                }
+
+                let oEvent = this.event;
+
+                if(!oEvent) {
+                    return;
                 }
             },
             setRepair: function() {
