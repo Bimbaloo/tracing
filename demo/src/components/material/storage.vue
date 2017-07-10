@@ -5,9 +5,6 @@
             <div class="content-message">
             	<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
             </div>
-            <!--div v-if="error" class="error">
-                {{ error }}
-            </div-->
             <div class="content-table">
             	<table class="raw-table" v-loading="loading">
             		<tr>
@@ -21,6 +18,9 @@
             			</td>
             		</tr>
             	</table>
+				<div v-if="empty" class="empty">
+					{{ empty }}
+				</div>
                 <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
             </div>
 
@@ -45,7 +45,7 @@
                 // 点击的物料节点信息。
                 node: {},
                 loading: false,
-                // error: null,
+                empty: "",
 				sErrorMessage: "",
                 materialData: {
                     columns: [{
@@ -157,59 +157,62 @@
 					materialInfoList: oNode.materialInfoList || []
 				}
 
-			    setTimeout(() => {
+			    // setTimeout(() => {
+				// 	this.loading = false;
+				// 	let aoTest = [{
+				//       "materialCode": "10000515", 
+				//       "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+				//       "barcode": "UN65457437520007057", 
+				//       "warehouse": "成品仓库", 
+				//       "reservoir": "CPK0001", 
+				//       "opType": "出库", 
+				//       "batchNo": "20160331B", 
+				//       "quantity": 16, 
+				//       "createTime": "2016-03-31 16:32:44", 
+				//       "personName": "周宇庭", 
+				//       "vendorName": "上海通用"
+				//     }, {
+				//       "materialCode": "10000515", 
+				//       "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+				//       "barcode": "UN65457437520007057", 
+				//       "warehouse": "成品仓库", 
+				//       "reservoir": "CPK0001", 
+				//       "opType": "入库", 
+				//       "batchNo": "20160331A", 
+				//       "quantity": 16, 
+				//       "createTime": "2016-03-31 16:32:44", 
+				//       "personName": "周宇庭", 
+				//       "vendorName": "上海通用"
+				//     }]
+
+				// 	oData.data = this.formatData(aoTest);
+			    // }, 1000)
+
+				this.$post(this.url, {
+					code: this.node.code,
+					materialInfoList: this.node.materialInfoList
+				})
+				.then((res) => {
 					this.loading = false;
-					let aoTest = [{
-				      "materialCode": "10000515", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "barcode": "UN65457437520007057", 
-				      "warehouse": "成品仓库", 
-				      "reservoir": "CPK0001", 
-				      "opType": "出库", 
-				      "batchNo": "20160331B", 
-				      "quantity": 16, 
-				      "createTime": "2016-03-31 16:32:44", 
-				      "personName": "周宇庭", 
-				      "vendorName": "上海通用"
-				    }, {
-				      "materialCode": "10000515", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "barcode": "UN65457437520007057", 
-				      "warehouse": "成品仓库", 
-				      "reservoir": "CPK0001", 
-				      "opType": "入库", 
-				      "batchNo": "20160331A", 
-				      "quantity": 16, 
-				      "createTime": "2016-03-31 16:32:44", 
-				      "personName": "周宇庭", 
-				      "vendorName": "上海通用"
-				    }]
-
-					oData.data = this.formatData(aoTest);
-			    }, 1000)
-
-            //  this.$post(this.url, {
-			// 	 code: this.node.code,
-			// 	 materialInfoList: this.node.materialInfoList
-			//  })
-            //  .then((res) => {
-            //      this.loading = false;
-			// 	this.judgeLoaderHandler(res,() => {
-			// 		// 保存数据。
-			// 		oData.data = this.formatData(res.data.data);
-            //         this.styleObject.minWidth = "1200px";						
-			// 	});				 
-            //      if(!res.errorCode) {
-                     
-            //      }
-            //  })
-            //  .catch((err) => {
-            //      this.loading = false;
-            //     //  this.error = "查询出错。"
-			// 	this.sErrorMessage = "查询出错。"
-			// 	this.showMessage();
-            //     this.styleObject.minWidth = 0;          
-            //  })
+					this.empty = "";
+					this.judgeLoaderHandler(res,() => {
+						// 保存数据。
+						if(res.data.data.length) {
+							oData.data = this.formatData(res.data.data);
+							this.styleObject.minWidth = "1200px";
+						}else {
+							this.empty = "暂无数据。"
+						}
+						
+					});				 
+				})
+				.catch((err) => {
+					this.loading = false;
+					//  this.error = "查询出错。"
+					this.sErrorMessage = "查询出错。"
+					this.showMessage();
+					this.styleObject.minWidth = 0;          
+				})
            },
            /**
             * 格式化数据。
@@ -257,6 +260,11 @@
     	}
     	
     	.content-table {
+			.empty {
+				height: 50px;
+				line-height: 50px;
+				text-align: center;
+			}
     		.raw-table {
     			width: 100%;
     			border-collapse: collapse;

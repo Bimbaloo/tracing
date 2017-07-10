@@ -97,10 +97,6 @@
 			 * @return {void}
 			 */
 			setPanelHeight() {
-				let self = this;
-				
-				debugger
-				
 			},
 			fetchData() {
 				this.fullscreenLoading = true;

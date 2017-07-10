@@ -310,6 +310,7 @@
 			},
 			// 获取设备所有数据。
 			fetchAllData() {
+				// debugger
 				this.loading = true;	
 
 				setTimeout(() => {
@@ -335,8 +336,11 @@
 				// 		if(!oData) {
 				// 			return;
 				// 		}
-				// 		this.eventData["1"] = oData.equipStatusList;
-
+				// 		this.eventData["1"] = [{
+				// 			equipmentId: oData.equipmentId,
+				// 			equipStatusList: oData.equipStatusList
+				// 		}];	
+						
 				// 		this.eventData["2"] = [{
 				// 			equipmentId: oData.equipmentId,
 				// 			startWorkList: oData.startWorkList,
@@ -344,7 +348,7 @@
 				// 			poolInList: oData.poolInList,
 				// 			poolOutList: oData.poolOutList
 				// 		}];	
-
+						
 				// 		this.eventData["3"] = [{
 				// 			equipmentId: oData.equipmentId,
 				// 			qcList: oData.qcList,
@@ -379,15 +383,16 @@
 				// })
 				// .catch((err) => {
 				// 	this.loading = false;
-				//  this.sErrorMessage = "查询出错";  
-				//  this.showMessage();
+				//  	this.sErrorMessage = "查询出错";  
+				//  	this.showMessage();
 				// })
 			},
 			/**
 			 * 获取数据。
 			 * @return {void}
 			 */
-            fetchData (type) {   
+            fetchData (type) {  
+				// debugger 
 				if(this.eventData[type]) {
 					// 若数据已加载。
 					return;
@@ -416,8 +421,8 @@
 				// })
 				// .catch((err) => {
 				// 	this.loading = false;
-				//  this.sErrorMessage = "查询出错";  
-				//  this.showMessage();
+				//  	this.sErrorMessage = "查询出错";  
+				//  	this.showMessage();
 				// })
            	},
 			/**
@@ -427,7 +432,7 @@
 			 * @return {void}
 			 */
 			formatEquipmentData(sType, aoData) {
-			
+
 				if(!aoData) {
 					return;
 				}

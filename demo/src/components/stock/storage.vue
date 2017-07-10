@@ -83,7 +83,7 @@
                         width: "160"
                     }],
                     data: [{
-                        "barcode": "单件条码",
+                        "barcode": "箱条码",
                         "barcodeTypeName": "1", 
                         "batchNo": "20160331A", 
                         "materialCode": "0031", 

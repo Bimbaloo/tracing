@@ -19,7 +19,7 @@ let aoTestData =
 	"name":"物料",
 	"key": "物料",
 	"type":"1",
-	"materialInfo": [{
+	"materialInfoList": [{
 		"barcode": "1",
 		"batchNo": "20160331A",
 		"quantity": 10
@@ -40,21 +40,21 @@ let aoTestData =
 	{
       	"doCode": "D201603310017", 
       	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-      	"equipmentId": 128, 
+      	"equipmentId": 200, 
       	"equipmentName": "装配2.2线GP12", 
       	"batchNo": "20160331A", 
       	"quantity": 16, 
-      	"shiftDate": "2016-03-31", 
+      	"shiftDate": "2017-05-27", 
       	"shiftName": "早班"
     }, 
     {
       	"doCode": "D201603310017", 
       	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-      	"equipmentId": 128, 
+      	"equipmentId": 201, 
       	"equipmentName": "装配2.2线GP12", 
       	"batchNo": "20160331A", 
       	"quantity": 16, 
-      	"shiftDate": "2016-03-31", 
+      	"shiftDate": "2017-05-27", 
       	"shiftName": "早班"
     }
     ],
@@ -118,49 +118,37 @@ let aoTestData =
 	"outputInfo": [{
       	"doCode": "D201603310017", 
       	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-      	"equipmentId": 1, 
+      	"equipmentId": 202, 
       	"equipmentName": "装配2.2线GP1", 
       	"batchNo": "20160331A", 
       	"quantity": 16, 
-      	"shiftDate": "2016-03-31", 
+      	"shiftDate": "2017-05-27", 
       	"shiftName": "早班",
-		"startTime": "2016-03-31 08:00:00",
-		"endTime": "2016-03-31 17:00:00"
+		"startTime": "2017-05-27 08:00:00",
+		"endTime": "2017-05-27 17:00:00"
     },{
       	"doCode": "D201603310017", 
       	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-      	"equipmentId": 2, 
+      	"equipmentId": 203, 
       	"equipmentName": "装配2.2线GP2", 
       	"batchNo": "20160331A", 
       	"quantity": 16, 
-      	"shiftDate": "2016-03-31", 
+      	"shiftDate": "2017-05-27", 
       	"shiftName": "早班",
-		"startTime": "2016-03-31 08:00:00",
-		"endTime": "2016-03-31 17:00:00"
+		"startTime": "2017-05-27 08:00:00",
+		"endTime": "2017-05-27 17:00:00"
     }, 
 	{
       	"doCode": "D201603310017", 
       	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-      	"equipmentId": 3, 
+      	"equipmentId": 204, 
       	"equipmentName": "装配2.2线GP3", 
       	"batchNo": "20160331A", 
       	"quantity": 16, 
-      	"shiftDate": "2016-03-31", 
+      	"shiftDate": "2017-05-27", 
       	"shiftName": "早班",
-		"startTime": "2016-03-31 08:00:00",
-		"endTime": "2016-03-31 17:00:00"
-    },
-    {
-      	"doCode": "D201603310017", 
-      	"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-      	"equipmentId": 4, 
-      	"equipmentName": "装配2.2线GP4", 
-      	"batchNo": "20160331A", 
-      	"quantity": 16, 
-      	"shiftDate": "2016-03-31", 
-      	"shiftName": "早班",
-		"startTime": "2016-03-31 07:00:00",
-		"endTime": "2016-03-31 16:00:00"
+		"startTime": "2017-05-27 08:00:00",
+		"endTime": "2017-05-27 17:00:00"
     }],
 	"process": 'GP12',
 	"ok": '500',
@@ -169,12 +157,16 @@ let aoTestData =
 	"delay": "0"
 },{
 	"parent":"结束工序",
-	"code":"009",
+	"code":"20000551",
 	"showName":"产品",
 	"name":"产品",
 	"key": "产品",
 	"type":"1",
-	"materialInfo": []
+	"materialInfoList": [{
+		"barcode": "010101079",
+		"batchNo": "20160419A",
+		"quantity": 16
+	}]
 }]
 
 
