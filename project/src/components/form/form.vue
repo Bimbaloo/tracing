@@ -32,6 +32,14 @@
             return {
             };
         },
+        watch: {
+        	keys: {
+        		handler: function() {
+        			this.$nextTick(() => this.resetForm('ruleForm'));
+        		},
+        		deep: true
+        	}
+        },
         mounted () {
             // 数据初始化。
             // this.$nextTick(() => {
@@ -47,7 +55,69 @@
                 return oFormData;
             },
             rules: function() {
-                return {};
+            	// 验证条码。
+            	var validateBarcode = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入条码"));
+            		}else {
+            			callback();
+            		}
+            	},
+            	validateBatch = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入批次"));
+            		}else {
+            			callback();
+            		}
+            	},
+            	validateMaterialcode = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入物料"));
+            		}else {
+            			callback();
+            		}
+            	};
+            	// 验证开始时间。
+            	var validateStartTime = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入开始时间"));
+            		}else {
+            			callback();
+            		}
+            	};
+            	// 验证结束时间。
+            	var validateEndTime = (rule, value, callback) => {
+            		let sStart = this.ruleForm.startTime;
+            		if(!value) {
+            			callback(new Error("请输入结束时间"));
+            		}else if(sStart && sStart > value) {
+            			// 如果开始时间存在，而且开始时间大于结束时间。
+            			callback(new Error("结束时间必须大于开始时间"));
+            		}else {
+            			callback();
+            		}
+            	};
+            	// 所有规则。
+            	var oAllRules =  {
+                	"barcode": [{validator: validateBarcode, trigger: "change"}],
+                	"batchNo": [{validator: validateBatch,trigger: "change"}],
+                	"materialCode": [{validator: validateMaterialcode,trigger: "change"}],
+                	// 开始时间。
+                	"startTime": [{validator: validateStartTime, trigger: "change"}],
+                	// 结束时间。
+                	"endTime": [{validator: validateEndTime, trigger: "change"}]
+                };
+                
+            	// 根据当前配的返回对应的规则。
+            	let oRule = {};
+				for(let key in this.keys) {
+					if(oAllRules[key]) {
+						oRule[key] = oAllRules[key];
+					}
+				}
+				
+				// 为了将页面中*都不存在。
+                return oRule;
             }
         },
         methods: {
@@ -57,21 +127,67 @@
             //     }
             //     debugger
             // },
+            getRules(sKey) {
+            	// 验证开始时间。
+            	var validateStartTime = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入开始时间"));
+            		}else {
+            			callback();
+            		}
+            	};
+            	// 验证结束时间。
+            	var validateEndTime = (rule, value, callback) => {
+            		let sStart = this.ruleForm.startTime;
+            		if(!value) {
+            			callback(new Error("请输入结束时间"));
+            		}else if(sStart && sStart > value) {
+            			// 如果开始时间存在，而且开始时间大于结束时间。
+            			callback(new Error("结束时间必须大于开始时间"));
+            		}else {
+            			callback();
+            		}
+            	};
+            	// 所有规则。
+            	var oAllRules =  {
+                	"barcode": [{required: true, message: "请输入条码", trigger: "change"}],
+                	"batchNo": [{required: true, message: "请输入批次",trigger: "change"}],
+                	"materialCode": [{required: true, message: "请输入物料编码",trigger: "change"}],
+                	// 开始时间。
+                	"startTime": [{required: true,validator: validateStartTime, trigger: "change"}],
+                	// 结束时间。
+                	"endTime": [{required: true, validator: validateEndTime, trigger: "change"}]
+                };
+                
+            	// 根据当前配的返回对应的规则。
+//          	let oRule = {};
+//				for(let key in this.keys) {
+//					if(oAllRules[key]) {
+//						oRule[key] = oAllRules[key];
+//					}
+//				}
+				if(Object.keys(this.keys).includes(sKey)) {
+	                return oAllRules[sKey];
+				}else {
+					return [];
+				}
+            },
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        // alert('submit!');
                         // 保存搜索条件。
+                        let oKeys = {};
                         for (let key in this.keys){
-                            this.keys[key] = this.ruleForm[key];
+//                          this.keys[key] = this.ruleForm[key];
+                            oKeys[key] = this.ruleForm[key];
                         }
                        
                         let oConditions = {
-                            keys: this.keys,
+                            keys: oKeys, // this.keys,
                             radio: this.active.radio
                         };
                         
-                        this.active.keys = this.keys;
+                        this.active.keys = oKeys; //this.keys;
                         this.handleSubmit(oConditions);
                         
                     } else {

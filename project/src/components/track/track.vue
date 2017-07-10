@@ -7,9 +7,6 @@
     	</div>
         <div class="router-content">
 	        <div class="innner-content" style="min-width: 1500px;">
-	            <!--div class="loading" v-if="gridData.loading">
-	                Loading...
-	            </div-->
 	            <div v-if="gridData.error" class="error">
 	                {{ gridData.error }}
 	            </div>
@@ -24,8 +21,6 @@
 <script>
 	import $ from "jquery"
     import table from "components/basic/table.vue"
-	// 测试的地址。
-	const TEST = "http://192.168.20.181:8080";
 	
     export default {
         components: {
@@ -34,7 +29,7 @@
         data () {
             return {
                 gridData: {
-                    url:  TEST + "/api/v1/trace/down/start-points",
+                    url:  HOST + "/api/v1/trace/down/start-points",
                     loading: false,
                     error: null,
                     height: "100%",
@@ -60,7 +55,7 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名字"
+                        name: "物料名称"
                     },{
                         prop: "materialSpec",
                         name: "物料规格"
@@ -191,7 +186,7 @@
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            		({ batchNo: oSelected.batchNo, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
             			
             		aSelected.push(oSelected);
             	})
@@ -208,19 +203,41 @@
                     tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
             	            	
             	sessionStorage.setItem("track_" + tag, JSON.stringify(oReportFilter));
-            	window.open("track/index.html?tag="+tag);  
+//          	window.open("track/index.html?tag="+tag);  
+		        window.open("trackIndex.html?tag="+tag);
             },
             onReport (event) {
-                // 保存参数。
-                let oReportFilter = this.setSession(),
-                    tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
+            	// 当gridData.data 为null时处理
+            	let aSelected = [];
+            	this.gridData.selected.forEach(o => {
+            		let oSelected = {};
+            		// 解构赋值。
+            		({ batchNo: oSelected.batchNo, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            			
+            		aSelected.push(oSelected);
+            	})
+
+            	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+            		oReportFilter = {
+            			length: this.gridData.data.length,
+            			selected: aSelected,
+            			filters: this.$route.query
+            		}
             	
             	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(oReportFilter));
-            	window.open("track/report.html?tag="+tag);
+            	// window.open("track/report.html?tag="+tag);
+                window.open("trackReport.html?tag="+tag);
             }
         }
     }  
 </script>
 
 <style lang="less" scoped>
+	.error {
+		border: 2px solid #42AF8F;
+	    padding: 20px 12px;
+	    margin-bottom: 30px;
+	    font-size: 14px;
+	    color: red;
+	}
 </style>

@@ -1,5 +1,5 @@
 <template>
-	<div class="node-outer" :class="[colorType]">
+	<div class="node-outer" :class="[colorType, isBorder?'':'sRadius']">
 		<div class="node-inner"></div>
 	</div>
 </template>
@@ -7,7 +7,13 @@
 <script>
 	
 	export default {
-		props: ["colorType"],
+		props: {
+			"colorType": String,
+			"isBorder": {
+				type: Boolean,
+				default: true
+			}
+		},
 		data() {
 			return {}
 		}
@@ -35,6 +41,14 @@
 			background-color: @normal;
 			border: 2px solid @normal;
 			border-radius: 50%;
+		}
+		
+		&.sRadius {
+			border-radius: 0;
+			
+			.node-inner {
+				border-radius: 0;
+			}
 		}
 		
 		/* 大个size。 */

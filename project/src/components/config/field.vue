@@ -64,7 +64,7 @@
             		// 设置表格数据。
             		this.tableData = res.data.data;
             		// 保存当前数据。
-//          		sessionStorage.setItem(sSessionItemName,JSON.stringify(this.tableData));
+//          		this.aBefore = Object.assign([], this.tableData);
             		this.aBefore = $.extend(true,[],this.tableData);
             	});
             }).catch(function(error) {
@@ -114,18 +114,18 @@
 	            	this.$refs[formName].validate((valid) => {
 	            		if(valid) {
 	            			// 判断。
-			                console.log(this.tableData);
 			                //调用接口，修改数据
 			                this.$ajax.put(TABLE_DATA_URL,{
 			                	"items": this.tableData
 			                }).then((res) => {
 			                	// 判断是否更新成功。
 			                	this.judgeLoaderHandler(res,() => {
+									// 重新设置保存的值。
+									this.aBefore = $.extend(true,[],this.tableData);
 				            		this.sErrorMessage="更新成功！";
 			        				this.showMessage();
 				            	},()=>{
 				            		// 恢复更新数据。
-				            		//let aData = JSON.parse(sessionStorage.getItem(sSessionItemName));
 									let aData = this.aBefore;
 				            		this.tableData = aData?aData:[];
 				            	});

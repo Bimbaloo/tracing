@@ -21,7 +21,7 @@
 					<div v-show="!bFullScreen" class="line"></div>
 					<div class="resume-main" :class="{showDiff:sCurrentTab === 'lines' }">
 						<div class="resume-handler">
-							<div class="resume-tabs">
+							<div class="resume-tabs" v-show="false">
 								<v-button text-data="BOM表" tab-data="tables" :type-data="sBomType"  @query="changeTab('tables')"></v-button>
 								<v-button text-data="时间轴" tab-data="lines"  :type-data="sTimeLineType" @query="changeTab('lines')"></v-button>
 							</div>
@@ -39,12 +39,18 @@
 								<span class="title-subText">批次:xxxxxxxx</span>
 							</div>
 							<!--:row-style="tableRowStyleName"-->
-							<el-table 
+							<div v-if="oTab.tables.error" :style="{height:getHeight()+'px'}" class="error">
+								{{ oTab.tables.error }}
+							</div>
+							<el-table
+								v-else
 								class="table-main" 
 								:data="aParsedData" 
 								:height="getHeight()" 
 								stripe
 								style="width: 100%;"
+								v-loading="oTab.tables.loading"
+								element-loading-text="拼命加载中"
 								row-class-name="table-item">
 								<!-- 工序 -->
 								<el-table-column min-width="200px">
@@ -362,8 +368,15 @@
 						</div>
 						
 						<!-- 时间轴 -->
-						<div v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height:getHeight()+'px'}">
-							<div class="time-line-content">
+						<div 
+							v-loading="oTab.lines.loading"
+							element-loading-text="拼命加载中"
+							v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height:getHeight()+'px'}">
+							
+							<div v-if="oTab.lines.error" class="error">
+								{{ oTab.lines.error }}
+							</div>
+							<div v-else class="time-line-content">
 								<div 
 									class="time-line-wrap"
 									v-for="(timeItem, index) in aoTimeLineData">
@@ -376,11 +389,71 @@
 									<div class="item-line"></div>
 									<div class="line-list">
 										<div class="list-sub" :class="{first:!itemIndex}"
-											v-for="(item,itemIndex) in timeItem.data">
-											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.data.length-1)" class="node-line"></div>
-											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.data.length-1}">{{ item.time }}</span>
+											v-for="(item,itemIndex) in timeItem.resumes">
+											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1)" class="node-line"></div>
+											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.time).Format("hh:mm:ss") }}</span>
 											<div class="sub-node">
 												<v-node :color-type="getTimeLineTypeInfo(item.type).color"></v-node>
+											</div>
+											<div class="sub-info" :class="getTimeLineTypeInfo(item.type).color">
+												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
+													<div class="item-type">{{getTimeLineTypeInfo(item.type).text}} :</div>
+													<div class="item-info">
+														<span class="tips">{{ item.personName }}</span> 将条码
+														<span class="tips">{{ item.barcode }}</span> ,批次
+														<span class="tips">{{ item.batchNo }}</span> 的
+														<span class="tips">{{ item.materialName }}</span>
+														<span class="tips">{{ item.quantity }}</span> 件,入库到
+														<span class="tips">{{ item.warehouse }}</span>
+														<span class="tips">{{ item.reservoir }}</span>
+													</div>
+												</div>
+												<div class="sub-item" v-else-if="getTimeLineTypeInfo(item.type).type==2">
+													<div class="item-type">{{ item.processName+getTimeLineTypeInfo(item.type).text }} :</div>
+													<div class="item-info">
+														<span class="tips">{{ item.personName }}</span> 在
+														<span class="tips">{{ item.equipmentName }}</span> 上将条码
+														<span class="tips">{{ item.barcode }}</span> ,批次
+														<span class="tips">{{ item.batchNo }}</span> 的
+														<span class="tips">{{ item.materialName }}</span>
+														{{ getTimeLineTypeInfo(item.type).text }}
+													</div>
+												</div>
+												<div class="sub-item" v-else>
+													<div class="item-type">{{ getTimeLineTypeInfo(item.type).text }} :</div>
+													<div class="item-info">
+														<span class="tips">{{ item.personName }}</span> 将条码
+														<span class="tips">{{ item.barcode }}</span> ,批次
+														<span class="tips">{{ item.batchNo }}</span> ,在
+														<span class="tips">{{ item.equipmentName }}</span> 上产出
+														<span class="tips">{{ item.materialName }}</span> 物料,共计
+														<span class="tips">{{ item.quantity }}</span> 件,结果为
+														<span class="tips">{{ item.checkResult }}</span>
+													</div>
+												</div>
+											</div>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div v-show="false" class="time-line-content-clone">
+								<div 
+									class="time-line-wrap"
+									v-for="(timeItem, index) in aoTimeLineData">
+									
+									<div class="line-item">
+										<span class="item-date">{{ timeItem.date }}</span>
+										<div class="item-node" :class="{bigSize:!index}"><v-node :is-border="false" :class="{bigSize:!index}" color-type="blue"></v-node></div>
+										<span class="item-title" v-if="!index">产品履历</span>
+									</div>
+									<div class="item-line"></div>
+									<div class="line-list">
+										<div class="list-sub" :class="{first:!itemIndex}"
+											v-for="(item,itemIndex) in timeItem.resumes">
+											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1)" class="node-line"></div>
+											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.time).Format("hh:mm:ss") }}</span>
+											<div class="sub-node">
+												<v-node :is-border="false" :color-type="getTimeLineTypeInfo(item.type).color"></v-node>
 											</div>
 											<div class="sub-info" :class="getTimeLineTypeInfo(item.type).color">
 												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
@@ -423,7 +496,6 @@
 									</div>
 								</div>
 							</div>
-							
 						</div>
 					</div>
 					
@@ -453,6 +525,14 @@
 		},
 		// 页面数据。
 		data() {
+			// 验证条码。
+        	var validateBarcode = (rule, value, callback) => {
+        		if(!value) {
+        			callback(new Error("请输入条码或扫码"));
+        		}else {
+        			callback();
+        		}
+        	};
 			return {
 				// 默认测试数据。
 				sText: "a",
@@ -469,7 +549,7 @@
 					barcode: ""
 				},
 				// 当前tab值。
-				sCurrentTab: "tables",
+				sCurrentTab: "lines",
 				// 当前表格中的数据。
 				aoTable: [],
 				// 创建表格数据，处理后的数据。
@@ -480,17 +560,22 @@
 				oTab: {
 					"tables": {
 						url: "static/resume_demo.json",
-						bCreated: false
+						bCreated: false,
+						loading: false,
+						error: ""
 					},
 					"lines": {
-						url: "static/resume_timeLine.json",
-						bCreated: false
+						url: HOST + "/api/v1/resume/timeline",
+//						url: "static/resume_timeLine.json",
+						bCreated: false,
+						loading: false,
+						error: ""
 					}
 				},
 				// 规则。
 				rules: {
 					barcode: [
-						{required: true, message: "请输入条码或扫码",trigger: "blur"}
+						{validator: validateBarcode,trigger: "blur"}
 					]
 				}
 			}
@@ -552,7 +637,11 @@
 				this.aoTimeLineData = [];
 				// 默认都未创建。
 				this.oTab.tables.bCreated = false;
+				this.oTab.tables.loading = false;
+				this.oTab.tables.error = "";
 				this.oTab.lines.bCreated = false;
+				this.oTab.lines.loading = false;
+				this.oTab.lines.error = "";
 			},
 			// 获取页面的高度。
 			getHeight() {
@@ -577,7 +666,6 @@
 			submitForm(formName) {
 				this.$refs[formName].validate((valid) => {
 					if (valid) {
-						alert("输入成功！");
 						// 重置数据。----
 						this.initData();
 //						this.bSubmit = true;
@@ -615,18 +703,35 @@
 			// 获取数据。
 			getPageData() {
 				// 获取数据。-- 根据当前显示的tab创建数据。
+				this.oTab[this.sCurrentTab].loading = true;
+//				this.oTab[this.sCurrentTab].error = "";
+				
 				if(!this.oTab[this.sCurrentTab].bCreated) { // && this.bSubmit
-					this.$ajax.get(this.oTab[this.sCurrentTab].url).then((res) => {
-						// 保存数据。
-						if(this.sCurrentTab == "tables") {
-						    this.aoTable =res.data.resume_info;
-						    this.aParsedData = this.parseTableData();
-						}else {
-							this.aoTimeLineData =res.data.resume_info;
-						}
+					this.$ajax.post(this.oTab[this.sCurrentTab].url, this.ruleForm).then((res) => {
+						this.oTab[this.sCurrentTab].loading = false;
 						// 设置为已创建。
 					    this.oTab[this.sCurrentTab].bCreated = true;
+					    
+						if(!res.data.errorCode) {
+							// 保存数据。
+							if(this.sCurrentTab == "tables") {
+							    this.aoTable =res.data.data;
+							    this.aParsedData = this.parseTableData();
+							}else {
+								this.aoTimeLineData =res.data.data;
+							}
+						}else {
+						    // 根据errorCode 错误时设置。error
+							this.oTab[this.sCurrentTab].error = res.data.errorMsg.message;
+						}
+						
+					    
+				    }).catch((err)=> {
+				    	this.oTab[this.sCurrentTab].loading = false;
+						this.oTab[this.sCurrentTab].error = "查询出错";
 				    });
+				}else {
+					this.oTab[this.sCurrentTab].loading = false;
 				}
 			},
 			// 表格数据转换成可用于创建的数据。
@@ -911,7 +1016,9 @@
 				 	jNow = jClone;
 				 }else {
 				 	// 时间轴。
-				 	jNow = jTimeLine;
+				 	jClone.html($(".time-line-content-clone").html());
+//				 	jNow = jTimeLine;
+					jNow = jClone;
 				 }
 					
 				// 时间轴。
@@ -932,20 +1039,23 @@
 			},
 			// 打印功能。。
 			onPrintHandler() {
-//				alert("打印。");				
+//				alert("打印。");
+				
 				var jDown = $("#downloadImage"),
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),
 					jTableClone = $(".resume-table-clone"),
 					jNow = null;
-				
+					
 				 if(this.sCurrentTab === "tables"){
 				 	// 表格。
 				 	jClone.html(jTableClone.html());
 				 	jNow = jClone;
 				 }else {
 				 	// 时间轴。
-				 	jNow = jTimeLine;
+				 	jClone.html($(".time-line-content-clone").html());
+//				 	jNow = jTimeLine;
+					jNow = jClone;
 				 }
 					
 				// 时间轴。
@@ -1031,6 +1141,7 @@
 				margin-left: 10px;
 			}
 		}
+		.time-line;
 	}
 	.resume-wraps {
 		.resume-content-wrap {
@@ -1060,11 +1171,15 @@
 				.resume-main {
 					padding: 20px;
 					
+					.error {
+						text-align: center;
+					}
+					
 					.resume-handler {
 						.resume-tabs {}
 						.resume-icons {
 							text-align: right;
-							margin-top: -26px;
+							/*margin-top: -26px;*/
 							color: @green;
 							
 							.resume-icon {
@@ -1124,129 +1239,23 @@
 							
 						}
 					}
+					
 					.resume-timeLine {
 						margin-top: 25px;
 						color: #FFFFFF;
 						/*height: 730px;*/
 						overflow: auto;
 						
-						.time-line-content {
-							padding: 20px 30px;
-							
-							.time-line-wrap {
-								
-								.line-item {
-									color: @blue;
-									font-size: 20px;
-									/*display: flex;*/
-									
-									.item-date {
-										display: inline-block;
-										vertical-align: middle;
-										/*width: 180px;*/
-										padding: 0 25px;
-										line-height: 40px;
-										background: rgba(0,153,255,.3);
-										border-radius: 20px;
-									}
-									.item-node {
-										display: inline-block;
-										vertical-align: middle;
-										margin: 0 40px;
-										
-										&.bigSize {
-											margin: 0 20px;
-										}
-									}
-									.item-title {
-										display: inline-block;
-										vertical-align: middle;
-										font-size: 24px;
-									}
-								}
-								.item-line {
-									width: 4px;
-									height: 40px;
-									background: @blue;
-									position: relative;
-									left: 216px;
-									top: 0px;
-								}
-								.line-list {
-									font-size: 18px;
-									
-									.list-sub {
-										margin: 50px 0;
-										display: flex;
-										line-height: 24px;
-										
-										&.first {
-											margin-top: 10px;
-										}
-										
-										.sub-date {
-											color: #CCCCCC;
-											font-size: 16px;
-											margin-left: 70px;
-											
-											&.last {
-												margin-left: 74px;
-											}
-										}
-										.sub-node {
-											margin: 0 36px 0 70px;
-										}
-										.node-line {
-											width: 4px;
-											background: @blue;
-											position: relative;
-											left: 216px;
-											top: 35px;
-										}
-										.sub-info {
-											.sub-item {
-												display: flex;
-												
-												.item-type {
-													white-space: nowrap;
-													margin-right: 4px;
-													font-size: 20px;
-												}
-												.item-info {
-													color: #e5e5e5;
-												}
-											}
-											&.blue {
-												.tips {
-													color: @blue;
-												}
-											}
-											&.yellow {
-												.tips {
-													color: @yellow;
-												}
-											}
-											&.red {
-												.tips {
-													color: @red;
-												}
-											}
-											&.green {
-												.tips {
-													color: @inVent;
-												}
-											}
-										}
-									}
-								}
-							}
+						.time-line-content,
+						.time-line-content-clone {
+							.time-line;
 						}
-						
 						
 					}
 					
 					&.showDiff {
-						background-color: #1d272f;
+						background-image: url(../../assets/img/bg.jpg);
+						/*background-color: #1d272f;*/
 					}
 					
 				}
@@ -1255,4 +1264,120 @@
 			
 		}
 	}
+	
+	.time-line {
+		padding: 20px 30px;
+		
+		.time-line-wrap {
+			
+			.line-item {
+				color: @blue;
+				font-size: 20px;
+				/*display: flex;*/
+				
+				.item-date {
+					display: inline-block;
+					vertical-align: middle;
+					/*width: 180px;*/
+					padding: 0 25px;
+					line-height: 40px;
+					background: rgba(0,153,255,.3);
+					border-radius: 20px;
+				}
+				.item-node {
+					display: inline-block;
+					vertical-align: middle;
+					margin: 0 40px;
+					
+					&.bigSize {
+						margin: 0 20px;
+					}
+				}
+				.item-title {
+					display: inline-block;
+					vertical-align: middle;
+					font-size: 24px;
+				}
+			}
+			.item-line {
+				width: 4px;
+				height: 40px;
+				background: @blue;
+				position: relative;
+				left: 216px;
+				top: 0px;
+			}
+			.line-list {
+				font-size: 18px;
+				
+				.list-sub {
+					margin: 50px 0;
+					display: flex;
+					line-height: 24px;
+					
+					&.first {
+						margin-top: 10px;
+					}
+					
+					.sub-date {
+						color: #CCCCCC;
+						font-size: 16px;
+						margin-left: 70px;
+						
+						&.last {
+							margin-left: 74px;
+						}
+					}
+					.sub-node {
+						margin: 0 36px 0 70px;
+					}
+					.node-line {
+						width: 4px;
+						background: @blue;
+						position: relative;
+						left: 216px;
+						top: 35px;
+					}
+					.sub-info {
+						.sub-item {
+							display: flex;
+							
+							.item-type {
+								color: #fff;
+								white-space: nowrap;
+								margin-right: 4px;
+								font-size: 20px;
+							}
+							.item-info {
+								color: #e5e5e5;
+							}
+						}
+						&.blue {
+							.tips {
+								color: @blue;
+							}
+						}
+						&.yellow {
+							.tips {
+								color: @yellow;
+							}
+						}
+						&.red {
+							.tips {
+								color: @red;
+							}
+						}
+						&.green {
+							.tips {
+								color: @inVent;
+							}
+						}
+					}
+				}
+			}
+		}
+						
+		
+	}
+	
 </style>

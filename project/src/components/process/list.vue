@@ -5,7 +5,7 @@
             <h2 class="content-title">
             	工序&nbsp;—&nbsp;{{node.name}}
             </h2>
-			<div class="content-panel">
+			<div class="content-panel" v-if="equipments.length">
 				<!--设备-->
 				<div class="equipment-list">
 					<!--div class="btn-group">				
@@ -33,9 +33,11 @@
 					<!--el-button class="btn btn-plain" v-for="name in dimension" :key="name">{{name}}</el-button-->
 					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button>
 				</div>
-			</div>
-			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
-        </div>
+			</div>			
+			<v-equipment v-if="equipments.length" :equipments="equipments" :process-key="processKey" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
+			<div v-else class="empty">{{empty}}</div>
+		</div>
+		
     </div>      
 </template>
 
@@ -48,7 +50,6 @@
 		},
         data () {
             return {
-                key: this.$route.params.key,
                 styleObject: {
                     "min-width": "1000px"
                 },
@@ -72,6 +73,7 @@
 				}],
 				checkboxIf: false,
 				checkAll: true,
+				
 				equipments: [],
 				checkedEquipments: [],
 				// 视窗时间，默认为2小时。
@@ -84,13 +86,17 @@
 					left: 0
 				},
 				slectedDimension: "",			
-				isIndeterminate: false
+				isIndeterminate: false,
+				empty: "暂无数据。"
             }
         },
         computed: {
 			rawData () {
 		    	return this.$store.state.rawData
-		   }
+		    },
+			processKey () {
+				return (this.$route.query && this.$route.query.key) || ''
+			}
         },
         created () {
             // 组件创建完后获取数据，
@@ -98,11 +104,11 @@
 			this.setEquipmentList();
         },
         mounted () {
-
+            
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            // '$route': 'fetchData'
+            '$route': 'setEquipmentList'
         },
         methods: {
 			/**
@@ -110,14 +116,16 @@
 			 * @return {void}
 			 */
 			setEquipmentList () {
-				let sKey = this.$route.query && this.$route.query.key,
+				debugger
+				let 
 				// 提取选中的工序节点数据。
-					oNode = this.rawData.filter(o => o.key == sKey)[0] || {};
+					oNode = this.rawData.filter(o => o.key == this.processKey)[0] || {};
 
 				this.node = oNode;	
-				// this.node.outputInfo && this.node.outputInfo.map(o => o.actived = true);	
-				this.equipments = this.node.outputInfo;
-				this.equipments.forEach(o => this.checkedEquipments.push(o.equipmentId));
+				this.checkedEquipments = [];
+				// this.node.processInfoList && this.node.processInfoList.map(o => o.actived = true);	
+				this.equipments = this.node.processInfoList || [];
+				this.equipments.forEach(o => this.checkedEquipments.push(o.equipmentId));	
 			},
 		   	handleCheckAllChange(event) {
 				this.checkedEquipments = [];
@@ -243,6 +251,5 @@
 
 			}	 
 		}    
-
     }
 </style>

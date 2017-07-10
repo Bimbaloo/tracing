@@ -1,0 +1,582 @@
+<!--设备列表-->
+<template>
+    <div class="content-list" v-loading="loading">
+		<div class="handle clear">
+			<label>视窗时间：</label><el-input v-model="windowTime.interval" class="time" type="number" :min="windowTime.min" :max="windowTime.max" @blur="inputTimeBlur"></el-input><label>小时</label>
+			<span>{{windowTime.start}}</span><span class="split">~</span>
+			<span>{{windowTime.end}}</span>
+			<div class="legend">
+				<span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
+			</div>
+		</div>
+		<v-equipmentLine :equipments="equipments" :equipment-data="equipmentData" :dimension-data="dimensionData" :ratio="ratio" :date-time="datetime" :window-time="windowTime"></v-equipmentLine>
+		<div class="timeline">
+			<div class="line clear" @click="moveSlider">
+				<i class="icon icon-20 icon-start"></i>
+				<i class="icon icon-20 icon-end"></i>
+				<div class="slider" ref="slider" :style="{width: 100/ratio + '%', left: windowTime.left + '%'}" v-if="windowTime.interval>=2" draggable="true"></div>
+			</div>		
+			<div class="setting clear">
+				<div class="start">		    
+					<span v-if="startIf" @dblclick="startIf=false">{{datetime.start}}</span>
+					<div v-else class="edit">
+						<v-datetime :form-data="datetime" key-data="start"></v-datetime>
+						<span class="edit-icon">
+							<i class="el-icon-circle-check" @click="saveStart"></i>
+							<i class="el-icon-circle-cross" @click="cancelStart"></i>
+						</span>
+					</div>
+				</div>
+				<div class="end">
+					<span v-if="endIf" @dblclick="endIf=false">{{datetime.end}}</span>
+					<div v-else class="edit">
+						<v-datetime :form-data="datetime" key-data="end"></v-datetime>
+						<span class="edit-icon">
+							<i class="el-icon-circle-check" @click="saveEnd"></i>
+							<i class="el-icon-circle-cross" @click="cancelEnd"></i>
+						</span>
+					</div>
+				</div>
+			</div>					
+		</div>   
+    </div>      
+</template>
+
+<script>
+	import DateTime from 'components/basic/dateTime.vue'
+	import EquipmentLine from 'components/equipment/equipmentLine.vue'
+
+    export default {
+		props: {
+			equipments: Array,
+			checkedEquipments: Array,
+			dimensionData: [Array, String]
+		},
+		components: {
+			'v-datetime': DateTime,
+			'v-equipmentLine': EquipmentLine
+		},
+        data () {
+            return {
+				loading: false,
+                url: "api/v1/trace/equipments-events",
+				// 视窗时间，默认为2小时。
+				windowTime: {
+					interval: 2,
+					start: "",
+					end: "",
+					min: 2,
+					max: 2,
+					left: 0
+				},		
+				// 比例。
+				ratio: 1,
+				// 设备状态。
+				states: [{
+					key: "run",
+					name: "加工",
+					color: "#72b733"
+				},{
+					key: "stop",
+					name: "停机",
+					color: "#fac41b"
+				},{
+					key: "debug",
+					name: "调试",
+					color: "#009aff"
+				},{
+					key: "close",
+					name: "关机",
+					color: "#cccccc"
+				}],				
+				startIf: true,
+				endIf: true,
+				eventData: {}
+            }
+        },
+        computed: {
+			rawData () {
+		    	return this.$store.state.rawData
+		  	},
+			datetime () {
+				let start = "",
+					end = "";
+				this.checkedEquipments.forEach((id, index) => {
+					let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
+					if(equipment) {
+						let sTemp = equipment.startTime,
+							eTemp = equipment.endTime
+						if(!index) {
+							start = sTemp;
+							end = eTemp;
+						}else{
+							if(start > sTemp) {
+								start = sTemp;
+							}
+							if(end < eTemp) {
+								end = eTemp;
+							}
+						} 									
+					}					
+				})
+
+				return {
+					start: start,
+					initStart: start,
+					end: end,
+					initEnd: end
+				}
+			},
+			equipmentData () {
+				let oData = {};
+				this.equipments.forEach(o => {
+					let sId = o.equipmentId;
+					oData[sId] = {
+						selected: this.checkedEquipments.indexOf(sId) > -1,
+						status: [],
+						// 加工
+						work: {},
+						// 质量
+						quality: {},
+						// 事件
+						event: {},
+						// 维护
+						repair: {},
+						// 工具
+						tool: {}
+					}
+				})	
+				return oData;			
+			}
+        },
+        created () {
+            // 组件创建完后获取数据，
+            // 此时 data 已经被 observed 了
+			// 设置窗口时长。
+			this.setWindowTime();
+			// 查询设备状态。
+            this.fetchData("1");
+        },
+        mounted () {
+
+        },
+        watch: {
+			// 选中维度变化。
+			dimensionData: function() {
+				if(this.dimensionData == 1 || this.dimensionData == 2 || this.dimensionData == 3) {
+					this.fetchData(this.dimensionData);
+				}				
+			},
+			// 选中设备变化。
+			checkedEquipments: function() {
+				this.equipments.forEach(o => this.equipmentData[o.equipmentId].selected = this.checkedEquipments.indexOf(o.equipmentId) > -1)				
+			}
+        },
+        methods: {
+			/**
+			 * 获取数据。
+			 * @return {void}
+			 */
+            fetchData (type) {   
+				if(this.eventData[type]) {
+					// 若数据已加载。
+					return;
+				}
+				this.loading = true;	
+				
+				let oTest = {
+					"1": [{
+						"equipmentId": 1,
+						"equipStatusList" : [{
+							"startTime" : "2016-03-31 7:00:00",
+							"endTime" : "2016-03-31 7:30:00",
+							"type" : "close"
+						},{
+							"startTime" : "2016-03-31 7:30:00",
+							"endTime" : "2016-03-31 14:00:00",
+							"type" : "run"
+						},{
+							"startTime" : "2016-03-31 14:00:00",
+							"endTime" : "2016-03-31 14:30:00",
+							"type" : "debug"
+						},{
+							"startTime" : "2016-03-31 14:30:00",
+							"endTime" : "2016-03-31 16:30:00",
+							"type" : "stop"
+						},{
+							"startTime" : "2016-03-31 16:30:00",
+							"endTime" : "2016-03-31 17:00:00",
+							"type" : "close"
+						}]
+					}],
+					"2": [{
+						"equipmentId": 1,
+						"startWorkList" : [{
+							"groupId" : 1,
+							"happenTime" : "2016-03-31 7:30:00",
+							"doCode" : "D201603310017", 
+							"personName" : "李瑞娇",
+							"processName" : "GP12"
+						}],
+						"finishWorkList" : [{
+							"groupId" : 1,
+							"happenTime" : "2016-03-31 14:00:00",
+							"doCode" : "D201603310017", 
+							"personName" : "李瑞娇",
+							"processName" : "GP12"
+						}],
+						"poolInList" : [{
+							"groupId" : 3,
+							"happenTime" : "2016-03-31 8:00:00",
+							"doCode" : "D201603310017", 
+							"materialName" : "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+							"materialCode" : "10000515",
+							"batchNo" : "20160331A",
+							"quantity" : 20,
+							"personName" : "李瑞娇"
+						}],
+						"poolOutList" :[{
+							"groupId" : 3,
+							"happenTime" : "2016-03-31 13:30:00",
+							"doCode" : "D201603310017",
+							"materialName" : "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+							"materialCode" : "10000515",
+							"batchNo" : "20160331A",
+							"quantity" : 20,
+							"goodNum" : 18,
+							"badNum" : 1,
+							"personName" : "李瑞娇"
+						}]
+					}],				
+					"3": [{
+						"equipmentId": 1,
+						"shortQcList" :[{
+							"startTime" : "2016-03-31 9:30:33",
+							"endTime" : "2016-03-31 10:35:33",
+							"personName" : "李瑞娇",
+							"method" : "xxx",
+							"result" : "bad"
+						}],
+						"longQcList" :[{
+							"happenTime" : "2016-03-31 12:00:00",
+							"requestId" : "xxxxxxxx",
+							"doCode" : "D201703310017",
+							"materialName" : "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
+							"materialCode" : "10000515",
+							"batchNo" : "20160331A",
+							"type" : "化验",
+							"quantity" : 20,
+							"personName" : "李瑞娇",
+							"method" : "xxx",
+							"result" : "pass",
+							"checkTime" : "2016-03-31 14:00:00",
+							"checkPersonName" : "李瑞娇",
+							"reportpath" : "\\192.168.1.2\report\XXXX\YYYY"
+						}]
+					}]
+				};
+
+				setTimeout(() => {
+					this.loading = false;
+					this.eventData[type] = oTest[type];
+					this.formatEquipmentData(type, this.eventData[type]);
+				}, 1000)
+
+				// this.$get(this.url, {
+				// 	equipmentIdList: this.checkedEquipments.join(","),
+				// 	startTime: this.datetime.start,
+				// 	endTime: this.datetime.end,
+				// 	type: type
+				// })
+				// .then((res) => {
+				// 	this.loading = false;
+				// 	if(!res.errorCode) {
+				// 		// 保存数据。
+				// 		this.eventData[type] = res.data;				
+				// 		this.formatEquipmentData(type, this.eventData[type]);		
+				// 	}
+				// })
+				// .catch((err) => {
+				// 	this.loading = false;  
+				// })
+           	},
+			/**
+			 * 格式化设备数据。
+			 * @param {Stirng} sType
+			 * @param {Array} aoData
+			 * @return {void}
+			 */
+			formatEquipmentData(sType, aoData) {
+				if(!aoData) {
+					return;
+				}
+				switch(sType) {
+					case "1":
+						aoData.forEach(oData => this.equipmentData[oData.equipmentId].status = oData.equipStatusList);
+						break;
+					case "2":
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].work = oData);
+					case "3":
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].quality = oData);
+					case "4":
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].event = oData);
+					case "5":
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].repair = oData);
+					case "6":
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].tool = oData);
+				}
+			},
+			// 保存开始时间。
+			saveStart () {
+				this.datetime.start = new Date(this.datetime.start).Format("yyyy-MM-dd hh:mm:ss");
+				this.datetime.initStart = this.datetime.start;
+				this.startIf=true;
+				this.setWindowTime();
+			},
+			// 取消保存开始时间。
+			cancelStart () {
+				this.datetime.start = this.datetime.initStart;
+				this.startIf=true;
+			},
+			// 保存结束时间。
+			saveEnd () {
+				this.datetime.end = new Date(this.datetime.end).Format("yyyy-MM-dd hh:mm:ss");
+				this.datetime.initEnd = this.datetime.end;
+				this.endIf=true;
+				this.setWindowTime();
+			},
+			// 取消保存结束时间。
+			cancelEnd () {
+				this.datetime.end = this.datetime.initEnd;
+				this.endIf=true;
+			},
+			// 设置窗口时长。
+			setWindowTime () {
+				this.windowTime.interval = (new Date(this.datetime.end).getTime() - new Date(this.datetime.start).getTime())/1000/60/60;
+
+				this.windowTime.start = this.datetime.start;
+				this.windowTime.max = Math.floor(this.windowTime.interval);
+
+				if(this.windowTime.interval > 2) {				
+					this.ratio = this.windowTime.interval/2;
+					this.windowTime.interval = 2;
+					this.windowTime.min = 2;
+					this.windowTime.end = new Date(new Date(this.windowTime.start).getTime() + 2*60*60*1000).Format("yyyy-MM-dd hh:mm:ss");
+				}else {
+					this.ratio = 1;
+					this.windowTime.end = this.datetime.end;
+					this.windowTime.min = 0;
+				}
+				
+			},
+			/**
+			 * 跳转到单设备分析。
+			 * @param {Object} oData
+			 * @return {void}
+			 */
+			showEquiomentDetail (oData) {
+				
+			},
+			/**
+			 * @param {Object} event
+			 * @return {void}
+			 */
+			moveSlider (event) {
+				// 设置滑块位置。
+				let maxLeft = event.currentTarget.clientWidth - this.$refs.slider.clientWidth,				
+					nRatio = 0;
+				
+				if(event.target.getAttribute("class").indexOf("icon-start") > -1) {
+					this.$refs.slider.style.left = 0;
+				}else if(event.target.getAttribute("class").indexOf("icon-end") > -1) {
+					nRatio = Math.floor(maxLeft*100/event.currentTarget.clientWidth);
+				}else if(event.target.getAttribute("class").indexOf("slider") > -1){
+					let left = event.offsetX + event.target.offsetLeft
+					nRatio = Math.floor((left > maxLeft ? maxLeft : left)*100/event.currentTarget.clientWidth);
+				}else {
+					nRatio = Math.floor((event.offsetX > maxLeft ? maxLeft : event.offsetX)*100/event.currentTarget.clientWidth);
+				}	
+
+				let nStart = new Date(this.datetime.start).getTime()*(1-nRatio/100) + nRatio/100*(new Date(this.datetime.end).getTime());
+				this.windowTime.start = new Date(nStart).Format("yyyy-MM-dd hh:mm:ss");
+				this.windowTime.end =  new Date(nStart + this.windowTime.interval*60*60*1000).Format("yyyy-MM-dd hh:mm:ss")
+				this.windowTime.left = nRatio;
+			},
+			// 输入框失去焦点事件,设置视窗。
+			inputTimeBlur () {
+				debugger
+				let nInterval = this.windowTime.interval*60*60*1000,
+					nEnd = new Date(this.windowTime.start).getTime() + nInterval;
+
+				if(Rt.utils.DateDiff(nEnd, this.datetime.end) < 0) {
+					// 若超出结束时间。
+					this.windowTime.end = this.datetime.end;
+					this.windowTime.start = new Date(new Date(this.datetime.end).getTime() - nInterval).Format("yyyy-MM-dd hh:mm:ss");
+					this.windowTime.left = Math.floor(Rt.utils.DateDiff(this.datetime.start, this.windowTime.start)*100/Rt.utils.DateDiff(this.datetime.start, this.datetime.end));
+				}else {
+					this.windowTime.end = new Date(nEnd).Format("yyyy-MM-dd hh:mm:ss");	
+				}
+				
+				this.ratio = Rt.utils.DateDiff(this.datetime.start, this.datetime.end)/1000/60/60/this.windowTime.interval;		
+				// this.$refs.slider.style.width = 100/this.ratio + "%";
+
+			}
+        }
+    }  
+</script>
+
+<style lang="less">    
+	.material-stock  {	  	
+    	.content-list {
+			padding-top: 30px;
+
+			.handle {
+				padding: 0 170px 0 0;
+
+				.time {
+					width: auto;
+				}
+				input {
+					width: 40px;
+					height: 30px;
+					text-align: center;
+					border-radius: 0;
+					padding: 0;
+				}
+				label {
+					display: inline-block;
+					margin: 0 10px;
+				}
+				.split {
+					padding: 0 5px;
+				}
+				.legend {
+					float: right;
+					span {
+						display: inline-block;
+						width: 60px;
+						height: 30px;
+						line-height: 30px;
+						text-align: center;
+						color: #fff;
+						margin-left: 20px;
+					}
+				}
+			}
+
+			.analysis {
+				display: flex;
+				padding-right: 170px;
+
+				.name {
+					width: 150px;
+					flex: 0 150px;
+
+					label {
+						display: block;
+						margin: 20px 0;
+
+						&:first-child {
+							margin-top: 40px;
+						}
+
+						&:hover {
+							overflow: visible;	
+							color: #42af8f;
+						}
+
+						i {
+							display: inline-block;
+							font-size: 12px;
+							margin-left: 10px;
+						}	
+					}
+				}
+				.equipment {
+					flex: 1 1;
+					overflow: hidden;
+					position: relative;
+				}
+			}
+
+			.timeline {
+				margin-top: 20px;
+
+				.line {
+					margin: 0 170px 0 150px;
+					background: url(../../assets/img/line.png) repeat;
+					position: relative;
+
+					cursor: pointer;
+
+					.icon-start {
+						background-color: #fff;
+						margin-left: -20px;
+					}
+					.icon-end {
+						float: right;
+						background-color: #fff;
+						margin-right: -20px;
+					}
+				}
+				// 滑块。
+				.slider {
+					position: absolute;
+					border: 2px solid #42af8f;
+					background-color: #fff;
+					height: 20px;
+					box-sizing: border-box;
+					left: 0;
+					top: 0;
+					
+					
+					&:hover {
+						background-color: #42af8f;
+					}
+				}
+				.setting {
+					height: 30px;
+					line-height: 30px;
+					padding: 0 100px 0 60px;
+
+					.start,.end {
+						width: 180px;
+						text-align: center;
+					}
+					.start {
+						float: left;
+					}
+					.end {
+						float: right;
+					}
+					.edit {
+						position: relative;
+
+						.edit-icon {
+							position: absolute;
+							right: -40px;
+							top: 0;
+							i {
+								cursor: pointer;
+								color: #bfd9d4;
+								&:hover {
+									color: #42af8f;
+								}
+							}
+							i + i {
+								margin-left: 5px;
+							}
+						}
+					}
+					.el-input__inner {
+						height: 30px;
+						border-radius: 0;
+					}
+
+				}
+
+			}
+
+    	}
+    }
+</style>

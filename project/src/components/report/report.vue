@@ -1,12 +1,9 @@
 <template>
 	<div class="report">
-		<!--div class="loading" v-if="loading">
-			Loading...
-		</div-->
-		<div v-if="error" class="error">
+		<!--div v-if="error" class="error">
 			{{ error }}
-		</div>
-		<div v-if="!error" ref="content">
+		</div-->
+		<div v-if="!sErrorMessage" ref="content">
 			<div ref="outputs" :class="{ actived: active.outputs }">				
 				<h2 class="content-title" @click="active.outputs=!active.outputs">汇总信息<i class="el-icon-d-arrow-right icon"></i></h2>
 				<div class="content-table">
@@ -31,9 +28,9 @@
 			<div ref="outStocks" :class="{ actived: active.outStocks }">				
 				<h2 class="content-title" @click="active.outStocks=!active.outStocks">出库明细<i class="el-icon-d-arrow-right icon"></i></h2>
 				<div class="content-table">
-					<h2 class="inner-title">非成品出库</h2>
+					<h2 class="inner-title">出库明细</h2>
 					<v-table :table-data="reportData.outStocks" :loading="loading"></v-table>
-					<h2 class="inner-title">成品发货</h2>
+					<h2 class="inner-title">发货明细</h2>
 					<v-table :table-data="reportData.delivery" :loading="loading"></v-table>
 				</div>
 			</div>
@@ -54,7 +51,7 @@
 		data() {
 			return {
 				loading: false,
-				error: null,
+				sErrorMessage: '',
 				url: "/tracereport/bybatch",
 				active: {
 					outputs: true,
@@ -63,6 +60,7 @@
 					inMakings: false
 				},
 				reportData: {
+					// 汇总。
 					outputs: {
 						columns: [{
 							prop: "batchNo",
@@ -74,7 +72,7 @@
 							sortable: true
 						}, {
 							prop: "materialName",
-							name: "物料名字",
+							name: "物料名称",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -98,7 +96,7 @@
 								return a-b>0;
 							}
 						}, {
-							prop: "scrapNum",
+							prop: "disabilityNum",
 							name: "报废数",
 							sortable: true,
 							sortMethod: function(a, b) {
@@ -118,20 +116,25 @@
 						data: [{
 							"batchNo": "20160331A",
 							"materialCode": "0031",
-							"materialName": "物料名字",
+							"materialName": "物料名称",
 							"quantity": 16,
 							"qualifiedNum": "14",
 							"unqualifiedNum": "1",
-							"scrapNum": "1",
+							"disabilityNum": "1",
 							"rate": "0.87"
 						}]
 					},
+					// 发货。
 					delivery: {					
 						columns: [{
 							prop: "barcode",
 							name: "条码",
 							sortable: true
-						}, {
+//						}, {
+//							prop: "barcodeTypeName",
+//							name: "条码类型",
+//							sortable: true
+						},{
 							prop: "batchNo",
 							name: "批次",
 							sortable: true
@@ -141,7 +144,7 @@
 							sortable: true
 						}, {
 							prop: "materialName",
-							name: "物料名字",
+							name: "物料名称",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -186,9 +189,10 @@
 						}],
 						data: [{
 							"barcode": "003311",
+//							"barcodeTypeName": "22",
 							"batchNo": "20160331A",
 							"materialCode": "物料编码",
-							"materialName": "物料名字",
+							"materialName": "物料名称",
 							"quantity": 16,
 							"stock": "仓库",
 							"stocklot": "库位",
@@ -198,9 +202,10 @@
 							"outstockTime": "2016-03-31 14:28:33"
 						}, {
 							"barcode": "003311",
+//							"barcodeTypeName": "22",
 							"batchNo": "20160331A",
 							"materialCode": "物料编码",
-							"materialName": "物料名字",
+							"materialName": "物料名称",
 							"quantity": 16,
 							"stock": "仓库",
 							"stocklot": "库位",
@@ -210,12 +215,17 @@
 							"outstockTime": "2016-03-31 14:28:33"
 						}]
 					},
+					// 出库。
 					outStocks: {					
 						columns: [{
 							prop: "barcode",
 							name: "条码",
 							sortable: true
-						}, {
+//						}, {
+//							prop: "barcodeTypeName",
+//							name: "条码类型",
+//							sortable: true
+						},{
 							prop: "batchNo",
 							name: "批次",
 							sortable: true
@@ -225,7 +235,7 @@
 							sortable: true
 						}, {
 							prop: "materialName",
-							name: "物料名字",
+							name: "物料名称",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -270,9 +280,10 @@
 						}],
 						data: [{
 							"barcode": "003311",
+//							"barcodeTypeName": "22",
 							"batchNo": "20160331A",
 							"materialCode": "物料编码",
-							"materialName": "物料名字",
+							"materialName": "物料名称",
 							"quantity": 16,
 							"stock": "仓库",
 							"stocklot": "库位",
@@ -282,12 +293,17 @@
 							"outstockTime": "2016-03-31 14:28:33"
 						}]
 					},
+					// 在库
 					inStocks: {					
 						columns: [{
 							prop: "barcode",
 							name: "条码",
 							sortable: true
-						}, {
+//						}, {
+//							prop: "barcodeTypeName",
+//							name: "条码类型",
+//							sortable: true
+						},{
 							prop: "batchNo",
 							name: "批次",
 							sortable: true
@@ -297,7 +313,7 @@
 							sortable: true
 						}, {
 							prop: "materialName",
-							name: "物料名字",
+							name: "物料名称",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -346,11 +362,12 @@
 						}],
 						data: [{
 							"barcode": "003322",
+//							"barcodeTypeName": "2",
 							"batchNo": "批次号",
 							"materialCode": "物料编码",
-							"materialName": "物料名字",
+							"materialName": "物料名称",
 							"quantity": 16,
-							 "remainingNum": 16,
+							"remainingNum": 16,
 							"stock": "仓库",
 							"stocklot": "库位",
 							"customer": "客户名",
@@ -359,6 +376,7 @@
 							"instockTime": "2016-03-31 14:28:33"
 						}]
 					},
+					// 加工
 					inMakings: {
 						columns: [{
 							prop: "batchNo",
@@ -370,11 +388,15 @@
 							sortable: true
 						}, {
 							prop: "materialName",
-							name: "物料名字",
+							name: "物料名称",
 							sortable: true
 						}, {
 							prop: "processName",
 							name: "工序",
+							sortable: true
+						}, {
+							prop: "equipmentName",
+							name: "设备",
 							sortable: true
 						}, {
 							prop: "inNum",
@@ -384,14 +406,14 @@
 								return a-b>0;
 							}
 						}, {
-							prop: "useNum",
+							prop: "consumedNum",
 							name: "已消耗数量",
 							sortable: true,
 							sortMethod: function(a, b) {
 								return a-b>0;
 							}
 						}, {
-							prop: "remainNum",
+							prop: "remainingNum",
 							name: "剩余量",
 							sortable: true,
 							sortMethod: function(a, b) {
@@ -406,14 +428,16 @@
 						data: [{
 							"batchNo": "批次号", 
 							"materialCode": "物料编码", 
-							"materialName": "物料名字", 
+							"materialName": "物料名称", 
 							"processName": "工序名称",
+							"equipmentName": "设备名称",
 							"inTime": "2016-03-31 14:28:33", 
 							"inNum": 16,
-							"useNum": 14,
-							"remainNum": 1
+							"consumedNum": 14,
+							"remainingNum": 1
 				        }]
 					},
+					// 滞留
 					remain: {
 						columns: [{
 							prop: "batchNo",
@@ -425,56 +449,67 @@
 							sortable: true
 						}, {
 							prop: "materialName",
-							name: "物料名字",
+							name: "物料名称",
 							sortable: true
 						}, {
 							prop: "processName",
 							name: "工序",
 							sortable: true
 						}, {
-							prop: "lastOutQuantity",
+							prop: "equipmentName",
+							name: "设备",
+							sortable: true
+						}, {
+							prop: "outNum",
 							name: "数量",
 							sortable: true,
 							sortMethod: function(a, b) {
 								return a-b>0;
 							}
 						}, {
-							prop: "lastOutQualifiedNum",
+							prop: "qualifiedNum",
 							name: "合格数",
 							sortable: true,
 							sortMethod: function(a, b) {
 								return a-b>0;
 							}
 						}, {
-							prop: "lastOutUnqualifiedNum",
+							prop: "unqualifiedNum",
 							name: "不合格数",
 							sortable: true,
 							sortMethod: function(a, b) {
 								return a-b>0;
 							}
 						}, {
-							prop: "lastOutScrapNum",
+							prop: "disabilityNum",
 							name: "报废数",
 							sortable: true,
 							sortMethod: function(a, b) {
 								return a-b>0;
 							}
 						}, {
-							prop: "lastOutTime",
-							name: "产出时间",
+							prop: "outTimeFirst",
+							name: "最早产出时间",
+							width: "150",
+							sortable: true
+						},{
+							prop: "outTimeLast",
+							name: "最晚产出时间",
 							width: "150",
 							sortable: true
 						}],
 						data: [{
 							"batchNo": "批次号", 
 							"materialCode": "物料编码", 
-							"materialName": "物料名字", 
+							"materialName": "物料名称", 
 							"processName": "工序名称",
-							"lastOutTime": "2016-03-31 14:28:33", //最后产出时间 格式：yyyy-MM-dd hh:mm:ss
-							"lastOutQuantity": 16, //最后产出数量
-							"lastOutQualifiedNum": 14, //最后产出合格数
-							"lastOutUnqualifiedNum": 1, //最后产出不合格数,
-							"lastOutScrapNum": 1, // 最后产出报废数,
+							"equipmentName": "设备名称",
+							"outTimeFirst": "2016-03-31 14:28:33",
+							"outTimeLast": "2016-03-31 14:28:33", //最后产出时间 格式：yyyy-MM-dd hh:mm:ss
+							"outNum": 16, //最后产出数量
+							"qualifiedNum": 14, //最后产出合格数
+							"unqualifiedNum": 1, //最后产出不合格数,
+							"disabilityNum": 1, // 最后产出报废数
 				        }]
 					}
 				}				
@@ -489,8 +524,31 @@
 			this.setSequence();
 		},
 		methods: {
+			// 判断调用接口是否成功。
+			judgeLoaderHandler(param, fnSu, fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					this.sErrorMessage = param.data.errorMsg.message;
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu();
+				}
+			},	
+			// 显示提示信息。
+			showMessage() {
+				this.$message({
+					message: this.sErrorMessage,
+					duration: 3000
+				});
+			},		
 			fetchData() {
-				this.error = null;
+				this.sErrorMessage = '';
 				this.loading = true;
 				
 				let oQuery = this.$route.query;
@@ -506,17 +564,15 @@
 					}
 				}
 				
-				this.$get(this.url, oQuery)
+				this.$get(HOST + this.url, oQuery)
 					.then((res) => {
-						this.loading = false;
-						
+						this.loading = false;					
 						let bSetWidth = false;
-						
-						if(!res.errorCode) {
+						this.judgeLoaderHandler(res, () => {
 							let oData = this.reportData;
 								
 							for(let p in oData) {
-								oData[p].data = res[p];
+								oData[p].data = res.data.data[p];
 								
 								if(res[p].length && !bSetWidth) {
 									bSetWidth = true;
@@ -534,17 +590,19 @@
 										}
 									})
 								}
-							}														
-						}
-						
+							}							
+						})
+
 						if(!bSetWidth) {
 							this.$emit("noData");
 							this.error = "查无数据。"
 						}
+
 					})
 					.catch((err) => {
 						this.loading = false;
-						this.error = "查询出错。"
+						this.sErrorMessage = "查询出错。"
+						this.showMessage();
 						this.$emit("noData");
 					})
 			},
@@ -552,8 +610,7 @@
 				if(this.type == "trace") {
 					// 若为快速报告，改变显示顺序：汇总-出库-在制-在库
 					this.$refs.content.insertBefore(this.$refs.outStocks, this.$refs.inMakings);
-					this.$refs.content.append(this.$refs.inStocks);
-					
+					this.$refs.content.append(this.$refs.inStocks);					
 				}
 			}
 		}

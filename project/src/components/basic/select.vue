@@ -94,7 +94,8 @@
         			// 物料只取其中一部分。
         			this.options = this.list.filter((o,index)=>{
         				return index<nLen;
-        			})
+        			});
+        			this.oInit = this.options;
         		}else {
         			// 默认为所有、
 	        		this.options = this.list;
@@ -108,7 +109,7 @@
 		        	 	this.list = res.data.data.map(o=>{
 		        	 		return {
 		        	 			label: o[oAjax[sKey].code+"Name"],
-		        	 			value: o[oAjax[sKey].code+"Code"]
+		        	 			value: (sKey == "equipmentId")?o[oAjax[sKey].code+"Id"]:o[oAjax[sKey].code+"Code"]
 		        	 		}
 		        	 	});
 	        		}else {
@@ -156,7 +157,8 @@
             				this.loading = false;
             				this.options = this.list.filter(o=>{
             					// 编码或名称匹配
-            					if((o.label.indexOf(sQuery)>-1 || o.value.indexOf(sQuery)>-1) && nFilter<nLen){
+            					let sLable = this.getDisplayName(o);
+            					if((sLable.indexOf(sQuery)>-1||o.label.indexOf(sQuery)>-1 || o.value.indexOf(sQuery)>-1) && nFilter<nLen){
             						nFilter++;
             						return true;
             					}else {

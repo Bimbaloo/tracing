@@ -22,7 +22,7 @@ Date.prototype.Format = function(fmt){
 	}
 	
 	return fmt;   
-} 
+}
 
 // 全局变量，命名空间
 Rt = {};

@@ -72,9 +72,6 @@
             tool: function() {
                 return this.equipmentTool;
             },
-            diffTime: function() {
-                return Rt.utils.DateDiff(this.dateTime.start, this.dateTime.end);
-            },
             selectedDimension: function() {
                 if(typeof this.dimensionData == "string") {
                     return [this.dimensionData];
@@ -109,12 +106,12 @@
                 this.setTool();
             },
             selectedDimension: function() {
-            },
-            dateTime: function() {
-
             }
         },
         methods: {
+            getDiffTime: function() {
+                return Rt.utils.DateDiff(this.dateTime.start, this.dateTime.end);
+            },
             // 设置状态。
             setStatus: function() {
                 // console.log(JSON.stringify(this.status));
@@ -133,8 +130,8 @@
                             return createElement("div", {
                                 class: ["status"],
                                 style: {
-                                    left: Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.diffTime + "%",
-                                    width: Rt.utils.DateDiff(item.startTime, item.endTime)*100/self.diffTime + "%"
+                                    left: Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.getDiffTime() + "%",
+                                    width: Rt.utils.DateDiff(item.startTime, item.endTime)*100/self.getDiffTime() + "%"
                                 },
                                 attrs: {
                                     "data-type": item.type
@@ -347,7 +344,7 @@
                         return createElement("div", {
                             class: ["dimension-list", sType, sClass],
                             style: {
-                                left: Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.diffTime + "%"
+                                left: Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.getDiffTime() + "%"
                             },
                             attrs: {
                                 "group-id": groupId

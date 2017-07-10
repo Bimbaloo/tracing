@@ -146,11 +146,12 @@
 										}
 									})
 								}else {
+									debugger
 									this.$router.push({ 
-										path: "/process", 
+										path: "/process",
 										query: {
 											"key": node.data.key
-										}
+										}										
 									})
 								}
 							},
@@ -328,7 +329,7 @@
 										margin: 4,
 										stroke: "#169bd5"
 									},
-									new go.Binding("text", "key"))
+									new go.Binding("text", "showName"))	// key
 							),
 							// create a placeholder to represent the area where the contents of the group are
 							$(go.Placeholder, {

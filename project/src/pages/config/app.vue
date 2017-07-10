@@ -10,9 +10,11 @@
             </div>
 
             <div class="content-bg">
-                <div class="content">
-                    <router-view></router-view>
-                </div>
+            	<div class="content-wrap">
+	                <div class="content">
+	                    <router-view></router-view>
+	                </div>
+            	</div>
             </div>
         </div>
     </div>
@@ -103,12 +105,21 @@
         }
         .content-bg{
             width: 100%;
+            /*height: 100%;*/
             background: #cccccc;
             padding: 20px;
-            .content{
-                width: 100%;
-                height: 100%;
-                background: #ffffff;
+            display: flex;
+            
+            .content-wrap {
+            	flex: 1;
+            	position: relative;
+            	
+	            .content{
+	            	position: absolute;
+	                width: 100%;
+	                height: 100%;
+	                background: #ffffff;
+	            }
             }
         }
     }

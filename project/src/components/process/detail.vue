@@ -61,15 +61,15 @@
 					show: false,
                     list: [{
 						name: "质检",
-						path: "",
+						cpt: "/QTReport.cpt",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "送检",
-						path: "",
+						cpt: "/QCReport.cpt",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "FGB",
-						path: "",
+						cpt: "/FGBReport.cpt&__bypagesize__=false",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     }]
 				}, {
@@ -79,7 +79,7 @@
 					list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentId", "startTime", "endTime"]  
+						query: ["equipmentIdList", "startTime", "endTime"]  
                     }]
 				}, {
 					name: "事件",
@@ -139,7 +139,18 @@
 			listButtonClick(oData) {
 				if(oData.router) {				
 					let oQuery = this.getParamter(oData.query);
+					
 					this.$router.push({path: oData.router, query: oQuery});
+				}
+
+				if(oData.cpt) {
+					let oParam = this.getParamter(oData.parameter),
+						sPath = FINE_REPORT_HOST + oData.cpt;
+
+					oData.parameter.forEach(p => {
+						sPath += "&" + p + "=" + oParam[p]
+					});
+					window.open(sPath , "_blank");
 				}
 			},
 			/**
@@ -150,6 +161,9 @@
 				let oParam = {};
 				aQuery.forEach(param => {
 					switch (param) {
+						case "equipmentIdList":
+							oParam[param] = this.node.equipmentId;
+							break;
 						case "equipmentId": 
 							oParam[param] = this.node[param];
 							break;

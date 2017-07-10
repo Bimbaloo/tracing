@@ -2,27 +2,30 @@
   <div id="app">
     <v-header></v-header>
     <el-row :gutter="0" class="content">
-      <el-col :xs="15" :sm="12" :md="9" :lg="5" class="nav" v-if="!collapse">      	
-          <el-tabs 
-          v-model="activeKey" 
-          type="border-card" 
-          class="search-tab"  
-          ref="searchTab" 
-          @tab-click="handleClick"  
-          v-bind:style="{ height: searchTab }">
-            <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-              <v-panel :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
-            </el-tab-pane>
-          </el-tabs>            
+      <el-col :xs="15" :sm="12" :md="9" :lg="5" :class="[{ collapsed: collapse }, 'nav']">      	
+         <div class="flex-wraps">
+	         <el-tabs 
+	          v-model="activeKey" 
+	          type="border-card" 
+	          class="search-tab"  
+	          ref="searchTab" 
+	          @tab-click="handleClick"  
+	          v-bind:style="{ height: searchTab,position:'absolute' }">
+	            <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
+	              <v-panel :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
+	            </el-tab-pane>
+	          </el-tabs>            
+         </div>
       </el-col>
       <el-col :xs="collapse?24:9" :sm="collapse?24:12" :md="collapse?24:15" :lg="collapse?24:19" class="router">
-      		<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
-      		<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
-          <div class="router-container" ref="routerContainer">
-            <div v-if="tip" class="tip"></div>
-            <router-view></router-view>
-          </div>
-        
+      		<div class="flex-wraps">
+	      		<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
+	      		<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
+	          <div class="router-container" ref="routerContainer">
+	            <div v-if="tip" class="tip"></div>
+	            <router-view></router-view>
+	          </div>
+      		</div>
       </el-col>
     </el-row>
   </div>
@@ -61,10 +64,11 @@
           oData = JSON.parse(oData);
           this.activeKey = oData.tab;
       }else if(window.location.hash.length > 2) {
-					// 清空了cookie后，或url中有参数。
-					location.assign("detail.html")
+					// 清空了cookie后，url中有参数。则获取url中的参数。
+					oData = this.getSearchData();
+					this.activeKey = oData.tab;
       }
-			
+      
       this.$ajax.get(MODULE_ITEM_URL).then((res) => {
       	this.judgeLoaderHandler(res,() => {
 	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
@@ -88,6 +92,7 @@
       		
       	});
       });
+      
     },
     mounted() {
       window.onresize = () => {
@@ -95,19 +100,28 @@
       }
     },
     methods: {
-    	query () {
-				let url = location.search; //获取url中"?"符后的字串 
-				let oRequest = {};
-				if(url.indexOf("?") != -1) {
-					let strs = url.substr(1).split("&");
-
-					for(let i = 0; i < strs.length; i++) {
-						oRequest[strs[i].split("=")[0]] = decodeURIComponent(strs[i].split("=")[1]);
-					}
-				}
-				console.log(url)
-				console.log(oRequest)
-				return oRequest;
+    	getSearchData () {
+				let oData = {
+							tab: "",
+							keys: {},
+							radio: "1"
+						},
+						aHref = location.href.split("?"),
+						aParams = aHref[1].split("&"),
+						aInfo = aHref[0].split("/");
+					
+					// 设置tab和radio
+					oData.tab = aInfo[aInfo.length-2];
+					oData.radio = aInfo[aInfo.length-1];
+					
+					// 设置keys。
+					aParams.forEach(o=>{
+						let aAttr = o.split("=");
+						oData.keys[aAttr[0]] = aAttr[1];
+					});
+					
+					// 返回参数。
+					return oData;
 			},
     	// 判断调用接口是否成功。
     	judgeLoaderHandler(param,fnSu,fnFail) {
@@ -157,10 +171,10 @@
 
           sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
 
-          if(this.activeKey == "stock") {
+//        if(this.activeKey == "stock") {
             // 若为查出库。
             sPath = sPath + '/' + oConditions.radio;
-          }
+//        }
         
           this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
       }
@@ -169,7 +183,7 @@
 </script>
 
 <style lang="less">
-  html,body {
+ html,body {
     height: 100%;
   }
 
@@ -186,24 +200,30 @@
     flex-direction: column;
 
     .content {
+    	display: flex;
       flex: 1;
 			
       .nav {
+      	display: flex;
         border-right: 1px solid #ccc;
         box-sizing: border-box;
-        height: 100%;
+        /*height: 100%;*/
+        
+        &.collapsed {
+					display: none;
+				}
       }
 
       .router {
-        // flex: 1 1;
+      	display: flex;
         padding: 20px;  
         box-sizing: border-box;
-        height: 100%;
+        /*height: 100%;*/
         position: relative;
               
 				.btn-collapse {
 					position: absolute;
-					left: 2px;
+					left: -18px; // 2px;
 					top: 50%;
 					color: #42AF8F;
 					font-weight: bold;
@@ -212,7 +232,13 @@
 				} 
       }
 
+			.flex-wraps {
+				flex: 1;
+				position: relative;
+			}
+			
       .router-container {
+      	position: absolute;
         border: 1px solid #ccc;
         background-color: #fff;
         padding: 0 20px;

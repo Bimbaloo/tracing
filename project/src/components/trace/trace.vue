@@ -4,9 +4,6 @@
     	<el-button class="btn btn-plain" @click="onTrace">溯源</el-button>
         <div class="router-content">
 	        <div class="innner-content" style="min-width: 1500px;">
-	            <!--div class="loading" v-if="gridData.loading">
-	                Loading...
-	            </div-->
 	            <div v-if="gridData.error" class="error">
 	                {{ gridData.error }}
 	            </div>
@@ -21,8 +18,6 @@
 <script>
 	import $ from "jquery"
     import table from "components/basic/table.vue"
-	// 测试的地址。
-	const TEST = "http://192.168.20.181:8080";
 	
     export default {
         components: {
@@ -31,7 +26,7 @@
         data () {
             return {
                 gridData: {
-                    url: TEST + "/api/v1/trace/up/start-points",
+                    url: HOST + "/api/v1/trace/up/start-points",
                     loading: false,
                     error: null,
                     height: "100%",
@@ -56,7 +51,7 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名字"
+                        name: "物料名称"
                     },{
                         prop: "materialSpec",
                         name: "物料规格"
@@ -171,7 +166,7 @@
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            		({ batchNo: oSelected.batchNo,materialName:oSelected.materialName,materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
             			
             		aSelected.push(oSelected);
             	})
@@ -179,11 +174,21 @@
             	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
             	
             	sessionStorage.setItem("trace_" + tag, JSON.stringify(aSelected));
-            	window.open("trace/index.html?tag="+tag);            	
+//          	window.open("trace/index.html?tag="+tag);     
+            	window.open("traceIndex.html?tag="+tag);
             }
         }
     }  
 </script>
 
 <style lang="less">
+	
+	.error {
+		border: 2px solid #42AF8F;
+	    padding: 20px 12px;
+	    margin-bottom: 30px;
+	    font-size: 14px;
+	    color: red;
+	}
+	
 </style>

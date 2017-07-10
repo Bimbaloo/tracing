@@ -11,10 +11,24 @@
 		</div>
 		<div class="analysis">
 			<div class="name">
-				<label @click="showEquiomentDetail(info)" v-for="info in equipments" v-if="equipmentData[info.equipmentId].selected">{{info.equipmentName}}<i class="el-icon-d-arrow-right"></i></label>
+				<label @click="showEquipmentDetail(info)" v-for="info in equipments" v-if="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected">{{info.equipmentName}}<i class="el-icon-d-arrow-right"></i></label>
 			</div>
 			<div class="equipment">
-				<v-equipmentLine v-for="(info,index) in equipments" v-if="equipmentData[info.equipmentId].selected" :key="info.equipmentId" :euqipment-index="index" :euqipment-status="equipmentData[info.equipmentId].status" :euqipment-work="equipmentData[info.equipmentId].work" :euqipment-quality="equipmentData[info.equipmentId].quality" :euqipment-event="equipmentData[info.equipmentId].event" :euqipment-repair="equipmentData[info.equipmentId].repair" :euqipment-tool="equipmentData[info.equipmentId].tool" :dimension-data="dimensionData" :ratio="ratio" :date-time="datetime" :window-time="windowTime"></v-equipmentLine>
+				<v-equipmentLine 
+					v-for="(info,index) in equipments" 
+					v-if="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected" 
+					:key="info.equipmentId" 
+					:euqipment-index="index" 
+					:euqipment-status="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].status" 
+					:euqipment-work="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].work" 
+					:euqipment-quality="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].quality" 
+					:euqipment-event="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].event" 
+					:euqipment-repair="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].repair" 
+					:euqipment-tool="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].tool" 
+					:dimension-data="dimensionData" 
+					:ratio="ratio" 
+					:date-time="datetime" 
+					:window-time="windowTime"></v-equipmentLine>
 			</div>
 		</div>
 		<div class="timeline">
@@ -59,7 +73,8 @@
 			checkedEquipments: Array,
 			dimensionData: [Array, String],
 			windowTime: Object,
-			process: String
+			process: String,
+			processKey: String,
 		},
 		components: {
 			'v-datetime': DateTime,
@@ -69,48 +84,48 @@
             return {		
 				oTest: {
 					"1": [{
-						"equipmentId": 1,
+						"equipmentId": 175,
 						"equipStatusList" : [{
-							"startTime" : "2016-03-31 8:00:00",
-							"endTime" : "2016-03-31 8:30:00",
+							"startTime" : "2017-06-23 8:00:00",
+							"endTime" : "2017-06-23 8:30:00",
 							"type" : "close"
 						},{
-							"startTime" : "2016-03-31 8:30:00",
-							"endTime" : "2016-03-31 14:00:00",
+							"startTime" : "2017-06-23 8:30:00",
+							"endTime" : "2017-06-23 14:00:00",
 							"type" : "run"
 						},{
-							"startTime" : "2016-03-31 14:00:00",
-							"endTime" : "2016-03-31 14:30:00",
+							"startTime" : "2017-06-23 14:00:00",
+							"endTime" : "2017-06-23 14:30:00",
 							"type" : "debug"
 						},{
-							"startTime" : "2016-03-31 14:30:00",
-							"endTime" : "2016-03-31 16:30:00",
+							"startTime" : "2017-06-23 14:30:00",
+							"endTime" : "2017-06-23 16:30:00",
 							"type" : "stop"
 						},{
-							"startTime" : "2016-03-31 16:30:00",
-							"endTime" : "2016-03-31 17:00:00",
+							"startTime" : "2017-06-23 16:30:00",
+							"endTime" : "2017-06-23 17:00:00",
 							"type" : "close"
 						}]
 					}],
 					"2": [{
-						"equipmentId": 1,
+						"equipmentId": 202,
 						"startWorkList" : [{
 							"groupId" : 1,
-							"happenTime" : "2016-03-31 8:30:00",
+							"happenTime" : "2017-06-23 8:30:00",
 							"doCode" : "D201603310017", 
 							"personName" : "李瑞娇",
 							"processName" : "GP12"
 						}],
 						"finishWorkList" : [{
 							"groupId" : 1,
-							"happenTime" : "2016-03-31 14:00:00",
+							"happenTime" : "2017-06-23 14:00:00",
 							"doCode" : "D201603310017", 
 							"personName" : "李瑞娇",
 							"processName" : "GP12"
 						}],
 						"poolInList" : [{
 							"groupId" : 3,
-							"happenTime" : "2016-03-31 9:00:00",
+							"happenTime" : "2017-06-23 9:00:00",
 							"doCode" : "D201603310017", 
 							"materialName" : "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
 							"materialCode" : "10000515",
@@ -120,7 +135,7 @@
 						}],
 						"poolOutList" :[{
 							"groupId" : 3,
-							"happenTime" : "2016-03-31 13:30:00",
+							"happenTime" : "2017-06-23 13:30:00",
 							"doCode" : "D201603310017",
 							"materialName" : "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
 							"materialCode" : "10000515",
@@ -132,16 +147,16 @@
 						}]
 					}],				
 					"3": [{
-						"equipmentId": 1,
-						"shortQcList" :[{
-							"startTime" : "2016-03-31 9:30:33",
-							"endTime" : "2016-03-31 10:35:33",
+						"equipmentId": 202,
+						"qcList" :[{
+							"startTime" : "2017-06-23 9:30:33",
+							"endTime" : "2017-06-23 10:35:33",
 							"personName" : "李瑞娇",
 							"method" : "xxx",
 							"result" : "bad"
 						}],
-						"longQcList" :[{
-							"happenTime" : "2016-03-31 12:00:00",
+						"submitQcList" :[{
+							"happenTime" : "2017-06-23 12:00:00",
 							"requestId" : "xxxxxxxx",
 							"doCode" : "D201703310017",
 							"materialName" : "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
@@ -152,7 +167,7 @@
 							"personName" : "李瑞娇",
 							"method" : "xxx",
 							"result" : "pass",
-							"checkTime" : "2016-03-31 14:00:00",
+							"checkTime" : "2017-06-23 14:00:00",
 							"checkPersonName" : "李瑞娇",
 							"reportpath" : "\\192.168.1.2\report\XXXX\YYYY"
 						}]
@@ -160,7 +175,7 @@
 				},
 				loading: false,
 				sErrorMessage: "",
-                url: HOST + "/api/v1/trace/equipments-events",		
+                url: HOST + "/api/v1/trace/equipments-events",	
 				// 比例。
 				ratio: 1,
 				// 设备状态。
@@ -183,43 +198,117 @@
 				}],				
 				startIf: true,
 				endIf: true,
-				eventData: {}
+				eventData: {},
+				equipmentData: {},
+				datetime: {
+					start: "",
+					initStart: "",
+					end: "",
+					initEnd: ""
+				}
             }
         },
         computed: {
 			rawData () {
 		    	return this.$store.state.rawData
 		  	},
-			datetime () {
-				let start = "",
-					end = "";
-				this.checkedEquipments.forEach((id, index) => {
-					let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
-					if(equipment) {
-						let sTemp = equipment.startTime,
-							eTemp = equipment.endTime
-						if(!index) {
-							start = sTemp;
-							end = eTemp;
-						}else{
-							if(start > sTemp) {
-								start = sTemp;
-							}
-							if(end < eTemp) {
-								end = eTemp;
-							}
-						} 									
-					}					
-				})
+			// equipmentData () {				
+			// 	let oData = {};
+			// 	this.equipments.forEach(o => {
+			// 		let sId = o.equipmentId;
+			// 		oData[sId] = {
+			// 			selected: this.checkedEquipments.indexOf(sId) > -1,
+			// 			status: [],
+			// 			// 加工
+			// 			work: {},
+			// 			// 质量
+			// 			quality: {},
+			// 			// 事件
+			// 			event: {},
+			// 			// 维护
+			// 			repair: {},
+			// 			// 工具
+			// 			tool: {}
+			// 		}
+			// 	})	
+			// 	return oData;			
+			// },			
+			// datetime () {
+			// 	let start = "",
+			// 		end = "";
+			// 	this.checkedEquipments.forEach((id, index) => {
+			// 		let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
+			// 		if(equipment) {
+			// 			let sTemp = equipment.shitStartTime,
+			// 				eTemp = equipment.shitEndTime
+			// 			if(!index) {
+			// 				start = sTemp;
+			// 				end = eTemp;
+			// 			}else{
+			// 				if(start > sTemp) {
+			// 					start = sTemp;
+			// 				}
+			// 				if(end < eTemp) {
+			// 					end = eTemp;
+			// 				}
+			// 			} 									
+			// 		}					
+			// 	})
 
-				return {
-					start: start,
-					initStart: start,
-					end: end,
-					initEnd: end
+			// 	return {
+			// 		start: start,
+			// 		initStart: start,
+			// 		end: end,
+			// 		initEnd: end
+			// 	}
+			// },
+        },
+        created () {
+            // 组件创建完后获取数据，
+            // 此时 data 已经被 observed 了
+			// 设置窗口时长。
+			this.init();
+
+        },
+        mounted () {
+
+        },
+        watch: {
+			// 选中维度变化。
+			dimensionData: function() {
+				this.getDimensionData();					
+			},
+			// 选中设备变化。
+			checkedEquipments: function() {
+				// debugger
+				this.equipments.forEach(o => this.equipmentData[o.equipmentId] && (this.equipmentData[o.equipmentId].selected = this.checkedEquipments.indexOf(o.equipmentId) > -1))			
+			},
+			processKey: function() {
+				this.init();
+			}	
+        },
+        methods: {
+			init() {
+				// debugger
+				this.setInitData();
+				
+				this.setWindowTime();
+
+				if(typeof this.dimensionData == "string") {
+					// 查询设备状态。
+					this.fetchData("1");
+				}else {
+					// 获取所有数据。
+					this.fetchAllData();
 				}
 			},
-			equipmentData () {
+			// 初始化数据。
+			setInitData() {
+				this.ratio = 1;
+				this.startIf = true;
+				this.endIf = true;
+				this.eventData = {};
+					
 				let oData = {};
 				this.equipments.forEach(o => {
 					let sId = o.equipmentId;
@@ -238,37 +327,38 @@
 						tool: {}
 					}
 				})	
-				return oData;			
-			}
-        },
-        created () {
-            // 组件创建完后获取数据，
-            // 此时 data 已经被 observed 了
-			// 设置窗口时长。
-			this.setWindowTime();
+				this.equipmentData = oData;
 
-			if(typeof this.dimensionData == "string") {
-				// 查询设备状态。
-            	this.fetchData("1");
-			}else {
-				// 获取所有数据。
-				this.fetchAllData();
-			}
-        },
-        mounted () {
+				let start = "",
+					end = "";
+				this.checkedEquipments.forEach((id, index) => {
+					let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
+					if(equipment) {
+						let sTemp = equipment.shitStartTime,
+							eTemp = equipment.shitEndTime
+						if(!index) {
+							start = sTemp;
+							end = eTemp;
+						}else{
+							if(start > sTemp) {
+								start = sTemp;
+							}
+							if(end < eTemp) {
+								end = eTemp;
+							}
+						} 									
+					}					
+				})
 
-        },
-        watch: {
-			// 选中维度变化。
-			dimensionData: function() {
-				this.getDimensionData();					
+				this.datetime = {
+					start: start,
+					initStart: start,
+					end: end,
+					initEnd: end
+				}
+
+
 			},
-			// 选中设备变化。
-			checkedEquipments: function() {
-				this.equipments.forEach(o => this.equipmentData[o.equipmentId].selected = this.checkedEquipments.indexOf(o.equipmentId) > -1)				
-			}
-        },
-        methods: {
 			// 判断调用接口是否成功。
 			judgeLoaderHandler(param,fnSu,fnFail) {
 				let bRight = param.data.errorCode;
@@ -318,8 +408,7 @@
 				// 	this.eventData = Object.assign({}, this.oTest);;
 				// 	["1", "2", "3", "4", "5", "6"].forEach(type => this.formatEquipmentData(type, this.eventData[type]));
 					
-				// }, 1000)
-
+				// }, 1000)				
 				this.$post(this.url, {
 					equipmentIdList: this.checkedEquipments.join(","),
 					startTime: this.datetime.start,
@@ -335,8 +424,11 @@
 						if(!oData) {
 							return;
 						}
-						this.eventData["1"] = oData.equipStatusList;
-
+						this.eventData["1"] = [{
+							equipmentId: oData.equipmentId,
+							equipStatusList: oData.equipStatusList
+						}];	
+						
 						this.eventData["2"] = [{
 							equipmentId: oData.equipmentId,
 							startWorkList: oData.startWorkList,
@@ -378,7 +470,9 @@
 					});
 				})
 				.catch((err) => {
-					this.loading = false;  
+					this.loading = false;
+				 	this.sErrorMessage = "查询出错";  
+				 	this.showMessage();
 				})
 			},
 			/**
@@ -391,7 +485,6 @@
 					return;
 				}
 				this.loading = true;	
-				// debugger
 				// setTimeout(() => {
 				// 	this.loading = false;
 				// 	this.eventData[type] = Object.assign([], this.oTest[type]);
@@ -413,7 +506,9 @@
 					});					
 				})
 				.catch((err) => {
-					this.loading = false;  
+					this.loading = false;
+				 	this.sErrorMessage = "查询出错";  
+				 	this.showMessage();
 				})
            	},
 			/**
@@ -423,29 +518,29 @@
 			 * @return {void}
 			 */
 			formatEquipmentData(sType, aoData) {
-			
+				
 				if(!aoData) {
 					return;
 				}
 				
 				switch(sType) {
 					case "1":
-						aoData.forEach(oData => this.equipmentData[oData.equipmentId].status = oData.equipStatusList);
+						aoData.forEach(oData => this.equipmentData[oData.equipmentId] && (this.equipmentData[oData.equipmentId].status = oData.equipStatusList));
 						break;
 					case "2":
-					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].work = oData);
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId] && (this.equipmentData[oData.equipmentId].work = oData));
 						break;
 					case "3":
-					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].quality = oData);
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId] && (this.equipmentData[oData.equipmentId].quality = oData));
 						break;
 					case "4":
-					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].event = oData);
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId] && (this.equipmentData[oData.equipmentId].event = oData));
 						break;
 					case "5":
-					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].repair = oData);
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId] && (this.equipmentData[oData.equipmentId].repair = oData));
 						break;
 					case "6":
-					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId].tool = oData);
+					 	aoData.forEach(oData => this.equipmentData[oData.equipmentId] && (this.equipmentData[oData.equipmentId].tool = oData));
 						break;
 					default:;
 				}
@@ -559,7 +654,7 @@
 			 * @param {Object} oData
 			 * @return {void}
 			 */
-			showEquiomentDetail (oData) {
+			showEquipmentDetail (oData) {
 				let self = this;				
 				if(typeof this.dimensionData == "string") {
 					// 若为设备列表页面。
@@ -568,8 +663,8 @@
 						query: {
 							equipmentId: oData.equipmentId,
 							equipmentName: oData.equipmentName,
-							startTime: oData.startTime,
-							endTime: oData.endTime,
+							startTime: oData.shiftStartTime,
+							endTime: oData.shiftEndTime,
 							process: this.process
 						}
 					})

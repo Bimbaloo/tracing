@@ -52,7 +52,6 @@ function onClickNode(e, node, oTree, oCatalog) {
 
         node.background = "#40484a";
         node.findObject("TB") && (node.findObject("TB").stroke = "#fff");
-
     }else {    	
 		node.background = null;
         
@@ -90,7 +89,6 @@ function onDoubleClickNode(e, node) {
 		node.wasTreeExpanded = true;
 		node.collapseTree();
 	}
-
 }
 
 /**

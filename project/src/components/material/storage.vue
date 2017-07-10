@@ -11,7 +11,7 @@
             <div class="content-table">
             	<table class="raw-table" v-loading="loading">
             		<tr>
-            			<th v-for="column in materialData.columns" :style="{width: column.width}"  v-if="!column.hide">
+            			<th v-for="column in materialData.columns" :style="{width: column.width}" v-if="!column.hide">
             				{{column.name}}
             			</th>
             		</tr>
@@ -21,6 +21,9 @@
             			</td>
             		</tr>
             	</table>
+				<div v-if="empty" class="empty">
+					{{ empty }}
+				</div>
                 <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
             </div>
 
@@ -41,11 +44,11 @@
                 styleObject: {
                     "min-width": "1000px"
                 },
-                url: "/api/v1/trace/material-detail",
+                url: HOST + "/api/v1/trace/material-detail",
                 // 点击的物料节点信息。
                 node: {},
                 loading: false,
-                // error: null,
+                empty: "",
 				sErrorMessage: "",
                 materialData: {
                     columns: [{
@@ -60,9 +63,7 @@
                     },{
                         prop: "batchNo",
                         name: "批次号",
-                        class: {
-                        	batch: true
-                        },
+                        class: "batch",
                         click: this.batchClick
                     },{
                         prop: "quantity",
@@ -107,14 +108,14 @@
         created () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
-            this.fetchData(this.materialData);
+            this.fetchData();
         },
         mounted () {
 
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            // '$route': 'fetchData'
+            '$route': 'fetchData'
         },
         methods: {
 			// 判断调用接口是否成功。
@@ -144,9 +145,9 @@
             batchClick (row) {
                 this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
             },
-            fetchData (oData) {
-       
-                this.error = oData.data = null;
+            fetchData () {
+				let  oData = this.materialData;
+                oData.data = null;
                 this.loading = true;
 				
 				let sKey = this.$route.query && this.$route.query.key,
@@ -190,28 +191,31 @@
 				// 	oData.data = this.formatData(aoTest);
 			    // }, 1000)
 
-             this.$post(this.url, {
-				 code: this.node.code,
-				 materialInfoList: this.node.materialInfoList
-			 })
-             .then((res) => {
-                 this.loading = false;
-				this.judgeLoaderHandler(res,() => {
-					// 保存数据。
-					oData.data = this.formatData(res.data.data);
-                    this.styleObject.minWidth = "1200px";						
-				});				 
-                 if(!res.errorCode) {
-                     
-                 }
-             })
-             .catch((err) => {
-                 this.loading = false;
-                //  this.error = "查询出错。"
-				this.sErrorMessage = "查询出错。"
-				this.showMessage();
-                this.styleObject.minWidth = 0;          
-             })
+				this.$post(this.url, {
+					code: this.node.code,
+					materialInfoList: this.node.materialInfoList
+				})
+				.then((res) => {
+					this.loading = false;
+					this.empty = "";
+					this.judgeLoaderHandler(res,() => {
+						// 保存数据。
+						if(res.data.data.length) {
+							oData.data = this.formatData(res.data.data);
+							this.styleObject.minWidth = "1200px";
+						}else {
+							this.empty = "暂无数据。"
+						}
+						
+					});				 
+				})
+				.catch((err) => {
+					this.loading = false;
+					//  this.error = "查询出错。"
+					this.sErrorMessage = "查询出错。"
+					this.showMessage();
+					this.styleObject.minWidth = 0;          
+				})
            },
            /**
             * 格式化数据。

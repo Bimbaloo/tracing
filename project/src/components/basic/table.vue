@@ -26,10 +26,8 @@
         :filter-method="column.filterMethod"
         :filter-placement="column.filterPlacement"
         :width="column.width">
-            <template scope="props">
-                <div class="cell" :class="{clicked: props.row.barcodeTypeName == '2'}">{{props.row[column.prop]}}</div>
-            </template>
-        </el-table-column>     
+        </el-table-column>
+        
     </el-table>
 </template>
 
@@ -58,6 +56,7 @@
         methods: {    
             cellClick: function(row, column, cell, event) {
                 let oColumn = this.columns.filter(o => o.prop==column.property)[0];
+                // && row[column.property]
                 oColumn.cellClick && oColumn.cellClick(row);
                 
             },

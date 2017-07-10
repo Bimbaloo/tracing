@@ -1,12 +1,11 @@
 <template>
-    <div class="router-content">
+    <div class="router-content" v-loading="loading">
         <div class="innner-content" :style="styleObject">
             <h2 class="content-title">
             	产出
-            </h2>
-		
+            </h2>	
 			<div class="content-table">
-				<el-table :data="outData" border style="width: 100%" class="table">
+				<!--el-table :data="outData" border style="width: 100%" class="table">
 					<el-table-column v-for="(item, index) in outItems" align="center" :label="item.name" :width="item.width" :key="index">
 						<template scope="props">
 							<div class="cell" v-for="a in props.row[item.prop]">{{a}}</div>
@@ -23,7 +22,23 @@
 
 						</template>
 					</el-table-column>
-				</el-table> 
+				</el-table--> 
+
+                <table class="raw-table" v-loading="loading">
+            		<tr>
+            			<th v-for="column in outItems" :style="{width: column.width}" v-if="!column.hide">
+            				{{column.name}}
+            			</th>
+            		</tr>
+            		<tr v-for="row in product.out">
+            			<td v-for="column in outItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
+            				{{row[column.prop]}}
+            			</td>
+            		</tr>
+            	</table>
+				<div v-if="!product.out.length" class="empty">
+					{{ empty }}
+				</div>
 			</div>
 			
             <h2 class="content-title">
@@ -31,7 +46,7 @@
             </h2>
 	
 			<div class="content-table">
-				<el-table :data="inDatas" border style="width: 100%" class="table">
+				<!--el-table :data="inData" border style="width: 100%" class="table">
 					<el-table-column v-for="(item,index) in inItems" align="center" :label="item.name" :width="item.width" :key="index">
 						<template scope="props">
 							<div class="cell" v-for=" a in props.row[item.prop]">{{a}}</div>
@@ -48,7 +63,22 @@
 
 						</template>
 					</el-table-column>
-				</el-table>
+				</el-table-->
+                <table class="raw-table" v-loading="loading">
+            		<tr>
+            			<th v-for="column in inItems" :style="{width: column.width}" v-if="!column.hide">
+            				{{column.name}}
+            			</th>
+            		</tr>
+            		<tr v-for="row in product.in">
+            			<td v-for="column in inItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
+            				{{row[column.prop]}}
+            			</td>
+            		</tr>
+            	</table>
+				<div v-if="!product.in.length" class="empty">
+					{{ empty }}
+				</div>
 			</div>			
 					
         </div>
@@ -57,14 +87,23 @@
 
 <script>
 
+const url = HOST + "/api/v1/trace/inout/by-equipment";
+
 export default {
     data() {
         return {
+            loading: false,
+            sErrorMessage: "",
+            empty: "暂无数据。",
 			styleObject: {
 				"min-width": "2000px"
 			},
+            product: {
+                out: [],
+                in: []
+            },
             outData: [{
-                eqipmentName: ['装配线2.2线GP1'],
+                equipmentName: ['装配线2.2线GP1'],
                 moldCode: ['2331'],
                 doCode: ['D201705050004'],
                 barcode: ['UN654574375200'],
@@ -79,7 +118,7 @@ export default {
                 happenTime: ['2017-06-29 12:24:24'],
                 rowNum: ['UN654574375200']
             }, {
-                eqipmentName: ['装配线2.2线GP1'],
+                equipmentName: ['装配线2.2线GP1'],
                 moldCode: ['2331'],
                 doCode: ['D201705050004'],
                 barcode: ['UN654574375200'],
@@ -94,7 +133,7 @@ export default {
                 happenTime: ['2017-06-29 12:24:24'],
                 rowNum: ['UN654574375200']
             },{
-                eqipmentName: ['装配线2.2线GP1'],
+                equipmentName: ['装配线2.2线GP1'],
                 moldCode: ['2331'],
                 doCode: ['D201705050004', 'D201705050003'],
                 barcode: ['UN654574375200', 'UN654574375201'],
@@ -109,28 +148,30 @@ export default {
                 happenTime: ['2017-06-29 12:24:24', ''],
                 rowNum: ['UN654574375200', '2222']
             }],
-            inDatas: [{
-                eqipmentName: ['暂无数据'],
-                moldCode: ['暂无数据'],
-                doCode: ['暂无数据'],
-                barcode: ['暂无数据'],
-                batchNo: ['暂无数据'],
-                materialCode:['暂无数据'],
-                materialName: ['暂无数据'],
-                quantity: ['暂无数据'],
-                shiftName: ['暂无数据'],
-                personName: ['暂无数据'],
-                happenTime: ['暂无数据'],
-                rowNum: ['暂无数据']
+            inData: [{
+                equipmentName: ['装配线2.2线GP1'],
+                moldCode: ['2331'],
+                doCode: ['D201705050004'],
+                barcode: ['UN654574375200'],
+                batchNo: ['20170505A'],
+                materialCode:['bbbbbbbbb'],
+                materialName: ['半成品活塞'],
+                quantity: ['1'],
+                shiftName: ['白天'],
+                personName: ['王小虎'],
+                happenTime: ['2017-06-29 12:24:24'],
+                rowNum: ['UN654574375200']
             }],
             outItems: [{
                 name: "设备名称",
-                prop: "eqipmentName",
-                width: "150"
+                prop: "equipmentName",
+                width: "150",
+                merge: true
             }, {
                 name: "模号",
                 prop: "moldCode",
-                width: "120"
+                width: "120",
+                merge: true
             }, {
                 name: "派工单号",
                 prop: "doCode",
@@ -175,16 +216,17 @@ export default {
                 name: "产出时间",
                 prop: "happenTime",
                 width: "200"
-            }]
-            ,
+            }],
             inItems: [{
                 name: "设备名称",
-                prop: "eqipmentName",
-                width: "150"
+                prop: "equipmentName",
+                width: "150",
+                merge: true
             }, {
                 name: "模号",
                 prop: "moldCode",
-                width: "120"
+                width: "120",
+                merge: true
             }, {
                 name: "派工单号",
                 prop: "doCode",
@@ -226,44 +268,133 @@ export default {
         }
     },
     created() {
+        this.fetchData();
+        // this.$get('http://rapapi.org/mockjsdata/21533/a?').
+        //     then((response) => {
+        //         let _outDatas = response.data.out;
 
-        this.$get('http://rapapi.org/mockjsdata/21533/a?').
-            then((response) => {
-                let _outDatas = response.data.out;
+        //         this.outData = this.dataChange(_outDatas)
 
-                this.outData = this.dataChange(_outDatas)
+        //         let _inData = response.data.in;
 
-                let _inDatas = response.data.in;
-
-                this.inDatas = this.dataChange(_inDatas)
-            })
+        //         this.inData = this.dataChange(_inData)
+        //     })
+    },
+    watch: {
+        // 如果路由有变化，会再次执行该方法
+        '$route': 'fetchData'
     },
     methods: {
+        // 判断调用接口是否成功。
+        judgeLoaderHandler(param, fnSu, fnFail) {
+            let bRight = param.data.errorCode;
+            
+            // 判断是否调用成功。
+            if(bRight != "0") {
+                // 提示信息。
+                this.sErrorMessage = param.data.errorMsg.message;
+                this.showMessage();
+                // 失败后的回调函。
+                fnFail && fnFail();
+            }else {
+                // 调用成功后的回调函数。
+                fnSu && fnSu();
+            }
+        },	
+        // 显示提示信息。
+        showMessage() {
+            this.$message({
+                message: this.sErrorMessage,
+                duration: 3000
+            });
+        },		       
+        // 获取数据。
+        fetchData() {    
+            this.loading = true;
+            let oQuery = this.$route.query;
+
+            this.$post(url, oQuery)
+            .then((res) => {
+                this.loading = false;
+             
+                this.judgeLoaderHandler(res,() => {
+                    // 保存数据。
+                    // debugger
+                    // let _outDatas = res.data.data.out;
+                    // this.outData = this.dataChange(_outDatas)
+                    // let _inData = res.data.data.in;
+                    // this.inData = this.dataChange(_inData)
+                    this.product.out = this.formatData(res.data.data.out, this.outItems);
+                    this.product.in = this.formatData(res.data.data.in, this.inItems);
+                });				 
+            })
+            .catch((err) => {
+                this.loading = false;
+                //  this.error = "查询出错。"
+                this.sErrorMessage = "查询出错。"
+                this.showMessage();
+                this.styleObject.minWidth = 0;          
+            })
+        },
+        /**
+        * 格式化数据。
+        * @param {Array} aoData
+        * @return {Array}
+        */
+        formatData (aoData, aocolumns) {
+            // 按照条码进行排序。
+            aoData.sort((a, b) => a.equipmentId>b.equipmentId);
+            
+            let oEquipmentId = {},
+                nRow = 0,
+                nIndex = 1;
+            aoData.forEach((o, index) => {
+                if(oEquipmentId[o.equipmentId]) {							
+                    oEquipmentId[o.equipmentId]++;
+                    aoData[nRow].rowspan = oEquipmentId[o.equipmentId];
+                    o.hide = true;
+                }else {
+                    o.index = nIndex;
+                    oEquipmentId[o.equipmentId] = 1;
+                    nRow = index;
+                    nIndex ++;
+                    o.rowspan = oEquipmentId[o.equipmentId];
+                }
+            })   
+            
+            aocolumns.forEach(column => {					
+                if(aoData.every(o => o[column.prop] === "" || o[column.prop] == undefined)) {
+                // 若每一行都为空，设置隐藏。
+                    column.hide = true;
+                }
+            })
+        
+            return aoData;
+        },
         handleClick(a) {
-            console.log(a);
         },
         dataChange(Datas) {
             /* 格式转化，转化为数组 */
             Datas.forEach(o => {
-                for (var prop in o) {
-                    o[prop] = [o[prop]]
+                for (let p in o) {
+                    o[p] = [o[p]]
                 }
             });
             /* 相同id单元格合并 */
-            for (var i = 0; i < Datas.length; i++) {
-                for (var j = 0; j < Datas.length - i - 1; j++) {
-                    var a = Datas[i + j],
+            for (let i = 0; i < Datas.length; i++) {
+                for (let j = 0; j < Datas.length - i - 1; j++) {
+                    let a = Datas[i + j],
                         b = Datas[i + j + 1];
                     if (a.equipmentId[0] === b.equipmentId[0]) {  //判断id是否相同，相同的则合并
                         if (a.moldCode[0] !== b.moldCode[0]) {    //id相同的情况下判断模块号是否相同  
-                            for (var prop in b) {                 //模块号相同的时候
-                                if (prop !== "eqipmentName") {
+                            for (let prop in b) {                 //模块号相同的时候
+                                if (prop !== "equipmentName") {
                                     a[prop].push(b[prop][0])
                                 }
                             }
                         } else {                                  //模块号不相同的时候
-                            for (var prop in b) {
-                                if (prop !== "eqipmentName" && prop !== "moldCode") {
+                            for (let prop in b) {
+                                if (prop !== "equipmentName" && prop !== "moldCode") {
                                     a[prop].push(b[prop][0])
                                 }
                             }

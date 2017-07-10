@@ -42,7 +42,7 @@
         created () {
             // 设置选中的初始值。
             this.radio = this.category.active.radio;
-            let initData = this.category.list.filter(o => o.key == this.radio)[0];     
+            let initData = this.category.list.filter(o => o.key == this.radio)[0];    
             this.keys = this.getKeys(initData);
             // this.$nextTick(() => {
             //     this._init(initData);

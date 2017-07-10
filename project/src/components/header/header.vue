@@ -3,25 +3,30 @@
         <img :src="logo"/>
         ——&nbsp;&nbsp;追溯系统
         <div class="header-icon">
-	        <i class="icon icon-back" @click="goToSearch"></i>
-	        <i v-if="bShow" class="icon el-icon-setting" @click="goToConfig"></i>
+	        <i v-if="bShowSearch" class="icon icon-back" @click="goToSearch"></i>
+	        <i v-if="bShowConfig" class="icon el-icon-setting" @click="goToConfig"></i>
         </div>
     </header>
 </template>
 <script>
     import logo from 'assets/img/logo-w.png'
     
+    const pathName = window.location.pathname;
+    
     export default {
         data () {
             return {
                 logo,
-                bShow: window.location.pathname.indexOf("config.html")<0
+                bShowSearch: pathName.indexOf("trace")<0 && pathName.indexOf("track")<0,
+                bShowConfig: pathName.indexOf("config.html")<0 && pathName.indexOf("trace")<0 && pathName.indexOf("track")<0
             }
         },
         methods: {
         	// 跳转到搜索页。
         	goToSearch() {
+//      		console.log(window.location.origin)
         		window.open("search.html", "_self");
+        		// 返回上一级目录。
         	},
         	// 跳转到配置页面。
         	goToConfig() {

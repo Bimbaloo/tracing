@@ -76,7 +76,10 @@
 							nodeSpacing: 0,
 							setsPortSpot: false,
 							setsChildPortSpot: false
-						})
+						}),
+						click: (e) => {
+							this.$emit("init");
+						}
 					});
 
 				this.catalog.nodeTemplate =

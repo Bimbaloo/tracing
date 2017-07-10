@@ -3,18 +3,18 @@
 		<v-header></v-header>
 		<el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading">
 			<el-col class="router" ref="router">
-				<div @mouseenter="showTable" @mouseleave="unShowTable" v-if="!fullscreen">
+				<div @mouseenter="showTable" @mouseleave="unShowTable" v-if="false">  <!--!fullscreen-->
 					<i class="icon icon-20 icon-balance"></i>
 					<div class="table-line" v-if="show"></div>
 					<transition name="slide-fade">
-						<el-table :data="tableData" border style="width:304px" id='table' v-if="show">
+						<el-table :data="tableData" border style="width:305px" id='table' v-if="show">
 							<el-table-column prop="process" label="工序" width="61">
 							</el-table-column>
 							<el-table-column prop="ok" label="合格数" width="61">
 							</el-table-column>
 							<el-table-column prop="ng" label="不合格数" width="61">
 							</el-table-column>
-							<el-table-column prop="scrap" label="报废数"   width="61">
+							<el-table-column prop="scrap" label="报废数"   width="60">
 							</el-table-column>
 							<el-table-column prop="delay" label="滞留数"   width="60">
 							</el-table-column>
@@ -36,8 +36,9 @@
 <script>
 	import header from 'components/header/header.vue'
 	import tree from 'components/tree/tree.vue'	
-	import {aoTestData} from './data'
-
+//	import {aoTestData} from './data'
+	import fnP from "assets/js/public.js"
+	
 	export default {
 		components: {
 			'v-header': header,
@@ -47,7 +48,7 @@
 			return {
 				// 页面加载中动画。
 				fullscreenLoading: false,
-				url: "/track/track-main",
+				url: HOST + "/api/v1/trace/down/trace-info",
 				treeData: {},
 				params: [],
 				show: false,
@@ -80,25 +81,25 @@
 			// 此时 data 已经被 observed 了
 			let oFilter = sessionStorage.getItem("track_" + this.query.tag);
 			if(oFilter) {
-				this.filter = JSON.parse(oFilter);
-				this.params = oFilter.selected;		
+				let oAll = JSON.parse(oFilter);
+				this.filter = oAll.filters;
+				this.params = oAll.selected;
 			}
-
 			// 加载数据。
-//			this.fetchData();	
-			this.fullscreenLoading = true;
-		    setTimeout(() => {
-		    	this.fullscreenLoading = false;
-		    	
-				this.$store.commit({
-					type: "updateData",
-					data: aoTestData
-				});
-
-				// 格式化数据。
-				this.treeData = this.parseTreeData();
-				this.tableData = this.parseTableData();
-		    }, 1000)
+			this.fetchData();	
+//			this.fullscreenLoading = true;
+//		    setTimeout(() => {
+//		    	this.fullscreenLoading = false;
+//		    	
+//				this.$store.commit({
+//					type: "updateData",
+//					data: aoTestData
+//				});
+//
+//				// 格式化数据。
+//				this.treeData = this.parseTreeData();
+//				this.tableData = this.parseTableData();
+//		    }, 1000)
 		},
 		mounted() {
 			// this.$refs.view.style.height = this.$refs.view.clientHeight + "px"
@@ -108,40 +109,38 @@
 			 * 设置面板高度。
 			 * @return {void}
 			 */
-			setPanelHeight() {
-				let self = this;
-				
-				debugger
-				
+			setPanelHeight() {			
 			},
 			fetchData() {
 				this.fullscreenLoading = true;
 				
-				this.$get(this.url, this.params)
-					.then((res) => {
-						this.fullscreenLoading = false;
-						if(!res.errorCode) {
-//							this.rawData = res.data;
-							this.$store.commit({
-								type: "updateData",
-								data: res.data
-							});
-							if(!this.rawData.length) {
-								this.$message.warning('查无数据。');
-							} else {
-								// 格式化数据。
-								this.treeData = this.parseTreeData();
-								this.catalogData = this.parseCatalogData();
-								this.tableData = this.parseTableData();
-							}
+				this.$ajax.post(this.url, {
+					"startPointDtos": this.params
+				}).then((res) => {
+					this.fullscreenLoading = false;
+					if(!res.data.errorCode) {
+						this.$store.commit({
+							type: "updateData",
+							data: fnP.parseTreeData(res.data.data)
+						});
+						if(!this.rawData.length) {
+							this.$message.warning('查无数据。');
 						} else {
-							this.$message.error('查询出错！');
+							// 格式化数据。
+							this.treeData = this.parseTreeData();
+							this.tableData = this.parseTableData();
+							// console.log(this.treeData)
 						}
-					})
-					.catch((err) => {
-						this.fullscreenLoading = false;
-						this.$message.error('查询出错！');
-					})
+					} else {
+						this.$message.error(res.data.errorMsg.message);
+					}
+
+					c
+				})
+				.catch((err) => {
+					this.fullscreenLoading = false;
+					this.$message.error('查询出错！');
+				})
 			},
 
 			/**
@@ -164,7 +163,7 @@
 						aoDiagramData.push(oGroup);
 						aoDiagramLinkData.push({
 							from: oData.parent,
-							to: oData.name
+							to: oData.key //oData.name	
 						})
 						
 						oData.subProcess.forEach(o => {
@@ -175,7 +174,7 @@
 							if(o.parent) {
 								aoDiagramLinkData.push({
 									from: o.parent,
-									to: o.name
+									to: o.key //o.name
 								})
 							}
 						})
@@ -183,7 +182,7 @@
 						aoDiagramData.push(oData);
 						aoDiagramLinkData.push({
 							from: oData.parent,
-							to: oData.name
+							to: oData.key //oData.name
 						})
 					}
 				})

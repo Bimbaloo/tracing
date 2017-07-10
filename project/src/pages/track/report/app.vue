@@ -19,9 +19,6 @@
 				    <el-radio-button label="selected" class="btn-radio">选中</el-radio-button>
 				    <el-radio-button label="filtered" class="btn-radio">过滤</el-radio-button>
 				</el-radio-group>				 				 
-				<!--<div class="loading" v-if="gridData.loading">
-	                Loading...
-	            </div>-->
 	            <div v-if="gridData.error" class="error">
 	                {{ gridData.error }}
 	            </div>
@@ -53,7 +50,7 @@
 				},
                 gridData: {
                 	// 追踪结果集。
-                    url: "/trace/tracereverse",
+                    url: "/api/v1/trace/down/start-points",
 //                  loading: false,
                     error: null,
                     selected: [],
@@ -64,6 +61,9 @@
                     },{
                         prop: "barcode",
                         name: "条码"
+//                  },{
+//                  	prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
+//                      name: "条码类型"
                     },{
                         prop: "batchNo",
                         name: "批次号"
@@ -72,7 +72,7 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名字"
+                        name: "物料名称"
                     },{
                         prop: "materialSpec",
                         name: "物料规格"
@@ -106,6 +106,7 @@
                     }],
                     data: [{
 				      "barcode": "UN65457437520007057", 
+//				      "barcodeTypeName": "2", 
 				      "batchNo": "20160331A", 
 				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
 				      "materialCode": "10000515", 
@@ -122,6 +123,7 @@
 				      "bucketNo": ""
 				    },{
 				      "barcode": "UN65457437520007066", 
+//				      "barcodeTypeName": "2", 
 				      "batchNo": "20160331A", 
 				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
 				      "materialCode": "10000515", 
@@ -192,8 +194,8 @@
 //              this.$get(oData.url, this.filters)
 //              .then((res) => {
 //
-//                  if(!res.errorCode) {
-//                      oData.data = res.data;
+//                  if(!res.data.errorCode) {
+//                      oData.data = res.data.data;
 
                         oData.data.forEach((o, index) => {
                         	if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
@@ -208,6 +210,8 @@
                         	columns: oData.columns,
                         	data: oData.data
                         }
+//                  }else {
+//                  	oData.error = res.data.errorMsg.message;
 //                  }
 //              })
 //              .catch((err) => {

@@ -3,14 +3,14 @@
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
             <h2 class="content-title">出库信息</h2>
-            <div v-if="outstockData.error" class="error">
+            <div v-if="outstockData.error" class="error" :style="styleError">
                 {{ outstockData.error }}
             </div>
             <div v-else class="content-table">
             	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
             </div>
             <h2 class="content-title">入库信息</h2>
-            <div v-if="instockData.error" class="error">
+            <div v-if="instockData.error" class="error" :style="styleError">
                 {{ instockData.error }}
             </div>
             <div v-else class="content-table">
@@ -24,8 +24,6 @@
     import table from "components/basic/table.vue"
     import $ from "jquery"
     
-    const TEST = "http://192.168.20.102:8080";
-    
     export default {
         components: {
             'v-table': table
@@ -36,24 +34,24 @@
                 styleObject: {
                     "min-width": "1200px"
                 },
+                styleError: {
+                	"max-height": "200px"
+                },
                 outstockData: {
-                    url: TEST + "/api/v1/outstock",
+                    url: HOST + "/api/v1/outstock",
                     loading: false,
                     error: null,
                     height: "100%",
                     columns: [{
                         prop: "barcode",
-                        name: "条码",
-                        cellClick: this.barcodeClick
-                    },{
-                        prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
-                        name: "条码类型"
+                        name: "条码"
+//                  },{
+//                      prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
+//                      name: "条码类型"
                     },{
                         prop: "batchNo",
                         name: "批次号",
-                        class: {
-                            batch: true,
-                        },
+                        class: "batch",
                         cellClick: this.batchClick
                     },{
                         prop: "materialCode",
@@ -74,19 +72,19 @@
                         prop: "customer",
                         name: "客户"
                     },{
-                        prop: "outstockType",
+                        prop: "stockType",
                         name: "出库类型"
                     },{
                         prop: "person",
                         name: "出库人"
                     },{
-                        prop: "outstockTime",//格式：yyyy-MM-dd hh:mm:ss
+                        prop: "createTime",//格式：yyyy-MM-dd hh:mm:ss
                         name: "出库时间",
                         width: "160"
                     }],
                     data: [{
                         "barcode": "单件条码",
-                        "barcodeTypeName": "1", 
+//                      "barcodeTypeName": "1", 
                         "batchNo": "20160331A", 
                         "materialCode": "0031", 
                         "materialName": "物料名字", 
@@ -94,22 +92,22 @@
                         "stock": "仓库",
                         "stocklot": "库位",
                         "customer": "客户名",
-                        "outstockType": "出库类型",
+                        "stockType": "出库类型",
                         "person": "出库人", 
-                        "outstockTime": "2016-03-31 14:28:33"
+                        "createTime": "2016-03-31 14:28:33"
                     }]
                 },
                 instockData: {
-                    url: TEST + "/api/v1/instock",
+                    url: HOST + "/api/v1/instock",
                     loading: false,
                     error: null,
                     height: "100%",
                     columns: [{
                         prop: "barcode",
                         name: "条码"
-                    },{
-                        prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
-                        name: "条码类型"
+//                  },{
+//                      prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
+//                      name: "条码类型"
                     },{
                         prop: "batchNo",
                         name: "批次号",
@@ -137,19 +135,19 @@
                         prop: "customer",
                         name: "客户"
                     },{
-                        prop: "instockType",
+                        prop: "stockType",
                         name: "入库类型"
                     },{
                         prop: "person",
                         name: "入库人"
                     },{
-                        prop: "instockTime",//格式：yyyy-MM-dd hh:mm:ss
+                        prop: "createTime",//格式：yyyy-MM-dd hh:mm:ss
                         name: "入库时间",
                         width: "160"
                     }],
                     data: [{
                         "barcode": "单件条码",
-                        "barcodeTypeName": "2", 
+//                      "barcodeTypeName": "2", 
                         "batchNo": "批次号", 
                         "materialCode": "0024", 
                         "materialName": "物料名字", 
@@ -158,9 +156,9 @@
                         "stock": "仓库",
                         "stocklot": "库位",
                         "customer": "客户名",
-                        "instockType": "入库类型",
+                        "stockType": "入库类型",
                         "person": "入库人", 
-                        "instockTime": "2016-03-31 14:28:33"
+                        "createTime": "2016-03-31 14:28:33"
                     }]
                 },
             }
@@ -182,9 +180,6 @@
             // 条码点击。
             barcodeClick (row) {
                 // 若为箱码。
-                if(row.barcodeTypeName == "2") {
-
-                }
             },
             // 点击批次
             batchClick (row) {
@@ -234,7 +229,7 @@
                         break;
                     default: break;
                 }
-                //console.log(this.$route.query);
+                
                 this.$ajax.post(sPath, this.$route.query)
                 .then((res) => {
                     oData.loading = false;
@@ -243,6 +238,7 @@
                         oData.data = res.data.data;
                         this.styleObject.minWidth = "1200px";
                     }else {
+                    	this.styleError.maxHeight = this.adjustHeight()-50+"px"
                     	oData.error = res.data.errorMsg.message;
                     }
                 })
@@ -251,6 +247,7 @@
                     oData.error = "查询出错。"
                     if(this.outstockData.error && this.instockData.error) {
                         this.styleObject.minWidth = 0;
+                        this.styleError.maxHeight = this.adjustHeight()-50+"px"
                     }           
                 })
             }
@@ -273,6 +270,15 @@
 	            } 
 	        }         
     	   
+    	}
+    	
+    	.error {
+    		border: 2px solid #42AF8F;
+		    padding: 20px 12px;
+		    margin-bottom: 30px;
+		    font-size: 14px;
+		    color: red;
+		    overflow: auto;
     	}
     }
     

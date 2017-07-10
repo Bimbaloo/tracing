@@ -3,7 +3,6 @@
       v-model="form[key]" 
       type="datetime"
       :placeholder="hint" 
-      format="yyyy-MM-dd HH:mm:ss"
       style="width: 100%;"
       @change="dateChange">
     </el-date-picker>

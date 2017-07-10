@@ -3,15 +3,17 @@
 	<div class="router-content">
 		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList">可疑品</el-button>
 		<div class="innner-content" :style="styleObject">
-			<h2 class="content-title">{{batch}}出库信息</h2>
-			<div v-if="outstockData.error" class="error">
+			<h2 class="content-title">
+				<span class="tag">{{batch}}</span>出库信息</h2>
+			<div v-if="outstockData.error" class="error" :style="styleError">
 				{{ outstockData.error }}
 			</div>
 			<div v-else class="content-table">
 				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
 			</div>
-			<h2 class="content-title">{{batch}}入库信息</h2>
-			<div v-if="instockData.error" class="error">
+			<h2 class="content-title">
+				<span class="tag">{{batch}}</span>在库信息</h2>
+			<div v-if="instockData.error" class="error" :style="styleError">
 				{{ instockData.error }}
 			</div>
 			<div v-else class="content-table">
@@ -25,7 +27,6 @@
 <script>
 	import $ from "jquery"
 	import table from "components/basic/table.vue"
-	const TEST = "http://192.168.20.102:8080";
 	
 	export default {
 		components: {
@@ -36,18 +37,21 @@
 				styleObject: {
 					"min-width": "1200px"
 				},
+				styleError: {
+                	"max-height": "200px"
+                },
 				batch: this.$route.query.batchNo,
 				outstockData: {
-					url: TEST + "/api/v1/outstock/bybatch",
+					url: HOST + "/api/v1/outstock/bybatch",
 					loading: false,
 					error: null,
 					height: "100%",
 					columns: [{
 						prop: "barcode",
 						name: "条码"
-					}, {
-						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
-						name: "条码类型"
+//					}, {
+//						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
+//						name: "条码类型"
 					}, {
 						prop: "batchNo",
 						name: "批次号"
@@ -70,19 +74,19 @@
 						prop: "customer",
 						name: "客户"
 					}, {
-						prop: "outstockType",
+						prop: "stockType",
 						name: "出库类型"
 					}, {
 						prop: "person",
 						name: "出库人"
 					}, {
-						prop: "outstockTime", //格式：yyyy-MM-dd hh:mm:ss
+						prop: "createTime", //格式：yyyy-MM-dd hh:mm:ss
 						name: "出库时间",
 						width: "160"
 					}],
 					data: [{
 						"barcode": "单件条码",
-						"barcodeTypeName": "2",
+//						"barcodeTypeName": "2",
 						"batchNo": "20160331A",
 						"materialCode": "021",
 						"materialName": "物料名字",
@@ -90,22 +94,22 @@
 						"stock": "仓库",
 						"stocklot": "库位",
 						"customer": "客户名",
-						"outstockType": "出库类型",
+						"stockType": "出库类型",
 						"person": "出库人",
-						"outstockTime": "2016-03-31 14:28:33"
+						"createTime": "2016-03-31 14:28:33"
 					}]
 				},
 				instockData: {
-					url: TEST + "/api/v1/instock/bybatch",
+					url: HOST + "/api/v1/stock/bybatch",
 					loading: false,
 					error: null,
 					height: "100%",
 					columns: [{
 						prop: "barcode",
 						name: "条码"
-					}, {
-						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
-						name: "条码类型"
+//					}, {
+//						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
+//						name: "条码类型"
 					}, {
 						prop: "batchNo",
 						name: "批次号"
@@ -114,7 +118,7 @@
 						name: "物料编码"
 					}, {
 						prop: "materialName",
-						name: "物料名字"
+						name: "物料名称"
 					}, {
 						prop: "quantity",
 						name: "数量"
@@ -127,23 +131,23 @@
 					}, {
 						prop: "stocklot",
 						name: "库位"
+//					}, {
+//						prop: "customer",
+//						name: "客户"
 					}, {
-						prop: "customer",
-						name: "客户"
-					}, {
-						prop: "instockType",
+						prop: "stockType",
 						name: "入库类型"
 					}, {
 						prop: "person",
 						name: "入库人"
 					}, {
-						prop: "instockTime", //格式：yyyy-MM-dd hh:mm:ss
+						prop: "createTime", //格式：yyyy-MM-dd hh:mm:ss
 						name: "入库时间",
 						width: "160"
 					}],
 					data: [{
 						"barcode": "单件条码",
-						"barcodeTypeName": "2",
+//						"barcodeTypeName": "2",
 						"batchNo": "批次号",
 						"materialCode": "031",
 						"materialName": "物料名字",
@@ -152,9 +156,9 @@
 						"stock": "仓库",
 						"stocklot": "库位",
 						"customer": "客户名",
-						"instockType": "入库类型",
+						"stockType": "入库类型",
 						"person": "入库人",
-						"instockTime": "2016-03-31 14:28:33"
+						"createTime": "2016-03-31 14:28:33"
 					}]
 				},
 			}
@@ -203,6 +207,7 @@
 							oData.data = res.data.data;
 							this.styleObject.minWidth = "1200px";
 						}else {
+							this.styleError.maxHeight = this.adjustHeight()-50+"px"
 							oData.error = res.data.errorMsg.message;
 						}
 					})
@@ -211,6 +216,7 @@
 						oData.error = "查询出错。"
 						if(this.outstockData.error && this.instockData.error) {
 							this.styleObject.minWidth = 0;
+							this.styleError.maxHeight = this.adjustHeight()-50+"px"
 						}
 					})
 			},
@@ -242,6 +248,21 @@
 			right: 0;
 			top: 65px;
 		}
+		
+		.content-title {
+			.tag {
+				color: #f90;
+			}
+		}
+		
+		.error {
+    		border: 2px solid #42AF8F;
+		    padding: 20px 12px;
+		    margin-bottom: 30px;
+		    font-size: 14px;
+		    color: red;
+		    overflow: auto;
+    	}
 	}
 	
 	.el-table {
