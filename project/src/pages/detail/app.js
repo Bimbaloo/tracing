@@ -7,7 +7,7 @@ import App from './app.vue'
 import axios from 'axios'
 
 import 'assets/css/reset.css'
-import 'assets/css/common.css'
+import 'assets/css/common.less'
 
 Vue.use(VueRouter)
 Vue.use(ElementUI)

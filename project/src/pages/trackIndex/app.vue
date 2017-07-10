@@ -81,6 +81,8 @@
 		created() {
 			// 组件创建完后获取数据
 			// 此时 data 已经被 observed 了
+			// 重置路由。
+			this.$router.push("/");
 			let oFilter = sessionStorage.getItem("track_" + this.query.tag);
 			if(oFilter) {
 				this.points = JSON.parse(oFilter);

@@ -32,6 +32,8 @@
 <script>
 	import equipment from "components/equipment/list"
 
+	const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet=";
+
     export default {
 		components: {
 			'v-equipment': equipment
@@ -145,10 +147,12 @@
 
 				if(oData.cpt) {
 					let oParam = this.getParamter(oData.parameter),
-						sPath = FINE_REPORT_HOST + oData.cpt;
+						sPath = sFineReportUrl + oData.cpt;
 
 					oData.parameter.forEach(p => {
-						sPath += "&" + p + "=" + oParam[p]
+						if(oParam[p]) {
+							sPath += "&" + p + "=" + oParam[p]
+						}						
 					});
 					window.open(sPath , "_blank");
 				}

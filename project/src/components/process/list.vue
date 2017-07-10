@@ -116,7 +116,7 @@
 			 * @return {void}
 			 */
 			setEquipmentList () {
-				debugger
+				// debugger
 				let 
 				// 提取选中的工序节点数据。
 					oNode = this.rawData.filter(o => o.key == this.processKey)[0] || {};

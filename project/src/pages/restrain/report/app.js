@@ -5,7 +5,7 @@ import App from './app.vue'
 import axios from 'axios'
 
 import 'assets/css/reset.css'
-import 'assets/css/common.css'
+import 'assets/css/common.less'
 import 'assets/js/global.js'
 
 Vue.use(ElementUI)

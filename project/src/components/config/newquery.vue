@@ -56,7 +56,7 @@
 </template>
 
 <script>
-	import "assets/css/common.css"
+	import "assets/css/common.less"
 	import $ from "jquery"
     import Transfer from "components/config/newTrans.vue"
 	

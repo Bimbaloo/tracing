@@ -239,8 +239,8 @@
 			// 	this.checkedEquipments.forEach((id, index) => {
 			// 		let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
 			// 		if(equipment) {
-			// 			let sTemp = equipment.shitStartTime,
-			// 				eTemp = equipment.shitEndTime
+			// 			let sTemp = equipment.shiftStartTime,
+			// 				eTemp = equipment.shiftEndTime
 			// 			if(!index) {
 			// 				start = sTemp;
 			// 				end = eTemp;
@@ -334,8 +334,8 @@
 				this.checkedEquipments.forEach((id, index) => {
 					let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
 					if(equipment) {
-						let sTemp = equipment.shitStartTime,
-							eTemp = equipment.shitEndTime
+						let sTemp = equipment.shiftStartTime,
+							eTemp = equipment.shiftEndTime
 						if(!index) {
 							start = sTemp;
 							end = eTemp;

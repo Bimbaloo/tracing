@@ -70,15 +70,16 @@
 		created() {
 			// 组件创建完后获取数据
 			// 此时 data 已经被 observed 了
+			// 重置路由。
+			this.$router.push("/");
 			let sSelected = sessionStorage.getItem("trace_" + this.query.tag);
 			if(sSelected) {
 				this.params = JSON.parse(sSelected);
 			}
 			
-			console.log(this.params)
-
 			// 加载数据。
-			this.fetchData();	
+			this.fetchData();
+				
 //			this.fullscreenLoading = true;
 //		    setTimeout(() => {
 //		    	this.fullscreenLoading = false;
@@ -95,7 +96,6 @@
 //		    }, 1000)
 		},
 		mounted() {
-			// this.$refs.view.style.height = this.$refs.view.clientHeight + "px"
 		},
 		methods: {
 			/**

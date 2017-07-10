@@ -6,8 +6,8 @@ import 'element-ui/lib/theme-green/index.css';
 import App from './app.vue';
 import axios from 'axios';
 
-import 'assets/css/reset.css';
-import 'assets/css/common.css';
+import 'assets/css/reset.css'
+import 'assets/css/common.less'
 import 'assets/css/icon.less'
 
 Vue.use(VueRouter);

@@ -313,4 +313,10 @@
 			font-weight: 600;
 		}
 	}
+
+	.el-dialog__headerbtn {
+		border: none;
+    	outline: none;
+    	background-color: transparent;
+	}
 </style>

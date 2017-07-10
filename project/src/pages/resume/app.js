@@ -6,7 +6,7 @@ import axios from 'axios'
 import $ from 'jquery'
 
 import 'assets/css/reset.css'
-import 'assets/css/common.css'
+import 'assets/css/common.less'
 import 'assets/css/icon.less'
 import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'

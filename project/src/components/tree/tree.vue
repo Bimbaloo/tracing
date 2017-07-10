@@ -146,7 +146,7 @@
 										}
 									})
 								}else {
-									debugger
+									// debugger
 									this.$router.push({ 
 										path: "/process",
 										query: {
