@@ -174,10 +174,10 @@
 			
 			if(oConditions) {
 				oConditions = JSON.parse(oConditions);			
-				debugger
 				this.result.selected = (oConditions.selected && oConditions.selected.length) || 0;
 				this.result.whole = oConditions.length || 0;
 				this.result.filter = this.result.whole - this.result.selected;
+				// debugger
 				this.filters = oConditions.filters || [];
 				this.selected = oConditions.selected || [];
 			}
@@ -205,30 +205,32 @@
 			fetchData () {
 				this.error = "";
 				this.gridData.data = [];
-             	this.$get(this.url, this.filters)
-             	.then((res) => {
-					this.judgeLoaderHandler(res, () => {
-						this.gridData.data = res.data.data;
-
-                        this.gridData.data.forEach((o, index) => {
-                        	if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
-                        		// 标记为选中。
-                        		o.tag = "selected";
-                        	}else {
-                        		o.tag = "filtered";
-                        	}
-                        });
+				// url:api/v1/trace/down/start-points
+            //  	this.$post(this.url, this.filters)
+            //  	.then((res) => {
+			// 		debugger
+			// 		this.judgeLoaderHandler(res, () => {
+			// 			this.gridData.data = res.data.data;
+						
+            //             this.gridData.data.forEach((o, index) => {
+            //             	if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
+            //             		// 标记为选中。
+            //             		o.tag = "selected";
+            //             	}else {
+            //             		o.tag = "filtered";
+            //             	}
+            //             });
                         
-                        this.showData = {
-                        	columns: this.gridData.columns,
-                        	data: this.gridData.data
-                        }						
-					})
-             })
-             .catch((err) => {
-                 this.gridData.loading = false;
-                 this.gridData.error = "查询出错。"
-             })
+            //             this.showData = {
+            //             	columns: this.gridData.columns,
+            //             	data: this.gridData.data
+            //             }						
+			// 		})
+            //  })
+            //  .catch((err) => {
+            //      this.gridData.loading = false;
+            //      this.gridData.error = "查询出错。"
+            //  })
             },
 			setWidth() {
 				this.styleObject.minWidth = "1200px";

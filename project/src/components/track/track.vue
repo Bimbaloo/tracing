@@ -212,7 +212,7 @@
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            		({ batchNo: oSelected.batchNo, iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
             			
             		aSelected.push(oSelected);
             	})
@@ -220,7 +220,7 @@
             	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
             		oReportFilter = {
             			length: this.gridData.data.length,
-            			selected: aSelected,
+            			selected: aSelected,//this.gridData.selected,
             			filters: this.$route.query
             		}
             	

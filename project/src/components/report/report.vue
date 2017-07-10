@@ -4,10 +4,10 @@
 			{{ error }}
 		</div-->
 		<div v-if="!sErrorMessage" ref="content">
-			<div ref="outputs" :class="{ actived: active.outputs }">				
-				<h2 class="content-title" @click="active.outputs=!active.outputs">汇总信息<i class="el-icon-d-arrow-right icon"></i></h2>
+			<div ref="summary" :class="{ actived: active.summary }">				
+				<h2 class="content-title" @click="active.summary=!active.summary">汇总信息<i class="el-icon-d-arrow-right icon"></i></h2>
 				<div class="content-table">
-					<v-table :table-data="reportData.outputs" :loading="loading"></v-table>
+					<v-table :table-data="reportData.summary" :loading="loading"></v-table>
 				</div>
 			</div>
 			<div ref="inStocks" :class="{ actived: active.inStocks }">			
@@ -20,7 +20,7 @@
 				<h2 class="content-title" @click="active.inMakings=!active.inMakings">在制明细<i class="el-icon-d-arrow-right icon"></i></h2>
 				<div class="content-table">
 					<h2 class="inner-title">加工中</h2>
-					<v-table :table-data="reportData.inMakings" :loading="loading"></v-table>
+					<v-table :table-data="reportData.inMaking" :loading="loading"></v-table>
 					<h2 class="inner-title">滞留中</h2>
 					<v-table :table-data="reportData.remain" :loading="loading"></v-table>
 				</div>
@@ -31,7 +31,7 @@
 					<h2 class="inner-title">出库明细</h2>
 					<v-table :table-data="reportData.outStocks" :loading="loading"></v-table>
 					<h2 class="inner-title">发货明细</h2>
-					<v-table :table-data="reportData.delivery" :loading="loading"></v-table>
+					<v-table :table-data="reportData.delivered" :loading="loading"></v-table>
 				</div>
 			</div>
 		</div>
@@ -52,16 +52,16 @@
 			return {
 				loading: false,
 				sErrorMessage: '',
-				url: "/tracereport/bybatch",
+				url: "/api/v1/trace/report/by-batch",
 				active: {
-					outputs: true,
+					summary: false,
 					inStocks: false,
 					outStocks: false,
 					inMakings: false
 				},
 				reportData: {
 					// 汇总。
-					outputs: {
+					summary: {
 						columns: [{
 							prop: "batchNo",
 							name: "批次",
@@ -113,19 +113,21 @@
 								return a-b>0;
 							}
 						}],
-						data: [{
-							"batchNo": "20160331A",
-							"materialCode": "0031",
-							"materialName": "物料名称",
-							"quantity": 16,
-							"qualifiedNum": "14",
-							"unqualifiedNum": "1",
-							"disabilityNum": "1",
-							"rate": "0.87"
-						}]
+						data: [
+							// {
+							// 	"batchNo": "20160331A",
+							// 	"materialCode": "0031",
+							// 	"materialName": "物料名称",
+							// 	"quantity": 16,
+							// 	"qualifiedNum": "14",
+							// 	"unqualifiedNum": "1",
+							// 	"disabilityNum": "1",
+							// 	"rate": "0.87"
+							// }
+						]
 					},
 					// 发货。
-					delivery: {					
+					delivered: {					
 						columns: [{
 							prop: "barcode",
 							name: "条码",
@@ -377,7 +379,7 @@
 						}]
 					},
 					// 加工
-					inMakings: {
+					inMaking: {
 						columns: [{
 							prop: "batchNo",
 							name: "批次",
@@ -517,11 +519,17 @@
 		},
 		created() {
 			// 数据加载。
-//			this.fetchData();
+			this.fetchData();
+			
+
 		},
 		mounted() {
 //			设置显示顺序.
+			
 			this.setSequence();
+			// this.active.summary = this.active.summary
+			
+			
 		},
 		methods: {
 			// 判断调用接口是否成功。
@@ -551,36 +559,52 @@
 				this.sErrorMessage = '';
 				this.loading = true;
 				
-				let oQuery = this.$route.query;
+				let oQuery = this.query;
 				
 				if(this.type == "trace") {
 					// 若为快速报告，根据物料+批次+bucketNo获取数据。
-					this.url = "/tracereport/bybatchlist";
+					this.url = "/api/v1/trace/report/by-start-points";
+					
 					oQuery = this.query;
 				}else {
 					if("equipmentId" in oQuery) {
 						// 若根据设备查询。
-						this.url = "/tracereport/byequipment";
+						this.url = "/api/v1/trace/report/by-equipment";
 					}
 				}
+				// url:api/v1/trace/report/by-start-points
+				console.log(HOST + this.url)
+				console.log(oQuery)
 				
-				this.$get(HOST + this.url, oQuery)
+				// oQuery = [
+				// 			{
+				// 			"batchNo": "20151118A",
+				// 			"bucketNo": "28_D201511170002_20151118152959491",
+				// 			"iokey": "D201511170003_59_2015-11-18 15:49:55_6501",
+				// 			"materialCode": "20000375",
+				// 			"materialName": "MP/C15VVT-S3 活塞毛坯/074175",
+				// 			"productionMode": 0
+				// 			}
+				// 		]
+				this.$post(HOST + this.url, oQuery)
 					.then((res) => {
+	
 						this.loading = false;					
 						let bSetWidth = false;
 						this.judgeLoaderHandler(res, () => {
 							let oData = this.reportData;
 								
 							for(let p in oData) {
-								oData[p].data = res.data.data[p];
 								
-								if(res[p].length && !bSetWidth) {
+								oData[p].data = res.data.data[p];
+							
+								if(res.data.data[p].length && !bSetWidth) {
 									bSetWidth = true;
 									// 设置最小宽度。
 									this.$emit("hasData");
 								}
 								
-								if(p == "outputs") {
+								if(p == "summary") {
 									// 若为汇总信息。
 									oData[p].data.map(o => {
 										if(o.quantity) {
@@ -590,21 +614,25 @@
 										}
 									})
 								}
-							}							
+							}						
 						})
-
+						let time = setTimeout(() =>
+							this.active.summary = !this.active.summary
+						,500)
 						if(!bSetWidth) {
 							this.$emit("noData");
 							this.error = "查无数据。"
 						}
-
+						
 					})
 					.catch((err) => {
 						this.loading = false;
+						
 						this.sErrorMessage = "查询出错。"
 						this.showMessage();
 						this.$emit("noData");
 					})
+					
 			},
 			setSequence() {
 				if(this.type == "trace") {
@@ -613,6 +641,9 @@
 					this.$refs.content.append(this.$refs.inStocks);					
 				}
 			}
+			// showSummer() {
+			// 	this.active.summary = !this.active.summary
+			// }
 		}
 	}
 </script>
@@ -649,4 +680,18 @@
 			text-indent: 10px;
 		}
 	}
+
+	.fade-enter-active,
+	.fade-leave-active {
+		transition: opacity .5s
+	}
+
+	.fade-enter,
+	.fade-leave-to
+	/* .fade-leave-active in <2.1.8 */
+
+	{
+		opacity: 0
+	}
+
 </style>
