@@ -178,7 +178,6 @@
                 /* 模拟序号数据 */
                 
                 dialogData: {
-                    url: TEST + "/api/v1/instock",
                     dialogVisible : false,
                     height: "100%",
                     columns: [{
@@ -191,25 +190,10 @@
                     }],
                     data: [{
                         "barcode": "1",
-                        "batchNo": "saaasas", 
+                        "batchNo": "batchNo", 
                     }]
                     
                 }
-
-                // gridData: [{
-                //         barcode: '2016-05-02',
-                //         batchNo: '王小虎',                    
-                //         }, {
-                //         barcode: '2016-05-04',
-                //         batchNo: '王小虎',
-                //         }, {
-                //         barcode: '2016-05-01',
-                //         batchNo: '王小虎',
-                //         }, {
-                //         barcode: '2016-05-03',
-                //         batchNo: '王小虎',
-                //         }],
-                // dialogTableVisible: false
             }
         },
         created () {
@@ -231,9 +215,8 @@
                 // 若为箱码。
                 if(row.barcodeTypeName == "2") {
                     console.log("2");
-                    debugger
-                    this.dialogData.dialogVisible  = true
-                   // console.log(this.dialogData.dialogVisible)
+                    
+                    this.dialogData.dialogVisible  = !this.dialogData.dialogVisible
                     
                 }
             },

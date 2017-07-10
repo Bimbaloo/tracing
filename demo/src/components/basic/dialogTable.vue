@@ -1,5 +1,5 @@
  <template>
-    <el-dialog :visible.sync="dialogVisible" top='20%' :show-close='false' >
+    <el-dialog :visible.sync="dialogData.dialogVisible" top='20%' :show-close='false' >
         <el-table :data="gridData" border width='100%'>
             <!--<el-table-column property="batchNo" label="序号" align="center"></el-table-column>
             <el-table-column property="barcode" label="条码" align="center"></el-table-column>-->
@@ -28,51 +28,23 @@
             heights: {
             	required: false,
             	default: "100%"
-            },
-            dialogVisible:Boolean
+            }
         },
         data() {
             return {
-                _dialogVisible:false
             }
         },
         computed: {
         	gridData: function() {
         		return this.dialogData.data
         	},
-            // dialogVisible : function() {
-        	// 	return this.dialogData.dialogVisible 
-        	// },
+
             columns: function() {
                 return this.dialogData.columns
-            },
-            _dialogVisible: function(){
-                return this.dialogData.dialogVisible
-            } 
-        },
-        watch: {
-            '_dialogVisible': function() {
-                 debugger
-                if(!this.dialogVisible){
-                    this.dialogVisibleChange();
-                }
-                
             }
-        },
-        methods: {    
-            // cellClick: function(row, column, cell, event) {
-            //     let oColumn = this.columns.filter(o => o.prop==column.property)[0];
-            //     oColumn.cellClick && oColumn.cellClick(row);
-                
-            // }
-            // selectionChange: function(selection) {
-            // 	this.dialoData.selected = selection;
-            // }
-            dialogVisibleChange:function() {
-                //this.dialogVisible
-                this.$emit('dialogVisibleChange')
-            }
+
         }
+       
     }
 </script>
 
