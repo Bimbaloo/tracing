@@ -54,7 +54,7 @@
 				sErrorMessage: '',
 				url: "/api/v1/trace/report/by-batch",
 				active: {
-					summary: false,
+					summary: true,
 					inStocks: false,
 					outStocks: false,
 					inMakings: false
@@ -113,18 +113,7 @@
 								return a-b>0;
 							}
 						}],
-						data: [
-							// {
-							// 	"batchNo": "20160331A",
-							// 	"materialCode": "0031",
-							// 	"materialName": "物料名称",
-							// 	"quantity": 16,
-							// 	"qualifiedNum": "14",
-							// 	"unqualifiedNum": "1",
-							// 	"disabilityNum": "1",
-							// 	"rate": "0.87"
-							// }
-						]
+						data: []
 					},
 					// 发货。
 					delivered: {					
@@ -132,10 +121,6 @@
 							prop: "barcode",
 							name: "条码",
 							sortable: true
-//						}, {
-//							prop: "barcodeTypeName",
-//							name: "条码类型",
-//							sortable: true
 						},{
 							prop: "batchNo",
 							name: "批次",
@@ -191,7 +176,6 @@
 						}],
 						data: [{
 							"barcode": "003311",
-//							"barcodeTypeName": "22",
 							"batchNo": "20160331A",
 							"materialCode": "物料编码",
 							"materialName": "物料名称",
@@ -204,7 +188,6 @@
 							"outstockTime": "2016-03-31 14:28:33"
 						}, {
 							"barcode": "003311",
-//							"barcodeTypeName": "22",
 							"batchNo": "20160331A",
 							"materialCode": "物料编码",
 							"materialName": "物料名称",
@@ -223,10 +206,6 @@
 							prop: "barcode",
 							name: "条码",
 							sortable: true
-//						}, {
-//							prop: "barcodeTypeName",
-//							name: "条码类型",
-//							sortable: true
 						},{
 							prop: "batchNo",
 							name: "批次",
@@ -282,7 +261,6 @@
 						}],
 						data: [{
 							"barcode": "003311",
-//							"barcodeTypeName": "22",
 							"batchNo": "20160331A",
 							"materialCode": "物料编码",
 							"materialName": "物料名称",
@@ -301,10 +279,6 @@
 							prop: "barcode",
 							name: "条码",
 							sortable: true
-//						}, {
-//							prop: "barcodeTypeName",
-//							name: "条码类型",
-//							sortable: true
 						},{
 							prop: "batchNo",
 							name: "批次",
@@ -364,7 +338,6 @@
 						}],
 						data: [{
 							"barcode": "003322",
-//							"barcodeTypeName": "2",
 							"batchNo": "批次号",
 							"materialCode": "物料编码",
 							"materialName": "物料名称",
@@ -520,17 +493,12 @@
 		created() {
 			// 数据加载。
 			this.fetchData();
-			
-
 		},
 		mounted() {
 //			设置显示顺序.
-			
-			this.setSequence();
-			// this.active.summary = this.active.summary
-			
-			
+			this.setSequence();	
 		},
+
 		methods: {
 			// 判断调用接口是否成功。
 			judgeLoaderHandler(param, fnSu, fnFail) {
@@ -539,6 +507,7 @@
 				// 判断是否调用成功。
 				if(bRight != "0") {
 					// 提示信息。
+					debugger
 					this.sErrorMessage = param.data.errorMsg.message;
 					this.showMessage();
 					// 失败后的回调函。
@@ -560,21 +529,22 @@
 				this.loading = true;
 				
 				let oQuery = this.query;
-				
+
 				if(this.type == "trace") {
 					// 若为快速报告，根据物料+批次+bucketNo获取数据。
 					this.url = "/api/v1/trace/report/by-start-points";
 					
 					oQuery = this.query;
 				}else {
-					if("equipmentId" in oQuery) {
+					if(oQuery && ("equipmentId" in oQuery)) {
 						// 若根据设备查询。
 						this.url = "/api/v1/trace/report/by-equipment";
 					}
+					oQuery ={
+						"materialCode":this.$route.query.materialCode,
+						"batchNo":this.$route.query.batchNo
+					}
 				}
-				// url:api/v1/trace/report/by-start-points
-				console.log(HOST + this.url)
-				console.log(oQuery)
 				
 				// oQuery = [
 				// 			{
@@ -588,12 +558,10 @@
 				// 		]
 				this.$post(HOST + this.url, oQuery)
 					.then((res) => {
-	
 						this.loading = false;					
 						let bSetWidth = false;
 						this.judgeLoaderHandler(res, () => {
 							let oData = this.reportData;
-								
 							for(let p in oData) {
 								
 								oData[p].data = res.data.data[p];
@@ -616,9 +584,6 @@
 								}
 							}						
 						})
-						let time = setTimeout(() =>
-							this.active.summary = !this.active.summary
-						,500)
 						if(!bSetWidth) {
 							this.$emit("noData");
 							this.error = "查无数据。"
@@ -627,7 +592,7 @@
 					})
 					.catch((err) => {
 						this.loading = false;
-						
+
 						this.sErrorMessage = "查询出错。"
 						this.showMessage();
 						this.$emit("noData");
@@ -641,9 +606,6 @@
 					this.$refs.content.append(this.$refs.inStocks);					
 				}
 			}
-			// showSummer() {
-			// 	this.active.summary = !this.active.summary
-			// }
 		}
 	}
 </script>
@@ -679,19 +641,6 @@
 			margin: 13px 0;
 			text-indent: 10px;
 		}
-	}
-
-	.fade-enter-active,
-	.fade-leave-active {
-		transition: opacity .5s
-	}
-
-	.fade-enter,
-	.fade-leave-to
-	/* .fade-leave-active in <2.1.8 */
-
-	{
-		opacity: 0
 	}
 
 </style>

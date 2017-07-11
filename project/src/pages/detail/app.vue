@@ -72,7 +72,7 @@
       this.$ajax.get(MODULE_ITEM_URL).then((res) => {
       	this.judgeLoaderHandler(res,() => {
 	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
-	       	console.log(this.categories)
+	       //	console.log(this.categories)
 	       	this.categories.forEach(o => {
 	          if(oData && oData.tab == o.key) {
 	            o.active = oData;
@@ -167,7 +167,7 @@
           
           let sPath = '/' + this.activeKey;
           oConditions.tab = this.activeKey;
-          console.log(oConditions);
+         // console.log(oConditions);
 
           sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
 

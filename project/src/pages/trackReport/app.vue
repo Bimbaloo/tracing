@@ -11,7 +11,10 @@
 				<span v-for="filter in Object.entries(filters)">
 					{{filter[0]}} : {{filter[1]}}
 				</span>
-				<span @click="dialogTableVisible = true" style="cursor:pointer">结果集 : 共<i> {{result.whole}} </i>条，选中<i> {{result.selected}} </i>条，过滤<i> {{result.filter}} </i>条。</span>
+				<span style="cursor:pointer">结果集:</span>
+				<span @click="dialogVisible('all')" label="all" style="cursor:pointer">共<i> {{result.whole}} </i>条,</span>
+				<span @click="dialogVisible('selected')" label="selected" style="cursor:pointer">选中<i> {{result.selected}} </i>条,</span>
+				<span @click="dialogVisible('filtered')" label="filtered" style="cursor:pointer">过滤<i> {{result.filter}} </i>条。</span>
 			</div>
 			<el-dialog title="结果集" :visible.sync="dialogTableVisible" size="large">
 				<el-radio-group v-model="radio" @change="radioChange">
@@ -23,7 +26,7 @@
 	                {{ error }}
 	            </div>
 	            <div v-else class="content-table">
-	                <v-table :table-data="showData" :loading="loading"></v-table>    
+	                <v-table :table-data="showData" :loading="loading" :heights="500"></v-table>    
 	            </div>     
 			</el-dialog>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
@@ -61,9 +64,6 @@
                     },{
                         prop: "barcode",
                         name: "条码"
-//                  },{
-//                  	prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
-//                      name: "条码类型"
                     },{
                         prop: "batchNo",
                         name: "批次号"
@@ -106,7 +106,6 @@
                     }],
                     data: [{
 				      "barcode": "UN65457437520007057", 
-//				      "barcodeTypeName": "2", 
 				      "batchNo": "20160331A", 
 				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
 				      "materialCode": "10000515", 
@@ -123,7 +122,6 @@
 				      "bucketNo": ""
 				    },{
 				      "barcode": "UN65457437520007066", 
-//				      "barcodeTypeName": "2", 
 				      "batchNo": "20160331A", 
 				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
 				      "materialCode": "10000515", 
@@ -149,7 +147,7 @@
 					selected: 0,
 					filter: 0
 				},
-				selected: [],
+				//selected: [],
 				filters: {}
 			}
 		},
@@ -206,31 +204,31 @@
 				this.error = "";
 				this.gridData.data = [];
 				// url:api/v1/trace/down/start-points
-            //  	this.$post(this.url, this.filters)
-            //  	.then((res) => {
-			// 		debugger
-			// 		this.judgeLoaderHandler(res, () => {
-			// 			this.gridData.data = res.data.data;
+             	this.$post(this.url, this.filters)
+             	.then((res) => {
+					//debugger
+					this.judgeLoaderHandler(res, () => {
+						this.gridData.data = res.data.data;
 						
-            //             this.gridData.data.forEach((o, index) => {
-            //             	if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
-            //             		// 标记为选中。
-            //             		o.tag = "selected";
-            //             	}else {
-            //             		o.tag = "filtered";
-            //             	}
-            //             });
+                        this.gridData.data.forEach((o, index) => {
+                        	if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
+                        		// 标记为选中。
+                        		o.tag = "selected";
+                        	}else {
+                        		o.tag = "filtered";
+                        	}
+                        });
                         
-            //             this.showData = {
-            //             	columns: this.gridData.columns,
-            //             	data: this.gridData.data
-            //             }						
-			// 		})
-            //  })
-            //  .catch((err) => {
-            //      this.gridData.loading = false;
-            //      this.gridData.error = "查询出错。"
-            //  })
+                        this.showData = {
+                        	columns: this.gridData.columns,
+                        	data: this.gridData.data
+                        }						
+					})
+             })
+             .catch((err) => {
+                 this.gridData.loading = false;
+                 this.gridData.error = "查询出错。"
+             })
             },
 			setWidth() {
 				this.styleObject.minWidth = "1200px";
@@ -239,12 +237,16 @@
 				this.styleObject.minWidth = 0;
 			},
 			radioChange(value) {
-//				debugger
 				if(value !== "all") {
 					this.showData.data = this.gridData.data.filter(o => o.tag == value);
 				}else {
 					this.showData.data = this.gridData.data;
 				}			
+			},
+			dialogVisible(value){
+				this.dialogTableVisible = true;
+				this.radio = value
+				this.radioChange(value)
 			}
 		}
 	}
@@ -300,7 +302,10 @@
 		
 		span {
 			display: inline-block;
-			&+span {
+			&+span:nth-child(1) {
+				margin-left: 60px;
+			}
+			&+span:nth-child(2) {
 				margin-left: 60px;
 			}
 		}

@@ -37,8 +37,8 @@
             tableData: Object,
             loading: Boolean,
             heights: {
-            	required: false,
-            	default: "100%"
+            	required: false
+            	//default: "100%"
             }
         },
         data() {
