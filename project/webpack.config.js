@@ -109,7 +109,7 @@ const config = {
           {
             loader: 'url-loader',
             options: {
-              limit: 10000
+              limit: 1000000
             }
           }
         ]
@@ -128,7 +128,7 @@ const config = {
   ],
   devServer: {
     host: '127.0.0.1',
-    port: 8080,
+    port: 8088,
     historyApiFallback: false,
     noInfo: true,
     proxy: {
