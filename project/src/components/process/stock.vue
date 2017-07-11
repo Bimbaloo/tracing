@@ -70,9 +70,11 @@
                 this.$router.push({ path: `/process/detail/product`, query: this.product})
             },
             setRouteQuery() {
-                let aHref = location.href.split("?")[0].split("/"),
+                let aLocation = location.href.split("?"),
+                    aHref = aLocation[1].split("/"),
                     sType = aHref[aHref.length-1];
-
+                
+                // debugger
                 if(sType == "detail") {
                     this.detail = this.$route.query;
                 }else if(sType == "product") {
