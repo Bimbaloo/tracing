@@ -498,6 +498,7 @@
 //			设置显示顺序.
 			this.setSequence();	
 		},
+
 		methods: {
 			// 判断调用接口是否成功。
 			judgeLoaderHandler(param, fnSu, fnFail) {
@@ -506,6 +507,7 @@
 				// 判断是否调用成功。
 				if(bRight != "0") {
 					// 提示信息。
+					debugger
 					this.sErrorMessage = param.data.errorMsg.message;
 					this.showMessage();
 					// 失败后的回调函。
@@ -527,16 +529,20 @@
 				this.loading = true;
 				
 				let oQuery = this.query;
-				
+
 				if(this.type == "trace") {
 					// 若为快速报告，根据物料+批次+bucketNo获取数据。
 					this.url = "/api/v1/trace/report/by-start-points";
 					
 					oQuery = this.query;
 				}else {
-					if("equipmentId" in oQuery) {
+					if(oQuery && ("equipmentId" in oQuery)) {
 						// 若根据设备查询。
 						this.url = "/api/v1/trace/report/by-equipment";
+					}
+					oQuery ={
+						"materialCode":this.$route.query.materialCode,
+						"batchNo":this.$route.query.batchNo
 					}
 				}
 				
@@ -552,12 +558,10 @@
 						]
 				this.$post(HOST + this.url, oQuery)
 					.then((res) => {
-	
 						this.loading = false;					
 						let bSetWidth = false;
 						this.judgeLoaderHandler(res, () => {
 							let oData = this.reportData;
-								
 							for(let p in oData) {
 								
 								oData[p].data = res.data.data[p];

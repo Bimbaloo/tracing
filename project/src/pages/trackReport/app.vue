@@ -147,7 +147,7 @@
 					selected: 0,
 					filter: 0
 				},
-				selected: [],
+				//selected: [],
 				filters: {}
 			}
 		},
