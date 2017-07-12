@@ -9,11 +9,16 @@
         <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
       </el-tab-pane>
     </el-tabs>
+    <footer>
+      <img :src="version"/>
+    </footer>
   </div>
 </template>
 
 <script>
-  import logo from 'assets/img/logo-w.png'
+  //import logo from 'assets/img/logo-w.png'
+  import logo from 'assets/img/kssp-logo.png'
+  import version from 'assets/img/version.png'
   import panel from 'components/panel/panel.vue'
 	import fnP from "assets/js/public.js"
 	
@@ -26,6 +31,7 @@
     data() {
       return {
         logo,
+        version,
         activeKey: "stock",
         categories: [],
         labelWidth: "100px",
@@ -138,7 +144,12 @@
         margin-bottom: 10px;
     }
   }
-
+ footer {
+   position: fixed;
+   left: 50%;
+   margin-left: -150px;
+   bottom: 30px
+ }
   .panel-title {
       padding: 19px 0;
       .el-radio+.el-radio {
@@ -200,10 +211,64 @@
           }
         }
       }
+      .form-button {
+        .btn:first-child {
+          margin-left: 100px;
+        }
+      }
+      &>.el-tabs__content {
+        padding: 0 300px;
+      }
+    } 
+  }
+  @media screen and (max-width: 1400px){
+    footer{
+      bottom: 10px;
+    }
+    .search-tab {
+    height: 610px;
+
+    &.el-tabs--border-card {
+      &>.el-tabs__header {
+        height:40px;
+        .el-tabs__item {
+          height: 32px;
+          line-height: 32px;     
+
+          &:hover {
+            color: #333;
+          }
+
+          &.is-active {
+            color: #42af8f;
+            border-top-color: #42af8f;
+          }
+        }
+      }
+
+      .el-form-item {
+        margin-bottom: 16px;
+
+        .el-form-item__label {
+          font-size: 12px;
+          padding: 6px 10px 6px 0;
+        }
+        .el-form-item__content {
+          line-height: 24px;
+          .el-input {
+            font-size: 12px;
+            .el-input__inner{
+              height: 24px;
+              //color: #999
+            }
+          }
+        }
+      }
 
       &>.el-tabs__content {
         padding: 0 300px;
       }
     } 
+  }
   }
 </style>

@@ -1,7 +1,8 @@
 <!--同批出入库-->
 <template>
 	<div class="router-content">
-		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList">可疑品</el-button>
+		<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>
+		<!--<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList"  >可疑品</el-button>-->
 		<div class="innner-content" :style="styleObject">
 			<h2 class="content-title">
 				<span class="tag">{{batch}}</span>出库信息</h2>
@@ -34,6 +35,7 @@
 		},
 		data() {
 			return {
+				btnShow: true,
 				styleObject: {
 					"min-width": "1200px"
 				},
@@ -222,27 +224,38 @@
 			},
 			// 可疑品列表。
 			showSuspiciousList() {
-				let sKey = this.$route.params.key,
-					sPath = "";
-					
-				if(sKey != undefined && sKey !== "") {
-					sPath = `/stock/${sKey}/restrain`;
-					
-				}else {
-					sPath = "/stock/restrain"
+				if(!this.btnShow){
+					let sKey = this.$route.params.key,
+					sPath = "";				
+					if(sKey != undefined && sKey !== "") {
+						sPath = `/stock/${sKey}/restrain`;			
+					}else {
+							sPath = "/stock/restrain"
+						}		
+				this.$router.push({ path: sPath, query: this.$route.query})
+				}else{
+					console.log("该功能将在后续开发，敬请期待...")
 				}
 				
-				this.$router.push({ path: sPath, query: this.$route.query})
 			}
 		}
 	}
 </script>
 
 <style lang="less" scoped>
+		
 	.router-content {
 		flex: 1 1;
 		overflow: auto;
-		
+
+		.nobtn {
+			background: rgb(204,204,204);
+			border: none;
+			color: #fff;
+			// cursor: no-drop;
+			cursor:auto;
+		}
+
 		.btn-restrain {
 			position: absolute;
 			right: 0;
@@ -254,6 +267,8 @@
 				color: #f90;
 			}
 		}
+
+		
 		
 		.error {
     		border: 2px solid #42AF8F;

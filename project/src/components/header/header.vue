@@ -1,7 +1,7 @@
 <template>
     <header>
         <img :src="logo"/>
-        ——&nbsp;&nbsp;追溯系统
+        <!--——&nbsp;&nbsp;追溯系统-->
         <div class="header-icon">
 	        <i v-if="bShowSearch" class="icon icon-24 icon-back" @click="goToSearch"></i>
 	        <i v-if="bShowConfig" class="icon icon-24 icon-config" @click="goToConfig"></i>
@@ -9,7 +9,9 @@
     </header>
 </template>
 <script>
-    import logo from 'assets/img/logo-w.png'
+
+   // import logo from 'assets/img/logo-w.png'
+    import logo from 'assets/img/kssp-logo.png'
     import 'assets/css/icon.less'
 
     const pathName = window.location.pathname;

@@ -3,7 +3,9 @@
         <el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
             <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
         </el-form-item>
-        <div class="form-button">
+        <div  :class="['form-button', { 'form-button-last': active.radio === '4' && items.length > 10 }]">
+        <!--<div :class="[active.radio == '4' ? 'form-button-last' : '', 'form-button']">-->
+        <!--<div class="form-button">-->
             <el-button class="btn" type="primary" @click="submitForm('ruleForm')">查询</el-button>
             <el-button class="btn" type="primary" @click="resetForm('ruleForm')">重置</el-button>
         </div>
@@ -296,5 +298,12 @@
         height: 30px;
         border-radius: 0;
         border-color: #ddd;
-    }  
+    }
+    .form-button {
+        margin-top: 50px
+    }
+    .form-button-last {
+        margin-top: 30px;
+        margin-bottom: 30px;
+    }
 </style>

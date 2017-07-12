@@ -28,10 +28,10 @@
 				<!-- 分析维度-->
 				<div class="dimension">
 					<el-radio-group v-model="slectedDimension" class="btn-group" >
-						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type">{{obj.name}}</el-radio-button>
+						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type"  >{{obj.name}}</el-radio-button>
 					</el-radio-group>
 					<!--el-button class="btn btn-plain" v-for="name in dimension" :key="name">{{name}}</el-button-->
-					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button>
+					<el-button  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'parameter']" @click="parameterClick">工艺</el-button>
 				</div>
 			</div>			
 			<v-equipment v-if="equipments.length" :equipments="equipments" :process-key="processKey" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
@@ -50,6 +50,7 @@
 		},
         data () {
             return {
+				btnShow: true, //用与判断'工艺'按钮是否禁用
                 styleObject: {
                     "min-width": "1000px"
                 },
@@ -185,6 +186,13 @@
 				box-sizing: border-box;
 				white-space: nowrap;
 
+				.nobtn {
+					background: rgb(204, 204, 204);
+					border: none;
+					color: #fff; // cursor: no-drop;
+					cursor: auto;
+				}
+
 				.btn-group {
 					flex: 1 0;
 					white-space: nowrap;
@@ -193,8 +201,34 @@
 					vertical-align: middle;
 
 					label {
-						margin-right: 20px;						
+						margin-right: 20px;					
 					}
+					/* 临时屏蔽该按钮 */
+					label:nth-child(3) {
+						span {
+							background: rgb(204,204,204);
+							color: #fff;
+							cursor:default;
+							border: 2px solid #ccc 
+						}						
+					}
+					label:nth-child(4) {
+						span {
+							background: rgb(204,204,204);
+							color: #fff;
+							cursor:default;
+							border: 2px solid #ccc 
+						}						
+					}
+					label:nth-child(5) {
+						span {
+							background: rgb(204,204,204);
+							color: #fff;
+							cursor:default;
+							border: 2px solid #ccc 
+						}						
+					}
+
 					.el-checkbox-button__inner, .el-radio-button__inner {
 						padding: 6px 8px;
 						border-radius: 0;
