@@ -6,33 +6,37 @@
 		<div v-if="!sErrorMessage" ref="content">
 			<div ref="summary" :class="{ actived: active.summary }">				
 				<h2 class="content-title" @click="active.summary=!active.summary">汇总信息<i class="el-icon-d-arrow-right icon"></i></h2>
-				<div class="content-table">
+				<!--<div class="content-table">
 					<v-table :table-data="reportData.summary" :loading="loading"></v-table>
-				</div>
+				</div>-->
+				<transition name="el-zoom-in-top">
+					<v-table v-show="active.summary" :table-data="reportData.summary" :loading="loading"></v-table>
+				</transition>
 			</div>
 			<div ref="inStocks" :class="{ actived: active.inStocks }">			
 				<h2 class="content-title" @click="active.inStocks=!active.inStocks">在库明细<i class="el-icon-d-arrow-right icon"></i></h2>
-				<div class="content-table">
-					<v-table :table-data="reportData.inStocks" :loading="loading"></v-table>
-				</div>
+				<transition name="el-zoom-in-top">
+					<v-table  v-show="active.inStocks" :table-data="reportData.inStocks" :loading="loading"></v-table>
+				</transition>
 			</div>
 			<div ref="inMakings" :class="{ actived: active.inMakings }">			
 				<h2 class="content-title" @click="active.inMakings=!active.inMakings">在制明细<i class="el-icon-d-arrow-right icon"></i></h2>
-				<div class="content-table">
-					<h2 class="inner-title">加工中</h2>
-					<v-table :table-data="reportData.inMaking" :loading="loading"></v-table>
-					<h2 class="inner-title">滞留中</h2>
-					<v-table :table-data="reportData.remain" :loading="loading"></v-table>
-				</div>
+				<!--<transition-group class="content-table">-->
+				<transition-group name="el-zoom-in-top" tag="div">
+					<h2 v-show="active.inMakings" key="1" class="inner-title">加工中</h2>
+					<v-table v-show="active.inMakings" key="2" :table-data="reportData.inMaking" :loading="loading"></v-table>
+					<h2 v-show="active.inMakings" key="3" class="inner-title">滞留中</h2>
+					<v-table v-show="active.inMakings" key="4" :table-data="reportData.remain" :loading="loading"></v-table>
+				</transition-group>
 			</div>
 			<div ref="outStocks" :class="{ actived: active.outStocks }">				
 				<h2 class="content-title" @click="active.outStocks=!active.outStocks">出库明细<i class="el-icon-d-arrow-right icon"></i></h2>
-				<div class="content-table">
-					<h2 class="inner-title">出库明细</h2>
-					<v-table :table-data="reportData.outStocks" :loading="loading"></v-table>
-					<h2 class="inner-title">发货明细</h2>
-					<v-table :table-data="reportData.delivered" :loading="loading"></v-table>
-				</div>
+				<transition-group name="el-zoom-in-top" tag="div">
+					<h2 v-show="active.outStocks" key="5" class="inner-title">出库明细</h2>
+					<v-table v-show="active.outStocks" key="6" :table-data="reportData.outStocks" :loading="loading"></v-table>
+					<h2 v-show="active.outStocks" key="7" class="inner-title">发货明细</h2>
+					<v-table v-show="active.outStocks" key="8" :table-data="reportData.delivered" :loading="loading"></v-table>
+				</transition-group>
 			</div>
 		</div>
 	</div>
@@ -636,11 +640,12 @@
 	.content-table {
 		display: none;
 		
-		.inner-title {
+		
+	}
+	.inner-title {
 			color: #42AF8F;
 			margin: 13px 0;
 			text-indent: 10px;
-		}
 	}
 
 </style>
