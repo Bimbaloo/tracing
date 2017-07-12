@@ -31,9 +31,8 @@
 </template>
 
 <script>
-    import table from "components/basic/table.vue"
     import $ from "jquery"
-
+    import table from "components/basic/table.vue"
     import dialogTable from "components/basic/dialogTable.vue"
     
     export default {
@@ -71,7 +70,7 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名字"
+                        name: "物料名称"
                     },{
                         prop: "quantity",
                         name: "数量"
@@ -100,7 +99,7 @@
 //                      "barcodeTypeName": "1", 
                         "batchNo": "20160331A", 
                         "materialCode": "0031", 
-                        "materialName": "物料名字", 
+                        "materialName": "物料名称", 
                         "quantity": 16, 
                         "stock": "仓库",
                         "stocklot": "库位",
@@ -132,7 +131,7 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名字"
+                        name: "物料名称"
                     },{
                         prop: "quantity",
                         name: "数量"
@@ -164,7 +163,7 @@
 //                      "barcodeTypeName": "2", 
                         "batchNo": "批次号", 
                         "materialCode": "0024", 
-                        "materialName": "物料名字", 
+                        "materialName": "物料名称", 
                         "quantity": 16, 
                         "remainingNum": 16,
                         "stock": "仓库",
@@ -199,14 +198,14 @@
         created () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
-            // this.fetchPage();
+               this.fetchPage();
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
 //          '$route': 'fetchPage'
             '$route': function() {
             	this.key = this.$route.params.key;
-            	// this.fetchPage();
+              	 this.fetchPage();
             }
         },
         methods: {

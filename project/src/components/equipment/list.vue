@@ -11,12 +11,12 @@
 		</div>
 		<div class="analysis">
 			<div class="name">
-				<label @click="showEquipmentDetail(info)" v-for="info in equipments" v-if="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected">{{info.equipmentName}}<i class="el-icon-d-arrow-right"></i></label>
+				<label @click="showEquipmentDetail(info)" v-for="info in equipments" v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected">{{info.equipmentName}}<i class="el-icon-d-arrow-right"></i></label>
 			</div>
 			<div class="equipment">
 				<v-equipmentLine 
 					v-for="(info,index) in equipments" 
-					v-if="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected" 
+					v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected" 
 					:key="info.equipmentId" 
 					:euqipment-index="index" 
 					:euqipment-status="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].status" 
@@ -304,6 +304,7 @@
 			},
 			// 初始化数据。
 			setInitData() {
+				// debugger
 				this.ratio = 1;
 				this.startIf = true;
 				this.endIf = true;
@@ -408,7 +409,8 @@
 				// 	this.eventData = Object.assign({}, this.oTest);;
 				// 	["1", "2", "3", "4", "5", "6"].forEach(type => this.formatEquipmentData(type, this.eventData[type]));
 					
-				// }, 1000)				
+				// }, 1000)		
+				// debugger		
 				this.$post(this.url, {
 					equipmentIdList: this.checkedEquipments.join(","),
 					startTime: this.datetime.start,
@@ -576,7 +578,7 @@
 				this.windowTime.interval = (new Date(this.datetime.end).getTime() - new Date(this.datetime.start).getTime())/1000/60/60;
 
 				this.windowTime.start = this.datetime.start;
-				this.windowTime.max = Math.floor(this.windowTime.interval);
+				this.windowTime.max = this.formatData(this.windowTime.interval, 2);//Math.floor
 
 				if(this.windowTime.interval > 2) {				
 					this.ratio = this.windowTime.interval/2;
@@ -663,37 +665,45 @@
 						query: {
 							equipmentId: oData.equipmentId,
 							equipmentName: oData.equipmentName,
-							startTime: oData.shiftStartTime,
-							endTime: oData.shiftEndTime,
+							shiftStartTime: oData.shiftStartTime,
+							shiftEndTime: oData.shiftEndTime,
 							process: this.process
 						}
 					})
 				}
 			},
+			
 			/**
 			 * @param {Object} event
 			 * @return {void}
 			 */
 			moveSlider (event) {
 				// 设置滑块位置。
-				let maxLeft = event.currentTarget.clientWidth - this.$refs.slider.clientWidth,				
+				let maxLeft = event.currentTarget.offsetWidth - this.$refs.slider.offsetWidth,				
 					nRatio = 0;
 				
 				if(event.target.getAttribute("class").indexOf("icon-start") > -1) {
 					this.$refs.slider.style.left = 0;
 				}else if(event.target.getAttribute("class").indexOf("icon-end") > -1) {
-					nRatio = Math.floor(maxLeft*100/event.currentTarget.clientWidth);
+					
+					nRatio = this.formatData(maxLeft*100/event.currentTarget.offsetWidth, 2);//Math.floor
 				}else if(event.target.getAttribute("class").indexOf("slider") > -1){
 					let left = event.offsetX + event.target.offsetLeft
-					nRatio = Math.floor((left > maxLeft ? maxLeft : left)*100/event.currentTarget.clientWidth);
+					nRatio = this.formatData((left > maxLeft ? maxLeft : left)*100/event.currentTarget.offsetWidth, 2);//Math.floor
 				}else {
-					nRatio = Math.floor((event.offsetX > maxLeft ? maxLeft : event.offsetX)*100/event.currentTarget.clientWidth);
+					nRatio = this.formatData((event.offsetX > maxLeft ? maxLeft : event.offsetX)*100/event.currentTarget.offsetWidth, 2);//Math.floor
 				}	
 
 				let nStart = new Date(this.datetime.start).getTime()*(1-nRatio/100) + nRatio/100*(new Date(this.datetime.end).getTime());
 				this.windowTime.start = new Date(nStart).Format("yyyy-MM-dd hh:mm:ss");
 				this.windowTime.end =  new Date(nStart + this.windowTime.interval*60*60*1000).Format("yyyy-MM-dd hh:mm:ss")
 				this.windowTime.left = nRatio;
+			},
+			/**
+			 * 格式化数据，保留特定小数位数。
+			 */
+			formatData (value, pos) {
+				return Math.floor(value*Math.pow(10, pos))/Math.pow(10, pos);
 			},
 			// 滑块拖动事件。
 			dragSlider (event) {
@@ -707,7 +717,7 @@
 					line = self.$refs.line,
 					nLeft = parseFloat(slider.style.left.split("%")[0]),
 					nMouseX = event.clientX,
-					nMax = (1 - slider.clientWidth/line.clientWidth)*100,
+					nMax = (1 - slider.offsetWidth/line.offsetWidth)*100,
 					nRatio = 0;
 
 				// 鼠标移动事件。
@@ -722,12 +732,12 @@
 					e.stopPropagation();
 					e.preventDefault();		
 
-					nRatio = nLeft + (e.clientX - nMouseX)*100/line.clientWidth;
+					nRatio = nLeft + (e.clientX - nMouseX)*100/line.offsetWidth;
 					// debugger
 					if(nRatio < 0) {
 						nRatio = 0;
 					}else if(nRatio > nMax) {
-						nRatio = Math.floor(nMax);
+						nRatio = Math.floor(nMax);//formatData
 					}
 					slider.style.left = nRatio + "%";
 					
@@ -764,8 +774,10 @@
 				if(Rt.utils.DateDiff(nEnd, this.datetime.end) < 0) {
 					// 若超出结束时间。
 					this.windowTime.end = this.datetime.end;
-					this.windowTime.start = new Date(new Date(this.datetime.end).getTime() - nInterval).Format("yyyy-MM-dd hh:mm:ss");
-					this.windowTime.left = Math.floor(Rt.utils.DateDiff(this.datetime.start, this.windowTime.start)*100/Rt.utils.DateDiff(this.datetime.start, this.datetime.end));
+					this.windowTime.start = new Date(new Date(this.datetime.end).getTime()
+											- nInterval).Format("yyyy-MM-dd hh:mm:ss");
+					this.windowTime.left = this.formatData(Rt.utils.DateDiff(this.datetime.start, this.windowTime.start)*100
+											/ Rt.utils.DateDiff(this.datetime.start, this.datetime.end), 2);//Math.floor
 				}else {
 					this.windowTime.end = new Date(nEnd).Format("yyyy-MM-dd hh:mm:ss");	
 				}

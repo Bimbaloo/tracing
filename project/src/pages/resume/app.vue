@@ -9,8 +9,8 @@
 			<div class="resume-content-wrap" :class="{full:bFullScreen}">
 				<div class="clone"></div>
 				<div class="resume-content">
-					<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="100px">
-						<el-form-item label="成品条码:" prop="barcode">
+					<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="80px">
+						<el-form-item class="filters-code" label="成品条码:" prop="barcode">
 							<v-input placeholder-data="请输入条码或扫码" key-data="barcode" :form-data="ruleForm"></v-input>
 						</el-form-item>
 						<el-form-item>

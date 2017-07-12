@@ -1,5 +1,5 @@
 <template>
-    <div class="equipment-line" :style="{width: ratio*100 + '%', left: (-windowTime.left)*ratio + '%', 'padding-top': (this.top-14) + 'px', 'padding-bottom': (this.bottom-14) + 'px'}" ref="wrap">
+    <div class="equipment-line" :style="{width: ratio*100 + '%', left: (-windowTime.left)*ratio + '%', 'padding-top': (top-14) + 'px', 'padding-bottom': (bottom-14) + 'px'}" ref="wrap">
         <!--div v-for="(info,index) in status" :key="index" :data-type="info.type" class="status" :style="{left: Rt.utils.DateDiff(info.startTime, datetime.start)*100/Rt.utils.DateDiff(datetime.endTime, datetime.start) + "%", width: Rt.utils.DateDiff(info.endTime, info.startTime)*100/Rt.utils.DateDiff(datetime.endTime, datetime.start) + "%"}">
             <div>{{info.startTime}}~{{info.endTime}}</div>
         </div-->
@@ -10,7 +10,9 @@
 
 <script>
     import Vue from 'vue'
-    
+
+    const statusHeight = 14;
+
     export default{
         props: {
 			euqipmentStatus: Array,
@@ -26,30 +28,45 @@
             euqipmentIndex: Number
 		},
         data() {
-            return {
-                top: 0,
-                bottom: 0,
+            return {         
+                top: statusHeight,
+                bottom: statusHeight,
                 labelNode: null,
 				dimension: [{
 					name: "质量",
                     key: "quality",
-					type: "3"
+					type: "3",
+                    top: statusHeight,
+                    bottom: statusHeight,
+                    node: []
 				}, {
 					name: "加工",
                     key: "work",
-					type: "2"
+					type: "2",
+                    top: statusHeight,
+                    bottom: statusHeight,
+                    node: []
 				}, {
 					name: "事件",
                     key: "event",
-					type: "4"
+					type: "4",
+                    top: statusHeight,
+                    bottom: statusHeight,
+                    node: []
 				}, {
 					name: "维护",
                     key: "repair",
-					type: "5"
+					type: "5",
+                    top: statusHeight,
+                    bottom: statusHeight,
+                    node: []
 				}, {
 					name: "工具",
                     key: "tool",
-					type: "6"
+					type: "6",
+                    top: statusHeight,
+                    bottom: statusHeight,
+                    node: []
 				}],
             }
         },
@@ -106,14 +123,19 @@
                 this.setTool();
             },
             selectedDimension: function() {
+                console.log("change")
+                
+                this.$nextTick(() => {
+                    this.setPanelPadding();
+                })
             }
         },
         methods: {
-            getDiffTime: function() {
+            getDiffTime() {
                 return Rt.utils.DateDiff(this.dateTime.start, this.dateTime.end);
             },
             // 设置状态。
-            setStatus: function() {
+            setStatus() {
                 // console.log(JSON.stringify(this.status));
                 // this.status = [{"startTime":"2016-03-31 8:30:33","endTime":"2016-03-31 14:35:33","type":"run"},{"startTime":"2016-03-31 14:30:33","endTime":"2016-03-31 16:35:33","type":"stop"}]
 
@@ -217,35 +239,35 @@
                 aoSortData.sort((a, b) => {
                     return a.startTime < b.startTime;
                 });
-
+           
                 aoSortData.map((o, index) => {
                     if(o.type == "startWorkList") {
                         // 加工。
-                        this._createNode(o, index, "work", "加工", {
+                        this.setDimensionConfig("work", this._createNode(o, index, "work", "加工", {
                             happenTime: "发生时间",                      
                             personName: "操作人",
                             doCode: "工单号",
                             processName: "工序"
-                        }, o.groupId);
+                        }, o.groupId));
                     }else if(o.type == "finishWorkList") {
                         // 完工。
-                        this._createNode(o, index, "work", "完工", {
+                        this.setDimensionConfig("work", this._createNode(o, index, "work", "完工", {
                             happenTime: "发生时间",
                             personName: "操作人"
-                        }, o.groupId);
+                        }, o.groupId));
                     }else if(o.type == "poolInList") {
                         // 投料。
-                        this._createNode(o, index, "work", "投料", {
+                        this.setDimensionConfig("work", this._createNode(o, index, "work", "投料", {
                             happenTime: "发生时间",
                             personName: "操作人",
                             doCode: "工单号",
                             materialName : "物料", 
 						    batchNo : "批次",
 							quantity : "数量"
-                        }, o.groupId);
+                        }, o.groupId));
                     }else if(o.type == "poolOutList") {
                         // 产出。
-                        this._createNode(o, index, "work", "产出", {
+                        this.setDimensionConfig("work", this._createNode(o, index, "work", "产出", {
                             happenTime: "发生时间",
                             personName: "操作人",
                             doCode: "工单号",
@@ -254,15 +276,144 @@
 							quantity : "数量",
                             goodNum : "合格数",
 							badNum : "不合格数",
-                        }, o.groupId);
+                        }, o.groupId));
                     }
                 })
 
+                this.setPanelPadding()   
+            },
+            /**
+             * 设置面板padding高度。
+             * @param {String} sType
+             * @return {void}
+             */            
+            setPanelPadding () {
+                        
+                let oDimension = {};
+
+                if(!this.selectedDimension.length) {
+                    // 若无选中。
+                    this.top = statusHeight;
+                    this.bottom = statusHeight;
+                }else if(this.selectedDimension.length == 1) {
+                    // 若当前只显示一个维度的数据。              
+                    let sType = this.selectedDimension[0];
+                    oDimension = this.getDimensionConfig(sType);
+                    this.top = oDimension.top;
+                    this.bottom = oDimension.bottom;
+                }else {
+                    // 若有多个维度的数据。
+                    this.selectedDimension.map(sDimension => {
+                        oDimension = this.getDimensionConfig(sDimension);
+                        if(this.top < oDimension.top) {
+                            this.top = oDimension.top;
+                        }
+                        if(this.bottom < oDimension.bottom) {
+                            this.bottom = oDimension.bottom;
+                        }
+                    })
+                }
+                
+                this.labelNode.style.paddingTop =  (this.top-statusHeight) + "px";
+                this.labelNode.style.paddingBottom =  (this.bottom-statusHeight) + "px";
+
+                this.selectedDimension.map(sDimension => {
+                    oDimension = this.getDimensionConfig(sDimension);
+                    oDimension.node.map(oData => {
+                        let com = oData.node;
+                        if(oData.class == "up") {
+                            // 若分布在状态轴上方。
+                            com.style.top = (this.top - com.offsetHeight) + "px";
+                        }else {
+                            // 若分布在状态轴下方。
+                            com.style.bottom = (this.bottom - com.offsetHeight) + "px";
+                        }
+                        
+                    })
+                })
+
+                // 事件显示在设备状态轴上方。
+                // if(sClass == "up") {  
+                //     // 若当前上方高度小于节点内容高度。         
+                //     if(this.top < component.$el.clientHeight) {
+                //         // 更新高度为内容高度。
+                //         this.top = component.$el.clientHeight;                        
+                //         this.labelNode.style.paddingTop =  (this.top-statusHeight) + "px";
+                   
+                //         if(this.top) {
+                //             // 设置高度。
+                //             component.$el.parentElement.querySelectorAll(".dimension-list.up").forEach(o => {                        
+                //                 o.style.top = (this.top - o.clientHeight) + "px";
+                //             }) 
+                //         } 
+                //     }                       
+                //     component.$el.style.top =  (this.top -  component.$el.clientHeight) + "px";             
+                // }else {
+                //     // 事件显示在设备状态轴下方。
+                //     // 若当前下方高度小于节点内容高度。   
+                //     if(this.bottom < component.$el.clientHeight) {
+                //         this.bottom = component.$el.clientHeight;
+                //         this.labelNode.style.paddingBottom =  (this.bottom-statusHeight) + "px";
+
+                //         if(this.bottom) {
+                //             component.$el.parentElement.querySelectorAll(".dimension-list.down").forEach(o => {                        
+                //                 o.style.bottom = (this.bottom - o.clientHeight) + "px";
+                //             }) 
+                //         } 
+                //     }
+                //     component.$el.style.bottom =  (this.bottom -  component.$el.clientHeight) + "px"; 
+                // }
+
+            },
+            /**
+             * 设置维度配置数据。
+             * @param {String} sType
+             * @param {Object} oData
+             * @return {void}
+             */
+            setDimensionConfig (sType, oData) {
+                let aoDimension = this.dimension,
+                    sLength = aoDimension.length,
+                    // 事件节点。
+                    oNode = oData.node,
+                    // 节点内容高度。
+                    nHeight = oNode.offsetHeight;
+
+                for(let i = 0; i < sLength; i ++) {
+                    if(aoDimension[i].key == sType) {
+                        // 若初始值小于高度值，更新初始值。
+                        aoDimension[i].node.push(oData);
+
+                        if(oData.class == "up") {
+                            // 若在状态上方
+                            if(aoDimension[i].top < nHeight) {
+                                // 若小于当前节点高度值。
+                                aoDimension[i].top = nHeight;
+                            }
+
+                        }else {
+                            // 若在状态下方
+                            if(aoDimension[i].bottom < nHeight) {
+                                // 若小于当前节点高度值。
+                                aoDimension[i].bottom = nHeight;
+                            }                            
+                        }
+        
+                        break;
+                    }
+                }
+            },
+            /**
+             * 获取维度设置。
+             * @param {String} sType
+             * @return {Object}
+             */
+            getDimensionConfig (sType) {
+                return this.dimension.filter(o => o.type == sType)[0];
             },
             // 设置质量。
-            setQuality: function() {
-                console.log(JSON.stringify(this.quality));
-                
+            setQuality () {
+                // console.log(JSON.stringify(this.quality));
                 let oNode = this.$refs.quality;
 
                 if(this.$refs.quality instanceof Array) {
@@ -296,22 +447,21 @@
                     }                    
                 }
 
-                // 按照开始时间排序。
                 aoSortData.sort((a, b) => {
                     return a.startTime < b.startTime;
                 });
 
                 aoSortData.map((o, index) => {
                     if(o.type == "qcList") {
-                        this._createNode(o, index, "quality", "质检", {
+                        this.setDimensionConfig("quality", this._createNode(o, index, "quality", "质检", {
                             startTime: "开始时间",
                             endTime: "结束时间",                         
                             personName: "操作人",
                             method: "三检类型",
                             result: "质检结果"
-                        });
+                        }));
                     }else if(o.type == "submitQcList") {
-                        this._createNode(o, index, "quality", "送检", {
+                        this.setDimensionConfig("quality", this._createNode(o, index, "quality", "送检", {
                             happenTime: "送检时间",
                             checkTime: "检验时间",
                             checkPersonName: "检验人",
@@ -319,11 +469,14 @@
                             materialName: "物料",
                             batchNo: "批次",
                             result: "送检结果"
-                        });
+                        }));
                     }
                 })
+
+                this.setPanelPadding()               
             },
             /**
+             * 创建列表节点。
              * @param {Object} item
              * @param {String} sType
              * @param {String} sTitle
@@ -331,7 +484,7 @@
              * @param {Number} groupId
              * @return {void} 
              */
-            _createNode: function(item, index, sType, sTitle, oList, groupId) {
+            _createNode (item, index, sType, sTitle, oList, groupId) {
                 let self = this,
                     sClass = "up";
 
@@ -350,28 +503,34 @@
                                 "group-id": groupId
                             },
                             on: {
+                                // 鼠标移入事件。
                                 mouseenter: function (event) {
                                     let sGroup =  event.target.getAttribute("group-id");
                                     if(!sGroup) {
                                         return;
                                     }
+                                    // 获取groupId相同的节点。
                                     let aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
                                         return node.getAttribute("group-id") == sGroup && node != event.target;
                                     });
+                                    // 设置激活样式。
                                     aoNode.forEach(o => {
                                         if(o.className.indexOf("actived") < 0) {
                                             o.className += " actived";
                                         }
                                     })
                                 },
+                                // 鼠标移出事件。
                                 mouseleave: function (event) {
                                     let sGroup =  event.target.getAttribute("group-id");
                                     if(!sGroup) {
                                         return;
                                     }
+                                    // 获取groupId相同的节点。
                                     let aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
                                         return node.getAttribute("group-id") == sGroup && node != event.target;
                                     });
+                                    // 取消激活样式。
                                     aoNode.forEach(o => {
                                         if(o.className.indexOf("actived") > -1) {
                                             o.className = o.className.split(" ").filter(sClass => sClass != "actived").join(" ");
@@ -412,35 +571,15 @@
                 if(this.$refs[sType] instanceof Array) {
                     oNode = oNode[0];
                 }
+                // 将节点添加到页面中。
                 oNode.appendChild(component.$el);
-                // debugger
-                if(sClass == "up") {           
-                    if(this.top < component.$el.clientHeight) {
-                        this.top = component.$el.clientHeight;                        
-                        this.labelNode.style.paddingTop =  (this.top-14) + "px";
-                   
-                        if(this.top) {
-                            component.$el.parentElement.querySelectorAll(".dimension-list.up").forEach(o => {                        
-                                o.style.top = (this.top - o.clientHeight) + "px";
-                            }) 
-                        } 
-                    }                       
-                    component.$el.style.top =  (this.top -  component.$el.clientHeight) + "px";             
-                }else {
-                    if(this.bottom < component.$el.clientHeight) {
-                        this.bottom = component.$el.clientHeight;
-                        this.labelNode.style.paddingBottom =  (this.bottom-14) + "px";
 
-                        if(this.bottom) {
-                            component.$el.parentElement.querySelectorAll(".dimension-list.down").forEach(o => {                        
-                                o.style.bottom = (this.bottom - o.clientHeight) + "px";
-                            }) 
-                        } 
-                    }
-                    component.$el.style.bottom =  (this.bottom -  component.$el.clientHeight) + "px"; 
+                return {
+                    node: component.$el,
+                    class: sClass
                 }
             },     
-            setEvent: function() {
+            setEvent () {
                 console.log(this.event)
                 let oNode = this.$refs.event;
 
@@ -454,7 +593,7 @@
                     return;
                 }
             },
-            setRepair: function() {
+            setRepair () {
                 console.log(this.repair)
                 let oNode = this.$refs.repair;
 

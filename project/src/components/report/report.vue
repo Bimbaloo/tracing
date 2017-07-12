@@ -546,16 +546,16 @@
 					}
 				}
 				
-				// oQuery = [
-				// 			{
-				// 			"batchNo": "20151118A",
-				// 			"bucketNo": "28_D201511170002_20151118152959491",
-				// 			"iokey": "D201511170003_59_2015-11-18 15:49:55_6501",
-				// 			"materialCode": "20000375",
-				// 			"materialName": "MP/C15VVT-S3 活塞毛坯/074175",
-				// 			"productionMode": 0
-				// 			}
-				// 		]
+				oQuery = [
+							{
+							"batchNo": "20151118A",
+							"bucketNo": "28_D201511170002_20151118152959491",
+							"iokey": "D201511170003_59_2015-11-18 15:49:55_6501",
+							"materialCode": "20000375",
+							"materialName": "MP/C15VVT-S3 活塞毛坯/074175",
+							"productionMode": 0
+							}
+						]
 				this.$post(HOST + this.url, oQuery)
 					.then((res) => {
 						this.loading = false;					
