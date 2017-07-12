@@ -400,10 +400,10 @@
 													<div class="item-type">{{getTimeLineTypeInfo(item.type).text}} :</div>
 													<div class="item-info">
 														<span class="tips">{{ item.personName }}</span> 将条码
-														<span class="tips">{{ item.barcode }}</span> ,批次
+														<span class="tips">{{ item.barcode }}</span> ，批次
 														<span class="tips">{{ item.batchNo }}</span> 的
 														<span class="tips">{{ item.materialName }}</span>
-														<span class="tips">{{ item.quantity }}</span> 件,入库到
+														<span class="tips">{{ item.quantity }}</span> 件，入库到
 														<span class="tips">{{ item.warehouse }}</span>
 														<span class="tips">{{ item.reservoir }}</span>
 													</div>
@@ -413,7 +413,7 @@
 													<div class="item-info">
 														<span class="tips">{{ item.personName }}</span> 在
 														<span class="tips">{{ item.equipmentName }}</span> 上将条码
-														<span class="tips">{{ item.barcode }}</span> ,批次
+														<span class="tips">{{ item.barcode }}</span> ，批次
 														<span class="tips">{{ item.batchNo }}</span> 的
 														<span class="tips">{{ item.materialName }}</span>
 														{{ getTimeLineTypeInfo(item.type).text }}
@@ -423,11 +423,11 @@
 													<div class="item-type">{{ getTimeLineTypeInfo(item.type).text }} :</div>
 													<div class="item-info">
 														<span class="tips">{{ item.personName }}</span> 将条码
-														<span class="tips">{{ item.barcode }}</span> ,批次
-														<span class="tips">{{ item.batchNo }}</span> ,在
+														<span class="tips">{{ item.barcode }}</span> ，批次
+														<span class="tips">{{ item.batchNo }}</span> ，在
 														<span class="tips">{{ item.equipmentName }}</span> 上产出
-														<span class="tips">{{ item.materialName }}</span> 物料,共计
-														<span class="tips">{{ item.quantity }}</span> 件,结果为
+														<span class="tips">{{ item.materialName }}</span> 物料，共计
+														<span class="tips">{{ item.quantity }}</span> 件，结果为
 														<span class="tips">{{ item.checkResult }}</span>
 													</div>
 												</div>
@@ -593,7 +593,7 @@
 				return this.sCurrentTab=="lines"?"primary":"text";
 			}
 		},
-		// 创建时处理。
+		// 创建时处理。mounted
 		created() {
 			// 获取所需的查询参数。
 			let oData = sessionStorage.getItem("searchConditions");
@@ -604,7 +604,10 @@
 		        if(oData.tab === "resume") {
 			        this.ruleForm.barcode = oData.keys.barcode;
 		        }
+		    }else {
+		    	this.ruleForm.barcode = "";
 		    }
+		    
 		    // 如果是全屏，则取参数值。--- 通过url获取。
 		    if(this.bFullScreen) {
 		    	let url = location.search; //获取url中"?"符后的字串 
@@ -618,12 +621,14 @@
 				}
 				this.ruleForm.barcode = oRequest.barcode;
 		    }
+		    
 			// 如果是全屏，则默认创建。
 //			if(this.bFullScreen) {
 //				this.getPageData();
 //			}
-			// 默认查询。
+			// 默认查询。--- created()
 			this.getPageData();
+//			this.submitForm('ruleForm')
 		},
 		// 页面方法。
 		methods: {
@@ -670,7 +675,7 @@
 						this.initData();
 //						this.bSubmit = true;
 						
-						// 更新form中的值。
+						// 更新form中的值。--直接设置值。
 //						let oData = sessionStorage.getItem("searchConditions");
 //
 //						// 履历模块。
@@ -704,7 +709,7 @@
 			getPageData() {
 				// 获取数据。-- 根据当前显示的tab创建数据。
 				this.oTab[this.sCurrentTab].loading = true;
-//				this.oTab[this.sCurrentTab].error = "";
+				this.oTab[this.sCurrentTab].error = "";
 				
 				if(!this.oTab[this.sCurrentTab].bCreated) { // && this.bSubmit
 					this.$ajax.post(this.oTab[this.sCurrentTab].url, this.ruleForm).then((res) => {
@@ -1159,6 +1164,10 @@
 					
 					.el-form-item {
 						display: inline-block;
+						
+						&.filters-code {
+							width: 600px;
+						}
 					}
 				}
 				

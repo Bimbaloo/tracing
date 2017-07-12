@@ -19,7 +19,7 @@ var parseData = function(aoGet){
 	// 类型判断处理。
 	let oType = {
 		"materialCode": "select",
-		"equipmentId": "select",
+		"equipmentCode": "select",
 		"processCode": "select",
 		"personCode": "select",
 		"startTime": "datetime",

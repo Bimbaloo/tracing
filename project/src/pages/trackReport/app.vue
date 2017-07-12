@@ -147,7 +147,6 @@
 					selected: 0,
 					filter: 0
 				},
-				//selected: [],
 				filters: {}
 			}
 		},
@@ -192,12 +191,13 @@
 				// 判断是否调用成功。
 				if(bRight != "0") {
 					// 提示信息。
-					this.error = param.data.errorMsg.message;
+					this.error = "查无数据";
+					console.warn(param.data.errorMsg.message);
 					// 失败后的回调函。
 					fnFail && fnFail();
 				}else {
 					// 调用成功后的回调函数。
-					fnSu && fnSu();
+					fnSu && fnSu(param.data.data);
 				}
 			},	
 			fetchData () {
@@ -207,18 +207,23 @@
              	this.$post(this.url, this.filters)
              	.then((res) => {
 					//debugger
-					this.judgeLoaderHandler(res, () => {
-						this.gridData.data = res.data.data;
+					this.judgeLoaderHandler(res, (data) => {
 						
-                        this.gridData.data.forEach((o, index) => {
-                        	if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
-                        		// 标记为选中。
-                        		o.tag = "selected";
-                        	}else {
-                        		o.tag = "filtered";
-                        	}
-                        });
-                        
+						this.gridData.data = data;
+						
+						if(!data.length) {
+							console.log('查无数据。');
+						}else {
+							this.gridData.data.forEach((o, index) => {
+								if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
+									// 标记为选中。
+									o.tag = "selected";
+								}else {
+									o.tag = "filtered";
+								}
+							});
+						}
+              
                         this.showData = {
                         	columns: this.gridData.columns,
                         	data: this.gridData.data
@@ -227,7 +232,8 @@
              })
              .catch((err) => {
                  this.gridData.loading = false;
-                 this.gridData.error = "查询出错。"
+				 this.error = "查无数据";
+				 console.warn("查询出错。");
              })
             },
 			setWidth() {
@@ -325,5 +331,11 @@
 		border: none;
     	outline: none;
     	background-color: transparent;
+	}
+
+	.error {
+		height: 60px;
+		line-height: 60x;
+		text-align: center;
 	}
 </style>

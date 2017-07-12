@@ -14,9 +14,9 @@
 							</el-table-column>
 							<el-table-column prop="ng" label="不合格数" width="61">
 							</el-table-column>
-							<el-table-column prop="scrap" label="报废数"   width="60">
+							<el-table-column prop="scrap" label="报废数" width="60">
 							</el-table-column>
-							<el-table-column prop="delay" label="滞留数"   width="60">
+							<el-table-column prop="delay" label="滞留数" width="60">
 							</el-table-column>
 						</el-table>
 					</transition>
@@ -55,7 +55,8 @@
                 tableData: [],
 				// filter: {},
 				// 起点集
-				points: {} 
+				points: {},
+				tip: "暂无数据" 
 			}
 		},
 		computed: {
@@ -117,6 +118,27 @@
 			 */
 			setPanelHeight() {			
 			},
+			// 判断调用接口是否成功。
+			judgeLoaderHandler(param, fnSu, fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					console.warn(res.data.errorMsg.message);
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu(param.data.data);
+				}
+			},	
+			showMessage() {
+				this.$alert('查无数据', '提示', {
+					type: 'warn'
+				});
+			},
 			fetchData() {
 				this.fullscreenLoading = true;
 				
@@ -124,26 +146,29 @@
 					"startPointDtos": this.points.selected || []
 				}).then((res) => {
 					this.fullscreenLoading = false;
-					if(!res.data.errorCode) {
-						this.$store.commit({
-							type: "updateData",
-							data: fnP.parseTreeData(res.data.data)
-						});
-						if(!this.rawData.length) {
-							this.$message.warning('查无数据。');
+
+					this.judgeLoaderHandler(res, (data) => {
+						if(!data.length) {
+							console.log('查无数据。');
+							this.showMessage();
+							// this.$message.warn('查无数据。');
 						} else {
+							this.$store.commit({
+								type: "updateData",
+								data: fnP.parseTreeData(data)
+							});
 							// 格式化数据。
 							this.treeData = this.parseTreeData();
 							this.tableData = this.parseTableData();
 							// console.log(this.treeData)
-						}
-					} else {
-						this.$message.error(res.data.errorMsg.message);
-					}
+						}						
+					})
 				})
 				.catch((err) => {
 					this.fullscreenLoading = false;
-					this.$message.error('查询出错！');
+					console.warn('查询出错！')
+					this.showMessage();
+					// this.$message.error('查询出错！');
 				})
 			},
 
@@ -285,6 +310,11 @@
 					font-size: 16px;
 					cursor: pointer;
 				}
+				.tip {
+					position: absolute;
+					top: 100px;
+					left: 100px;
+				}
 			}
 			.router-container {
 				/*border: 1px solid #ccc;
@@ -392,5 +422,9 @@
 		opacity: 0;
 	}
 
-	
+	.el-dialog__headerbtn {
+		background-color: transparent;
+		border: none;
+		outline: none;
+	}
 </style>

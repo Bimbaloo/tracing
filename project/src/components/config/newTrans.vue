@@ -66,7 +66,7 @@
 			moduleColde: String 
 		},
 		data() {
-			let aRequiredParam = ["barcode","materialCode","doCode","equipmentId"];
+			let aRequiredParam = ["barcode","materialCode","doCode","equipmentCode"];
 			// 溯源与追踪的配置限制，  条码，物料，设备，工单必须有一项。
 			var validateChecked = (rule, value, callback) => {
 		        if (!value.length) {

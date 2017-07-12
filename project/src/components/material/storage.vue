@@ -21,8 +21,8 @@
             			</td>
             		</tr>
             	</table>
-				<div v-if="empty" class="empty">
-					{{ empty }}
+				<div v-if="error" class="error">
+					{{ error }}
 				</div>
                 <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
             </div>
@@ -48,8 +48,8 @@
                 // 点击的物料节点信息。
                 node: {},
                 loading: false,
-                empty: "",
-				sErrorMessage: "",
+                error: "",
+				// sErrorMessage: "",
                 materialData: {
                     columns: [{
                         prop: "index",
@@ -125,22 +125,16 @@
 				// 判断是否调用成功。
 				if(bRight != "0") {
 					// 提示信息。
-					this.sErrorMessage = param.data.errorMsg.message;
-					this.showMessage();
+					this.error = "查无数据";
+					console.warn(param.data.errorMsg.message);
 					// 失败后的回调函。
 					fnFail && fnFail();
 				}else {
 					// 调用成功后的回调函数。
-					fnSu && fnSu();
+					fnSu && fnSu(param.data.data);
 				}
-			},	
-			// 显示提示信息。
-			showMessage() {
-				this.$message({
-					message: this.sErrorMessage,
-					duration: 3000
-				});
-			},		
+			},			
+
             // 点击批次
             batchClick (row) {
                 this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
@@ -197,23 +191,25 @@
 				})
 				.then((res) => {
 					this.loading = false;
-					this.empty = "";
-					this.judgeLoaderHandler(res,() => {
+					this.error = "";
+					this.judgeLoaderHandler(res, (data) => {
+						debugger
 						// 保存数据。
-						if(res.data.data.length) {
-							oData.data = this.formatData(res.data.data);
-							this.styleObject.minWidth = "1200px";
+						if(!data.length) {
+							// this.error = "查无数据。"
+							console.log("查无数据。");
 						}else {
-							this.empty = "暂无数据。"
+							oData.data = this.formatData(data);
+							this.styleObject.minWidth = "1200px";
 						}
 						
 					});				 
 				})
 				.catch((err) => {
 					this.loading = false;
-					//  this.error = "查询出错。"
-					this.sErrorMessage = "查询出错。"
-					this.showMessage();
+					this.error = "查无数据。"
+					// this.sErrorMessage = "查询出错。"
+					// this.showMessage();
 					this.styleObject.minWidth = 0;          
 				})
            },

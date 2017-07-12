@@ -44,8 +44,7 @@
 				url: HOST + "/api/v1/trace/up/trace-info",
 				treeData: {},
 				catalogData: [],
-				params: [],
-				ajaxData: []
+				params: []
 			}
 		},
 		computed: {
@@ -111,35 +110,57 @@
 			 */
 			setPanelHeight() {
 			},
+
+			// 判断调用接口是否成功。
+			judgeLoaderHandler(param, fnSu, fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					console.warn(param.data.errorMsg.message);
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu(param.data.data);
+				}
+			},	
+			showMessage() {
+				this.$alert('查无数据', '提示', {
+					type: 'warn'
+				});
+			},
+
 			fetchData() {
 				this.fullscreenLoading = true;
 				
 				this.$ajax.post(this.url, {
 					"startPointDtos": this.params
 				}).then((res) => {
-						this.fullscreenLoading = false;
-						if(!res.data.errorCode) {
-//							this.rawData = res.data;
-							this.ajaxData = res.data.data;
+					this.fullscreenLoading = false;
+					this.judgeLoaderHandler(res, (data) => {
+						if(!data.length) {
+							console.log('查无数据。');
+							this.showMessage();
+							// this.$message.warn('查无数据。');
+						} else {
 							this.$store.commit({
 								type: "updateData",
-								data: fnP.parseTreeData(this.ajaxData)
+								data: fnP.parseTreeData(data)
 							});
-							if(!this.rawData.length) {
-								this.$message.warning('查无数据。');
-							} else {
-								// 格式化数据。
-								this.treeData = this.parseTreeData();
-								this.catalogData = this.parseCatalogData();
-							}
-						} else {
-							this.$message.error(res.data.errorMsg.message);
-						}
+							// 格式化数据。
+							this.treeData = this.parseTreeData();
+							this.catalogData = this.parseCatalogData();
+						}						
 					})
-					.catch((err) => {
-						this.fullscreenLoading = false;
-						this.$message.error('查询出错！');
-					})
+				})
+				.catch((err) => {
+					this.fullscreenLoading = false;
+					console.warn('查询出错！')
+					this.showMessage();
+				})
 			},
 
 			/**

@@ -60,7 +60,7 @@
             	let oForm = this.ruleForm,
             		oKeys = this.keys,
             		// 溯源及追踪的参数。
-            		aParams = ["barcode","materialCode","equipmentId","doCode"],
+            		aParams = ["barcode","materialCode","equipmentCode","doCode"],
             		// 验证条码
 	            	validateBarcode = (rule, value, callback) => {
 	            		if(!value) {
@@ -155,7 +155,7 @@
             		"trace": {
             			"barcode": [{validator: validateParam, trigger: "change"}],
             			"materialCode": [{validator: validateParam, trigger: "change"}],
-            			"equipmentId": [{validator: validateParam, trigger: "change"}],
+            			"equipmentCode": [{validator: validateParam, trigger: "change"}],
             			"doCode": [{validator: validateParam, trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateTime, trigger: "change"}]
@@ -164,7 +164,7 @@
             		"track": {
             			"barcode": [{validator: validateParam,trigger: "change"}],
             			"materialCode": [{validator: validateParam,trigger: "change"}],
-            			"equipmentId": [{validator: validateParam,trigger: "change"}],
+            			"equipmentCode": [{validator: validateParam,trigger: "change"}],
             			"doCode": [{validator: validateParam,trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateTime, trigger: "change"}]

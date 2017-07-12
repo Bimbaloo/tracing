@@ -45,7 +45,7 @@
 			code: "material"
 		},
 		// 设备。
-		"equipmentId": {
+		"equipmentCode": {
 			url: HOST + "/api/v1/basicinfo/equipments",//"/api/v1/customized/equipments",
 			code: "equipment"
 		},
@@ -109,7 +109,7 @@
 		        	 	this.list = res.data.data.map(o=>{
 		        	 		return {
 		        	 			label: o[oAjax[sKey].code+"Name"],
-		        	 			value: (sKey == "equipmentId")?o[oAjax[sKey].code+"Id"]:o[oAjax[sKey].code+"Code"]
+		        	 			value: o[oAjax[sKey].code+"Code"]
 		        	 		}
 		        	 	});
 	        		}else {
