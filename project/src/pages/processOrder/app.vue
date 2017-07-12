@@ -31,14 +31,16 @@
     	},
     	created: function () {
     		this.$ajax.get(url).then(function (res) {
-    			let arr = res.errorCode ? [] : res.data.data;
+    			if (res.errorCode) {
+    				console.log(res.errorMsg);
+    				return;
+    			}
+    			
+    			let arr = res.data.data || [];
     			if (arr.length) {
     				arr.forEach(function (item) {
     					item.flag = true;//更新的数据(update)
     				});
-    			}
-    			else {
-    				arr = [];
     			}
     			arr.push(this.createNewLine());
       			this.totalData = arr;

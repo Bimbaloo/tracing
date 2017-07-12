@@ -162,27 +162,33 @@
                 })
             },
             onTrace (event) {
-            	let aSelected = [];
-            	this.gridData.selected.forEach(o => {
-            		let oSelected = {};
-            		// 解构赋值。
-            		({ batchNo: oSelected.batchNo,materialName:oSelected.materialName,materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-            			
-            		aSelected.push(oSelected);
-            	})
-
-            	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
-            	
-            	sessionStorage.setItem("trace_" + tag, JSON.stringify(aSelected));
-//          	window.open("trace/index.html?tag="+tag);     
-            	window.open("traceIndex.html?tag="+tag);
+            	if(this.gridData.data && this.gridData.selected.length) {
+	            	let aSelected = [];
+	            	this.gridData.selected.forEach(o => {
+	            		let oSelected = {};
+	            		// 解构赋值。
+	            		({ batchNo: oSelected.batchNo,materialName:oSelected.materialName,materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+	            			
+	            		aSelected.push(oSelected);
+	            	})
+	
+	            	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
+	            	
+	            	sessionStorage.setItem("trace_" + tag, JSON.stringify(aSelected));
+//	          		window.open("trace/index.html?tag="+tag);     
+	            	window.open("traceIndex.html?tag="+tag);
+            	}else {
+            		this.$message("没有数据溯源");
+            	}
             }
         }
     }  
 </script>
 
 <style lang="less">
-	
+	// .btn {
+	// 	margin-bottom: 10px;
+	// }
 	.error {
 		border: 2px solid #42AF8F;
 	    padding: 20px 12px;

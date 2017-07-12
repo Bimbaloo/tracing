@@ -50,6 +50,7 @@
     		:transfer-data="getAllFilter()"
     		:checked-data="getTransferData().aChecked"
     		:title="getTransferData().title"
+    		:module-colde="sCurrentModule"
     		@hideModal="hidePopModal"
     	></v-trans>
     </div>

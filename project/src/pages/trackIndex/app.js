@@ -33,7 +33,6 @@ const Product = r => require.ensure([], () => r(require('components/process/prod
 const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-datail')
 const Track = r => require.ensure([], () => r(require('components/track/track.vue')), 'group-datail')
 
-
 Vue.use(VueRouter)
 // 定义路由
 const routes = [{ 
@@ -50,7 +49,7 @@ const routes = [{
       component: Suspicious
     }]
   },{ 
-    path: '/process/:key', 
+    path: '/process', 
     component: Process,
     children: [{
       path: '',
@@ -68,7 +67,7 @@ const routes = [{
   },
   { path: '/trace', component: Trace },
   { path: '/track', component: Track }
-]	
+]
 
 // 创建 router 实例，然后传 `routes` 配置
 const router = new VueRouter({

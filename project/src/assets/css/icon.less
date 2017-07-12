@@ -201,3 +201,28 @@
 		}
 	}
 }
+
+/*
+ * 24x24 图标。
+ */
+.icon.icon-24 {
+	width: @px24;
+	height: @px24;
+	background-image: url(../img/icon-24.png);
+
+    // 返回。
+	&.icon-back {
+		background-position: 0 0;
+	}
+	&.icon-back:hover {
+		background-position: -@px24 0;
+	}
+
+    // 设置。
+	&.icon-config {
+		background-position: 0 -@px24;
+	}
+	&.icon-config:hover {
+		background-position: -@px24 -@px24;
+	}
+}

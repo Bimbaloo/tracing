@@ -3,14 +3,15 @@
         <img :src="logo"/>
         ——&nbsp;&nbsp;追溯系统
         <div class="header-icon">
-	        <i v-if="bShowSearch" class="icon icon-back" @click="goToSearch"></i>
-	        <i v-if="bShowConfig" class="icon el-icon-setting" @click="goToConfig"></i>
+	        <i v-if="bShowSearch" class="icon icon-24 icon-back" @click="goToSearch"></i>
+	        <i v-if="bShowConfig" class="icon icon-24 icon-config" @click="goToConfig"></i>
         </div>
     </header>
 </template>
 <script>
     import logo from 'assets/img/logo-w.png'
-    
+    import 'assets/css/icon.less'
+
     const pathName = window.location.pathname;
     
     export default {
@@ -53,24 +54,11 @@
     .header-icon {
     	float: right;
     	
-	    .icon {
-	    	display: inline-block;
-	    	vertical-align: middle;
-	    	cursor: pointer;
-			
-	    	&.icon-back {
-		    	width: 24px;
-		    	height: 18px;
-		    	background: url(../../assets/img/icon-back.png) no-repeat 0 0;
-		    	
-		    	&:hover {
-		    		background-position: -24px 0;
-		    	}
-	    	}
-	    	
-	    	&.el-icon-setting {
-	    		margin-left: 10px;
-	    	}
-	    }
+        .icon-back, .icon-config {
+            cursor: pointer;
+        }
+        .icon-config {
+            margin-left: 10px;
+        }
     }
 </style>

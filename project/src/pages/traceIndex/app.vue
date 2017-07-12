@@ -44,7 +44,8 @@
 				url: HOST + "/api/v1/trace/up/trace-info",
 				treeData: {},
 				catalogData: [],
-				params: []
+				params: [],
+				ajaxData: []
 			}
 		},
 		computed: {
@@ -119,9 +120,10 @@
 						this.fullscreenLoading = false;
 						if(!res.data.errorCode) {
 //							this.rawData = res.data;
+							this.ajaxData = res.data.data;
 							this.$store.commit({
 								type: "updateData",
-								data: fnP.parseTreeData(res.data.data)
+								data: fnP.parseTreeData(this.ajaxData)
 							});
 							if(!this.rawData.length) {
 								this.$message.warning('查无数据。');
@@ -199,7 +201,7 @@
 					aoCatalogData = [],
 					oGroup = {},
 					aCopy = $.extend(true, [], this.rawData); //Object.assign([], this.rawData)
-				
+		
 				aCopy.forEach(oData => {
 					if(oData.type != "1" && oData.subProcess && oData.subProcess.length) {
 						oData.subProcess.forEach(o => {
@@ -209,8 +211,9 @@
 							o.type = oData.type;
 							o.group = oData.key;
 							aoCopyData.push(o);
-							
+							// 若当前节点在同一个group中无子节点，即为产线工序的最后一个节点
 							if(oData.subProcess.every(sub => sub.parent != o.key)) {
+								// 保存产线工序中的最后一个节点key。
 								oGroup[oData.key] = o.key;
 							}
 							
@@ -220,12 +223,13 @@
 					}
 				})
 				
-				aoCopyData.map(o => {					
+				aoCopyData.map(o => {
+					// 若节点的父节点为产线节点，则该节点的父节点重设为产线中的最后一个节点key。					
 					if(oGroup[o.parent]) {
-						return o.parent == oGroup[o.parent];
+						return o.parent = oGroup[o.parent];
 					}
 				});
-				
+		
 				for(let i = aoCopyData.length - 1; i >= 0; i--) {
 					let oData = aoCopyData[i];
 

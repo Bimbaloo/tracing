@@ -61,14 +61,33 @@
 			title: {
 				type: String,
 				default: ""
-			}
+			},
+			// 当前选中的模块。
+			moduleColde: String 
 		},
 		data() {
+			let aRequiredParam = ["barcode","materialCode","doCode","equipmentId"];
+			// 溯源与追踪的配置限制，  条码，物料，设备，工单必须有一项。
 			var validateChecked = (rule, value, callback) => {
 		        if (!value.length) {
-		          callback(new Error("条件不能为空，请选择条件"));
+		          	callback(new Error("条件不能为空，请选择条件"));
 		        } else {
-		          callback();
+		          	// 如果是溯源与追踪，则判断条件是否正确。
+		          	if(this.moduleCode === "stock") {
+		          		// 只要存在就行。
+			          	callback();
+		          	}else {
+		          		// 其他要判断条件。
+		          		let bRight = value.some(o=> {
+		          			return aRequiredParam.includes(o);
+		          		});
+		          		
+		          		if(bRight) {
+		          			callback();
+		          		}else {
+		          			callback(new Error("条码，物料，设备，工单必须存在一项"));
+		          		}
+		          	}
 		        }
 		    };
 		    var validateName = (rule, value, callback) => {

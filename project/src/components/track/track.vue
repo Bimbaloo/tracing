@@ -199,40 +199,51 @@
             },
             onTrack (event) {
                 // 保存参数。
-                let oReportFilter = this.setSession(),
-                    tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
-            	            	
-            	sessionStorage.setItem("track_" + tag, JSON.stringify(oReportFilter));
-//          	window.open("track/index.html?tag="+tag);  
-		        window.open("trackIndex.html?tag="+tag);
+                if(this.gridData.data && this.gridData.selected.length) {
+		            let oReportFilter = this.setSession(),
+		                tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
+		        	            	
+		        	sessionStorage.setItem("track_" + tag, JSON.stringify(oReportFilter));
+//		            window.open("track/index.html?tag="+tag);  
+					window.open("trackIndex.html?tag="+tag);
+				}else {
+					this.$message("没有数据追踪");
+				}
             },
             onReport (event) {
             	// 当gridData.data 为null时处理
-            	let aSelected = [];
-            	this.gridData.selected.forEach(o => {
-            		let oSelected = {};
-            		// 解构赋值。
+            	if(this.gridData.data) {
+	            	let aSelected = [];
+	            	this.gridData.selected.forEach(o => {
+	            		let oSelected = {};
+	            		// 解构赋值。
             		({ batchNo: oSelected.batchNo, iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-            			
-            		aSelected.push(oSelected);
-            	})
-
-            	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-            		oReportFilter = {
-            			length: this.gridData.data.length,
-            			selected: aSelected,//this.gridData.selected,
-            			filters: this.$route.query
-            		}
-            	
-            	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(oReportFilter));
-            	// window.open("track/report.html?tag="+tag);
-                window.open("trackReport.html?tag="+tag);
+	            			
+	            		aSelected.push(oSelected);
+	            	})
+	
+	            	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+	            		oReportFilter = {
+	            			length: this.gridData.data.length,
+	            			selected: aSelected,
+	            			filters: this.$route.query
+	            		}
+	            	
+	            	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(oReportFilter));
+//	          		window.open("track/report.html?tag="+tag);
+	            	window.open("trackReport.html?tag="+tag);
+            	}else {
+            		this.$message("没有数据报告");
+            	}
             }
         }
     }  
 </script>
 
 <style lang="less" scoped>
+	.btn-wrapper {
+		margin-bottom: 10px;
+	}
 	.error {
 		border: 2px solid #42AF8F;
 	    padding: 20px 12px;

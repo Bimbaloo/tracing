@@ -6,7 +6,7 @@
          </el-radio-group>
         </div>
         <div class="panel-content">
-            <v-form :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>
+            <v-form :tab="category.key" :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>
         </div>
     </div>
     
