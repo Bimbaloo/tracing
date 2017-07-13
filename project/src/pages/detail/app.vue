@@ -1,33 +1,55 @@
 <template>
-  <div id="app">
+  <div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
     <v-header></v-header>
-    <el-row :gutter="0" class="content">
-      <el-col :xs="15" :sm="12" :md="9" :lg="5" :class="[{ collapsed: collapse }, 'nav']">      	
-         <div class="flex-wraps">
-	         <el-tabs 
-	          v-model="activeKey" 
-	          type="border-card" 
-	          class="search-tab"  
-	          ref="searchTab" 
-	          @tab-click="handleClick"  
-	          v-bind:style="{ height: searchTab,position:'absolute' }">
-	            <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-	              <v-panel :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
-	            </el-tab-pane>
-	          </el-tabs>            
-         </div>
-      </el-col>
-      <el-col :xs="collapse?24:9" :sm="collapse?24:12" :md="collapse?24:15" :lg="collapse?24:19" class="router">
-      		<div class="flex-wraps">
-	      		<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
-	      		<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
-	          <div class="router-container" ref="routerContainer">
-	            <div v-if="tip" class="tip"></div>
-	            <router-view></router-view>
-	          </div>
-      		</div>
-      </el-col>
-    </el-row>
+     <div class="content">
+      <div :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">
+        <div class="flex-wraps">
+          <el-tabs v-model="activeKey" type="border-card" class="search-tab" ref="searchTab" @tab-click="handleClick" v-bind:style="{ height: searchTab,position:'absolute' }">
+            <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
+              <v-panel :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </div>
+      <div  class="router">
+        <div class="flex-wraps">
+          <div id='changeWidth' class='changeWidth'></div>
+          <i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
+          <i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
+          <div class="router-container" ref="routerContainer">
+            <div v-if="tip" class="tip"></div>
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div> 
+     <!-- <el-row :gutter="0" class="content">
+          <el-col :xs="15" :sm="12" :md="9" :lg="5" :class="[{ collapsed: collapse }, 'nav']">      	
+             <div class="flex-wraps">
+    	         <el-tabs 
+    	          v-model="activeKey" 
+    	          type="border-card" 
+    	          class="search-tab"  
+    	          ref="searchTab" 
+    	          @tab-click="handleClick"  
+    	          v-bind:style="{ height: searchTab,position:'absolute' }">
+    	            <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
+    	              <v-panel :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
+    	            </el-tab-pane>
+    	          </el-tabs>            
+             </div>
+          </el-col>
+          <el-col :xs="collapse?24:9" :sm="collapse?24:12" :md="collapse?24:15" :lg="collapse?24:19" class="router">
+          		<div class="flex-wraps">
+    	      		<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
+    	      		<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
+    	          <div class="router-container" ref="routerContainer">
+    	            <div v-if="tip" class="tip"></div>
+    	            <router-view></router-view>
+    	          </div>
+          		</div>
+          </el-col>
+        </el-row>  -->
   </div>
 </template>
 
@@ -45,7 +67,11 @@
     },
     data() {
       return {
-      	// 侧栏是否收缩。
+        // 侧栏是否收缩。
+        _pageX:null,
+        changeWidth:0,
+        LayoutLeftWidth: 325,
+        dragging: false,
       	collapse: false,
         activeKey: "trace",
         categories: [],
@@ -180,6 +206,57 @@
 //        }
         
           this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
+      },
+      dragstar(e){   //鼠标按下，开始拖动
+      //  console.log('开始')
+        if(e.target.id === 'changeWidth'){
+          this.LayoutLeftWidth = this.reversedMessage
+          this.changeWidth = 0
+          this.dragging = true;
+          this._pageX = e.pageX
+
+          if(this.collapse){
+            this.collapse = false
+          }
+        }
+       
+        
+       
+      },
+      dragend(e){ //鼠标松开，结束拖动
+
+        //console.log('结束')
+        this.dragging = false
+        e.stopPropagation = true
+      },
+      onMouseMove(e){ //拖动过程
+      
+        if(this.dragging){
+         // console.log('开始动了')
+          this.changeWidth = e.pageX-this._pageX
+        }
+        
+      }
+    },
+    watch: {
+      // 如果 左边小于260px 直接收缩
+      reversedMessage: function () {
+       // console.log('走你')
+        if(this.reversedMessage<=245 && !this.collapse){
+            this.collapse = true
+        }
+      },
+      collapse: function () {
+       // 侧边栏展开时默认325
+        if(!this.collapse){
+            this.LayoutLeftWidth = 325
+        }
+      }
+    },
+    computed: {
+      reversedMessage: function () {
+          let _width = this.LayoutLeftWidth+this.changeWidth
+            return _width
       }
     }
   }
@@ -223,7 +300,7 @@
         box-sizing: border-box;
         /*height: 100%;*/
         position: relative;
-              
+        flex-grow: 1;
 				.btn-collapse {
 					position: absolute;
 					left: -18px; // 2px;
@@ -238,6 +315,16 @@
 			.flex-wraps {
 				flex: 1;
 				position: relative;
+        .changeWidth {
+          position: absolute;
+          left: -20px;
+          color: #42AF8F;
+          cursor: e-resize;
+          width:20px;
+          //background-color:rgba(0,0,0,0.1);
+          height:100%;
+          top:0
+         }
 			}
 			
       .router-container {

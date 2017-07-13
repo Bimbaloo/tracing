@@ -6,15 +6,16 @@
             	<i class="icon icon-20 icon-print" title="打印" @click="printHandle('fastreport', $event)"></i>
 			</div>
 			<div class="tag">
-				<span>报告人：</span>
+				<span>报告人：admin</span>
 				<span>报告时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span>
 			</div>
 			<h1 class="title">快速报告</h1>
 			<h2 class="content-title">查询条件</h2>
 			<div class="condition" ref="condition">		
-				<span v-for="filter in Object.entries(filters)">
+				<!-- <span v-for="filter in Object.entries(filters)">
 					{{filter[0]}} : {{filter[1]}}
-				</span>
+				</span> -->
+				<span >条码 : {{filters.barcode}}</span>
 				<span style="cursor:pointer">结果集:</span>
 				<span @click="dialogVisible('all')" label="all" style="cursor:pointer">共<i> {{result.whole}} </i>条,</span>
 				<span @click="dialogVisible('selected')" label="selected" style="cursor:pointer">选中<i> {{result.selected}} </i>条,</span>
@@ -34,6 +35,13 @@
 	            </div>     
 			</el-dialog>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
+			<h2 class="content-title">审核</h2>
+			<div class="condition-audit" >		
+				<div class="tag">
+					<span>签名：</span>
+					<span>时间：</span>
+				</div>
+			</div>
 		</div>
   	</div>
 </template>
@@ -178,7 +186,7 @@
 				this.result.selected = (oConditions.selected && oConditions.selected.length) || 0;
 				this.result.whole = oConditions.length || 0;
 				this.result.filter = this.result.whole - this.result.selected;
-				// debugger
+				 //debugger
 				this.filters = oConditions.filters || [];
 				this.selected = oConditions.selected || [];
 			}
@@ -208,6 +216,7 @@
 				this.error = "";
 				this.gridData.data = [];
 				// url:api/v1/trace/down/start-points
+				//console.log(this.url)
              	this.$post(this.url, this.filters)
              	.then((res) => {
 					//debugger
@@ -359,6 +368,25 @@
 			color: #42AF8F;
 			font-style: normal;
 			font-weight: 600;
+		}
+	}
+	.condition-audit {
+		border: 2px solid #42AF8F;
+		padding: 20px 12px;
+		margin-top: 30px;
+		font-size: 14px;
+		height: 70px;
+		position: relative;
+		.tag {
+			right: 120px;
+			top: 48px;
+			span {
+				display: block;
+				line-height: 24px;
+				&+span {
+					margin-left: 0;
+				}
+			}
 		}
 	}
 
