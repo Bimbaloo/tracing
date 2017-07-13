@@ -7,15 +7,19 @@
 			</div>
 			<h1 class="title">快速报告</h1>
 			<h2 class="content-title">查询条件</h2>
-			<div class="condition" ref="condition">		
-				<!-- <span v-for="filter in Object.entries(filters)">
-					{{filter[0]}} : {{filter[1]}}
-				</span> -->
-				<span >条码 : {{filters.barcode}}</span>
-				<span style="cursor:pointer">结果集:</span>
-				<span @click="dialogVisible('all')" label="all" style="cursor:pointer">共<i> {{result.whole}} </i>条,</span>
-				<span @click="dialogVisible('selected')" label="selected" style="cursor:pointer">选中<i> {{result.selected}} </i>条,</span>
-				<span @click="dialogVisible('filtered')" label="filtered" style="cursor:pointer">过滤<i> {{result.filter}} </i>条。</span>
+			<div class="condition" ref="condition">	
+				<div class='condition-messsage'>
+					<span v-for="filter in _filters">
+						{{filter[0]}} : {{filter[1]}}
+					</span> 
+				</div>	
+				<div class='result-messsage'>
+					<span style="cursor:pointer">结果集:</span>
+					<span @click="dialogVisible('all')" label="all" style="cursor:pointer">共<i> {{result.whole}} </i>条,</span>
+					<span @click="dialogVisible('selected')" label="selected" style="cursor:pointer">选中<i> {{result.selected}} </i>条,</span>
+					<span @click="dialogVisible('filtered')" label="filtered" style="cursor:pointer">过滤<i> {{result.filter}} </i>条。</span>
+				</div>
+				
 			</div>
 			<el-dialog title="结果集" :visible.sync="dialogTableVisible" size="large">
 				<el-radio-group v-model="radio" @change="radioChange">
@@ -46,6 +50,9 @@
 	import report from "components/report/report.vue"
 	import table from "components/basic/table.vue"
 
+	// 数据名称接口。
+    const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
+
 	export default {
 		components: {
 			'v-report': report,
@@ -61,6 +68,7 @@
 				},
 				// 追踪结果集。
 				url: HOST + "/api/v1/trace/down/start-points",
+				dataName:[],
 				loading: false,
                 error: "",
                 selected: [],
@@ -170,6 +178,27 @@
 					} 
 				} 
 				return oRequest; 
+			},
+			_filters: function() {
+				let _filters = this.filters
+				for(let i in _filters){
+					if(_filters[i] === '' || i === '_tag'){
+						delete _filters[i]
+					}
+				}
+				/* 为了将获取到的 barcode等转换为对应的中文 */
+				let b = Object.entries(_filters),
+					a = this.dataName;
+
+				b.forEach(o =>
+                    a.forEach(function (x) {
+                        if(o[0] === x.itemCode){
+                            o[0] = x.itemName
+                        }
+                    })
+                )
+				return b
+				/* 为了将获取到的 barcode等转换为对应的中文 */
 			}
 		},
 		created() {
@@ -187,6 +216,7 @@
 				this.selected = oConditions.selected || [];
 			}
 
+			this.fetchDataName()  //获取名称
 		},
 		mounted() {
 			this.fetchData();
@@ -244,7 +274,17 @@
 				 this.error = "查无数据";
 				 console.warn("查询出错。");
              })
-            },
+			},
+			fetchDataName() {
+				this.$ajax.get(TABLE_DATA_URL).then((res) => {
+					this.judgeLoaderHandler(res, () => {
+						// 获取对应的名称。
+						//debugger
+
+						this.dataName = res.data.data	
+					});
+				});
+			},
 			setWidth() {
 				this.styleObject.minWidth = "1200px";
 			},
@@ -295,10 +335,11 @@
 			margin: 28px auto;
 		}
 		
-		.tag {
+		&>.tag {
 			position: absolute;
-			top: 32px;
-			right: 20px;
+			top: 34px;
+			left: 50%;
+			margin-left: 80px;
 			
 			span {
 				display: inline-block;
@@ -311,18 +352,29 @@
 	}
 	.condition {
 		border: 2px solid #42AF8F;
-		padding: 20px 12px;
+		padding: 10px 12px;
 		margin-bottom: 30px;
 		font-size: 14px;
-		
+		.condition-messsage {
+			line-height: 25px;
+			span {
+				margin-left: 10px
+			}
+		}
+		.result-messsage {
+			line-height: 25px;
+			span:nth-child(1) {
+				margin-left: 10px
+			}
+		}
 		span {
 			display: inline-block;
 			&+span:nth-child(1) {
 				margin-left: 60px;
 			}
-			&+span:nth-child(2) {
-				margin-left: 60px;
-			}
+			// &+span:nth-child(2) {
+			// 	margin-left: 60px;
+			// }
 		}
 		
 		.condition-line+.condition-line {
@@ -343,6 +395,7 @@
 		height: 70px;
 		position: relative;
 		.tag {
+			position: absolute;
 			right: 120px;
 			top: 48px;
 			span {
