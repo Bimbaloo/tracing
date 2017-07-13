@@ -21,7 +21,8 @@
 						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type">{{obj.name}}</el-radio-button>
 					</el-radio-group-->
 					<!--el-button class="btn btn-plain" v-for="name in dimension" :key="name">{{name}}</el-button-->
-					<el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button>
+					<el-button :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'parameter']" @click="parameterClick">工艺</el-button>
+					<!-- <el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button> -->  
 				</div>
 			</div>
 			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="selectedDimension" :window-time="windowTime"></v-equipment>
@@ -40,6 +41,7 @@
 		},
         data () {
             return {
+				btnShow: true, //用与判断'工艺'按钮是否禁用
                 key: this.$route.params.key,
                 styleObject: {
                     "min-width": "1000px"
@@ -186,12 +188,16 @@
 				return oParam;
 			},
 			showButton(oData, event) {
-				oData.show = true;
-				this.$nextTick(function () {
+
+				if(oData.name === '质量' || oData.name === '加工'){   // 临时屏蔽了'事件'、'维护'、'工具' 三个按钮
+					oData.show = true;
+					this.$nextTick(function () {
 					// DOM 更新了
-					let node = event.target.querySelector(".list-btn-wrap");
-					node.style.left = (event.target.offsetLeft + 24 - node.clientWidth/2) + "px";					
-				})
+						let node = event.target.querySelector(".list-btn-wrap");
+						node.style.left = (event.target.offsetLeft + 24 - node.clientWidth/2) + "px";					
+					})
+				}
+				
 			},
 			hideButton(oData, event) {
 				oData.show = false;
@@ -204,9 +210,36 @@
 	.content-panel {
 		position: relative;
 	}
+
 	.list-wrap {
 		display: inline-block;
-	}  
+		/* 临时屏蔽该按钮 */
+		label.el-checkbox-button.is-checked {
+			span:nth-child(3) {
+				background: rgb(204, 204, 204) ;
+				color: #fff;
+				cursor: default ;
+				border: 2px solid #ccc 
+			}
+		}
+		label:nth-child(4) {
+			span {
+				background: rgb(204, 204, 204) ;
+				color: #fff ;
+				cursor: default ;
+				border: 2px solid #ccc 
+			}
+		}
+		label:nth-child(5) {
+			.el-checkbox-button__inner {
+				background: rgb(204, 204, 204) ;
+				color: #fff ;
+				cursor: default ;
+				border: 2px solid #ccc 
+			}
+		}
+	}
+
 	.link-line {
 		position: absolute;
 		// border-right: 2px solid #42af8f;
@@ -239,4 +272,48 @@
 			}
 		}
 	}
+
+	.nobtn {
+		background: rgb(204, 204, 204);
+		border: none;
+		color: #fff; // cursor: no-drop;
+		cursor: auto;
+	}
+
+	.list-wrap:nth-child(3) {
+		/* 临时屏蔽该按钮 */
+		.el-checkbox-button {
+			span {
+				background: rgb(204, 204, 204);
+				color: #fff;
+				cursor: default;
+				border: 2px solid #ccc !important
+			}
+		}
+	}
+	.list-wrap:nth-child(4) {
+		/* 临时屏蔽该按钮 */
+		.el-checkbox-button {
+			span {
+				background: rgb(204, 204, 204);
+				color: #fff;
+				cursor: default;
+				border: 2px solid #ccc !important
+			}
+		}
+	}
+	.list-wrap:nth-child(5) {
+		/* 临时屏蔽该按钮 */
+		.el-checkbox-button {
+			span {
+				background: rgb(204, 204, 204);
+				color: #fff;
+				cursor: default;
+				border: 2px solid #ccc !important
+			}
+		}
+	}
+
+	
+
 </style>

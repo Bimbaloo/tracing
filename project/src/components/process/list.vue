@@ -168,6 +168,7 @@
 				border-color: #ff9900;
 				display: inline-block;
 				vertical-align: middle;
+				margin-bottom:0; 
 
 				&:hover {
 					background-color: #ff9900;
