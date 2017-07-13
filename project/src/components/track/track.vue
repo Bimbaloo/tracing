@@ -227,7 +227,7 @@
     }  
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 	.btn-wrapper {
 		margin-bottom: 10px;
 	}

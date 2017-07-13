@@ -8,6 +8,7 @@ import App from './app.vue'
 import axios from 'axios'
 import Vuex from 'vuex'
 
+import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'

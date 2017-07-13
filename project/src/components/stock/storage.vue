@@ -2,29 +2,34 @@
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
-            <h2 class="content-title">出库信息</h2>
+            <h2 class="content-title">
+                出库信息
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>
+            </h2>
             <div v-if="outstockData.error" class="error" :style="styleError">
                 {{ outstockData.error }}
             </div>
-            <div v-else class="content-table">
-            	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
-                
+            <div v-else class="content-table" ref="outstockTable">
+            	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>            
                 <!--<el-dialog  :visible.sync="dialogTableVisible" top='20%' >
                     <el-table :data="gridData" border width='100%'>
                         <el-table-column property="batchNo" label="序号" align="center"></el-table-column>
                         <el-table-column property="barcode" label="条码" align="center"></el-table-column>
                     </el-table>                    
                 </el-dialog>-->
-
-                <v-dialogTable  :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="VisibleChange"></v-dialogTable>
-                
+                <v-dialogTable  :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
-            <h2 class="content-title">入库信息</h2>
+            <h2 class="content-title" ref="instockTable">
+                入库信息
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+            </h2>
             <div v-if="instockData.error" class="error" :style="styleError">
                 {{ instockData.error }}
             </div>
-            <div v-else class="content-table">
-            	<v-table :table-data="instockData" :heights="outstockData.height" :loading="instockData.loading"></v-table>
+            <div v-else class="content-table" ref="instockTable">
+            	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
             </div>
         </div>
     </div>      
@@ -34,7 +39,10 @@
     import $ from "jquery"
     import table from "components/basic/table.vue"
     import dialogTable from "components/basic/dialogTable.vue"
-    
+    import XLSX from 'xlsx'
+    import Blob from 'blob'
+    import FileSaver from 'file-saver'
+
     export default {
         components: {
             'v-table': table,
@@ -49,11 +57,14 @@
                 styleError: {
                 	"max-height": "200px"
                 },
+                excel: true,
+                print: true,
                 outstockData: {
                     url: HOST + "/api/v1/outstock",
                     loading: false,
                     error: null,
                     height: "100%",
+                    filename: "出库",
                     columns: [{
                         prop: "barcode",
                         name: "条码"
@@ -94,20 +105,22 @@
                         name: "出库时间",
                         width: "160"
                     }],
-                    data: [{
-                        "barcode": "单件条码",
-//                      "barcodeTypeName": "1", 
-                        "batchNo": "20160331A", 
-                        "materialCode": "0031", 
-                        "materialName": "物料名称", 
-                        "quantity": 16, 
-                        "stock": "仓库",
-                        "stocklot": "库位",
-                        "customer": "客户名",
-                        "stockType": "出库类型",
-                        "person": "出库人", 
-                        "createTime": "2016-03-31 14:28:33"
-                    }]
+                    data: [
+//                         {
+//                         "barcode": "单件条码",
+// //                      "barcodeTypeName": "1", 
+//                         "batchNo": "20160331A", 
+//                         "materialCode": "0031", 
+//                         "materialName": "物料名称", 
+//                         "quantity": 16, 
+//                         "stock": "仓库",
+//                         "stocklot": "库位",
+//                         "customer": "客户名",
+//                         "stockType": "出库类型",
+//                         "person": "出库人", 
+//                         "createTime": "2016-03-31 14:28:33"
+//                     }
+                    ]
                 },
                 instockData: {
                     url: HOST + "/api/v1/instock",
@@ -158,21 +171,23 @@
                         name: "入库时间",
                         width: "160"
                     }],
-                    data: [{
-                        "barcode": "单件条码",
-//                      "barcodeTypeName": "2", 
-                        "batchNo": "批次号", 
-                        "materialCode": "0024", 
-                        "materialName": "物料名称", 
-                        "quantity": 16, 
-                        "remainingNum": 16,
-                        "stock": "仓库",
-                        "stocklot": "库位",
-                        "customer": "客户名",
-                        "stockType": "入库类型",
-                        "person": "入库人", 
-                        "createTime": "2016-03-31 14:28:33"
-                    }]
+                    data: [
+//                         {
+//                         "barcode": "单件条码",
+// //                      "barcodeTypeName": "2", 
+//                         "batchNo": "批次号", 
+//                         "materialCode": "0024", 
+//                         "materialName": "物料名称", 
+//                         "quantity": 16, 
+//                         "remainingNum": 16,
+//                         "stock": "仓库",
+//                         "stocklot": "库位",
+//                         "customer": "客户名",
+//                         "stockType": "入库类型",
+//                         "person": "入库人", 
+//                         "createTime": "2016-03-31 14:28:33"
+//                     }
+                    ]
                 },
                 /* 模拟序号数据 */
                 
@@ -287,9 +302,93 @@
                     }           
                 })
             },
-            VisibleChange (){
+            visibleChange () {
 //              debugger
                 this.dialogData.dialogVisible = !this.dialogData.dialogVisible
+            },
+            // 表格导出。
+            exportExcelHandle (oData, event) {
+                if(!oData) {
+                    return;
+                }
+                // 下载表格。
+                Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
+                // let aoTableJson = [];
+
+                // if(oData instanceof Array ) {
+                //     // 若为数值。
+                //     aoTableJson = oData;
+                // }else if(!oData.columns || !oData.columns.length) {
+                //     // 若无表头配置数据
+                //     aoTableJson = oData.data;
+                // }else {
+                //     // 若有表头配置数据。
+
+                //     oData.data.map(o => {
+                //         let oNewData = {};
+
+                //         oData.columns.map(col => {
+                //             oNewData[col.name] = o[col.prop]==undefined ? '':o[col.prop];
+                //         })
+
+                //         aoTableJson.push(oNewData);
+                //     })
+                // }
+
+                // if(aoTableJson.length) {
+                //     // 创建表格。
+                //     let wb = {
+                //          SheetNames: ["Sheet1"],
+                //          Sheets: {
+                //              Sheet1: XLSX.utils.json_to_sheet(aoTableJson)
+                //          }
+                //     }
+
+                //     let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+
+                //     let sFileName = oData.filename || "table";
+
+                //     // 下载表格。
+			    //     FileSaver.saveAs(new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' }), sFileName + ".xlsx");  
+                // }            
+            },
+            // // 字符转换。
+            // s2ab (s) {
+            //     if(typeof ArrayBuffer !== 'undefined') {
+            //         var buf = new ArrayBuffer(s.length);
+            //         var view = new Uint8Array(buf);
+            //         for (var i=0; i!=s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+            //         return buf;
+            //     } else {
+            //         var buf = new Array(s.length);
+            //         for (var i=0; i!=s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
+            //         return buf;
+            //     }
+            // },
+            // 表格打印。
+            printHandle (refTable, event) {
+                let oTable = this.$refs[refTable];
+                if(!oTable) {
+                    return;
+                }
+                Rt.utils.printHtml(oTable);
+
+				// // 将表格转换成图片。
+				// html2canvas(oTable,{
+				// 	onrendered:function(canvas) {
+				// 		var sImg = canvas.toDataURL("image/png");
+							
+				// 		// 打印
+				// 		var w = window.open("about:blank","image from cancas");
+				// 		w.document.write("<img src='"+sImg+"' alt='from canvas'>")
+					
+				// 		setTimeout(function() {
+				// 			w.print();
+							
+				// 			w.close();
+				// 		},200)
+				// 	}
+				// });              
             }
         }
     }  
@@ -300,7 +399,22 @@
     .router-content {
     	flex: 1 1;
     	overflow: auto;
-    	
+    	        
+        .icon {
+            margin-left: 10px;
+            position: relative;
+            top: -2px;
+            cursor: pointer;
+            
+            &.disabled {
+                &.icon-print:hover {
+                    background-position: 0 0;
+                }
+                &.icon-excel:hover {
+                    background-position: 0 -40px;
+                }           
+            }
+        }
     	.table {
     	    .batch {
     	    	cursor: pointer;
@@ -323,6 +437,7 @@
 		    color: red;
 		    overflow: auto;
     	}
+
     }
     
     .el-table {
