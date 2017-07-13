@@ -43,3 +43,11 @@ Rt.utils.DateDiff = function(start, end) {
 
 	return dEnd.getTime() - dStart.getTime();
 }
+
+
+Rt.utils.isEmptyObject = function(e) {  
+    var t;  
+    for (t in e)  
+        return !1;  
+    return !0  
+}  

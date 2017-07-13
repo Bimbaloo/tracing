@@ -287,11 +287,10 @@
              * @param {String} sType
              * @return {void}
              */            
-            setPanelPadding () {
-                        
+            setPanelPadding () {     
                 let oDimension = {};
 
-                if(!this.selectedDimension.length) {
+                if(!this.selectedDimension.length || (this.selectedDimension.length == 1 && !this.selectedDimension[0])) {
                     // 若无选中。
                     this.top = statusHeight;
                     this.bottom = statusHeight;
@@ -305,6 +304,7 @@
                     // 若有多个维度的数据。
                     this.selectedDimension.map(sDimension => {
                         oDimension = this.getDimensionConfig(sDimension);
+                        // 设置最大值。
                         if(this.top < oDimension.top) {
                             this.top = oDimension.top;
                         }
@@ -318,6 +318,10 @@
                 this.labelNode.style.paddingBottom =  (this.bottom-statusHeight) + "px";
 
                 this.selectedDimension.map(sDimension => {
+                    if(!sDimension) {
+                        return;
+                    }
+                    // 获取维度配置数据。
                     oDimension = this.getDimensionConfig(sDimension);
                     oDimension.node.map(oData => {
                         let com = oData.node;
@@ -331,38 +335,6 @@
                         
                     })
                 })
-
-                // 事件显示在设备状态轴上方。
-                // if(sClass == "up") {  
-                //     // 若当前上方高度小于节点内容高度。         
-                //     if(this.top < component.$el.clientHeight) {
-                //         // 更新高度为内容高度。
-                //         this.top = component.$el.clientHeight;                        
-                //         this.labelNode.style.paddingTop =  (this.top-statusHeight) + "px";
-                   
-                //         if(this.top) {
-                //             // 设置高度。
-                //             component.$el.parentElement.querySelectorAll(".dimension-list.up").forEach(o => {                        
-                //                 o.style.top = (this.top - o.clientHeight) + "px";
-                //             }) 
-                //         } 
-                //     }                       
-                //     component.$el.style.top =  (this.top -  component.$el.clientHeight) + "px";             
-                // }else {
-                //     // 事件显示在设备状态轴下方。
-                //     // 若当前下方高度小于节点内容高度。   
-                //     if(this.bottom < component.$el.clientHeight) {
-                //         this.bottom = component.$el.clientHeight;
-                //         this.labelNode.style.paddingBottom =  (this.bottom-statusHeight) + "px";
-
-                //         if(this.bottom) {
-                //             component.$el.parentElement.querySelectorAll(".dimension-list.down").forEach(o => {                        
-                //                 o.style.bottom = (this.bottom - o.clientHeight) + "px";
-                //             }) 
-                //         } 
-                //     }
-                //     component.$el.style.bottom =  (this.bottom -  component.$el.clientHeight) + "px"; 
-                // }
 
             },
             /**

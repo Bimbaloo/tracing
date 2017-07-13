@@ -159,6 +159,209 @@ var aPrev1 = [{
 var parseTreeData = function(aPrev) {
 
 	// 转换后的数据。
+	let aNew = [],
+		nIndex = aPrev.length;
+	
+	// 先按level排序。
+//	aPrev.sort( (o1,o2) => o1.level-o2.level );
+	
+	// 增加元素的key值及showName值。
+	aPrev.forEach( (o,index) => {
+		// 新增其属性值。
+		o.key = index+1+"";
+		o.showName = o.name;
+
+		if(!o.group) {
+			o.group = "";
+		}
+	});
+	
+	aPrev.forEach( o => {
+		// 元素合并处理。 -- 将元素加入数据中。
+		// 判断类型。
+		if(o.type == '1') {
+			// 物料。
+			if(!_isBeExist(o)) {
+				// 不存在，修改parent值并加入。
+				let sKey = _getParentNode(o),
+					oCopy = Object.assign({}, o);
+				
+				// 加入数据。
+				oCopy.parent = sKey;
+				aNew.push(oCopy);
+			}
+		}else {
+			// 工序。
+			
+			// 判断是否有group
+			if(o.groupCode) {
+				// 有grop。判断是否存在。-- 不存在则加入。
+				let oGrop = {
+					code: o.groupCode,
+					name: o.groupName,
+					showName: o.groupName,
+//					key: o.groupCode,
+					key: (++nIndex) +"",
+					type: "2",
+					materialInfoList: null,
+					processInfoList: null,
+					subProcess: []
+				};
+				
+				// 判断是否存在。
+				if(!_isBeExist(o)) {		//oGrop
+					o.groupKey = oGrop.key;
+					
+					let aSub = _getSubGroupByName(o),
+						aCopySub = [];
+					
+					// 循环修改subProcess 的parent
+					aCopySub = aSub.map( oSub => {
+						let oCopy = Object.assign({}, oSub),
+							sKey = _getParentNode(oCopy);
+						// 修改parent
+						oCopy.parent = sKey;
+						// 新增groupdekey
+						oCopy.groupKey = oGrop.key;
+						return oCopy;
+					});
+					
+					// 修改oGrop的parent 修改第一条数据的parent
+					oGrop.parent = aCopySub[0].parent;
+					aCopySub[0].parent = "";
+					oGrop.subProcess = aCopySub;
+					// 加入数据
+					aNew.push(oGrop);
+				}
+				
+			}else {
+				// 没有grop 判读是存在，加入。
+				// 修改parent
+				if(!_isBeExist(o)) {
+					// 不存在，修改parent值并加入。
+					let sKey = _getParentNode(o),
+						oCopy = Object.assign({}, o);
+					
+					// 加入数据。
+					oCopy.parent = sKey;
+					aNew.push(oCopy);
+				}
+			}
+			
+		}
+	})
+	
+	console.log(aNew)
+	
+	// 返回数据。
+	return aNew;
+	
+	
+	// 通过group码获取group组数据并拍好序。
+	/**
+	 * 获取该工序- 组下的所有工序数据。并排序。
+	 * @param {Object} sGroup
+	 */
+	function _getSubGroupByName(o) {
+		
+		let aSubGroup = [],
+			sGropCode = o.groupCode;
+			
+		// 不能直接通过groupCode获取，还得通过当前节点子级。
+		aSubGroup.push(o);
+		_getChild(o);
+		
+		// 获取其子工序并排序。 --- 
+		
+		aSubGroup = aSubGroup.sort((o1,o2)=>o1.processSeq-o2.processSeq);
+		
+		// 返回子级数据。
+		return aSubGroup;
+		console.log(aSubGroup)
+		
+		/**
+		 * 获取元素的同组子级。
+		 */
+		function _getChild(oNode) {
+			// 工序
+			let aReuslt = [];
+			aReuslt = _get(oNode);
+			
+			if(aReuslt.length) {
+//				aSubGroup = aSubGroup.concat(aReuslt)
+				aReuslt.forEach(o=> {
+					o.groupKey = oNode.groupKey;
+					aSubGroup.push(o);
+					_getChild(o);
+				})
+			}
+			
+			function _get(oLevel) {
+				return aPrev.filter( o => {
+						if(o.type == '2') {
+							return o.level == oNode.level+1 && o.parent == oNode.code && o.groupCode == oNode.groupCode
+						}
+					});
+			}
+			
+		}
+		
+	}
+	
+	// 获取父级元素处理。
+	function _getParentNode(oNode) {
+		// 获取元素的父级。
+		let aParent = [],
+			sParentKey = "";
+		
+		// 父级： 当前级的上级 且code为当前的parent
+		aParent = aPrev.filter(o=> {
+			if(oNode.type == '1') {
+				return o.level == oNode.level && o.code == oNode.parent;
+			}else {
+				return o.level == oNode.level-1 && o.code == oNode.parent;
+			}
+		});
+		
+		// 返回父级元素。---判断当前元素是否含有group，
+		if(aParent && aParent.length) {
+			// 存在。
+			if(aParent[0].groupCode && !oNode.groupCode) {
+				// 存在code 并且当前元素没有group组。 父级指向组
+				sParentKey = aParent[0].groupKey;  // groupCode
+			}else {
+				// 父级指向key
+				sParentKey = aParent[0].key;
+			}
+		}
+		
+		return sParentKey;
+	}
+	
+	// 判断元素是否已处理过。-- 根据key值判断是否存在。
+	function _isBeExist(oJudge) {
+		
+		// 是否存在。
+		let bExist = false;
+		
+		// 没有group则在aNew中判断，有group则在group的subProcess中判断
+		
+		bExist = aNew.some(o => {
+			if(oJudge.groupCode) {
+				return o.key == oJudge.groupKey
+			}else {
+				return o.key == oJudge.key
+			}
+		});
+		
+		
+		// 返回数据。
+		return bExist;
+	}
+}
+var parseTreeData1 = function(aPrev) {
+
+	// 转换后的数据。
 	let aNew = [];
 	
 	// 先按level排序。

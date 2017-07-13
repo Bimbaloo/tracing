@@ -50,10 +50,12 @@
 				fullscreenLoading: false,
 				url: HOST + "/api/v1/trace/down/trace-info",
 				treeData: {},
-				params: [],
+				// params: [],
 				show: false,
                 tableData: [],
-				filter: {}
+				// filter: {},
+				// 起点集
+				points: {} 
 			}
 		},
 		computed: {
@@ -81,12 +83,14 @@
 			// 此时 data 已经被 observed 了
 			let oFilter = sessionStorage.getItem("track_" + this.query.tag);
 			if(oFilter) {
-				let oAll = JSON.parse(oFilter);
-				this.filter = oAll.filters;
-				this.params = oAll.selected;
+				this.points = JSON.parse(oFilter);
+				// this.filter = oAll.filters;
+				// this.params = oAll.selected;
+	
 			}
 			// 加载数据。
 			this.fetchData();	
+	
 //			this.fullscreenLoading = true;
 //		    setTimeout(() => {
 //		    	this.fullscreenLoading = false;
@@ -115,7 +119,7 @@
 				this.fullscreenLoading = true;
 				
 				this.$ajax.post(this.url, {
-					"startPointDtos": this.params
+					"startPointDtos": this.points.selected || []
 				}).then((res) => {
 					this.fullscreenLoading = false;
 					if(!res.data.errorCode) {
@@ -134,8 +138,6 @@
 					} else {
 						this.$message.error(res.data.errorMsg.message);
 					}
-
-					c
 				})
 				.catch((err) => {
 					this.fullscreenLoading = false;
@@ -223,8 +225,9 @@
 			 */
             onReport (event) {
             	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。      	
-            	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(this.filter));
-            	window.open("report.html?tag="+tag);
+            	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(this.points));
+            	// window.open("report.html?tag="+tag);
+				window.open("trackReport.html?tag="+tag);
             }
 		}
 	}

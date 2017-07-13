@@ -147,7 +147,10 @@
 				});
 			},
       getKeys(sKey) {
-        return this.categories.filter(o => o.key==sKey)[0].active.keys;
+      	let oSearch = this.categories.filter(o => o.key==sKey)[0].active.keys
+      	// 加时间戳。生成标记-- 点击查询可多次
+      	oSearch._tag = new Date().getTime().toString().substr(-5);
+        return oSearch;
       },
       handleClick(tab, event) {
         // console.log(tab, event);

@@ -142,7 +142,8 @@
 									this.$router.push({ 
 										path: "/stock", 
 										query: {
-											"key": node.data.key
+											"key": node.data.key,
+											"_tag":  new Date().getTime().toString().substr(-5)
 										}
 									})
 								}else {
@@ -150,7 +151,8 @@
 									this.$router.push({ 
 										path: "/process",
 										query: {
-											"key": node.data.key
+											"key": node.data.key,
+											"_tag":  new Date().getTime().toString().substr(-5)
 										}										
 									})
 								}

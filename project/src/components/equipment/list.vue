@@ -285,7 +285,9 @@
 			},
 			processKey: function() {
 				this.init();
-			}	
+			},
+			// 为了每次点击都会查询。
+			"$route": "init"
         },
         methods: {
 			init() {

@@ -1,7 +1,7 @@
 <template>
     <div class="panel">
         <div class="panel-title">
-          <el-radio-group v-model="radio" @change="handleChange">
+          <el-radio-group v-model="radio"  @change="handleChange">
             <el-radio class="radio" :key="item.key" v-for="item in category.list" :label="item.key">{{item.title}}</el-radio>
          </el-radio-group>
         </div>
@@ -23,7 +23,7 @@
         data () {
             return {
                 radio: "1",          
-                keys: {},
+                keys: {}
             }
         },
         computed: {
@@ -72,6 +72,7 @@
 
                 this.category.active.radio = value;  
             }
+            
         }
     }
 </script>

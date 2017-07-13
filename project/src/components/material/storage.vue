@@ -193,7 +193,7 @@
 					this.loading = false;
 					this.error = "";
 					this.judgeLoaderHandler(res, (data) => {
-						debugger
+//						debugger
 						// 保存数据。
 						if(!data.length) {
 							// this.error = "查无数据。"

@@ -288,7 +288,7 @@
                 })
             },
             VisibleChange (){
-                debugger
+//              debugger
                 this.dialogData.dialogVisible = !this.dialogData.dialogVisible
             }
         }

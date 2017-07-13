@@ -59,7 +59,8 @@
             },
             rules: function() {
             	// 验证条码。
-            	let oForm = this.ruleForm,
+            	let _that = this,
+            		oForm = this.ruleForm,
             		oKeys = this.keys,
             		// 溯源及追踪的参数。
             		aParams = ["barcode","materialCode","equipmentCode","doCode"],
@@ -111,13 +112,15 @@
 	            // 验证是否存在
 	            var validateParam = (rule, value, callback) => {
 	            	// 当前筛选条件中需判断的参数。
-	            	let oJudge = {};
+	            	let oJudge = {},
+	            		aJudgeName = [];
 	            	
 	            	// 循环处理。
 	            	for (let param in oKeys) {
 	            		// 当前参数存在。
 	            		if(aParams.includes(param)) {
-	            			oJudge[param] = oForm[param]
+	            			oJudge[param] = oForm[param];
+	            			aJudgeName.push(_that.getNameByKey(param));
 	            		}
 	            	}
 	            	
@@ -127,7 +130,7 @@
 	            		callback();
 	            	}else {
 	            		// 否则。
-	            		callback(new Error("物料，条码，工单，设备其中一项不能为空"));
+	            		callback(new Error(aJudgeName.join(",")+(aJudgeName.length != 1?"其中一项":"")+"不能为空"));
 	            	}
 	            	
 	            },
@@ -190,56 +193,14 @@
             }
         },
         methods: {
-            // _init() {
-            //     for(let k in this.keys) {
-            //         this.ruleForm[k] = this.keys[k];          
-            //     }
-            //     debugger
-            // },
-            getRules(sKey) {
-            	// 验证开始时间。
-            	var validateStartTime = (rule, value, callback) => {
-            		if(!value) {
-            			callback(new Error("请输入开始时间"));
-            		}else {
-            			callback();
-            		}
-            	};
-            	// 验证结束时间。
-            	var validateEndTime = (rule, value, callback) => {
-            		let sStart = this.ruleForm.startTime;
-            		if(!value) {
-            			callback(new Error("请输入结束时间"));
-            		}else if(sStart && sStart > value) {
-            			// 如果开始时间存在，而且开始时间大于结束时间。
-            			callback(new Error("结束时间必须大于开始时间"));
-            		}else {
-            			callback();
-            		}
-            	};
-            	// 所有规则。
-            	var oAllRules =  {
-                	"barcode": [{required: true, message: "请输入条码", trigger: "change"}],
-                	"batchNo": [{required: true, message: "请输入批次",trigger: "change"}],
-                	"materialCode": [{required: true, message: "请输入物料编码",trigger: "change"}],
-                	// 开始时间。
-                	"startTime": [{required: true,validator: validateStartTime, trigger: "change"}],
-                	// 结束时间。
-                	"endTime": [{required: true, validator: validateEndTime, trigger: "change"}]
-                };
-                
-            	// 根据当前配的返回对应的规则。
-//          	let oRule = {};
-//				for(let key in this.keys) {
-//					if(oAllRules[key]) {
-//						oRule[key] = oAllRules[key];
-//					}
-//				}
-				if(Object.keys(this.keys).includes(sKey)) {
-	                return oAllRules[sKey];
-				}else {
-					return [];
-				}
+            getNameByKey(sKey) {
+            	let aItem = this.items.filter(o => o.key === sKey);
+            	
+            	if(aItem && aItem.length) {
+            		return aItem[0].name;
+            	}else {
+            		return "";
+            	}
             },
             submitForm(formName) {
                 this.$refs[formName].validate((valid) => {
@@ -266,7 +227,12 @@
                 });
             },
             resetForm(formName) {
+            	// 清空所有数据。
+            	console.log(this.ruleForm)
                 this.$refs[formName].resetFields();
+//          	for(let key in this.ruleForm) {
+//          		this.ruleForm[key] = "";
+//          	}
             }
         }    
     }

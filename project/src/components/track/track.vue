@@ -186,7 +186,7 @@
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            		({ batchNo: oSelected.batchNo,iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
             			
             		aSelected.push(oSelected);
             	})
@@ -213,21 +213,8 @@
             onReport (event) {
             	// 当gridData.data 为null时处理
             	if(this.gridData.data) {
-	            	let aSelected = [];
-	            	this.gridData.selected.forEach(o => {
-	            		let oSelected = {};
-	            		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-	            			
-	            		aSelected.push(oSelected);
-	            	})
-	
 	            	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-	            		oReportFilter = {
-	            			length: this.gridData.data.length,
-	            			selected: aSelected,
-	            			filters: this.$route.query
-	            		}
+	            		oReportFilter = this.setSession();
 	            	
 	            	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(oReportFilter));
 //	          		window.open("track/report.html?tag="+tag);
