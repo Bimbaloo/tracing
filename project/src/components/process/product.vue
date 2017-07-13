@@ -3,6 +3,8 @@
         <div class="innner-content" :style="styleObject">
             <h2 class="content-title">
             	产出
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('outputTable', '产出', $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
             </h2>	
 			<div class="content-table">
 				<!--el-table :data="outData" border style="width: 100%" class="table">
@@ -24,7 +26,7 @@
 					</el-table-column>
 				</el-table--> 
 
-                <table class="raw-table" v-loading="loading">
+                <table class="raw-table" v-loading="loading" ref="outputTable">
             		<tr>
             			<th v-for="column in outItems" :style="{width: column.width}" v-if="!column.hide">
             				{{column.name}}
@@ -43,6 +45,8 @@
 			
             <h2 class="content-title">
             	投入
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
             </h2>
 	
 			<div class="content-table">
@@ -64,7 +68,7 @@
 						</template>
 					</el-table-column>
 				</el-table-->
-                <table class="raw-table" v-loading="loading">
+                <table class="raw-table" v-loading="loading" ref="inputTable">
             		<tr>
             			<th v-for="column in inItems" :style="{width: column.width}" v-if="!column.hide">
             				{{column.name}}
@@ -86,12 +90,17 @@
 </template>
 
 <script>
+	import XLSX from 'xlsx'
+    import Blob from 'blob'
+    import FileSaver from 'file-saver'
 
 const url = HOST + "/api/v1/trace/inout/by-equipment";
 
 export default {
     data() {
         return {
+            excel: true,
+			print: true,
             loading: false,
             sErrorMessage: "",
             empty: "暂无数据。",
@@ -404,6 +413,20 @@ export default {
                 }
             }
             return Datas
+        },
+        // 表格导出。
+        exportExcelHandle (sTable, sFileName, event) {
+
+            // 下载表格。
+            Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName);      
+        },
+        // 表格打印。
+        printHandle (refTable, event) {
+            let oTable = this.$refs[refTable];
+            if(!oTable) {
+                return;
+            }
+            Rt.utils.printHtml(oTable);              
         }
     }
 }
@@ -424,7 +447,11 @@ export default {
         }
     }
 }
-
+.content-title {
+    .icon-print {
+        right: auto;
+    }
+}
 .table {
     th {
         height: 36px;

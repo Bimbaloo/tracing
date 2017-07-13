@@ -4,12 +4,14 @@
         <div class="innner-content" :style="styleObject">
             <div class="content-message">
             	<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', '仓储表', $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
             </div>
             <!--div v-if="error" class="error">
                 {{ error }}
             </div-->
-            <div class="content-table">
-            	<table class="raw-table" v-loading="loading">
+            <div class="content-table"> 
+            	<table class="raw-table" v-loading="loading" ref="rawTable">
             		<tr>
             			<th v-for="column in materialData.columns" :style="{width: column.width}" v-if="!column.hide">
             				{{column.name}}
@@ -33,6 +35,9 @@
 
 <script>
     // import table from "components/basic/table.vue"
+	import XLSX from 'xlsx'
+    import Blob from 'blob'
+    import FileSaver from 'file-saver'
 
     export default {
         // components: {
@@ -40,6 +45,8 @@
         // },
         data () {
             return {
+				excel: true,
+				print: true,
                 key: this.$route.params.key,
                 styleObject: {
                     "min-width": "1000px"
@@ -247,7 +254,22 @@
 				})
 			
 				return aoData;
-           }
+            },
+		   	// 表格导出。
+            exportExcelHandle (sTable, sFileName, event) {
+
+                // 下载表格。
+                Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName);      
+            },
+            // 表格打印。
+            printHandle (refTable, event) {
+
+                let oTable = this.$refs[refTable];
+                if(!oTable) {
+                    return;
+                }
+                Rt.utils.printHtml(oTable);              
+            }
         }
     }  
 </script>
@@ -256,6 +278,10 @@
 	.material-stock  {	    	    	
     	.content-message {
     		margin-top: 20px;
+
+			.icon-print {
+				right: auto;
+			}
     	}
     	
     	.content-table {

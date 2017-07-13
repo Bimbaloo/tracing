@@ -5,37 +5,75 @@
 		</div-->
 		<div v-if="!sErrorMessage" ref="content">
 			<div ref="summary" :class="{ actived: active.summary }">				
-				<h2 class="content-title" @click="active.summary=!active.summary">汇总信息<i class="el-icon-d-arrow-right icon"></i></h2>
+				<h2 class="content-title" @click="active.summary=!active.summary">
+					汇总信息
+					<i class="el-icon-d-arrow-right icon"></i>
+                	<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.summary, $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('summaryTable', $event)"></i>					
+				</h2>
 				<!--<div class="content-table">
 					<v-table :table-data="reportData.summary" :loading="loading"></v-table>
 				</div>-->
 				<transition name="el-zoom-in-top">
-					<v-table v-show="active.summary" :table-data="reportData.summary" :loading="loading"></v-table>
+					<div class="content-table inner" ref="summaryTable">
+						<v-table v-show="active.summary" :table-data="reportData.summary" :loading="loading"></v-table>
+					</div>
 				</transition>
 			</div>
 			<div ref="inStocks" :class="{ actived: active.inStocks }">			
-				<h2 class="content-title" @click="active.inStocks=!active.inStocks">在库明细<i class="el-icon-d-arrow-right icon"></i></h2>
+				<h2 class="content-title" @click="active.inStocks=!active.inStocks">
+					在库明细
+					<i class="el-icon-d-arrow-right icon"></i>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.inStocks, $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inStocksTable', $event)"></i>
+				</h2>
 				<transition name="el-zoom-in-top">
+					<div class="content-table inner" ref="inStocksTable">
 					<v-table  v-show="active.inStocks" :table-data="reportData.inStocks" :loading="loading"></v-table>
+					</div>
 				</transition>
 			</div>
 			<div ref="inMakings" :class="{ actived: active.inMakings }">			
 				<h2 class="content-title" @click="active.inMakings=!active.inMakings">在制明细<i class="el-icon-d-arrow-right icon"></i></h2>
 				<!--<transition-group class="content-table">-->
 				<transition-group name="el-zoom-in-top" tag="div">
-					<h2 v-show="active.inMakings" key="1" class="inner-title">加工中</h2>
-					<v-table v-show="active.inMakings" key="2" :table-data="reportData.inMaking" :loading="loading"></v-table>
-					<h2 v-show="active.inMakings" key="3" class="inner-title">滞留中</h2>
-					<v-table v-show="active.inMakings" key="4" :table-data="reportData.remain" :loading="loading"></v-table>
+					<h2 v-show="active.inMakings" key="1" class="inner-title">
+						加工中
+						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.inMaking, $event)"></i>
+                		<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inMakingTable', $event)"></i>
+					</h2>
+					<div class="content-table inner" ref="inMakingTable" key="2">
+						<v-table v-show="active.inMakings" key="2" :table-data="reportData.inMaking" :loading="loading"></v-table>
+					</div>
+					<h2 v-show="active.inMakings" key="3" class="inner-title">
+						滞留中
+						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.remain, $event)"></i>
+                		<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('remainTable', $event)"></i>
+					</h2>
+					<div class="content-table inner" ref="remainTable" key="4">
+						<v-table v-show="active.inMakings" :table-data="reportData.remain" :loading="loading"></v-table>
+					</div>
 				</transition-group>
 			</div>
 			<div ref="outStocks" :class="{ actived: active.outStocks }">				
 				<h2 class="content-title" @click="active.outStocks=!active.outStocks">出库明细<i class="el-icon-d-arrow-right icon"></i></h2>
 				<transition-group name="el-zoom-in-top" tag="div">
-					<h2 v-show="active.outStocks" key="5" class="inner-title">出库明细</h2>
-					<v-table v-show="active.outStocks" key="6" :table-data="reportData.outStocks" :loading="loading"></v-table>
-					<h2 v-show="active.outStocks" key="7" class="inner-title">发货明细</h2>
-					<v-table v-show="active.outStocks" key="8" :table-data="reportData.delivered" :loading="loading"></v-table>
+					<h2 v-show="active.outStocks" key="5" class="inner-title">
+						出库明细
+						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.outStocks, $event)"></i>
+                		<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outStocksTable', $event)"></i>
+					</h2>
+					<div class="content-table inner" key="6" ref="outStocksTable">
+						<v-table v-show="active.outStocks" :table-data="reportData.outStocks" :loading="loading"></v-table>
+					</div>
+					<h2 v-show="active.outStocks" key="7" class="inner-title">
+						发货明细
+						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.delivered, $event)"></i>
+                		<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('deliveredTable', $event)"></i>
+					</h2>
+					<div class="content-table inner" key="8" ref="deliveredTable">
+						<v-table v-show="active.outStocks" :table-data="reportData.delivered" :loading="loading"></v-table>
+					</div>
 				</transition-group>
 			</div>
 		</div>
@@ -44,6 +82,10 @@
 
 <script>
 	import table from "components/basic/table.vue"
+	import XLSX from 'xlsx'
+    import Blob from 'blob'
+    import FileSaver from 'file-saver'
+
 	export default {
 		components: {
 			'v-table': table
@@ -54,6 +96,8 @@
 		},
 		data() {
 			return {
+				excel: true,
+				print: true,
 				loading: false,
 				sErrorMessage: '',
 				url: "/api/v1/trace/report/by-batch",
@@ -66,6 +110,7 @@
 				reportData: {
 					// 汇总。
 					summary: {
+						filename: "汇总",
 						columns: [{
 							prop: "batchNo",
 							name: "批次",
@@ -120,7 +165,8 @@
 						data: []
 					},
 					// 发货。
-					delivered: {					
+					delivered: {
+						filename: "发货",					
 						columns: [{
 							prop: "barcode",
 							name: "条码",
@@ -205,7 +251,8 @@
 						}]
 					},
 					// 出库。
-					outStocks: {					
+					outStocks: {
+						filename: "出库",						
 						columns: [{
 							prop: "barcode",
 							name: "条码",
@@ -278,7 +325,8 @@
 						}]
 					},
 					// 在库
-					inStocks: {					
+					inStocks: {		
+						filename: "在库",					
 						columns: [{
 							prop: "barcode",
 							name: "条码",
@@ -357,6 +405,7 @@
 					},
 					// 加工
 					inMaking: {
+						filename: "加工",
 						columns: [{
 							prop: "batchNo",
 							name: "批次",
@@ -418,6 +467,7 @@
 					},
 					// 滞留
 					remain: {
+						filename: "滞留",
 						columns: [{
 							prop: "batchNo",
 							name: "批次",
@@ -608,24 +658,56 @@
 					this.$refs.content.insertBefore(this.$refs.outStocks, this.$refs.inMakings);
 					this.$refs.content.append(this.$refs.inStocks);					
 				}
-			}
+			},
+			// 表格导出。
+            exportExcelHandle (oData, event) {
+				event.stopPropagation();
+				
+                if(!oData) {
+                    return;
+                }
+                // 下载表格。
+                Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);      
+            },
+            // 表格打印。
+            printHandle (refTable, event) {
+				event.stopPropagation();
+
+                let oTable = this.$refs[refTable];
+                if(!oTable) {
+                    return;
+                }
+                Rt.utils.printHtml(oTable);              
+            }
 		}
 	}
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+	.content-title {
+		.icon-excel, .icon-print {
+			display: none;
+		}
+	}
 	.actived {
-		.icon {
+		.icon-excel, .icon-print {
+			margin-left: 10px;
+			position: relative;
+			top: -2px;
+			display: inline-block;
+			cursor: pointer;
+		}
+		.el-icon-d-arrow-right {
 			display: none;
 		}
 		.content-title {
 			color: #333;
 		}
-		.content-table {
+		.content-table.inner {
 			display: block;
 		}
 	}
-	.icon {
+	.el-icon-d-arrow-right {
 		font-size: 14px;
 	}
 	.content-title {
@@ -636,10 +718,8 @@
 			cursor: pointer;
 		}
 	}
-	.content-table {
+	.content-table.inner {
 		display: none;
-		
-		
 	}
 	.inner-title {
 			color: #42AF8F;

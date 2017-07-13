@@ -1,4 +1,5 @@
 <template>
+
     <el-table
     :data="dataArray"
     stripe
@@ -9,7 +10,7 @@
     :height="heights"
     v-loading="loading"
     element-loading-text="拼命加载中"
-    style="width: 100%">
+    style="width: 100%">   
         <el-table-column 
         v-for="column in columns"       
         align="center"
@@ -26,9 +27,9 @@
         :filter-method="column.filterMethod"
         :filter-placement="column.filterPlacement"
         :width="column.width">
-        </el-table-column>
-        
+        </el-table-column>        
     </el-table>
+   
 </template>
 
 <script>
@@ -54,13 +55,12 @@
         	}
         },
         methods: {    
-            cellClick: function(row, column, cell, event) {
+            cellClick (row, column, cell, event) {
                 let oColumn = this.columns.filter(o => o.prop==column.property)[0];
                 // && row[column.property]
-                oColumn.cellClick && oColumn.cellClick(row);
-                
+                oColumn.cellClick && oColumn.cellClick(row);                
             },
-            selectionChange: function(selection) {
+            selectionChange (selection) {
             	this.tableData.selected = selection;
             }
         }
@@ -93,6 +93,6 @@
                 padding: 0;
             }             
         }
-
     }
+
 </style>

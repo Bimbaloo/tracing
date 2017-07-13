@@ -1,6 +1,10 @@
 <template>
-	<div id="app" class="report-wrapper">
+	<div id="app" class="report-wrapper" ref="fastreport">
 		<div class="report-container">	
+			<div class="page-icon">
+				<i class="icon icon-20 icon-download" title="下载" @click="downloadHandle('fastreport', $event)"></i>
+            	<i class="icon icon-20 icon-print" title="打印" @click="printHandle('fastreport', $event)"></i>
+			</div>
 			<div class="tag">
 				<span>报告人：admin</span>
 				<span>报告时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span>
@@ -302,7 +306,27 @@
 				this.dialogTableVisible = true;
 				this.radio = value
 				this.radioChange(value)
-			}
+			},
+			// 页面下载。
+            downloadHandle (refHtml, event) {
+				event.stopPropagation();
+				
+                let oRef = this.$refs[refHtml];
+                if(!oRef) {
+                    return;
+                }
+                Rt.utils.downloadHtml(oRef, "快速报告");     
+            },
+            // 页面打印。
+            printHandle (refHtml, event) {
+				event.stopPropagation();
+
+                let oRef = this.$refs[refHtml];
+                if(!oRef) {
+                    return;
+                }
+                Rt.utils.printHtml(oRef);              
+            }
 		}
 	}
 </script>
@@ -325,6 +349,17 @@
 		background-color: #fff;
 		position: relative;
 		
+		.page-icon {
+			position: absolute;
+			top: 78px;
+			right: 20px;
+
+			.icon {
+				margin-left: 10px;
+				cursor: pointer;
+			}
+		}
+
 		.title {
 			height: 24px;
 			font: normal 24px/1 "微软雅黑",arial,sans-serif;

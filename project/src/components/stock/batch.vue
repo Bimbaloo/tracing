@@ -5,19 +5,25 @@
 		<!--<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList"  >可疑品</el-button>-->
 		<div class="innner-content" :style="styleObject">
 			<h2 class="content-title">
-				<span class="tag">{{batch}}</span>出库信息</h2>
+				<span class="tag">{{batch}}</span>出库信息
+				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
+			</h2>
 			<div v-if="outstockData.error" class="error" :style="styleError">
 				{{ outstockData.error }}
 			</div>
-			<div v-else class="content-table">
+			<div v-else class="content-table" ref="outstockTable">
 				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
 			</div>
 			<h2 class="content-title">
-				<span class="tag">{{batch}}</span>在库信息</h2>
+				<span class="tag">{{batch}}</span>在库信息
+				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+			</h2>
 			<div v-if="instockData.error" class="error" :style="styleError">
 				{{ instockData.error }}
 			</div>
-			<div v-else class="content-table">
+			<div v-else class="content-table" ref="instockTable">
 				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
 			</div>
 		</div>
@@ -28,13 +34,18 @@
 <script>
 	import $ from "jquery"
 	import table from "components/basic/table.vue"
-	
+	import XLSX from 'xlsx'
+    import Blob from 'blob'
+    import FileSaver from 'file-saver'
+
 	export default {
 		components: {
 			'v-table': table
 		},
 		data() {
 			return {
+				excel: true,
+				print: true,
 				btnShow: true,
 				styleObject: {
 					"min-width": "1200px"
@@ -48,6 +59,7 @@
 					loading: false,
 					error: null,
 					height: "100%",
+					filename: this.$route.query.batchNo + "出库",
 					columns: [{
 						prop: "barcode",
 						name: "条码"
@@ -86,26 +98,29 @@
 						name: "出库时间",
 						width: "160"
 					}],
-					data: [{
-						"barcode": "单件条码",
-//						"barcodeTypeName": "2",
-						"batchNo": "20160331A",
-						"materialCode": "021",
-						"materialName": "物料名字",
-						"quantity": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "客户名",
-						"stockType": "出库类型",
-						"person": "出库人",
-						"createTime": "2016-03-31 14:28:33"
-					}]
+					data: [
+// 						{
+// 						"barcode": "单件条码",
+// //						"barcodeTypeName": "2",
+// 						"batchNo": "20160331A",
+// 						"materialCode": "021",
+// 						"materialName": "物料名字",
+// 						"quantity": 16,
+// 						"stock": "仓库",
+// 						"stocklot": "库位",
+// 						"customer": "客户名",
+// 						"stockType": "出库类型",
+// 						"person": "出库人",
+// 						"createTime": "2016-03-31 14:28:33"
+// 					}
+					]
 				},
 				instockData: {
 					url: HOST + "/api/v1/stock/bybatch",
 					loading: false,
 					error: null,
 					height: "100%",
+					filename: this.$route.query.batchNo + "在库",
 					columns: [{
 						prop: "barcode",
 						name: "条码"
@@ -147,21 +162,23 @@
 						name: "入库时间",
 						width: "160"
 					}],
-					data: [{
-						"barcode": "单件条码",
-//						"barcodeTypeName": "2",
-						"batchNo": "批次号",
-						"materialCode": "031",
-						"materialName": "物料名字",
-						"quantity": 16,
-						// "remainingNum": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "客户名",
-						"stockType": "入库类型",
-						"person": "入库人",
-						"createTime": "2016-03-31 14:28:33"
-					}]
+					data: [
+// 						{
+// 						"barcode": "单件条码",
+// //						"barcodeTypeName": "2",
+// 						"batchNo": "批次号",
+// 						"materialCode": "031",
+// 						"materialName": "物料名字",
+// 						"quantity": 16,
+// 						// "remainingNum": 16,
+// 						"stock": "仓库",
+// 						"stocklot": "库位",
+// 						"customer": "客户名",
+// 						"stockType": "入库类型",
+// 						"person": "入库人",
+// 						"createTime": "2016-03-31 14:28:33"
+// 					}
+					]
 				},
 			}
 		},
@@ -237,7 +254,24 @@
 					console.log("该功能将在后续开发，敬请期待...")
 				}
 				
-			}
+			},
+			// 表格导出。
+            exportExcelHandle (oData, event) {
+                if(!oData) {
+                    return;
+                }
+                // 下载表格。
+                Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);      
+            },
+            // 表格打印。
+            printHandle (refTable, event) {
+                let oTable = this.$refs[refTable];
+                if(!oTable) {
+                    return;
+                }
+                Rt.utils.printHtml(oTable);              
+            }
+
 		}
 	}
 </script>
