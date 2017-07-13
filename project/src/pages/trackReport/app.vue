@@ -31,6 +31,13 @@
 	            </div>     
 			</el-dialog>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
+			<h2 class="content-title">审核</h2>
+			<div class="condition-audit" >		
+				<div class="tag">
+					<span>签名：</span>
+					<span>时间：</span>
+				</div>
+			</div>
 		</div>
   	</div>
 </template>
@@ -326,6 +333,25 @@
 			color: #42AF8F;
 			font-style: normal;
 			font-weight: 600;
+		}
+	}
+	.condition-audit {
+		border: 2px solid #42AF8F;
+		padding: 20px 12px;
+		margin-top: 30px;
+		font-size: 14px;
+		height: 70px;
+		position: relative;
+		.tag {
+			right: 120px;
+			top: 48px;
+			span {
+				display: block;
+				line-height: 24px;
+				&+span {
+					margin-left: 0;
+				}
+			}
 		}
 	}
 

@@ -208,7 +208,7 @@
           this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
       },
       dragstar(e){   //鼠标按下，开始拖动
-        console.log('开始')
+      //  console.log('开始')
         if(e.target.id === 'changeWidth'){
           this.LayoutLeftWidth = this.reversedMessage
           this.changeWidth = 0
@@ -224,17 +224,15 @@
        
       },
       dragend(e){ //鼠标松开，结束拖动
-        /*
-        计算此时的宽度是否够，不够的话直接变成260
-        */
-        console.log('结束')
+
+        //console.log('结束')
         this.dragging = false
         e.stopPropagation = true
       },
       onMouseMove(e){ //拖动过程
       
         if(this.dragging){
-          console.log('开始动了')
+         // console.log('开始动了')
           this.changeWidth = e.pageX-this._pageX
         }
         
