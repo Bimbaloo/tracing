@@ -202,7 +202,6 @@
 							</el-table>
 						</div>
 						
-						
 						<!-- 表格的复制 -->
 						<div v-show="false" class="resume-table-clone">
 							<div class="table-title">
@@ -394,67 +393,6 @@
 											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.time).Format("hh:mm:ss") }}</span>
 											<div class="sub-node">
 												<v-node :color-type="getTimeLineTypeInfo(item.type).color"></v-node>
-											</div>
-											<div class="sub-info" :class="getTimeLineTypeInfo(item.type).color">
-												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
-													<div class="item-type">{{getTimeLineTypeInfo(item.type).text}} :</div>
-													<div class="item-info">
-														<span class="tips">{{ item.personName || "-" }}</span> 
-														将条码 <span class="tips">{{ item.barcode || "-" }}</span>
-														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName || "-" }}</span>
-														<span class="tips">{{ item.quantity || "-" }}</span> 件，入库到
-														<span class="tips">{{ item.warehouse || "-" }}</span>
-														<span class="tips">{{ item.reservoir || "-" }}</span>
-													</div>
-												</div>
-												<div class="sub-item" v-else-if="getTimeLineTypeInfo(item.type).type==2">
-													<div class="item-type">{{ item.processName+getTimeLineTypeInfo(item.type).text }} :</div>
-													<div class="item-info">
-														<span class="tips">{{ item.personName || "-" }}</span> 在
-														<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上
-														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
-														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName || "-" }}</span> 物料
-														{{ getTimeLineTypeInfo(item.type).text }}
-													</div>
-												</div>
-												<div class="sub-item" v-else>
-													<div class="item-type">{{ getTimeLineTypeInfo(item.type).text }} :</div>
-													<div class="item-info">
-														<span class="tips">{{ item.personName || "-" }}</span> 
-														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
-														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														，在<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上产出的
-														<span class="tips">{{ item.materialName || "-" }}</span> 物料
-														{{ getTimeLineTypeInfo(item.type).text }}，共计
-														<span class="tips">{{ item.quantity || "-" }}</span> 件，结果为
-														<span class="tips">{{ item.checkResult || "-" }}</span>
-													</div>
-												</div>
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-							<div v-show="false" class="time-line-content-clone">
-								<div 
-									class="time-line-wrap"
-									v-for="(timeItem, index) in aoTimeLineData">
-									
-									<div class="line-item">
-										<span class="item-date">{{ timeItem.date }}</span>
-										<div class="item-node" :class="{bigSize:!index}"><v-node :is-border="false" :class="{bigSize:!index}" color-type="blue"></v-node></div>
-										<span class="item-title" v-if="!index">产品履历</span>
-									</div>
-									<div class="item-line"></div>
-									<div class="line-list">
-										<div class="list-sub" :class="{first:!itemIndex}"
-											v-for="(item,itemIndex) in timeItem.resumes">
-											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1)" class="node-line"></div>
-											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.time).Format("hh:mm:ss") }}</span>
-											<div class="sub-node">
-												<v-node :is-border="false" :color-type="getTimeLineTypeInfo(item.type).color"></v-node>
 											</div>
 											<div class="sub-info" :class="getTimeLineTypeInfo(item.type).color">
 												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
@@ -1015,16 +953,18 @@
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),
 					jTableClone = $(".resume-table-clone"),
+					sFileName = "",
 					jNow = null;
 				
 				 if(this.sCurrentTab === "tables"){
 				 	// 表格。
 				 	jClone.html(jTableClone.html());
+				 	sFileName = "BOM表格";
 				 	jNow = jClone;
 				 }else {
 				 	// 时间轴。
-				 	jClone.html($(".time-line-content-clone").html());
-//				 	jNow = jTimeLine;
+				 	jClone.html(jTimeLine.html());
+				 	sFileName = "时间轴";
 					jNow = jClone;
 				 }
 					
@@ -1037,7 +977,7 @@
 							
 						jDown.attr({
 							"href":sImg,
-							"download": new Date().getTime() +".png"
+							"download": sFileName +".png"
 						}).get(0).click()
 						// 重置复制内容。
 						jClone.html("");
@@ -1046,7 +986,6 @@
 			},
 			// 打印功能。。
 			onPrintHandler() {
-//				alert("打印。");
 				
 				var jDown = $("#downloadImage"),
 					jTimeLine = $(".time-line-content"),
@@ -1060,8 +999,7 @@
 				 	jNow = jClone;
 				 }else {
 				 	// 时间轴。
-				 	jClone.html($(".time-line-content-clone").html());
-//				 	jNow = jTimeLine;
+				 	jClone.html(jTimeLine.html());
 					jNow = jClone;
 				 }
 					
@@ -1119,10 +1057,6 @@
 		}	
 	}
 	
-	.el-icon-upload2 {
-		transform: rotate(180deg);
-	}
-	
 	.domDown {
 		position: absolute;
 		z-index: 0;
@@ -1149,6 +1083,24 @@
 			}
 		}
 		.time-line;
+		
+		.item-node {
+			.node-outer {
+				border-radius: 0;
+				.node-inner {
+					border-radius: 0;
+				}
+			}
+		}
+		.sub-node {
+			.node-outer {
+				border-radius: 0;
+				
+				.node-inner {
+					border-radius: 0;
+				}
+			}
+		}
 	}
 	.resume-wraps {
 		.resume-content-wrap {
@@ -1257,8 +1209,7 @@
 						/*height: 730px;*/
 						overflow: auto;
 						
-						.time-line-content,
-						.time-line-content-clone {
+						.time-line-content {
 							.time-line;
 						}
 						

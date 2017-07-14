@@ -6,7 +6,7 @@ import axios from 'axios'
 
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
-
+import 'assets/js/global.js'
 Vue.use(ElementUI)
 
 Vue.prototype.$ajax = axios;

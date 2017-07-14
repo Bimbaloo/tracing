@@ -50,6 +50,23 @@ Rt.utils.DateDiff = function(start, end) {
 }
 
 /**
+ * 获取对象的键值。
+ * @param {Object} oParam
+ * @return {Array}
+ */
+Rt.utils.getObjectValues = function(oParam) {
+	let aValues = [];
+	
+	for(let sParam in oParam) {
+		aValues.push(oParam[sParam]);
+	}
+	
+	// 返回键值。
+	return aValues;
+}
+
+
+/**
  * 判断对象是否为空对象。
  * @param {Object} e
  * @return {Boolean}
@@ -168,9 +185,10 @@ function s2ab (s) {
  * 页面节点内容打印。依赖html2Canvas。
  * @param {Element} element
  * @param {Object} option
+ * @param {Boolean} isClear 是否清空，默认不清空 -- 查出库中的表格print内容是复制的内容需清空
  * @return {void}
  */
-Rt.utils.printHtml = function(element, option) {
+Rt.utils.printHtml = function(element, option, isClear) {
 	// 将页面转换为图片。
 	html2canvas(element, Object.assign(option || {}, {
 		onrendered: function(canvas) {
@@ -186,6 +204,10 @@ Rt.utils.printHtml = function(element, option) {
 				
 				w.close();
 			},200)
+			
+			if(isClear) {
+				element.innerHTML = "";
+			}
 		}
 	})); 
 }

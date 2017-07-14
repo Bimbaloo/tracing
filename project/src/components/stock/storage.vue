@@ -1,35 +1,37 @@
 <!--出入库-->
 <template>
     <div class="router-content">
+    	<div class="tableClone" ref="printTable"></div>
         <div class="innner-content" :style="styleObject">
             <h2 class="content-title">
-                出库信息
+               	 出库信息
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>
             </h2>
             <div v-if="outstockData.error" class="error" :style="styleError">
                 {{ outstockData.error }}
             </div>
-            <div v-else class="content-table" ref="outstockTable">
+            <div v-else class="content-table">
             	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>            
-                <!--<el-dialog  :visible.sync="dialogTableVisible" top='20%' >
-                    <el-table :data="gridData" border width='100%'>
-                        <el-table-column property="batchNo" label="序号" align="center"></el-table-column>
-                        <el-table-column property="barcode" label="条码" align="center"></el-table-column>
-                    </el-table>                    
-                </el-dialog>-->
-                <v-dialogTable  :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
+                <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
-            <h2 class="content-title" ref="instockTable">
-                入库信息
+            <h2 class="content-title">
+               	 入库信息
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
             </h2>
             <div v-if="instockData.error" class="error" :style="styleError">
                 {{ instockData.error }}
             </div>
-            <div v-else class="content-table" ref="instockTable">
+            <div v-else class="content-table">
             	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
+            </div>
+            <!-- 复制的内容 -->
+            <div v-show="false" ref="outstockTable">
+            	<v-table :table-data="outstockData" :loading="outstockData.loading"></v-table>
+            </div>
+            <div v-show="false" ref="instockTable">
+            	<v-table :table-data="instockData" :loading="instockData.loading"></v-table>
             </div>
         </div>
     </div>      
@@ -220,7 +222,7 @@
 //          '$route': 'fetchPage'
             '$route': function() {
             	this.key = this.$route.params.key;
-              	 this.fetchPage();
+              	this.fetchPage();
             }
         },
         methods: {
@@ -370,28 +372,14 @@
             // },
             // 表格打印。
             printHandle (refTable, event) {
-                let oTable = this.$refs[refTable];
+                let oTable = this.$refs[refTable],
+                	oPrint = this.$refs["printTable"];
+                	
                 if(!oTable) {
                     return;
                 }
-                Rt.utils.printHtml(oTable);
-
-				// // 将表格转换成图片。
-				// html2canvas(oTable,{
-				// 	onrendered:function(canvas) {
-				// 		var sImg = canvas.toDataURL("image/png");
-							
-				// 		// 打印
-				// 		var w = window.open("about:blank","image from cancas");
-				// 		w.document.write("<img src='"+sImg+"' alt='from canvas'>")
-					
-				// 		setTimeout(function() {
-				// 			w.print();
-							
-				// 			w.close();
-				// 		},200)
-				// 	}
-				// });              
+				oPrint.innerHTML = oTable.innerHTML;
+                Rt.utils.printHtml(oPrint,null,true);
             }
         }
     }  

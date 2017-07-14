@@ -1,8 +1,8 @@
 <!--同批出入库-->
 <template>
 	<div class="router-content">
+		<div class="tableClone" ref="printTable"></div>
 		<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>
-		<!--<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList"  >可疑品</el-button>-->
 		<div class="innner-content" :style="styleObject">
 			<h2 class="content-title">
 				<span class="tag">{{batch}}</span>出库信息
@@ -12,7 +12,7 @@
 			<div v-if="outstockData.error" class="error" :style="styleError">
 				{{ outstockData.error }}
 			</div>
-			<div v-else class="content-table" ref="outstockTable">
+			<div v-else class="content-table">
 				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
 			</div>
 			<h2 class="content-title">
@@ -23,9 +23,16 @@
 			<div v-if="instockData.error" class="error" :style="styleError">
 				{{ instockData.error }}
 			</div>
-			<div v-else class="content-table" ref="instockTable">
+			<div v-else class="content-table">
 				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
 			</div>
+			<!-- 复制的内容 -->
+            <div v-show="false" ref="outstockTable">
+            	<v-table :table-data="outstockData" :loading="outstockData.loading"></v-table>
+            </div>
+            <div v-show="false" ref="instockTable">
+            	<v-table :table-data="instockData" :loading="instockData.loading"></v-table>
+            </div>
 		</div>
 	</div>
 
@@ -268,11 +275,14 @@
             },
             // 表格打印。
             printHandle (refTable, event) {
-                let oTable = this.$refs[refTable];
+                let oTable = this.$refs[refTable],
+                	oPrint = this.$refs["printTable"];
+                
                 if(!oTable) {
                     return;
                 }
-                Rt.utils.printHtml(oTable);              
+                oPrint.innerHTML = oTable.innerHTML;
+                Rt.utils.printHtml(oPrint,null,true);              
             }
 
 		}

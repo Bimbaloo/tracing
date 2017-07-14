@@ -736,5 +736,5 @@
 			margin: 13px 0;
 			text-indent: 10px;
 	}
-	}
+}
 </style>

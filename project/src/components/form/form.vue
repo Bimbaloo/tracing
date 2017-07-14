@@ -4,8 +4,6 @@
             <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
         </el-form-item>
         <div  :class="['form-button', { 'form-button-last': active.radio === '4' && items.length > 10 }]">
-        <!--<div :class="[active.radio == '4' ? 'form-button-last' : '', 'form-button']">-->
-        <!--<div class="form-button">-->
             <el-button class="btn" type="primary" @click="submitForm('ruleForm')">查询</el-button>
             <el-button class="btn" type="primary" @click="resetForm('ruleForm')">重置</el-button>
         </div>
@@ -50,7 +48,7 @@
         	keys: {
         		handler: function() {
         			this.$nextTick(() => {
-        				if(Object.values(this.ruleForm).every(o=>!o)) {
+        				if(Rt.utils.getObjectValues(this.ruleForm).every(o=>!o)) {
 	        				this.resetForm('ruleForm')
         				}
         			});
@@ -59,16 +57,12 @@
         	}
         },
         mounted () {
-            // 数据初始化。
-            // this.$nextTick(() => {
-            //     this._init();
-            // })
         },
         computed: {
             ruleForms: function() {
                 let oFormData = {};
                 this.items.forEach(o => {
-                    oFormData[o.key] = this.active.keys[o.key] || '';
+                	oFormData[o.key] = this.active.keys[o.key] || '';
                 });
                 return oFormData;
             },
@@ -140,7 +134,7 @@
 	            	}
 	            	
 	            	// 如果judge的参数中所有的都为空。则提示
-	            	if(Object.values(oJudge).some(o=>o)) {
+	            	if(Rt.utils.getObjectValues(oJudge).some(o=>o)) {
 	            		// 只要一个有数据。
 	            		callback();
 	            	}else {

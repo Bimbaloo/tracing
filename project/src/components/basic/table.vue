@@ -1,5 +1,4 @@
 <template>
-
     <el-table
     :data="dataArray"
     stripe
@@ -10,7 +9,7 @@
     :height="heights"
     v-loading="loading"
     element-loading-text="拼命加载中"
-    style="width: 100%">   
+    style="width: 100%">
         <el-table-column 
         v-for="column in columns"       
         align="center"
@@ -27,9 +26,9 @@
         :filter-method="column.filterMethod"
         :filter-placement="column.filterPlacement"
         :width="column.width">
-        </el-table-column>        
+        </el-table-column>
+        
     </el-table>
-   
 </template>
 
 <script>
@@ -93,6 +92,6 @@
                 padding: 0;
             }             
         }
-    }
 
+    }
 </style>
