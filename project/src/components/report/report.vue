@@ -684,11 +684,14 @@
 </script>
 
 <style lang="less">
-	.content-title {
-		.icon-excel, .icon-print {
-			display: none;
+	.report {
+		.content-title {
+			.icon-excel, .icon-print {
+				display: none;
+			}
 		}
-	}
+
+
 	.actived {
 		.icon-excel, .icon-print {
 			margin-left: 10px;
@@ -726,5 +729,5 @@
 			margin: 13px 0;
 			text-indent: 10px;
 	}
-
+	}
 </style>

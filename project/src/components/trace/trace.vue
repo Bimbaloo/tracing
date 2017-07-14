@@ -186,9 +186,9 @@
 </script>
 
 <style lang="less">
-	.btn {
-		margin-bottom: 10px;
-	}
+	// .btn {
+	// 	margin-bottom: 10px;
+	// }
 	.error {
 		border: 2px solid #42AF8F;
 	    padding: 20px 12px;
