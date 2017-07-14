@@ -50,13 +50,13 @@
                 node: {},
                 equipments: [],
                 checkedEquipments: [],
-				// 视窗时间，默认为2小时。
+				// 视窗时间，默认为30分钟。
 				windowTime: {
-					interval: 2,
+					interval: 30,
 					start: "",
 					end: "",
-					min: 2,
-					max: 2,
+					min: 1,
+					max: 30,
 					left: 0
 				},
 				dimension: [{

@@ -1,10 +1,12 @@
 <!--设备-->
 <template>
-    <div class="content-list" v-loading="loading">
+    <div :class="[{detailed: show}, 'content-list']" v-loading="loading">
 		<div class="handle clear">
-			<label>视窗时间：</label><el-input v-model="windowTime.interval" class="time" type="number" :min="windowTime.min" :max="windowTime.max" @blur="inputTimeBlur"></el-input><label>小时</label>
+			<label>视窗时间：</label><el-input v-model="windowTime.interval" class="time" type="number" :min="windowTime.min" :max="windowTime.max" @blur="inputTimeBlur"></el-input><label>分钟</label>
 			<span>{{windowTime.start}}</span><span class="split">~</span>
 			<span>{{windowTime.end}}</span>
+			<!--i class="icon icon-20 icon-show" v-if="show" @click="show=false"></i>
+			<i class="icon icon-20 icon-hide" v-else @click="show=true"></i-->
 			<div class="legend">
 				<span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
 			</div>
@@ -35,7 +37,7 @@
 			<div class="line clear" @click="moveSlider" ref="line">
 				<i class="icon icon-20 icon-start"></i>
 				<i class="icon icon-20 icon-end"></i>
-				<div class="slider" @mousedown="dragSlider" @click="preventMove" ref="slider" :style="{width: 100/ratio + '%', left: windowTime.left + '%'}" v-if="windowTime.interval>=2"></div>
+				<div class="slider" @mousedown="dragSlider" @click="preventMove" ref="slider" :style="{width: 100/ratio + '%', left: windowTime.left + '%'}"></div>
 			</div>		
 			<div class="setting clear">
 				<div class="start">		    
@@ -73,15 +75,15 @@
 			checkedEquipments: Array,
 			dimensionData: [Array, String],
 			windowTime: Object,
-			process: String,
-			processKey: String,
+			process: String
 		},
 		components: {
 			'v-datetime': DateTime,
 			'v-equipmentLine': EquipmentLine
 		},
         data () {
-            return {		
+            return {
+				show: true,		
 				oTest: {
 					"1": [{
 						"equipmentId": 175,
@@ -268,7 +270,6 @@
             // 此时 data 已经被 observed 了
 			// 设置窗口时长。
 			this.init();
-
         },
         mounted () {
 
@@ -283,15 +284,11 @@
 				// debugger
 				this.equipments.forEach(o => this.equipmentData[o.equipmentId] && (this.equipmentData[o.equipmentId].selected = this.checkedEquipments.indexOf(o.equipmentId) > -1))			
 			},
-			processKey: function() {
-				this.init();
-			},
 			// 为了每次点击都会查询。
 			"$route": "init"
         },
         methods: {
 			init() {
-				// debugger
 				this.setInitData();
 				
 				this.setWindowTime();
@@ -577,16 +574,16 @@
 			},
 			// 设置窗口时长。
 			setWindowTime () {
-				this.windowTime.interval = (new Date(this.datetime.end).getTime() - new Date(this.datetime.start).getTime())/1000/60/60;
+				this.windowTime.interval = (new Date(this.datetime.end).getTime() - new Date(this.datetime.start).getTime())/1000/60;
 
 				this.windowTime.start = this.datetime.start;
 				this.windowTime.max = this.formatData(this.windowTime.interval, 2);//Math.floor
 
-				if(this.windowTime.interval > 2) {				
-					this.ratio = this.windowTime.interval/2;
-					this.windowTime.interval = 2;
-					this.windowTime.min = 2;
-					this.windowTime.end = new Date(new Date(this.windowTime.start).getTime() + 2*60*60*1000).Format("yyyy-MM-dd hh:mm:ss");
+				if(this.windowTime.interval > 30) {				
+					this.ratio = this.windowTime.interval/30;
+					this.windowTime.interval = 30;
+					this.windowTime.min = 1;
+					this.windowTime.end = new Date(new Date(this.windowTime.start).getTime() + this.windowTime.interval*60*1000).Format("yyyy-MM-dd hh:mm:ss");
 				}else {
 					this.ratio = 1;
 					this.windowTime.end = this.datetime.end;
@@ -698,7 +695,7 @@
 
 				let nStart = new Date(this.datetime.start).getTime()*(1-nRatio/100) + nRatio/100*(new Date(this.datetime.end).getTime());
 				this.windowTime.start = new Date(nStart).Format("yyyy-MM-dd hh:mm:ss");
-				this.windowTime.end =  new Date(nStart + this.windowTime.interval*60*60*1000).Format("yyyy-MM-dd hh:mm:ss")
+				this.windowTime.end =  new Date(nStart + this.windowTime.interval*60*1000).Format("yyyy-MM-dd hh:mm:ss")
 				this.windowTime.left = nRatio;
 			},
 			/**
@@ -742,7 +739,18 @@
 						nRatio = Math.floor(nMax);//formatData
 					}
 					slider.style.left = nRatio + "%";
-					
+
+					_setWindowTime();
+						
+				}
+				/**
+				 * 设置视窗时间。
+				 */
+				function _setWindowTime() {
+					let nStart = new Date(self.datetime.start).getTime()*(1-nRatio/100) + nRatio/100*(new Date(self.datetime.end).getTime());
+					self.windowTime.start = new Date(nStart).Format("yyyy-MM-dd hh:mm:ss");
+					self.windowTime.end =  new Date(nStart + self.windowTime.interval*60*1000).Format("yyyy-MM-dd hh:mm:ss")
+					self.windowTime.left = nRatio;	
 				}
 				/**
 				 * @param {Object} e
@@ -753,12 +761,7 @@
 					e.preventDefault();
 
 					window.removeEventListener("mousemove", _moveHandler);
-					window.removeEventListener("mouseup", _upHandler);
-
-					let nStart = new Date(self.datetime.start).getTime()*(1-nRatio/100) + nRatio/100*(new Date(self.datetime.end).getTime());
-					self.windowTime.start = new Date(nStart).Format("yyyy-MM-dd hh:mm:ss");
-					self.windowTime.end =  new Date(nStart + self.windowTime.interval*60*60*1000).Format("yyyy-MM-dd hh:mm:ss")
-					self.windowTime.left = nRatio;					
+					window.removeEventListener("mouseup", _upHandler);				
 				}
 			
 			},
@@ -770,7 +773,7 @@
 			},
 			// 输入框失去焦点事件,设置视窗。
 			inputTimeBlur () {
-				let nInterval = this.windowTime.interval*60*60*1000,
+				let nInterval = this.windowTime.interval*60*1000,
 					nEnd = new Date(this.windowTime.start).getTime() + nInterval;
 
 				if(Rt.utils.DateDiff(nEnd, this.datetime.end) < 0) {
@@ -784,7 +787,7 @@
 					this.windowTime.end = new Date(nEnd).Format("yyyy-MM-dd hh:mm:ss");	
 				}
 				
-				this.ratio = Rt.utils.DateDiff(this.datetime.start, this.datetime.end)/1000/60/60/this.windowTime.interval;		
+				this.ratio = Rt.utils.DateDiff(this.datetime.start, this.datetime.end)/1000/60/this.windowTime.interval;		
 				// this.$refs.slider.style.width = 100/this.ratio + "%";
 			}
         }
@@ -879,11 +882,13 @@
 					.icon-start {
 						background-color: #fff;
 						margin-left: -20px;
+						top: 0;
 					}
 					.icon-end {
 						float: right;
 						background-color: #fff;
 						margin-right: -20px;
+						top: 0;
 					}
 				}
 				// 滑块。
@@ -943,7 +948,6 @@
 				}
 
 			}
-
     	}
     }
 </style>

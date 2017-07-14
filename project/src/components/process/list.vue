@@ -34,7 +34,7 @@
 					<el-button  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'parameter']" @click="parameterClick">工艺</el-button>
 				</div>
 			</div>			
-			<v-equipment v-if="equipments.length" :equipments="equipments" :process-key="processKey" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
+			<v-equipment v-if="equipments.length" :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
 			<div v-else class="empty">{{empty}}</div>
 		</div>
 		
@@ -77,13 +77,13 @@
 				
 				equipments: [],
 				checkedEquipments: [],
-				// 视窗时间，默认为2小时。
+				// 视窗时间，默认为30分钟。
 				windowTime: {
-					interval: 2,
+					interval: 30,
 					start: "",
 					end: "",
-					min: 2,
-					max: 2,
+					min: 1,
+					max: 30,
 					left: 0
 				},
 				slectedDimension: "",			
@@ -117,7 +117,6 @@
 			 * @return {void}
 			 */
 			setEquipmentList () {
-				
 				let 
 				// 提取选中的工序节点数据。
 					oNode = this.rawData.filter(o => o.key == this.processKey)[0] || {};

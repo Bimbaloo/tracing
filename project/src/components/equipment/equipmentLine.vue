@@ -527,7 +527,7 @@
                                 self.$createElement('ul', {
                                     class: ["content"]
                                 }, Object.keys(oList).map(p => {
-                                    return self.$createElement('li', {}, oList[p] + "：" + item[p])
+                                    return self.$createElement('li', {}, oList[p] + "：" + (item[p] || ""))
                                 }))
                             ]),                                                                
                             self.$createElement('div', {
@@ -588,6 +588,18 @@
 
 <style lang="less">
     @import "../../assets/css/base.less";
+
+    
+    // 展示详情。
+    .detailed {
+        .dimension-content {
+            visibility: visible;					
+        }
+    }
+    .dimension-content {
+        visibility: hidden;					
+    }
+
     .equipment-line {
         width: 100%;
         // border: 1px solid #ccc;
@@ -673,7 +685,7 @@
 
     .dimension-list {
         position: absolute;
-        
+        border-left: 2px solid #42af8f;
         
         &.up {
             top: 0px;
@@ -692,6 +704,8 @@
         }     
 
         .circle {
+            position: relative;
+            left: -5px;
             width: 8px;
             height: 8px;
             border-radius: 4px;
@@ -700,7 +714,7 @@
 
         .dimension-content {
             margin-left: 3px;
-            border-left: 2px solid #42af8f;
+            // border-left: 2px solid #42af8f;
 
             h2 {
                 height: 30px;
