@@ -305,6 +305,7 @@
 			// 初始化数据。
 			setInitData() {
 				// debugger
+				this.show = true;
 				this.ratio = 1;
 				this.startIf = true;
 				this.endIf = true;

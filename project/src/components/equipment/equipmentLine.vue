@@ -10,6 +10,7 @@
 
 <script>
     import Vue from 'vue'
+    import $ from "jquery"
 
     const statusHeight = 14;
 
@@ -129,9 +130,17 @@
                 this.$nextTick(() => {
                     this.setPanelPadding();
                 })
-            }
+            },
+            visible: 'setVisible'
         },
         methods: {
+            //  设置可见性。
+            setVisible() {
+                if(this.visible) {
+                    // 若可见。
+                    $(".dimension-content").show();
+                }
+            },
             getDiffTime() {
                 return Rt.utils.DateDiff(this.dateTime.start, this.dateTime.end);
             },
@@ -354,6 +363,10 @@
                     // 节点内容高度。
                     nHeight = oNode.offsetHeight;
 
+                oNode.style.height = nHeight + "px";
+                
+                // oNode.lastChild.style.top = (nHeight - oNode.lastChild.offsetHeight) + 'px';
+
                 for(let i = 0; i < sLength; i ++) {
                     if(aoDimension[i].key == sType) {
                         // 若初始值小于高度值，更新初始值。
@@ -365,13 +378,13 @@
                                 // 若小于当前节点高度值。
                                 aoDimension[i].top = nHeight;
                             }
-
+                            
                         }else {
                             // 若在状态下方
                             if(aoDimension[i].bottom < nHeight) {
                                 // 若小于当前节点高度值。
                                 aoDimension[i].bottom = nHeight;
-                            }                            
+                            }                          
                         }
         
                         break;
@@ -480,17 +493,21 @@
                             on: {
                                 // 鼠标移入事件。
                                 mouseenter: function (event) {
-                                    let sGroup =  event.target.getAttribute("group-id");
-                                    if(!sGroup) {
-                                        return;
+                                    
+                                    let sGroup =  event.target.getAttribute("group-id"),
+                                        aoNode = [];
+                                    if(sGroup) {
+                                        // 获取groupId相同的节点。
+                                        aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
+                                            if(node ==  event.target) {
+                                                node.setAttribute("data-level", "top");
+                                            }
+                                            return node.getAttribute("group-id") == sGroup;
+                                        });                                        
+                                    }else {
+                                        aoNode.push(event.target);
                                     }
-                                    // 获取groupId相同的节点。
-                                    let aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
-                                        if(node ==  event.target) {
-                                            node.setAttribute("data-level", "top");
-                                        }
-                                        return node.getAttribute("group-id") == sGroup;
-                                    });
+
                                     // 设置激活样式。
                                     aoNode.forEach(o => {
                                         if(o.className.indexOf("actived") < 0) {
@@ -498,7 +515,7 @@
                                         }
 
                                         if(!self.visible) {
-                                            o.querySelector(".dimension-content").style.visibility = "visible";
+                                            o.querySelector(".dimension-content").style.display = "block";
                                         }
 
                                     })
@@ -506,17 +523,20 @@
                                 },
                                 // 鼠标移出事件。
                                 mouseleave: function (event) {
-                                    let sGroup =  event.target.getAttribute("group-id");
-                                    if(!sGroup) {
-                                        return;
-                                    }
+                                    let sGroup =  event.target.getAttribute("group-id"),
+                                        aoNode = [];
+
+                                    if(sGroup) {
                                     // 获取groupId相同的节点。
-                                    let aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
-                                        if(node ==  event.target) {
-                                            node.removeAttribute("data-level");
-                                        }
-                                        return node.getAttribute("group-id") == sGroup;
-                                    });
+                                        aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
+                                            if(node ==  event.target) {
+                                                node.removeAttribute("data-level");
+                                            }
+                                            return node.getAttribute("group-id") == sGroup;
+                                        });
+                                    }else {
+                                        aoNode.push(event.target);
+                                    }
                                     // 取消激活样式。
                                     aoNode.forEach(o => {
                                         if(o.className.indexOf("actived") > -1) {
@@ -524,7 +544,7 @@
                                         }
 
                                         if(!self.visible) {
-                                            o.querySelector(".dimension-content").style.visibility = "hidden";
+                                            o.querySelector(".dimension-content").style.display = "none";
                                         }
                                     })
                                 }
@@ -535,6 +555,7 @@
                             }),
                             self.$createElement('div', {
                                 class: ["dimension-content"]
+
                             }, [
                                 self.$createElement('h2', {}, [
                                     self.$createElement('i', {
@@ -562,6 +583,7 @@
                 if(this.$refs[sType] instanceof Array) {
                     oNode = oNode[0];
                 }
+
                 // 将节点添加到页面中。
                 oNode.appendChild(component.$el);
 
@@ -611,11 +633,11 @@
     // 展示详情。
     .detailed {
         .dimension-content {
-            visibility: visible;					
+            display: block;					
         }
     }
     .dimension-content {
-        visibility: hidden;					
+        display: none;					
     }
 
     .equipment-line {
@@ -762,7 +784,11 @@
         
         &.up {
             top: 0px;
+            .circle:first-child {
+                top: 0px;
+            }
             .circle:last-child {
+                bottom: 0px;
                 background-color: #fff;
                 margin: 3px 0 0;
             }
@@ -770,14 +796,17 @@
         &.down {
             bottom: 0px;
             .circle:first-child {
+                top: 0px;
                 background-color: #fff;
                 margin:  0 0 3px;
             }
-
+            .circle:last-child {
+                bottom: 0px;
+            }
         }     
 
         .circle {
-            position: relative;
+            position: absolute;
             left: -5px;
             width: 8px;
             height: 8px;
@@ -790,6 +819,7 @@
             // border-left: 2px solid #42af8f;
             border: 1px solid transparent;
             border-left-width: 0;
+            margin: 8px 0;
 
             h2 {
                 height: 30px;
