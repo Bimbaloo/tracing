@@ -872,8 +872,11 @@
 			}
 
 			.timeline {
-				margin-top: 20px;
-
+				position: absolute;
+				bottom: 10px;
+				width: 100%;
+				background-color: rgba(255,255,255,0.6);
+				z-index: 1;
 				.line {
 					margin: 0 170px 0 150px;
 					background: url(../../assets/img/line.png) repeat;
