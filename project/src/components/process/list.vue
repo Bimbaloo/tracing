@@ -125,6 +125,7 @@
 			 * @return {void}
 			 */
 			setEquipmentList () {
+				this.slectedDimension = ""  // 路由变化时，选择状态清空
 				let 
 				// 提取选中的工序节点数据。
 					oNode = this.rawData.filter(o => o.key == this.processKey)[0] || {};
