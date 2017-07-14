@@ -103,7 +103,8 @@
 			showMessage() {
 				this.$message({
 					message: this.sErrorMessage,
-					duration: 3000
+					duration: 3000,
+					type: "error"
 				});
 			},
       handleClick(tab, event) {

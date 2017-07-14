@@ -204,7 +204,7 @@
 //						debugger
 						// 保存数据。
 						if(!data.length) {
-							// this.error = "查无数据。"
+							this.error = "查无数据。"
 							console.log("查无数据。");
 						}else {
 							oData.data = this.formatData(data);
@@ -228,7 +228,11 @@
             */
            formatData (aoData) {
            		// 按照条码进行排序。
-				aoData.sort((a, b) => a.barcode>b.barcode);
+//				aoData.sort((a, b) => a.barcode>b.barcode);
+				let that = this;
+				aoData.sort(function(oA,oB) {
+					return that.sortData(oA.barcode,oB.barcode);
+				});
 				
 				let oBarcode = {},
 					nRow = 0,
@@ -270,6 +274,27 @@
                     return;
                 }
                 Rt.utils.printHtml(oTable);              
+            },
+            sortData(param1,param2, sType) {
+
+                // 默认按照从小到大排序。
+                if(sType == "desc") {
+                    // 从大到小时。
+                    [param1,param2] = [param2,param1];                
+                }
+
+                // 根据数据类型设置排序的方式。
+                if(escape(param1).indexOf("%u")>-1) {
+                    // 中文。
+                    return param1.localeCompare(param2);
+                }else if(!isNaN(Number(param1))) {
+                    // 数字。
+                    return param1 - param2;
+                }else {
+                    // 字符串。
+                    return param1 > param2 ? 1:-1;
+                }
+
             }
         }
     }  

@@ -6,7 +6,7 @@
         <div class="flex-wraps">
           <el-tabs v-model="activeKey" type="border-card" class="search-tab" ref="searchTab" @tab-click="handleClick" v-bind:style="{ height: searchTab,position:'absolute' }">
             <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-              <v-panel :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
+              <v-panel :panel-height="panelHeight" :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
             </el-tab-pane>
           </el-tabs>
         </div>
@@ -77,6 +77,7 @@
         categories: [],
         labelWidth: "70px",
         searchTab: "100%",
+        panelHeight: "100%",
         tip: true,
         handleSubmit: this._submitForm,
         sErrorMessage: ""
@@ -121,8 +122,12 @@
       
     },
     mounted() {
+      let that = this;
+    	that.setParamBlockHeight();
+    	
       window.onresize = () => {
-        this.adjustTabHeight;
+//      that.adjustTabHeight,
+        that.setParamBlockHeight();
       }
     },
     methods: {
@@ -189,6 +194,12 @@
         }else {
           this.searchTab = "100%";
         }
+      },
+      // 调整面板中参数设置的高度。
+      setParamBlockHeight() {
+      	let oSearchTab = this.$refs.searchTab.$el;
+      	
+      	this.panelHeight =  oSearchTab.clientHeight - 80;
       },
       // 数据提交
       _submitForm(oConditions) {

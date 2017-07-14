@@ -301,8 +301,9 @@ export default {
             // 判断是否调用成功。
             if(bRight != "0") {
                 // 提示信息。
-                this.sErrorMessage = param.data.errorMsg.message;
-                this.showMessage();
+//              this.sErrorMessage = param.data.errorMsg.message;
+//              this.showMessage();
+                console.log(param.data.errorMsg.message)
                 // 失败后的回调函。
                 fnFail && fnFail();
             }else {
@@ -320,6 +321,8 @@ export default {
         // 获取数据。
         fetchData() {    
             this.loading = true;
+            this.product.out = [];
+            this.product.in = [];
             let oQuery = this.$route.query;
 
             this.$post(url, oQuery)
@@ -339,10 +342,10 @@ export default {
             })
             .catch((err) => {
                 this.loading = false;
-                //  this.error = "查询出错。"
-                this.sErrorMessage = "查询出错。"
-                this.showMessage();
-                this.styleObject.minWidth = 0;          
+//              this.sErrorMessage = "查询出错。"
+//              this.showMessage();
+                this.styleObject.minWidth = 0;   
+                console.log("数据库查询出错。")
             })
         },
         /**

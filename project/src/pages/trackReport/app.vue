@@ -233,7 +233,7 @@
 				// 判断是否调用成功。
 				if(bRight != "0") {
 					// 提示信息。
-					this.error = "查无数据";
+//					this.error = "查无数据";
 					console.warn(param.data.errorMsg.message);
 					// 失败后的回调函。
 					fnFail && fnFail();
@@ -246,7 +246,6 @@
 				this.error = "";
 				this.gridData.data = [];
 				// url:api/v1/trace/down/start-points
-				//console.log(this.url)
              	this.$post(this.url, this.filters)
              	.then((res) => {
 					//debugger
@@ -274,9 +273,9 @@
 					})
              })
              .catch((err) => {
-                 this.gridData.loading = false;
-				 this.error = "查无数据";
-				 console.warn("查询出错。");
+                this.gridData.loading = false;
+//				this.error = "查无数据";
+				console.warn("查询出错。");
              })
 			},
 			fetchDataName() {

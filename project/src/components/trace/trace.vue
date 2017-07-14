@@ -3,7 +3,7 @@
     	<h2 class="content-title">查询结果集</h2>
     	<el-button class="btn btn-plain" @click="onTrace">溯源</el-button>
         <div class="router-content">
-	        <div class="innner-content" style="min-width: 1500px;">
+	        <div class="innner-content" :style="styleObject">
 	            <div v-if="gridData.error" class="error">
 	                {{ gridData.error }}
 	            </div>
@@ -25,6 +25,9 @@
         },
         data () {
             return {
+            	styleObject: {
+                    "min-width": "1500px"
+                },
                 gridData: {
                     url: HOST + "/api/v1/trace/up/start-points",
                     loading: false,
@@ -130,11 +133,14 @@
             },
         	// 获取数据。
             fetchData (oData) {
-                oData.error = oData.data = null
-                oData.loading = true
+                oData.error = null;
+                oData.data = [];
+                oData.loading = true;
 
+                this.styleObject.minWidth = "1500px";
+                
                 let sPath = oData.url;
-
+                
                 this.$ajax.post(sPath, this.$route.query)
                 .then((res) => {
                     oData.loading = false;
@@ -142,23 +148,33 @@
 					
                     if(!res.data.errorCode) {
                         oData.data = res.data.data;
-						if(oData.number > 1000) {
-							this.$alert("查询结果集包含" + oData.number + "条数据，页面显示其中1000条，如需查询全部，请缩小条件范围进行精确查詢。", "提示", {
-					          	confirmButtonText: "确定",
-					          	callback: action => {
-						            this.$message({
-						              type: "info"
-						            });
-					        	}
-					        });
-						}
+//						if(oData.number > 1000) {
+//							this.$alert("查询结果集包含" + oData.number + "条数据，页面显示其中1000条，如需查询全部，请缩小条件范围进行精确查詢。", "提示", {
+//					          	confirmButtonText: "确定",
+//					          	callback: action => {
+//						            this.$message({
+//						              type: "info"
+//						            });
+//					        	}
+//					        });
+//						}
                     }else {
-                    	oData.error = res.data.errorMsg.message;
+//                  	oData.error = res.data.errorMsg.message;
+                    	// 当前是由于数据过多的提示，则显示出来。
+                    	let sError = res.data.errorMsg.message;
+                    	if(sError == "起点记录太多，请更换查询条件") {
+	                    	this.styleObject.minWidth = 0;
+                    		oData.error = sError;
+                    	}else {
+                    		// 其他错误，则直接console
+                    		console.log(sError);
+                    	}
                     }
                 })
                 .catch((err) => {
                     oData.loading = false;
-                    oData.error = "查询出错。"
+//                  oData.error = "查询出错。";
+                    console.log("接口查询出错。")
                 })
             },
             onTrace (event) {
@@ -190,6 +206,7 @@
 	// 	margin-bottom: 10px;
 	// }
 	.error {
+		margin-top: 10px;
 		border: 2px solid #42AF8F;
 	    padding: 20px 12px;
 	    margin-bottom: 30px;

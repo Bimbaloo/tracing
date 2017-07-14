@@ -9,7 +9,7 @@
 				<!-- 分析维度-->
 				<div class="dimension">
                 	<el-checkbox-group v-model="selectedDimension" class="btn-group">
-						<div v-for="obj in dimension" :key="obj.type" class="list-wrap" @mouseenter="showButton(obj, $event)" @mouseleave="hideButton(obj, $event)">
+						<div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'list-wrap']" @mouseenter="showButton(obj, $event)" @mouseleave="hideButton(obj, $event)">
 							<el-checkbox-button :label="obj.type">{{obj.name}}</el-checkbox-button>
 							<div class="link-line" v-show="obj.show"></div>
 							<div class="list-btn-wrap" v-show="obj.show">
@@ -62,6 +62,7 @@
 				dimension: [{
 					name: "质量",
 					type: "3",
+					key: "quality",
 					show: false,
                     list: [{
 						name: "质检",
@@ -79,6 +80,7 @@
 				}, {
 					name: "加工",
 					type: "2",
+					key: "work",
 					show: false,
 					list: [{
 						name: "投产表",
@@ -88,6 +90,7 @@
 				}, {
 					name: "事件",
 					type: "4",
+					key: "event",
 					show: false,
 					list: [{
 						name: "事件记录",
@@ -97,6 +100,7 @@
 				}, {
 					name: "维护",
 					type: "5",
+					key: "repair",
 					show: false,
 					list: [{
 						name: "维护记录",
@@ -106,6 +110,7 @@
 				}, {
 					name: "工具",
 					type: "6",
+					key: "tool",
 					show: false,
 					list: [{
 						name: "刀模具记录",
@@ -113,7 +118,7 @@
 						parameter: ["equipmentId", "startTime", "endTime"]  
                     }]
 				}],
-				selectedDimension: ["2", "3", "4", "5", "6"]
+				selectedDimension: ["2", "3"]
             }
         },
         computed: {
@@ -207,6 +212,13 @@
 </script>
 
 <style lang="less"> 
+    @import "../../assets/css/base.less";
+
+	.border-color(@style) {
+		border-color: @style;
+		border-left-color: @style;		
+	}
+
 	.content-panel {
 		position: relative;
 	}
@@ -247,6 +259,7 @@
 		height: 10px;
 		background: url(../../assets/img/division.png) center center no-repeat;
 	}
+
 	.list-btn-wrap {
 		position: absolute;
 		border: 1px solid #42af8f;
@@ -254,6 +267,7 @@
 		top: 60px;
 		background-color: #fff;
 
+		
 		span {
 			display: inline-block;
 			cursor: pointer;
@@ -314,6 +328,72 @@
 		}
 	}
 
+	.el-checkbox-button:first-child .el-checkbox-button__inner {
+		border-radius: 0;
+		border-left-width: 2px;
+	}
+	.dimension {
+		.quality {
+			.is-checked {
+				.el-checkbox-button__inner {
+					color: #fff;
+					background-color: @quality;			
+				}
+
+			}
+			
+			.el-checkbox-button__inner {
+				.border-color(@quality);				
+			}
+
+			&:hover {
+				.el-checkbox-button__inner {
+					color: #fff;
+					background-color: @quality;
+					.border-color(@quality);	
+				}
+			}
+			&:focus {
+				.el-checkbox-button__inner {
+					color: #fff;
+					background-color: @quality;
+					.border-color(@quality);	
+				}
+			}
+
+		}
+		.el-checkbox-button__orig-checkbox:checked+.el-checkbox-button__inner {
+			box-shadow: none;
+		}
+		.work {
+			.is-checked {
+				.el-checkbox-button__inner {
+					color: #fff;
+					background-color: @work;			
+				}
+			}
+
+			.el-checkbox-button__inner {
+				.border-color(@work);				
+			}
+
+			&:hover {
+				.el-checkbox-button__inner {
+					color: #fff;
+					background-color: @work;
+					.border-color(@work);	
+				}
+			}
+			&:focus {
+				.el-checkbox-button__inner {
+					color: #fff;
+					background-color: @work;
+					.border-color(@work);	
+				}
+			}
+
+		}
+	}
 	
 
 </style>

@@ -28,13 +28,13 @@
 				<!-- 分析维度-->
 				<div class="dimension">
 					<el-radio-group v-model="slectedDimension" class="btn-group" >
-						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type"  >{{obj.name}}</el-radio-button>
+						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type" :class="obj.key" >{{obj.name}}</el-radio-button>
 					</el-radio-group>
 					<!--el-button class="btn btn-plain" v-for="name in dimension" :key="name">{{name}}</el-button-->
-					<el-button  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'parameter']" @click="parameterClick">工艺</el-button>
+					<el-button :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'parameter']" @click="parameterClick">工艺</el-button>
 				</div>
 			</div>			
-			<v-equipment v-if="equipments.length" :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
+			<v-equipment v-if="bShowEq" :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
 			<div v-else class="empty">{{empty}}</div>
 		</div>
 		
@@ -58,19 +58,24 @@
                 node: {},
 				dimension: [{
 					name: "质量",
-					type: "3"
+					type: "3",
+					key: "quality"
 				}, {
 					name: "加工",
-					type: "2"
+					type: "2",
+					key: "work"
 				}, {
 					name: "事件",
-					type: "4"
+					type: "4",
+					key: "event"
 				}, {
 					name: "维护",
-					type: "5"
+					type: "5",
+					key: "repair"
 				}, {
 					name: "工具",
-					type: "6"
+					type: "6",
+					key: "tool"
 				}],
 				checkboxIf: false,
 				checkAll: true,
@@ -97,6 +102,9 @@
 		    },
 			processKey () {
 				return (this.$route.query && this.$route.query.key) || ''
+			},
+			bShowEq() {
+				return this.equipments.length && this.equipments.some(o=>o.shiftStartTime && o.shiftEndTime)
 			}
         },
         created () {
@@ -148,8 +156,27 @@
     }  
 </script>
 
-<style lang="less">    
-	.material-stock  {	
+<style lang="less"> 	
+    @import "../../assets/css/base.less";
+
+	.border-color(@style) {
+		border-color: @style;
+		border-left-color: @style;		
+	}
+
+	.material-stock {	
+		.el-radio-button:first-child .el-radio-button__inner {
+			border-left: 2px solid rgb(191, 217, 212); 
+    		border-radius: 0; 
+    		box-shadow: none;
+		}
+		.el-checkbox-button__inner, .el-radio-button__inner {
+			padding: 6px 8px;
+			border-radius: 0;
+			border-color: #42af8f;
+			border-width: 2px;
+			border-left: 2px solid #42af8f;
+		}
 		.content-panel {
 			border: 1px solid #ccc;
 			// padding: 10px;
@@ -229,14 +256,71 @@
 						}						
 					}
 
-					.el-checkbox-button__inner, .el-radio-button__inner {
-						padding: 6px 8px;
-						border-radius: 0;
-						border-color: #42af8f;
-						border-width: 2px;
-						border-left: 2px solid #42af8f;
-					}
+
 					 
+				}
+			}
+
+			.dimension {
+				.quality {
+					&.is-active {
+						.el-radio-button__inner {
+							color: #fff;
+							background-color: @quality;			
+						}
+
+					}
+					
+					.el-radio-button__inner {
+						.border-color(@quality);				
+					}
+
+					&:hover {
+						.el-radio-button__inner {
+							color: #fff;
+							background-color: @quality;
+							.border-color(@quality);	
+						}
+					}
+					&:focus {
+						.el-radio-button__inner {
+							color: #fff;
+							background-color: @quality;
+							.border-color(@quality);	
+						}
+					}
+
+				}
+				.el-radio-button__orig-radio:checked+.el-radio-button__inner {
+					box-shadow: none;
+				}
+				.work {
+					&.is-active {
+						.el-radio-button__inner {
+							color: #fff;
+							background-color: @work;			
+						}
+					}
+
+					.el-radio-button__inner {
+						.border-color(@work);				
+					}
+
+					&:hover {
+						.el-radio-button__inner {
+							color: #fff;
+							background-color: @work;
+							.border-color(@work);	
+						}
+					}
+					&:focus {
+						.el-radio-button__inner {
+							color: #fff;
+							background-color: @work;
+							.border-color(@work);	
+						}
+					}
+
 				}
 			}
 

@@ -212,8 +212,9 @@
             },
             // 获取参数。
 			fetchData(oData) {
-				oData.error = oData.data = null
-				oData.loading = true
+				oData.error = null;
+				oData.data = [];
+				oData.loading = true;
 
 				let sPath = oData.url;
 
@@ -226,13 +227,15 @@
 							oData.data = res.data.data;
 							this.styleObject.minWidth = "1200px";
 						}else {
-							this.styleError.maxHeight = this.adjustHeight()-50+"px"
-							oData.error = res.data.errorMsg.message;
+							this.styleError.maxHeight = this.adjustHeight()-50+"px";
+//							oData.error = res.data.errorMsg.message;
+							console.log(res.data.errorMsg.message);
 						}
 					})
 					.catch((err) => {
 						oData.loading = false;
-						oData.error = "查询出错。"
+//						oData.error = "查询出错。"
+						console.log("接口查询出错。");
 						if(this.outstockData.error && this.instockData.error) {
 							this.styleObject.minWidth = 0;
 							this.styleError.maxHeight = this.adjustHeight()-50+"px"

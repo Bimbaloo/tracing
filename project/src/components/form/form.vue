@@ -24,6 +24,7 @@
             keys: Object,
             items: Array,
             tab: String,
+            subTab: String,
             handleSubmit: Function          
         },
         components: {
@@ -32,13 +33,27 @@
             'v-datetime': DateTime
         },
         data() {
+        	let oFormData = {};
+            this.items.forEach(o => {
+            	if(this.subTab == this.active.radio) {
+                    oFormData[o.key] = this.active.keys[o.key] || "";
+            	}else {
+            		oFormData[o.key] = "";
+            	}
+            });
+            
             return {
+            	ruleForm: oFormData
             };
         },
         watch: {
         	keys: {
         		handler: function() {
-        			this.$nextTick(() => this.resetForm('ruleForm'));
+        			this.$nextTick(() => {
+        				if(Object.values(this.ruleForm).every(o=>!o)) {
+	        				this.resetForm('ruleForm')
+        				}
+        			});
         		},
         		deep: true
         	}
@@ -50,7 +65,7 @@
             // })
         },
         computed: {
-            ruleForm: function() {
+            ruleForms: function() {
                 let oFormData = {};
                 this.items.forEach(o => {
                     oFormData[o.key] = this.active.keys[o.key] || '';
@@ -130,7 +145,7 @@
 	            		callback();
 	            	}else {
 	            		// 否则。
-	            		callback(new Error(aJudgeName.join(",")+(aJudgeName.length != 1?"其中一项":"")+"不能为空"));
+	            		callback(new Error(aJudgeName.join(",")+(aJudgeName.length == 1?"不能为空":"必填其中一项")));
 	            	}
 	            	
 	            },
@@ -228,7 +243,6 @@
             },
             resetForm(formName) {
             	// 清空所有数据。
-            	console.log(this.ruleForm)
                 this.$refs[formName].resetFields();
 //          	for(let key in this.ruleForm) {
 //          		this.ruleForm[key] = "";

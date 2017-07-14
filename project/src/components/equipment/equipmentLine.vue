@@ -4,7 +4,7 @@
             <div>{{info.startTime}}~{{info.endTime}}</div>
         </div-->
         <div class="status-line" ref="line"></div>
-        <div v-for="info in dimension" v-show="selectedDimension.indexOf(info.type)>-1" :ref="info.key"></div>
+        <div v-for="info in dimension" v-show="selectedDimension.indexOf(info.type)>-1" :ref="info.key" :class="info.key"></div>
     </div>
 </template>
 
@@ -15,6 +15,7 @@
 
     export default{
         props: {
+            visible: Boolean,
 			euqipmentStatus: Array,
             euqipmentWork: Object,
             euqipmentQuality: Object,
@@ -289,7 +290,9 @@
              */            
             setPanelPadding () {     
                 let oDimension = {};
-
+  
+                this.top = 14;
+                this.bottom = 14;
                 if(!this.selectedDimension.length || (this.selectedDimension.length == 1 && !this.selectedDimension[0])) {
                     // 若无选中。
                     this.top = statusHeight;
@@ -327,10 +330,10 @@
                         let com = oData.node;
                         if(oData.class == "up") {
                             // 若分布在状态轴上方。
-                            com.style.top = (this.top - com.offsetHeight) + "px";
+                            com.style.top = (this.top - com.offsetHeight - 3) + "px";
                         }else {
                             // 若分布在状态轴下方。
-                            com.style.bottom = (this.bottom - com.offsetHeight) + "px";
+                            com.style.bottom = (this.bottom - com.offsetHeight - 3) + "px";
                         }
                         
                     })
@@ -483,14 +486,23 @@
                                     }
                                     // 获取groupId相同的节点。
                                     let aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
-                                        return node.getAttribute("group-id") == sGroup && node != event.target;
+                                        if(node ==  event.target) {
+                                            node.setAttribute("data-level", "top");
+                                        }
+                                        return node.getAttribute("group-id") == sGroup;
                                     });
                                     // 设置激活样式。
                                     aoNode.forEach(o => {
                                         if(o.className.indexOf("actived") < 0) {
                                             o.className += " actived";
                                         }
+
+                                        if(!self.visible) {
+                                            o.querySelector(".dimension-content").style.visibility = "visible";
+                                        }
+
                                     })
+
                                 },
                                 // 鼠标移出事件。
                                 mouseleave: function (event) {
@@ -500,12 +512,19 @@
                                     }
                                     // 获取groupId相同的节点。
                                     let aoNode = Array.prototype.filter.call(event.target.parentElement.querySelectorAll(".dimension-list"), node =>{
-                                        return node.getAttribute("group-id") == sGroup && node != event.target;
+                                        if(node ==  event.target) {
+                                            node.removeAttribute("data-level");
+                                        }
+                                        return node.getAttribute("group-id") == sGroup;
                                     });
                                     // 取消激活样式。
                                     aoNode.forEach(o => {
                                         if(o.className.indexOf("actived") > -1) {
                                             o.className = o.className.split(" ").filter(sClass => sClass != "actived").join(" ");
+                                        }
+
+                                        if(!self.visible) {
+                                            o.querySelector(".dimension-content").style.visibility = "hidden";
                                         }
                                     })
                                 }
@@ -527,7 +546,7 @@
                                 self.$createElement('ul', {
                                     class: ["content"]
                                 }, Object.keys(oList).map(p => {
-                                    return self.$createElement('li', {}, oList[p] + "：" + (item[p] || ""))
+                                    return self.$createElement('li', {}, oList[p] + '：' + (item[p] == undefined ? '':item[p]))
                                 }))
                             ]),                                                                
                             self.$createElement('div', {
@@ -589,7 +608,6 @@
 <style lang="less">
     @import "../../assets/css/base.less";
 
-    
     // 展示详情。
     .detailed {
         .dimension-content {
@@ -683,6 +701,61 @@
         }
     }
 
+    .work {
+        .dimension-list {
+             border-left-color: @work;
+
+            .circle {
+                background-color: @work;
+            }
+
+            .dimension-content {
+                h2 {
+                    color: @work;
+                }
+            }
+            
+            &:hover, &.actived {
+                h2 {
+                    color: #fff;
+                    background-color: @work;
+                } 
+            }
+            &:hover, &.actived {
+                .dimension-content {
+                    border-color: @work;
+                }
+            }
+        }
+    }
+    .quality {
+        .dimension-list {
+             border-left-color: @quality;
+
+            .circle {
+                background-color: @quality;
+            }
+
+            .dimension-content {
+                h2 {
+                    color: @quality;
+                }
+            }
+            
+            &:hover, &.actived {
+                h2 {
+                    color: #fff;
+                    background-color: @quality;
+                } 
+            }
+
+            &:hover, &.actived {
+                .dimension-content {
+                    border-color: @quality;
+                }
+            }
+        }
+    }
     .dimension-list {
         position: absolute;
         border-left: 2px solid #42af8f;
@@ -691,14 +764,14 @@
             top: 0px;
             .circle:last-child {
                 background-color: #fff;
-                margin: 3px 0;
+                margin: 3px 0 0;
             }
         }
         &.down {
             bottom: 0px;
             .circle:first-child {
                 background-color: #fff;
-                margin: 3px 0;
+                margin:  0 0 3px;
             }
 
         }     
@@ -713,8 +786,10 @@
         }
 
         .dimension-content {
-            margin-left: 3px;
+            // margin-left: 3px;
             // border-left: 2px solid #42af8f;
+            border: 1px solid transparent;
+            border-left-width: 0;
 
             h2 {
                 height: 30px;
@@ -743,7 +818,13 @@
             }
         }
 
+        &[data-level=top] {
+            &:hover, &.actived {
+                z-index: 1001;
+            }
+        }
         &:hover, &.actived {
+            z-index: 1000;
             h2 {
                 background-color: #42af8f;
                 color: #fff;
@@ -773,7 +854,11 @@
             .icon-tool {
                 background-position: -@px20 -19*@px20;
             }
+            
+            .dimension-content {
+                background-color: #fff;
 
+            }
         }
     }
 </style>

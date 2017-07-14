@@ -581,6 +581,11 @@
 				this.sErrorMessage = '';
 				this.loading = true;
 				
+				// 初始设置内容为空。
+				for(let param in this.reportData) {
+					this.reportData[param].data = [];
+				}
+				
 				let oQuery = this.query;
 
 				if(this.type == "trace") {
@@ -639,16 +644,18 @@
 						})
 						if(!bSetWidth) {
 							this.$emit("noData");
-							this.error = "查无数据。"
+//							this.error = "查无数据。"
+							console.log("查无数据。")
 						}
 						
 					})
 					.catch((err) => {
 						this.loading = false;
 
-						this.sErrorMessage = "查询出错。"
-						this.showMessage();
+//						this.sErrorMessage = "查询出错。";
+//						this.showMessage();
 						this.$emit("noData");
+						console.log("查询出错。")
 					})
 					
 			},

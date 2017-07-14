@@ -399,37 +399,37 @@
 												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
 													<div class="item-type">{{getTimeLineTypeInfo(item.type).text}} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 
+														<span class="tips">{{ item.personName || "-" }}</span> 
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span>
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName }}</span>
-														<span class="tips">{{ item.quantity }}</span> 件，入库到
-														<span class="tips">{{ item.warehouse }}</span>
-														<span class="tips">{{ item.reservoir }}</span>
+														的 <span class="tips">{{ item.materialName || "-" }}</span>
+														<span class="tips">{{ item.quantity || "-" }}</span> 件，入库到
+														<span class="tips">{{ item.warehouse || "-" }}</span>
+														<span class="tips">{{ item.reservoir || "-" }}</span>
 													</div>
 												</div>
 												<div class="sub-item" v-else-if="getTimeLineTypeInfo(item.type).type==2">
 													<div class="item-type">{{ item.processName+getTimeLineTypeInfo(item.type).text }} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 在
-														<span class="tips">{{ item.equipmentName }}</span> 设备上
+														<span class="tips">{{ item.personName || "-" }}</span> 在
+														<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName }}</span> 物料
+														的 <span class="tips">{{ item.materialName || "-" }}</span> 物料
 														{{ getTimeLineTypeInfo(item.type).text }}
 													</div>
 												</div>
 												<div class="sub-item" v-else>
 													<div class="item-type">{{ getTimeLineTypeInfo(item.type).text }} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 
+														<span class="tips">{{ item.personName || "-" }}</span> 
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														，在<span class="tips">{{ item.equipmentName }}</span> 设备上产出的
-														<span class="tips">{{ item.materialName }}</span> 物料
+														，在<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上产出的
+														<span class="tips">{{ item.materialName || "-" }}</span> 物料
 														{{ getTimeLineTypeInfo(item.type).text }}，共计
-														<span class="tips">{{ item.quantity }}</span> 件，结果为
-														<span class="tips">{{ item.checkResult }}</span>
+														<span class="tips">{{ item.quantity || "-" }}</span> 件，结果为
+														<span class="tips">{{ item.checkResult || "-" }}</span>
 													</div>
 												</div>
 											</div>
@@ -460,37 +460,37 @@
 												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
 													<div class="item-type">{{getTimeLineTypeInfo(item.type).text}} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 
+														<span class="tips">{{ item.personName || "-" }}</span> 
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span>
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName }}</span>
-														<span class="tips">{{ item.quantity }}</span> 件，入库到
-														<span class="tips">{{ item.warehouse }}</span>
-														<span class="tips">{{ item.reservoir }}</span>
+														的 <span class="tips">{{ item.materialName || "-" }}</span>
+														<span class="tips">{{ item.quantity || "-" }}</span> 件，入库到
+														<span class="tips">{{ item.warehouse || "-" }}</span>
+														<span class="tips">{{ item.reservoir || "-" }}</span>
 													</div>
 												</div>
 												<div class="sub-item" v-else-if="getTimeLineTypeInfo(item.type).type==2">
 													<div class="item-type">{{ item.processName+getTimeLineTypeInfo(item.type).text }} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 在
-														<span class="tips">{{ item.equipmentName }}</span> 设备上
+														<span class="tips">{{ item.personName || "-" }}</span> 在
+														<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName }}</span> 物料
+														的 <span class="tips">{{ item.materialName || "-" }}</span> 物料
 														{{ getTimeLineTypeInfo(item.type).text }}
 													</div>
 												</div>
 												<div class="sub-item" v-else>
 													<div class="item-type">{{ getTimeLineTypeInfo(item.type).text }} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 
+														<span class="tips">{{ item.personName || "-" }}</span> 
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														，在<span class="tips">{{ item.equipmentName }}</span> 设备上产出的
-														<span class="tips">{{ item.materialName }}</span> 物料
+														，在<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上产出的
+														<span class="tips">{{ item.materialName || "-" }}</span> 物料
 														{{ getTimeLineTypeInfo(item.type).text }}，共计
-														<span class="tips">{{ item.quantity }}</span> 件，结果为
-														<span class="tips">{{ item.checkResult }}</span>
+														<span class="tips">{{ item.quantity || "-" }}</span> 件，结果为
+														<span class="tips">{{ item.checkResult || "-" }}</span>
 													</div>
 												</div>
 											</div>

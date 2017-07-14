@@ -5,8 +5,8 @@
 			<label>视窗时间：</label><el-input v-model="windowTime.interval" class="time" type="number" :min="windowTime.min" :max="windowTime.max" @blur="inputTimeBlur"></el-input><label>分钟</label>
 			<span>{{windowTime.start}}</span><span class="split">~</span>
 			<span>{{windowTime.end}}</span>
-			<!--i class="icon icon-20 icon-show" v-if="show" @click="show=false"></i>
-			<i class="icon icon-20 icon-hide" v-else @click="show=true"></i-->
+			<i class="icon icon-20 icon-show" v-if="show" @click="show=false"></i>
+			<i class="icon icon-20 icon-hide" v-else @click="show=true"></i>
 			<div class="legend">
 				<span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
 			</div>
@@ -20,6 +20,7 @@
 					v-for="(info,index) in equipments" 
 					v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected" 
 					:key="info.equipmentId" 
+					:visible="show"
 					:euqipment-index="index" 
 					:euqipment-status="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].status" 
 					:euqipment-work="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].work" 
