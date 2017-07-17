@@ -8,7 +8,7 @@ import axios from 'axios'
 
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
-import 'assets/js/html2canvas.js'
+//import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'
 
 Vue.use(VueRouter)

@@ -382,7 +382,10 @@
                     return;
                 }
 				oPrint.innerHTML = oTable.innerHTML;
-                window.Rt.utils.printHtml(oPrint,null,true);
+                window.Rt.utils.printHtml(oPrint,{
+                	height: oPrint.clientHeight,
+                	width: 1500
+                },true);
             }
         }
     }  

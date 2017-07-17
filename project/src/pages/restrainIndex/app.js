@@ -7,16 +7,15 @@ import axios from 'axios'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
 import 'assets/css/icon.less'
-//import 'assets/js/html2canvas.js'
+import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'
 
 Vue.use(ElementUI)
-
 Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
 Vue.prototype.$post = axios.post;
 
-new Vue({
-  el: '#app',
-  render: h => h(App)
-})
+var vm = new Vue({
+	el: '#app',
+	render: h => h(App)
+});

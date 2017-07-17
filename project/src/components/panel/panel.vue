@@ -32,7 +32,8 @@
             labelWidth: String,
             category: Object,
             handleSubmit: Function,
-            panelHeight: Number
+            panelHeight: Number,
+            activeTab: String
         },
         data () {
             return {
@@ -58,6 +59,11 @@
         watch: {
         	panelHeight: function() {
         		this.setPanelHeight();
+        	},
+        	activeTab: function() {
+        		if(this.activeTab == this.category.key) {
+        			this.setPanelHeight();
+        		}
         	}
         },
         created () {
@@ -75,7 +81,6 @@
         methods: {
         	setPanelHeight() {
         		let oPanelTitle = this.$refs.panelTitle;
-        		
         		if(oPanelTitle) {
 	        		this.sPanelHeight = (this.panelHeight - oPanelTitle.clientHeight)+ "px"
         		}

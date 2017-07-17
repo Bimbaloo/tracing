@@ -3,6 +3,7 @@
     :data="dataArray"
     stripe
     border
+    @filter-change="filterChange"
     @selection-change="selectionChange"
     @cell-click="cellClick"
     class="table"
@@ -61,6 +62,9 @@
             },
             selectionChange (selection) {
             	this.tableData.selected = selection;
+            },
+            filterChange (filters) {
+                this.tableData.filterChange && this.tableData.filterChange(filters);
             }
         }
     }

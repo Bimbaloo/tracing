@@ -94,7 +94,8 @@
 	 * # }
 	 * @return {void}
 	 */
-	window.Rt.utils.exportJson2Excel = function(XLSX, Blob, FileSaver, oData) {
+	window.Rt.utils.exportJson2Excel = function(XLSX, Blob, FileSaver, oTableData) {
+		let oData = Object.assign({}, oTableData);
 
 		let aoTableJson = [];
 
@@ -106,6 +107,11 @@
 			aoTableJson = oData.data || [];
 		}else if(oData.data && oData.data.length){
 			// 若有表头配置数据,且有数据。
+			if(oData.filteredData && oData.filteredData.length) {
+				// 若有过滤数据，打印过滤数据。
+				oData.data = oData.filteredData;
+			}
+
 			oData.data.map(o => {
 				let oNewData = {};
 

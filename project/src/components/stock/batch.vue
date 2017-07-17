@@ -196,7 +196,12 @@
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
-			'$route': 'fetchPage'
+			'$route': 'fetchPage',
+			// 在物料仓储时，放大处理。
+			'$store.state.fullscreen': function() {
+				// 修改页面的内容的高度。
+				this.outstockData.height = this.instockData.height=this.adjustHeight();
+			}
 		},
 		methods: {
 			 // 查询。
@@ -257,9 +262,9 @@
 					if(sKey != undefined && sKey !== "") {
 						sPath = `/stock/${sKey}/restrain`;			
 					}else {
-							sPath = "/stock/restrain"
-						}		
-				this.$router.push({ path: sPath, query: this.$route.query})
+						sPath = "/stock/restrain"
+					}		
+					this.$router.push({ path: sPath, query: this.$route.query})
 				}else{
 					console.log("该功能将在后续开发，敬请期待...")
 				}

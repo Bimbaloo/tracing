@@ -1004,25 +1004,29 @@
 				 }
 					
 				// 时间轴。
-				html2canvas(jNow.get(0),{
-					height: jNow.outerHeight(true) + 100,
-					background: "#1d272f",
-					onrendered:function(canvas) {
-						var sImg = canvas.toDataURL("image/png");
-							
-						// 打印
-						var w = window.open("about:blank","image from cancas");
-						w.document.write("<img src='"+sImg+"' alt='from canvas'>")
-					
-						setTimeout(function() {
-							w.print();
-							
-							w.close();
-						},200)
-						// 重置复制内容。
-						jClone.html("");
-					}
-				});
+				window.Rt.utils.printHtml(jNow.get(0),{
+					height: jNow.outerHeight(true) + 200,
+					background: "#1d272f"
+                },true);
+//				html2canvas(jNow.get(0),{
+//					height: jNow.outerHeight(true) + 200,
+//					background: "#1d272f",
+//					onrendered:function(canvas) {
+//						var sImg = canvas.toDataURL("image/png");
+//							
+//						// 打印
+//						var w = window.open("about:blank","image from cancas");
+//						w.document.write("<img src='"+sImg+"' alt='from canvas'>")
+//					
+//						setTimeout(function() {
+//							w.print();
+//							
+//							w.close();
+//						},200)
+//						// 重置复制内容。
+//						jClone.html("");
+//					}
+//				});
 			}
 		}
 		
@@ -1084,7 +1088,7 @@
 		}
 		.time-line;
 		
-		.item-node {
+		/*.item-node {
 			.node-outer {
 				border-radius: 0;
 				.node-inner {
@@ -1100,7 +1104,7 @@
 					border-radius: 0;
 				}
 			}
-		}
+		}*/
 	}
 	.resume-wraps {
 		.resume-content-wrap {

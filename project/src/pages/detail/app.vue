@@ -6,7 +6,7 @@
         <div class="flex-wraps">
           <el-tabs v-model="activeKey" type="border-card" class="search-tab" ref="searchTab" @tab-click="handleClick" v-bind:style="{ height: searchTab,position:'absolute' }">
             <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-              <v-panel :panel-height="panelHeight" :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
+              <v-panel :active-tab="activeKey" :panel-height="panelHeight" :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
             </el-tab-pane>
           </el-tabs>
         </div>

@@ -276,7 +276,9 @@
                 if(!oTable) {
                     return;
                 }
-                window.Rt.utils.printHtml(oTable);              
+                window.Rt.utils.printHtml(oTable,{
+                	height: oTable.clientHeight * 1.5
+                });
             },
             sortData(param1,param2, sType) {
 

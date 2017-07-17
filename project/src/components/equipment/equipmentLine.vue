@@ -837,6 +837,7 @@
     .status-line {
         height: 14px;
         position: relative;
+        background-color: #dedede;
     }
 
     .status {

@@ -125,15 +125,43 @@
 			 * @return {void}
 			 */
 			setEquipmentList () {
-				this.slectedDimension = ""  // 路由变化时，选择状态清空
+				this.slectedDimension = "";  // 路由变化时，选择状态清空
+				this.equipments = [];
+				
 				let 
 				// 提取选中的工序节点数据。
 					oNode = this.rawData.filter(o => o.key == this.processKey)[0] || {};
 
 				this.node = oNode;	
 				this.checkedEquipments = [];
-				// this.node.processInfoList && this.node.processInfoList.map(o => o.actived = true);	
-				this.equipments = this.node.processInfoList || [];
+
+				let oEquipments = {}; 	
+				this.node.processInfoList && this.node.processInfoList.forEach(o => {
+					if(!oEquipments[o.equipmentId]) {
+						oEquipments[o.equipmentId] = [];
+					}
+					oEquipments[o.equipmentId].push(o);
+				})
+
+				for(let p in oEquipments) {
+					let sStart = "",
+						sEnd = "";
+
+					oEquipments[p].sort((a, b) => a.shiftStartTime > b.shiftStartTime);
+					// 最早班次开始时间。
+					sStart = oEquipments[p][0].shiftStartTime;
+					oEquipments[p].sort((a, b) => a.shiftEndTime < b.shiftEndTime);
+					// 最晚班次结束时间。
+					sEnd = oEquipments[p][0].shiftEndTime;
+
+					this.equipments.push({
+						equipmentId: oEquipments[p][0].equipmentId,
+						equipmentName: oEquipments[p][0].equipmentName,
+						shiftStartTime: sStart,
+						shiftEndTime:　sEnd
+					})
+				}
+				
 				this.equipments.forEach(o => this.checkedEquipments.push(o.equipmentId));	
 			},
 		   	handleCheckAllChange(event) {

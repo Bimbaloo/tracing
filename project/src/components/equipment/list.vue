@@ -15,7 +15,8 @@
 			<div class="name">
 				<label @click="showEquipmentDetail(info)" v-for="info in equipments" v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected">{{info.equipmentName}}<i class="el-icon-d-arrow-right"></i></label>
 			</div>
-			<div class="equipment">
+			<div v-if="sErrorMessage" class="empty">{{ sErrorMessage }}</div>
+			<div v-else class="equipment">
 				<v-equipmentLine 
 					v-for="(info,index) in equipments" 
 					v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected" 
@@ -197,7 +198,7 @@
 				},{
 					key: "close",
 					name: "关机",
-					color: "#cccccc"
+					color: "#999"
 				}],				
 				startIf: true,
 				endIf: true,
@@ -286,7 +287,12 @@
 				this.equipments.forEach(o => this.equipmentData[o.equipmentId] && (this.equipmentData[o.equipmentId].selected = this.checkedEquipments.indexOf(o.equipmentId) > -1))			
 			},
 			// 为了每次点击都会查询。
-			"$route": "init"
+			"$route": function() {
+				if(typeof this.dimensionData == "string") {
+					// 设备列表页面。
+					this.init();
+				}			
+			}
         },
         methods: {
 			init() {
@@ -295,9 +301,11 @@
 				this.setWindowTime();
 
 				if(typeof this.dimensionData == "string") {
+					// 设备列表页面。
 					// 查询设备状态。
 					this.fetchData("1");
 				}else {
+					// 设备详情页面。
 					// 获取所有数据。
 					this.fetchAllData();
 				}
@@ -368,8 +376,10 @@
 				// 判断是否调用成功。
 				if(bRight != "0") {
 					// 提示信息。
-					this.sErrorMessage = param.data.errorMsg.message;
-					this.showMessage();
+//					this.sErrorMessage = param.data.errorMsg.message;
+//					this.showMessage();
+					this.sErrorMessage = "暂无数据";
+					console.log(param.data.errorMsg.message);
 					// 失败后的回调函。
 					fnFail && fnFail();
 				}else {
@@ -474,8 +484,10 @@
 				})
 				.catch((err) => {
 					this.loading = false;
-				 	this.sErrorMessage = "查询出错";  
-				 	this.showMessage();
+//				 	this.sErrorMessage = "查询出错";  
+//				 	this.showMessage();
+				 	this.sErrorMessage = "暂无数据";
+					console.log("查询出错");
 				})
 			},
 			/**
@@ -510,8 +522,10 @@
 				})
 				.catch((err) => {
 					this.loading = false;
-				 	this.sErrorMessage = "查询出错";  
-				 	this.showMessage();
+//				 	this.sErrorMessage = "查询出错";  
+//				 	this.showMessage();
+				 	this.sErrorMessage = "暂无数据";
+					console.log("查询出错");
 				})
            	},
 			/**
@@ -883,6 +897,9 @@
 							margin-left: 10px;
 						}	
 					}
+				}
+				.empty {
+					margin-top: 20px;
 				}
 				.equipment {
 					flex: 1 1;

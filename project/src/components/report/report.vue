@@ -167,7 +167,11 @@
 					},
 					// 发货。
 					delivered: {
-						filename: "发货",					
+						filename: "发货",	
+						filteredData: [],	
+						filterChange: (filters) => {
+							this.filterChange(filters, 'delivered');
+						},		
 						columns: [{
 							prop: "barcode",
 							name: "条码",
@@ -201,13 +205,7 @@
 							prop: "customer",
 							name: "客户",
 							sortable: true,
-							filters: [{
-								"text": "上海通用",
-								"value": "上海通用"
-							},{
-								"text": "通用",
-								"value": "通用"
-							}],
+							filters: [],
 							filterMethod: function(value, row) {
 						        return row.customer === value;
 						   	},
@@ -254,7 +252,11 @@
 					},
 					// 出库。
 					outStocks: {
-						filename: "出库",						
+						filename: "出库",		
+						filteredData: [],	
+						filterChange: (filters) => {
+							this.filterChange(filters, 'outStocks');
+						},			
 						columns: [{
 							prop: "barcode",
 							name: "条码",
@@ -291,10 +293,7 @@
 							prop: "customer",
 							name: "客户",
 							sortable: true,
-							filters: [{
-								"text": "客户",
-								"value": "客户"
-							}],
+							filters: [],
 							filterMethod: function(value, row) {
 						        return row.customer === value;
 						   	},
@@ -329,7 +328,11 @@
 					},
 					// 在库
 					inStocks: {		
-						filename: "在库",					
+						filename: "在库",	
+						filteredData: [],	
+						filterChange: (filters) => {
+							this.filterChange(filters, 'inStocks');
+						},				
 						columns: [{
 							prop: "barcode",
 							name: "条码",
@@ -370,10 +373,7 @@
 							prop: "customer",
 							name: "客户",
 							sortable: true,
-							filters: [{
-								"text": "客户",
-								"value": "客户"
-							}],
+							filters: [],
 							filterMethod: function(value, row) {
 						        return row.customer === value;
 						   	},
@@ -625,11 +625,12 @@
 						this.loading = false;					
 						let bSetWidth = false;
 						this.judgeLoaderHandler(res, () => {
+							
 							let oData = this.reportData;
 							for(let p in oData) {
 								
 								oData[p].data = res.data.data[p];
-							
+								oData[p].filteredData = oData[p].data;
 								if(res.data.data[p].length && !bSetWidth) {
 									bSetWidth = true;
 									// 设置最小宽度。
@@ -640,13 +641,16 @@
 									// 若为汇总信息。
 									oData[p].data.map(o => {
 										if(o.quantity) {
-											//debugger
+											
 											o.rate = (o.qualifiedNum/o.quantity).toFixed(4);  //保留小数点后两位
 										}else {
 											o.rate = 0;
 										}
 									})
 								}
+								
+								this.setFilters(oData[p]);
+
 							}						
 						})
 						if(!bSetWidth) {
@@ -665,6 +669,50 @@
 						console.log("查询出错。")
 					})
 					
+			},
+			// 设置过滤。
+			setFilters(oData) {
+				
+				let aoColumns = oData.columns,
+					aoData = oData.data;
+				
+				for(let i = 0, l = aoColumns.length; i < l; i ++)  {
+					if(aoColumns[i].prop == "customer") {
+						// 若有客户信息。
+						let oFilter = {};
+						
+						aoData.map(o => {
+							if(!oFilter[o.customer]) {
+								oFilter[o.customer] = 1;
+							}
+						});
+
+						Object.keys(oFilter).map(key => aoColumns[i].filters.push({
+							text: key,
+							value: key
+						}))
+
+						break;
+					}
+				}
+
+			},
+			/**
+			 * 表格筛选变化。
+			 * @param {Object} filters
+			 * @param {String} param
+			 * @return {void}
+			 */
+			filterChange(filters, param) {
+				let selected = [];
+
+				for(let p in filters) {
+					selected = filters[p];
+				}
+				debugger
+				// 设置过滤数据。
+				selected.map(s => this.reportData[param].filteredData = this.reportData[param].data.filter(o => o.customer == s))
+						
 			},
 			setSequence() {
 				if(this.type == "trace") {
@@ -705,43 +753,46 @@
 			}
 		}
 
-
-	.actived {
-		.icon-excel, .icon-print {
-			margin-left: 10px;
-			position: relative;
-			top: -2px;
-			display: inline-block;
-			cursor: pointer;
+		.actived {
+			.icon-excel, .icon-print {
+				margin-left: 10px;
+				position: relative;
+				top: -2px;
+				display: inline-block;
+				cursor: pointer;
+			}
+			.el-icon-d-arrow-right {
+				display: none;
+			}
+			.content-title {
+				color: #333;
+			}
+			.content-table.inner {
+				display: block;
+			}
 		}
 		.el-icon-d-arrow-right {
-			display: none;
+			font-size: 14px;
 		}
 		.content-title {
-			color: #333;
+			color: #42AF8F;
+
+			&:hover {
+				color: #42AF8F;
+				cursor: pointer;
+			}
 		}
 		.content-table.inner {
-			display: block;
+			display: none;
 		}
-	}
-	.el-icon-d-arrow-right {
-		font-size: 14px;
-	}
-	.content-title {
-		color: #42AF8F;
+		.inner-title {
+				color: #42AF8F;
+				margin: 13px 0;
+				text-indent: 10px;
+		}
 
-		&:hover {
-			color: #42AF8F;
-			cursor: pointer;
+		.el-table th>.cell.highlight {
+			color: #f9ff00;
 		}
 	}
-	.content-table.inner {
-		display: none;
-	}
-	.inner-title {
-			color: #42AF8F;
-			margin: 13px 0;
-			text-indent: 10px;
-	}
-}
 </style>
