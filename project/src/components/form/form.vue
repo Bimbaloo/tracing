@@ -1,7 +1,8 @@
 <template>
-    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="labelWidth">
+    <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="labelWidth" @keyup.enter.native="submitForm('ruleForm')" >
         <el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
             <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
+			<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
         </el-form-item>
         <div  :class="['form-button', { 'form-button-last': active.radio === '4' && items.length > 10 }]">
             <el-button class="btn" type="primary" @click="submitForm('ruleForm')">查询</el-button>
