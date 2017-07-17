@@ -1,6 +1,6 @@
 <template>
     <div class="equipment-line" :style="{width: ratio*100 + '%', left: (-windowTime.left)*ratio + '%', 'padding-top': (top-14) + 'px', 'padding-bottom': (bottom-14) + 'px'}" ref="wrap">
-        <!--div v-for="(info,index) in status" :key="index" :data-type="info.type" class="status" :style="{left: Rt.utils.DateDiff(info.startTime, datetime.start)*100/Rt.utils.DateDiff(datetime.endTime, datetime.start) + "%", width: Rt.utils.DateDiff(info.endTime, info.startTime)*100/Rt.utils.DateDiff(datetime.endTime, datetime.start) + "%"}">
+        <!--div v-for="(info,index) in status" :key="index" :data-type="info.type" class="status" :style="{left: window.Rt.utils.DateDiff(info.startTime, datetime.start)*100/window.Rt.utils.DateDiff(datetime.endTime, datetime.start) + "%", width: window.Rt.utils.DateDiff(info.endTime, info.startTime)*100/window.Rt.utils.DateDiff(datetime.endTime, datetime.start) + "%"}">
             <div>{{info.startTime}}~{{info.endTime}}</div>
         </div-->
         <div class="status-line" ref="line"></div>
@@ -144,7 +144,7 @@
                 }
             },
             getDiffTime() {
-                return Rt.utils.DateDiff(this.dateTime.start, this.dateTime.end);
+                return window.Rt.utils.DateDiff(this.dateTime.start, this.dateTime.end);
             },
             // 设置状态。
             setStatus() {
@@ -164,8 +164,8 @@
                             return createElement("div", {
                                 class: ["status"],
                                 style: {
-                                    left: Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.getDiffTime() + "%",
-                                    width: Rt.utils.DateDiff(item.startTime, item.endTime)*100/self.getDiffTime() + "%"
+                                    left: window.Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.getDiffTime() + "%",
+                                    width: window.Rt.utils.DateDiff(item.startTime, item.endTime)*100/self.getDiffTime() + "%"
                                 },
                                 attrs: {
                                     "data-type": item.type
@@ -487,7 +487,7 @@
                         return createElement("div", {
                             class: ["dimension-list", sType, sClass],
                             style: {
-                                left: Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.getDiffTime() + "%"
+                                left: window.Rt.utils.DateDiff(self.dateTime.start, item.startTime)*100/self.getDiffTime() + "%"
                             },
                             attrs: {
                                 "group-id": groupId

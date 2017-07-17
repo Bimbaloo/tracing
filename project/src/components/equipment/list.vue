@@ -778,18 +778,18 @@
 				let nInterval = this.windowTime.interval*60*1000,
 					nEnd = new Date(this.windowTime.start).getTime() + nInterval;
 
-				if(Rt.utils.DateDiff(nEnd, this.datetime.end) < 0) {
+				if(window.Rt.utils.DateDiff(nEnd, this.datetime.end) < 0) {
 					// 若超出结束时间。
 					this.windowTime.end = this.datetime.end;
 					this.windowTime.start = new Date(new Date(this.datetime.end).getTime()
 											- nInterval).Format("yyyy-MM-dd hh:mm:ss");
-					this.windowTime.left = this.formatData(Rt.utils.DateDiff(this.datetime.start, this.windowTime.start)*100
-											/ Rt.utils.DateDiff(this.datetime.start, this.datetime.end), 2);//Math.floor
+					this.windowTime.left = this.formatData(window.Rt.utils.DateDiff(this.datetime.start, this.windowTime.start)*100
+											/ window.Rt.utils.DateDiff(this.datetime.start, this.datetime.end), 2);//Math.floor
 				}else {
 					this.windowTime.end = new Date(nEnd).Format("yyyy-MM-dd hh:mm:ss");	
 				}
 				
-				this.ratio = Rt.utils.DateDiff(this.datetime.start, this.datetime.end)/1000/60/this.windowTime.interval;		
+				this.ratio = window.Rt.utils.DateDiff(this.datetime.start, this.datetime.end)/1000/60/this.windowTime.interval;		
 				// this.$refs.slider.style.width = 100/this.ratio + "%";
 			}
         }

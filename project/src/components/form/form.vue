@@ -48,7 +48,7 @@
         	keys: {
         		handler: function() {
         			this.$nextTick(() => {
-        				if(Rt.utils.getObjectValues(this.ruleForm).every(o=>!o)) {
+        				if(window.Rt.utils.getObjectValues(this.ruleForm).every(o=>!o)) {
 //	        				this.resetForm('ruleForm')
 							// 只重置切换的判断。
 							this.$refs["ruleForm"].resetFields();
@@ -136,7 +136,7 @@
 	            	}
 	            	
 	            	// 如果judge的参数中所有的都为空。则提示
-	            	if(Rt.utils.getObjectValues(oJudge).some(o=>o)) {
+	            	if(window.Rt.utils.getObjectValues(oJudge).some(o=>o)) {
 	            		// 只要一个有数据。
 	            		callback();
 	            	}else {

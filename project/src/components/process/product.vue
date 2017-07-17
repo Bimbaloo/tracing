@@ -421,7 +421,7 @@ export default {
         exportExcelHandle (sTable, sFileName, event) {
 
             // 下载表格。
-            Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName);      
+            window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName);      
         },
         // 表格打印。
         printHandle (refTable, event) {
@@ -429,7 +429,7 @@ export default {
             if(!oTable) {
                 return;
             }
-            Rt.utils.printHtml(oTable);              
+            window.Rt.utils.printHtml(oTable);              
         }
     }
 }

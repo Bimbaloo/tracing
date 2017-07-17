@@ -314,7 +314,7 @@
                 if(!oRef) {
                     return;
                 }
-                Rt.utils.downloadHtml(oRef, "快速报告");     
+                window.Rt.utils.downloadHtml(oRef, "快速报告");     
             },
             // 页面打印。
             printHandle (refHtml, event) {
@@ -324,7 +324,7 @@
                 if(!oRef) {
                     return;
                 }
-                Rt.utils.printHtml(oRef);              
+                window.Rt.utils.printHtml(oRef);              
             }
 		}
 	}

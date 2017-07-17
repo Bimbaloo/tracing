@@ -674,7 +674,7 @@
                     return;
                 }
                 // 下载表格。
-                Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);      
+                window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);      
             },
             // 表格打印。
             printHandle (refTable, event) {
@@ -684,7 +684,7 @@
                 if(!oTable) {
                     return;
                 }
-                Rt.utils.printHtml(oTable);              
+                window.Rt.utils.printHtml(oTable);              
             }
 		}
 	}

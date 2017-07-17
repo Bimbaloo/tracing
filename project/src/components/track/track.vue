@@ -248,7 +248,7 @@
 	// 	margin-bottom: 10px;
 	// }
 	.error {
-		margin-top: 10px;
+		// margin-top: 10px;
 		border: 2px solid #42AF8F;
 	    padding: 20px 12px;
 	    margin-bottom: 30px;
