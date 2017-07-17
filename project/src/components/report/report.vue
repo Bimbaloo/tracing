@@ -122,6 +122,7 @@
 						}, {
 							prop: "materialName",
 							name: "物料名称",
+							width: "300",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -182,6 +183,7 @@
 						}, {
 							prop: "materialName",
 							name: "物料名称",
+							width: "300",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -268,6 +270,7 @@
 						}, {
 							prop: "materialName",
 							name: "物料名称",
+							width: "300",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -342,6 +345,7 @@
 						}, {
 							prop: "materialName",
 							name: "物料名称",
+							width: "300",
 							sortable: true
 						}, {
 							prop: "quantity",
@@ -417,6 +421,7 @@
 						}, {
 							prop: "materialName",
 							name: "物料名称",
+							width: "300",
 							sortable: true
 						}, {
 							prop: "processName",
@@ -479,6 +484,7 @@
 						}, {
 							prop: "materialName",
 							name: "物料名称",
+							width: "300",
 							sortable: true
 						}, {
 							prop: "processName",

@@ -159,6 +159,7 @@
                     return;
                 }
                 this.status.map(item => {
+                    // 创建状态区间。
                     let MyComponent = Vue.extend({
                         render: function (createElement) {                    
                             return createElement("div", {
@@ -196,9 +197,9 @@
                     this.$refs.line.appendChild(component.$el);                     
                 })        
             },
+            // 设置加工事件。
             setWork: function() {
-                // console.log(this.work);
-                
+                // console.log(this.work);               
                 let oNode = this.$refs.work;
 
                 if(this.$refs.work instanceof Array) {
@@ -328,15 +329,18 @@
                     })
                 }
                 
+                // 设置设备名称的问题。
                 this.labelNode.style.paddingTop =  (this.top-statusHeight) + "px";
                 this.labelNode.style.paddingBottom =  (this.bottom-statusHeight) + "px";
 
+                // 选中的维度。
                 this.selectedDimension.map(sDimension => {
                     if(!sDimension) {
                         return;
                     }
                     // 获取维度配置数据。
                     oDimension = this.getDimensionConfig(sDimension);
+                    // 不同维度下的事件节点都要重置位置。
                     oDimension.node.map(oData => {
                         let com = oData.node;
                         if(oData.class == "up") {
@@ -366,8 +370,6 @@
                     nHeight = oNode.offsetHeight;
 
                 oNode.style.height = nHeight + "px";
-                
-                // oNode.lastChild.style.top = (nHeight - oNode.lastChild.offsetHeight) + 'px';
 
                 for(let i = 0; i < sLength; i ++) {
                     if(aoDimension[i].key == sType) {
@@ -594,6 +596,7 @@
                     class: sClass
                 }
             },     
+            // 设置异常事件。
             setEvent () {
                 console.log(this.event)
                 let oNode = this.$refs.event;
@@ -607,22 +610,190 @@
                 if(!oEvent) {
                     return;
                 }
+
+                for(let p in oEvent) {
+                    if(p == "startEquipWarningList") {
+                        // 事件开始时间。
+                        oEvent[p].forEach(o => {
+                            o.type = "startEquipWarningList";
+                        })
+                        aoSortData = aoSortData.concat(oEvent[p]);
+
+                    }else if(p == "endEquipWarningList") {
+                        // 事件结束时间。
+                        oEvent[p].forEach(o => {
+                            o.type = "endEquipWarningList";
+                            o.startTime = o.endTime;
+                        })
+                        aoSortData = aoSortData.concat(oEvent[p]);
+                    }                    
+                }
+
+                aoSortData.sort((a, b) => {
+                    return a.startTime < b.startTime;
+                });
+
+                aoSortData.map((o, index) => {
+                    if(o.type == "startEquipWarningList") {
+                        this.setDimensionConfig("event", this._createNode(o, index, "event", "事件开始", {
+                            startTime: "开始时间",                      
+                            personName: "上报人",
+                            type: "类型",
+                            status: "状态"
+                        }));
+                    }else if(o.type == "endEquipWarningList") {
+                        this.setDimensionConfig("event", this._createNode(o, index, "event", "事件结束", {
+                            endTime: "结束时间",
+                            checkPersonName: "操作人"
+                        }));
+                    }
+                })
+
+                this.setPanelPadding()                   
             },
+            // 设置维护事件。
             setRepair () {
-                console.log(this.repair)
+                // console.log(this.repair)
                 let oNode = this.$refs.repair;
 
                 if(this.$refs.repair instanceof Array) {
                     oNode = oNode[0];
                 }
+
+                let oRepair = this.repair;
+
+                if(!oRepair) {
+                    return;
+                }
+
+                for(let p in oRepair) {
+                    if(p == "spotCheckList") {
+                        // 设备点击。
+                        oRepair[p].forEach(o => {
+                            o.type = "spotCheckList";
+                            o.startTime = o.happenTime;
+                        })
+                        aoSortData = aoSortData.concat(oRepair[p]);
+
+                    }else if(p == "startEquipRepairList") {
+                        // 设备维护开始。
+                        oRepair[p].forEach(o => {
+                            o.type = "startEquipRepairList";
+                        })
+                        aoSortData = aoSortData.concat(oRepair[p]);
+                    }else if(p == "endEquipRepairList") {
+                        // 设备维护结束。
+                        oRepair[p].forEach(o => {
+                            o.type = "endEquipRepairList";
+                            o.startTime = o.endTime;
+                        })
+                        aoSortData = aoSortData.concat(oRepair[p]);
+                    }                     
+                }
+
+                aoSortData.sort((a, b) => {
+                    return a.startTime < b.startTime;
+                });
+
+                aoSortData.map((o, index) => {
+                    if(o.type == "spotCheckList") {
+                        this.setDimensionConfig("repair", this._createNode(o, index, "repair", "设备点检", {
+                            happenTime: "发生时间",                      
+                            personName: "操作人",
+                            result: "点检结果"
+                        }));
+                    }else if(o.type == "startEquipRepairList") {
+                        this.setDimensionConfig("repair", this._createNode(o, index, "repair", "设备维护开始", {
+                            startTime: "开始时间",
+                            personName: "操作人",
+                            reason: "维护原因"
+                        }));
+                    }else if(o.type == "endEquipRepairList") {
+                        this.setDimensionConfig("repair", this._createNode(o, index, "repair", "设备维护结束", {
+                            endTime: "结束时间"
+                        }));
+                    }
+                })
+
+                this.setPanelPadding()                  
             },
+            // 设置工具事件。
             setTool: function() {
-                console.log(this.tool);
+                // console.log(this.tool);
                 let oNode = this.$refs.tool;
 
                 if(this.$refs.tool instanceof Array) {
                     oNode = oNode[0];
                 }
+
+                let oTool = this.tool;
+
+                if(!oTool) {
+                    return;
+                }
+
+                for(let p in oTool) {
+                    if(p == "installToolList") {
+                        // 上刀/上模。
+                        oTool[p].forEach(o => {
+                            o.type = "installToolList";
+                            o.startTime = o.happenTime;
+                        })
+                        aoSortData = aoSortData.concat(oTool[p]);
+
+                    }else if(p == "startEquipRepairList") {
+                        // 设备维护开始。
+                        oTool[p].forEach(o => {
+                            o.type = "startEquipRepairList";
+                        })
+                        aoSortData = aoSortData.concat(oTool[p]);
+                    }else if(p == "endEquipRepairList") {
+                        // 设备维护结束。
+                        oTool[p].forEach(o => {
+                            o.type = "endEquipRepairList";
+                            o.startTime = o.endTime;
+                        })
+                        aoSortData = aoSortData.concat(oTool[p]);
+                    }                     
+                }
+
+                aoSortData.sort((a, b) => {
+                    return a.startTime < b.startTime;
+                });
+
+                aoSortData.map((o, index) => {
+                    let sTitle = "";
+                    if(o.type == "installToolList") {
+                        
+                        if(o.type == "刀具") {
+                            sTitle = "上刀";
+                        }else  {
+                            sTitle = "上模";
+                        }
+                        this.setDimensionConfig("tool", this._createNode(o, index, "tool", sTitle, {
+                            happenTime: "发生时间",                      
+                            personName: "操作人",
+                            type: "工具类型",
+                            toolCode: "工具编码",
+                            reason: "原因"
+                        }));
+                    }else if(o.type == "removeToolList") {
+                        if(o.type == "刀具") {
+                            sTitle = "下刀";
+                        }else  {
+                            sTitle = "下模";
+                        }
+                        this.setDimensionConfig("tool", this._createNode(o, index, "tool", sTitle, {
+                            happenTime: "发生时间",                      
+                            personName: "操作人",
+                            type: "工具类型",
+                            toolCode: "工具编码",
+                            reason: "原因"
+                        }));
+                    }
+                })
+
+                this.setPanelPadding()
             }
         }
         

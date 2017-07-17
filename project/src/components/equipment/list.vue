@@ -685,14 +685,23 @@
 				
 				if(event.target.getAttribute("class").indexOf("icon-start") > -1) {
 					this.$refs.slider.style.left = 0;
-				}else if(event.target.getAttribute("class").indexOf("icon-end") > -1) {
-					
+				}else if(event.target.getAttribute("class").indexOf("icon-end") > -1) {					
 					nRatio = this.formatData(maxLeft*100/event.currentTarget.offsetWidth, 2);//Math.floor
 				}else if(event.target.getAttribute("class").indexOf("slider") > -1){
+					
 					let left = event.offsetX + event.target.offsetLeft
 					nRatio = this.formatData((left > maxLeft ? maxLeft : left)*100/event.currentTarget.offsetWidth, 2);//Math.floor
 				}else {
-					nRatio = this.formatData((event.offsetX > maxLeft ? maxLeft : event.offsetX)*100/event.currentTarget.offsetWidth, 2);//Math.floor
+					
+					let left = event.offsetX + event.target.offsetLeft
+					if(event.offsetX > maxLeft) {
+						left = maxLeft;
+					}else if(event.offsetX < 0) {
+						left = 0;
+					}else {
+						left = event.offsetX;
+					}
+					nRatio = this.formatData(left*100/event.currentTarget.offsetWidth, 2);//Math.floor
 				}	
 
 				let nStart = new Date(this.datetime.start).getTime()*(1-nRatio/100) + nRatio/100*(new Date(this.datetime.end).getTime());
@@ -718,9 +727,9 @@
 					line = self.$refs.line,
 					nLeft = parseFloat(slider.style.left.split("%")[0]),
 					nMouseX = event.clientX,
-					nMax = (1 - slider.offsetWidth/line.offsetWidth)*100,
+					// nMax = (1 - slider.offsetWidth/line.offsetWidth)*100,
 					nRatio = 0;
-
+					
 				// 鼠标移动事件。
 				window.addEventListener("mousemove", _moveHandler);
 				window.addEventListener("mouseup", _upHandler);
@@ -733,13 +742,23 @@
 					e.stopPropagation();
 					e.preventDefault();		
 
-					nRatio = nLeft + (e.clientX - nMouseX)*100/line.offsetWidth;
+					
+					// nRatio = nLeft + (e.clientX - nMouseX)*100/line.offsetWidth;
 					// debugger
+					
+					// if(nRatio < 0) {
+					// 	nRatio = 0;
+					// }else if(nRatio > nMax) {
+					// 	nRatio = Math.floor(nMax);//formatData
+					// }
+					// 移动后的位置。
+					nRatio = nLeft*line.offsetWidth/100 + e.clientX - nMouseX;
 					if(nRatio < 0) {
 						nRatio = 0;
-					}else if(nRatio > nMax) {
-						nRatio = Math.floor(nMax);//formatData
+					}else if(nRatio  + slider.offsetWidth >  line.offsetWidth) {
+						nRatio = line.offsetWidth - slider.offsetWidth;
 					}
+					nRatio = nRatio*100/line.offsetWidth;
 					slider.style.left = nRatio + "%";
 
 					_setWindowTime();
