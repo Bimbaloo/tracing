@@ -257,7 +257,9 @@
 						}						
 					}
 
-
+					.el-checkbox-button:first-child .el-checkbox-button__inner {
+						border-left: none;
+					}
 					 
 				}
 			}
