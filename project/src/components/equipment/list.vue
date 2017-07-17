@@ -877,6 +877,7 @@
 				bottom: 10px;
 				width: 100%;
 				background-color: rgba(255,255,255,0.6);
+				right: 5px; // 防止透明部分盖住滚动条 
 				z-index: 1;
 				.line {
 					margin: 0 170px 0 150px;
