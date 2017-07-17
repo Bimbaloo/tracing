@@ -838,7 +838,8 @@
 			.analysis {
 				display: flex;
 				padding-right: 170px;
-
+				margin-bottom: 50px;
+				
 				.name {
 					width: 150px;
 					flex: 0 150px;

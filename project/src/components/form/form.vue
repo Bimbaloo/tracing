@@ -49,7 +49,9 @@
         		handler: function() {
         			this.$nextTick(() => {
         				if(Rt.utils.getObjectValues(this.ruleForm).every(o=>!o)) {
-	        				this.resetForm('ruleForm')
+//	        				this.resetForm('ruleForm')
+							// 只重置切换的判断。
+							this.$refs["ruleForm"].resetFields();
         				}
         			});
         		},
@@ -238,9 +240,10 @@
             resetForm(formName) {
             	// 清空所有数据。
                 this.$refs[formName].resetFields();
-//          	for(let key in this.ruleForm) {
-//          		this.ruleForm[key] = "";
-//          	}
+                // 清空数据。
+            	for(let key in this.ruleForm) {
+            		this.ruleForm[key] = "";
+            	}
             }
         }    
     }

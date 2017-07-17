@@ -12,7 +12,6 @@
 
 <script>
 	import $ from 'jquery';
-	import Vue from 'vue';
 	import WipPriceTable from 'components/wip/wipPriceTable.vue';
 	import WipTitle from 'components/wip/wipTitle.vue';
 	

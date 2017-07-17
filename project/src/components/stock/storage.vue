@@ -236,7 +236,10 @@
             },
             // 点击批次
             batchClick (row) {
-                this.$router.push({ path: `/stock/${this.key}/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+            	// 如果批次数据存在，则可点击。
+            	if(row.batchNo) {
+	                this.$router.push({ path: `/stock/${this.key}/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+            	}
             },
             // 获取高度。
             adjustHeight() {

@@ -18,7 +18,7 @@
             			</th>
             		</tr>
             		<tr v-for="row in materialData.data">
-            			<td v-for="column in materialData.columns" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
+            			<td v-for="column in materialData.columns" :style="{cursor: column.click && !row[column.prop]?'default':'cursor'}" :class="column.class" @click="column.click && column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
             				{{row[column.prop]}}
             			</td>
             		</tr>
@@ -144,7 +144,10 @@
 
             // 点击批次
             batchClick (row) {
-                this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+            	if(row.batchNo) {
+            		// 批次存在可点击
+	                this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+            	}
             },
             fetchData () {
 				

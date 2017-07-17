@@ -2,7 +2,7 @@
 	<div class="banner">
 		<!-- 搜索 -->
 		<div class="search-block">
-			<el-select v-model="searchColumnName" placeholder="请选择搜索列">
+			<el-select clearable v-model="searchColumnName" placeholder="请选择搜索列">
 				<el-option
 				  	v-for="item in columnNames"
 				  	:key="item.value"

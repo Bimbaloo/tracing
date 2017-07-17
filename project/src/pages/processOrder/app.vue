@@ -12,7 +12,6 @@
 
 <script>
 	import $ from 'jquery';
-	import Vue from 'vue';
 	import ProcessOrderTable from 'components/wip/processOrderTable.vue';
 	import WipTitle from 'components/wip/wipTitle.vue';
 	

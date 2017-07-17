@@ -103,7 +103,9 @@
         },
         mounted() {
             let nodes = this.$refs.wrap.parentElement.previousElementSibling.querySelectorAll("label");
-            this.labelNode = nodes[this.euqipmentIndex];            
+            this.labelNode = nodes[this.euqipmentIndex];
+            // 初始设置位置。
+            this.setPanelPadding();
         },
         watch: {
             status: function() {

@@ -1,8 +1,10 @@
 <template>
-  	<el-table tooltip-effect="dark"
+  	<el-table
+  		tooltip-effect="dark"
 		@select-all="toggleAll"
 		:data="tableData" border 
-		style="width:100%;height:100%;" max-height="400px;">
+		style="width:100%;"
+		>
 		
 		<el-table-column fixed type="selection">
 			<template scope="scope">
@@ -51,6 +53,10 @@
 	    	tableData: {
 				type: Array,
 				default: []
+			},
+			loading: {
+				type: Boolean,
+				default: true
 			}
 	    }
   	}

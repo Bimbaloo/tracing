@@ -21,7 +21,7 @@
 			    </el-pagination>
 		  	</div>
 			
-			<WipTable :table-data="totalData" :column-names="columns"
+			<WipTable :table-data="totalData" :column-names="columns" :loading="loading"
 				@select-item="selectHandler" />
 		</div>
 
@@ -30,7 +30,6 @@
 
 <script>
 	import $ from 'jquery';
-	import Vue from 'vue';
 	import Banner from 'components/wip/banners.vue';
 	import WipTable from 'components/wip/wipTable.vue';
 	import WipTitle from 'components/wip/wipTitle.vue';
@@ -68,6 +67,8 @@
 		        	{ label: '条码', value: 'barCode'}
 	        	],
 	        	searchObj: null,
+	        	loading: false,
+	        	tableHeight: 0
     		}
     	},
     	created: function () {
@@ -83,6 +84,7 @@
 	      		this.getDataByPage();
 	      	},
     		getDataByPage: function () {
+    			this.loading = true;
     			const param = {
     				'page': this.currentPage - 1,
 				   	'size': this.pageSize, 
@@ -93,6 +95,7 @@
     			}
     			
     			this.$ajax.put(url, param).then(function (res) {
+    				this.loading = false;
 	    			if (res.errorCode) {
 	    				console.log(res.errorMsg);
 	    				return;
@@ -180,10 +183,15 @@
 </script>
 
 <style>
+	html, body {
+		width: 100%;
+		height: 100%;
+		padding: 0;
+		margin: 0;
+	}
 	#app {
 		width: 100%;
 		height: 100%;
-		margin: 20px 0;
 	}
 	.main {
 		width: 90%;
@@ -192,7 +200,6 @@
 		border-radius: 5px;
 		height: 90%;
 		padding: 10px 28px 10px;
-		overflow: auto;
 	}
 	.block {
 		margin: 20px 0;

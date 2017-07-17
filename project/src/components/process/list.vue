@@ -231,8 +231,8 @@
 					label {
 						margin-right: 20px;					
 					}
-					/* 临时屏蔽该按钮 */
-					label:nth-child(3) {
+					/* 临时屏蔽该按钮 。只是维度屏蔽*/
+					label.el-radio-button:nth-child(3) {
 						span {
 							background: rgb(204,204,204);
 							color: #fff;
@@ -240,7 +240,7 @@
 							border: 2px solid #ccc 
 						}						
 					}
-					label:nth-child(4) {
+					label.el-radio-button:nth-child(4) {
 						span {
 							background: rgb(204,204,204);
 							color: #fff;
@@ -248,7 +248,7 @@
 							border: 2px solid #ccc 
 						}						
 					}
-					label:nth-child(5) {
+					label.el-radio-button:nth-child(5) {
 						span {
 							background: rgb(204,204,204);
 							color: #fff;

@@ -111,6 +111,26 @@
 									type: "updateRoot",
 									key: sRootKey
 								});
+								
+								if(node.data.type == "1") {
+									// 根据物料节点查询仓储信息。        
+									this.$router.push({ 
+										path: "/stock", 
+										query: {
+											"key": node.data.key,
+											"_tag":  new Date().getTime().toString().substr(-5)
+										}
+									})
+								}else {
+									// debugger
+									this.$router.push({ 
+										path: "/process",
+										query: {
+											"key": node.data.key,
+											"_tag":  new Date().getTime().toString().substr(-5)
+										}										
+									})
+								}
 
 							},
 							doubleClick: onDoubleClickNode
