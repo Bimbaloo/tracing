@@ -640,7 +640,8 @@
 									// 若为汇总信息。
 									oData[p].data.map(o => {
 										if(o.quantity) {
-											o.rate = o.qualifiedNum/o.quantity;
+											//debugger
+											o.rate = (o.qualifiedNum/o.quantity).toFixed(4);  //保留小数点后两位
 										}else {
 											o.rate = 0;
 										}
