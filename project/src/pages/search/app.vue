@@ -40,43 +40,20 @@
         loading: false
       }
     },
-    created() {
-//    let oData = sessionStorage.getItem('searchConditions');
-//
-//    if(oData) {
-//        oData = JSON.parse(oData);
-//        this.activeKey = oData.tab;
-//    }
-//    this.$ajax.get("static/data.json").then((res) => {
-//      this.categories = res.data.categories.filter(o=>o.key!="restrain" && o.key!="chain");
-//      this.categories.forEach(o => {
-//        if(oData && oData.tab == o.key) {
-//          o.active = oData;
-//        }else {
-//          o.active = {
-//            radio: "1",
-//            keys: {}
-//          }            
-//        }
-//      })
-//    });   
+    created() {  
       this.loading = true;
       this.$ajax.get(MODULE_ITEM_URL).then((res) => {
       	this.loading = false;
       	this.judgeLoaderHandler(res,() => {
+
 	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
-	       	console.log(this.categories)
-	       this.categories.forEach(o => {
-//	          if(oData && oData.tab == o.key) {
-//	            o.active = oData;
-//	          }else {
+
+	        this.categories.forEach(o => {
 	            o.active = {
 	              radio: "1",
 	              keys: {}
 	            }            
-//	          }
 	        })
-      		
       	});
       });
       

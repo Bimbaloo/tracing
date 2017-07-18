@@ -54,7 +54,7 @@
             return {
                 key: this.$route.params.key,
                 styleObject: {
-                    "min-width": "1200px"
+                    "min-width": "1500px"
                 },
                 styleError: {
                 	"max-height": "200px"
@@ -83,7 +83,8 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名称"
+                        name: "物料名称",
+                        width: "300"
                     },{
                         prop: "quantity",
                         name: "数量"
@@ -146,7 +147,8 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名称"
+                        name: "物料名称",
+                        width: "300"
                     },{
                         prop: "quantity",
                         name: "数量"
@@ -293,7 +295,7 @@
                     oData.height = this.adjustHeight();
                     if(!res.data.errorCode) {
                         oData.data = res.data.data;
-                        this.styleObject.minWidth = "1200px";
+                        this.styleObject.minWidth = "1500px";
                     }else {
                     	this.styleError.maxHeight = this.adjustHeight()-50+"px";
 //                  	oData.error = res.data.errorMsg.message;

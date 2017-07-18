@@ -21,7 +21,7 @@
 					<div v-show="!bFullScreen" class="line"></div>
 					<div class="resume-main" :class="{showDiff:sCurrentTab === 'lines' }">
 						<div class="resume-handler">
-							<div class="resume-tabs" v-show="false">
+							<div class="resume-tabs" v-show="true">
 								<v-button text-data="BOM表" tab-data="tables" :type-data="sBomType"  @query="changeTab('tables')"></v-button>
 								<v-button text-data="时间轴" tab-data="lines"  :type-data="sTimeLineType" @query="changeTab('lines')"></v-button>
 							</div>
@@ -34,9 +34,9 @@
 						<!-- 表格 -->
 						<div v-show="sCurrentTab === 'tables'" class="resume-table">
 							<div class="table-title">
-								<span class="title-text">xxxxx产品履历</span>
-								<span class="title-subText">条码:xxxxxxxx</span>
-								<span class="title-subText">批次:xxxxxxxx</span>
+								<span class="title-text">{{ oTitle.materialName }}产品履历</span>
+								<span class="title-subText">条码:{{ oTitle.barcode }}</span>
+								<span class="title-subText">批次:{{ oTitle.batchNo }}</span>
 							</div>
 							<!--:row-style="tableRowStyleName"-->
 							<div v-if="oTab.tables.error" :style="{height:getHeight()+'px'}" class="error">
@@ -52,151 +52,25 @@
 								v-loading="oTab.tables.loading"
 								element-loading-text="拼命加载中"
 								row-class-name="table-item">
-								<!-- 工序 -->
-								<el-table-column min-width="200px">
+								
+								<el-table-column
+									v-for="(column,index) in oTab.tables.columns"
+									:align="index?'center':'left'"
+									:min-width="column.width"
+									:label="column.name">
 									<template scope="props">
-										<div :style="{marginLeft:props.row.level*nLevelDis+'px'}">
+										<div v-if="!index" :style="{marginLeft:props.row.level*nLevelDis+'px'}">
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div class="cell-info" :style="{marginLeft:((props.row.level+1)*nLevelDis+nIconDis)+'px'}">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.material_name}"
-											>{{ item.material_name || sText }}</p>
-										</div>
-									</template>
-								</el-table-column >
-								
-								<!-- 类型 type -->
-								<el-table-column label="类型" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
+										<div v-else class="isVis">{{ sText }}</div>
+										
+										<div class="cell-info" :style="{marginLeft:!index?((props.row.level+1)*nLevelDis+nIconDis)+'px':0}">
 											<p 
 												v-for="item in props.row.data"
-												:class="{isVis: !item.type}"
-											> {{ item.type || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 时间 time -->
-								<el-table-column label="时间" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.time}"
-											> {{ _parseTimeFormat(item.time) || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 地点 location -->
-								<el-table-column label="地点" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.location}"
-											> {{ item.location || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 批次 batch_no -->
-								<el-table-column label="批次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.batch_no}"
-											> {{ item.batch_no || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 条码 barcode -->
-								<el-table-column label="条码" align="center" width="180px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.barcode}"
-											> {{ item.barcode || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 数量 quantity -->
-								<el-table-column label="数量" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.quantity}"
-											> {{ item.quantity || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 班次 shift -->
-								<el-table-column label="班次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.shift}"
-											> {{ item.shift || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 人员 person_name -->
-								<el-table-column label="人员" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.person_name}"
-											> {{ item.person_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 模号 mold_code -->
-								<el-table-column label="模号" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.mold_code}"
-											> {{ item.mold_code || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 供应商/客户 vendor_name -->
-								<el-table-column label="供应商/客户" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.vendor_name}"
-											>{{ item.vendor_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 检验结果 check_result -->
-								<el-table-column label="检验结果" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-										<p 
-											v-for="item in props.row.data"
-											:class="{isVis: !item.check_result}"
-										> {{ item.check_result || sText }} </p></div>
+												:class="{isVis: !item[column.prop]}"
+											> {{ column.formatter(item[column.prop]) }} </p></div>
+										
 									</template>
 								</el-table-column>
 							</el-table>
@@ -205,162 +79,34 @@
 						<!-- 表格的复制 -->
 						<div v-show="false" class="resume-table-clone">
 							<div class="table-title">
-								<span class="title-text">xxxxx产品履历</span>
-								<span class="title-subText">条码:xxxxxxxx</span>
-								<span class="title-subText">批次:xxxxxxxx</span>
+								<span class="title-text">{{ oTitle.materialName }}产品履历</span>
+								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
+								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
 							<el-table 
 								class="table-main" 
 								:data="aParsedData" 
 								stripe
 								style="width: 100%;"
-								row-class-name="table-item"
-							>
-								<!-- 工序 -->
-								<el-table-column min-width="200px">
+								row-class-name="table-item">
+								<el-table-column
+									v-for="(column,index) in oTab.tables.columns"
+									:align="index?'center':'left'"
+									:min-width="column.width"
+									:label="column.name">
 									<template scope="props">
-										<div :style="{marginLeft:props.row.level*nLevelDis+'px'}">
+										<div v-if="!index" :style="{marginLeft:props.row.level*nLevelDis+'px'}">
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div class="cell-info" :style="{marginLeft:((props.row.level+1)*nLevelDis+nIconDis)+'px'}">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.material_name}"
-											>{{ item.material_name || sText }}</p>
-										</div>
-									</template>
-								</el-table-column >
-								
-								<!-- 类型 type -->
-								<el-table-column label="类型" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
+										<div v-else class="isVis">{{ sText }}</div>
+										
+										<div class="cell-info" :style="{marginLeft:!index?((props.row.level+1)*nLevelDis+nIconDis)+'px':0}">
 											<p 
 												v-for="item in props.row.data"
-												:class="{isVis: !item.type}"
-											> {{ item.type || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 时间 time -->
-								<el-table-column label="时间" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.time}"
-											> {{ _parseTimeFormat(item.time) || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 地点 location -->
-								<el-table-column label="地点" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.location}"
-											> {{ item.location || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 批次 batch_no -->
-								<el-table-column label="批次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.batch_no}"
-											> {{ item.batch_no || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 条码 barcode -->
-								<el-table-column label="条码" align="center" width="180px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.barcode}"
-											> {{ item.barcode || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 数量 quantity -->
-								<el-table-column label="数量" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.quantity}"
-											> {{ item.quantity || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 班次 shift -->
-								<el-table-column label="班次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.shift}"
-											> {{ item.shift || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 人员 person_name -->
-								<el-table-column label="人员" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.person_name}"
-											> {{ item.person_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 模号 mold_code -->
-								<el-table-column label="模号" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.mold_code}"
-											> {{ item.mold_code || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 供应商/客户 vendor_name -->
-								<el-table-column label="供应商/客户" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.vendor_name}"
-											>{{ item.vendor_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 检验结果 check_result -->
-								<el-table-column label="检验结果" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-										<p 
-											v-for="item in props.row.data"
-											:class="{isVis: !item.check_result}"
-										> {{ item.check_result || sText }} </p></div>
+												:class="{isVis: !item[column.prop]}"
+											> {{ column.formatter(item[column.prop]) }} </p></div>
+										
 									</template>
 								</el-table-column>
 							</el-table>
@@ -466,6 +212,7 @@
 		// 页面数据。
 		data() {
 			// 验证条码。
+			let self = this;
         	var validateBarcode = (rule, value, callback) => {
         		if(!value) {
         			callback(new Error("请输入条码或扫码"));
@@ -489,17 +236,110 @@
 					barcode: ""
 				},
 				// 当前tab值。
-				sCurrentTab: "lines",
+				sCurrentTab: "tables",
 				// 当前表格中的数据。
 				aoTable: [],
 				// 创建表格数据，处理后的数据。
 				aParsedData: [],
 				// 当前时间轴数据。
 				aoTimeLineData: [],
+				// 当前数据标题。
+				oTitle: {
+					materialName: "",
+					batchNo: "",
+					barcode: ""
+				},
 				// 类型。
 				oTab: {
 					"tables": {
-						url: "static/resume_demo.json",
+						url: HOST + "/api/v1/resume/bom",
+//						url: "static/resume_demo.json",
+						columns: [{
+							prop: "materialName",
+							name: "",
+							width: 400,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "type",
+							name: "类型",
+							width: 120,
+							formatter: function(sValue) {
+//								return sValue || self.sText
+								return self.getTimeLineTypeInfo(sValue).text || self.sText
+							}
+						},{
+							prop: "time",
+							name: "时间",
+							width: 120,
+							formatter: function(sValue) {
+								return self._parseTimeFormat(sValue) || self.sText
+							}
+						},{
+							prop: "location",
+							name: "地点",
+							width: 180,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "batchNo",
+							name: "批次",
+							width: 200,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "barcode",
+							name: "条码",
+							width: 300,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "quantity",
+							name: "数量",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "shiftName",
+							name: "班次",
+							width: 180,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "personName",
+							name: "人员",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "moldCode",
+							name: "模号",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "vendorName",
+							name: "供应商/客户",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "checkResult",
+							name: "检验结果",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						}],
 						bCreated: false,
 						loading: false,
 						error: ""
@@ -574,6 +414,10 @@
 		methods: {
 			// 初始化数据。
 			initData() {
+				// 标题值重置。
+				for(let param in this.oTitle) {
+					this.oTitle[param] = "";
+				}
 				// 当前表格中的数据。
 				this.aoTable = [];
 				// 创建表格数据，处理后的数据。
@@ -651,17 +495,26 @@
 				this.oTab[this.sCurrentTab].loading = true;
 				this.oTab[this.sCurrentTab].error = "";
 				
+				// 设置barcode。
+				this.oTitle.barcode = this.ruleForm.barcode;
+				
 				if(!this.oTab[this.sCurrentTab].bCreated) { // && this.bSubmit
+						
 					this.$ajax.post(this.oTab[this.sCurrentTab].url, this.ruleForm).then((res) => {
 						this.oTab[this.sCurrentTab].loading = false;
 						// 设置为已创建。
 					    this.oTab[this.sCurrentTab].bCreated = true;
-					    
 						if(!res.data.errorCode) {
 							// 保存数据。
 							if(this.sCurrentTab == "tables") {
 							    this.aoTable =res.data.data;
 							    this.aParsedData = this.parseTableData();
+							    
+							    // 设置批次及产品。
+							    if(this.aoTable.length) {
+								    this.oTitle.materialName = this.aoTable[0].nodeName;
+								    this.oTitle.batchNo = this.aoTable[0].batchNo;
+							    }
 							}else {
 								this.aoTimeLineData =res.data.data;
 							}
@@ -669,7 +522,6 @@
 						    // 根据errorCode 错误时设置。error
 							this.oTab[this.sCurrentTab].error = res.data.errorMsg.message;
 						}
-						
 					    
 				    }).catch((err)=> {
 				    	this.oTab[this.sCurrentTab].loading = false;
@@ -683,12 +535,11 @@
 			parseTableData() {
 				var	_that = this,
 				    aoNew = [];
-				
-				_getData("", 0);
+				    
+				_getData(null, 0);		// ""
 				
 				// [{name,parent,data,level}]
 				return aoNew;
-				
 				/**
 				 * 获取表格中的数据。
 				 * @param {String} sParent  当前显示的parent值。
@@ -696,7 +547,6 @@
 				 */
 				function _getData(sParent,nLevel) {
 					var aInvialid = [];
-					
 					// 获取元素的子级数据。
 					aInvialid = _that._getTableChildDataById(sParent);
 					
@@ -704,13 +554,13 @@
 					if(aInvialid.length) {
 						aInvialid.forEach(function(oData) {
 							aoNew.push({
-								name: oData.name,
-								parent: oData.parent,
-								data: oData.data,
+								name: oData.nodeName,		// name
+								parent: oData.parentNodeName,		// parent
+								data: oData.resumes,					//data
 								level: nLevel
 							});
 							// 循环获取数据。
-							_getData(oData.name,nLevel+1);
+							_getData(oData.nodeName,nLevel+1);
 						});
 					}
 					
@@ -723,7 +573,7 @@
 					
 				// 遍历数据。
 				aResult = _that.aoTable.filter(function(oData) {
-					return oData.parent == sId;
+					return oData.parentNodeName == sId;		// parent
 				});
 				
 				// 返回数据。
@@ -954,13 +804,15 @@
 					jClone = $(".clone"),
 					jTableClone = $(".resume-table-clone"),
 					sFileName = "",
-					jNow = null;
+					jNow = null,
+					isTable = false;
 				
 				 if(this.sCurrentTab === "tables"){
 				 	// 表格。
 				 	jClone.html(jTableClone.html());
 				 	sFileName = "BOM表格";
 				 	jNow = jClone;
+				 	isTable = true;
 				 }else {
 				 	// 时间轴。
 				 	jClone.html(jTimeLine.html());
@@ -971,7 +823,7 @@
 				// 时间轴。
 				html2canvas(jNow.get(0),{
 					height: jNow.outerHeight(true) + 100,
-					background: "#1d272f",
+					background: isTable?"#fff":"#1d272f",
 					onrendered:function(canvas) {
 						var sImg = canvas.toDataURL("image/png");
 							
@@ -986,15 +838,16 @@
 			},
 			// 打印功能。。
 			onPrintHandler() {
-				
 				var jDown = $("#downloadImage"),
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),
 					jTableClone = $(".resume-table-clone"),
-					jNow = null;
+					jNow = null,
+					isTable = false;
 					
 				 if(this.sCurrentTab === "tables"){
 				 	// 表格。
+				 	isTable = true;
 				 	jClone.html(jTableClone.html());
 				 	jNow = jClone;
 				 }else {
@@ -1006,7 +859,7 @@
 				// 时间轴。
 				window.Rt.utils.printHtml(jNow.get(0),{
 					height: jNow.outerHeight(true) + 200,
-					background: "#1d272f"
+					background: isTable?"#fff":"#1d272f"
                 },true);
 //				html2canvas(jNow.get(0),{
 //					height: jNow.outerHeight(true) + 200,

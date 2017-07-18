@@ -29,7 +29,7 @@
         data () {
             return {
             	styleObject: {
-                    "min-width": "1500px"
+                    "min-width": "1800px"
                 },
                 gridData: {
                     url:  HOST + "/api/v1/trace/down/start-points",
@@ -58,7 +58,8 @@
                         name: "物料编码"
                     },{
                         prop: "materialName",
-                        name: "物料名称"
+                        name: "物料名称",
+                        width: "300"
                     },{
                         prop: "materialSpec",
                         name: "物料规格"
@@ -157,7 +158,7 @@
                 oData.data = [];
                 oData.loading = true;
 
-				this.styleObject.minWidth = "1500px";
+				this.styleObject.minWidth = "1800px";
 				
                 let sPath = oData.url;
                 this.$ajax.post(sPath, this.$route.query)
