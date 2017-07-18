@@ -148,7 +148,7 @@
 					// 设置keys。
 					aParams.forEach(o=>{
 						let aAttr = o.split("=");
-						oData.keys[aAttr[0]] = aAttr[1];
+						oData.keys[aAttr[0]] = decodeURIComponent(aAttr[1]);
 					});
 					
 					// 返回参数。
@@ -253,21 +253,23 @@
       // 如果 左边小于260px 直接收缩
       reversedMessage: function () {
        // console.log('走你')
-        if(this.reversedMessage<=245 && !this.collapse){
+        if(this.reversedMessage<=275 && !this.collapse){
             this.collapse = true
         }
       },
       collapse: function () {
        // 侧边栏展开时默认325
         if(!this.collapse){
-            this.LayoutLeftWidth = 325
+        		// 修改当展开时，每次都是原始宽度
+        		this.changeWidth = 0;
+            this.LayoutLeftWidth = 325;
         }
       }
     },
     computed: {
       reversedMessage: function () {
           let _width = this.LayoutLeftWidth+this.changeWidth
-            return _width
+          return _width
       }
     }
   }

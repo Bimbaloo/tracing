@@ -21,7 +21,7 @@
 					<div v-show="!bFullScreen" class="line"></div>
 					<div class="resume-main" :class="{showDiff:sCurrentTab === 'lines' }">
 						<div class="resume-handler">
-							<div class="resume-tabs" v-show="true">
+							<div class="resume-tabs">
 								<v-button text-data="BOM表" tab-data="tables" :type-data="sBomType"  @query="changeTab('tables')"></v-button>
 								<v-button text-data="时间轴" tab-data="lines"  :type-data="sTimeLineType" @query="changeTab('lines')"></v-button>
 							</div>
@@ -56,6 +56,7 @@
 								<el-table-column
 									v-for="(column,index) in oTab.tables.columns"
 									:align="index?'center':'left'"
+									:fixed="!index?true:false"
 									:min-width="column.width"
 									:label="column.name">
 									<template scope="props">
@@ -63,12 +64,12 @@
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else class="isVis">{{ sText }}</div>
+										<div v-else class="isVis cell-content">{{ sText }}</div>
 										
 										<div class="cell-info" :style="{marginLeft:!index?((props.row.level+1)*nLevelDis+nIconDis)+'px':0}">
 											<p 
 												v-for="item in props.row.data"
-												:class="{isVis: !item[column.prop]}"
+												:class="[{isVis: !item[column.prop]}, 'cell-content']"
 											> {{ column.formatter(item[column.prop]) }} </p></div>
 										
 									</template>
@@ -257,7 +258,7 @@
 						columns: [{
 							prop: "materialName",
 							name: "",
-							width: 400,
+							width: 450,
 							formatter: function(sValue) {
 								return sValue || self.sText
 							}
@@ -400,6 +401,7 @@
 					} 
 				}
 				this.ruleForm.barcode = oRequest.barcode;
+				this.sCurrentTab = oRequest.type;
 		    }
 		    
 			// 如果是全屏，则默认创建。
@@ -447,7 +449,8 @@
 							- (this.bFullScreen?0:jLine.outerHeight(true))
 							- ($(".resume-main").outerHeight(true) - $(".resume-main").height())
 							- $(".resume-handler").outerHeight(true)
-							- 20;
+							- $(".resume-table .table-title").outerHeight(true);
+							
 				// 返回数据。
 				return nReturnHeight;
 			},
@@ -674,12 +677,16 @@
 			expandOrCollapseTr(ev) {
 				var _that = this,
 					jItem = $(ev.target).closest(".table-item"),
-					// 图表。
-					jIcon = jItem.find(".icon-down"),
-					// 数据列表。
-					jList = jItem.find(".cell .cell-info"),
 					// 当前行的索引值。
 					nIndex = jItem.index(),
+					// 图表。
+					jIcon = jItem.find(".icon-down"),
+					// 展示的表格。
+					jDisTr = jItem.parents(".el-table").find(".el-table__body-wrapper tbody tr.table-item"),
+					jAllItem = jItem.add(jDisTr.eq(nIndex)),
+					// 数据列表。
+					jList = jAllItem.find(".cell .cell-info"),
+					jAllIcon = jAllItem.find(".icon-down"),
 					// 当前元素的子级索引值。--- 默认是需要展开或折叠。
 					aChildrenIndex = this.getChildrenIndexArrByParentIndex(nIndex),
 					// 是否折叠。-- 默认是展开的。
@@ -695,31 +702,64 @@
 				}
 				
 				// 子级内容隐藏。
-				jItem.parent("tbody").find("tr.table-item").each(function(index) {
-					let jTr = $(this),
-						jArrow = jTr.find(".icon-down");
+				jItem.parents(".el-table").find("tbody").each(function() {
+					let jTbody = $(this);
+					// 重置数据。
+					jATr = [];
+					aFilterIndex = [];
 					
-					// 如果当前索引存在于其子级中，则处理状态。
-					if(aChildrenIndex.indexOf(index) > -1) {
-						// 判断当前是否为展开的。
-						jATr.push(jTr);
-						
-						// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
-						if(jArrow.hasClass("actived")) {
-							// 当前及其子级是隐藏的。
-							aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
-						}
-						
-						if(bCollapsed) {
-							jTr.fadeOut(500);
-						}else {
-							// 显示的判断。
-							if(aFilterIndex.indexOf(index) < 0) {
-								jTr.fadeIn(500);
+					jTbody.find("tr.table-item").each(function(index) {
+						let jTr = $(this),
+							jArrow = jTr.find(".icon-down");
+							
+						// 如果当前索引存在于其子级中，则处理状态。
+						if(aChildrenIndex.indexOf(index) > -1) {
+							// 判断当前是否为展开的。
+							jATr.push(jTr);
+							
+							// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
+							if(jArrow.hasClass("actived")) {
+								// 当前及其子级是隐藏的。
+								aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
+							}
+							
+							if(bCollapsed) {
+								jTr.fadeOut(500);
+							}else {
+								// 显示的判断。
+								if(aFilterIndex.indexOf(index) < 0) {
+									jTr.fadeIn(500);
+								}
 							}
 						}
-					}
+					})
 				});
+
+//				jItem.parent("tbody").find("tr.table-item").each(function(index) {
+//					let jTr = $(this),
+//						jArrow = jTr.find(".icon-down");
+//					
+//					// 如果当前索引存在于其子级中，则处理状态。
+//					if(aChildrenIndex.indexOf(index) > -1) {
+//						// 判断当前是否为展开的。
+//						jATr.push(jTr);
+//						
+//						// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
+//						if(jArrow.hasClass("actived")) {
+//							// 当前及其子级是隐藏的。
+//							aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
+//						}
+//						
+//						if(bCollapsed) {
+//							jTr.fadeOut(500);
+//						}else {
+//							// 显示的判断。
+//							if(aFilterIndex.indexOf(index) < 0) {
+//								jTr.fadeIn(500);
+//							}
+//						}
+//					}
+//				});
 				
 				// 内容展开或折叠。
 				if(bCollapsed) {
@@ -728,7 +768,7 @@
 					jList.slideDown();
 				}
 				
-				jIcon.toggleClass("actived");
+				jAllIcon.toggleClass("actived");		// jIcon
 			},
 			// 创建表格。
 			createTable(aData) {
@@ -795,7 +835,7 @@
 			// 全屏展示。
 			openFullScreen(ev) {
 				// 新打开一个页面。
-				window.open("resume.html?barcode="+this.ruleForm.barcode+"#full");
+				window.open("resume.html?barcode="+this.ruleForm.barcode+"&type="+this.sCurrentTab+"#full");
 			},
 			// 下载功能。
 			onDownLoadHandler() {
@@ -999,7 +1039,7 @@
 						.resume-tabs {}
 						.resume-icons {
 							text-align: right;
-							/*margin-top: -26px;*/
+							margin-top: -26px;
 							color: @green;
 							
 							.resume-icon {
@@ -1019,7 +1059,7 @@
 						
 						.table-title {
 							text-align: center;
-							margin: -25px 25px 25px;
+							margin: 15px 25px 25px;
 							
 							.title-text {
 								font-size: 24px;
@@ -1035,6 +1075,10 @@
 							
 							.isVis {
 								visibility: hidden;
+							}
+							
+							.cell-content {
+								line-height: 36px;
 							}
 							
 							.icon-down {

@@ -418,8 +418,13 @@
     	    .batch {
     	    	cursor: pointer;
 	            color: #f90;
+	            
 	            .cell {
 	                font-weight: 600;
+	                
+	                &:empty {
+	                	cursor: default;
+	                }
 	            } 
 	        }         
             .clicked {
