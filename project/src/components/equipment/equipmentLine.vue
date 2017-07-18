@@ -366,6 +366,7 @@
                     sLength = aoDimension.length,
                     // 事件节点。
                     oNode = oData.node,
+
                     // 节点内容高度。
                     nHeight = oNode.offsetHeight;
 
@@ -394,6 +395,11 @@
                         break;
                     }
                 }
+
+                if(!this.visible) {
+                    oNode.querySelector(".dimension-content").style.display = "none";           
+                }
+                
             },
             /**
              * 获取维度设置。
@@ -558,8 +564,10 @@
                                 class: ["circle"]
                             }),
                             self.$createElement('div', {
-                                class: ["dimension-content"]
-
+                                class: ["dimension-content"],
+                                style: {
+                                    display: "block"
+                                }
                             }, [
                                 self.$createElement('h2', {}, [
                                     self.$createElement('i', {

@@ -84,7 +84,6 @@ const store = new Vuex.Store({
     root: "",
     chrome: /chrome/i.test(navigator.userAgent),
     type: "",
-    // 
     fullscreen: false,
     // 原始树数据。
     rawData: []

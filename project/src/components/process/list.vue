@@ -125,14 +125,30 @@
 			 * @return {void}
 			 */
 			setEquipmentList () {
+				
 				this.slectedDimension = "";  // 路由变化时，选择状态清空
 				this.equipments = [];
 				
-				let 
+				let aoData = this.rawData,
+					oNode = null;
 				// 提取选中的工序节点数据。
-					oNode = this.rawData.filter(o => o.key == this.processKey)[0] || {};
-
-				this.node = oNode;	
+				let aoFilter = this.rawData.filter(o => o.key == this.processKey);
+				if(aoFilter.length) {
+					oNode = aoFilter[0];
+				}else {
+					// 节点在子工序中。
+					this.rawData.map(o => {
+						if(o.subProcess) {
+							let aoNode = o.subProcess.filter(item => item.key == this.processKey);
+							if(aoNode.length) {
+								oNode = aoNode[0];
+							}
+						}			
+									
+					})
+				}
+				
+				this.node = oNode || {};	
 				this.checkedEquipments = [];
 
 				let oEquipments = {}; 	
@@ -286,7 +302,11 @@
 					}
 
 					.el-checkbox-button:first-child .el-checkbox-button__inner {
-						border-left: none;
+						border-left-color: #42af8f;
+					}
+
+					.el-checkbox-button:last-child .el-checkbox-button__inner {
+						border-radius: 0;
 					}
 					 
 				}

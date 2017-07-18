@@ -85,7 +85,7 @@
 		},
         data () {
             return {
-				show: true,		
+				show: false,		
 				oTest: {
 					"1": [{
 						"equipmentId": 175,
@@ -313,7 +313,7 @@
 			// 初始化数据。
 			setInitData() {
 				// debugger
-				this.show = true;
+				this.show = false;
 				this.ratio = 1;
 				this.startIf = true;
 				this.endIf = true;
