@@ -10,7 +10,7 @@
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
 					<v-tree :tree-data="treeData" :class="{hide: fullscreen}"></v-tree>
-					<div class="view" ref="view">
+					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
 					</div>
 				</div>
@@ -63,9 +63,14 @@
 			rawData () {
 		    	return this.$store.state.rawData
 		    },
+		    // 表格数据全屏。
 			fullscreen () {
 		    	return this.$store.state.fullscreen
-		    }
+		    },
+		   	// 树的数据全屏。
+		   	treeFullscreen () {
+		   		return this.$store.state.treeFullscreen
+		   	}
 		},
 		created() {
 			// 组件创建完后获取数据
@@ -379,6 +384,10 @@
 					overflow: auto;
 					position: relative;
 					height: 50px;
+					
+					&.hide {
+						display: none;
+					}
 				}
 			}
 		}

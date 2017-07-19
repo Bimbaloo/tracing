@@ -280,14 +280,14 @@
 						},{
 							prop: "location",
 							name: "地点",
-							width: 180,
+							width: 250,
 							formatter: function(sValue) {
 								return sValue || self.sText
 							}
 						},{
 							prop: "batchNo",
 							name: "批次",
-							width: 200,
+							width: 300,
 							formatter: function(sValue) {
 								return sValue || self.sText
 							}
@@ -1000,6 +1000,8 @@
 		}*/
 	}
 	.resume-wraps {
+		background-color: #F2F2F2;
+		
 		.resume-content-wrap {
 			background-color: #FFFFFF;
 			margin: 20px;

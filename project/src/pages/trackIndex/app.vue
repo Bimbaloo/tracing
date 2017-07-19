@@ -24,7 +24,7 @@
 				<i class="icon icon-20 icon-report" @click="onReport" title="快速报告" v-if="!fullscreen"></i>
 				<div class="router-container" ref="routerContainer">
 					<v-tree :tree-data="treeData" :class="{hide: fullscreen}"></v-tree>
-					<div class="view" ref="view">
+					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
 					</div>
 				</div>
@@ -77,7 +77,11 @@
 		    },
 			fullscreen () {
 		    	return this.$store.state.fullscreen
-		    }
+		    },
+		    // 树的数据全屏。
+		   	treeFullscreen () {
+		   		return this.$store.state.treeFullscreen
+		   	}
 		},
 		created() {
 			// 组件创建完后获取数据
@@ -346,6 +350,10 @@
 					overflow: auto;
 					position: relative;
 					height: 50px;
+					
+					&.hide {
+						display: none;
+					}
 				}
 			}
 		}
@@ -355,8 +363,8 @@
 		position: absolute;
 		cursor: pointer;
 		z-index: 100;
-		right: 120px;
-		top: 40px;
+		right: 160px;
+		top: 30px;
 	}
 	.table-line {
 		position: absolute;
