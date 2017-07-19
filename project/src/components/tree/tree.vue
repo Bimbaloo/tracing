@@ -3,11 +3,8 @@
 		<div class="icons">
 			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
 			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
-<<<<<<< HEAD
 			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
-=======
->>>>>>> 8e393845ecd8329a67f8ff9fdf94b143c0f96e4f
 		</div>
 		<div id="tree" style="height: 100%;"></div>
 		<div id="overview"></div>
