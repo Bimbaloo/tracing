@@ -4,7 +4,7 @@
     	<el-button class="btn btn-plain" @click="onTrace">溯源</el-button>
         <div class="router-content">
 	        <div class="innner-content" :style="styleObject">
-	            <div v-if="gridData.error" class="error">
+	            <div v-if="gridData.error" class="error" style="margin-top: 10px;">
 	                {{ gridData.error }}
 	            </div>
 	            <div v-if="!gridData.error" class="content-table">
@@ -203,11 +203,7 @@
 </script>
 
 <style lang="less">
-	// .btn {
-	// 	margin-bottom: 10px;
-	// }
 	.error {
-		// margin-top: 10px;
 		border: 2px solid #42AF8F;
 	    padding: 20px 12px;
 	    margin-bottom: 30px;

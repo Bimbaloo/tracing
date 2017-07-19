@@ -1,7 +1,11 @@
 <template>
 	<div class="diagram">
-		<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
-		<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
+		<div class="icons">
+			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
+			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
+			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
+            <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
+		</div>
 		<div id="tree" style="height: 100%;"></div>
 		<div id="overview"></div>
 	</div>
@@ -60,7 +64,11 @@
 		    },
 		    type () {
 		    	return this.$store.state.type
-		    }
+		    },
+		    // 树的数据全屏。
+		   	treeFullscreen () {
+		   		return this.$store.state.treeFullscreen
+		   	}
 		},
 		created() {
 		},		
@@ -69,6 +77,20 @@
 			this.createOverview();
 		},
 		methods: {
+			fullScreenClick() {
+                // 详情全屏按钮点击事件。
+				this.$store.commit({
+					type: "updateTreeFullscreen",
+					key: true
+				});
+            },
+            restoreScreenClick() {
+                // 详情还原按钮点击事件。
+  				this.$store.commit({
+					type: "updateTreeFullscreen",
+					key: false
+				});    
+            },
 			/**
 			 * 设置gojs图形。
 			 * @param {Object} oData
@@ -90,7 +112,7 @@
 						hasHorizontalScrollbar: this.chrome,
 						hasVerticalScrollbar: this.chrome,
 						allowVerticalScroll: true,
-
+						
 			//          initialAutoScale:go.Diagram.Uniform,
 						layout: $(go.TreeLayout, {
 							nodeSpacing: 100,
@@ -482,16 +504,36 @@
 
 <style lang="less">
 	.diagram {
+		display: flex;
+		flex-direction: column;
+	}
+	.icons {
 		position: relative;
+		flex: 0 40px;
+		text-align: right;
+		
+		.icon-exportImg,
+		.icon-print,
+		.icon-fullScreen,
+		.icon-restoreScreen {
+			cursor: pointer;
+			margin: 10px;
+			vertical-align: middle;
+			
+			/*position: absolute;
+			top: 10px;
+			right: 20px;
+			z-index: 100;
+			cursor: pointer;*/
+		}
+		
+		.icon-exportImg {
+			/*right: 60px;*/
+		}
 	}
-	.icon-exportImg,.icon-print {
-		position: absolute;
-		top: 20px;
-		right: 20px;
-		z-index: 100;
-		cursor: pointer;
+	
+	#tree {
+		flex: 1 1;
 	}
-	.icon-exportImg {
-		right: 60px;
-	}
+	
 </style>

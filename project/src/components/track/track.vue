@@ -7,10 +7,10 @@
     	</div>
         <div class="router-content">
 	        <div class="innner-content" :style="styleObject">
-	            <div v-if="gridData.error" class="error">
+	            <div v-if="gridData.error" class="error" style="margin-top: 10px;">
 	                {{ gridData.error }}
 	            </div>
-	            <div v-if="!gridData.error" class="content-table">
+	            <div v-if="!gridData.error" class="content-table" >
 	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading"></v-table>    
 	            </div>     
 	       </div>   
@@ -245,11 +245,7 @@
 </script>
 
 <style lang="less">
-	// .btn-wrapper {
-	// 	margin-bottom: 10px;
-	// }
 	.error {
-		// margin-top: 10px;
 		border: 2px solid #42AF8F;
 	    padding: 20px 12px;
 	    margin-bottom: 30px;

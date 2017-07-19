@@ -34,9 +34,9 @@
 						<!-- 表格 -->
 						<div v-show="sCurrentTab === 'tables'" class="resume-table">
 							<div class="table-title">
-								<span class="title-text">{{ oTitle.materialName }}产品履历</span>
-								<span class="title-subText">条码:{{ oTitle.barcode }}</span>
-								<span class="title-subText">批次:{{ oTitle.batchNo }}</span>
+								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
+								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
+								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
 							<!--:row-style="tableRowStyleName"-->
 							<div v-if="oTab.tables.error" :style="{height:getHeight()+'px'}" class="error">
@@ -80,7 +80,7 @@
 						<!-- 表格的复制 -->
 						<div v-show="false" class="resume-table-clone">
 							<div class="table-title">
-								<span class="title-text">{{ oTitle.materialName }}产品履历</span>
+								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
 								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
 								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
@@ -280,14 +280,14 @@
 						},{
 							prop: "location",
 							name: "地点",
-							width: 180,
+							width: 250,
 							formatter: function(sValue) {
 								return sValue || self.sText
 							}
 						},{
 							prop: "batchNo",
 							name: "批次",
-							width: 200,
+							width: 300,
 							formatter: function(sValue) {
 								return sValue || self.sText
 							}
@@ -885,17 +885,18 @@
 					jNow = null,
 					isTable = false;
 					
-				 if(this.sCurrentTab === "tables"){
+				if(this.sCurrentTab === "tables"){
 				 	// 表格。
 				 	isTable = true;
 				 	jClone.html(jTableClone.html());
 				 	jNow = jClone;
-				 }else {
+				}else {
 				 	// 时间轴。
 				 	jClone.html(jTimeLine.html());
 					jNow = jClone;
-				 }
-					
+				}
+				
+				
 				// 时间轴。
 				window.Rt.utils.printHtml(jNow.get(0),{
 					height: jNow.outerHeight(true) + 200,
@@ -961,6 +962,7 @@
 	.clone {
 		position: absolute;
 		z-index: -1;
+		/*padding: 0 20px;*/
 		
 		.isVis {
 			visibility: hidden;
@@ -1000,6 +1002,8 @@
 		}*/
 	}
 	.resume-wraps {
+		background-color: #F2F2F2;
+		
 		.resume-content-wrap {
 			background-color: #FFFFFF;
 			margin: 20px;

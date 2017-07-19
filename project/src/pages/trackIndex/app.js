@@ -86,6 +86,7 @@ const store = new Vuex.Store({
     type: "",
     // 
     fullscreen: false,
+    treeFullscreen: false,
     // 原始树数据。
     rawData: []
   },
@@ -104,6 +105,10 @@ const store = new Vuex.Store({
     },
     updateFullscreen (state, payload) {
       state.fullscreen = payload.key;
+    },
+    // 更新树型图形的放大。
+    updateTreeFullscreen (state, payload) {
+    	state.treeFullscreen = payload.key;
     }
   },
   actions: {

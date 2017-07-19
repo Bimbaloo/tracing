@@ -15,7 +15,10 @@
         <div class="flex-wraps">
           <div id='changeWidth' class='changeWidth'></div>
           <i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
-          <i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
+          <i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="
+          LayoutLeftWidth = reversedMessage;
+          changeWidth = 0;
+          collapse=false"></i>
           <div class="router-container" ref="routerContainer">
             <div v-if="tip" class="tip"></div>
             <router-view></router-view>
