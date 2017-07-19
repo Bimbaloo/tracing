@@ -301,9 +301,6 @@
 						}						
 					}
 
-					.el-checkbox-button:first-child .el-checkbox-button__inner {
-						border-left-color: #42af8f;
-					}
 
 					.el-checkbox-button:last-child .el-checkbox-button__inner {
 						border-radius: 0;
@@ -381,6 +378,9 @@
 				position: relative;
 				display: flex;
 
+				.el-checkbox-button:first-child .el-checkbox-button__inner {
+					border-left-color: #42af8f;
+				}
 				.select {
 					flex: 0 50px;
 					padding: 3px 0px 3px 10px;
