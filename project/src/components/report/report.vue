@@ -157,7 +157,7 @@
 							name: "合格率",
 							sortable: true,
 							formatter: function(row, column) {
-								return row.rate*100 + "%"
+								return (row.rate*100).toFixed(2) + "%"
 							},
 							sortMethod: function(a, b) {
 								return a-b>0;
