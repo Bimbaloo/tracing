@@ -363,7 +363,7 @@
 		position: absolute;
 		cursor: pointer;
 		z-index: 100;
-		right: 160px;
+		right: 120px;		// 160
 		top: 30px;
 	}
 	.table-line {

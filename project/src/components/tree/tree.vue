@@ -1,12 +1,10 @@
 <template>
-	<div class="diagram" :style="{flex: !treeFullscreen?'0 400px':'1 1'}">
+	<div class="diagram">
 		<div class="icons">
 			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
 			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
-			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
-            <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
 		</div>
-		<div id="tree"></div>
+		<div id="tree" style="height: 100%;"></div>
 		<div id="overview"></div>
 	</div>
 </template>
@@ -504,36 +502,23 @@
 
 <style lang="less">
 	.diagram {
-		display: flex;
-		flex-direction: column;
+		position: relative;
 	}
 	.icons {
-		position: relative;
-		flex: 0 40px;
-		text-align: right;
 		
 		.icon-exportImg,
-		.icon-print,
-		.icon-fullScreen,
-		.icon-restoreScreen {
-			cursor: pointer;
-			margin: 10px;
-			vertical-align: middle;
-			/*position: absolute;
+		.icon-print {
+			position: absolute;
 			top: 10px;
 			right: 20px;
 			z-index: 100;
-			cursor: pointer;*/
+			cursor: pointer;
 		}
 		
 		.icon-exportImg {
-			/*right: 60px;*/
+			right: 60px;
 		}
 			
 	}
-	#tree {
-		flex: 1 1;
-	}
-	
 	
 </style>
