@@ -452,8 +452,8 @@
                 aoSortData.map((o, index) => {
                     if(o.type == "qcList") {
                         this.setDimensionConfig("quality", this._createNode(o, index, "quality", "质检", {
-                            startTime: "开始时间",
-                            endTime: "结束时间",                         
+                            startTime: "质检时间",
+                            // endTime: "结束时间",                         
                             personName: "操作人",
                             method: "三检类型",
                             result: "质检结果"
