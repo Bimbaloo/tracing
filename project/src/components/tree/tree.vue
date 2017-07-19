@@ -83,13 +83,15 @@
 					type: "updateTreeFullscreen",
 					key: true
 				});
+				this.tree.requestUpdate()
             },
             restoreScreenClick() {
                 // 详情还原按钮点击事件。
   				this.$store.commit({
 					type: "updateTreeFullscreen",
 					key: false
-				});    
+				}); 
+				this.tree.requestUpdate()
             },
 			/**
 			 * 设置gojs图形。
