@@ -225,31 +225,6 @@
 
 	.list-wrap {
 		display: inline-block;
-		/* 临时屏蔽该按钮 */
-		label.el-checkbox-button.is-checked {
-			span:nth-child(3) {
-				background: rgb(204, 204, 204) ;
-				color: #fff;
-				cursor: default ;
-				border: 2px solid #ccc 
-			}
-		}
-		label:nth-child(4) {
-			span {
-				background: rgb(204, 204, 204) ;
-				color: #fff ;
-				cursor: default ;
-				border: 2px solid #ccc 
-			}
-		}
-		label:nth-child(5) {
-			.el-checkbox-button__inner {
-				background: rgb(204, 204, 204) ;
-				color: #fff ;
-				cursor: default ;
-				border: 2px solid #ccc 
-			}
-		}
 	}
 
 	.link-line {
