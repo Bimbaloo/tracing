@@ -25,7 +25,11 @@
 					<!-- <el-button class="btn btn-plain parameter" @click="parameterClick">工艺</el-button> -->  
 				</div>
 			</div>
-			<v-equipment :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="selectedDimension" :window-time="windowTime"></v-equipment>
+			<v-equipment 
+				:equipments="equipments" 
+				:checked-equipments="checkedEquipments" 
+				:dimension-data="selectedDimension" 
+				:datetime="datetime"></v-equipment>
         </div>
     </div>      
 </template>
@@ -51,14 +55,15 @@
                 equipments: [],
                 checkedEquipments: [],
 				// 视窗时间，默认为30分钟。
-				windowTime: {
-					interval: 30,
-					start: "",
-					end: "",
-					min: 1,
-					max: 30,
-					left: 0
-				},
+				// windowTime: {
+				// 	interval: 30,
+				// 	start: "",
+				// 	end: "",
+				// 	min: 1,
+				// 	max: 30,
+				// 	left: 0
+				// },
+				datetime:{},
 				dimension: [{
 					name: "质量",
 					type: "3",
@@ -129,13 +134,44 @@
         created () {        
             this.node = this.$route.query;
             this.equipments = [this.node];
-            this.checkedEquipments = [this.node.equipmentId];   
+            this.checkedEquipments = [this.node.equipmentId];  
+			this.setDateTime(); 
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
             // '$route': 'fetchData'
+			checkedEquipments: 'setDateTime'
         },
         methods: {
+			setDateTime () {
+				let start = "",
+					end = "";
+				this.checkedEquipments.forEach((id, index) => {
+					let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
+					if(equipment) {
+						let sTemp = equipment.shiftStartTime,
+							eTemp = equipment.shiftEndTime
+						if(!index) {
+							start = sTemp;
+							end = eTemp;
+						}else{
+							if(start > sTemp) {
+								start = sTemp;
+							}
+							if(end < eTemp) {
+								end = eTemp;
+							}
+						} 									
+					}					
+				})
+
+				this.datetime = {
+					start: start,
+					initStart: start,
+					end: end,
+					initEnd: end
+				}
+			},
 			// 工艺参数点击事件。
 			parameterClick() {
 
@@ -179,10 +215,10 @@
 							oParam[param] = this.node[param];
 							break;
 						case "startTime":
-							oParam[param] = this.windowTime.start;
+							oParam[param] = this.datetime.start;
 							break;
 						case "endTime":
-							oParam[param] = this.windowTime.end;
+							oParam[param] = this.datetime.end;
 							break;
 						case "processCode":
 							oParam[param] = this.node.process;

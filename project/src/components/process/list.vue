@@ -26,15 +26,21 @@
 					</div>									
 				</div>
 				<!-- 分析维度-->
-				<div class="dimension">
-					<el-radio-group v-model="slectedDimension" class="btn-group" >
-						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type" :class="obj.key" >{{obj.name}}</el-radio-button>
+				<div class="dimension" @click.self="dimensionClick">
+					<el-radio-group v-model="slectedDimension" class="btn-group">
+						<el-radio-button v-for="obj in dimension" :key="obj.type" :label="obj.type" :class="obj.key">{{obj.name}}</el-radio-button>
 					</el-radio-group>
 					<!--el-button class="btn btn-plain" v-for="name in dimension" :key="name">{{name}}</el-button-->
 					<el-button :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'parameter']" @click="parameterClick">工艺</el-button>
 				</div>
 			</div>			
-			<v-equipment v-if="bShowEq" :equipments="equipments" :checked-equipments="checkedEquipments" :dimension-data="slectedDimension" :process="node.process" :window-time="windowTime"></v-equipment>
+			<v-equipment v-if="bShowEq" 
+				:equipments="equipments" 
+				:checked-equipments="checkedEquipments" 
+				:dimension-data="slectedDimension" 
+				:process="node.process" 
+				:datetime="datetime">
+			</v-equipment>
 			<div v-else class="empty">{{empty}}</div>
 		</div>
 		
@@ -83,14 +89,15 @@
 				equipments: [],
 				checkedEquipments: [],
 				// 视窗时间，默认为30分钟。
-				windowTime: {
-					interval: 30,
-					start: "",
-					end: "",
-					min: 1,
-					max: 30,
-					left: 0
-				},
+				// windowTime: {
+				// 	interval: 30,
+				// 	start: "",
+				// 	end: "",
+				// 	min: 1,
+				// 	max: 30,
+				// 	left: 0
+				// },
+				datetime:{},
 				slectedDimension: "",			
 				isIndeterminate: false,
 				empty: "暂无数据。"
@@ -111,15 +118,50 @@
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
 			this.setEquipmentList();
+			this.setDateTime();
         },
         mounted () {
             
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': 'setEquipmentList'
+            '$route': 'setEquipmentList',
+			checkedEquipments: 'setDateTime'
         },
         methods: {
+			setDateTime () {
+				let start = "",
+					end = "";
+				this.checkedEquipments.forEach((id, index) => {
+					let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
+					if(equipment) {
+						let sTemp = equipment.shiftStartTime,
+							eTemp = equipment.shiftEndTime
+						if(!index) {
+							start = sTemp;
+							end = eTemp;
+						}else{
+							if(start > sTemp) {
+								start = sTemp;
+							}
+							if(end < eTemp) {
+								end = eTemp;
+							}
+						} 									
+					}					
+				})
+
+				this.datetime = {
+					start: start,
+					initStart: start,
+					end: end,
+					initEnd: end
+				}
+			},
+			// 单选按钮点击事件。
+			dimensionClick (event) {
+				this.slectedDimension = "";
+			},
 			/**
 			 * 设置设备列表。
 			 * @return {void}

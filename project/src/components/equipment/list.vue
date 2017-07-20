@@ -76,8 +76,9 @@
 			equipments: Array,
 			checkedEquipments: Array,
 			dimensionData: [Array, String],
-			windowTime: Object,
-			process: String
+			// windowTime: Object,
+			process: String,
+			datetime: [Object]
 		},
 		components: {
 			'v-datetime': DateTime,
@@ -85,7 +86,16 @@
 		},
         data () {
             return {
-				show: false,		
+				show: false,
+				// 视窗时间，默认为30分钟。
+				windowTime: {
+					interval: 30,
+					start: "",
+					end: "",
+					min: 1,
+					max: 30,
+					left: 0
+				},		
 				oTest: {
 					"1": [{
 						"equipmentId": 175,
@@ -204,12 +214,12 @@
 				endIf: true,
 				eventData: {},
 				equipmentData: {},
-				datetime: {
-					start: "",
-					initStart: "",
-					end: "",
-					initEnd: ""
-				}
+				// datetime: {
+				// 	start: "",
+				// 	initStart: "",
+				// 	end: "",
+				// 	initEnd: ""
+				// }
             }
         },
         computed: {
@@ -339,33 +349,33 @@
 				})	
 				this.equipmentData = oData;
 
-				let start = "",
-					end = "";
-				this.checkedEquipments.forEach((id, index) => {
-					let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
-					if(equipment) {
-						let sTemp = equipment.shiftStartTime,
-							eTemp = equipment.shiftEndTime
-						if(!index) {
-							start = sTemp;
-							end = eTemp;
-						}else{
-							if(start > sTemp) {
-								start = sTemp;
-							}
-							if(end < eTemp) {
-								end = eTemp;
-							}
-						} 									
-					}					
-				})
+				// let start = "",
+				// 	end = "";
+				// this.checkedEquipments.forEach((id, index) => {
+				// 	let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
+				// 	if(equipment) {
+				// 		let sTemp = equipment.shiftStartTime,
+				// 			eTemp = equipment.shiftEndTime
+				// 		if(!index) {
+				// 			start = sTemp;
+				// 			end = eTemp;
+				// 		}else{
+				// 			if(start > sTemp) {
+				// 				start = sTemp;
+				// 			}
+				// 			if(end < eTemp) {
+				// 				end = eTemp;
+				// 			}
+				// 		} 									
+				// 	}					
+				// })
 
-				this.datetime = {
-					start: start,
-					initStart: start,
-					end: end,
-					initEnd: end
-				}
+				// this.datetime = {
+				// 	start: start,
+				// 	initStart: start,
+				// 	end: end,
+				// 	initEnd: end
+				// }
 
 
 			},
@@ -567,7 +577,7 @@
 				this.datetime.start = new Date(this.datetime.start).Format("yyyy-MM-dd hh:mm:ss");
 				this.datetime.initStart = this.datetime.start;
 				this.startIf=true;
-				this.setWindowTime();
+				this.setDateWindowTime();
 				this.refreshData();
 			},
 			// 取消保存开始时间。
@@ -580,7 +590,7 @@
 				this.datetime.end = new Date(this.datetime.end).Format("yyyy-MM-dd hh:mm:ss");
 				this.datetime.initEnd = this.datetime.end;
 				this.endIf=true;
-				this.setWindowTime();
+				this.setDateWindowTime();
 				this.refreshData();
 			},
 			// 取消保存结束时间。
@@ -588,8 +598,31 @@
 				this.datetime.end = this.datetime.initEnd;
 				this.endIf=true;
 			},
+			setDateWindowTime() {
+				this.windowTime.left = 0;
+
+				let nInterval = (new Date(this.datetime.end).getTime() - new Date(this.datetime.start).getTime())/1000/60;
+
+				this.windowTime.start = this.datetime.start;
+				this.windowTime.max = this.formatData(this.windowTime.interval, 2);//Math.floor
+
+				if(nInterval > 30) {		
+					if(this.windowTime.interval < 30) {
+						this.windowTime.interval = 30;
+					}		
+					this.ratio = nInterval/this.windowTime.interval;
+					this.windowTime.min = 1;
+					this.windowTime.end = new Date(new Date(this.windowTime.start).getTime() + this.windowTime.interval*60*1000).Format("yyyy-MM-dd hh:mm:ss");
+				}else {
+					this.windowTime.interval = nInterval;
+					this.ratio = 1;
+					this.windowTime.end = this.datetime.end;
+					this.windowTime.min = 0;
+				}	
+			},
 			// 设置窗口时长。
 			setWindowTime () {
+				this.windowTime.left = 0;
 				this.windowTime.interval = (new Date(this.datetime.end).getTime() - new Date(this.datetime.start).getTime())/1000/60;
 
 				this.windowTime.start = this.datetime.start;
@@ -604,8 +637,7 @@
 					this.ratio = 1;
 					this.windowTime.end = this.datetime.end;
 					this.windowTime.min = 0;
-				}
-				
+				}			
 			},
 			
 			/**
