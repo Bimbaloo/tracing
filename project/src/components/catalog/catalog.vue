@@ -9,7 +9,11 @@
 
 	export default {
 		props: {
-			catalogData: Array
+			catalogData: Array,
+			resize:{
+				type: Number,
+      			required: false
+			}
 		},
 		data() {
 			return {			
@@ -44,7 +48,11 @@
 		    		// 若点击树节点。
 		    		this.setCatalogSelection();
 		    	}
-		    }
+		    },
+			/* 外部父div大小变化，视图大小更新 */
+			resize: function(){
+				this.updateCanvas();
+			}
 		},
 		methods: {
 			/**
@@ -266,6 +274,11 @@
 //			        	nodeInmenutree.isSelected = false;
 //			        }
 //			    }				
+			},
+			/* 大小自适应 */
+			updateCanvas(){
+				//debugger
+				this.catalog.requestUpdate()
 			}
 		}
 	}

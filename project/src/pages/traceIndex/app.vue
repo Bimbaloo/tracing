@@ -1,22 +1,26 @@
 <template>
-	<div id="app">
+	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
 		<v-header></v-header>
-		<el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading">
-			<el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']">
-				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
-			</el-col>
-			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router">
+		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
+		<div class="content" v-loading.fullscreen.lock="fullscreenLoading">
+			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
+			<div @click="goToInit" :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
+				<v-catalog @init="treeDataInit" :catalog-data="catalogData" :resize="resizeUpdate"></v-catalog>
+			</div>
+			<!-- <div :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router"> -->
+			<div  class="router">
+				<div id='changeWidth' class='changeWidth'></div>
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}"></v-tree>
+					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
+					<div id='changeDiagram' :class="[{hide: treeFullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
 					</div>
 				</div>
-
-			</el-col>
-		</el-row>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -37,6 +41,20 @@
 		},
 		data() {
 			return {
+				/* 左右拖动功能添加属性 */
+				_pageX:null,          //鼠标的横向位置
+				changeWidth:0,        //改变的宽度
+				LayoutLeftWidth: 325, //默认宽度
+				draggingX: false,	  //左右拖动功能启动
+				resizeUpdate:0,       //监听父集div大小改变更新左侧图形
+
+				/* 左右拖动功能添加属性 */
+				treeHeight:400,  	// 默认高度tree组件高度
+				draggingY: false,	  //上下拖动功能启动
+				_pageY:null,     	//鼠标的纵向位置
+				changeHeight:0,  	//改变的高度
+				resizeUpdateY:0,     //监听父集div大小改变更新左侧图形
+
 				// 页面加载中动画。
 				fullscreenLoading: false,
 				// 侧栏是否收缩。
@@ -70,7 +88,22 @@
 		   	// 树的数据全屏。
 		   	treeFullscreen () {
 		   		return this.$store.state.treeFullscreen
-		   	}
+		   	},
+			reversedMessage() {
+				let _width = this.LayoutLeftWidth+this.changeWidth
+				return _width
+			  },
+			_treeFullscreen() {
+				if(!!this.treeFullscreen){
+					return 1
+				}else{
+					return 0
+				}
+			},
+			_treeHeight() {
+				let _height = this.treeHeight+this.changeHeight
+				return _height
+			}
 		},
 		created() {
 			// 组件创建完后获取数据
@@ -304,6 +337,65 @@
 			},
 			goToInit() {
 				console.log(1)
+			},
+			/* 拖动功能 */
+			dragstar(e){   //鼠标按下，开始拖动
+			//  console.log('开始')
+			//	console.log(this.treeFullscreen)
+				if(e.target.id === 'changeWidth'){
+				this.LayoutLeftWidth = this.reversedMessage
+				this.changeWidth = 0
+				this.draggingX = true;
+				this._pageX = e.pageX
+					if(this.collapse){
+						this.collapse = false
+					}
+				}else if(e.target.id === 'changeDiagram'){
+					this.treeHeight = this._treeHeight
+					this.changeHeight = 0
+					this.draggingY = true;
+					this._pageY = e.pageY
+				//	console.log(this._pageY)
+				}
+			
+				
+			
+			},
+			dragend(e){ //鼠标松开，结束拖动
+
+				//console.log('结束')
+				this.draggingX = false  //关闭拖动功能
+				this.draggingY = false  //关闭拖动功能
+				this.resizeUpdate = this.reversedMessage //改变 changeWidth 的值，触发 canvas 大小更新
+
+
+			},
+			onMouseMove(e){ //拖动过程
+				if(this.draggingX){
+					this.changeWidth = e.pageX-this._pageX
+				}else if(this.draggingY){
+					this.changeHeight = e.pageY-this._pageY
+					this.resizeUpdateY = this._treeHeight //改变 resizeUpdateY 的值，触发 canvas 大小更新
+				}
+				
+			},
+			/* tree组件恢复默认大小 */
+			recoverTree(){  
+				this.changeHeight = 0
+			}  
+		},
+		watch: {
+			_treeHeight: function () {
+				let viewHeight = document.querySelector(".router").offsetHeight
+				let	maxTreeHeight = viewHeight - 40 -20 -100  
+				if(this._treeHeight > maxTreeHeight && !this.treeFullscreen){  //底部内容不得小于100px
+					this.treeHeight = maxTreeHeight
+					this.changeHeight = 0
+
+				}else if(this._treeHeight < 130 && !this.treeFullscreen){
+					this.treeHeight = 130
+					this.changeHeight = 0
+				}
 			}
 		}
 
@@ -330,6 +422,18 @@
 		flex-direction: column;
 		.content {
 			flex: 1;
+			display:flex;
+			.changeWidth {
+				position: absolute;
+				left: -1px;
+				color: #42AF8F;
+				cursor: e-resize;
+				width:20px;
+				//background-color:rgba(0,0,0,0.1);
+				height:100%;
+				top:0;
+				z-index:2
+			}
 			.nav {
 				border-right: 1px solid #ccc;
 				box-sizing: border-box;
@@ -372,8 +476,19 @@
 					background-color: #fff;
 					/*flex: 0 400px;*/
 					flex: 1 1;
-					margin-bottom: 20px;
+					//margin-bottom: 20px;
 
+					&.hide {
+						display: none;
+					}
+				}
+				.changeDiagram {
+					background-color: #fff;
+					width: 100%;
+    				height: 10px;
+    				flex-basis: 20px;
+					z-index: 3;
+					cursor:n-resize;
 					&.hide {
 						display: none;
 					}

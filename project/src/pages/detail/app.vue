@@ -70,12 +70,13 @@
     },
     data() {
       return {
-        // 侧栏是否收缩。
+        /* 拖动功能添加属性 */
         _pageX:null,
         changeWidth:0,
         LayoutLeftWidth: 325,
         dragging: false,
-      	collapse: false,
+
+      	collapse: false, // 侧栏是否收缩。
         activeKey: "trace",
         categories: [],
         labelWidth: "70px",

@@ -18,7 +18,11 @@
 
 	export default {
 		props: {
-			treeData: Object
+			treeData: Object,
+			flexBasis:{
+				type: Number,
+      			required: false
+			}
 		},
 		data() {
 			return {
@@ -47,7 +51,10 @@
 		    },
 		    root: function() {
 		    	this.redrawTree();
-		    }
+			},
+			flexBasis: function(){
+				this.updateCanvas()
+			}
 		},
 		computed: {
 			data () {
@@ -90,7 +97,8 @@
   				this.$store.commit({
 					type: "updateTreeFullscreen",
 					key: false
-				}); 
+				});
+				this.recoverSize() 
 				this.updateCanvas()
             },
 			/**
@@ -500,7 +508,11 @@
 				}, 200);
 			},
 			updateCanvas(){
+				
 				this.tree.requestUpdate()
+			},
+			recoverSize(){
+				this.$emit('recoverSize')
 			}
 	
 		}
@@ -516,6 +528,7 @@
 		position: relative;
 		flex: 0 40px;
 		text-align: right;
+		padding-right:20px;
 		
 		.icon-exportImg,
 		.icon-print,
@@ -532,9 +545,9 @@
 			cursor: pointer;*/
 		}
 		
-		.icon-exportImg {
-			/*right: 60px;*/
-		}
+		// .icon-exportImg {
+		// 	/*right: 60px;*/
+		// }
 	}
 	
 	#tree {
