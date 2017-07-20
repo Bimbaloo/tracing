@@ -532,9 +532,9 @@
 			cursor: pointer;*/
 		}
 		
-		.icon-exportImg {
-			/*right: 60px;*/
-		}
+		// .icon-exportImg {
+		// 	/*right: 60px;*/
+		// }
 	}
 	
 	#tree {

@@ -1,11 +1,15 @@
 <template>
-	<div id="app">
+	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
 		<v-header></v-header>
-		<el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading">
-			<el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']">
-				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
-			</el-col>
-			<el-col :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router">
+		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
+		<div class="content" v-loading.fullscreen.lock="fullscreenLoading">
+			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
+			<div @click="goToInit" :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
+				<v-catalog @init="treeDataInit" :catalog-data="catalogData" :resize="resizeUpdate"></v-catalog>
+			</div>
+			<!-- <div :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router"> -->
+			<div  class="router">
+				<div id='changeWidth' class='changeWidth'></div>
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
@@ -14,9 +18,8 @@
 						<router-view></router-view>
 					</div>
 				</div>
-
-			</el-col>
-		</el-row>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -37,6 +40,13 @@
 		},
 		data() {
 			return {
+				/* 拖动功能添加属性 */
+				_pageX:null,
+				changeWidth:0,
+				LayoutLeftWidth: 325,
+				dragging: false,
+				resizeUpdate:0,
+
 				// 页面加载中动画。
 				fullscreenLoading: false,
 				// 侧栏是否收缩。
@@ -70,7 +80,11 @@
 		   	// 树的数据全屏。
 		   	treeFullscreen () {
 		   		return this.$store.state.treeFullscreen
-		   	}
+		   	},
+			reversedMessage: function () {
+				let _width = this.LayoutLeftWidth+this.changeWidth
+				return _width
+      		}  
 		},
 		created() {
 			// 组件创建完后获取数据
@@ -304,7 +318,39 @@
 			},
 			goToInit() {
 				console.log(1)
-			}
+			},
+			/* 拖动功能 */
+			dragstar(e){   //鼠标按下，开始拖动
+			//  console.log('开始')
+				if(e.target.id === 'changeWidth'){
+				this.LayoutLeftWidth = this.reversedMessage
+				this.changeWidth = 0
+				this.dragging = true;
+				this._pageX = e.pageX
+					if(this.collapse){
+						this.collapse = false
+					}
+				}
+			
+				
+			
+			},
+			dragend(e){ //鼠标松开，结束拖动
+
+				//console.log('结束')
+				this.dragging = false  //关闭拖动功能
+				this.resizeUpdate = this.reversedMessage //改变 changeWidth 的值，触发 canvas 大小更新
+				//console.log('resizeUpdate'+this.resizeUpdate)
+				//e.stopPropagation = true
+			},
+			onMouseMove(e){ //拖动过程
+			
+				if(this.dragging){
+				// console.log('开始动了')
+					this.changeWidth = e.pageX-this._pageX
+				}
+				
+			}  
 		}
 
 	}
@@ -330,6 +376,18 @@
 		flex-direction: column;
 		.content {
 			flex: 1;
+			display:flex;
+			.changeWidth {
+				position: absolute;
+				left: -1px;
+				color: #42AF8F;
+				cursor: e-resize;
+				width:20px;
+				//background-color:rgba(0,0,0,0.1);
+				height:100%;
+				top:0;
+				z-index:2
+			}
 			.nav {
 				border-right: 1px solid #ccc;
 				box-sizing: border-box;
