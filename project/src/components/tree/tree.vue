@@ -18,7 +18,11 @@
 
 	export default {
 		props: {
-			treeData: Object
+			treeData: Object,
+			flexBasis:{
+				type: Number,
+      			required: false
+			}
 		},
 		data() {
 			return {
@@ -47,7 +51,10 @@
 		    },
 		    root: function() {
 		    	this.redrawTree();
-		    }
+			},
+			flexBasis: function(){
+				this.updateCanvas()
+			}
 		},
 		computed: {
 			data () {
@@ -500,6 +507,7 @@
 				}, 200);
 			},
 			updateCanvas(){
+				
 				this.tree.requestUpdate()
 			}
 	
