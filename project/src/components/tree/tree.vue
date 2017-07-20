@@ -97,7 +97,8 @@
   				this.$store.commit({
 					type: "updateTreeFullscreen",
 					key: false
-				}); 
+				});
+				this.recoverSize() 
 				this.updateCanvas()
             },
 			/**
@@ -509,6 +510,9 @@
 			updateCanvas(){
 				
 				this.tree.requestUpdate()
+			},
+			recoverSize(){
+				this.$emit('recoverSize')
 			}
 	
 		}
@@ -524,6 +528,7 @@
 		position: relative;
 		flex: 0 40px;
 		text-align: right;
+		padding-right:20px;
 		
 		.icon-exportImg,
 		.icon-print,

@@ -13,7 +13,7 @@
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}"></v-tree>
+					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
 					<div id='changeDiagram' class='changeDiagram'></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
@@ -355,7 +355,7 @@
 					this.changeHeight = 0
 					this.draggingY = true;
 					this._pageY = e.pageY
-					console.log(this._pageY)
+				//	console.log(this._pageY)
 				}
 			
 				
@@ -367,21 +367,39 @@
 				this.draggingX = false  //关闭拖动功能
 				this.draggingY = false  //关闭拖动功能
 				this.resizeUpdate = this.reversedMessage //改变 changeWidth 的值，触发 canvas 大小更新
-			//	this.resizeUpdateY = this._treeHeight //改变 changeWidth 的值，触发 canvas 大小更新
-				//console.log('resizeUpdate'+this.resizeUpdate)
-				//e.stopPropagation = true
+
+
 			},
 			onMouseMove(e){ //拖动过程
-			//debugger
 				if(this.draggingX){
-				// console.log('开始动了')
 					this.changeWidth = e.pageX-this._pageX
 				}else if(this.draggingY){
 					this.changeHeight = e.pageY-this._pageY
-					this.resizeUpdateY = this._treeHeight
+					this.resizeUpdateY = this._treeHeight //改变 resizeUpdateY 的值，触发 canvas 大小更新
 				}
 				
+			},
+			/* tree组件恢复默认大小 */
+			recoverTree(){  
+				this.changeHeight = 0
 			}  
+		},
+		watch: {
+			_treeHeight: function () {
+				let viewHeight = document.querySelector(".router").offsetHeight
+				let	maxTreeHeight = viewHeight - 40 -20 -40  
+				//debugger
+				console.log("this._treeHeight"+this._treeHeight)
+				console.log('maxTreeHeight'+maxTreeHeight)
+				console.log("this.treeFullscreen"+this.treeFullscreen)
+				if(this._treeHeight > maxTreeHeight && !this.treeFullscreen){  //canvas太大且未全屏时，自动全屏
+					//debugger
+					this.$store.commit({
+						type: "updateTreeFullscreen",
+						key: true
+					});
+				}
+			}
 		}
 
 	}
