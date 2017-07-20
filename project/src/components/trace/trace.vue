@@ -3,7 +3,7 @@
     	<h2 class="content-title">查询结果集</h2>
     	<el-button class="btn btn-plain" @click="onTrace">溯源</el-button>
         <div class="router-content">
-	        <div class="innner-content" :style="styleObject">
+	        <div class="innner-content">
 	            <div v-if="gridData.error" class="error" style="margin-top: 10px;">
 	                {{ gridData.error }}
 	            </div>
@@ -25,9 +25,6 @@
         },
         data () {
             return {
-            	styleObject: {
-                    "min-width": "1800px"
-                },
                 gridData: {
                     url: HOST + "/api/v1/trace/up/start-points",
                     loading: false,
@@ -48,7 +45,8 @@
                         name: "条码"
                     },{
                         prop: "batchNo",
-                        name: "批次号"
+                        name: "批次号",
+                        width: "120"
                     },{
                         prop: "materialCode",
                         name: "物料编码"
@@ -74,7 +72,8 @@
                         name: "操作人"
                     },{
                         prop: "equipmentName",
-                        name: "设备名称"
+                        name: "设备名称",
+                        width: "120"
                     },{
                         prop: "equipmentCode",
                         name: "设备编码"
@@ -83,28 +82,13 @@
                         name: "设备类型"
                     },{
                         prop: "processName",
-                        name: "工序名称"
+                        name: "工序名称",
+                        width: "120"
                     },{
                         prop: "moldCode",
                         name: "模号"
                     }],
-                    data: [{
-				      "barcode": "UN65457437520007057", 
-				      "batchNo": "20160331A", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "materialCode": "10000515", 
-				      "materialSpec": "", 
-				      "materialUnit": "kg", 
-				      "quantity": 16, 
-				      "happenTime": "2016-03-31 14:28:33", 
-				      "personName": "李瑞娇", 
-				      "equipmentName": "装配2.2线GP12", 
-				      "equipmentCode": "RLSB1", 
-				      "equipmentType": "", 
-				      "processName": "GP12", 
-				      "moldCode": "",
-				      "bucketNo": ""
-				    }]
+                    data: []
                 },
             }
         },
@@ -138,8 +122,6 @@
                 oData.data = [];
                 oData.loading = true;
 
-                this.styleObject.minWidth = "1800px";
-                
                 let sPath = oData.url;
                 
                 this.$ajax.post(sPath, this.$route.query)
@@ -164,7 +146,6 @@
                     	// 当前是由于数据过多的提示，则显示出来。
                     	let sError = res.data.errorMsg.message;
                     	if(sError == "起点记录太多，请更换查询条件") {
-	                    	this.styleObject.minWidth = 0;
                     		oData.error = sError;
                     	}else {
                     		// 其他错误，则直接console

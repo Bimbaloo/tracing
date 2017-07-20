@@ -3,7 +3,7 @@
 	<div class="router-content">
 		<div class="tableClone" ref="printTable"></div>
 		<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>
-		<div class="innner-content" :style="styleObject">
+		<div class="innner-content">
 			<h2 class="content-title">
 				<span class="tag">{{batch}}</span>出库信息
 				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
@@ -54,9 +54,6 @@
 				excel: true,
 				print: true,
 				btnShow: true,
-				styleObject: {
-					"min-width": "1500px"
-				},
 				styleError: {
                 	"max-height": "200px"
                 },
@@ -69,13 +66,15 @@
 					filename: this.$route.query.batchNo + "出库",
 					columns: [{
 						prop: "barcode",
-						name: "条码"
+						name: "条码",
+						fixed: true
 //					}, {
 //						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
 //						name: "条码类型"
 					}, {
 						prop: "batchNo",
-						name: "批次号"
+						name: "批次号",
+						width: "120"
 					}, {
 						prop: "materialCode",
 						name: "物料编码"
@@ -106,22 +105,7 @@
 						name: "出库时间",
 						width: "160"
 					}],
-					data: [
-// 						{
-// 						"barcode": "单件条码",
-// //						"barcodeTypeName": "2",
-// 						"batchNo": "20160331A",
-// 						"materialCode": "021",
-// 						"materialName": "物料名字",
-// 						"quantity": 16,
-// 						"stock": "仓库",
-// 						"stocklot": "库位",
-// 						"customer": "客户名",
-// 						"stockType": "出库类型",
-// 						"person": "出库人",
-// 						"createTime": "2016-03-31 14:28:33"
-// 					}
-					]
+					data: []
 				},
 				instockData: {
 					url: HOST + "/api/v1/stock/bybatch",
@@ -131,13 +115,15 @@
 					filename: this.$route.query.batchNo + "在库",
 					columns: [{
 						prop: "barcode",
-						name: "条码"
+						name: "条码",
+						fixed: true
 //					}, {
 //						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
 //						name: "条码类型"
 					}, {
 						prop: "batchNo",
-						name: "批次号"
+						name: "批次号",
+						width: "120"
 					}, {
 						prop: "materialCode",
 						name: "物料编码"
@@ -171,23 +157,7 @@
 						name: "入库时间",
 						width: "160"
 					}],
-					data: [
-// 						{
-// 						"barcode": "单件条码",
-// //						"barcodeTypeName": "2",
-// 						"batchNo": "批次号",
-// 						"materialCode": "031",
-// 						"materialName": "物料名字",
-// 						"quantity": 16,
-// 						// "remainingNum": 16,
-// 						"stock": "仓库",
-// 						"stocklot": "库位",
-// 						"customer": "客户名",
-// 						"stockType": "入库类型",
-// 						"person": "入库人",
-// 						"createTime": "2016-03-31 14:28:33"
-// 					}
-					]
+					data: []
 				},
 			}
 		},
@@ -239,7 +209,6 @@
 						
 						if(!res.data.errorCode) {
 							oData.data = res.data.data;
-							this.styleObject.minWidth = "1500px";
 						}else {
 							this.styleError.maxHeight = this.adjustHeight()-50+"px";
 //							oData.error = res.data.errorMsg.message;
@@ -251,7 +220,6 @@
 //						oData.error = "查询出错。"
 						console.log("接口查询出错。");
 						if(this.outstockData.error && this.instockData.error) {
-							this.styleObject.minWidth = 0;
 							this.styleError.maxHeight = this.adjustHeight()-50+"px"
 						}
 					})
@@ -336,7 +304,7 @@
 	
 	.el-table {
     	.el-table__body-wrapper {
-    		overflow-x: hidden;
+    		/*overflow-x: hidden;*/
     	}
     }
 	

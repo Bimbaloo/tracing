@@ -52,7 +52,6 @@
 								v-loading="oTab.tables.loading"
 								element-loading-text="拼命加载中"
 								row-class-name="table-item">
-								
 								<el-table-column
 									v-for="(column,index) in oTab.tables.columns"
 									:align="index?'center':'left'"
@@ -60,18 +59,19 @@
 									:min-width="column.width"
 									:label="column.name">
 									<template scope="props">
-										<div v-if="!index" :style="{marginLeft:props.row.level*nLevelDis+'px'}">
+										<div :class="[{evens:props.row.total%2},'cell-content']" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+'px'}">
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else class="isVis cell-content">{{ sText }}</div>
+										<div v-else :class="[{evens:props.row.total%2},'isVis', 'cell-content']">{{ sText }}</div>
 										
-										<div class="cell-info" :style="{marginLeft:!index?((props.row.level+1)*nLevelDis+nIconDis)+'px':0}">
+										<div class="cell-info">
 											<p 
-												v-for="item in props.row.data"
-												:class="[{isVis: !item[column.prop]}, 'cell-content']"
-											> {{ column.formatter(item[column.prop]) }} </p></div>
-										
+												v-for="(item,cellIndex) in props.row.data"
+												:class="[{isVis: !item[column.prop]},{evens:(props.row.total+cellIndex+1)%2}, 'cell-content']"
+												:style="{paddingLeft:!index?((props.row.level+1)*nLevelDis+nIconDis+nFirstDis)+'px':0}"> 
+												{{ column.formatter(item[column.prop]) }}</p>
+										</div>
 									</template>
 								</el-table-column>
 							</el-table>
@@ -96,18 +96,19 @@
 									:min-width="column.width"
 									:label="column.name">
 									<template scope="props">
-										<div v-if="!index" :style="{marginLeft:props.row.level*nLevelDis+'px'}">
+										<div :class="[{evens:props.row.total%2},'cell-content']" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+'px'}">
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else class="isVis">{{ sText }}</div>
+										<div v-else :class="[{evens:props.row.total%2},'isVis', 'cell-content']">{{ sText }}</div>
 										
-										<div class="cell-info" :style="{marginLeft:!index?((props.row.level+1)*nLevelDis+nIconDis)+'px':0}">
+										<div class="cell-info">
 											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item[column.prop]}"
-											> {{ column.formatter(item[column.prop]) }} </p></div>
-										
+												v-for="(item,cellIndex) in props.row.data"
+												:class="[{isVis: !item[column.prop]},{evens:(props.row.total+cellIndex+1)%2}, 'cell-content']"
+												:style="{paddingLeft:!index?((props.row.level+1)*nLevelDis+nIconDis+nFirstDis)+'px':0}"> 
+												{{ column.formatter(item[column.prop]) }}</p>
+										</div>
 									</template>
 								</el-table-column>
 							</el-table>
@@ -223,11 +224,13 @@
         	};
 			return {
 				// 默认测试数据。
-				sText: "a",
+				sText: "a",		// a
 				// 默认工序层级的间距。
 				nLevelDis: 10,
 				// 工序收缩图标宽度
 				nIconDis: 14,
+				// 首项默认的距离。
+				nFirstDis : 5,
 				// 是否全屏显示。
 				bFullScreen: bFull,
 				// 变量是否点击过查询。
@@ -254,7 +257,6 @@
 				oTab: {
 					"tables": {
 						url: HOST + "/api/v1/resume/bom",
-//						url: "static/resume_demo.json",
 						columns: [{
 							prop: "materialName",
 							name: "",
@@ -267,7 +269,6 @@
 							name: "类型",
 							width: 120,
 							formatter: function(sValue) {
-//								return sValue || self.sText
 								return self.getTimeLineTypeInfo(sValue).text || self.sText
 							}
 						},{
@@ -347,7 +348,6 @@
 					},
 					"lines": {
 						url: HOST + "/api/v1/resume/timeline",
-//						url: "static/resume_timeLine.json",
 						bCreated: false,
 						loading: false,
 						error: ""
@@ -449,7 +449,7 @@
 							- (this.bFullScreen?0:jLine.outerHeight(true))
 							- ($(".resume-main").outerHeight(true) - $(".resume-main").height())
 							- $(".resume-handler").outerHeight(true)
-							- $(".resume-table .table-title").outerHeight(true);
+							- (this.sCurrentTab == "tables"?$(".resume-table .table-title").outerHeight(true):0);
 							
 				// 返回数据。
 				return nReturnHeight;
@@ -512,7 +512,7 @@
 							if(this.sCurrentTab == "tables") {
 							    this.aoTable =res.data.data;
 							    this.aParsedData = this.parseTableData();
-							    
+							    console.log(this.aParsedData)
 							    // 设置批次及产品。
 							    if(this.aoTable.length) {
 								    this.oTitle.materialName = this.aoTable[0].nodeName;
@@ -556,11 +556,21 @@
 					// 返回元素的子集。
 					if(aInvialid.length) {
 						aInvialid.forEach(function(oData) {
+							// 获取每一级中其上级所有数据的总和。
+							let nTotal = 0,
+								oPrev = aoNew[aoNew.length-1];
+							
+							if(!oPrev) {
+								nTotal = 0;
+							}else {
+								nTotal = oPrev.total + oPrev.data.length+1;
+							}
 							aoNew.push({
 								name: oData.nodeName,		// name
 								parent: oData.parentNodeName,		// parent
 								data: oData.resumes,					//data
-								level: nLevel
+								level: nLevel,
+								total: nTotal
 							});
 							// 循环获取数据。
 							_getData(oData.nodeName,nLevel+1);
@@ -902,25 +912,6 @@
 					height: jNow.outerHeight(true) + 200,
 					background: isTable?"#fff":"#1d272f"
                 },true);
-//				html2canvas(jNow.get(0),{
-//					height: jNow.outerHeight(true) + 200,
-//					background: "#1d272f",
-//					onrendered:function(canvas) {
-//						var sImg = canvas.toDataURL("image/png");
-//							
-//						// 打印
-//						var w = window.open("about:blank","image from cancas");
-//						w.document.write("<img src='"+sImg+"' alt='from canvas'>")
-//					
-//						setTimeout(function() {
-//							w.print();
-//							
-//							w.close();
-//						},200)
-//						// 重置复制内容。
-//						jClone.html("");
-//					}
-//				});
 			}
 		}
 		
@@ -947,12 +938,21 @@
 	}
 	
 	.el-table .el-table__header thead tr th {
-		
 		background-color: @green;
 		.cell {
 			background-color: @green;
 			color: #FFFFFF;
 		}	
+	}
+	
+	.el-table .cell {
+		padding: 0;
+	}	
+	
+	.el-table tbody {
+		.cell-content.evens {
+			background-color: #C0CCDA;
+		}
 	}
 	
 	.domDown {
@@ -965,7 +965,13 @@
 		/*padding: 0 20px;*/
 		
 		.isVis {
-			visibility: hidden;
+			// 不显示占位符. - 的话打印会错位
+			color: transparent;
+			/*visibility: hidden;*/
+		}
+		
+		.cell-content {
+			line-height: 40px;
 		}
 		
 		.table-title {
@@ -982,25 +988,9 @@
 			}
 		}
 		.time-line;
-		
-		/*.item-node {
-			.node-outer {
-				border-radius: 0;
-				.node-inner {
-					border-radius: 0;
-				}
-			}
-		}
-		.sub-node {
-			.node-outer {
-				border-radius: 0;
-				
-				.node-inner {
-					border-radius: 0;
-				}
-			}
-		}*/
 	}
+	
+	
 	.resume-wraps {
 		background-color: #F2F2F2;
 		
@@ -1078,11 +1068,16 @@
 						.table-main {
 							
 							.isVis {
-								visibility: hidden;
+								/*visibility: hidden;*/
+								color: transparent;
+								
+								&::selection {
+									color: transparent;
+								}
 							}
 							
 							.cell-content {
-								line-height: 36px;
+								line-height: 40px;
 							}
 							
 							.icon-down {

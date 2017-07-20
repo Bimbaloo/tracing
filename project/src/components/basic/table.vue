@@ -14,6 +14,7 @@
         <el-table-column 
         v-for="column in columns"       
         align="center"
+        :fixed="column.fixed?true:false"
         :sortable="column.sortable"
         :type="column.type"
         :resizable="resize"
