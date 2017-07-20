@@ -14,7 +14,7 @@
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
 					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
-					<div id='changeDiagram' class='changeDiagram'></div>
+					<div id='changeDiagram' :class="[{hide: treeFullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
 					</div>
@@ -387,17 +387,14 @@
 		watch: {
 			_treeHeight: function () {
 				let viewHeight = document.querySelector(".router").offsetHeight
-				let	maxTreeHeight = viewHeight - 40 -20 -40  
-				//debugger
-				console.log("this._treeHeight"+this._treeHeight)
-				console.log('maxTreeHeight'+maxTreeHeight)
-				console.log("this.treeFullscreen"+this.treeFullscreen)
-				if(this._treeHeight > maxTreeHeight && !this.treeFullscreen){  //canvas太大且未全屏时，自动全屏
-					//debugger
-					this.$store.commit({
-						type: "updateTreeFullscreen",
-						key: true
-					});
+				let	maxTreeHeight = viewHeight - 40 -20 -100  
+				if(this._treeHeight > maxTreeHeight && !this.treeFullscreen){  //底部内容不得小于100px
+					this.treeHeight = maxTreeHeight
+					this.changeHeight = 0
+
+				}else if(this._treeHeight < 130 && !this.treeFullscreen){
+					this.treeHeight = 130
+					this.changeHeight = 0
 				}
 			}
 		}
@@ -492,6 +489,9 @@
     				flex-basis: 20px;
 					z-index: 3;
 					cursor:n-resize;
+					&.hide {
+						display: none;
+					}
 				}
 				.view {
 					border: 1px solid #ccc;
