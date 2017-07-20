@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  //import logo from 'assets/img/logo-w.png'
+  // import logo from 'assets/img/logo-w.png'
   import logo from 'assets/img/kssp-logo.png'
   import version from 'assets/img/version.png'
   import panel from 'components/panel/panel.vue'

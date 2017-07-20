@@ -5,9 +5,7 @@
 		</div-->
 		<div v-if="!sErrorMessage" ref="content">
 			<div ref="summary" :class="{ actived: active.summary }">				
-				<h2 class="content-title" @click="active.summary=!active.summary">
-					汇总信息
-					<i class="el-icon-d-arrow-right icon"></i>
+				<h2 class="content-title" @click="active.summary=!active.summary">汇总信息<i class="el-icon-d-arrow-right icon"></i>
                 	<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.summary, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('summaryTable', $event)"></i>					
 				</h2>
@@ -21,9 +19,7 @@
 				</transition>
 			</div>
 			<div ref="inStocks" :class="{ actived: active.inStocks }">			
-				<h2 class="content-title" @click="active.inStocks=!active.inStocks">
-					在库明细
-					<i class="el-icon-d-arrow-right icon"></i>
+				<h2 class="content-title" @click="active.inStocks=!active.inStocks">在库明细<i class="el-icon-d-arrow-right icon"></i>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.inStocks, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inStocksTable', $event)"></i>
 				</h2>

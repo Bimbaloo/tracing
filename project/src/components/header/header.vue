@@ -10,7 +10,7 @@
 </template>
 <script>
 
-   // import logo from 'assets/img/logo-w.png'
+//    import logo from 'assets/img/logo-w.png'
     import logo from 'assets/img/kssp-logo.png'
     import 'assets/css/icon.less'
 
