@@ -271,5 +271,10 @@
 	}
 </script>
 
-<style>
+<style lang="less">
+	#catalog {
+		canvas {
+			outline: none;
+		}
+	}
 </style>

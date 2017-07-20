@@ -539,6 +539,10 @@
 	
 	#tree {
 		flex: 1 1;
+
+		canvas {
+			outline: none;
+		}
 	}
 	
 </style>
