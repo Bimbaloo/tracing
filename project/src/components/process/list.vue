@@ -7,11 +7,11 @@
             </h2>
 			<div class="content-panel" v-if="equipments.length">
 				<!--设备-->
-				<div class="equipment-list">
+				<div class="equipment-list" @click.self="checkboxIf=false">
 					<!--div class="btn-group">				
 						<el-button :class="[{ actived: `${checkedEquipments.indexOf(info.equipmentId)>-1}`}, 'btn', 'btn-plain']" v-for="info in equipments" :key="info.equipmentId">{{info.equipmentName}}</el-button>
 					</div-->				
-					<el-checkbox-group v-model="checkedEquipments" class="btn-group" @change="handleCheckedEquipmentsChange">
+					<el-checkbox-group v-model="checkedEquipments" class="btn-group" @change="handleCheckedEquipmentsChange" @click.self="checkboxIf=false">
 						<el-checkbox-button v-for="info in equipments" :label="info.equipmentId" :key="info.equipmentId">{{info.equipmentName}}</el-checkbox-button>
 					</el-checkbox-group>
 					<div class="select">
@@ -126,7 +126,7 @@
         watch: {
             // 如果路由有变化，会再次执行该方法
             '$route': 'setEquipmentList',
-			checkedEquipments: 'setDateTime'
+			// checkedEquipments: 'setDateTime'
         },
         methods: {
 			setDateTime () {
@@ -308,7 +308,7 @@
 				}
 
 				.btn-group {
-					flex: 1 0;
+					// flex: 1 0;
 					white-space: nowrap;
 					overflow: hidden;
 					display: inline-block;
@@ -342,9 +342,7 @@
 							border: 2px solid #ccc 
 						}						
 					}
-
-
-					.el-checkbox-button:last-child .el-checkbox-button__inner {
+					.el-radio-button:last-child .el-radio-button__inner, .el-checkbox-button:last-child .el-checkbox-button__inner {
 						border-radius: 0;
 					}
 					 

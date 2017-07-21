@@ -20,7 +20,7 @@
 					
 					<div v-show="!bFullScreen" class="line"></div>
 					<div class="resume-main" :class="{showDiff:sCurrentTab === 'lines' }">
-						<div class="resume-handler">
+						<div class="resume-handler" v-show="!bCarousel">
 							<div class="resume-tabs">
 								<v-button text-data="BOM表" tab-data="tables" :type-data="sBomType"  @query="changeTab('tables')"></v-button>
 								<v-button text-data="时间轴" tab-data="lines"  :type-data="sTimeLineType" @query="changeTab('lines')"></v-button>
@@ -32,7 +32,7 @@
 							</div>
 						</div>
 						<!-- 表格 -->
-						<div v-show="sCurrentTab === 'tables'" class="resume-table">
+						<div v-show="sCurrentTab === 'tables'" class="resume-table" ref="table">
 							<div class="table-title">
 								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
 								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
@@ -118,7 +118,7 @@
 						<div 
 							v-loading="oTab.lines.loading"
 							element-loading-text="拼命加载中"
-							v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height:getHeight()+'px'}">
+							v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height:getHeight()+'px'}" ref="timeLine">
 							
 							<div v-if="oTab.lines.error" class="error">
 								{{ oTab.lines.error }}
@@ -235,6 +235,8 @@
 				bFullScreen: bFull,
 				// 变量是否点击过查询。
 				bSubmit: bFull?true:false,
+				// 是否大屏轮播。
+				bCarousel: window.location.hash.indexOf("carousel")>-1?true:false,
 				// 查询搜索值。
 				ruleForm: {
 					barcode: ""
@@ -521,6 +523,12 @@
 							}else {
 								this.aoTimeLineData =res.data.data;
 							}
+							if(this.bCarousel) {
+								this.$nextTick(function() {
+									// 设置滚动。
+									this.setScroll();
+								})						
+							}
 						}else {
 						    // 根据errorCode 错误时设置。error
 							this.oTab[this.sCurrentTab].error = res.data.errorMsg.message;
@@ -533,6 +541,32 @@
 				}else {
 					this.oTab[this.sCurrentTab].loading = false;
 				}
+			},
+			// 设置滚动。
+			setScroll () {
+				// 时间轴
+				let node = this.$refs.timeLine,
+					bEnd = false;
+
+				if(this.sCurrentTab == "tables") {
+					// 表格
+					node = this.$refs.table.querySelector(".el-table__body-wrapper");
+				}
+				
+				if(node.scrollHeight > node.clientHeight) {
+					
+					setInterval(function() {
+						if(bEnd) {					
+							node.scrollTop = 0;
+							bEnd = false;
+						}else if(node.scrollTop + 100 + node.clientHeight > node.scrollHeight) {
+							node.scrollTop = node.scrollHeight - node.clientHeight;
+							bEnd = true;
+						}else {
+							node.scrollTop += 100;
+						}
+					}, 1000)
+				}				
 			},
 			// 表格数据转换成可用于创建的数据。
 			parseTableData() {

@@ -247,12 +247,12 @@
                     }
                     
                 }
-
+                
                 // 按照开始时间排序。
                 aoSortData.sort((a, b) => {
-                    return a.startTime < b.startTime;
+                    return (new Date(a.startTime).getTime() -  new Date(b.startTime).getTime());
                 });
-           
+
                 aoSortData.map((o, index) => {
                     if(o.type == "startWorkList") {
                         // 加工。
@@ -445,8 +445,9 @@
                     }                    
                 }
 
+                // 按照开始时间排序。
                 aoSortData.sort((a, b) => {
-                    return a.startTime < b.startTime;
+                    return (new Date(a.startTime).getTime() -  new Date(b.startTime).getTime());
                 });
 
                 aoSortData.map((o, index) => {
@@ -577,7 +578,7 @@
                                     self.$createElement('span', {}, sTitle)
                                 ]),
                                 self.$createElement('ul', {
-                                    class: ["content"]
+                                    class: ["ul-content"]
                                 }, Object.keys(oList).map(p => {
                                     return self.$createElement('li', {}, oList[p] + '：' + (item[p] == undefined ? '':item[p]))
                                 }))
@@ -637,8 +638,9 @@
                     }                    
                 }
 
+                // 按照开始时间排序。
                 aoSortData.sort((a, b) => {
-                    return a.startTime < b.startTime;
+                    return (new Date(a.startTime).getTime() -  new Date(b.startTime).getTime());
                 });
 
                 aoSortData.map((o, index) => {
@@ -699,8 +701,9 @@
                     }                     
                 }
 
+                // 按照开始时间排序。
                 aoSortData.sort((a, b) => {
-                    return a.startTime < b.startTime;
+                    return (new Date(a.startTime).getTime() -  new Date(b.startTime).getTime());
                 });
 
                 aoSortData.map((o, index) => {
@@ -765,8 +768,9 @@
                     }                     
                 }
 
+                // 按照开始时间排序。
                 aoSortData.sort((a, b) => {
-                    return a.startTime < b.startTime;
+                    return (new Date(a.startTime).getTime() -  new Date(b.startTime).getTime());
                 });
 
                 aoSortData.map((o, index) => {
@@ -873,7 +877,7 @@
             }
         }
         &[data-type="close"] {
-            background-color: #cccccc;
+            background-color: #999;
             .icon-period {
                 background-position: 0 -90px;
             }
@@ -1014,7 +1018,8 @@
 
             }
 
-            .content {
+            .ul-content {
+                // display: block;
                 padding: 5px 0;
                 li {
                     padding: 5px 10px;
