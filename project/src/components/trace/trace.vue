@@ -35,7 +35,8 @@
                         prop: "bucketNo",
                         name: "",
                         type: "selection",
-                        width: "30"
+                        width: "30",
+                        fixed: true
                     },{
                         type: "index",
                         name: "序号",

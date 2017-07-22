@@ -38,7 +38,8 @@
                         prop: "bucketNo",
                         name: "",
                         type: "selection",
-                        width: "30"
+                        width: "30",
+                        fixed: true
                     },{
 //                      prop: "index",
                         type: "index",

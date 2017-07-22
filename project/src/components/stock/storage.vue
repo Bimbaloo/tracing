@@ -28,10 +28,10 @@
             </div>
             <!-- 复制的内容 -->
             <div v-show="false" ref="outstockTable">
-            	<v-table :table-data="outstockData" :loading="outstockData.loading"></v-table>
+            	<v-table :b-fixed="false" :table-data="outstockData" :loading="outstockData.loading"></v-table>
             </div>
             <div v-show="false" ref="instockTable">
-            	<v-table :table-data="instockData" :loading="instockData.loading"></v-table>
+            	<v-table :b-fixed="false" :table-data="instockData" :loading="instockData.loading"></v-table>
             </div>
         </div>
     </div>      
@@ -44,7 +44,8 @@
     import XLSX from 'xlsx'
     import Blob from 'blob'
     import FileSaver from 'file-saver'
-
+	import rasterizeHTML from 'rasterizehtml'
+	
     export default {
         components: {
             'v-table': table,
@@ -186,7 +187,7 @@
         created () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
-               this.fetchPage();
+            this.fetchPage();
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
@@ -297,11 +298,13 @@
                 if(!oTable) {
                     return;
                 }
-				oPrint.innerHTML = oTable.innerHTML;
-                window.Rt.utils.printHtml(oPrint,{
-                	height: oPrint.clientHeight,
-                	width: 1500
-                },true);
+//				oPrint.innerHTML = oTable.innerHTML;
+//              window.Rt.utils.printHtml(oPrint,{
+//              	height: oPrint.clientHeight,
+//              	width: 1500
+//              },true);
+                
+                window.Rt.utils.rasterizeHTML(rasterizeHTML, oTable);
             }
         }
     }  

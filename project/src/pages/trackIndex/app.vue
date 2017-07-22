@@ -334,7 +334,8 @@
 					border: 1px solid #ccc;
 					box-sizing: border-box;
 					background-color: #fff;
-					flex: 0 400px;
+					/*flex: 0 400px;*/
+					flex: 1 1;
 					margin-bottom: 20px;
 
 					&.hide {
@@ -363,7 +364,7 @@
 		position: absolute;
 		cursor: pointer;
 		z-index: 100;
-		right: 120px;		// 160
+		right: 180px;
 		top: 30px;
 	}
 	.table-line {

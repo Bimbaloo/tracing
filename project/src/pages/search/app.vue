@@ -16,7 +16,7 @@
 </template>
 
 <script>
-  // import logo from 'assets/img/logo-w.png'
+  //import logo from 'assets/img/logo-w.png'
   import logo from 'assets/img/kssp-logo.png'
   import version from 'assets/img/version.png'
   import panel from 'components/panel/panel.vue'
@@ -136,7 +136,8 @@
   }
 
   .panel-content {
-      margin-left: -100px;
+      /*margin-left: -100px;*/
+			padding: 0 80px;     
   }
 
   .el-tabs--border-card {
@@ -159,7 +160,7 @@
   
   .search-tab {
     width: 1080px;
-    height: 700px;
+    height: 750px;
     margin: 0 auto;
     border: none;
     box-shadow: none;
@@ -195,7 +196,7 @@
         }
       }
       &>.el-tabs__content {
-        padding: 0 300px;
+        /*padding: 0 300px;*/
       }
     } 
   }
@@ -244,7 +245,7 @@
       }
 
       &>.el-tabs__content {
-        padding: 0 300px;
+        /*padding: 0 300px;*/
       }
     } 
   }

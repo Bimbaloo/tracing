@@ -33,20 +33,20 @@
 						</div>
 						<!-- 表格 -->
 						<div v-show="sCurrentTab === 'tables'" class="resume-table" ref="table">
-							<div class="table-title">
+							<div class="table-title" v-show="bShowTitle">
 								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
 								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
 								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
 							<!--:row-style="tableRowStyleName"-->
-							<div v-if="oTab.tables.error" :style="{height:getHeight()+'px'}" class="error">
+							<div v-if="oTab.tables.error" :style="{height:oTab.tables.height+'px'}" class="error">
 								{{ oTab.tables.error }}
 							</div>
 							<el-table
 								v-else
 								class="table-main" 
 								:data="aParsedData" 
-								:height="getHeight()" 
+								:height = "oTab.tables.height"
 								stripe
 								style="width: 100%;"
 								v-loading="oTab.tables.loading"
@@ -237,6 +237,8 @@
 				bSubmit: bFull?true:false,
 				// 是否大屏轮播。
 				bCarousel: window.location.hash.indexOf("carousel")>-1?true:false,
+				// 是否显示标题。  只有当调用成功后才显示。
+				bShowTitle: false,
 				// 查询搜索值。
 				ruleForm: {
 					barcode: ""
@@ -346,13 +348,15 @@
 						}],
 						bCreated: false,
 						loading: false,
-						error: ""
+						error: "",
+						height: "100%"
 					},
 					"lines": {
 						url: HOST + "/api/v1/resume/timeline",
 						bCreated: false,
 						loading: false,
-						error: ""
+						error: "",
+						height: "100%"
 					}
 				},
 				// 规则。
@@ -414,6 +418,11 @@
 			this.getPageData();
 //			this.submitForm('ruleForm')
 		},
+		watch: {
+			bShowTitle: function() {
+				this.oTab[this.sCurrentTab].height = this.getHeight();
+			}
+		},
 		// 页面方法。
 		methods: {
 			// 初始化数据。
@@ -428,6 +437,8 @@
 				this.aParsedData = [];
 				// 当前时间轴数据。
 				this.aoTimeLineData = [];
+				// 默认不显示标题
+				this.bShowTitle = false;
 				// 默认都未创建。
 				this.oTab.tables.bCreated = false;
 				this.oTab.tables.loading = false;
@@ -443,7 +454,7 @@
 					jForm = $(".filters"),
 					jLine = $(".line"),
 					nReturnHeight = 0;
-				
+					
 				nReturnHeight = nHeight
 							- (this.bFullScreen?0:$("header").outerHeight(true))
 							-  (jWrap.outerHeight(true) - jWrap.height())
@@ -451,8 +462,8 @@
 							- (this.bFullScreen?0:jLine.outerHeight(true))
 							- ($(".resume-main").outerHeight(true) - $(".resume-main").height())
 							- $(".resume-handler").outerHeight(true)
-							- (this.sCurrentTab == "tables"?$(".resume-table .table-title").outerHeight(true):0);
-							
+							- (this.sCurrentTab == "tables" && this.bShowTitle?$(".resume-table .table-title").outerHeight(true):0);
+				
 				// 返回数据。
 				return nReturnHeight;
 			},
@@ -498,23 +509,31 @@
 			getPageData() {
 				// 获取数据。-- 根据当前显示的tab创建数据。
 				this.oTab[this.sCurrentTab].loading = true;
-				this.oTab[this.sCurrentTab].error = "";
 				
 				// 设置barcode。
 				this.oTitle.barcode = this.ruleForm.barcode;
 				
-				if(!this.oTab[this.sCurrentTab].bCreated) { // && this.bSubmit
-						
+				
+				if(!this.oTab[this.sCurrentTab].bCreated) {
+					// 需要调用接口，才将错误信息去掉
+					this.oTab[this.sCurrentTab].error = "";
+					
 					this.$ajax.post(this.oTab[this.sCurrentTab].url, this.ruleForm).then((res) => {
 						this.oTab[this.sCurrentTab].loading = false;
 						// 设置为已创建。
 					    this.oTab[this.sCurrentTab].bCreated = true;
+					    
+						this.oTab[this.sCurrentTab].height = this.getHeight();
+						
 						if(!res.data.errorCode) {
 							// 保存数据。
 							if(this.sCurrentTab == "tables") {
+								// 显示标题。
+								this.bShowTitle = true;
+								
 							    this.aoTable =res.data.data;
 							    this.aParsedData = this.parseTableData();
-							    console.log(this.aParsedData)
+							    
 							    // 设置批次及产品。
 							    if(this.aoTable.length) {
 								    this.oTitle.materialName = this.aoTable[0].nodeName;
@@ -523,6 +542,7 @@
 							}else {
 								this.aoTimeLineData =res.data.data;
 							}
+							
 							if(this.bCarousel) {
 								this.$nextTick(function() {
 									// 设置滚动。
@@ -530,6 +550,13 @@
 								})						
 							}
 						}else {
+							
+							// 如果是表格，则隐藏标题。
+							if(this.sCurrentTab == "tables") {
+								// 显示标题。
+								this.bShowTitle = false;
+							}
+							
 						    // 根据errorCode 错误时设置。error
 							this.oTab[this.sCurrentTab].error = res.data.errorMsg.message;
 						}
@@ -1064,6 +1091,8 @@
 					}
 					
 					.resume-handler {
+						margin-bottom: 20px;
+						
 						.resume-tabs {}
 						.resume-icons {
 							text-align: right;
@@ -1138,9 +1167,8 @@
 					}
 					
 					.resume-timeLine {
-						margin-top: 25px;
+						/*margin-top: 25px;*/
 						color: #FFFFFF;
-						/*height: 730px;*/
 						overflow: auto;
 						
 						.time-line-content {

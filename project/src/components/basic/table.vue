@@ -14,7 +14,7 @@
         <el-table-column 
         v-for="column in columns"       
         align="center"
-        :fixed="column.fixed?true:false"
+        :fixed="bFixed && column.fixed?true:false"
         :sortable="column.sortable"
         :type="column.type"
         :resizable="resize"
@@ -40,7 +40,11 @@
             loading: Boolean,
             heights: {
             	required: false
-            	//default: "100%"
+            },
+            bFixed: {
+            	required: false,
+            	type: Boolean,
+            	default: true
             }
         },
         data() {

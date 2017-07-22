@@ -153,7 +153,7 @@
 		// 下载表格。
 		FileSaver.saveAs(new Blob([s2ab(wbout)], { type: 'application/octet-stream' }), sFileName + ".xlsx");            	
 	}
-
+	
 	/**
 	 * 导出Table为excel。依赖xlsx、blob、file-saver。
 	 * @param {Element} oElement table节点
@@ -217,6 +217,29 @@
 				}
 			}
 		})); 
+	}
+	
+	/**
+	 *  将页面中的数据下载。 rasterizeHTML
+	 *  @param {Element} element
+	 *  @param {Object} option
+	 *  @return {void}
+	 */
+	window.Rt.utils.rasterizeHTML = function(rasterizeHTML,element, option) {
+		let canvas = document.createElement("canvas");
+		
+        rasterizeHTML.drawHTML(element.innerHTML, canvas, option || {}).then(function(res) {
+        	var w = window.open("about:blank","image from cancas");
+			
+			w.document.body.appendChild(res.image);
+		
+			setTimeout(function() {
+				// 打印图片。
+				w.print();
+				
+				w.close();
+			},200)
+        })
 	}
 
 
