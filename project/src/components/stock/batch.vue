@@ -74,7 +74,7 @@
 					}, {
 						prop: "batchNo",
 						name: "批次号",
-						width: "120"
+						width: "150"
 					}, {
 						prop: "materialCode",
 						name: "物料编码"
@@ -123,7 +123,7 @@
 					}, {
 						prop: "batchNo",
 						name: "批次号",
-						width: "120"
+						width: "150"
 					}, {
 						prop: "materialCode",
 						name: "物料编码"

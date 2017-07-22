@@ -86,7 +86,7 @@ const store = new Vuex.Store({
     type: "",
     // 
     fullscreen: false,
-    treeFullscreen: false,
+    treeFullscreen: true,
     // 原始树数据。
     rawData: []
   },

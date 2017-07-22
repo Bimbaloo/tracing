@@ -125,7 +125,7 @@
 						
 			//          initialAutoScale:go.Diagram.Uniform,
 						layout: $(go.TreeLayout, {
-							nodeSpacing: 100,
+							nodeSpacing: 20,
 							layerSpacing: 33
 						}),
 			//	        layout: $(go.LayeredDigraphLayout, {layerSpacing: 33, columnSpacing: 6}),
@@ -160,6 +160,10 @@
 							selectionChanged: onNodeSelectionChange,
 							click: (e, node) => {
 //								onClickNode(e, node, this.tree, this.catalog)
+								if(this.treeFullscreen) {
+									this.restoreScreenClick();
+								}
+								
 								this.$store.commit({
 									type: "updateType",
 									key: "tree"

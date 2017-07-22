@@ -2,7 +2,13 @@
 <template>
     <div :class="[{detailed: show}, 'content-list']" v-loading="loading">
 		<div class="handle clear">
-			<label>视窗时间：</label><el-input v-model="windowTime.interval" class="time" type="number" :min="windowTime.min" :max="windowTime.max" @blur="inputTimeBlur"></el-input><label>分钟</label>
+			<label>视窗时间：</label>
+			<el-input v-model="windowTime.interval" class="time" type="number" 
+				:min="windowTime.min" 
+				:max="windowTime.max" 
+				@blur="inputTimeBlur">
+			</el-input>
+			<label>分钟</label>
 			<span>{{windowTime.start}}</span><span class="split">~</span>
 			<span>{{windowTime.end}}</span>
 			<i class="icon icon-20 icon-show" v-if="show" @click="show=false"></i>
@@ -11,9 +17,15 @@
 				<span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
 			</div>
 		</div>
-		<div class="analysis">
+		<div class="analysis" :style="{marginBottom: bList ? '50px':'100px'}">
 			<div class="name">
-				<label @click="showEquipmentDetail(info)" v-for="info in equipments" v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected">{{info.equipmentName}}<i class="el-icon-d-arrow-right"></i></label>
+				<label 
+					@click="showEquipmentDetail(info)" 
+					v-for="info in equipments" 
+					v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected">
+					<span>{{info.equipmentName}}</span>
+					<i class="el-icon-d-arrow-right"></i>
+				</label>
 			</div>
 			<div v-if="sErrorMessage" class="empty">{{ sErrorMessage }}</div>
 			<div v-else class="equipment">
@@ -63,6 +75,11 @@
 					</div>
 				</div>
 			</div>					
+		</div>
+					
+		<div class="handle-button" v-if="!bList">
+			<el-button>可疑品</el-button>
+			<el-button>追踪</el-button>
 		</div>   
     </div>      
 </template>
@@ -213,69 +230,16 @@
 				startIf: true,
 				endIf: true,
 				eventData: {},
-				equipmentData: {},
-				// datetime: {
-				// 	start: "",
-				// 	initStart: "",
-				// 	end: "",
-				// 	initEnd: ""
-				// }
+				equipmentData: {}
             }
         },
         computed: {
 			rawData () {
 		    	return this.$store.state.rawData
 		  	},
-			// equipmentData () {				
-			// 	let oData = {};
-			// 	this.equipments.forEach(o => {
-			// 		let sId = o.equipmentId;
-			// 		oData[sId] = {
-			// 			selected: this.checkedEquipments.indexOf(sId) > -1,
-			// 			status: [],
-			// 			// 加工
-			// 			work: {},
-			// 			// 质量
-			// 			quality: {},
-			// 			// 事件
-			// 			event: {},
-			// 			// 维护
-			// 			repair: {},
-			// 			// 工具
-			// 			tool: {}
-			// 		}
-			// 	})	
-			// 	return oData;			
-			// },			
-			// datetime () {
-			// 	let start = "",
-			// 		end = "";
-			// 	this.checkedEquipments.forEach((id, index) => {
-			// 		let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
-			// 		if(equipment) {
-			// 			let sTemp = equipment.shiftStartTime,
-			// 				eTemp = equipment.shiftEndTime
-			// 			if(!index) {
-			// 				start = sTemp;
-			// 				end = eTemp;
-			// 			}else{
-			// 				if(start > sTemp) {
-			// 					start = sTemp;
-			// 				}
-			// 				if(end < eTemp) {
-			// 					end = eTemp;
-			// 				}
-			// 			} 									
-			// 		}					
-			// 	})
-
-			// 	return {
-			// 		start: start,
-			// 		initStart: start,
-			// 		end: end,
-			// 		initEnd: end
-			// 	}
-			// },
+			bList () {
+				return true;//typeof this.dimensionData === "string"
+			}
         },
         created () {
             // 组件创建完后获取数据，
@@ -298,7 +262,7 @@
 			},
 			// 为了每次点击都会查询。
 			"$route": function() {
-				if(typeof this.dimensionData == "string") {
+				if(this.bList) {				
 					// 设备列表页面。
 					this.init();
 				}			
@@ -310,7 +274,7 @@
 				
 				this.setWindowTime();
 
-				if(typeof this.dimensionData == "string") {
+				if(this.bList) {
 					// 设备列表页面。
 					// 查询设备状态。
 					this.fetchData("1");
@@ -349,35 +313,6 @@
 				})	
 				this.equipmentData = oData;
 
-				// let start = "",
-				// 	end = "";
-				// this.checkedEquipments.forEach((id, index) => {
-				// 	let equipment = this.equipments.filter(o => o.equipmentId == id)[0];
-				// 	if(equipment) {
-				// 		let sTemp = equipment.shiftStartTime,
-				// 			eTemp = equipment.shiftEndTime
-				// 		if(!index) {
-				// 			start = sTemp;
-				// 			end = eTemp;
-				// 		}else{
-				// 			if(start > sTemp) {
-				// 				start = sTemp;
-				// 			}
-				// 			if(end < eTemp) {
-				// 				end = eTemp;
-				// 			}
-				// 		} 									
-				// 	}					
-				// })
-
-				// this.datetime = {
-				// 	start: start,
-				// 	initStart: start,
-				// 	end: end,
-				// 	initEnd: end
-				// }
-
-
 			},
 			// 判断调用接口是否成功。
 			judgeLoaderHandler(param,fnSu,fnFail) {
@@ -405,7 +340,7 @@
 				});
 			},
 			getDimensionData () {
-				if(typeof this.dimensionData == "string") {
+				if(this.bList) {
 					// 设备列表，单维度查看。
 					if(this.dimensionData == 1 || this.dimensionData == 2 || this.dimensionData == 3) {
 						this.fetchData(this.dimensionData);
@@ -431,7 +366,7 @@
 				// 	["1", "2", "3", "4", "5", "6"].forEach(type => this.formatEquipmentData(type, this.eventData[type]));
 					
 				// }, 1000)		
-				// debugger		
+				
 				this.$post(this.url, {
 					equipmentIdList: this.checkedEquipments.join(","),
 					startTime: this.datetime.start,
@@ -645,7 +580,7 @@
 			 * @return {void}
 			 */
 			refreshData () {
-				if(typeof this.dimensionData == "string") {
+				if(this.bList) {
 					// 若为设备列表页面。				
 					for(let p in this.equipmentData) {
 						this.equipmentData[p].status = [];					
@@ -705,7 +640,7 @@
 			 */
 			showEquipmentDetail (oData) {
 				let self = this;				
-				if(typeof this.dimensionData == "string") {
+				if(this.bList) {
 					// 若为设备列表页面。
 					this.$router.push({ 
 						path: `/process/detail`, 
@@ -919,14 +854,27 @@
 						}
 
 						&:hover {
-							overflow: visible;	
+								
 							color: #42af8f;
+
+							span {
+								overflow: visible;
+							}
 						}
 
+						span {
+							display: inline-block;
+							vertical-align: middle;
+							width: 120px;
+							overflow: hidden;
+							text-overflow: ellipsis;
+							white-space: nowrap;						
+						}
 						i {
 							display: inline-block;
+							vertical-align: middle;
 							font-size: 12px;
-							margin-left: 10px;
+							// margin-left: 10px;
 						}	
 					}
 				}

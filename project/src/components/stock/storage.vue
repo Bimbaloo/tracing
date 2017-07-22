@@ -74,7 +74,7 @@
                     },{
                         prop: "batchNo",
                         name: "批次号",
-                        width: "120",
+                        width: "150",
                         class: "batch",
                         cellClick: this.batchClick
                     },{
@@ -125,7 +125,7 @@
                     },{
                         prop: "batchNo",
                         name: "批次号",
-                        width: "120",
+                        width: "150",
                         class: "batch",
                         cellClick: this.batchClick
                     },{
