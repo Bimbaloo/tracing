@@ -81,7 +81,7 @@
 						name: "物料编码"
 					}, {
 						prop: "materialName",
-						name: "物料名字",
+						name: "物料名称",
 						width: "300"
 					}, {
 						prop: "quantity",
@@ -267,7 +267,7 @@
 	}
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
 		
 	.router-content {
 		flex: 1 1;

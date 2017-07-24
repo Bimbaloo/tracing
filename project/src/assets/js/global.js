@@ -160,9 +160,20 @@
 	 * @param {String} sFileName 文件名
 	 * @return {void}
 	 */
-	window.Rt.utils.exportTable2Excel = function(XLSX, Blob, FileSaver, oElement, sFileName) {
+	window.Rt.utils.exportTable2Excel = function(XLSX, Blob, FileSaver, oElement, sFileName, oFormat) {
 		// 根据table节点生产表。
-		let wb = XLSX.utils.table_to_book(oElement);
+		let wb = XLSX.utils.table_to_book(oElement),
+			sheet = wb.Sheets[wb.SheetNames[0]];
+		
+		if(oFormat.date) {
+			for(let p in sheet) {
+				if(sheet[p].t == "n" && sheet[p].z == "m/d/yy") {
+					// 若为日期，则改变格式为"yyyy/mm/dd HH:MM:ss"
+					sheet[p].z = oFormat.date;
+				}
+			}
+		}
+
 		let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 
 		// 下载表格。

@@ -348,7 +348,7 @@
 					background-color: #fff;
 					flex: 1 1;
 					padding: 0 20px;
-					overflow: auto;
+					// overflow: auto;
 					position: relative;
 					height: 50px;
 					

@@ -421,7 +421,7 @@ export default {
         exportExcelHandle (sTable, sFileName, event) {
 
             // 下载表格。
-            window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName);      
+            window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      
         },
         // 表格打印。
         printHandle (refTable, event) {

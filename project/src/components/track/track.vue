@@ -44,37 +44,15 @@
 //                      prop: "index",
                         type: "index",
                         name: "序号",
-                        width: "50"
+                        width: "50",
+                        fixed: true
                     },{
                         prop: "barcode",
                         name: "条码"
                     },{
-                        prop: "batchNo",
-                        name: "批次号",
-                        width: "150"
-                    },{
-                        prop: "materialCode",
-                        name: "物料编码"
-                    },{
-                        prop: "materialName",
-                        name: "物料名称",
-                        width: "300"
-                    },{
-                        prop: "materialSpec",
-                        name: "物料规格"
-                    },{
-                        prop: "materialUnit",
-                        name: "物料单位"
-                    },{
-                        prop: "quantity",
-                        name: "数量"
-                    },{
-                        prop: "happenTime",
-                        name: "加工时间",
-                        width: "160"
-                    },{
-                        prop: "personName",
-                        name: "操作人"
+                        prop: "processName",
+                        name: "工序名称",
+                        width: "120"
                     },{
                         prop: "equipmentName",
                         name: "设备名称",
@@ -86,12 +64,37 @@
                         prop: "equipmentType",
                         name: "设备类型"
                     },{
-                        prop: "processName",
-                        name: "工序名称",
-                        width: "120"
-                    },{
                         prop: "moldCode",
                         name: "模号"
+                    },{
+                        prop: "batchNo",
+                        name: "批次号",
+                        width: "150"
+                    },{
+                        prop: "materialCode",
+                        name: "物料编码"
+                    },{
+                        prop: "materialName",
+                        name: "物料名称",
+                        width: "300"
+                    // },{
+                    //     prop: "materialSpec",
+                    //     name: "物料规格"
+                    },{
+                        prop: "materialUnit",
+                        name: "单位",
+                         width: "50"
+                    },{
+                        prop: "quantity",
+                        name: "数量",
+                        width: "50"
+                    },{
+                        prop: "happenTime",
+                        name: "加工时间",
+                        width: "160"
+                    },{
+                        prop: "personName",
+                        name: "操作人"
                     }],
                     data: []
                 },
