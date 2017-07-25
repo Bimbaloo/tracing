@@ -13,8 +13,8 @@
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
-					<div id='changeDiagram' :class="[{hide: treeFullscreen},'changeDiagram']"></div>
+					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :resize="resizeUpdate" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
+					<div id='changeDiagram' :class="[{hide: treeFullscreen},{hide: fullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
 					</div>
@@ -392,9 +392,16 @@
 					this.treeHeight = maxTreeHeight
 					this.changeHeight = 0
 
-				}else if(this._treeHeight < 130 && !this.treeFullscreen){
+				}else if(this._treeHeight < 130 && !this.treeFullscreen){      //顶部内容不得小于130px
 					this.treeHeight = 130
 					this.changeHeight = 0
+				}
+			},
+			reversedMessage: function(){
+				if(this.reversedMessage < 50 && !this.collapse){  //底部内容不得小于100px
+					this.LayoutLeftWidth = 50
+					this.changeWidth = 0
+
 				}
 			}
 		}
@@ -457,6 +464,7 @@
 					color: #42AF8F;
 					font-weight: bold;
 					font-size: 16px;
+					z-index:3;
 					cursor: pointer;
 				}
 			}
@@ -483,7 +491,7 @@
 					}
 				}
 				.changeDiagram {
-					background-color: #fff;
+					//background-color: #fff;
 					width: 100%;
     				height: 10px;
     				flex-basis: 20px;

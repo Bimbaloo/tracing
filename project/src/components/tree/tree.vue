@@ -19,7 +19,11 @@
 	export default {
 		props: {
 			treeData: Object,
-			flexBasis:{
+			flexBasis:{      // 用于追溯页面上下拖动后视图大小更新
+				type: Number,
+      			required: false
+			},
+			resize: {		 // 用于追溯页面左右拖动后视图大小更新
 				type: Number,
       			required: false
 			}
@@ -53,6 +57,9 @@
 		    	this.redrawTree();
 			},
 			flexBasis: function(){
+				this.updateCanvas()
+			},
+			resize: function(){
 				this.updateCanvas()
 			}
 		},
