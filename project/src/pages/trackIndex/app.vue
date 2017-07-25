@@ -1,8 +1,10 @@
 <template>
-	<div id="app">
+	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
 		<v-header></v-header>
-		<el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading">
-			<el-col class="router" ref="router">
+		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
+		<div class="content" v-loading.fullscreen.lock="fullscreenLoading">
+			<!-- <el-col class="router" ref="router"> -->
+			<div  class="router" ref="router">
 				<div @mouseenter="showTable" @mouseleave="unShowTable" v-if="false">  <!--!fullscreen-->
 					<i class="icon icon-20 icon-balance"></i>
 					<div class="table-line" v-if="show"></div>
@@ -23,13 +25,14 @@
 				</div>
 				<i class="icon icon-20 icon-report" @click="onReport" title="快速报告" v-if="!fullscreen"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}"></v-tree>
+					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
+					<div id='changeDiagram' :class="[{hide: treeFullscreen},{hide: fullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
 					</div>
 				</div>
-			</el-col>
-		</el-row>
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -46,6 +49,13 @@
 		},
 		data() {
 			return {
+				/* 上下拖动功能添加属性 */
+				treeHeight:400,  	 // 默认高度tree组件高度
+				draggingY: false,	 //上下拖动功能启动
+				_pageY:null,     	 //鼠标的纵向位置
+				changeHeight:0,  	 //改变的高度
+				resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
+
 				// 页面加载中动画。
 				fullscreenLoading: false,
 				url: HOST + "/api/v1/trace/down/trace-info",
@@ -81,7 +91,20 @@
 		    // 树的数据全屏。
 		   	treeFullscreen () {
 		   		return this.$store.state.treeFullscreen
-		   	}
+		   	},
+
+			// 上下拖动功能
+			_treeFullscreen() {
+				if(!!this.treeFullscreen){
+					return 1
+				}else{
+					return 0
+				}
+			},
+			_treeHeight() {
+				let _height = this.treeHeight+this.changeHeight
+				return _height
+			}   
 		},
 		created() {
 			// 组件创建完后获取数据
@@ -259,8 +282,55 @@
             	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(this.points));
             	// window.open("report.html?tag="+tag);
 				window.open("trackReport.html?tag="+tag);
-            }
+            },
+
+			/* 拖动功能 */
+			dragstar(e){   //鼠标按下，开始拖动
+			//  console.log('开始')
+			//	console.log(this.treeFullscreen)
+				if(e.target.id === 'changeDiagram'){
+					this.treeHeight = this._treeHeight
+					this.changeHeight = 0
+					this.draggingY = true;
+					this._pageY = e.pageY
+				}
+			
+				
+			
+			},
+			dragend(e){ //鼠标松开，结束拖动
+
+				this.draggingY = false  //关闭拖动功能
+
+
+			},
+			onMouseMove(e){ //拖动过程
+				if(this.draggingY){
+					this.changeHeight = e.pageY-this._pageY
+					this.resizeUpdateY = this._treeHeight //改变 resizeUpdateY 的值，触发 canvas 大小更新
+				}
+				
+			},
+			/* tree组件恢复默认大小 */
+			recoverTree(){  
+				this.changeHeight = 0
+			}  
+		},
+		watch: {
+			_treeHeight: function () {
+				let viewHeight = document.querySelector(".router").offsetHeight
+				let	maxTreeHeight = viewHeight - 40 -20 -100  
+				if(this._treeHeight > maxTreeHeight && !this.treeFullscreen){  //底部内容不得小于100px
+					this.treeHeight = maxTreeHeight
+					this.changeHeight = 0
+
+				}else if(this._treeHeight < 130 && !this.treeFullscreen){      //顶部内容不得小于130px
+					this.treeHeight = 130
+					this.changeHeight = 0
+				}
+			}
 		}
+
 	}
 </script>
 
@@ -336,8 +406,19 @@
 					background-color: #fff;
 					/*flex: 0 400px;*/
 					flex: 1 1;
-					margin-bottom: 20px;
+					//margin-bottom: 20px;
 
+					&.hide {
+						display: none;
+					}
+				}
+				.changeDiagram {
+					//background-color: #fff;
+					width: 100%;
+    				height: 10px;
+    				flex-basis: 20px;
+					z-index: 3;
+					cursor:n-resize;
 					&.hide {
 						display: none;
 					}

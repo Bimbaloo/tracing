@@ -48,12 +48,12 @@
 				draggingX: false,	  //左右拖动功能启动
 				resizeUpdate:0,       //监听父集div大小改变更新左侧图形
 
-				/* 左右拖动功能添加属性 */
-				treeHeight:400,  	// 默认高度tree组件高度
-				draggingY: false,	  //上下拖动功能启动
-				_pageY:null,     	//鼠标的纵向位置
-				changeHeight:0,  	//改变的高度
-				resizeUpdateY:0,     //监听父集div大小改变更新左侧图形
+				/* 上下拖动功能添加属性 */
+				treeHeight:400,  	 // 默认高度tree组件高度
+				draggingY: false,	 //上下拖动功能启动
+				_pageY:null,     	 //鼠标的纵向位置
+				changeHeight:0,  	 //改变的高度
+				resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
 
 				// 页面加载中动画。
 				fullscreenLoading: false,
@@ -398,7 +398,7 @@
 				}
 			},
 			reversedMessage: function(){
-				if(this.reversedMessage < 50 && !this.collapse){  //底部内容不得小于100px
+				if(this.reversedMessage < 50 && !this.collapse){  //左边内容不得小于50px
 					this.LayoutLeftWidth = 50
 					this.changeWidth = 0
 
