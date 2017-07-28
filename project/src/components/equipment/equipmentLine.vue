@@ -17,9 +17,9 @@
     export default{
         props: {
             visible: Boolean,
-			euqipmentStatus: Array,
-            euqipmentWork: Object,
-            euqipmentQuality: Object,
+			equipmentStatus: Array,
+            equipmentWork: Object,
+            equipmentQuality: Object,
             equipmentEvent: Object,
             equipmentRepair: Object,
             equipmentTool: Object,
@@ -27,7 +27,7 @@
             ratio: Number,
             dateTime: Object,
             windowTime: Object,
-            euqipmentIndex: Number
+            equipmentIndex: Number
 		},
         data() {
             return {         
@@ -74,16 +74,16 @@
         },
         computed: {
             status: function() {
-                return this.euqipmentStatus;
+                return this.equipmentStatus;
             },
             work: function() {
-                return this.euqipmentWork;
+                return this.equipmentWork;
             },
             quality: function() {
-                return this.euqipmentQuality;
+                return this.equipmentQuality;
             },
             event: function() {
-                return this.euqipmentEvent;
+                return this.equipmentEvent;
             },
             repair: function() {
                 return this.equipmentRepair;
@@ -103,7 +103,7 @@
         },
         mounted() {
             let nodes = this.$refs.wrap.parentElement.previousElementSibling.querySelectorAll("label");
-            this.labelNode = nodes[this.euqipmentIndex];
+            this.labelNode = nodes[this.equipmentIndex];
             // 初始设置位置。
             this.setPanelPadding();
         },
@@ -126,9 +126,7 @@
             tool: function() {
                 this.setTool();
             },
-            selectedDimension: function() {
-                console.log("change")
-                
+            selectedDimension: function() {       
                 this.$nextTick(() => {
                     this.setPanelPadding();
                 })
@@ -215,6 +213,9 @@
                     return;
                 }
                 for(let p in oWork) {
+                    if(!oWork[p]) {
+                        continue;
+                    }
                     if(p == "startWorkList") {
                         // 加工。
                         oWork[p].forEach(o => {
@@ -428,6 +429,9 @@
                 }
 
                 for(let p in oQuality) {
+                    if(!oQuality[p]) {
+                        continue;
+                    }
                     if(p == "qcList") {
                         // 质检。
                         oQuality[p].forEach(o => {
@@ -607,20 +611,24 @@
             },     
             // 设置异常事件。
             setEvent () {
-                console.log(this.event)
+                // console.log(this.event)
                 let oNode = this.$refs.event;
 
                 if(this.$refs.event instanceof Array) {
                     oNode = oNode[0];
                 }
 
-                let oEvent = this.event;
+                let oEvent = this.event,
+                    aoSortData = [];
 
                 if(!oEvent) {
                     return;
                 }
 
                 for(let p in oEvent) {
+                    if(!oEvent[p]) {
+                        continue;
+                    }
                     if(p == "startEquipWarningList") {
                         // 事件开始时间。
                         oEvent[p].forEach(o => {
@@ -642,19 +650,20 @@
                 aoSortData.sort((a, b) => {
                     return (new Date(a.startTime).getTime() -  new Date(b.startTime).getTime());
                 });
-
+                
                 aoSortData.map((o, index) => {
                     if(o.type == "startEquipWarningList") {
                         this.setDimensionConfig("event", this._createNode(o, index, "event", "事件开始", {
-                            startTime: "开始时间",                      
-                            personName: "上报人",
-                            type: "类型",
+                            startTime: "发生时间",  
+                            reportTime: "上报时间",                    
+                            reportName: "上报人",
+                            eventType: "事件类型",
+                            reason: "事件原因",
                             status: "状态"
                         }));
                     }else if(o.type == "endEquipWarningList") {
                         this.setDimensionConfig("event", this._createNode(o, index, "event", "事件结束", {
-                            endTime: "结束时间",
-                            checkPersonName: "操作人"
+                            endTime: "结束时间"
                         }));
                     }
                 })
@@ -670,13 +679,17 @@
                     oNode = oNode[0];
                 }
 
-                let oRepair = this.repair;
+                let oRepair = this.repair,
+                    aoSortData = [];
 
                 if(!oRepair) {
                     return;
                 }
 
                 for(let p in oRepair) {
+                    if(!oRepair[p]) {
+                        continue;
+                    }
                     if(p == "spotCheckList") {
                         // 设备点击。
                         oRepair[p].forEach(o => {
@@ -737,13 +750,17 @@
                     oNode = oNode[0];
                 }
 
-                let oTool = this.tool;
+                let oTool = this.tool,
+                    aoSortData = [];               
 
                 if(!oTool) {
                     return;
                 }
 
                 for(let p in oTool) {
+                    if(!oTool[p]) {
+                        continue;
+                    }
                     if(p == "installToolList") {
                         // 上刀/上模。
                         oTool[p].forEach(o => {
@@ -815,6 +832,33 @@
 <style lang="less">
     @import "../../assets/css/base.less";
 
+    .line-color(@color) {
+        .dimension-list {
+             border-left-color: @color;
+
+            .circle {
+                background-color: @color;
+            }
+
+            .dimension-content {
+                h2 {
+                    color: @color;
+                }
+            }
+            
+            &:hover, &.actived {
+                h2 {
+                    color: #fff;
+                    background-color: @color;
+                } 
+            }
+            &:hover, &.actived {
+                .dimension-content {
+                    border-color: @color;
+                }
+            }
+        }        
+    }
     // 展示详情。
     .detailed {
         .dimension-content {
@@ -910,60 +954,21 @@
     }
 
     .work {
-        .dimension-list {
-             border-left-color: @work;
-
-            .circle {
-                background-color: @work;
-            }
-
-            .dimension-content {
-                h2 {
-                    color: @work;
-                }
-            }
-            
-            &:hover, &.actived {
-                h2 {
-                    color: #fff;
-                    background-color: @work;
-                } 
-            }
-            &:hover, &.actived {
-                .dimension-content {
-                    border-color: @work;
-                }
-            }
-        }
+        .line-color(@work);
     }
     .quality {
-        .dimension-list {
-             border-left-color: @quality;
-
-            .circle {
-                background-color: @quality;
-            }
-
-            .dimension-content {
-                h2 {
-                    color: @quality;
-                }
-            }
-            
-            &:hover, &.actived {
-                h2 {
-                    color: #fff;
-                    background-color: @quality;
-                } 
-            }
-
-            &:hover, &.actived {
-                .dimension-content {
-                    border-color: @quality;
-                }
-            }
-        }
+        .line-color(@quality);
     }
+    .event {
+        .line-color(@event);
+    }
+    .repair {
+        .line-color(@repair);
+    }
+    .tool {
+        .line-color(@tool);
+    }
+
     .dimension-list {
         position: absolute;
         border-left: 2px solid #42af8f;

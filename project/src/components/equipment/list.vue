@@ -34,13 +34,13 @@
 					v-show="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].selected" 
 					:key="info.equipmentId" 
 					:visible="show"
-					:euqipment-index="index" 
-					:euqipment-status="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].status" 
-					:euqipment-work="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].work" 
-					:euqipment-quality="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].quality" 
-					:euqipment-event="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].event" 
-					:euqipment-repair="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].repair" 
-					:euqipment-tool="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].tool" 
+					:equipment-index="index" 
+					:equipment-status="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].status" 
+					:equipment-work="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].work" 
+					:equipment-quality="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].quality" 
+					:equipment-event="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].event" 
+					:equipment-repair="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].repair" 
+					:equipment-tool="equipmentData[info.equipmentId] && equipmentData[info.equipmentId].tool" 
 					:dimension-data="dimensionData" 
 					:ratio="ratio" 
 					:date-time="datetime" 
@@ -77,10 +77,10 @@
 			</div>					
 		</div>
 					
-		<div class="handle-button" v-if="!bList">
+		<!--div class="handle-button" v-if="!bList">
 			<el-button>可疑品</el-button>
 			<el-button>追踪</el-button>
-		</div>   
+		</div-->   
     </div>      
 </template>
 
@@ -238,13 +238,13 @@
 		    	return this.$store.state.rawData
 		  	},
 			bList () {
-				return true;//typeof this.dimensionData === "string"
+				return typeof this.dimensionData === "string"
 			}
         },
         created () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
-			// 设置窗口时长。
+			// 设置窗口时长。			
 			this.init();
         },
         mounted () {
@@ -257,8 +257,9 @@
 			},
 			// 选中设备变化。
 			checkedEquipments: function() {
-				// debugger
-				this.equipments.forEach(o => this.equipmentData[o.equipmentId] && (this.equipmentData[o.equipmentId].selected = this.checkedEquipments.indexOf(o.equipmentId) > -1))			
+				this.equipments.forEach(o => 
+					this.equipmentData[o.equipmentId] && 
+					(this.equipmentData[o.equipmentId].selected = this.checkedEquipments.indexOf(o.equipmentId) > -1))			
 			},
 			// 为了每次点击都会查询。
 			"$route": function() {
@@ -286,7 +287,6 @@
 			},
 			// 初始化数据。
 			setInitData() {
-				// debugger
 				this.show = false;
 				this.ratio = 1;
 				this.startIf = true;
@@ -342,15 +342,15 @@
 			getDimensionData () {
 				if(this.bList) {
 					// 设备列表，单维度查看。
-					if(this.dimensionData == 1 || this.dimensionData == 2 || this.dimensionData == 3) {
+					// if(this.dimensionData == 1 || this.dimensionData == 2 || this.dimensionData == 3) {
 						this.fetchData(this.dimensionData);
-					}
+					// }
 				}else {
 					// 设备详情，多维度查看。
 					this.dimensionData.forEach(dimension => {
-						if(dimension == 1 || dimension == 2 || dimension == 3) {
+						// if(dimension == 1 || dimension == 2 || dimension == 3) {
 							this.fetchData(dimension);
-						}
+						// }
 						
 					})
 				}	
@@ -376,17 +376,18 @@
 				.then((res) => {
 					this.loading = false;
 					this.judgeLoaderHandler(res, () => {
-						// 保存数据。
+						// 保存数据。		
 						let oData = res.data.data[0];
 
 						if(!oData) {
 							return;
 						}
+
 						this.eventData["1"] = [{
 							equipmentId: oData.equipmentId,
 							equipStatusList: oData.equipStatusList
 						}];	
-						
+
 						this.eventData["2"] = [{
 							equipmentId: oData.equipmentId,
 							startWorkList: oData.startWorkList,
@@ -419,7 +420,7 @@
 							installToolList: oData.installToolList,
 							removeToolList: oData.removeToolList
 						}];
-				
+
 						["1", "2", "3", "4", "5", "6"].forEach(type => {
 							if(this.eventData[type]) {
 								this.formatEquipmentData(type, this.eventData[type])
@@ -698,7 +699,6 @@
 			},
 			// 滑块拖动事件。
 			dragSlider (event) {
-				// debugger
 				// 阻止冒泡事件。
 				event.stopPropagation();
 				event.preventDefault();
@@ -722,11 +722,9 @@
 				function _moveHandler(e) {	
 					e.stopPropagation();
 					e.preventDefault();		
-
 					
 					// nRatio = nLeft + (e.clientX - nMouseX)*100/line.offsetWidth;
-					// debugger
-					
+
 					// if(nRatio < 0) {
 					// 	nRatio = 0;
 					// }else if(nRatio > nMax) {

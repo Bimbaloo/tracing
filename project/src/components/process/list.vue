@@ -250,7 +250,26 @@
 		border-color: @style;
 		border-left-color: @style;		
 	}
+	.button-color(@color) {
+		&.is-active {
+			.el-radio-button__inner {
+				color: #fff;
+				background-color: @color;			
+			}
+		}
 
+		.el-radio-button__inner {
+			.border-color(@color);				
+		}
+
+		&:hover, &:focus {
+			.el-radio-button__inner {
+				color: #fff;
+				background-color: @color;
+				.border-color(@color);	
+			}
+		}
+	}
 	.material-stock {	
 		.el-radio-button:first-child .el-radio-button__inner {
 			border-left: 2px solid rgb(191, 217, 212); 
@@ -318,30 +337,30 @@
 						margin-right: 20px;					
 					}
 					/* 临时屏蔽该按钮 。只是维度屏蔽*/
-					label.el-radio-button:nth-child(3) {
-						span {
-							background: rgb(204,204,204);
-							color: #fff;
-							cursor:default;
-							border: 2px solid #ccc 
-						}						
-					}
-					label.el-radio-button:nth-child(4) {
-						span {
-							background: rgb(204,204,204);
-							color: #fff;
-							cursor:default;
-							border: 2px solid #ccc 
-						}						
-					}
-					label.el-radio-button:nth-child(5) {
-						span {
-							background: rgb(204,204,204);
-							color: #fff;
-							cursor:default;
-							border: 2px solid #ccc 
-						}						
-					}
+					// label.el-radio-button:nth-child(3) {
+					// 	span {
+					// 		background: rgb(204,204,204);
+					// 		color: #fff;
+					// 		cursor:default;
+					// 		border: 2px solid #ccc 
+					// 	}						
+					// }
+					// label.el-radio-button:nth-child(4) {
+					// 	span {
+					// 		background: rgb(204,204,204);
+					// 		color: #fff;
+					// 		cursor:default;
+					// 		border: 2px solid #ccc 
+					// 	}						
+					// }
+					// label.el-radio-button:nth-child(5) {
+					// 	span {
+					// 		background: rgb(204,204,204);
+					// 		color: #fff;
+					// 		cursor:default;
+					// 		border: 2px solid #ccc 
+					// 	}						
+					// }
 					.el-radio-button:last-child .el-radio-button__inner, .el-checkbox-button:last-child .el-checkbox-button__inner {
 						border-radius: 0;
 					}
@@ -351,65 +370,27 @@
 
 			.dimension {
 				.quality {
-					&.is-active {
-						.el-radio-button__inner {
-							color: #fff;
-							background-color: @quality;			
-						}
-
-					}
-					
-					.el-radio-button__inner {
-						.border-color(@quality);				
-					}
-
-					&:hover {
-						.el-radio-button__inner {
-							color: #fff;
-							background-color: @quality;
-							.border-color(@quality);	
-						}
-					}
-					&:focus {
-						.el-radio-button__inner {
-							color: #fff;
-							background-color: @quality;
-							.border-color(@quality);	
-						}
-					}
+					.button-color(@quality)
 
 				}
 				.el-radio-button__orig-radio:checked+.el-radio-button__inner {
 					box-shadow: none;
 				}
 				.work {
-					&.is-active {
-						.el-radio-button__inner {
-							color: #fff;
-							background-color: @work;			
-						}
-					}
-
-					.el-radio-button__inner {
-						.border-color(@work);				
-					}
-
-					&:hover {
-						.el-radio-button__inner {
-							color: #fff;
-							background-color: @work;
-							.border-color(@work);	
-						}
-					}
-					&:focus {
-						.el-radio-button__inner {
-							color: #fff;
-							background-color: @work;
-							.border-color(@work);	
-						}
-					}
+					.button-color(@work)
 
 				}
+				.event {
+					.button-color(@event)
+
+				}	
+				.repair {
+					.button-color(@repair)
+
+				}
+				.tool {
+					.button-color(@tool)
+				}												
 			}
 
 			.equipment-list {
@@ -461,4 +442,5 @@
 			}	 
 		}    
     }
+	
 </style>

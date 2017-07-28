@@ -123,7 +123,7 @@
 						parameter: ["equipmentId", "startTime", "endTime"]  
                     }]
 				}],
-				selectedDimension: ["2", "3"]
+				selectedDimension: ["2", "3", "4", "5", "6"]
             }
         },
         computed: {
@@ -230,14 +230,14 @@
 			},
 			showButton(oData, event) {
 
-				if(oData.name === '质量' || oData.name === '加工'){   // 临时屏蔽了'事件'、'维护'、'工具' 三个按钮
+				// if(oData.name === '质量' || oData.name === '加工'){   // 临时屏蔽了'事件'、'维护'、'工具' 三个按钮
 					oData.show = true;
 					this.$nextTick(function () {
 					// DOM 更新了
 						let node = event.target.querySelector(".list-btn-wrap");
 						node.style.left = (event.target.offsetLeft + 24 - node.clientWidth/2) + "px";					
 					})
-				}
+				// }
 				
 			},
 			hideButton(oData, event) {
@@ -254,6 +254,33 @@
 		border-color: @style;
 		border-left-color: @style;		
 	}
+	.button-color(@color) {
+		&.is-active {
+			.el-checkbox-button__inner {
+				color: #fff;
+				background-color: @color;			
+			}
+		}
+
+		.el-checkbox-button__inner {
+			.border-color(@color);				
+		}
+
+		.el-checkbox-button.is-checked .el-checkbox-button__inner {
+			color: #fff;
+			background-color: @color;
+			border-color: @color;
+			box-shadow: -1px 0 0 0 @color;
+		}
+
+		&:hover,&:focus {
+			.el-checkbox-button__inner {
+				color: #fff;
+				background-color: @color;
+				.border-color(@color);	
+			}
+		}
+	}
 
 	.content-panel {
 		position: relative;
@@ -262,30 +289,30 @@
 	.list-wrap {
 		display: inline-block;
 		/* 临时屏蔽该按钮 */
-		label.el-checkbox-button.is-checked {
-			span:nth-child(3) {
-				background: rgb(204, 204, 204) ;
-				color: #fff;
-				cursor: default ;
-				border: 2px solid #ccc 
-			}
-		}
-		label:nth-child(4) {
-			span {
-				background: rgb(204, 204, 204) ;
-				color: #fff ;
-				cursor: default ;
-				border: 2px solid #ccc 
-			}
-		}
-		label:nth-child(5) {
-			.el-checkbox-button__inner {
-				background: rgb(204, 204, 204) ;
-				color: #fff ;
-				cursor: default ;
-				border: 2px solid #ccc 
-			}
-		}
+		// label.el-checkbox-button.is-checked {
+		// 	span:nth-child(3) {
+		// 		background: rgb(204, 204, 204) ;
+		// 		color: #fff;
+		// 		cursor: default ;
+		// 		border: 2px solid #ccc 
+		// 	}
+		// }
+		// label:nth-child(4) {
+		// 	span {
+		// 		background: rgb(204, 204, 204) ;
+		// 		color: #fff ;
+		// 		cursor: default ;
+		// 		border: 2px solid #ccc 
+		// 	}
+		// }
+		// label:nth-child(5) {
+		// 	.el-checkbox-button__inner {
+		// 		background: rgb(204, 204, 204) ;
+		// 		color: #fff ;
+		// 		cursor: default ;
+		// 		border: 2px solid #ccc 
+		// 	}
+		// }
 	}
 
 	.link-line {
@@ -330,104 +357,67 @@
 		cursor: auto;
 	}
 
-	.list-wrap:nth-child(3) {
-		/* 临时屏蔽该按钮 */
-		.el-checkbox-button {
-			span {
-				background: rgb(204, 204, 204);
-				color: #fff;
-				cursor: default;
-				border: 2px solid #ccc !important
-			}
-		}
-	}
-	.list-wrap:nth-child(4) {
-		/* 临时屏蔽该按钮 */
-		.el-checkbox-button {
-			span {
-				background: rgb(204, 204, 204);
-				color: #fff;
-				cursor: default;
-				border: 2px solid #ccc !important
-			}
-		}
-	}
-	.list-wrap:nth-child(5) {
-		/* 临时屏蔽该按钮 */
-		.el-checkbox-button {
-			span {
-				background: rgb(204, 204, 204);
-				color: #fff;
-				cursor: default;
-				border: 2px solid #ccc !important
-			}
-		}
-	}
+	// .list-wrap:nth-child(3) {
+	// 	/* 临时屏蔽该按钮 */
+	// 	.el-checkbox-button {
+	// 		span {
+	// 			background: rgb(204, 204, 204);
+	// 			color: #fff;
+	// 			cursor: default;
+	// 			border: 2px solid #ccc !important
+	// 		}
+	// 	}
+	// }
+	// .list-wrap:nth-child(4) {
+	// 	/* 临时屏蔽该按钮 */
+	// 	.el-checkbox-button {
+	// 		span {
+	// 			background: rgb(204, 204, 204);
+	// 			color: #fff;
+	// 			cursor: default;
+	// 			border: 2px solid #ccc !important
+	// 		}
+	// 	}
+	// }
+	// .list-wrap:nth-child(5) {
+	// 	/* 临时屏蔽该按钮 */
+	// 	.el-checkbox-button {
+	// 		span {
+	// 			background: rgb(204, 204, 204);
+	// 			color: #fff;
+	// 			cursor: default;
+	// 			border: 2px solid #ccc !important
+	// 		}
+	// 	}
+	// }
 
 	.el-checkbox-button:first-child .el-checkbox-button__inner {
 		border-radius: 0;
 		border-left-width: 2px;
 	}
 	.dimension {
-		.quality {
-			.is-checked {
-				.el-checkbox-button__inner {
-					color: #fff;
-					background-color: @quality;			
-				}
 
-			}
-			
-			.el-checkbox-button__inner {
-				.border-color(@quality);				
-			}
-
-			&:hover {
-				.el-checkbox-button__inner {
-					color: #fff;
-					background-color: @quality;
-					.border-color(@quality);	
-				}
-			}
-			&:focus {
-				.el-checkbox-button__inner {
-					color: #fff;
-					background-color: @quality;
-					.border-color(@quality);	
-				}
-			}
-
-		}
 		.el-checkbox-button__orig-checkbox:checked+.el-checkbox-button__inner {
 			box-shadow: none;
 		}
+		.quality {
+			.button-color(@quality)
+
+		}
 		.work {
-			.is-checked {
-				.el-checkbox-button__inner {
-					color: #fff;
-					background-color: @work;			
-				}
-			}
+			.button-color(@work)
 
-			.el-checkbox-button__inner {
-				.border-color(@work);				
-			}
+		}
+		.event {
+			.button-color(@event)
 
-			&:hover {
-				.el-checkbox-button__inner {
-					color: #fff;
-					background-color: @work;
-					.border-color(@work);	
-				}
-			}
-			&:focus {
-				.el-checkbox-button__inner {
-					color: #fff;
-					background-color: @work;
-					.border-color(@work);	
-				}
-			}
+		}	
+		.repair {
+			.button-color(@repair)
 
+		}
+		.tool {
+			.button-color(@tool)
 		}
 	}
 	
