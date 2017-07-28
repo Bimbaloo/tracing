@@ -3,27 +3,30 @@
 		<v-header></v-header>
 		<div class="panel">
 			<div class='panel-title'>
-				<el-tabs element-loading-text="拼命加载中"  class="search-tab" >
+				<el-tabs  element-loading-text="拼命加载中" :rules="rules"  class="search-tab" @tab-click="handleClick">
 					<el-tab-pane label="新建遏制"  activeName="first">
-						<el-radio-group v-model="radioa">
+						<el-radio-group v-model="radioNumber">
 							<div class='radio'>
 								<el-radio :label="radio.key" v-for="radio in radioList">{{radio.groupName}}</el-radio>
 							</div>
-							<el-form :inline="true" ref="radio.ruleForm" :model="radio.ruleForm"  :class="[{ hide: radioa === radio.key }, 'demo-form-inline','form-inline']" v-for="radio in radioList">
-								 <el-form-item v-for="item in radio.groupItems" :label="item.placeholder">
-									 <component :is="`v-${item.type}`" :form-data="radio.ruleForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+							<el-form :inline="true" ref="radioRuleForm" :model="ruleForm"  :class="[ 'demo-form-inline','form-inline']">
+								 <el-form-item v-for="(item,index) in groupItems" :label="item.placeholder" v-show="item.key === radioNumber" :key="groupItems[index].itemCode" :prop="groupItems[index].itemCode">
+									 <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
-									<el-button type="primary" class='btn' @click="submitForm(radio.ruleForm)">查询</el-button>
+									<el-button type="primary" class='btn' @click="submitForm('radioRuleForm')">查询</el-button>
 								</el-form-item>
 							</el-form>
 						</el-radio-group>
 					</el-tab-pane>
-					<el-tab-pane label="遏制列表" activeName="second">遏制列表</el-tab-pane>
+					<el-tab-pane label="遏制列表" activeName="second">
+					</el-tab-pane>
 				</el-tabs>
 			</div>
 			<div class="panel-content">
-				
+				<div class="router-container" >
+					<router-view></router-view>
+				</div>
 			</div>
 		</div>
 	</div>
@@ -37,7 +40,13 @@
     import Select from 'components/basic/select.vue'
     import DateTime from 'components/basic/dateTime.vue'
 
+
+//	const URL = HOST + "/api/v1/suppress/list";   // 正式
 	
+	const URL = "http://rapapi.org/mockjsdata/21533/list?";   // 测试获取遏制列表数据
+
+	//const URL_JOIN = "http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
+
 	export default {
 		// 页面组件。
 		components: {
@@ -49,72 +58,75 @@
 		// 页面数据。
 		data() {
 			return {
-				radioList:[{
-					key:'1',
-					groupName:'物料',
-					groupItems: [
-                        {
-                            itemCode: "materialCode",
-							itemName: "物料",
-							type: "select",
-							placeholder:"请选择物料"
-                        },
-                        {
-                            itemCode: "batchNo",
-							itemName: "批次",
-							type: "input",
-							placeholder:"请输入批次"
-                        }
-					],
-					ruleForm:{
-						materialCode:'',
-						batchNo:''
-					}
-				},
-				{
-					key:'2',
-					groupName:'设备',
-					groupItems: [
-                        {
-                            itemCode: "personCode",
-							itemName: "人员",
-							type: "select",
-							placeholder:"请选择人员"
-                        },
-                        {
-                            itemCode: "startTime",
-							itemName: "开始时间",
-							type: "datetime",
-							placeholder:"请选择开始时间"
-                        },
-                        {
-                            itemCode: "endTime",
-							itemName: "结束时间",
-							type: "datetime",
-							placeholder:"请选择结束时间"
-                        }
-					],
-					ruleForm:{
-						personCode:'',
-						startTime:'',
-						endTime:''
-					}
-				}],
+				radioList:[
+				// {
+				// 	key:'0',
+				// 	groupName:'物料'
+				// },
+				// {
+				// 	key:'1',
+				// 	groupName:'人员',
+				// }
+				],
+				groupItems: [
+                        // {
+						// 	key:'1',
+                        //     itemCode: "personCode",
+						// 	itemName: "人员",
+						// 	type: "select",
+						// 	placeholder:"请选择人员"
+                        // }
+                        // {
+						// 	key:'1',
+                        //     itemCode: "startTime",
+						// 	itemName: "开始时间",
+						// 	type: "datetime",
+						// 	placeholder:"请选择开始时间"
+                        // },
+                        // {
+						// 	key:'1',
+                        //     itemCode: "endTime",
+						// 	itemName: "结束时间",
+						// 	type: "datetime",
+						// 	placeholder:"请选择结束时间"
+						// },
+						// {
+						// 	key:'0',
+                        //     itemCode: "materialCode",
+						// 	itemName: "物料",
+						// 	type: "select",
+						// 	placeholder:"请选择物料"
+                        // },
+                        // {
+						// 	key:'0',
+                        //     itemCode: "batchNo",
+						// 	itemName: "批次",
+						// 	type: "input",
+						// 	placeholder:"请输入批次"
+                        // }
+				],
 
+				ruleForm:{
+					// personCode:'',
+					// startTime:'',
+					// endTime:'',
+					// materialCode:'',
+					// batchNo: ''
+				},
 				activeName: 'first',
-				radioa: '1'
+				radioNumber: '0'
 				
 			}
 		},
 		// 计算属性。
 		computed: {
-            ruleForms: function() {
-                let oFormData = {};
-                this.items.forEach(o => {
-                	oFormData[o.key] = this.active.keys[o.key] || '';
-                });
-                return oFormData;
-            },
+            // ruleForms: function() {
+            //     let oFormData = {};
+            //     this.items.forEach(o => {
+            //     	oFormData[o.key] = this.active.keys[o.key] || '';
+            //     });
+            //     return oFormData;
+            // },
             rules: function() {
             	// 验证条码。
             	let _that = this,
@@ -251,12 +263,100 @@
             }
         },
 		// 创建时处理。mounted
-		created() {},
+		created() {
+
+			/* 根据传入数据 */
+			this.$ajax.get('../static/2.json').then((res) => {
+				this.judgeLoaderHandler(res,() => {
+				let datas = res.data.data
+				let _radioList = []
+				let _groupItems = []
+				datas.forEach(o => {
+					if(o.moduleCode === "restrain"){
+						
+						(o.groups).forEach((group,index) => {
+						
+							_radioList.push({
+								key: `${index}`,
+								groupName: `${group.groupName}`
+							})
+							var groupItems = group.groupItems
+							groupItems.forEach(function(item){
+								//debugger
+								if(item.itemCode === "personCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
+									item.type = 'select'
+									item.placeholder = `请选择${item.itemName}`
+								}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
+									item.type = 'input'
+									item.placeholder = `请输入${item.itemName}`
+								}else{											//查询条件如果是'时间'
+									item.type = 'datetime'						
+									item.placeholder = `请选择${item.itemName}`
+								}
+								console.log(`${index}`)
+							
+								_groupItems.push({
+									key: `${index}`,
+									itemCode: `${item.itemCode}`,
+									groupName: `${item.groupName}`,
+									type: `${item.type}`,
+									placeholder: `${item.placeholder}`
+								})
+							})						
+						})
+						this.radioList = _radioList
+						this.groupItems = _groupItems
+						_groupItems.forEach(item => {
+							this.ruleForm[item.itemCode] = ''
+						})
+					}
+				})
+
+			 	});
+			})
+		},
 		// 页面方法。
 		methods: {
 			submitForm(formName) {
-                console.log(formName)
-            }
+			  this.$refs[formName].validate((valid) => {
+					if (valid) {
+						console.log(this.ruleForm)
+					}
+				});
+			},
+			// 判断调用接口是否成功。
+			judgeLoaderHandler(param,fnSu,fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					this.sErrorMessage = param.data.errorMsg.message;
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu();
+				}
+			},
+			// 显示提示信息。
+			showMessage() {
+				this.$message({
+					message: this.sErrorMessage,
+					duration: 3000
+				});
+			},
+			// 切换tab
+			handleClick(tab) {
+				if(tab.index === '1'){
+					this.$router.push({ path: 'list'})
+				}else{
+					this.$router.push({ path: '/'})
+				}
+			},
+
+			
 		}
 		
 	}
@@ -388,4 +488,26 @@
 	}
 	
 	
+</style>
+<style scoped lang="less">
+	#app {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items:stretch;
+		
+		.panel {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+		.panel-content {
+			flex: 1;
+			padding-left: 28px;
+        	padding-right: 28px;
+			.router-container {
+				height: 100%;
+			}
+		}
+	}
 </style>

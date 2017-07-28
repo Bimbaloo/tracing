@@ -150,11 +150,12 @@
 	.router-content {
 		flex: 1 1;
 		overflow: auto;
+		position: relative;
 		
 		.btn-restrain {
 			position: absolute;
 			right: 0;
-			top: 65px;
+			top: 45px;
 		}
 		
 		.condition {

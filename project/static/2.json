@@ -1,0 +1,321 @@
+{
+    "errorCode": 0,
+    "errorMsg": "",
+    "data": [
+        {
+            "moduleCode": "stock",
+            "moduleName": "查出库",
+            "groups": [
+                {
+                    "groupName": "条码",
+                    "groupItems": [
+                        {
+                            "itemCode": "barcode",
+                            "itemName": "条码"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "批次",
+                    "groupItems": [
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "batchNo",
+                            "itemName": "批次"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "出库时间",
+                    "groupItems": [
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "startTime",
+                            "itemName": "开始时间"
+                        },
+                        {
+                            "itemCode": "endTime",
+                            "itemName": "结束时间"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "入库时间",
+                    "groupItems": [
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "startTime",
+                            "itemName": "开始时间"
+                        },
+                        {
+                            "itemCode": "endTime",
+                            "itemName": "结束时间"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "moduleCode": "trace",
+            "moduleName": "溯源",
+            "groups": [
+                {
+                    "groupName": "条码",
+                    "groupItems": [
+                        {
+                            "itemCode": "barcode",
+                            "itemName": "条码"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "批次",
+                    "groupItems": [
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "batchNo",
+                            "itemName": "批次"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "设备",
+                    "groupItems": [
+                        {
+                            "itemCode": "equipmentCode",
+                            "itemName": "设备"
+                        },
+                        {
+                            "itemCode": "startTime",
+                            "itemName": "开始时间"
+                        },
+                        {
+                            "itemCode": "endTime",
+                            "itemName": "结束时间"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "高级",
+                    "groupItems": [
+                        {
+                            "itemCode": "barcode",
+                            "itemName": "条码"
+                        },
+                        {
+                            "itemCode": "doCode",
+                            "itemName": "工单"
+                        },
+                        {
+                            "itemCode": "batchNo",
+                            "itemName": "批次"
+                        },
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "processCode",
+                            "itemName": "工序"
+                        },
+                        {
+                            "itemCode": "shiftName",
+                            "itemName": "班次"
+                        },
+                        {
+                            "itemCode": "equipmentCode",
+                            "itemName": "设备"
+                        },
+                        {
+                            "itemCode": "startTime",
+                            "itemName": "开始时间"
+                        },
+                        {
+                            "itemCode": "endTime",
+                            "itemName": "结束时间"
+                        },
+                        {
+                            "itemCode": "moldCode",
+                            "itemName": "模号"
+                        },
+                        {
+                            "itemCode": "personCode",
+                            "itemName": "人员"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "moduleCode": "track",
+            "moduleName": "追踪",
+            "groups": [
+                {
+                    "groupName": "条码",
+                    "groupItems": [
+                        {
+                            "itemCode": "barcode",
+                            "itemName": "条码"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "批次",
+                    "groupItems": [
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "batchNo",
+                            "itemName": "批次"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "设备",
+                    "groupItems": [
+                        {
+                            "itemCode": "equipmentCode",
+                            "itemName": "设备"
+                        },
+                        {
+                            "itemCode": "startTime",
+                            "itemName": "开始时间"
+                        },
+                        {
+                            "itemCode": "endTime",
+                            "itemName": "结束时间"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "工单",
+                    "groupItems": [
+                        {
+                            "itemCode": "doCode",
+                            "itemName": "工单"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "高级",
+                    "groupItems": [
+                        {
+                            "itemCode": "barcode",
+                            "itemName": "条码"
+                        },
+                        {
+                            "itemCode": "doCode",
+                            "itemName": "工单"
+                        },
+                        {
+                            "itemCode": "batchNo",
+                            "itemName": "批次"
+                        },
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "processCode",
+                            "itemName": "工序"
+                        },
+                        {
+                            "itemCode": "shiftName",
+                            "itemName": "班次"
+                        },
+                        {
+                            "itemCode": "equipmentCode",
+                            "itemName": "设备"
+                        },
+                        {
+                            "itemCode": "startTime",
+                            "itemName": "开始时间"
+                        },
+                        {
+                            "itemCode": "endTime",
+                            "itemName": "结束时间"
+                        },
+                        {
+                            "itemCode": "moldCode",
+                            "itemName": "模号"
+                        },
+                        {
+                            "itemCode": "personCode",
+                            "itemName": "人员"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "moduleCode": "resume",
+            "moduleName": "履历",
+            "groups": [
+                {
+                    "groupName": "成品条码",
+                    "groupItems": [
+                        {
+                            "itemCode": "barcode",
+                            "itemName": "条码"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "moduleCode": "restrain",
+            "moduleName": "遏制",
+            "groups": [
+                {
+                    "groupName": "物料",
+                    "groupItems": [
+                        {
+                            "itemCode": "materialCode",
+                            "itemName": "物料"
+                        },
+                        {
+                            "itemCode": "batchNo",
+                            "itemName": "批次"
+                        }
+                    ]
+                },
+                {
+                    "groupName": "设备",
+                    "groupItems": [
+                        {
+                            "itemCode": "personCode",
+                            "itemName": "人员"
+                        },
+                        {
+                            "itemCode": "startTime",
+                            "itemName": "开始时间"
+                        },
+                        {
+                            "itemCode": "endTime",
+                            "itemName": "结束时间"
+                        }
+                    ]
+                }
+            ]
+        },
+        {
+            "moduleCode": "link",
+            "moduleName": "链路修复",
+            "groups": []
+        }
+    ]
+}
