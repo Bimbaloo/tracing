@@ -141,8 +141,15 @@
 			if(oData) {
 				oData = JSON.parse(oData);
 				this.activeKey = oData.tab;  //路由
-				this.ruleForm = oData.keys
 				this.radioNumber = oData.radio
+				if(oData.radio === '0'){
+					this.ruleForm.materialCode = oData.keys.materialCode
+					this.ruleForm.batchNo = oData.keys.batchNo
+				}else{
+					this.ruleForm.equipmentCode = oData.keys.equipmentCode
+					this.ruleForm.startTime = oData.keys.startTime
+					this.ruleForm.endTime = oData.keys.endTime
+				}
 			}else if(window.location.hash.length > 2) {
 			// 清空了cookie后，url中有参数。则获取url中的参数。
 				oData = this.getSearchData();
@@ -289,7 +296,32 @@
 				// 加时间戳。生成标记-- 点击查询可多次
 				oSearch._tag = new Date().getTime().toString().substr(-5);
 				return oSearch;
-			}
+			},
+
+			getSearchData () {
+				let oData = {
+					tab: "",
+					keys: {},
+					radio: "1"
+				},
+				aHref = location.href.split("?"),
+				aParams = aHref[1].split("&"),
+				aInfo = aHref[0].split("/");
+					
+				// 设置tab和radio
+				oData.tab = aInfo[aInfo.length-2];
+				oData.radio = aInfo[aInfo.length-1];
+					
+				// 设置keys。
+				aParams.forEach(o=>{
+					let aAttr = o.split("=");
+					oData.keys[aAttr[0]] = decodeURIComponent(aAttr[1]);
+				});
+
+				// 返回参数。
+				console.log(oData)
+				return oData;
+			},
 			
 		}
 		
