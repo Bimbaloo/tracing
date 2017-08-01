@@ -3,7 +3,7 @@
 		<v-header></v-header>
 		<div class="panel">
 			<div class='panel-title'>
-				<el-tabs  element-loading-text="拼命加载中" :rules="rules"  class="search-tab" @tab-click="handleClick">
+				<el-tabs  element-loading-text="拼命加载中"   class="search-tab" @tab-click="handleClick">
 					<el-tab-pane label="新建遏制"  activeName="first">
 						<el-radio-group v-model="radioNumber">
 							<div class='radio'>
@@ -65,41 +65,41 @@
 				// },
 				// {
 				// 	key:'1',
-				// 	groupName:'人员',
+				// 	equipmentCode:'设备',
 				// }
 				],
 				groupItems: [
                         // {
 						// 	key:'1',
-                        //     itemCode: "personCode",
-						// 	itemName: "人员",
+                        //  itemCode: "equipmentCode",
+						// 	itemName: "设备",
 						// 	type: "select",
-						// 	placeholder:"请选择人员"
+						// 	placeholder:"请选择设备"
                         // }
                         // {
 						// 	key:'1',
-                        //     itemCode: "startTime",
+                        //  itemCode: "startTime",
 						// 	itemName: "开始时间",
 						// 	type: "datetime",
 						// 	placeholder:"请选择开始时间"
                         // },
                         // {
 						// 	key:'1',
-                        //     itemCode: "endTime",
+                        //  itemCode: "endTime",
 						// 	itemName: "结束时间",
 						// 	type: "datetime",
 						// 	placeholder:"请选择结束时间"
 						// },
 						// {
 						// 	key:'0',
-                        //     itemCode: "materialCode",
+                        //  itemCode: "materialCode",
 						// 	itemName: "物料",
 						// 	type: "select",
 						// 	placeholder:"请选择物料"
                         // },
                         // {
 						// 	key:'0',
-                        //     itemCode: "batchNo",
+                        //  itemCode: "batchNo",
 						// 	itemName: "批次",
 						// 	type: "input",
 						// 	placeholder:"请输入批次"
@@ -107,221 +107,135 @@
 				],
 
 				ruleForm:{
-					// personCode:'',
-					// startTime:'',
-					// endTime:'',
-					// materialCode:'',
-					// batchNo: ''
+					equipmentCode:'',   //设备
+					startTime:'',		//开始时间
+					endTime:'',			//结束时间
+					materialCode:'',	//物料编号
+					batchNo: ''			//批次号
 				},
 				activeName: 'first',
-				radioNumber: '0'
-				
+				radioNumber: '0',
+				keys: {},  //面板参数
+				activeKey:''  // 储存路由
 			}
 		},
 		// 计算属性。
 		computed: {
-            // ruleForms: function() {
-            //     let oFormData = {};
-            //     this.items.forEach(o => {
-            //     	oFormData[o.key] = this.active.keys[o.key] || '';
-            //     });
-            //     return oFormData;
-            // },
-            rules: function() {
-            	// 验证条码。
-            	let _that = this,
-            		oForm = this.ruleForm,
-            		oKeys = this.keys,
-            		// 溯源及追踪的参数。
-            		aParams = ["barcode","materialCode","equipmentCode","doCode"],
-            		// 验证条码
-	            	validateBarcode = (rule, value, callback) => {
-	            		if(!value) {
-	            			callback(new Error("请输入条码"));
-	            		}else {
-	            			callback();
-	            		}
-	            	},
-	            	// 验证批次。
-	            	validateBatch = (rule, value, callback) => {
-	            		if(!value) {
-	            			callback(new Error("请输入批次"));
-	            		}else {
-	            			callback();
-	            		}
-	            	},
-	            	// 验证物料。
-	            	validateMaterialcode = (rule, value, callback) => {
-	            		if(!value) {
-	            			callback(new Error("请输入物料"));
-	            		}else {
-	            			callback();
-	            		}
-	            	},
-            		// 验证开始时间。
-            	    validateStartTime = (rule, value, callback) => {
-	            		if(!value) {
-	            			callback(new Error("请输入开始时间"));
-	            		}else {
-	            			callback();
-	            		}
-	            	},
-            		// 验证结束时间。
-            		validateEndTime = (rule, value, callback) => {
-	            		let sStart = oForm.startTime;
-	            		if(!value) {
-	            			callback(new Error("请输入结束时间"));
-	            		}else if(sStart && sStart > value) {
-	            			// 如果开始时间存在，而且开始时间大于结束时间。
-	            			callback(new Error("结束时间必须大于开始时间"));
-	            		}else {
-	            			callback();
-	            		}
-	            	};
-	            	
-	            // 验证是否存在
-	            var validateParam = (rule, value, callback) => {
-	            	// 当前筛选条件中需判断的参数。
-	            	let oJudge = {},
-	            		aJudgeName = [];
-	            	
-	            	// 循环处理。
-	            	for (let param in oKeys) {
-	            		// 当前参数存在。
-	            		if(aParams.includes(param)) {
-	            			oJudge[param] = oForm[param];
-	            			aJudgeName.push(_that.getNameByKey(param));
-	            		}
-	            	}
-	            	
-	            	// 如果judge的参数中所有的都为空。则提示
-	            	if(window.Rt.utils.getObjectValues(oJudge).some(o=>o)) {
-	            		// 只要一个有数据。
-	            		callback();
-	            	}else {
-	            		// 否则。
-	            		callback(new Error(aJudgeName.join(",")+(aJudgeName.length == 1?"不能为空":"必填其中一项")));
-	            	}
-	            	
-	            },
-	            // 结束时间。
-	            validateTime = (rule, value, callback) => {
-	            	if(value && oForm.startTime && value < oForm.startTime) {
-	            		// 开始时间和结束时间都存在,且结束时间小。
-	            		callback(new Error("结束时间要大于开始时间"));
-	            	}else {
-	            		callback();
-	            	}
-	            };
-            	
-            	// 所有规则。
-            	var oAllRules =  {
-            		// 查出库。
-            		"stock": {
-	                	"barcode": [{validator: validateBarcode, trigger: "change"}],
-	                	"batchNo": [{validator: validateBatch,trigger: "change"}],
-	                	"materialCode": [{validator: validateMaterialcode,trigger: "change"}],
-	                	// 开始时间。
-	                	"startTime": [{validator: validateStartTime, trigger: "change"}],
-	                	// 结束时间。
-	                	"endTime": [{validator: validateEndTime, trigger: "change"}]
-            		},
-            		// 溯源。
-            		"trace": {
-            			"barcode": [{validator: validateParam, trigger: "change"}],
-            			"materialCode": [{validator: validateParam, trigger: "change"}],
-            			"equipmentCode": [{validator: validateParam, trigger: "change"}],
-            			"doCode": [{validator: validateParam, trigger: "change"}],
-            			// 结束时间。
-            			"endTime": [{validator: validateTime, trigger: "change"}]
-            		},
-            		// 追踪。
-            		"track": {
-            			"barcode": [{validator: validateParam,trigger: "change"}],
-            			"materialCode": [{validator: validateParam,trigger: "change"}],
-            			"equipmentCode": [{validator: validateParam,trigger: "change"}],
-            			"doCode": [{validator: validateParam,trigger: "change"}],
-            			// 结束时间。
-            			"endTime": [{validator: validateTime, trigger: "change"}]
-            		},
-            		// 履历。
-            		"resume": {
-            			"barcode": [{validator: validateBarcode, trigger: "change"}]
-            		}
-                };
-                
-            	// 根据当前配的返回对应的规则。
-            	let oRule = {};
-				for(let key in this.keys) {
-					if(oAllRules[this.tab][key]) {
-						oRule[key] = oAllRules[this.tab][key];
-					}
-				}
+			// 获取当前真正的查询条件
+			ruleForms: function(){
+
+				let ruleForms = {}
+				this.groupItems.filter((o) => o.key === this.radioNumber).forEach(item => {
+					ruleForms[item.itemCode] = this.ruleForm[item.itemCode]
+				})
+				return  ruleForms
 				
-				// 为了将页面中*都不存在。
-                return oRule;
-            }
+			}
         },
 		// 创建时处理。mounted
 		created() {
 
+			let oData = sessionStorage.getItem("searchConditions");
+			console.log(JSON.parse(oData))
+			// session 中获取
+			if(oData) {
+				oData = JSON.parse(oData);
+				this.activeKey = oData.tab;  //路由
+				this.ruleForm = oData.keys
+				this.radioNumber = oData.radio
+			}else if(window.location.hash.length > 2) {
+			// 清空了cookie后，url中有参数。则获取url中的参数。
+				oData = this.getSearchData();
+				this.activeKey = oData.tab;
+			}
+
+
+		//	this.getSearch()
+			//console.log(location.href.substr(location.href.indexOf("?")+1))
 			/* 根据传入数据 */
 			this.$ajax.get('../static/2.json').then((res) => {
 				this.judgeLoaderHandler(res,() => {
-				let datas = res.data.data
-				let _radioList = []
-				let _groupItems = []
-				datas.forEach(o => {
-					if(o.moduleCode === "restrain"){
-						
-						(o.groups).forEach((group,index) => {
-						
-							_radioList.push({
-								key: `${index}`,
-								groupName: `${group.groupName}`
-							})
-							var groupItems = group.groupItems
-							groupItems.forEach(function(item){
-								//debugger
-								if(item.itemCode === "personCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
-									item.type = 'select'
-									item.placeholder = `请选择${item.itemName}`
-								}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
-									item.type = 'input'
-									item.placeholder = `请输入${item.itemName}`
-								}else{											//查询条件如果是'时间'
-									item.type = 'datetime'						
-									item.placeholder = `请选择${item.itemName}`
-								}
-								console.log(`${index}`)
+					let datas = res.data.data
+					let _radioList = []
+					let _groupItems = []
+					datas.forEach(o => {
+						if(o.moduleCode === "restrain"){
 							
-								_groupItems.push({
+							(o.groups).forEach((group,index) => {
+							
+								_radioList.push({
 									key: `${index}`,
-									itemCode: `${item.itemCode}`,
-									groupName: `${item.groupName}`,
-									type: `${item.type}`,
-									placeholder: `${item.placeholder}`
+									groupName: `${group.groupName}`
 								})
-							})						
-						})
-						this.radioList = _radioList
-						this.groupItems = _groupItems
-						_groupItems.forEach(item => {
-							this.ruleForm[item.itemCode] = ''
-						})
-					}
-				})
+								var groupItems = group.groupItems
+								groupItems.forEach(function(item){
+									//debugger
+									if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
+										item.type = 'select'
+										item.placeholder = `请选择${item.itemName}`
+									}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
+										item.type = 'input'
+										item.placeholder = `请输入${item.itemName}`
+									}else{											//查询条件如果是'时间'
+										item.type = 'datetime'						
+										item.placeholder = `请选择${item.itemName}`
+									}
 
-			 	});
+								
+									_groupItems.push({
+										key: `${index}`,
+										itemCode: `${item.itemCode}`,
+										groupName: `${item.groupName}`,
+										type: `${item.type}`,
+										placeholder: `${item.placeholder}`
+									})
+								})						
+							})
+							this.radioList = _radioList
+							this.groupItems = _groupItems
+							// _groupItems.forEach(item => {
+							// 	this.keys[item.itemCode] = ''
+							// })
+
+						}
+					})
+				 });
+				 this.$nextTick(() => {
+					if(oData) {
+						this._submitForm(oData);
+					}            
+				})
 			})
+
+
 		},
 		// 页面方法。
 		methods: {
 			submitForm(formName) {
 			  this.$refs[formName].validate((valid) => {
 					if (valid) {
-						console.log(this.ruleForm)
-					}
+
+                        // 保存搜索条件。
+                        let oKeys = {};
+                        for (let key in this.keys){
+//                          this.keys[key] = this.ruleForm[key];
+                            oKeys[key] = this.ruleForm[key];
+                        }
+                       
+                        let oConditions = {
+                            keys: this.ruleForms, // this.keys,
+                            radio: this.radioNumber
+                        };
+                        
+					//    this.active.keys = oKeys; //this.keys;
+				//	debugger
+                        this._submitForm(oConditions);
+                        
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                
 				});
 			},
 			// 判断调用接口是否成功。
@@ -352,10 +266,30 @@
 				if(tab.index === '1'){
 					this.$router.push({ path: 'list'})
 				}else{
-					this.$router.push({ path: '/'})
+					this.$router.push({ path: '/stock/:key'})
 				}
 			},
 
+
+			// 数据提交
+			_submitForm(oConditions) {
+			//	 debugger
+				let sPath = '/' + this.activeKey;
+				oConditions.tab = this.activeKey;
+				// console.log(oConditions);
+
+				sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
+				sPath = sPath + '/' + oConditions.radio;
+				
+				this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
+			},
+			getKeys(sKey) {
+			//	debugger
+				let oSearch = this.ruleForms
+				// 加时间戳。生成标记-- 点击查询可多次
+				oSearch._tag = new Date().getTime().toString().substr(-5);
+				return oSearch;
+			}
 			
 		}
 		

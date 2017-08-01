@@ -22,12 +22,14 @@ const suspicious = r => require.ensure([], () => r(require('components/restrain/
 
 // 定义路由
 const routes = [
-  { path: '/list', component: list },
-  { path: '/', component: suspicious }
+  { path: '/list/:key', component: list },
+  { path: '/stock/:key', component: suspicious }
 ]
 
 // 创建 router 实例，然后传 `routes` 配置
 const router = new VueRouter({
+  // base:'/restrain/',
+  // mode: 'history',
   routes // （缩写）相当于 routes: routes
 })
 

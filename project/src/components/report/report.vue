@@ -546,8 +546,14 @@
 				}				
 			}
 		},
+		watch: {
+			'$route':function(){  
+				this.fetchData();
+			}
+		},
 		created() {
 			// 数据加载。
+			
 			this.fetchData();
 		},
 		mounted() {
@@ -587,18 +593,24 @@
 				for(let param in this.reportData) {
 					this.reportData[param].data = [];
 				}
-				
-				let oQuery = this.query;
 
+				let oQuery = this.query;
+				//console.log(this.$route.query.equipmentCode)
+				//debugger
 				if(this.type == "trace") {
 					// 若为快速报告，根据物料+批次+bucketNo获取数据。
 					this.url = "/api/v1/trace/report/by-start-points";
 					
 					oQuery = this.query;
 				}else {
-					if(oQuery && ("equipmentId" in oQuery)) {
+					if((oQuery && ("equipmentId" in oQuery)) || !!this.$route.query.equipmentCode ) {
 						// 若根据设备查询。
 						this.url = "/api/v1/trace/report/by-equipment";
+						oQuery ={
+							"materialCode":this.$route.query.materialCode,
+							"startTime":this.$route.query.startTime,
+							"endTime":this.$route.query.endTime
+						}
 					}
 					oQuery ={
 						"materialCode":this.$route.query.materialCode,

@@ -297,8 +297,8 @@
                     "groupName": "设备",
                     "groupItems": [
                         {
-                            "itemCode": "personCode",
-                            "itemName": "人员"
+                            "itemCode": "equipmentCode",
+                            "itemName": "设备"
                         },
                         {
                             "itemCode": "startTime",

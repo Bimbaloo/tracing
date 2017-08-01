@@ -42,11 +42,12 @@
     },
     created() {  
       this.loading = true;
-      this.$ajax.get(MODULE_ITEM_URL).then((res) => {
+      this.$ajax.get('../static/2.json').then((res) => {
       	this.loading = false;
       	this.judgeLoaderHandler(res,() => {
 
-	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+          // this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+          this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
 
 	        this.categories.forEach(o => {
 	            o.active = {
