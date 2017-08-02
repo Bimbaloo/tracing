@@ -28,7 +28,6 @@
 		},
 		data() {
 			return {
-				oQuery:'',  //查询参数
 				loading: false,
 				resize:true, //是否允许拖动table大小
 				tableDate:{
@@ -89,7 +88,7 @@
 							// }
 					],
 				},
-				/* 默认过滤条件 */
+				/* 查询条件 */
 				restrainList:{
 					startTime:"",
 					endTime:"",
@@ -99,23 +98,44 @@
 			}
 		},
 		created() {
-			//console.log(this.$route.meta.title)
-			this.$ajax.get(URL,this.oQuery).then((res) => {
-				this.judgeLoaderHandler(res,() => {
-					//console.log(res.data.data)
-					this.columnsData = res.data.data
-				});
-				this.filter()
-			})
-			//console.log(this.tableDate)
+			//获取查询条件
+			this.getCondition()
+			// 调用接口查询
+			this.getListhData(this.restrainList)
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
 			'$route': function(){
-				this.filter()
+				this.getCondition()
+				this.getListhData(this.restrainList)
 			}
 		},
 		methods: {
+		// 获取查询信息
+			getCondition(){
+				//debugger
+				let oRestrainList = sessionStorage.getItem('restrainList', JSON.stringify(this.ruleForm2)); //获取查询条件
+				//session 中获取查询条件
+				if(oRestrainList) {
+					debugger
+					this.restrainList = JSON.parse(oRestrainList)
+				}else{ //如果没有查询条件，默认查询所有一周前开始的所有信息
+					this.restrainList.startTime = this.setData()
+					console.log(this.restrainList)
+				}
+			},
+
+		// 调用接口查询
+			getListhData(oCondition){
+				//debugger
+				this.$ajax.get(URL,oCondition).then((res) => {
+					this.judgeLoaderHandler(res,() => {
+					//	debugger
+						this.tableDate.data = res.data.data
+					});
+				})
+			},
+
 		// 判断调用接口是否成功。
 			judgeLoaderHandler(param,fnSu,fnFail) {
 				let bRight = param.data.errorCode;
@@ -136,6 +156,7 @@
 			viewDetails(index){
 				console.log(index)
 			},
+			// 根据条件过滤
 			filter(){
 				
 				let a = sessionStorage.getItem('restrainList', JSON.stringify(this.ruleForm2));
@@ -163,14 +184,27 @@
 				//console.log(this._data)
 
 			},
+			// 根据人员条件过滤
 			isPerson(obj){
 				return obj.personCode === this.restrainList.personCode
 			},
+			// 根据开始时间过滤
 			isStartTime(obj){
 				return obj.startTime <= this.restrainList.startTime
 			},
+			// 根据结束时间过滤
 			isEndTime(obj){
 				return obj.endTime >= this.restrainList.endTime
+			},
+			// 获取一周前的时间
+			setData(){
+				let nowdate = new Date();
+				let oneweekdate = new Date(nowdate-7*24*3600*1000);
+				let y = oneweekdate.getFullYear();
+				let m = oneweekdate.getMonth()+1;
+				let d = oneweekdate.getDate();
+				let formatwdate = y+'-'+m+'-'+d+' '+'00:00:00';
+				return formatwdate
 			}
 		}
 	}
