@@ -10,7 +10,7 @@
 								<el-radio :label="radio.key" v-for="radio in radioList">{{radio.groupName}}</el-radio>
 							</div>
 							<el-form :inline="true" ref="radioRuleForm" :model="ruleForm"  :class="[ 'demo-form-inline','form-inline']">
-								 <el-form-item v-for="(item,index) in groupItems" :label="item.placeholder" v-show="item.key === radioNumber" :key="groupItems[index].itemCode" :prop="groupItems[index].itemCode">
+								 <el-form-item v-for="(item,index) in groupItems" :label="item.placeholder" v-show="item.key === radioNumber" :key="item.itemCode+index" :prop="item.itemCode">
 									 <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
@@ -20,6 +20,16 @@
 						</el-radio-group>
 					</el-tab-pane>
 					<el-tab-pane label="遏制列表" activeName="second">
+						<el-radio-group v-model="radioNumber">
+							<el-form :inline="true" ref="radioRuleForm1" :model="ruleForm2"  :class="[ 'demo-form-inline','form-inline']">
+								 <el-form-item v-for="(item,index) in groupItems2" :label="item.placeholder"  :key="`item`+index" :prop="item.itemCode">
+									 <component :is="`v-${item.type}`" :form-data="ruleForm2" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+								</el-form-item> 
+								<el-form-item>
+									<el-button type="primary" class='btn' @click="submitForm1('radioRuleForm1')">查询</el-button>
+								</el-form-item>
+							</el-form>
+						</el-radio-group>
 					</el-tab-pane>
 				</el-tabs>
 			</div>
@@ -41,9 +51,7 @@
     import DateTime from 'components/basic/dateTime.vue'
 
 
-//	const URL = HOST + "/api/v1/suppress/list";   // 正式
-	
-	const URL = "http://rapapi.org/mockjsdata/21533/list?";   // 测试获取遏制列表数据
+
 
 	//const URL_JOIN = "http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
 
@@ -116,7 +124,50 @@
 				activeName: 'first',
 				radioNumber: '0',
 				keys: {},  //面板参数
-				activeKey:''  // 储存路由
+				activeKey:'stock',  // 储存路由页面
+
+
+
+
+				/* 遏制列表页面数据 */
+				ruleForm2:{
+					startTime:'',		//开始时间
+					endTime:'',			//结束时间
+					personCode:'',		//操作人员
+				},
+				groupItems2: [
+                        {
+                         	itemCode: "personCode",
+							itemName: "人员",
+							type: "select",
+							placeholder:"请选择人员"
+                        },
+                        {
+                         	itemCode: "startTime",
+							itemName: "开始时间",
+							type: "datetime",
+							placeholder:"请选择开始时间"
+                        },
+                        {
+                         	itemCode: "endTime",
+							itemName: "结束时间",
+							type: "datetime",
+							placeholder:"请选择结束时间"
+						}
+				],
+				
+
+			/* 保存上次查询的数据 */
+				_Data:{
+					keys:{
+						materialCode: "",
+						batchNo: "",
+						_tag: ""
+					},
+					radio:"0",
+					tab:"stock"
+				}
+
 			}
 		},
 		// 计算属性。
@@ -130,15 +181,19 @@
 				})
 				return  ruleForms
 				
-			}
+			},
+
         },
 		// 创建时处理。mounted
 		created() {
 
+			sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2)); //设置默认过滤条件 -- 遏制列表的条件
+
 			let oData = sessionStorage.getItem("searchConditions");
-			console.log(JSON.parse(oData))
-			// session 中获取
+			//console.log(JSON.parse(oData))
+			//session 中获取
 			if(oData) {
+				
 				oData = JSON.parse(oData);
 				this.activeKey = oData.tab;  //路由
 				this.radioNumber = oData.radio
@@ -152,13 +207,11 @@
 				}
 			}else if(window.location.hash.length > 2) {
 			// 清空了cookie后，url中有参数。则获取url中的参数。
+			
 				oData = this.getSearchData();
 				this.activeKey = oData.tab;
 			}
 
-
-		//	this.getSearch()
-			//console.log(location.href.substr(location.href.indexOf("?")+1))
 			/* 根据传入数据 */
 			this.$ajax.get('../static/2.json').then((res) => {
 				this.judgeLoaderHandler(res,() => {
@@ -209,6 +262,7 @@
 				 });
 				 this.$nextTick(() => {
 					if(oData) {
+					//	console.log(oData)
 						this._submitForm(oData);
 					}            
 				})
@@ -231,13 +285,27 @@
                        
                         let oConditions = {
                             keys: this.ruleForms, // this.keys,
-                            radio: this.radioNumber
-                        };
-                        
-					//    this.active.keys = oKeys; //this.keys;
-				//	debugger
+							radio: this.radioNumber,
+							tab: this.activeKey
+						};
+						//debugger
                         this._submitForm(oConditions);
                         
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                
+				});
+			},
+			submitForm1(formName) {
+			  this.$refs[formName].validate((valid) => {
+					if (valid) {
+						sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2));
+						this.$router.push({ 
+							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变(不可见)，子组件监听路由触发事件
+							
+						})
                     } else {
                         console.log('error submit!!');
                         return false;
@@ -270,31 +338,40 @@
 			},
 			// 切换tab
 			handleClick(tab) {
+				
 				if(tab.index === '1'){
-					this.$router.push({ path: 'list'})
+					sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2));
+					this.$router.push({ 
+							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变(不可见)，子组件监听路由触发事件
+							
+						})
 				}else{
-					this.$router.push({ path: '/stock/:key'})
+					this._submitForm(this._Data)
 				}
 			},
 
 
 			// 数据提交
-			_submitForm(oConditions) {
-			//	 debugger
-				let sPath = '/' + this.activeKey;
+			_submitForm(oConditions) {	
+				
+				this._Data = oConditions
+				let sPath = '/' + this.activeKey;  //this.activeKey  == 'stock'
 				oConditions.tab = this.activeKey;
-				// console.log(oConditions);
+
 
 				sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
 				sPath = sPath + '/' + oConditions.radio;
 				
-				this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
+				this.$router.push({ path: sPath, query: this.getKeys() })
 			},
+			
 			getKeys(sKey) {
-			//	debugger
+				
 				let oSearch = this.ruleForms
 				// 加时间戳。生成标记-- 点击查询可多次
 				oSearch._tag = new Date().getTime().toString().substr(-5);
+				//this.Data = oSearch
+				
 				return oSearch;
 			},
 
@@ -319,7 +396,7 @@
 				});
 
 				// 返回参数。
-				console.log(oData)
+			//	console.log(oData)
 				return oData;
 			},
 			

@@ -1,12 +1,181 @@
 <template>
 	<div class="router-content">
 		<div class="innner-content" >
-			<h2 class="content-title">查询列表</h2>
-			<h2 class="content-table"></h2>
+			<h2 class="content-title path-title">遏制列表</h2>
+			<h2 class="content-title">遏制列表</h2>
+			<v-table :table-data="tableDate" :loading="loading" :resize="resize"></v-table>
 		</div>
 	</div>
 	
 </template>
+
+
+
+
+
+
+<script>
+
+	import table from "components/basic/table.vue"
+	//	const URL = HOST + "/api/v1/suppress/list";   // 正式
+	//const URL = "http://rapapi.org/mockjsdata/21533/list?";   // 测试获取遏制列表数据
+	const URL = "../static/restrain.json";   // 测试获取遏制列表数据
+
+
+	export default {
+		components: {
+			'v-table': table
+		},
+		data() {
+			return {
+				oQuery:'',  //查询参数
+				loading: false,
+				resize:true, //是否允许拖动table大小
+				tableDate:{
+					
+                    columns:[{
+                        type: "index",
+                        name: "序号",
+                        width: "50"
+                    },{
+                        prop: "condition",
+                        name: "物料信息"
+                    },{
+                        prop: "startTime",
+                        name: "遏制开始时间"
+                    },{
+                        prop: "endTime",
+                        name: "遏制结束时间"
+                    },{
+                        prop: "startDescription",
+                        name: "开始遏制详情"
+                    },{
+                        prop: "startOperator",
+                        name: "开始遏制人员"
+                    },{
+                        prop: "endDescription",
+                        name: "结束遏制详情"
+                    },{
+                        prop: "endOperator",
+                        name: "结束遏制人员"
+                    },{
+                        prop: "handle",
+						name: "操作",
+						cellClick:this.viewDetails,
+						class: "batch"
+                    }],
+					data: [
+							// {
+							// 	"handle" : "查看详情",
+							// 	"condition" : "物料：xxxxxxxx     批次：xxxxxxxx",
+							// 	"startTime": "2016-03-31 14:28:33",
+							// 	"startDescription" : "测试遏制功能",
+							// 	"startOperator" : "1029:徐晓锐",            
+							// 	"endTime": "2016-03-31 14:28:33",
+							// 	"endDescription" : "测试遏制功能",
+							// 	"endOperator" : "1029:徐晓锐",
+							// 	"personCode" : "1029"
+							// },
+							// {
+							// 	"handle": "查看详情",
+							// 	"condition" : "设备：xxxxxxxx     时间：2017-04-19 09:00:00 ~ 2017-04-19 11:00:00",
+							// 	"startTime": "2016-03-31 14:28:33",
+							// 	"startDescription" : "测试遏制功能",
+							// 	"startOperator" : "1133:周宇庭",    
+							// 	"endTime": "2016-03-31 14:28:33",
+							// 	"endDescription" : "测试遏制功能",
+							// 	"endOperator" : "1133:周宇庭",
+							// 	"personCode" : "1133"
+							// }
+					],
+				},
+				/* 默认过滤条件 */
+				restrainList:{
+					startTime:"",
+					endTime:"",
+					personCode:''
+				},
+				columnsData: []
+			}
+		},
+		created() {
+			//console.log(this.$route.meta.title)
+			this.$ajax.get(URL,this.oQuery).then((res) => {
+				this.judgeLoaderHandler(res,() => {
+					//console.log(res.data.data)
+					this.columnsData = res.data.data
+				});
+				this.filter()
+			})
+			//console.log(this.tableDate)
+		},
+		watch: {
+			// 如果路由有变化，会再次执行该方法
+			'$route': function(){
+				this.filter()
+			}
+		},
+		methods: {
+		// 判断调用接口是否成功。
+			judgeLoaderHandler(param,fnSu,fnFail) {
+				let bRight = param.data.errorCode;
+						
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					this.sErrorMessage = param.data.errorMsg.message;
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu();
+				}
+			},
+			//查看详情
+			viewDetails(index){
+				console.log(index)
+			},
+			filter(){
+				
+				let a = sessionStorage.getItem('restrainList', JSON.stringify(this.ruleForm2));
+				this.restrainList =  JSON.parse(a)
+				//console.log(this.restrainList)
+				debugger
+				if(this.restrainList.personCode !== '' && this.restrainList.startTime !== '' &&this.restrainList.endTime !== ''){  //三个条件都在
+					this.tableDate.data = (this.columnsData).filter(this.isPerson).filter(this.isStartTime).filter(this.isEndTime)
+				}else if(this.restrainList.personCode === '' && this.restrainList.startTime !== '' &&this.restrainList.endTime !== ''){  //未限制人员
+					this.tableDate.data = (this.columnsData).filter(this.isStartTime).filter(this.isEndTime)
+				}else if(this.restrainList.personCode !== '' && this.restrainList.startTime === '' &&this.restrainList.endTime !== ''){  //未限制开始时间
+					this.tableDate.data = (this.columnsData).filter(this.isPerson).filter(this.isEndTime)
+				}else if(this.restrainList.personCode !== '' && this.restrainList.startTime !== '' &&this.restrainList.endTime === ''){  //未限制结束时间
+					this.tableDate.data = (this.columnsData).filter(this.isPerson).filter(this.isStartTime)
+				}else if(this.restrainList.personCode !== '' && this.restrainList.startTime === '' &&this.restrainList.endTime === ''){  //只限制人员
+					this.tableDate.data = (this.columnsData).filter(this.isPerson)
+				}else if(this.restrainList.personCode === '' && this.restrainList.startTime !== '' &&this.restrainList.endTime === ''){  //只限制开始时间
+					this.tableDate.data = (this.columnsData).filter(this.isStartTime)
+				}else if(this.restrainList.personCode === '' && this.restrainList.startTime === '' &&this.restrainList.endTime !== ''){  //只限制结束时间
+					this.tableDate.data = (this.columnsData).filter(this.isEndTime) 														
+				}else{																													 //什么都不限制
+					this.tableDate.data = this.columnsData		
+				} 
+				
+				//console.log(this._data)
+
+			},
+			isPerson(obj){
+				return obj.personCode === this.restrainList.personCode
+			},
+			isStartTime(obj){
+				return obj.startTime <= this.restrainList.startTime
+			},
+			isEndTime(obj){
+				return obj.endTime >= this.restrainList.endTime
+			}
+		}
+	}
+</script>
+
 
 
 
@@ -24,7 +193,12 @@
 			align-items:stretch;
 
 			.content-table {
-				flex: 1
+				flex: 1;
+			}
+			.path-title {
+				border-left: 0;
+				margin-bottom: 0px;
+				margin-left: -10px
 			}
 		}
 	}

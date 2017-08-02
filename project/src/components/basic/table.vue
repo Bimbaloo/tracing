@@ -45,11 +45,16 @@
             	required: false,
             	type: Boolean,
             	default: true
+            },
+            resize:{
+                required: false,
+                type: Boolean,
+            	default: false
             }
         },
         data() {
             return {
-                resize: false,
+//              resize: false,
 //              dataArray: this.tableData.data,
                 columns: this.tableData.columns
             }
@@ -61,6 +66,7 @@
         },
         methods: {    
             cellClick (row, column, cell, event) {
+
                 let oColumn = this.columns.filter(o => o.prop==column.property)[0];
                 // && row[column.property]
                 oColumn.cellClick && oColumn.cellClick(row);                
