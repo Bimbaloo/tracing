@@ -23,7 +23,7 @@ const suspicious = r => require.ensure([], () => r(require('components/restrain/
 // 定义路由
 const routes = [
   { path: '/list/:key', component: list },
-  { path: '/stock/:key', component: suspicious }
+  { path: '/suspicious/:key', component: suspicious }
 ]
 
 // 创建 router 实例，然后传 `routes` 配置

@@ -67,14 +67,14 @@
 		data() {
 			return {
 				radioList:[
-				// {
-				// 	key:'0',
-				// 	groupName:'物料'
-				// },
-				// {
-				// 	key:'1',
-				// 	equipmentCode:'设备',
-				// }
+					// {
+					// 	key:'0',
+					// 	groupName:'物料'
+					// },
+					// {
+					// 	key:'1',
+					// 	equipmentCode:'设备',
+					// }
 				],
 				groupItems: [
                         // {
@@ -124,7 +124,7 @@
 				activeName: 'first',
 				radioNumber: '0',
 				keys: {},  //面板参数
-				activeKey:'stock',  // 储存路由页面
+			//	activeKey:'stock',  // 储存路由页面
 
 
 
@@ -157,16 +157,11 @@
 				],
 				
 
+				activeKey: "suspicious",  // 储存路由页面,默认suspicious
+
+
 			/* 保存上次查询的数据 */
-				_Data:{
-					keys:{
-						materialCode: "",
-						batchNo: "",
-						_tag: ""
-					},
-					radio:"0",
-					tab:"stock"
-				}
+				defaultConditions:{}
 
 			}
 		},
@@ -186,50 +181,35 @@
         },
 		// 创建时处理。mounted
 		created() {
-
+			/* 设置遏制类表的查询条件 */
 			sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2)); //设置默认过滤条件 -- 遏制列表的条件
 
+			/* 获取传入的查询条件 */
 			let oData = sessionStorage.getItem("searchConditions");
-			//console.log(JSON.parse(oData))
-			//session 中获取
-			if(oData) {
-				
+
+			if(oData) {									//如果该条件在 session 中有保存
 				oData = JSON.parse(oData);
-				this.activeKey = oData.tab;  //路由
-				this.radioNumber = oData.radio
-				if(oData.radio === '0'){
-					this.ruleForm.materialCode = oData.keys.materialCode
-					this.ruleForm.batchNo = oData.keys.batchNo
-				}else{
-					this.ruleForm.equipmentCode = oData.keys.equipmentCode
-					this.ruleForm.startTime = oData.keys.startTime
-					this.ruleForm.endTime = oData.keys.endTime
-				}
-			}else if(window.location.hash.length > 2) {
-			// 清空了cookie后，url中有参数。则获取url中的参数。
-			
+				this.render(oData) 						// 根据数据渲染页面
+			}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
 				oData = this.getSearchData();
-				this.activeKey = oData.tab;
+				this.render(oData)
 			}
 
 			/* 根据传入数据 */
 			this.$ajax.get('../static/2.json').then((res) => {
 				this.judgeLoaderHandler(res,() => {
 					let datas = res.data.data
-					let _radioList = []
-					let _groupItems = []
-					datas.forEach(o => {
-						if(o.moduleCode === "restrain"){
-							
+					let _radioList = []			//用于储存radioList
+					let _groupItems = []		//用于储存groupItems
+					datas.forEach(o => {		//用于获取页面上布局信息
+						if(o.moduleCode === "restrain"){	
 							(o.groups).forEach((group,index) => {
-							
 								_radioList.push({
 									key: `${index}`,
 									groupName: `${group.groupName}`
 								})
 								var groupItems = group.groupItems
 								groupItems.forEach(function(item){
-									//debugger
 									if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
 										item.type = 'select'
 										item.placeholder = `请选择${item.itemName}`
@@ -240,8 +220,6 @@
 										item.type = 'datetime'						
 										item.placeholder = `请选择${item.itemName}`
 									}
-
-								
 									_groupItems.push({
 										key: `${index}`,
 										itemCode: `${item.itemCode}`,
@@ -253,16 +231,12 @@
 							})
 							this.radioList = _radioList
 							this.groupItems = _groupItems
-							// _groupItems.forEach(item => {
-							// 	this.keys[item.itemCode] = ''
-							// })
 
 						}
 					})
 				 });
 				 this.$nextTick(() => {
 					if(oData) {
-					//	console.log(oData)
 						this._submitForm(oData);
 					}            
 				})
@@ -272,23 +246,30 @@
 		},
 		// 页面方法。
 		methods: {
+			/* 根据传入信息渲染页面 */
+			render(oData){
+				this.activeKey = oData.tab;  //路由
+				this.radioNumber = oData.radio
+				if(oData.radio === '0'){  // 将条件渲染到页面
+					this.ruleForm.materialCode = oData.keys.materialCode
+					this.ruleForm.batchNo = oData.keys.batchNo
+				}else{
+					this.ruleForm.equipmentCode = oData.keys.equipmentCode
+					this.ruleForm.startTime = oData.keys.startTime
+					this.ruleForm.endTime = oData.keys.endTime
+				}
+			},
+
 			submitForm(formName) {
 			  this.$refs[formName].validate((valid) => {
 					if (valid) {
 
-                        // 保存搜索条件。
-                        let oKeys = {};
-                        for (let key in this.keys){
-//                          this.keys[key] = this.ruleForm[key];
-                            oKeys[key] = this.ruleForm[key];
-                        }
-                       
                         let oConditions = {
                             keys: this.ruleForms, // this.keys,
 							radio: this.radioNumber,
 							tab: this.activeKey
 						};
-						//debugger
+
                         this._submitForm(oConditions);
                         
                     } else {
@@ -303,7 +284,7 @@
 					if (valid) {
 						sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2));
 						this.$router.push({ 
-							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变(不可见)，子组件监听路由触发事件
+							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变，子组件监听路由触发事件
 							
 						})
                     } else {
@@ -346,7 +327,7 @@
 							
 						})
 				}else{
-					this._submitForm(this._Data)
+					this._submitForm(this.defaultConditions)
 				}
 			},
 
@@ -354,23 +335,22 @@
 			// 数据提交
 			_submitForm(oConditions) {	
 				
-				this._Data = oConditions
-				let sPath = '/' + this.activeKey;  //this.activeKey  == 'stock'
+
+				let sPath = '/' + this.activeKey;  //this.activeKey  == 'suspicious'
 				oConditions.tab = this.activeKey;
 
-
+				this.defaultConditions = oConditions
 				sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
 				sPath = sPath + '/' + oConditions.radio;
 				
 				this.$router.push({ path: sPath, query: this.getKeys() })
 			},
 			
-			getKeys(sKey) {
+			getKeys() {
 				
 				let oSearch = this.ruleForms
 				// 加时间戳。生成标记-- 点击查询可多次
 				oSearch._tag = new Date().getTime().toString().substr(-5);
-				//this.Data = oSearch
 				
 				return oSearch;
 			},
