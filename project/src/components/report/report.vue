@@ -603,14 +603,9 @@
 					
 					oQuery = this.query;
 				}else {
-					if((oQuery && ("equipmentId" in oQuery)) || !!this.$route.query.equipmentCode ) {
+					if(oQuery && ("equipmentId" in oQuery)) {
 						// 若根据设备查询。
 						this.url = "/api/v1/trace/report/by-equipment";
-						oQuery ={
-							"materialCode":this.$route.query.materialCode,
-							"startTime":this.$route.query.startTime,
-							"endTime":this.$route.query.endTime
-						}
 					}
 					oQuery ={
 						"materialCode":this.$route.query.materialCode,

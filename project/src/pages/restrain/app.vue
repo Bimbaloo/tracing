@@ -9,24 +9,24 @@
 							<div class='radio'>
 								<el-radio :label="radio.key" v-for="radio in radioList">{{radio.groupName}}</el-radio>
 							</div>
-							<el-form :inline="true" ref="radioRuleForm" :model="ruleForm"  :class="[ 'demo-form-inline','form-inline']">
+							<el-form :inline="true" ref="materialForm" :model="materialForm"  :class="[ 'demo-form-inline','form-inline']" :rules="rules">
 								 <el-form-item v-for="(item,index) in groupItems" :label="item.placeholder" v-show="item.key === radioNumber" :key="item.itemCode+index" :prop="item.itemCode">
-									 <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+									 <component :is="`v-${item.type}`" :form-data="materialForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
-									<el-button type="primary" class='btn' @click="submitForm('radioRuleForm')">查询</el-button>
+									<el-button type="primary" class='btn' @click="submitForm('materialForm')">查询</el-button>
 								</el-form-item>
 							</el-form>
 						</el-radio-group>
 					</el-tab-pane>
 					<el-tab-pane label="遏制列表" activeName="second">
 						<el-radio-group v-model="radioNumber">
-							<el-form :inline="true" ref="radioRuleForm1" :model="ruleForm2"  :class="[ 'demo-form-inline','form-inline']">
+							<el-form :inline="true" ref="equipmentFrom" :model="equipmentFrom"  :class="[ 'demo-form-inline','form-inline']" :rules="equipmentRules">
 								 <el-form-item v-for="(item,index) in groupItems2" :label="item.placeholder"  :key="`item`+index" :prop="item.itemCode">
-									 <component :is="`v-${item.type}`" :form-data="ruleForm2" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+									 <component :is="`v-${item.type}`" :form-data="equipmentFrom" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
-									<el-button type="primary" class='btn' @click="submitForm1('radioRuleForm1')">查询</el-button>
+									<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')">查询</el-button>
 								</el-form-item>
 							</el-form>
 						</el-radio-group>
@@ -114,7 +114,7 @@
                         // }
 				],
 
-				ruleForm:{
+				materialForm:{
 					equipmentCode:'',   //设备
 					startTime:'',		//开始时间
 					endTime:'',			//结束时间
@@ -123,14 +123,32 @@
 				},
 				activeName: 'first',
 				radioNumber: '0',
-				keys: {},  //面板参数
-			//	activeKey:'stock',  // 储存路由页面
+				rules: {
+					batchNo: [
+						{ required: true, message: '请输入批次号', trigger: 'blur' }
+					],
+					materialCode: [
+						{ required: true, message: '请选择物料编号', trigger: 'change' }
+					]
+				},
+				equipmentRules: {
+					equipmentCode: [
+						{ required: true, message: '请选择物料编号', trigger: 'change' }
+					],
+					startTime: [
+						{ type: 'date', required: true, message: '请选择开始日期', trigger: 'change' }
+					],
+					endTime: [
+						{ type: 'date', required: true, message: '请选择结束日期', trigger: 'change' }
+					]
+				},
+
 
 
 
 
 				/* 遏制列表页面数据 */
-				ruleForm2:{
+				equipmentFrom:{
 					startTime:'',		//开始时间
 					endTime:'',			//结束时间
 					personCode:'',		//操作人员
@@ -172,7 +190,7 @@
 
 				let ruleForms = {}
 				this.groupItems.filter((o) => o.key === this.radioNumber).forEach(item => {
-					ruleForms[item.itemCode] = this.ruleForm[item.itemCode]
+					ruleForms[item.itemCode] = this.materialForm[item.itemCode]
 				})
 				return  ruleForms
 				
@@ -182,7 +200,7 @@
 		// 创建时处理。mounted
 		created() {
 			/* 设置遏制类表的查询条件 */
-			sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2)); //设置默认过滤条件 -- 遏制列表的条件
+			sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
 
 			/* 获取传入的查询条件 */
 			let oData = sessionStorage.getItem("searchConditions");
@@ -251,12 +269,12 @@
 				this.activeKey = oData.tab;  //路由
 				this.radioNumber = oData.radio
 				if(oData.radio === '0'){  // 将条件渲染到页面
-					this.ruleForm.materialCode = oData.keys.materialCode
-					this.ruleForm.batchNo = oData.keys.batchNo
+					this.materialForm.materialCode = oData.keys.materialCode
+					this.materialForm.batchNo = oData.keys.batchNo
 				}else{
-					this.ruleForm.equipmentCode = oData.keys.equipmentCode
-					this.ruleForm.startTime = oData.keys.startTime
-					this.ruleForm.endTime = oData.keys.endTime
+					this.materialForm.equipmentCode = oData.keys.equipmentCode
+					this.materialForm.startTime = oData.keys.startTime
+					this.materialForm.endTime = oData.keys.endTime
 				}
 			},
 
@@ -282,7 +300,7 @@
 			submitForm1(formName) {
 			  this.$refs[formName].validate((valid) => {
 					if (valid) {
-						sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2));
+						sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
 						this.$router.push({ 
 							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变，子组件监听路由触发事件
 							
@@ -321,7 +339,7 @@
 			handleClick(tab) {
 				
 				if(tab.index === '1'){
-					sessionStorage.setItem('restrainList', JSON.stringify(this.ruleForm2));
+					sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
 					this.$router.push({ 
 							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变(不可见)，子组件监听路由触发事件
 							

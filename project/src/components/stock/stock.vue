@@ -128,7 +128,7 @@
 			.btn-restrain {
 				position: absolute;
 				right: 0;
-				top: 65px;
+				top: 15px;
 			}
 			.table {
 	    	    .batch {
