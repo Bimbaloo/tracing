@@ -54,7 +54,7 @@
 			return {
 				excel: true,
 				print: true,
-				btnShow: true,
+				btnShow: false,  //根据需要是否隐藏‘可疑品’按钮
 				styleError: {
                 	"max-height": "200px"
                 },
@@ -284,7 +284,7 @@
 		.btn-restrain {
 			position: absolute;
 			right: 0;
-			top: 65px;
+			top: 10px;
 		}
 		
 		.content-title {
