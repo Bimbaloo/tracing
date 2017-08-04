@@ -53,7 +53,8 @@
 <script>
 	import report from "components/report/report.vue"
 	import table from "components/basic/table.vue"
-
+	import html2canvas from 'html2canvas'
+	
 	// 数据名称接口。
     const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
 
@@ -314,7 +315,7 @@
                 if(!oRef) {
                     return;
                 }
-                window.Rt.utils.downloadHtml(oRef, "快速报告");     
+                window.Rt.utils.downloadHtml(html2canvas, oRef, "快速报告");     
             },
             // 页面打印。
             printHandle (refHtml, event) {
@@ -324,7 +325,8 @@
                 if(!oRef) {
                     return;
                 }
-                window.Rt.utils.printHtml(oRef);              
+                
+                window.Rt.utils.printHtml(html2canvas,oRef);          
             }
 		}
 	}

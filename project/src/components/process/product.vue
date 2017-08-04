@@ -93,7 +93,8 @@
 	import XLSX from 'xlsx'
     import Blob from 'blob'
     import FileSaver from 'file-saver'
-
+	import html2canvas from 'html2canvas'
+	
 const url = HOST + "/api/v1/trace/inout/by-equipment";
 
 export default {
@@ -429,7 +430,7 @@ export default {
             if(!oTable) {
                 return;
             }
-            window.Rt.utils.printHtml(oTable);              
+            window.Rt.utils.printHtml(html2canvas, oTable);              
         }
     }
 }

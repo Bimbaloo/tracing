@@ -38,7 +38,8 @@
 	import XLSX from 'xlsx'
     import Blob from 'blob'
     import FileSaver from 'file-saver'
-
+	import html2canvas from 'html2canvas'
+	
     export default {
         // components: {
         //     'v-table': table
@@ -276,7 +277,7 @@
                 if(!oTable) {
                     return;
                 }
-                window.Rt.utils.printHtml(oTable,{
+                window.Rt.utils.printHtml(html2canvas, oTable,{
                 	height: oTable.clientHeight * 1.5
                 });
             },
