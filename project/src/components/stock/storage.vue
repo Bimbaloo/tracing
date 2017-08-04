@@ -1,7 +1,6 @@
 <!--出入库-->
 <template>
     <div class="router-content">
-    	<div class="tableClone" ref="printTable"></div>
         <div class="innner-content">
             <h2 class="content-title">
                	 出库信息
@@ -11,7 +10,7 @@
             <div v-if="outstockData.error" class="error" :style="styleError">
                 {{ outstockData.error }}
             </div>
-            <div v-else class="content-table">
+            <div v-else class="content-table" ref="outstockTable">
             	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>            
                 <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
@@ -23,16 +22,16 @@
             <div v-if="instockData.error" class="error" :style="styleError">
                 {{ instockData.error }}
             </div>
-            <div v-else class="content-table">
+            <div v-else class="content-table" ref="instockTable">
             	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
             </div>
             <!-- 复制的内容 -->
-            <div v-show="false" ref="outstockTable">
+            <!--<div v-show="false" ref="outstockTable">
             	<v-table :b-fixed="false" :table-data="outstockData" :loading="outstockData.loading"></v-table>
             </div>
             <div v-show="false" ref="instockTable">
             	<v-table :b-fixed="false" :table-data="instockData" :loading="instockData.loading"></v-table>
-            </div>
+            </div>-->
         </div>
     </div>      
 </template>
@@ -292,19 +291,53 @@
             },
             // 表格打印。
             printHandle (refTable, event) {
-                let oTable = this.$refs[refTable],
-                	oPrint = this.$refs["printTable"];
+                let oTable = this.$refs[refTable];
                 	
                 if(!oTable) {
                     return;
                 }
-//				oPrint.innerHTML = oTable.innerHTML;
-//              window.Rt.utils.printHtml(oPrint,{
-//              	height: oPrint.clientHeight,
-//              	width: 1500
-//              },true);
                 
-                window.Rt.utils.rasterizeHTML(rasterizeHTML, oTable);
+                let sHtml = `
+	        		<div class="table el-table">
+						<div class="el-table__header-wrapper">
+							${oTable.querySelector(".el-table__header-wrapper").innerHTML}
+						</div>
+						<div class="el-table__body-wrapper">
+							${oTable.querySelector(".el-table__body-wrapper").innerHTML}
+						</div>
+	        			<style>
+	            			.el-table td.is-center, .el-table th.is-center {
+	        					text-align: center;
+	            			}
+	        				.table thead th {
+	        					height: 36px;
+								background-color: #42af8f;
+	        				}
+	        				.table thead th .cell {
+	        					color: #fff;
+	        				}
+	        				.el-table__body-wrapper tr:nth-child(even) {
+	        				 	background-color: #fafafa;
+	        				}
+	        				.el-table__body-wrapper tr:nth-child(odd) {
+	        				 	background-color: #fff;
+	        				}
+	        				.el-table__body-wrapper .cell {
+	        					min-height: 30px;
+	        					line-height: 30px;
+//	        					border: 1px solid #e4efec;
+	        				}
+	        				.batch {
+	        					color: #f90;
+	        				}
+	        				.el-table__empty-block {
+	        					text-align: center;	
+	        				}
+	        			</style>
+	        		</div>
+	        	`;
+                
+                window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
             }
         }
     }  
@@ -360,11 +393,4 @@
     	}
 
     }
-    
-    .el-table {
-    	.el-table__body-wrapper {
-    		/*overflow-x: hidden;*/
-    	}
-    }
-    
 </style>
