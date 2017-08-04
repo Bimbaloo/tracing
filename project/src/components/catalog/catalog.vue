@@ -9,11 +9,11 @@
 
 	export default {
 		props: {
-			catalogData: Array,
-			resize:{
-				type: Number,
-      			required: false
-			}
+			catalogData: Object,	//Array
+			// resize:{
+			// 	type: Number,
+      		// 	required: false
+			// }
 		},
 		data() {
 			return {			
@@ -21,6 +21,9 @@
 			}
 		},
 		computed: {
+			resize () {
+		    	return this.$store.state.resize
+		    },
 		    key () {
 		      return this.$store.state.key
 		    },
@@ -41,7 +44,8 @@
 		watch: {
 		    // 如果 question 发生改变，这个函数就会运行
 		    catalogData: function () {			
-				this.catalog && (this.catalog.model = new go.TreeModel(this.catalogData));	
+//				this.catalog && (this.catalog.model = new go.TreeModel(this.catalogData));	
+				this.catalog && (this.catalog.model = new go.GraphLinksModel(this.catalogData.node, this.catalogData.link));
 		    },
 		    key: function() {
 		    	if(this.type == "tree") {
@@ -50,9 +54,7 @@
 		    	}
 		    },
 			/* 外部父div大小变化，视图大小更新 */
-			resize: function(){
-				this.updateCanvas();
-			}
+			resize: 'updateCanvas'
 		},
 		methods: {
 			/**
@@ -103,10 +105,17 @@
 								})
 								
 								let sRootKey = node.data.key;
-								if(node.data.parent &&　node.data.type != "1") {
-									sRootKey　= node.findTreeParentNode().data.key;				
-								}		
-
+								if(node.data.groupCode) {
+									// 获取没有grop的key值。
+									let sCurrentNode = node;
+									while(sCurrentNode.findTreeParentNode().data.groupCode) {
+										sCurrentNode = sCurrentNode.findTreeParentNode();
+									}
+									sRootKey　= sCurrentNode.findTreeParentNode().data.key;
+								}
+//								if(node.data.parent &&　node.data.type != "1") {
+//									sRootKey　= node.findTreeParentNode().data.key;				
+//								}	
 								this.$store.commit({
 									type: "updateType",
 									key: "catalog"
@@ -120,7 +129,7 @@
 									key: sRootKey
 								});
 								
-								if(node.data.type == "1") {
+								if(node.data.isMaterialNode) {		// node.data.type == "1"
 									// 根据物料节点查询仓储信息。        
 									this.$router.push({ 
 										path: "/stock", 
@@ -166,7 +175,7 @@
 									margin: new go.Margin(0, 0, 0, 2),
 									imageStretch: go.GraphObject.Uniform,
 								},
-								new go.Binding("source", "type", s => s == 1 ? material : process)
+								new go.Binding("source", "isMaterialNode", s => s ? material : process)
 							),
 							$(go.TextBlock, {
 									name: "TB",
@@ -174,7 +183,7 @@
 									stroke: "#fff",
 									margin: new go.Margin(4, 5, 4, 5)
 								},
-								new go.Binding("text", "showName", s => s)
+								new go.Binding("text", "name", s => s)
 							)
 						) // end Horizontal Panel
 					); // end Node
@@ -198,7 +207,7 @@
 									margin: new go.Margin(0, 5, 0, 2),
 									imageStretch: go.GraphObject.Uniform
 								},
-								new go.Binding("source", "type", s => s == 1 ? material : process)
+								new go.Binding("source", "isMaterialNode", s => s ? material : process)
 							),
 							$(go.Placeholder) // this represents the selected Node
 						),
@@ -209,7 +218,7 @@
 								stroke: "#333333",
 								margin: 5
 							},
-							new go.Binding("text", "showName")
+							new go.Binding("text", "name")
 						)
 					);
 

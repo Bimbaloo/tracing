@@ -1,5 +1,5 @@
 <template>
-	<div class="diagram">
+	<div class="diagram" ref="diagram">
 		<div class="icons">
 			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
 			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
@@ -15,18 +15,19 @@
 	import material from 'assets/img/material.png'
 	import process from 'assets/img/process.png'
 	import {onNodeSelectionChange, onClickNode, onContextClickNode, onDoubleClickNode, tooltipTextConverter, zoomDiagram} from 'assets/js/go-util'
-
+    import {ParallelLayout} from 'assets/js/ParallelLayout.js'
+	
 	export default {
 		props: {
 			treeData: Object,
-			flexBasis:{      // 用于追溯页面上下拖动后视图大小更新
-				type: Number,
-      			required: false
-			},
-			resize: {		 // 用于追溯页面左右拖动后视图大小更新
-				type: Number,
-      			required: false
-			}
+			// flexBasis:{      // 用于追溯页面上下拖动后视图大小更新
+			// 	type: Number,
+      		// 	required: false
+			// },
+			// resize: {		 // 用于追溯页面左右拖动后视图大小更新
+			// 	type: Number,
+      		// 	required: false
+			// }
 		},
 		data() {
 			return {
@@ -41,7 +42,8 @@
 		    	this.data = Object.assign({}, this.treeData);
 		    },
 		    data: function () {	
-		    	if(this.tree) {		    		
+		    	if(this.tree) {		  
+  		
 		    		this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    		
 		    	}				
 		    },
@@ -56,14 +58,16 @@
 		    root: function() {
 		    	this.redrawTree();
 			},
-			flexBasis: function(){
-				this.updateCanvas()
-			},
-			resize: function(){
-				this.updateCanvas()
-			}
+			flexBasis: 'updateCanvas',
+			resize: 'updateCanvas'
 		},
 		computed: {
+			resize () {
+		    	return this.$store.state.resize
+		    },
+			flexBasis () {
+				return this.$store.state.resizeY
+			},
 			data () {
 				return Object.assign({}, this.treeData);
 			},
@@ -131,11 +135,11 @@
 						allowVerticalScroll: true,
 						
 			//          initialAutoScale:go.Diagram.Uniform,
-						layout: $(go.TreeLayout, {
-							nodeSpacing: 20,
-							layerSpacing: 33
-						}),
-			//	        layout: $(go.LayeredDigraphLayout, {layerSpacing: 33, columnSpacing: 6}),
+			//			layout: $(go.TreeLayout, {
+			//				nodeSpacing: 20,
+			//				layerSpacing: 33
+			//			}),
+				        layout: $(go.LayeredDigraphLayout, {layerSpacing: 33, columnSpacing: 25}),
 						doubleClick: (e, node) => {
 							zoomDiagram(this.tree, this.flag);
 							this.flag = !this.flag;
@@ -180,7 +184,7 @@
 									key: node.data.key
 								});
 								
-								if(node.data.type == "1") {
+								if(node.data.isMaterialNode) {   // node.data.type == "1"
 									// 根据物料节点查询仓储信息。        
 									this.$router.push({ 
 										path: "/stock", 
@@ -221,7 +225,7 @@
 									margin: new go.Margin(0, 0, 0, 4),
 									imageStretch: go.GraphObject.Uniform,
 								},
-								new go.Binding("source", "type", s => s == 1 ? material : process)
+								new go.Binding("source", "isMaterialNode", s => s ? material : process)
 							)
 						),
 						$(go.TextBlock, {
@@ -232,7 +236,7 @@
 								margin: 5,
 								//	                  	textValidation:onEditName
 							},
-							new go.Binding("text", "showName").makeTwoWay() //
+							new go.Binding("text", "name").makeTwoWay() //
 						),
 						//	              new go.Binding("editable","editable"),
 						$("TreeExpanderButton", {
@@ -259,7 +263,6 @@
 								e.handled = true;
 								
 								let sGroup = node.data.group;
-								
 								if(node.isTreeExpanded) {
 									cmd.collapseTree(node);
 								} else {
@@ -291,7 +294,7 @@
 									margin: new go.Margin(0, 0, 0, 2),
 									imageStretch: go.GraphObject.Uniform,
 								},
-								new go.Binding("source", "type", s => s == 1 ? material : process)
+								new go.Binding("source", "isMaterialNode", s => s ? material : process)
 							),
 							$(go.Placeholder) // this represents the selected Node
 						),
@@ -302,7 +305,7 @@
 								stroke: "#333333",
 								margin: 5
 							},
-							new go.Binding("text", "showName")
+							new go.Binding("text", "name")
 						)
 					); // end Adornment
 
@@ -322,15 +325,11 @@
 								strokeWidth: 3
 							})
 					);
-
-				// define the group template
+					
+					// define the group template
 				this.tree.groupTemplate =
 					$(go.Group, "Auto", { // define the group's internal layout
-							layout: $(go.TreeLayout, {
-		//						angle: 90,
-		//						arrangement: go.TreeLayout.ArrangementHorizontal,
-		//						isRealtime: false
-							}),
+							layout: $(go.TreeLayout, {layerSpacing: 20, nodeSpacing: 10}),
 							// the group begins unexpanded;
 							// upon expansion, a Diagram Listener will generate contents for the group
 							isSubGraphExpanded: false,
@@ -374,7 +373,7 @@
 										margin: 4,
 										stroke: "#169bd5"
 									},
-									new go.Binding("text", "showName"))	// key
+									new go.Binding("text", "name"))	// key
 							),
 							// create a placeholder to represent the area where the contents of the group are
 							$(go.Placeholder, {
@@ -399,7 +398,15 @@
 				                     // point all the way to the commented node
 				          { stroke: "brown", strokeWidth: 1, fill: "lightyellow" })
 				      ));
-
+				      
+				      // 设置初始时节点在中间显示。
+				    let self = this;
+				    this.tree.addDiagramListener("LayoutCompleted", function(e){
+					  	let node = self.tree.findNodeForKey("1");
+					  	if(node) {
+							self.tree.centerRect(node.actualBounds);
+					  	}
+					});
 			},
 
 			/**
