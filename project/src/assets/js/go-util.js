@@ -97,7 +97,7 @@ function onDoubleClickNode(e, node) {
  * @return {String}
  */
 function tooltipTextConverter(data) {
-	return data.showName;
+	return data.name;
 }
 
 /**
