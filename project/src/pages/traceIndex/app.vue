@@ -5,15 +5,15 @@
 		<div class="content" v-loading.fullscreen.lock="fullscreenLoading">
 			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
 			<div @click="goToInit" :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
-				<v-catalog @init="treeDataInit" :catalog-data="catalogData" :resize="resizeUpdate"></v-catalog>
+				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
 			</div>
 			<!-- <div :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router"> -->
 			<div  class="router">
 				<div id='changeWidth' class='changeWidth'></div>
-				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
-				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
+				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapseTree"></i>
+				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="expandTree"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :resize="resizeUpdate" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
+					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
 					<div id='changeDiagram' :class="[{hide: treeFullscreen},{hide: fullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
@@ -46,14 +46,14 @@
 				changeWidth:0,        //改变的宽度
 				LayoutLeftWidth: 325, //默认宽度
 				draggingX: false,	  //左右拖动功能启动
-				resizeUpdate:0,       //监听父集div大小改变更新左侧图形
+				// resizeUpdate:0,       //监听父集div大小改变更新左侧图形
 
 				/* 上下拖动功能添加属性 */
 				treeHeight:400,  	 // 默认高度tree组件高度
 				draggingY: false,	 //上下拖动功能启动
 				_pageY:null,     	 //鼠标的纵向位置
 				changeHeight:0,  	 //改变的高度
-				resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
+				// resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
 
 				// 页面加载中动画。
 				fullscreenLoading: false,
@@ -61,11 +61,17 @@
 				collapse: false,
 				url: HOST + "/api/v1/trace/up/trace-info",
 				treeData: {},
-				catalogData: [],
+				catalogData: {},//[],
 				params: []
 			}
 		},
 		computed: {
+			resizeUpdate () {
+		    	return this.$store.state.resize
+		    },
+		    resizeUpdateY () {
+		    	return this.$store.state.resizeY
+		    },
 			query () {
 				let url = location.search; //获取url中"?"符后的字串 
 				let oRequest = {};
@@ -117,21 +123,6 @@
 			
 			// 加载数据。
 			this.fetchData();
-				
-//			this.fullscreenLoading = true;
-//		    setTimeout(() => {
-//		    	this.fullscreenLoading = false;
-//		    	
-//				this.$store.commit({
-//					type: "updateData",
-//					data: fnP.parseTreeData()
-////					data: aoTestData
-//				});
-//				
-//				// 格式化数据。
-//				this.treeData = this.parseTreeData();
-//				this.catalogData = this.parseCatalogData();
-//		    }, 1000)
 		},
 		mounted() {
 		},
@@ -188,7 +179,7 @@
 						} else {
 							this.$store.commit({
 								type: "updateData",
-								data: fnP.parseTreeData(data)
+								data: data		//fnP.parseTreeData(data)
 							});
 							// 格式化数据。
 							this.treeData = this.parseTreeData();
@@ -202,13 +193,13 @@
 					this.showMessage();
 				})
 			},
-
+			
 			/**
 			 * 设置右侧图表树结构数据。
 			 * @param {Array} aoData
 			 * @return {void}
 			 */
-			parseTreeData() {
+			parseTreeData1() {
 				let aoData = this.rawData,
 					aoDiagramData = [],
 					aoDiagramLinkData = [],
@@ -252,12 +243,75 @@
 					link: aoDiagramLinkData
 				};
 			},
+			/**
+			 * 设置右侧图表树结构数据。
+			 * @param {Array} aoData
+			 * @return {void}
+			 */
+			parseTreeData() {
+				
+				let aoData = fnP.parseTreeData(this.rawData),		//this.rawData,
+					aoDiagramData = [],
+					aoDiagramLinkData = [];
+					
+				aoData.forEach(oData => {
+					
+					aoDiagramData.push(oData);
+					
+					// 非组数据的处理。
+//					if(!oData.isGroup) {
+						// 物料或工序。 增加连接线。
+						let aoParents = oData.parents.split(",");
+						aoParents.forEach( sParent => {
+							aoDiagramLinkData.push({
+								from: sParent,
+								to: oData.key
+							});
+						})
+//					}
+					
+				})
+					
+				return {
+					node: aoDiagramData,
+					link: aoDiagramLinkData
+				}
+			},
+
+			/**
+			 * 获取左侧目录树数据。
+			 * @return {void}
+			 */
+			parseCatalogData() {
+				let aoDiagramData = [],
+					aoDiagramLinkData = [],
+					aoData = $.extend(true, [], this.rawData); //Object.assign([], this.rawData)
+		
+					aoData.forEach(oData => {
+					
+						aoDiagramData.push(oData);
+						
+						// 物料或工序。 增加连接线。
+						let aoParents = oData.parents.split(",");
+						aoParents.forEach( sParent => {
+							aoDiagramLinkData.push({
+								from: sParent,
+								to: oData.key
+							});
+						})
+					})
+						
+					return {
+						node: aoDiagramData,
+						link: aoDiagramLinkData
+					}
+			},
 	
 			/**
 			 * 获取左侧目录树数据。
 			 * @return {void}
 			 */
-			parseCatalogData() {	
+			parseCatalogData1() {	
 				let aoCopyData = [],
 					aoCatalogData = [],
 					oGroup = {},
@@ -338,15 +392,30 @@
 			goToInit() {
 				console.log(1)
 			},
+			// 收缩左侧树。
+			collapseTree() {
+				this.collapse = true;
+				this.$store.commit({
+					type: "updateResize",
+					key: 0
+				});
+			},
+			expandTree() {
+				this.collapse = false;
+				this.$store.commit({
+					type: "updateResize",
+					key: this.LayoutLeftWidth
+				});
+			},
 			/* 拖动功能 */
 			dragstar(e){   //鼠标按下，开始拖动
 			//  console.log('开始')
 			//	console.log(this.treeFullscreen)
 				if(e.target.id === 'changeWidth'){
-				this.LayoutLeftWidth = this.reversedMessage
-				this.changeWidth = 0
-				this.draggingX = true;
-				this._pageX = e.pageX
+					this.LayoutLeftWidth = this.reversedMessage
+					this.changeWidth = 0
+					this.draggingX = true;
+					this._pageX = e.pageX
 					if(this.collapse){
 						this.collapse = false
 					}
@@ -357,25 +426,28 @@
 					this._pageY = e.pageY
 				//	console.log(this._pageY)
 				}
-			
-				
-			
 			},
 			dragend(e){ //鼠标松开，结束拖动
 
 				//console.log('结束')
 				this.draggingX = false  //关闭拖动功能
 				this.draggingY = false  //关闭拖动功能
-				this.resizeUpdate = this.reversedMessage //改变 changeWidth 的值，触发 canvas 大小更新
-
-
+				// this.resizeUpdate = this.reversedMessage //改变 changeWidth 的值，触发 canvas 大小更新
+				this.$store.commit({
+					type: "updateResize",
+					key: this.reversedMessage
+				});
 			},
 			onMouseMove(e){ //拖动过程
 				if(this.draggingX){
 					this.changeWidth = e.pageX-this._pageX
 				}else if(this.draggingY){
 					this.changeHeight = e.pageY-this._pageY
-					this.resizeUpdateY = this._treeHeight //改变 resizeUpdateY 的值，触发 canvas 大小更新
+					// this.resizeUpdateY = this._treeHeight //改变 resizeUpdateY 的值，触发 canvas 大小更新
+					this.$store.commit({
+						type: "updateResizeY",
+						key: this._treeHeight
+					});
 				}
 				
 			},
