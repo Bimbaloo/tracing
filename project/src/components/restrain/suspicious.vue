@@ -8,7 +8,7 @@
 				<span>物料编码：{{$route.query.materialCode}}</span><span>批次：{{$route.query.batchNo}}</span>
 			</div>
 			<h2 class="title">可疑品列表</h2>
-			<v-report :hasData="setWidth" :noData="removeWidth"></v-report>
+			<v-report :hasData="setWidth" :noData="removeWidth" ></v-report>
 		</div>
 	</div>
 
@@ -150,11 +150,12 @@
 	.router-content {
 		flex: 1 1;
 		overflow: auto;
+		position: relative;
 		
 		.btn-restrain {
 			position: absolute;
 			right: 0;
-			top: 65px;
+			top: 45px;
 		}
 		
 		.condition {

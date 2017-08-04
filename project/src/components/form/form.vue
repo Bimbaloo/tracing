@@ -40,7 +40,8 @@
             		oFormData[o.key] = "";
             	}
             });
-            
+	//		console.log('ruleForm')
+	//		console.log(oFormData)
             return {
             	ruleForm: oFormData
             };

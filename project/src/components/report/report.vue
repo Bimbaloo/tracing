@@ -547,8 +547,14 @@
 				}				
 			}
 		},
+		watch: {
+			'$route':function(){  
+				this.fetchData();
+			}
+		},
 		created() {
 			// 数据加载。
+			
 			this.fetchData();
 		},
 		mounted() {
@@ -588,9 +594,10 @@
 				for(let param in this.reportData) {
 					this.reportData[param].data = [];
 				}
-				
-				let oQuery = this.query;
 
+				let oQuery = this.query;
+				//console.log(this.$route.query.equipmentCode)
+				//debugger
 				if(this.type == "trace") {
 					// 若为快速报告，根据物料+批次+bucketNo获取数据。
 					this.url = "/api/v1/trace/report/by-start-points";
