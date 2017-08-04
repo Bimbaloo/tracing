@@ -25,7 +25,7 @@
 				</div>
 				<i class="icon icon-20 icon-report" @click="onReport" title="快速报告" v-if="!fullscreen"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :flex-basis="resizeUpdateY" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
+					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
 					<div id='changeDiagram' :class="[{hide: treeFullscreen},{hide: fullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
@@ -54,7 +54,7 @@
 				draggingY: false,	 //上下拖动功能启动
 				_pageY:null,     	 //鼠标的纵向位置
 				changeHeight:0,  	 //改变的高度
-				resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
+				// resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
 
 				// 页面加载中动画。
 				fullscreenLoading: false,
@@ -81,7 +81,10 @@
 					}
 				}
 				return oRequest;
-			},		    
+			},		
+			resizeUpdateY () {
+		    	return this.$store.state.resizeY
+		    },    
 			rawData () {
 		    	return this.$store.state.rawData
 		    },
@@ -182,7 +185,7 @@
 						} else {
 							this.$store.commit({
 								type: "updateData",
-								data: fnP.parseTreeData(data)
+								data: data		//fnP.parseTreeData(data)
 							});
 							// 格式化数据。
 							this.treeData = this.parseTreeData();
@@ -204,7 +207,7 @@
 			 * @param {Array} aoData
 			 * @return {void}
 			 */
-			parseTreeData() {
+			parseTreeData1() {
 				let aoData = this.rawData,
 					aoDiagramData = [],
 					aoDiagramLinkData = [],
@@ -248,11 +251,45 @@
 					link: aoDiagramLinkData
 				};
 			},			
+			/**
+			 * 设置右侧图表树结构数据。
+			 * @param {Array} aoData
+			 * @return {void}
+			 */
+			parseTreeData() {
+				
+				let aoData = fnP.parseTreeData(this.rawData),		//this.rawData,
+					aoDiagramData = [],
+					aoDiagramLinkData = [];
+					
+				aoData.forEach(oData => {
+					
+					aoDiagramData.push(oData);
+					
+					// 非组数据的处理。
+//					if(!oData.isGroup) {
+						// 物料或工序。 增加连接线。
+						let aoParents = oData.parents.split(",");
+						aoParents.forEach( sParent => {
+							aoDiagramLinkData.push({
+								from: sParent,
+								to: oData.key
+							});
+						})
+//					}
+					
+				})
+					
+				return {
+					node: aoDiagramData,
+					link: aoDiagramLinkData
+				}
+			},	
 			parseTableData() {			
 				let aoData = this.rawData
 				let _rawData = []
 				aoData.forEach(oData => {
-					if(oData.type === "2") {
+					if(!oData.isMaterialNode) {
 						_rawData.push({
 							"process":oData.process,
 							"ok": oData.ok,
@@ -307,7 +344,11 @@
 			onMouseMove(e){ //拖动过程
 				if(this.draggingY){
 					this.changeHeight = e.pageY-this._pageY
-					this.resizeUpdateY = this._treeHeight //改变 resizeUpdateY 的值，触发 canvas 大小更新
+					// this.resizeUpdateY = this._treeHeight //改变 resizeUpdateY 的值，触发 canvas 大小更新
+					this.$store.commit({
+						type: "updateResizeY",
+						key: this._treeHeight
+					});
 				}
 				
 			},

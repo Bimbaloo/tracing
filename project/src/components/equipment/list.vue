@@ -797,7 +797,7 @@
 <style lang="less">    
 	.material-stock  {	  	
     	.content-list {
-			padding-top: 30px;
+			// padding-top: 30px;
 
 			.handle {
 				padding: 0 170px 0 0;
@@ -834,9 +834,9 @@
 			}
 
 			.analysis {
-				display: flex;
-				padding-right: 170px;
-				margin-bottom: 50px;
+				// display: flex;
+				// padding-right: 170px;
+				// margin-bottom: 50px;
 				
 				.name {
 					width: 150px;

@@ -660,11 +660,11 @@
                             eventType: "事件类型",
                             reason: "事件原因",
                             status: "状态"
-                        }));
+                        }, o.groupId));
                     }else if(o.type == "endEquipWarningList") {
                         this.setDimensionConfig("event", this._createNode(o, index, "event", "事件结束", {
                             endTime: "结束时间"
-                        }));
+                        }, o.groupId));
                     }
                 })
 
@@ -731,11 +731,11 @@
                             startTime: "开始时间",
                             personName: "操作人",
                             reason: "维护原因"
-                        }));
+                        }, o.groupId));
                     }else if(o.type == "endEquipRepairList") {
                         this.setDimensionConfig("repair", this._createNode(o, index, "repair", "设备维护结束", {
                             endTime: "结束时间"
-                        }));
+                        }, o.groupId));
                     }
                 })
 
@@ -769,20 +769,14 @@
                         })
                         aoSortData = aoSortData.concat(oTool[p]);
 
-                    }else if(p == "startEquipRepairList") {
-                        // 设备维护开始。
+                    }else if(p == "removeToolList") {
+                        // 下刀/下模。
                         oTool[p].forEach(o => {
-                            o.type = "startEquipRepairList";
+                            o.type = "removeToolList";
+                            o.startTime = o.happenTime;
                         })
                         aoSortData = aoSortData.concat(oTool[p]);
-                    }else if(p == "endEquipRepairList") {
-                        // 设备维护结束。
-                        oTool[p].forEach(o => {
-                            o.type = "endEquipRepairList";
-                            o.startTime = o.endTime;
-                        })
-                        aoSortData = aoSortData.concat(oTool[p]);
-                    }                     
+                    }                   
                 }
 
                 // 按照开始时间排序。
@@ -794,7 +788,7 @@
                     let sTitle = "";
                     if(o.type == "installToolList") {
                         
-                        if(o.type == "刀具") {
+                        if(o.toolType == "刀具") {
                             sTitle = "上刀";
                         }else  {
                             sTitle = "上模";
@@ -802,12 +796,12 @@
                         this.setDimensionConfig("tool", this._createNode(o, index, "tool", sTitle, {
                             happenTime: "发生时间",                      
                             personName: "操作人",
-                            type: "工具类型",
+                            toolType: "工具类型",
                             toolCode: "工具编码",
                             reason: "原因"
-                        }));
-                    }else if(o.type == "removeToolList") {
-                        if(o.type == "刀具") {
+                        }, o.groupId));
+                    }else if(o.toolType == "removeToolList") {
+                        if(o.toolType == "刀具") {
                             sTitle = "下刀";
                         }else  {
                             sTitle = "下模";
@@ -815,10 +809,10 @@
                         this.setDimensionConfig("tool", this._createNode(o, index, "tool", sTitle, {
                             happenTime: "发生时间",                      
                             personName: "操作人",
-                            type: "工具类型",
+                            toolType: "工具类型",
                             toolCode: "工具编码",
                             reason: "原因"
-                        }));
+                        }, o.groupId));
                     }
                 })
 

@@ -7,7 +7,7 @@
         </div>
         <div class="router-path">
             <span class="path-item" @click="checkEquipment">设备列表</span>
-            <span class="path-item" @click="checkDetail" v-if="detailIf">>设备详情</span>          
+            <!--span class="path-item" @click="checkDetail" v-if="detailIf">>设备详情</span-->          
             <span class="path-item" @click="checkProduction" v-if="productIf">>投产表</span>
             <span class="path-item" v-if="restrainIf">>遏制</span>
         </div> 
@@ -75,9 +75,10 @@
                     sType = aHref[aHref.length-1];
                 
                 // debugger
-                if(sType == "detail") {
-                    this.detail = this.$route.query;
-                }else if(sType == "product") {
+                // if(sType == "detail") {
+                //     this.detail = this.$route.query;
+                // }else 
+                if(sType == "product") {
                     this.product = this.$route.query;
                 }else if(sType == "restrain") {
                     this.restrain = this.$route.query;
@@ -90,20 +91,21 @@
                 let aPath = to.path.split("/"),
                     sType = aPath[aPath.length - 1];
 
-                if(sType == "detail") {
-                    this.detailIf = true;
-                    this.productIf = false;
-                    this.restrainIf = false;
-                }else if(sType == "product") {
-                    this.detailIf = true;
+                // if(sType == "detail") {
+                //     this.detailIf = true;
+                //     this.productIf = false;
+                //     this.restrainIf = false;
+                // }else 
+                if(sType == "product") {
+                    // this.detailIf = true;
                     this.productIf = true;
                     this.restrainIf = false;
                 }else if(sType == "restrain") {
-                    this.detailIf = true;
+                    // this.detailIf = true;
                     // this.productIf = true;
                     this.restrainIf = true;
                 }else {
-                    this.detailIf = false;
+                    // this.detailIf = false;
                     this.restrainIf = false;
                     this.productIf = false;
                 }   

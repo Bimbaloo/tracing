@@ -6,6 +6,7 @@ import 'element-ui/lib/theme-green/index.css'
 
 import App from './app.vue'
 import axios from 'axios'
+import echarts  from 'echarts'
 import Vuex from 'vuex'
 
 //import 'assets/js/html2canvas.js'
@@ -21,18 +22,22 @@ Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
 Vue.prototype.$post = axios.post;
 
-const Stock = r => require.ensure([], () => r(require('components/material/stock.vue')), 'group-datail')
-const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-datail')
-const Batch = r => require.ensure([], () => r(require('components/stock/batch.vue')), 'group-datail')
-const Suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-datail')
+// 添加echarts。
+Vue.prototype.$echarts = echarts
 
-const Process = r => require.ensure([], () => r(require('components/process/stock.vue')), 'group-datail')
-const List = r => require.ensure([], () => r(require('components/process/list.vue')), 'group-datail')
-const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-datail')
-const Product = r => require.ensure([], () => r(require('components/process/product.vue')), 'group-datail')
+const Stock = r => require.ensure([], () => r(require('components/material/stock.vue')), 'group-detail')
+const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-detail')
+const Batch = r => require.ensure([], () => r(require('components/stock/batch.vue')), 'group-detail')
+const Suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-detail')
 
-const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-datail')
-const Track = r => require.ensure([], () => r(require('components/track/track.vue')), 'group-datail')
+const Process = r => require.ensure([], () => r(require('components/process/stock.vue')), 'group-detail')
+const List = r => require.ensure([], () => r(require('components/process/list.vue')), 'group-detail')
+const Chart = r => require.ensure([], () => r(require('components/process/chart.vue')), 'group-detail')
+const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-detail')
+const Product = r => require.ensure([], () => r(require('components/process/product.vue')), 'group-detail')
+
+const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-detail')
+const Track = r => require.ensure([], () => r(require('components/track/track.vue')), 'group-detail')
 
 Vue.use(VueRouter)
 // 定义路由
@@ -54,7 +59,7 @@ const routes = [{
     component: Process,
     children: [{
       path: '',
-      component: List
+      component: Chart//List
     },{
       path: 'detail',
       component: Detail
@@ -87,7 +92,9 @@ const store = new Vuex.Store({
     fullscreen: false,
     treeFullscreen: true,
     // 原始树数据。
-    rawData: []
+    rawData: [],
+    resize: 0,
+    resizeY: 0
   },
   mutations: {  
     updateKey (state, payload) {
@@ -100,7 +107,12 @@ const store = new Vuex.Store({
       state.type = payload.key;
     },
     updateData (state, payload) {
-      state.rawData = payload.data || [];
+      state.rawData = (payload.data || []).map(o => {
+        if(o && o.key == null) {
+          o.key = o.id;
+        }
+        return o;
+      });
     },
     updateFullscreen (state, payload) {
       state.fullscreen = payload.key;
@@ -108,7 +120,15 @@ const store = new Vuex.Store({
     // 更新树型图形的放大。
     updateTreeFullscreen (state, payload) {
     	state.treeFullscreen = payload.key;
-    }
+    },
+    // 更新左右拖拽事件
+    updateResize (state, payload) {
+      state.resize = payload.key;
+    },
+    // 更新上下拖拽事件
+    updateResizeY (state, payload) {
+      state.resizeY = payload.key;
+    },
   },
   actions: {
 	  updateRootAsync ({ commit }) {
