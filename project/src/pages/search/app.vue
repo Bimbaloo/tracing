@@ -117,7 +117,8 @@
 
   header{
     text-align: center;
-
+		margin-top: -30px;
+		
     img {
         margin-bottom: 10px;
     }
@@ -129,7 +130,7 @@
    bottom: 30px
  }
   .panel-title {
-      padding: 19px 0;
+      padding: 10px 0;		// 19
       .el-radio+.el-radio {
           margin-left: 60px;
       }
@@ -190,6 +191,9 @@
           }
         }
       }
+      .el-form-item {
+        margin-bottom: 15px;
+      }
       .form-button {
         .btn:first-child {
           margin-left: 100px;
@@ -226,7 +230,7 @@
       }
 
       .el-form-item {
-        margin-bottom: 16px;
+        margin-bottom: 14px;
 
         .el-form-item__label {
           font-size: 12px;
