@@ -90,7 +90,6 @@
             setPathVisible(to) {
                 let aPath = to.path.split("/"),
                     sType = aPath[aPath.length - 1];
-
                 // if(sType == "detail") {
                 //     this.detailIf = true;
                 //     this.productIf = false;
@@ -98,6 +97,11 @@
                 // }else 
                 if(sType == "product") {
                     // this.detailIf = true;
+                    // 添加开始时间，结束时间。因为可以跳转到设备分析的时候，开始时间结束时间有修改。
+                    Object.assign(this.equipment, {
+                        startTime: to.query.startTime,
+                        endTime: to.query.endTime
+                    })
                     this.productIf = true;
                     this.restrainIf = false;
                 }else if(sType == "restrain") {
@@ -105,10 +109,9 @@
                     // this.productIf = true;
                     this.restrainIf = true;
                 }else {
-                    // this.detailIf = false;
                     this.restrainIf = false;
                     this.productIf = false;
-                }   
+                }  
             },
             fullScreenClick() {
                 // 详情全屏按钮点击事件。
@@ -143,7 +146,7 @@
 //          console.log(next);
 
             this.key = this.$route.params.key;
-            this.setRouteQuery();
+            this.setRouteQuery(to);
             // 设置path可见性。
             this.setPathVisible(to);
             next();

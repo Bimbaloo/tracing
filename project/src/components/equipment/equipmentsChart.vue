@@ -1,7 +1,8 @@
 <!--设备-->
 <template>
     <div class="content-list" v-loading="loading">
-		<div class="analysis" id="equipments"></div>
+        <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
+		<div v-else class="analysis" id="equipments"></div>
         <div class="links" v-if="selectedEquipment">
             <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item']">
                 <div v-for="item in obj.list" @click="listButtonClick(item)">{{item.name}}</div>
@@ -39,9 +40,9 @@
                 </ul>
             </div>
         </div>        
-		<!--div class="setting clear">
-            <div class="start">		    
-                <span v-if="startIf" @dblclick="startIf=false">{{datetime.start}}</span>
+		<div class="setting clear" v-if="!sErrorMessage&&!loading">
+            <div class="start">	    
+                <span v-if="startIf" @click="startIf=false">{{datetime.start}}</span>
                 <div v-else class="edit">
                     <v-datetime :form-data="datetime" key-data="start"></v-datetime>
                     <span class="edit-icon">
@@ -51,7 +52,7 @@
                 </div>
             </div>
             <div class="end">
-                <span v-if="endIf" @dblclick="endIf=false">{{datetime.end}}</span>
+                <span v-if="endIf" @click="endIf=false">{{datetime.end}}</span>
                 <div v-else class="edit">
                     <v-datetime :form-data="datetime" key-data="end"></v-datetime>
                     <span class="edit-icon">
@@ -60,7 +61,7 @@
                     </span>
                 </div>
             </div>
-		</div-->					 
+		</div>					 
     </div>      
 </template>
 
@@ -123,6 +124,12 @@
                         list: []
                     },
                 },
+                // 设备id列表。
+                // {
+                // value: o.equipmentName+ '+' + o.equipmentId + '+' + 0, // 最后一位代表是否选中这台设备
+                // id: o.equipmentId
+                // }
+                categories: [],
                 axisTooltipData: [],
 				dimension: [{
 					name: "质量",
@@ -199,15 +206,14 @@
 				// 是否全屏
 		    	return this.$store.state.fullscreen
 		    },
-            categories () {
-                return this.equipments.map(o => {
-                    return {
-                        value: o.equipmentName+ '+' + o.equipmentId + '+' + 0, 
-                        name: o.equipmentName,
-                        id: o.equipmentId    
-                    }
-                })
-            },
+            // categories () {
+            //     return this.equipments.map(o => {
+            //         return {
+            //             value: o.equipmentName+ '+' + o.equipmentId + '+' + 0, 
+            //             id: o.equipmentId    
+            //         }
+            //     })
+            // },
             option () {
                 let oData = {
                     legend: {
@@ -252,11 +258,11 @@
                             // 展示图像缩略轴。
                             showDataShadow: true,
                             // top: 400,
-                            height: 20,
+                            height: 16,
                             // borderColor: 'transparent',
                             // backgroundColor: '#e2e2e2',
                             handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
-                            handleSize: 20,
+                            handleSize: 16,
                             handleStyle: {
                                 shadowBlur: 6,
                                 shadowOffsetX: 1,
@@ -273,16 +279,19 @@
                             // show: true,
                             yAxisIndex: [0],
                             showDataShadow: true,
-                            width: 20,
+                            width: 16,
                             // borderColor: 'transparent',
                             // backgroundColor: '#e2e2e2',
                             handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
-                            handleSize: 20,
+                            handleSize: 16,
                             handleStyle: {
                                 shadowBlur: 6,
                                 shadowOffsetX: 1,
                                 shadowOffsetY: 2,
                                 shadowColor: '#fff'
+                            },
+                            labelFormatter: function(index, value) {
+                                return value.split("+")[0]
                             }
                         }, {
                             type: 'inside',
@@ -516,6 +525,7 @@
                             list: []
                         }
                     }
+                    this.selectedEquipment = '';
                 }        
             },
             // 重置图形大小。
@@ -764,8 +774,6 @@
 				// 判断是否调用成功。
 				if(bRight != "0") {
 					// 提示信息。
-//					this.sErrorMessage = param.data.errorMsg.message;
-//					this.showMessage();
 					this.sErrorMessage = "暂无数据";
 					console.log(param.data.errorMsg.message);
 					// 失败后的回调函。
@@ -785,7 +793,7 @@
 			// 获取设备所有数据。
 			fetchAllData() {
 				this.loading = true;	
-
+                this.sErrorMessage = "";
 				// setTimeout(() => {
 				// 	this.loading = false;
 					
@@ -802,6 +810,7 @@
 				})
 				.then((res) => {
 					this.loading = false;
+                    this.categories = [];
 					this.judgeLoaderHandler(res, () => {
 						// 保存数据。		
 						let aoData = res.data.data;
@@ -811,6 +820,10 @@
 						}
                         
                         aoData.forEach(o => {
+                            this.categories.push({
+                                id: o.equipmentId,
+                                value: `${o.equipmentName}+${o.equipmentId}+0`
+                            })
                             let oData = this.equipmentData[o.equipmentId];
                             if(oData) {
                                 Object.assign(oData, {
@@ -853,14 +866,13 @@
 				})
 				.catch((err) => {
 					this.loading = false;
-//				 	this.sErrorMessage = "查询出错";  
-//				 	this.showMessage();
 				 	this.sErrorMessage = "暂无数据";
 					console.log("查询出错");
 				})
 			},
             // 设置图形数据。
             setChartData () {
+                
                 // 设备状态。
                 this.option.series.filter(o => o.name=="状态")[0].data = this.getStatusData();
                 // 获取各事件维度数据。
@@ -1074,7 +1086,7 @@
                                 // 若存在。
                                 oMap[sKey]++                          
                                 let oFilter = aoData.filter(aData => aData[0]===oData.time&&aData[1]===nIndex)[0];
-                                oFilter[2]++
+                                oFilter[2]++;
                                 oFilter[3].push(oData);
                             }else {
                                 oMap[sKey] = 1;
@@ -1365,19 +1377,25 @@
             }
 
             .setting {
-                height: 30px;
-                line-height: 30px;
-                padding: 0 100px 0 60px;
+                position: absolute;
+                bottom: 0px;
+                height: 20px;
+                line-height: 20px;
+                width: 100%;
+                font-size: 12px;
 
                 .start,.end {
-                    width: 180px;
+                    width: 166px;
                     text-align: center;
+                    cursor: pointer;
                 }
                 .start {
                     float: left;
+                    margin-left: 40px;
                 }
                 .end {
                     float: right;
+                    margin-right: 40px;
                 }
                 .edit {
                     position: relative;
@@ -1399,8 +1417,9 @@
                     }
                 }
                 .el-input__inner {
-                    height: 30px;
+                    height: 20px;
                     border-radius: 0;
+                    font-size: 12px;
                 }
 
             }

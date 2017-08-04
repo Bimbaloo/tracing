@@ -61,25 +61,30 @@
         },
         methods: {
 			setDateTime () {
-				let start = "",
-					end = "";
-				this.equipments.forEach((equipment, index) => {
+				let oQuery = this.$route.query || {},
+					start = oQuery.startTime,
+					end = oQuery.endTime;	
 
-					let sTemp = equipment.shiftStartTime,
-						eTemp = equipment.shiftEndTime
-					if(!index) {
-						start = sTemp;
-						end = eTemp;
-					}else{
-						if(start > sTemp) {
+				if(!start || !end) {
+					this.equipments.forEach((equipment, index) => {
+
+						let sTemp = equipment.shiftStartTime,
+							eTemp = equipment.shiftEndTime
+						if(!index) {
 							start = sTemp;
-						}
-						if(end < eTemp) {
 							end = eTemp;
-						}
-					} 									
-								
-				})
+						}else{
+							if(start > sTemp) {
+								start = sTemp;
+							}
+							if(end < eTemp) {
+								end = eTemp;
+							}
+						} 									
+									
+					})
+
+				}
 
 				this.datetime = {
 					start: start,
@@ -93,6 +98,7 @@
 			 * @return {void}
 			 */
 			setEquipmentList () {
+				
 				this.equipments = [];
 				
 				let aoData = this.rawData,
@@ -101,17 +107,17 @@
 				let aoFilter = this.rawData.filter(o => o.key == this.processKey);
 				if(aoFilter.length) {
 					oNode = aoFilter[0];
-				}else {
-					// 节点在子工序中。
-					this.rawData.map(o => {
-						if(o.subProcess) {
-							let aoNode = o.subProcess.filter(item => item.key == this.processKey);
-							if(aoNode.length) {
-								oNode = aoNode[0];
-							}
-						}			
+				// }else {
+				// 	// 节点在子工序中。
+				// 	this.rawData.map(o => {
+				// 		if(o.subProcess) {
+				// 			let aoNode = o.subProcess.filter(item => item.key == this.processKey);
+				// 			if(aoNode.length) {
+				// 				oNode = aoNode[0];
+				// 			}
+				// 		}			
 									
-					})
+				// 	})
 				}
 				
 				this.node = oNode || {};	
