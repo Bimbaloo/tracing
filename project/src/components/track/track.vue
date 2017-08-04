@@ -48,53 +48,66 @@
                         fixed: true
                     },{
                         prop: "barcode",
-                        name: "条码"
+                        name: "条码",
+                        sortable: true
                     },{
                         prop: "processName",
                         name: "工序名称",
-                        width: "120"
+                        width: "120",
+                        sortable: true
                     },{
                         prop: "equipmentName",
                         name: "设备名称",
-                        width: "120"
+                        width: "120",
+                        sortable: true
                     },{
                         prop: "equipmentCode",
-                        name: "设备编码"
+                        name: "设备编码",
+                        sortable: true
                     },{
                         prop: "equipmentType",
-                        name: "设备类型"
+                        name: "设备类型",
+                        sortable: true
                     },{
                         prop: "moldCode",
-                        name: "模号"
+                        name: "模号",
+                        sortable: true
                     },{
                         prop: "batchNo",
                         name: "批次号",
-                        width: "150"
+                        width: "150",
+                        sortable: true
                     },{
                         prop: "materialCode",
-                        name: "物料编码"
+                        name: "物料编码",
+                        sortable: true
                     },{
                         prop: "materialName",
                         name: "物料名称",
-                        width: "300"
+                        width: "300",
+                        sortable: true
                     // },{
                     //     prop: "materialSpec",
                     //     name: "物料规格"
                     },{
                         prop: "materialUnit",
                         name: "单位",
-                         width: "50"
+                        width: "50",
+                        sortable: true
                     },{
                         prop: "quantity",
                         name: "数量",
-                        width: "50"
+                        width: "50",
+                        sortable: true
                     },{
                         prop: "happenTime",
                         name: "加工时间",
-                        width: "160"
+                        width: "160",
+                        sortable: true
                     },{
                         prop: "personName",
-                        name: "操作人"
+                        name: "操作人",
+                        sortable: true
                     }],
                     data: []
                 },
@@ -172,8 +185,8 @@
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		({ batchNo: oSelected.batchNo,iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-            			
+            		//({ batchNo: oSelected.batchNo,iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            		({ doId: oSelected.doId, barcode: oSelected.barcode, batchNo: oSelected.batchNo, iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
             		aSelected.push(oSelected);
             	})
                     
