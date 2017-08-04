@@ -117,7 +117,7 @@
 				let oRestrainList = sessionStorage.getItem('restrainList', JSON.stringify(this.ruleForm2)); //获取查询条件
 				//session 中获取查询条件
 				if(oRestrainList) {
-					debugger
+				//	debugger
 					this.restrainList = JSON.parse(oRestrainList)
 				}else{ //如果没有查询条件，默认查询所有一周前开始的所有信息
 					this.restrainList.startTime = this.setData()
@@ -162,7 +162,7 @@
 				let a = sessionStorage.getItem('restrainList', JSON.stringify(this.ruleForm2));
 				this.restrainList =  JSON.parse(a)
 				//console.log(this.restrainList)
-				debugger
+				//debugger
 				if(this.restrainList.personCode !== '' && this.restrainList.startTime !== '' &&this.restrainList.endTime !== ''){  //三个条件都在
 					this.tableDate.data = (this.columnsData).filter(this.isPerson).filter(this.isStartTime).filter(this.isEndTime)
 				}else if(this.restrainList.personCode === '' && this.restrainList.startTime !== '' &&this.restrainList.endTime !== ''){  //未限制人员
