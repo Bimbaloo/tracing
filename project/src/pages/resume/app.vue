@@ -39,21 +39,21 @@
 								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
 							<!--:row-style="tableRowStyleName"-->
-							<div v-if="oTab.tables.error" :style="{height:oTab.tables.height+'px'}" class="error">
-								{{ oTab.tables.error }}
+							<div v-if="oTab.error" :style="{height:oTab.tableHeight+'px'}" class="error">
+								{{ oTab.error }}
 							</div>
 							<el-table
 								v-else
 								class="table-main" 
 								:data="aParsedData" 
-								:height = "oTab.tables.height"
+								:height = "oTab.tableHeight"
 								stripe
 								style="width: 100%;"
-								v-loading="oTab.tables.loading"
+								v-loading="oTab.loading"
 								element-loading-text="拼命加载中"
 								row-class-name="table-item">
 								<el-table-column
-									v-for="(column,index) in oTab.tables.columns"
+									v-for="(column,index) in oTab.columns"
 									:align="index?'center':'left'"
 									:fixed="!index?true:false"
 									:min-width="column.width"
@@ -63,7 +63,9 @@
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else :class="[{evens:props.row.total%2},'isVis', 'cell-content']">{{ sText }}</div>
+										<div v-else :class="[{evens:props.row.total%2},{isVis: !props.row.inResumes[column.prop]}, 'cell-content']">
+											{{ column.formatter(props.row.inResumes[column.prop]) }}
+										</div>
 										
 										<div class="cell-info">
 											<p 
@@ -91,7 +93,7 @@
 								style="width: 100%;"
 								row-class-name="table-item">
 								<el-table-column
-									v-for="(column,index) in oTab.tables.columns"
+									v-for="(column,index) in oTab.columns"
 									:align="index?'center':'left'"
 									:min-width="column.width"
 									:label="column.name">
@@ -100,7 +102,9 @@
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else :class="[{evens:props.row.total%2},'isVis', 'cell-content']">{{ sText }}</div>
+										<div v-else :class="[{evens:props.row.total%2}, {isVis: !props.row.inResumes[column.prop]}, 'cell-content']">
+											{{ column.formatter(props.row.inResumes[column.prop]) }}
+										</div>
 										
 										<div class="cell-info">
 											<p 
@@ -116,12 +120,12 @@
 						
 						<!-- 时间轴 -->
 						<div 
-							v-loading="oTab.lines.loading"
+							v-loading="oTab.loading"
 							element-loading-text="拼命加载中"
-							v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height:getHeight()+'px'}" ref="timeLine">
+							v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height: oTab.timelineHeight +'px'}" ref="timeLine">
 							
-							<div v-if="oTab.lines.error" class="error">
-								{{ oTab.lines.error }}
+							<div v-if="oTab.error" class="error">
+								{{ oTab.error }}
 							</div>
 							<div v-else class="time-line-content">
 								<div 
@@ -200,6 +204,7 @@
 	import Input from "components/basic/input.vue"
 	import Button from "components/basic/button.vue"
 	import TimeNode from "components/resume/time-node.vue"
+	import html2canvas from 'html2canvas'
 	
 	var bFull = window.location.hash.indexOf("full")>-1?true:false;
 	
@@ -224,7 +229,7 @@
         	};
 			return {
 				// 默认测试数据。
-				sText: "a",		// a
+				sText: "a",
 				// 默认工序层级的间距。
 				nLevelDis: 10,
 				// 工序收缩图标宽度
@@ -259,105 +264,97 @@
 				},
 				// 类型。
 				oTab: {
-					"tables": {
-						url: HOST + "/api/v1/resume/bom",
-						columns: [{
-							prop: "materialName",
-							name: "",
-							width: 450,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "type",
-							name: "类型",
-							width: 120,
-							formatter: function(sValue) {
-								return self.getTimeLineTypeInfo(sValue).text || self.sText
-							}
-						},{
-							prop: "time",
-							name: "时间",
-							width: 120,
-							formatter: function(sValue) {
-								return self._parseTimeFormat(sValue) || self.sText
-							}
-						},{
-							prop: "location",
-							name: "地点",
-							width: 250,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "batchNo",
-							name: "批次",
-							width: 300,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "barcode",
-							name: "条码",
-							width: 300,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "quantity",
-							name: "数量",
-							width: 120,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "shiftName",
-							name: "班次",
-							width: 180,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "personName",
-							name: "人员",
-							width: 120,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "moldCode",
-							name: "模号",
-							width: 120,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "vendorName",
-							name: "供应商/客户",
-							width: 120,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						},{
-							prop: "checkResult",
-							name: "检验结果",
-							width: 120,
-							formatter: function(sValue) {
-								return sValue || self.sText
-							}
-						}],
-						bCreated: false,
-						loading: false,
-						error: "",
-						height: "100%"
-					},
-					"lines": {
-						url: HOST + "/api/v1/resume/timeline",
-						bCreated: false,
-						loading: false,
-						error: "",
-						height: "100%"
-					}
+					url: HOST + "/api/v1/resume/search",
+					columns: [{
+						prop: "materialName",
+						name: "",
+						width: 450,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "type",
+						name: "类型",
+						width: 120,
+						formatter: function(sValue) {
+							return self.getTimeLineTypeInfo(sValue).text || self.sText
+						}
+					},{
+						prop: "time",
+						name: "时间",
+						width: 120,
+						formatter: function(sValue) {
+							return self._parseTimeFormat(sValue) || self.sText
+						}
+					},{
+						prop: "location",
+						name: "地点",
+						width: 250,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "batchNo",
+						name: "批次",
+						width: 300,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "barcode",
+						name: "条码",
+						width: 300,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "quantity",
+						name: "数量",
+						width: 120,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "shiftName",
+						name: "班次",
+						width: 180,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "personName",
+						name: "人员",
+						width: 120,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "moldCode",
+						name: "模号",
+						width: 120,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "vendorName",
+						name: "供应商/客户",
+						width: 120,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					},{
+						prop: "checkResult",
+						name: "检验结果",
+						width: 120,
+						formatter: function(sValue) {
+							return sValue || self.sText
+						}
+					}],
+					bCreated: false,
+					loading: false,
+					error: "",
+					tableHeight: "",
+					timelineHeight: ""
 				},
 				// 规则。
 				rules: {
@@ -410,18 +407,8 @@
 				this.sCurrentTab = oRequest.type;
 		    }
 		    
-			// 如果是全屏，则默认创建。
-//			if(this.bFullScreen) {
-//				this.getPageData();
-//			}
 			// 默认查询。--- created()
 			this.getPageData();
-//			this.submitForm('ruleForm')
-		},
-		watch: {
-			bShowTitle: function() {
-				this.oTab[this.sCurrentTab].height = this.getHeight();
-			}
 		},
 		// 页面方法。
 		methods: {
@@ -440,12 +427,8 @@
 				// 默认不显示标题
 				this.bShowTitle = false;
 				// 默认都未创建。
-				this.oTab.tables.bCreated = false;
-				this.oTab.tables.loading = false;
-				this.oTab.tables.error = "";
-				this.oTab.lines.bCreated = false;
-				this.oTab.lines.loading = false;
-				this.oTab.lines.error = "";
+				this.oTab.loading = false;
+				this.oTab.error = "";
 			},
 			// 获取页面的高度。
 			getHeight() {
@@ -454,18 +437,19 @@
 					jForm = $(".filters"),
 					jLine = $(".line"),
 					nReturnHeight = 0;
-					
+				
+				// 获取页面中的可显示高度。
 				nReturnHeight = nHeight
 							- (this.bFullScreen?0:$("header").outerHeight(true))
 							-  (jWrap.outerHeight(true) - jWrap.height())
 							- (this.bFullScreen?0:jForm.outerHeight(true))
 							- (this.bFullScreen?0:jLine.outerHeight(true))
 							- ($(".resume-main").outerHeight(true) - $(".resume-main").height())
-							- $(".resume-handler").outerHeight(true)
-							- (this.sCurrentTab == "tables" && this.bShowTitle?$(".resume-table .table-title").outerHeight(true):0);
-				
-				// 返回数据。
-				return nReturnHeight;
+							- $(".resume-handler").outerHeight(true);
+
+				// 设置表格及时间轴的高度。
+				this.oTab.timelineHeight = nReturnHeight;
+				this.oTab.tableHeight = nReturnHeight - (this.bShowTitle?$(".resume-table .table-title").outerHeight(true):0)
 			},
 			// 查询操作处理 函数。
 			submitForm(formName) {
@@ -473,19 +457,6 @@
 					if (valid) {
 						// 重置数据。----
 						this.initData();
-//						this.bSubmit = true;
-						
-						// 更新form中的值。--直接设置值。
-//						let oData = sessionStorage.getItem("searchConditions");
-//
-//						// 履历模块。
-//					    if(oData) {
-//					        oData = JSON.parse(oData);
-//					        if(oData.tab === "resume") {
-//						        oData.keys.barcode = this.ruleForm.barcode;
-//						        sessionStorage.setItem("searchConditions", JSON.stringify(oData));
-//					        }
-//					    }
 						
 						// 根据当前tab类型创建数据。
 						this.getPageData();
@@ -495,79 +466,56 @@
 			// 修改页面中的显示tab。
 			changeTab(sTab) {
 				// 修改当前的tab值。
-				let _that = this,
-					sCurrent = _that.sCurrentTab;
-				if(sTab != sCurrent) {
-					// 当前是切换。
-					_that.sCurrentTab = sTab;
-					
-					// 初始化数据处理
-					this.getPageData();
+				if(sTab != this.sCurrentTab) {
+					// 修改当前的tab项。
+					this.sCurrentTab = sTab;
 				}
 			},
 			// 获取数据。
 			getPageData() {
 				// 获取数据。-- 根据当前显示的tab创建数据。
-				this.oTab[this.sCurrentTab].loading = true;
-				
+				this.oTab.loading = true;
 				// 设置barcode。
 				this.oTitle.barcode = this.ruleForm.barcode;
+				// 需要调用接口，才将错误信息去掉
+				this.oTab.error = "";
 				
-				
-				if(!this.oTab[this.sCurrentTab].bCreated) {
-					// 需要调用接口，才将错误信息去掉
-					this.oTab[this.sCurrentTab].error = "";
+				this.$ajax.post(this.oTab.url, this.ruleForm).then((res) => {
+					this.oTab.loading = false;
 					
-					this.$ajax.post(this.oTab[this.sCurrentTab].url, this.ruleForm).then((res) => {
-						this.oTab[this.sCurrentTab].loading = false;
-						// 设置为已创建。
-					    this.oTab[this.sCurrentTab].bCreated = true;
-					    
-						this.oTab[this.sCurrentTab].height = this.getHeight();
+					if(!res.data.errorCode) {
+						// 显示标题。
+						this.bShowTitle = true;
+					    this.oTitle.materialName = res.data.data.materialName;
+					    this.oTitle.batchNo = res.data.data.batchNo;
 						
-						if(!res.data.errorCode) {
-							// 保存数据。
-							if(this.sCurrentTab == "tables") {
-								// 显示标题。
-								this.bShowTitle = true;
-								
-							    this.aoTable =res.data.data;
-							    this.aParsedData = this.parseTableData();
-							    
-							    // 设置批次及产品。
-							    if(this.aoTable.length) {
-								    this.oTitle.materialName = this.aoTable[0].nodeName;
-								    this.oTitle.batchNo = this.aoTable[0].batchNo;
-							    }
-							}else {
-								this.aoTimeLineData =res.data.data;
-							}
-							
-							if(this.bCarousel) {
-								this.$nextTick(function() {
-									// 设置滚动。
-									this.setScroll();
-								})						
-							}
-						}else {
-							
-							// 如果是表格，则隐藏标题。
-							if(this.sCurrentTab == "tables") {
-								// 显示标题。
-								this.bShowTitle = false;
-							}
-							
-						    // 根据errorCode 错误时设置。error
-							this.oTab[this.sCurrentTab].error = res.data.errorMsg.message;
+						// 数据修改。
+					    this.aoTable = res.data.data.bomResumes;
+					    this.aParsedData = this.parseTableData();
+						this.aoTimeLineData = res.data.data.timeLineResumes;
+						
+						if(this.bCarousel) {
+							this.$nextTick(function() {
+								// 设置滚动。
+								this.setScroll();
+							})						
 						}
-					    
-				    }).catch((err)=> {
-				    	this.oTab[this.sCurrentTab].loading = false;
-						this.oTab[this.sCurrentTab].error = "查询出错";
-				    });
-				}else {
-					this.oTab[this.sCurrentTab].loading = false;
-				}
+					}else{
+						this.bShowTitle = false;
+					    // 根据errorCode 错误时设置。error
+						this.oTab.error = res.data.errorMsg.message;
+					}
+					
+					// 设置内容的高度。
+					this.getHeight();
+					
+			    }).catch((err)=> {
+			    	this.oTab.loading = false;
+					this.oTab.error = "查询出错";
+					// 设置内容的高度。
+					this.getHeight();
+			    });
+				
 			},
 			// 设置滚动。
 			setScroll () {
@@ -600,7 +548,7 @@
 				var	_that = this,
 				    aoNew = [];
 				    
-				_getData(null, 0);		// ""
+				_getData(null, 0);
 				
 				// [{name,parent,data,level}]
 				return aoNew;
@@ -627,14 +575,16 @@
 								nTotal = oPrev.total + oPrev.data.length+1;
 							}
 							aoNew.push({
+								id: oData.nodeId,
 								name: oData.nodeName,		// name
-								parent: oData.parentNodeName,		// parent
+								parent: oData.parentNodeId,		// parent
 								data: oData.resumes,					//data
+								inResumes: oData.inResume || {},			// 投入
 								level: nLevel,
 								total: nTotal
 							});
 							// 循环获取数据。
-							_getData(oData.nodeName,nLevel+1);
+							_getData(oData.nodeId, nLevel+1);
 						});
 					}
 					
@@ -647,7 +597,7 @@
 					
 				// 遍历数据。
 				aResult = _that.aoTable.filter(function(oData) {
-					return oData.parentNodeName == sId;		// parent
+					return oData.parentNodeId == sId;		// parent
 				});
 				
 				// 返回数据。
@@ -657,17 +607,11 @@
 			_parseTimeFormat(sTime) {
 				//2016-12-21 13:30:25
 				let sResult = "";
+				
 				if(sTime) {
 					sResult = new Date(sTime).Format("MM-dd hh:mm");	
 				}
-//				let nFirstIndex = sTime.indexOf("-"),
-//					nLastIndex = sTime.lastIndexOf(":"),
-//					sResult = "";
-//				
-//				// 如果存在。
-//				if(nFirstIndex >-1 && nLastIndex>-1) {
-//					sResult = sTime.substring(nFirstIndex+1,nLastIndex);
-//				}
+				
 				// 返回数据。
 				return sResult;
 			},
@@ -969,7 +913,7 @@
 				
 				
 				// 时间轴。
-				window.Rt.utils.printHtml(jNow.get(0),{
+				window.Rt.utils.printHtml(html2canvas, jNow.get(0),{
 					height: jNow.outerHeight(true) + 200,
 					background: isTable?"#fff":"#1d272f"
                 },true);

@@ -9,362 +9,121 @@
 			<div class="resume-content-wrap" :class="{full:bFullScreen}">
 				<div class="clone"></div>
 				<div class="resume-content">
-					<!--<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="100px">
-						<el-form-item label="成品条码:" prop="barcode">
+					<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="80px">
+						<el-form-item class="filters-code" label="成品条码:" prop="barcode">
 							<v-input placeholder-data="请输入条码或扫码" key-data="barcode" :form-data="ruleForm"></v-input>
 						</el-form-item>
 						<el-form-item>
 							<v-button text-data="查询" @query="submitForm('ruleForm')"></v-button>
 						</el-form-item>
-					</el-form>-->
-					<v-panel class="filters" :category="categories" label-width="70px"  :handle-submit="_panelSubmit"></v-panel>
+					</el-form>
+					
 					<div v-show="!bFullScreen" class="line"></div>
 					<div class="resume-main" :class="{showDiff:sCurrentTab === 'lines' }">
-						<div class="resume-handler">
+						<div class="resume-handler" v-show="!bCarousel">
 							<div class="resume-tabs">
 								<v-button text-data="BOM表" tab-data="tables" :type-data="sBomType"  @query="changeTab('tables')"></v-button>
 								<v-button text-data="时间轴" tab-data="lines"  :type-data="sTimeLineType" @query="changeTab('lines')"></v-button>
 							</div>
 							<div class="resume-icons">
-								<i class="resume-icon el-icon-menu" @click.stop="onPrintHandler"></i>
-								<i class="resume-icon el-icon-upload2" @click.stop="onDownLoadHandler"></i>
-								<i class="resume-icon el-icon-document" v-show="!bFullScreen" @click.stop="openFullScreen"></i>
+								<i class="resume-icon icon icon-20 icon-print" @click.stop="onPrintHandler"></i>
+								<i class="resume-icon icon icon-20 icon-download" @click.stop="onDownLoadHandler"></i>
+								<i class="resume-icon icon icon-20 icon-fullScreen" v-show="!bFullScreen" @click.stop="openFullScreen"></i>
 							</div>
 						</div>
 						<!-- 表格 -->
-						<div v-show="sCurrentTab === 'tables'" class="resume-table">
-							<div class="table-title">
-								<span class="title-text">xxxxx产品履历</span>
-								<span class="title-subText">条码:xxxxxxxx</span>
-								<span class="title-subText">批次:xxxxxxxx</span>
+						<div v-show="sCurrentTab === 'tables'" class="resume-table" ref="table">
+							<div class="table-title" v-show="bShowTitle">
+								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
+								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
+								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
 							<!--:row-style="tableRowStyleName"-->
-							<el-table 
+							<div v-if="oTab.tables.error" :style="{height:oTab.tables.height+'px'}" class="error">
+								{{ oTab.tables.error }}
+							</div>
+							<el-table
+								v-else
 								class="table-main" 
 								:data="aParsedData" 
-								:height="getHeight()" 
+								:height = "oTab.tables.height"
 								stripe
 								style="width: 100%;"
-								row-class-name="table-item"
-							>
-								<!-- 工序 -->
-								<el-table-column min-width="200px">
+								v-loading="oTab.tables.loading"
+								element-loading-text="拼命加载中"
+								row-class-name="table-item">
+								<el-table-column
+									v-for="(column,index) in oTab.tables.columns"
+									:align="index?'center':'left'"
+									:fixed="!index?true:false"
+									:min-width="column.width"
+									:label="column.name">
 									<template scope="props">
-										<div :style="{marginLeft:props.row.level*nLevelDis+'px'}">
+										<div :class="[{evens:props.row.total%2},'cell-content']" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+'px'}">
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div class="cell-info" :style="{marginLeft:((props.row.level+1)*nLevelDis+nIconDis)+'px'}">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.material_name}"
-											>{{ item.material_name || sText }}</p>
+										<div v-else :class="[{evens:props.row.total%2},'isVis', 'cell-content']">{{ sText }}</div>
+										
+										<div class="cell-info">
+											<p 
+												v-for="(item,cellIndex) in props.row.data"
+												:class="[{isVis: !item[column.prop]},{evens:(props.row.total+cellIndex+1)%2}, 'cell-content']"
+												:style="{paddingLeft:!index?((props.row.level+1)*nLevelDis+nIconDis+nFirstDis)+'px':0}"> 
+												{{ column.formatter(item[column.prop]) }}</p>
 										</div>
-									</template>
-								</el-table-column >
-								
-								<!-- 类型 type -->
-								<el-table-column label="类型" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.type}"
-											> {{ item.type || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 时间 time -->
-								<el-table-column label="时间" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.time}"
-											> {{ _parseTimeFormat(item.time) || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 地点 location -->
-								<el-table-column label="地点" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.location}"
-											> {{ item.location || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 批次 batch_no -->
-								<el-table-column label="批次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.batch_no}"
-											> {{ item.batch_no || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 条码 barcode -->
-								<el-table-column label="条码" align="center" width="180px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.barcode}"
-											> {{ item.barcode || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 数量 quantity -->
-								<el-table-column label="数量" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.quantity}"
-											> {{ item.quantity || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 班次 shift -->
-								<el-table-column label="班次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.shift}"
-											> {{ item.shift || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 人员 person_name -->
-								<el-table-column label="人员" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.person_name}"
-											> {{ item.person_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 模号 mold_code -->
-								<el-table-column label="模号" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.mold_code}"
-											> {{ item.mold_code || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 供应商/客户 vendor_name -->
-								<el-table-column label="供应商/客户" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.vendor_name}"
-											>{{ item.vendor_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 检验结果 check_result -->
-								<el-table-column label="检验结果" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-										<p 
-											v-for="item in props.row.data"
-											:class="{isVis: !item.check_result}"
-										> {{ item.check_result || sText }} </p></div>
 									</template>
 								</el-table-column>
 							</el-table>
 						</div>
 						
-						
 						<!-- 表格的复制 -->
 						<div v-show="false" class="resume-table-clone">
 							<div class="table-title">
-								<span class="title-text">xxxxx产品履历</span>
-								<span class="title-subText">条码:xxxxxxxx</span>
-								<span class="title-subText">批次:xxxxxxxx</span>
+								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
+								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
+								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
 							<el-table 
 								class="table-main" 
 								:data="aParsedData" 
 								stripe
 								style="width: 100%;"
-								row-class-name="table-item"
-							>
-								<!-- 工序 -->
-								<el-table-column min-width="200px">
+								row-class-name="table-item">
+								<el-table-column
+									v-for="(column,index) in oTab.tables.columns"
+									:align="index?'center':'left'"
+									:min-width="column.width"
+									:label="column.name">
 									<template scope="props">
-										<div :style="{marginLeft:props.row.level*nLevelDis+'px'}">
+										<div :class="[{evens:props.row.total%2},'cell-content']" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+'px'}">
 											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div class="cell-info" :style="{marginLeft:((props.row.level+1)*nLevelDis+nIconDis)+'px'}">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.material_name}"
-											>{{ item.material_name || sText }}</p>
+										<div v-else :class="[{evens:props.row.total%2},'isVis', 'cell-content']">{{ sText }}</div>
+										
+										<div class="cell-info">
+											<p 
+												v-for="(item,cellIndex) in props.row.data"
+												:class="[{isVis: !item[column.prop]},{evens:(props.row.total+cellIndex+1)%2}, 'cell-content']"
+												:style="{paddingLeft:!index?((props.row.level+1)*nLevelDis+nIconDis+nFirstDis)+'px':0}"> 
+												{{ column.formatter(item[column.prop]) }}</p>
 										</div>
-									</template>
-								</el-table-column >
-								
-								<!-- 类型 type -->
-								<el-table-column label="类型" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.type}"
-											> {{ item.type || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 时间 time -->
-								<el-table-column label="时间" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.time}"
-											> {{ _parseTimeFormat(item.time) || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 地点 location -->
-								<el-table-column label="地点" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.location}"
-											> {{ item.location || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 批次 batch_no -->
-								<el-table-column label="批次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.batch_no}"
-											> {{ item.batch_no || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 条码 barcode -->
-								<el-table-column label="条码" align="center" width="180px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.barcode}"
-											> {{ item.barcode || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 数量 quantity -->
-								<el-table-column label="数量" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.quantity}"
-											> {{ item.quantity || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 班次 shift -->
-								<el-table-column label="班次" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.shift}"
-											> {{ item.shift || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 人员 person_name -->
-								<el-table-column label="人员" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p
-												v-for="item in props.row.data"
-												:class="{isVis: !item.person_name}"
-											> {{ item.person_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 模号 mold_code -->
-								<el-table-column label="模号" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.mold_code}"
-											> {{ item.mold_code || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 供应商/客户 vendor_name -->
-								<el-table-column label="供应商/客户" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-											<p 
-												v-for="item in props.row.data"
-												:class="{isVis: !item.vendor_name}"
-											>{{ item.vendor_name || sText }} </p></div>
-									</template>
-								</el-table-column>
-								
-								<!-- 检验结果 check_result -->
-								<el-table-column label="检验结果" align="center" width="120px">
-									<template scope="props">
-										<div class="isVis">{{ sText }}</div>
-										<div class="cell-info">
-										<p 
-											v-for="item in props.row.data"
-											:class="{isVis: !item.check_result}"
-										> {{ item.check_result || sText }} </p></div>
 									</template>
 								</el-table-column>
 							</el-table>
 						</div>
 						
 						<!-- 时间轴 -->
-						<div v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height:getHeight()+'px'}">
-							<div class="time-line-content">
+						<div 
+							v-loading="oTab.lines.loading"
+							element-loading-text="拼命加载中"
+							v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height:getHeight()+'px'}" ref="timeLine">
+							
+							<div v-if="oTab.lines.error" class="error">
+								{{ oTab.lines.error }}
+							</div>
+							<div v-else class="time-line-content">
 								<div 
 									class="time-line-wrap"
 									v-for="(timeItem, index) in aoTimeLineData">
@@ -377,9 +136,9 @@
 									<div class="item-line"></div>
 									<div class="line-list">
 										<div class="list-sub" :class="{first:!itemIndex}"
-											v-for="(item,itemIndex) in timeItem.data">
-											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.data.length-1)" class="node-line"></div>
-											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.data.length-1}">{{ item.time }}</span>
+											v-for="(item,itemIndex) in timeItem.resumes">
+											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1)" class="node-line"></div>
+											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.time).Format("hh:mm:ss") }}</span>
 											<div class="sub-node">
 												<v-node :color-type="getTimeLineTypeInfo(item.type).color"></v-node>
 											</div>
@@ -387,36 +146,37 @@
 												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
 													<div class="item-type">{{getTimeLineTypeInfo(item.type).text}} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 将条码
-														<span class="tips">{{ item.barcode }}</span> ,批次
-														<span class="tips">{{ item.batchNo }}</span> 的
-														<span class="tips">{{ item.materialName }}</span>
-														<span class="tips">{{ item.quantity }}</span> 件,入库到
-														<span class="tips">{{ item.warehouse }}</span>
-														<span class="tips">{{ item.reservoir }}</span>
+														<span class="tips">{{ item.personName || "-" }}</span> 
+														将条码 <span class="tips">{{ item.barcode || "-" }}</span>
+														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
+														的 <span class="tips">{{ item.materialName || "-" }}</span>
+														<span class="tips">{{ item.quantity || "-" }}</span> 件，入库到
+														<span class="tips">{{ item.warehouse || "-" }}</span>
+														<span class="tips">{{ item.reservoir || "-" }}</span>
 													</div>
 												</div>
 												<div class="sub-item" v-else-if="getTimeLineTypeInfo(item.type).type==2">
 													<div class="item-type">{{ item.processName+getTimeLineTypeInfo(item.type).text }} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 在
-														<span class="tips">{{ item.equipmentName }}</span> 上将条码
-														<span class="tips">{{ item.barcode }}</span> ,批次
-														<span class="tips">{{ item.batchNo }}</span> 的
-														<span class="tips">{{ item.materialName }}</span>
+														<span class="tips">{{ item.personName || "-" }}</span> 在
+														<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上
+														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
+														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
+														的 <span class="tips">{{ item.materialName || "-" }}</span> 物料
 														{{ getTimeLineTypeInfo(item.type).text }}
 													</div>
 												</div>
 												<div class="sub-item" v-else>
 													<div class="item-type">{{ getTimeLineTypeInfo(item.type).text }} :</div>
 													<div class="item-info">
-														<span class="tips">{{ item.personName }}</span> 将条码
-														<span class="tips">{{ item.barcode }}</span> ,批次
-														<span class="tips">{{ item.batchNo }}</span> ,在
-														<span class="tips">{{ item.equipmentName }}</span> 上产出
-														<span class="tips">{{ item.materialName }}</span> 物料,共计
-														<span class="tips">{{ item.quantity }}</span> 件,结果为
-														<span class="tips">{{ item.result }}</span>
+														<span class="tips">{{ item.personName || "-" }}</span> 
+														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
+														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
+														，在<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上产出的
+														<span class="tips">{{ item.materialName || "-" }}</span> 物料
+														{{ getTimeLineTypeInfo(item.type).text }}，共计
+														<span class="tips">{{ item.quantity || "-" }}</span> 件，结果为
+														<span class="tips">{{ item.checkResult || "-" }}</span>
 													</div>
 												</div>
 											</div>
@@ -424,7 +184,6 @@
 									</div>
 								</div>
 							</div>
-							
 						</div>
 					</div>
 					
@@ -437,11 +196,11 @@
 
 <script>
 	import $ from "jquery"
-	import Header  from "components/header/header.vue"
-	import Panel from "components/panel/panel.vue"
+	import Header  from 'components/header/header.vue'
 	import Input from "components/basic/input.vue"
 	import Button from "components/basic/button.vue"
 	import TimeNode from "components/resume/time-node.vue"
+	import html2canvas from 'html2canvas'
 	
 	var bFull = window.location.hash.indexOf("full")>-1?true:false;
 	
@@ -449,27 +208,38 @@
 		// 页面组件。
 		components: {
 			"v-header": Header,
-			"v-panel": Panel,
 			"v-input": Input,
     		"v-button": Button,
     		"v-node": TimeNode
 		},
 		// 页面数据。
 		data() {
+			// 验证条码。
+			let self = this;
+        	var validateBarcode = (rule, value, callback) => {
+        		if(!value) {
+        			callback(new Error("请输入条码或扫码"));
+        		}else {
+        			callback();
+        		}
+        	};
 			return {
 				// 默认测试数据。
-				sText: "a",
+				sText: "a",		// a
 				// 默认工序层级的间距。
 				nLevelDis: 10,
 				// 工序收缩图标宽度
 				nIconDis: 14,
-				// 当前页面类型。
-				activeKey: "resume",
-				categories: {},
+				// 首项默认的距离。
+				nFirstDis : 5,
 				// 是否全屏显示。
 				bFullScreen: bFull,
 				// 变量是否点击过查询。
 				bSubmit: bFull?true:false,
+				// 是否大屏轮播。
+				bCarousel: window.location.hash.indexOf("carousel")>-1?true:false,
+				// 是否显示标题。  只有当调用成功后才显示。
+				bShowTitle: false,
 				// 查询搜索值。
 				ruleForm: {
 					barcode: ""
@@ -482,21 +252,118 @@
 				aParsedData: [],
 				// 当前时间轴数据。
 				aoTimeLineData: [],
+				// 当前数据标题。
+				oTitle: {
+					materialName: "",
+					batchNo: "",
+					barcode: ""
+				},
 				// 类型。
 				oTab: {
 					"tables": {
-						url: "static/resume_demo.json",
-						bCreated: false
+						url: HOST + "/api/v1/resume/bom",
+						columns: [{
+							prop: "materialName",
+							name: "",
+							width: 450,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "type",
+							name: "类型",
+							width: 120,
+							formatter: function(sValue) {
+								return self.getTimeLineTypeInfo(sValue).text || self.sText
+							}
+						},{
+							prop: "time",
+							name: "时间",
+							width: 120,
+							formatter: function(sValue) {
+								return self._parseTimeFormat(sValue) || self.sText
+							}
+						},{
+							prop: "location",
+							name: "地点",
+							width: 250,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "batchNo",
+							name: "批次",
+							width: 300,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "barcode",
+							name: "条码",
+							width: 300,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "quantity",
+							name: "数量",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "shiftName",
+							name: "班次",
+							width: 180,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "personName",
+							name: "人员",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "moldCode",
+							name: "模号",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "vendorName",
+							name: "供应商/客户",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						},{
+							prop: "checkResult",
+							name: "检验结果",
+							width: 120,
+							formatter: function(sValue) {
+								return sValue || self.sText
+							}
+						}],
+						bCreated: false,
+						loading: false,
+						error: "",
+						height: "100%"
 					},
 					"lines": {
-						url: "static/resume_timeLine.json",
-						bCreated: false
+						url: HOST + "/api/v1/resume/timeline",
+						bCreated: false,
+						loading: false,
+						error: "",
+						height: "100%"
 					}
 				},
 				// 规则。
 				rules: {
 					barcode: [
-						{required: true, message: "请输入条码或扫码",trigger: "blur"}
+						{validator: validateBarcode,trigger: "blur"}
 					]
 				}
 			}
@@ -514,7 +381,7 @@
 				return this.sCurrentTab=="lines"?"primary":"text";
 			}
 		},
-		// 创建时处理。
+		// 创建时处理。mounted
 		created() {
 			// 获取所需的查询参数。
 			let oData = sessionStorage.getItem("searchConditions");
@@ -522,10 +389,13 @@
 			// 履历模块。
 		    if(oData) {
 		        oData = JSON.parse(oData);
-		        if(oData.tab === this.activeKey) {
+		        if(oData.tab === "resume") {
 			        this.ruleForm.barcode = oData.keys.barcode;
 		        }
+		    }else {
+		    	this.ruleForm.barcode = "";
 		    }
+		    
 		    // 如果是全屏，则取参数值。--- 通过url获取。
 		    if(this.bFullScreen) {
 		    	let url = location.search; //获取url中"?"符后的字串 
@@ -538,45 +408,45 @@
 					} 
 				}
 				this.ruleForm.barcode = oRequest.barcode;
+				this.sCurrentTab = oRequest.type;
 		    }
 		    
-		    // 获取过滤的参数。
-		    this.$ajax.get('static/data.json').then((res) => {
-		        let aocategories = res.data.categories.filter(o => o.key=== this.activeKey);
-		        aocategories.forEach(o => {
-		          if(oData && oData.tab == o.key) {
-		            o.active = oData;
-		          }else {
-		            o.active = {
-		              radio: "1",
-		              keys: {}
-		            }            
-		          }
-		        })
-				this.categories = aocategories[0];
-		        this.$nextTick(() => {
-		          if(oData) {
-		            this._panelSubmit(oData);
-		          }            
-		        })
-		    });
-		    
-			// 默认查询。
+			// 如果是全屏，则默认创建。
+//			if(this.bFullScreen) {
+//				this.getPageData();
+//			}
+			// 默认查询。--- created()
 			this.getPageData();
+//			this.submitForm('ruleForm')
+		},
+		watch: {
+			bShowTitle: function() {
+				this.oTab[this.sCurrentTab].height = this.getHeight();
+			}
 		},
 		// 页面方法。
 		methods: {
 			// 初始化数据。
 			initData() {
+				// 标题值重置。
+				for(let param in this.oTitle) {
+					this.oTitle[param] = "";
+				}
 				// 当前表格中的数据。
 				this.aoTable = [];
 				// 创建表格数据，处理后的数据。
 				this.aParsedData = [];
 				// 当前时间轴数据。
 				this.aoTimeLineData = [];
+				// 默认不显示标题
+				this.bShowTitle = false;
 				// 默认都未创建。
 				this.oTab.tables.bCreated = false;
+				this.oTab.tables.loading = false;
+				this.oTab.tables.error = "";
 				this.oTab.lines.bCreated = false;
+				this.oTab.lines.loading = false;
+				this.oTab.lines.error = "";
 			},
 			// 获取页面的高度。
 			getHeight() {
@@ -585,7 +455,7 @@
 					jForm = $(".filters"),
 					jLine = $(".line"),
 					nReturnHeight = 0;
-				
+					
 				nReturnHeight = nHeight
 							- (this.bFullScreen?0:$("header").outerHeight(true))
 							-  (jWrap.outerHeight(true) - jWrap.height())
@@ -593,41 +463,30 @@
 							- (this.bFullScreen?0:jLine.outerHeight(true))
 							- ($(".resume-main").outerHeight(true) - $(".resume-main").height())
 							- $(".resume-handler").outerHeight(true)
-							- 20;
+							- (this.sCurrentTab == "tables" && this.bShowTitle?$(".resume-table .table-title").outerHeight(true):0);
+				
 				// 返回数据。
 				return nReturnHeight;
-			},
-			// 获取搜索的查询参数。
-			getKeys() {
-		        return this.categories.active.keys;
-		    },
-			// panel提交测试。
-			_panelSubmit(oConditions) {
-				console.log(oConditions)
-				oConditions.tab = this.activeKey;
-				sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
-				console.log(this.getKeys())
 			},
 			// 查询操作处理 函数。
 			submitForm(formName) {
 				this.$refs[formName].validate((valid) => {
 					if (valid) {
-						alert("输入成功！");
 						// 重置数据。----
 						this.initData();
 //						this.bSubmit = true;
 						
-						// 更新form中的值。
-						let oData = sessionStorage.getItem("searchConditions");
-
-						// 履历模块。
-					    if(oData) {
-					        oData = JSON.parse(oData);
-					        if(oData.tab === "resume") {
-						        oData.keys.barcode = this.ruleForm.barcode;
-						        sessionStorage.setItem("searchConditions", JSON.stringify(oData));
-					        }
-					    }
+						// 更新form中的值。--直接设置值。
+//						let oData = sessionStorage.getItem("searchConditions");
+//
+//						// 履历模块。
+//					    if(oData) {
+//					        oData = JSON.parse(oData);
+//					        if(oData.tab === "resume") {
+//						        oData.keys.barcode = this.ruleForm.barcode;
+//						        sessionStorage.setItem("searchConditions", JSON.stringify(oData));
+//					        }
+//					    }
 						
 						// 根据当前tab类型创建数据。
 						this.getPageData();
@@ -650,30 +509,102 @@
 			// 获取数据。
 			getPageData() {
 				// 获取数据。-- 根据当前显示的tab创建数据。
-				if(!this.oTab[this.sCurrentTab].bCreated) { // && this.bSubmit
-					this.$ajax.get(this.oTab[this.sCurrentTab].url).then((res) => {
-						// 保存数据。
-						if(this.sCurrentTab == "tables") {
-						    this.aoTable =res.data.resume_info;
-						    this.aParsedData = this.parseTableData();
-						}else {
-							this.aoTimeLineData =res.data.resume_info;
-						}
+				this.oTab[this.sCurrentTab].loading = true;
+				
+				// 设置barcode。
+				this.oTitle.barcode = this.ruleForm.barcode;
+				
+				
+				if(!this.oTab[this.sCurrentTab].bCreated) {
+					// 需要调用接口，才将错误信息去掉
+					this.oTab[this.sCurrentTab].error = "";
+					
+					this.$ajax.post(this.oTab[this.sCurrentTab].url, this.ruleForm).then((res) => {
+						this.oTab[this.sCurrentTab].loading = false;
 						// 设置为已创建。
 					    this.oTab[this.sCurrentTab].bCreated = true;
+					    
+						this.oTab[this.sCurrentTab].height = this.getHeight();
+						
+						if(!res.data.errorCode) {
+							// 保存数据。
+							if(this.sCurrentTab == "tables") {
+								// 显示标题。
+								this.bShowTitle = true;
+								
+							    this.aoTable =res.data.data;
+							    this.aParsedData = this.parseTableData();
+							    
+							    // 设置批次及产品。
+							    if(this.aoTable.length) {
+								    this.oTitle.materialName = this.aoTable[0].nodeName;
+								    this.oTitle.batchNo = this.aoTable[0].batchNo;
+							    }
+							}else {
+								this.aoTimeLineData =res.data.data;
+							}
+							
+							if(this.bCarousel) {
+								this.$nextTick(function() {
+									// 设置滚动。
+									this.setScroll();
+								})						
+							}
+						}else {
+							
+							// 如果是表格，则隐藏标题。
+							if(this.sCurrentTab == "tables") {
+								// 显示标题。
+								this.bShowTitle = false;
+							}
+							
+						    // 根据errorCode 错误时设置。error
+							this.oTab[this.sCurrentTab].error = res.data.errorMsg.message;
+						}
+					    
+				    }).catch((err)=> {
+				    	this.oTab[this.sCurrentTab].loading = false;
+						this.oTab[this.sCurrentTab].error = "查询出错";
 				    });
+				}else {
+					this.oTab[this.sCurrentTab].loading = false;
 				}
+			},
+			// 设置滚动。
+			setScroll () {
+				// 时间轴
+				let node = this.$refs.timeLine,
+					bEnd = false;
+
+				if(this.sCurrentTab == "tables") {
+					// 表格
+					node = this.$refs.table.querySelector(".el-table__body-wrapper");
+				}
+				
+				if(node.scrollHeight > node.clientHeight) {
+					
+					setInterval(function() {
+						if(bEnd) {					
+							node.scrollTop = 0;
+							bEnd = false;
+						}else if(node.scrollTop + 100 + node.clientHeight > node.scrollHeight) {
+							node.scrollTop = node.scrollHeight - node.clientHeight;
+							bEnd = true;
+						}else {
+							node.scrollTop += 100;
+						}
+					}, 1000)
+				}				
 			},
 			// 表格数据转换成可用于创建的数据。
 			parseTableData() {
 				var	_that = this,
 				    aoNew = [];
-				
-				_getData("", 0);
+				    
+				_getData(null, 0);		// ""
 				
 				// [{name,parent,data,level}]
 				return aoNew;
-				
 				/**
 				 * 获取表格中的数据。
 				 * @param {String} sParent  当前显示的parent值。
@@ -681,21 +612,30 @@
 				 */
 				function _getData(sParent,nLevel) {
 					var aInvialid = [];
-					
 					// 获取元素的子级数据。
 					aInvialid = _that._getTableChildDataById(sParent);
 					
 					// 返回元素的子集。
 					if(aInvialid.length) {
 						aInvialid.forEach(function(oData) {
+							// 获取每一级中其上级所有数据的总和。
+							let nTotal = 0,
+								oPrev = aoNew[aoNew.length-1];
+							
+							if(!oPrev) {
+								nTotal = 0;
+							}else {
+								nTotal = oPrev.total + oPrev.data.length+1;
+							}
 							aoNew.push({
-								name: oData.name,
-								parent: oData.parent,
-								data: oData.data,
-								level: nLevel
+								name: oData.nodeName,		// name
+								parent: oData.parentNodeName,		// parent
+								data: oData.resumes,					//data
+								level: nLevel,
+								total: nTotal
 							});
 							// 循环获取数据。
-							_getData(oData.name,nLevel+1);
+							_getData(oData.nodeName,nLevel+1);
 						});
 					}
 					
@@ -708,7 +648,7 @@
 					
 				// 遍历数据。
 				aResult = _that.aoTable.filter(function(oData) {
-					return oData.parent == sId;
+					return oData.parentNodeName == sId;		// parent
 				});
 				
 				// 返回数据。
@@ -717,14 +657,18 @@
 			// 将时间数据转换为页面显示格式的值。
 			_parseTimeFormat(sTime) {
 				//2016-12-21 13:30:25
-				let nFirstIndex = sTime.indexOf("-"),
-					nLastIndex = sTime.lastIndexOf(":"),
-					sResult = "";
-				
-				// 如果存在。
-				if(nFirstIndex >-1 && nLastIndex>-1) {
-					sResult = sTime.substring(nFirstIndex+1,nLastIndex);
+				let sResult = "";
+				if(sTime) {
+					sResult = new Date(sTime).Format("MM-dd hh:mm");	
 				}
+//				let nFirstIndex = sTime.indexOf("-"),
+//					nLastIndex = sTime.lastIndexOf(":"),
+//					sResult = "";
+//				
+//				// 如果存在。
+//				if(nFirstIndex >-1 && nLastIndex>-1) {
+//					sResult = sTime.substring(nFirstIndex+1,nLastIndex);
+//				}
 				// 返回数据。
 				return sResult;
 			},
@@ -805,12 +749,16 @@
 			expandOrCollapseTr(ev) {
 				var _that = this,
 					jItem = $(ev.target).closest(".table-item"),
-					// 图表。
-					jIcon = jItem.find(".icon-down"),
-					// 数据列表。
-					jList = jItem.find(".cell .cell-info"),
 					// 当前行的索引值。
 					nIndex = jItem.index(),
+					// 图表。
+					jIcon = jItem.find(".icon-down"),
+					// 展示的表格。
+					jDisTr = jItem.parents(".el-table").find(".el-table__body-wrapper tbody tr.table-item"),
+					jAllItem = jItem.add(jDisTr.eq(nIndex)),
+					// 数据列表。
+					jList = jAllItem.find(".cell .cell-info"),
+					jAllIcon = jAllItem.find(".icon-down"),
 					// 当前元素的子级索引值。--- 默认是需要展开或折叠。
 					aChildrenIndex = this.getChildrenIndexArrByParentIndex(nIndex),
 					// 是否折叠。-- 默认是展开的。
@@ -826,31 +774,64 @@
 				}
 				
 				// 子级内容隐藏。
-				jItem.parent("tbody").find("tr.table-item").each(function(index) {
-					let jTr = $(this),
-						jArrow = jTr.find(".icon-down");
+				jItem.parents(".el-table").find("tbody").each(function() {
+					let jTbody = $(this);
+					// 重置数据。
+					jATr = [];
+					aFilterIndex = [];
 					
-					// 如果当前索引存在于其子级中，则处理状态。
-					if(aChildrenIndex.indexOf(index) > -1) {
-						// 判断当前是否为展开的。
-						jATr.push(jTr);
-						
-						// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
-						if(jArrow.hasClass("actived")) {
-							// 当前及其子级是隐藏的。
-							aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
-						}
-						
-						if(bCollapsed) {
-							jTr.fadeOut(500);
-						}else {
-							// 显示的判断。
-							if(aFilterIndex.indexOf(index) < 0) {
-								jTr.fadeIn(500);
+					jTbody.find("tr.table-item").each(function(index) {
+						let jTr = $(this),
+							jArrow = jTr.find(".icon-down");
+							
+						// 如果当前索引存在于其子级中，则处理状态。
+						if(aChildrenIndex.indexOf(index) > -1) {
+							// 判断当前是否为展开的。
+							jATr.push(jTr);
+							
+							// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
+							if(jArrow.hasClass("actived")) {
+								// 当前及其子级是隐藏的。
+								aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
+							}
+							
+							if(bCollapsed) {
+								jTr.fadeOut(500);
+							}else {
+								// 显示的判断。
+								if(aFilterIndex.indexOf(index) < 0) {
+									jTr.fadeIn(500);
+								}
 							}
 						}
-					}
+					})
 				});
+
+//				jItem.parent("tbody").find("tr.table-item").each(function(index) {
+//					let jTr = $(this),
+//						jArrow = jTr.find(".icon-down");
+//					
+//					// 如果当前索引存在于其子级中，则处理状态。
+//					if(aChildrenIndex.indexOf(index) > -1) {
+//						// 判断当前是否为展开的。
+//						jATr.push(jTr);
+//						
+//						// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
+//						if(jArrow.hasClass("actived")) {
+//							// 当前及其子级是隐藏的。
+//							aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
+//						}
+//						
+//						if(bCollapsed) {
+//							jTr.fadeOut(500);
+//						}else {
+//							// 显示的判断。
+//							if(aFilterIndex.indexOf(index) < 0) {
+//								jTr.fadeIn(500);
+//							}
+//						}
+//					}
+//				});
 				
 				// 内容展开或折叠。
 				if(bCollapsed) {
@@ -859,7 +840,7 @@
 					jList.slideDown();
 				}
 				
-				jIcon.toggleClass("actived");
+				jAllIcon.toggleClass("actived");		// jIcon
 			},
 			// 创建表格。
 			createTable(aData) {
@@ -926,7 +907,7 @@
 			// 全屏展示。
 			openFullScreen(ev) {
 				// 新打开一个页面。
-				window.open("resume.html?barcode="+this.ruleForm.barcode+"#full");
+				window.open("resume.html?barcode="+this.ruleForm.barcode+"&type="+this.sCurrentTab+"#full");
 			},
 			// 下载功能。
 			onDownLoadHandler() {
@@ -934,27 +915,33 @@
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),
 					jTableClone = $(".resume-table-clone"),
-					jNow = null;
+					sFileName = "",
+					jNow = null,
+					isTable = false;
 				
 				 if(this.sCurrentTab === "tables"){
 				 	// 表格。
 				 	jClone.html(jTableClone.html());
+				 	sFileName = "BOM表格";
 				 	jNow = jClone;
+				 	isTable = true;
 				 }else {
 				 	// 时间轴。
-				 	jNow = jTimeLine;
+				 	jClone.html(jTimeLine.html());
+				 	sFileName = "时间轴";
+					jNow = jClone;
 				 }
 					
 				// 时间轴。
 				html2canvas(jNow.get(0),{
 					height: jNow.outerHeight(true) + 100,
-					background: "#1d272f",
+					background: isTable?"#fff":"#1d272f",
 					onrendered:function(canvas) {
 						var sImg = canvas.toDataURL("image/png");
 							
 						jDown.attr({
 							"href":sImg,
-							"download": new Date().getTime() +".png"
+							"download": sFileName +".png"
 						}).get(0).click()
 						// 重置复制内容。
 						jClone.html("");
@@ -963,43 +950,30 @@
 			},
 			// 打印功能。。
 			onPrintHandler() {
-//				alert("打印。");
-				
 				var jDown = $("#downloadImage"),
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),
 					jTableClone = $(".resume-table-clone"),
-					jNow = null;
-				
-				 if(this.sCurrentTab === "tables"){
+					jNow = null,
+					isTable = false;
+					
+				if(this.sCurrentTab === "tables"){
 				 	// 表格。
+				 	isTable = true;
 				 	jClone.html(jTableClone.html());
 				 	jNow = jClone;
-				 }else {
+				}else {
 				 	// 时间轴。
-				 	jNow = jTimeLine;
-				 }
-					
+				 	jClone.html(jTimeLine.html());
+					jNow = jClone;
+				}
+				
+				
 				// 时间轴。
-				html2canvas(jNow.get(0),{
-					height: jNow.outerHeight(true) + 100,
-					background: "#1d272f",
-					onrendered:function(canvas) {
-						var sImg = canvas.toDataURL("image/png");
-							
-						// 打印
-						var w = window.open("about:blank","image from cancas");
-						w.document.write("<img src='"+sImg+"' alt='from canvas'>")
-					
-						setTimeout(function() {
-							w.print();
-							
-							w.close();
-						},200)
-						// 重置复制内容。
-						jClone.html("");
-					}
-				});
+				window.Rt.utils.printHtml(html2canvas, jNow.get(0),{
+					height: jNow.outerHeight(true) + 200,
+					background: isTable?"#fff":"#1d272f"
+                },true);
 			}
 		}
 		
@@ -1026,7 +1000,6 @@
 	}
 	
 	.el-table .el-table__header thead tr th {
-		
 		background-color: @green;
 		.cell {
 			background-color: @green;
@@ -1034,8 +1007,14 @@
 		}	
 	}
 	
-	.el-icon-upload2 {
-		transform: rotate(180deg);
+	.el-table .cell {
+		padding: 0;
+	}	
+	
+	.el-table tbody {
+		.cell-content.evens {
+			background-color: #C0CCDA;
+		}
 	}
 	
 	.domDown {
@@ -1045,9 +1024,16 @@
 	.clone {
 		position: absolute;
 		z-index: -1;
+		/*padding: 0 20px;*/
 		
 		.isVis {
-			visibility: hidden;
+			// 不显示占位符. - 的话打印会错位
+			color: transparent;
+			/*visibility: hidden;*/
+		}
+		
+		.cell-content {
+			line-height: 40px;
 		}
 		
 		.table-title {
@@ -1063,8 +1049,13 @@
 				margin-left: 10px;
 			}
 		}
+		.time-line;
 	}
+	
+	
 	.resume-wraps {
+		background-color: #F2F2F2;
+		
 		.resume-content-wrap {
 			background-color: #FFFFFF;
 			margin: 20px;
@@ -1078,15 +1069,12 @@
 				.filters {
 					padding: 20px 20px 0;
 					
-					.panel-title {
-						display: none;
-					}
-					
 					.el-form-item {
 						display: inline-block;
-					}
-					.form-button {
-						display: inline-block;
+						
+						&.filters-code {
+							width: 600px;
+						}
 					}
 				}
 				
@@ -1099,7 +1087,13 @@
 				.resume-main {
 					padding: 20px;
 					
+					.error {
+						text-align: center;
+					}
+					
 					.resume-handler {
+						margin-bottom: 20px;
+						
 						.resume-tabs {}
 						.resume-icons {
 							text-align: right;
@@ -1123,7 +1117,7 @@
 						
 						.table-title {
 							text-align: center;
-							margin: -25px 25px 25px;
+							margin: 15px 25px 25px;
 							
 							.title-text {
 								font-size: 24px;
@@ -1138,7 +1132,16 @@
 						.table-main {
 							
 							.isVis {
-								visibility: hidden;
+								/*visibility: hidden;*/
+								color: transparent;
+								
+								&::selection {
+									color: transparent;
+								}
+							}
+							
+							.cell-content {
+								line-height: 40px;
 							}
 							
 							.icon-down {
@@ -1163,129 +1166,21 @@
 							
 						}
 					}
+					
 					.resume-timeLine {
-						margin-top: 25px;
+						/*margin-top: 25px;*/
 						color: #FFFFFF;
-						/*height: 730px;*/
 						overflow: auto;
 						
 						.time-line-content {
-							padding: 20px 30px;
-							
-							.time-line-wrap {
-								
-								.line-item {
-									color: @blue;
-									font-size: 20px;
-									/*display: flex;*/
-									
-									.item-date {
-										display: inline-block;
-										vertical-align: middle;
-										/*width: 180px;*/
-										padding: 0 25px;
-										line-height: 40px;
-										background: rgba(0,153,255,.3);
-										border-radius: 20px;
-									}
-									.item-node {
-										display: inline-block;
-										vertical-align: middle;
-										margin: 0 40px;
-										
-										&.bigSize {
-											margin: 0 20px;
-										}
-									}
-									.item-title {
-										display: inline-block;
-										vertical-align: middle;
-										font-size: 24px;
-									}
-								}
-								.item-line {
-									width: 4px;
-									height: 40px;
-									background: @blue;
-									position: relative;
-									left: 216px;
-									top: 0px;
-								}
-								.line-list {
-									font-size: 18px;
-									
-									.list-sub {
-										margin: 50px 0;
-										display: flex;
-										line-height: 24px;
-										
-										&.first {
-											margin-top: 10px;
-										}
-										
-										.sub-date {
-											color: #CCCCCC;
-											font-size: 16px;
-											margin-left: 70px;
-											
-											&.last {
-												margin-left: 74px;
-											}
-										}
-										.sub-node {
-											margin: 0 36px 0 70px;
-										}
-										.node-line {
-											width: 4px;
-											background: @blue;
-											position: relative;
-											left: 216px;
-											top: 35px;
-										}
-										.sub-info {
-											.sub-item {
-												display: flex;
-												
-												.item-type {
-													white-space: nowrap;
-													margin-right: 4px;
-													font-size: 20px;
-												}
-												.item-info {
-													color: #e5e5e5;
-												}
-											}
-											&.blue {
-												.tips {
-													color: @blue;
-												}
-											}
-											&.yellow {
-												.tips {
-													color: @yellow;
-												}
-											}
-											&.red {
-												.tips {
-													color: @red;
-												}
-											}
-											&.green {
-												.tips {
-													color: @inVent;
-												}
-											}
-										}
-									}
-								}
-							}
+							.time-line;
 						}
-						
 						
 					}
 					
 					&.showDiff {
-						background-color: #1d272f;
+						background-image: url(../../assets/img/bg.jpg);
+						/*background-color: #1d272f;*/
 					}
 					
 				}
@@ -1294,4 +1189,120 @@
 			
 		}
 	}
+	
+	.time-line {
+		padding: 20px 30px;
+		
+		.time-line-wrap {
+			
+			.line-item {
+				color: @blue;
+				font-size: 20px;
+				/*display: flex;*/
+				
+				.item-date {
+					display: inline-block;
+					vertical-align: middle;
+					/*width: 180px;*/
+					padding: 0 25px;
+					line-height: 40px;
+					background: rgba(0,153,255,.3);
+					border-radius: 20px;
+				}
+				.item-node {
+					display: inline-block;
+					vertical-align: middle;
+					margin: 0 40px;
+					
+					&.bigSize {
+						margin: 0 20px;
+					}
+				}
+				.item-title {
+					display: inline-block;
+					vertical-align: middle;
+					font-size: 24px;
+				}
+			}
+			.item-line {
+				width: 4px;
+				height: 40px;
+				background: @blue;
+				position: relative;
+				left: 216px;
+				top: 0px;
+			}
+			.line-list {
+				font-size: 18px;
+				
+				.list-sub {
+					margin: 50px 0;
+					display: flex;
+					line-height: 24px;
+					
+					&.first {
+						margin-top: 10px;
+					}
+					
+					.sub-date {
+						color: #CCCCCC;
+						font-size: 16px;
+						margin-left: 70px;
+						
+						&.last {
+							margin-left: 74px;
+						}
+					}
+					.sub-node {
+						margin: 0 36px 0 70px;
+					}
+					.node-line {
+						width: 4px;
+						background: @blue;
+						position: relative;
+						left: 216px;
+						top: 35px;
+					}
+					.sub-info {
+						.sub-item {
+							display: flex;
+							
+							.item-type {
+								color: #fff;
+								white-space: nowrap;
+								margin-right: 4px;
+								font-size: 20px;
+							}
+							.item-info {
+								color: #e5e5e5;
+							}
+						}
+						&.blue {
+							.tips {
+								color: @blue;
+							}
+						}
+						&.yellow {
+							.tips {
+								color: @yellow;
+							}
+						}
+						&.red {
+							.tips {
+								color: @red;
+							}
+						}
+						&.green {
+							.tips {
+								color: @inVent;
+							}
+						}
+					}
+				}
+			}
+		}
+						
+		
+	}
+	
 </style>
