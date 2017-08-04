@@ -188,7 +188,7 @@
 
 			.btn-restrain {
 				right: 10px;
-				top: 65px;
+			//	top: 65px;
                 z-index: 10;
 			}
 			

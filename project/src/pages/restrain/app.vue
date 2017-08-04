@@ -1,37 +1,404 @@
 <template>
 	<div id="app">
 		<v-header></v-header>
-		<el-tabs element-loading-text="拼命加载中"  type="border-card" class="search-tab" >
-			<el-tab-pane label="用户管理" name="first">用户管理</el-tab-pane>
-			<el-tab-pane label="配置管理" name="second">配置管理</el-tab-pane>
-			<el-tab-pane label="角色管理" name="third">角色管理</el-tab-pane>
-			<el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane>
-		</el-tabs>
+		<div class="panel">
+			<div class='panel-title'>
+				<el-tabs  element-loading-text="拼命加载中"   class="search-tab" @tab-click="handleClick">
+					<el-tab-pane label="新建遏制"  activeName="first">
+						<el-radio-group v-model="radioNumber">
+							<div class='radio'>
+								<el-radio :label="radio.key" v-for="radio in radioList">{{radio.groupName}}</el-radio>
+							</div>
+							<el-form :inline="true" ref="materialForm" :model="materialForm"  :class="[ 'demo-form-inline','form-inline']" :rules="rules">
+								 <el-form-item v-for="(item,index) in groupItems" :label="item.placeholder" v-show="item.key === radioNumber" :key="item.itemCode+index" :prop="item.itemCode">
+									 <component :is="`v-${item.type}`" :form-data="materialForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+								</el-form-item> 
+								<el-form-item>
+									<el-button type="primary" class='btn' @click="submitForm('materialForm')">查询</el-button>
+								</el-form-item>
+							</el-form>
+						</el-radio-group>
+					</el-tab-pane>
+					<el-tab-pane label="遏制列表" activeName="second">
+						<el-radio-group v-model="radioNumber">
+							<el-form :inline="true" ref="equipmentFrom" :model="equipmentFrom"  :class="[ 'demo-form-inline','form-inline']" :rules="equipmentRules">
+								 <el-form-item v-for="(item,index) in groupItems2" :label="item.placeholder"  :key="`item`+index" :prop="item.itemCode">
+									 <component :is="`v-${item.type}`" :form-data="equipmentFrom" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+								</el-form-item> 
+								<el-form-item>
+									<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')">查询</el-button>
+								</el-form-item>
+							</el-form>
+						</el-radio-group>
+					</el-tab-pane>
+				</el-tabs>
+			</div>
+			<div class="panel-content">
+				<div class="router-container" >
+					<router-view></router-view>
+				</div>
+			</div>
+		</div>
 	</div>
 </template>
 
 
 <script>
 	import header from "components/header/header.vue"
-	import panel from "components/panel/panel.vue"
-	
-	
+
+	import Input from 'components/basic/input.vue'
+    import Select from 'components/basic/select.vue'
+    import DateTime from 'components/basic/dateTime.vue'
+
+
+
+
+	//const URL_JOIN = "http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
+
 	export default {
 		// 页面组件。
 		components: {
 			"v-header": header,
-			'v-panel': panel
+			'v-input': Input,
+            'v-select': Select,
+            'v-datetime': DateTime
 		},
 		// 页面数据。
 		data() {
-			return {}
+			return {
+				radioList:[
+					// {
+					// 	key:'0',
+					// 	groupName:'物料'
+					// },
+					// {
+					// 	key:'1',
+					// 	equipmentCode:'设备',
+					// }
+				],
+				groupItems: [
+                        // {
+						// 	key:'1',
+                        //  itemCode: "equipmentCode",
+						// 	itemName: "设备",
+						// 	type: "select",
+						// 	placeholder:"请选择设备"
+                        // }
+                        // {
+						// 	key:'1',
+                        //  itemCode: "startTime",
+						// 	itemName: "开始时间",
+						// 	type: "datetime",
+						// 	placeholder:"请选择开始时间"
+                        // },
+                        // {
+						// 	key:'1',
+                        //  itemCode: "endTime",
+						// 	itemName: "结束时间",
+						// 	type: "datetime",
+						// 	placeholder:"请选择结束时间"
+						// },
+						// {
+						// 	key:'0',
+                        //  itemCode: "materialCode",
+						// 	itemName: "物料",
+						// 	type: "select",
+						// 	placeholder:"请选择物料"
+                        // },
+                        // {
+						// 	key:'0',
+                        //  itemCode: "batchNo",
+						// 	itemName: "批次",
+						// 	type: "input",
+						// 	placeholder:"请输入批次"
+                        // }
+				],
+
+				materialForm:{
+					equipmentCode:'',   //设备
+					startTime:'',		//开始时间
+					endTime:'',			//结束时间
+					materialCode:'',	//物料编号
+					batchNo: ''			//批次号
+				},
+				activeName: 'first',
+				radioNumber: '0',
+				rules: {
+					batchNo: [
+						{ required: true, message: '请输入批次号', trigger: 'blur' }
+					],
+					materialCode: [
+						{ required: true, message: '请选择物料编号', trigger: 'change' }
+					]
+				},
+				equipmentRules: {
+					equipmentCode: [
+						{ required: true, message: '请选择物料编号', trigger: 'change' }
+					],
+					startTime: [
+						{ type: 'date', required: true, message: '请选择开始日期', trigger: 'change' }
+					],
+					endTime: [
+						{ type: 'date', required: true, message: '请选择结束日期', trigger: 'change' }
+					]
+				},
+
+
+
+
+
+				/* 遏制列表页面数据 */
+				equipmentFrom:{
+					startTime:'',		//开始时间
+					endTime:'',			//结束时间
+					personCode:'',		//操作人员
+				},
+				groupItems2: [
+                        {
+                         	itemCode: "personCode",
+							itemName: "人员",
+							type: "select",
+							placeholder:"请选择人员"
+                        },
+                        {
+                         	itemCode: "startTime",
+							itemName: "开始时间",
+							type: "datetime",
+							placeholder:"请选择开始时间"
+                        },
+                        {
+                         	itemCode: "endTime",
+							itemName: "结束时间",
+							type: "datetime",
+							placeholder:"请选择结束时间"
+						}
+				],
+				
+
+				activeKey: "suspicious",  // 储存路由页面,默认suspicious
+
+
+			/* 保存上次查询的数据 */
+				defaultConditions:{}
+
+			}
 		},
 		// 计算属性。
-		computed: {},
+		computed: {
+			// 获取当前真正的查询条件
+			ruleForms: function(){
+
+				let ruleForms = {}
+				this.groupItems.filter((o) => o.key === this.radioNumber).forEach(item => {
+					ruleForms[item.itemCode] = this.materialForm[item.itemCode]
+				})
+				return  ruleForms
+				
+			},
+
+        },
 		// 创建时处理。mounted
-		created() {},
+		created() {
+			/* 设置遏制类表的查询条件 */
+			sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
+
+			/* 获取传入的查询条件 */
+			let oData = sessionStorage.getItem("searchConditions");
+
+			if(oData) {									//如果该条件在 session 中有保存
+				oData = JSON.parse(oData);
+				this.render(oData) 						// 根据数据渲染页面
+			}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
+				oData = this.getSearchData();
+				this.render(oData)
+			}
+
+			/* 根据传入数据 */
+			this.$ajax.get('../static/2.json').then((res) => {
+				this.judgeLoaderHandler(res,() => {
+					let datas = res.data.data
+					let _radioList = []			//用于储存radioList
+					let _groupItems = []		//用于储存groupItems
+					datas.forEach(o => {		//用于获取页面上布局信息
+						if(o.moduleCode === "restrain"){	
+							(o.groups).forEach((group,index) => {
+								_radioList.push({
+									key: `${index}`,
+									groupName: `${group.groupName}`
+								})
+								var groupItems = group.groupItems
+								groupItems.forEach(function(item){
+									if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
+										item.type = 'select'
+										item.placeholder = `请选择${item.itemName}`
+									}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
+										item.type = 'input'
+										item.placeholder = `请输入${item.itemName}`
+									}else{											//查询条件如果是'时间'
+										item.type = 'datetime'						
+										item.placeholder = `请选择${item.itemName}`
+									}
+									_groupItems.push({
+										key: `${index}`,
+										itemCode: `${item.itemCode}`,
+										groupName: `${item.groupName}`,
+										type: `${item.type}`,
+										placeholder: `${item.placeholder}`
+									})
+								})						
+							})
+							this.radioList = _radioList
+							this.groupItems = _groupItems
+
+						}
+					})
+				 });
+				 this.$nextTick(() => {
+					if(oData) {
+						this._submitForm(oData);
+					}            
+				})
+			})
+
+
+		},
 		// 页面方法。
-		methods: {}
+		methods: {
+			/* 根据传入信息渲染页面 */
+			render(oData){
+				this.activeKey = oData.tab;  //路由
+				this.radioNumber = oData.radio
+				if(oData.radio === '0'){  // 将条件渲染到页面
+					this.materialForm.materialCode = oData.keys.materialCode
+					this.materialForm.batchNo = oData.keys.batchNo
+				}else{
+					this.materialForm.equipmentCode = oData.keys.equipmentCode
+					this.materialForm.startTime = oData.keys.startTime
+					this.materialForm.endTime = oData.keys.endTime
+				}
+			},
+
+			submitForm(formName) {
+			  this.$refs[formName].validate((valid) => {
+					if (valid) {
+
+                        let oConditions = {
+                            keys: this.ruleForms, // this.keys,
+							radio: this.radioNumber,
+							tab: this.activeKey
+						};
+
+                        this._submitForm(oConditions);
+                        
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                
+				});
+			},
+			submitForm1(formName) {
+			  this.$refs[formName].validate((valid) => {
+					if (valid) {
+						sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
+						this.$router.push({ 
+							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变，子组件监听路由触发事件
+							
+						})
+                    } else {
+                        console.log('error submit!!');
+                        return false;
+                    }
+                
+				});
+			},
+			// 判断调用接口是否成功。
+			judgeLoaderHandler(param,fnSu,fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight != "0") {
+					// 提示信息。
+					this.sErrorMessage = param.data.errorMsg.message;
+					this.showMessage();
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu();
+				}
+			},
+			// 显示提示信息。
+			showMessage() {
+				this.$message({
+					message: this.sErrorMessage,
+					duration: 3000
+				});
+			},
+			// 切换tab
+			handleClick(tab) {
+				
+				if(tab.index === '1'){
+					sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
+					this.$router.push({ 
+							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变(不可见)，子组件监听路由触发事件
+							
+						})
+				}else{
+					this._submitForm(this.defaultConditions)
+				}
+			},
+
+
+			// 数据提交
+			_submitForm(oConditions) {	
+				
+
+				let sPath = '/' + this.activeKey;  //this.activeKey  == 'suspicious'
+				oConditions.tab = this.activeKey;
+
+				this.defaultConditions = oConditions
+				sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
+				sPath = sPath + '/' + oConditions.radio;
+				
+				this.$router.push({ path: sPath, query: this.getKeys() })
+			},
+			
+			getKeys() {
+				
+				let oSearch = this.ruleForms
+				// 加时间戳。生成标记-- 点击查询可多次
+				oSearch._tag = new Date().getTime().toString().substr(-5);
+				
+				return oSearch;
+			},
+
+			getSearchData () {
+				let oData = {
+					tab: "",
+					keys: {},
+					radio: "1"
+				},
+				aHref = location.href.split("?"),
+				aParams = aHref[1].split("&"),
+				aInfo = aHref[0].split("/");
+					
+				// 设置tab和radio
+				oData.tab = aInfo[aInfo.length-2];
+				oData.radio = aInfo[aInfo.length-1];
+					
+				// 设置keys。
+				aParams.forEach(o=>{
+					let aAttr = o.split("=");
+					oData.keys[aAttr[0]] = decodeURIComponent(aAttr[1]);
+				});
+
+				// 返回参数。
+			//	console.log(oData)
+				return oData;
+			},
+			
+		}
 		
 	}
 	
@@ -48,305 +415,140 @@
 		background-color: #f2f2f2;
 		font-size: 14px;
 		overflow: hidden;
-	}
-	
-	.el-button--text {
-		border: 1px solid #42af8f;
-		padding: 10px 15px;
-	}
-	
-	.el-table .el-table__header thead tr th {
-		
-		background-color: @green;
-		.cell {
-			background-color: @green;
-			color: #FFFFFF;
-		}	
-	}
-	
-	.domDown {
-		position: absolute;
-		z-index: 0;
-	}
-	.clone {
-		position: absolute;
-		z-index: -1;
-		
-		.isVis {
-			visibility: hidden;
-		}
-		
-		.table-title {
-			text-align: center;
-			/*margin: -25px 25px 25px;*/
-			
-			.title-text {
-				font-size: 24px;
-				margin-right: 10px;	
+
+		.panel {
+			padding: 20px;
+    		box-sizing: border-box;
+			.panel-title {
+				background-color: #fff;
+				.el-radio-group {
+					display:block;
+					text-align: left;
+					.radio {
+						margin-bottom:15px;
+					}
+					.form-inline {
+						border-bottom:1px solid #ccc
+					}
+				}
 			}
-			.title-subText {
-				font-size: 16px;
-				margin-left: 10px;
-			}
-		}
-		.time-line;
-		
-		/*.item-node {
-			.node-outer {
-				border-radius: 0;
-				.node-inner {
+			.el-form-item {
+				margin-right: 40px;
+				.el-select>.el-input {
+					width:180px;
+				}
+				.btn {
 					border-radius: 0;
+					width: 80px;
+					height: 30px;
+					padding: 0;
+					box-sizing: border-box;
+					font-size: 14px;
 				}
 			}
+			.el-form-item:last-child {
+				margin-left:60px;
+			}
+			
+			.panel-content {
+				background-color: #fff;
+			}
 		}
-		.sub-node {
-			.node-outer {
+	}
+	
+</style>
+
+<style lang="less">  
+    .el-radio {
+        &:hover {
+            color: #42af8f;
+
+            .el-radio__inner {
+                border-color: #42af8f;
+            }  
+        }
+    }
+
+    .el-radio__inner {
+        border: 2px solid #999;
+        width: 14px;
+        height: 14px;
+
+        &::after {
+            background-color: #42af8f;
+        }
+    }
+
+    .el-radio__input.is-checked .el-radio__inner {
+        border-color: #42af8f;
+        background: #fff;
+    }
+
+    .el-radio__label {
+        padding-left: 10px;
+    }
+
+    .panel-title {
+        text-align: center;
+        padding-left: 28px;
+        padding-right: 28px;
+    }
+    .panel-content {
+    	overflow: auto;
+    	
+    	.panel-content-wrap {
+    		padding:  0 28px;
+    	}
+    }
+    .hide {
+    	display: none;
+    }
+	.search-tab {
+		padding-top: 20px;
+		.el-tabs__header {
+			border-bottom:none;
+			.el-tabs__item {
 				border-radius: 0;
-				
-				.node-inner {
-					border-radius: 0;
-				}
+				width: 90px;
+				height: 30px;
+				padding: 0;
+				box-sizing: border-box;
+				font-size: 14px;
+				border: 2px solid #42af8f;
+				line-height: 26px;
+				margin-right: 20px;
 			}
-		}*/
-	}
-	.resume-wraps {
-		.resume-content-wrap {
-			background-color: #FFFFFF;
-			margin: 20px;
-			
-			&.full {
-				margin: 0;
+			.el-tabs__active-bar {
+				display:none
 			}
-			
-			.resume-content {
-				
-				.filters {
-					padding: 20px 20px 0;
-					
-					.el-form-item {
-						display: inline-block;
-						
-						&.filters-code {
-							width: 600px;
-						}
-					}
-				}
-				
-				.line {
-					width: 100%;
-					height: 1px;
-					background-color: #CCCCCC;
-				}
-				
-				.resume-main {
-					padding: 20px;
-					
-					.error {
-						text-align: center;
-					}
-					
-					.resume-handler {
-						.resume-tabs {}
-						.resume-icons {
-							text-align: right;
-							/*margin-top: -26px;*/
-							color: @green;
-							
-							.resume-icon {
-								cursor: pointer;
-								margin-right: 10px;
-								
-								&:last-child {
-									margin-right: 0;
-								}
-							}
-						}
-					}
-					
-					
-					.resume-table,
-					.resume-table-clone {
-						
-						.table-title {
-							text-align: center;
-							margin: -25px 25px 25px;
-							
-							.title-text {
-								font-size: 24px;
-								margin-right: 10px;	
-							}
-							.title-subText {
-								font-size: 16px;
-								margin-left: 10px;
-							}
-						}
-						
-						.table-main {
-							
-							.isVis {
-								visibility: hidden;
-							}
-							
-							.icon-down {
-									transition: transfrom 1s linear;
-									
-								&.actived {
-									transform: rotate(-180deg);
-								}
-							}
-							.cell-info {
-								&.actived {
-									display: none;
-								}
-							}
-							.table-item {
-								padding: 10px;
-								
-								&.actived {
-									display: none;
-								}
-							}
-							
-						}
-					}
-					
-					.resume-timeLine {
-						margin-top: 25px;
-						color: #FFFFFF;
-						/*height: 730px;*/
-						overflow: auto;
-						
-						.time-line-content {
-							.time-line;
-						}
-						
-					}
-					
-					&.showDiff {
-						background-image: url(../../assets/img/bg.jpg);
-						/*background-color: #1d272f;*/
-					}
-					
-				}
-				
+			.is-active {
+				background-color: #42af8f;
+				color: #fff;
 			}
-			
 		}
 	}
 	
-	.time-line {
-		padding: 20px 30px;
+	
+</style>
+<style scoped lang="less">
+	#app {
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		align-items:stretch;
 		
-		.time-line-wrap {
-			
-			.line-item {
-				color: @blue;
-				font-size: 20px;
-				/*display: flex;*/
-				
-				.item-date {
-					display: inline-block;
-					vertical-align: middle;
-					/*width: 180px;*/
-					padding: 0 25px;
-					line-height: 40px;
-					background: rgba(0,153,255,.3);
-					border-radius: 20px;
-				}
-				.item-node {
-					display: inline-block;
-					vertical-align: middle;
-					margin: 0 40px;
-					
-					&.bigSize {
-						margin: 0 20px;
-					}
-				}
-				.item-title {
-					display: inline-block;
-					vertical-align: middle;
-					font-size: 24px;
-				}
-			}
-			.item-line {
-				width: 4px;
-				height: 40px;
-				background: @blue;
-				position: relative;
-				left: 216px;
-				top: 0px;
-			}
-			.line-list {
-				font-size: 18px;
-				
-				.list-sub {
-					margin: 50px 0;
-					display: flex;
-					line-height: 24px;
-					
-					&.first {
-						margin-top: 10px;
-					}
-					
-					.sub-date {
-						color: #CCCCCC;
-						font-size: 16px;
-						margin-left: 70px;
-						
-						&.last {
-							margin-left: 74px;
-						}
-					}
-					.sub-node {
-						margin: 0 36px 0 70px;
-					}
-					.node-line {
-						width: 4px;
-						background: @blue;
-						position: relative;
-						left: 216px;
-						top: 35px;
-					}
-					.sub-info {
-						.sub-item {
-							display: flex;
-							
-							.item-type {
-								color: #fff;
-								white-space: nowrap;
-								margin-right: 4px;
-								font-size: 20px;
-							}
-							.item-info {
-								color: #e5e5e5;
-							}
-						}
-						&.blue {
-							.tips {
-								color: @blue;
-							}
-						}
-						&.yellow {
-							.tips {
-								color: @yellow;
-							}
-						}
-						&.red {
-							.tips {
-								color: @red;
-							}
-						}
-						&.green {
-							.tips {
-								color: @inVent;
-							}
-						}
-					}
-				}
+		.panel {
+			flex: 1;
+			display: flex;
+			flex-direction: column;
+		}
+		.panel-content {
+			flex: 1;
+			padding-left: 28px;
+        	padding-right: 28px;
+			.router-container {
+				height: 100%;
 			}
 		}
-						
-		
 	}
-	
 </style>

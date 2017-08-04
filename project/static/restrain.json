@@ -1,0 +1,29 @@
+{
+  "errorCode" : 0, 
+  "errorMsg" : "",
+  "data" : 
+    [
+      {
+        "handle" : "查看详情",
+        "condition" : "物料：xxxxxxxx     批次：xxxxxxxx",
+        "startTime": "2016-03-31 14:28:33",
+        "startDescription" : "测试遏制功能",
+        "startOperator" : "1029:徐晓锐",            
+        "endTime": "2016-03-31 14:28:33",
+        "endDescription" : "测试遏制功能",
+        "endOperator" : "1029:徐晓锐",
+        "personCode" : "1029"
+      },
+      {
+        "handle": "查看详情",
+        "condition" : "设备：xxxxxxxx     时间：2017-04-19 09:00:00 ~ 2017-04-19 11:00:00",
+        "startTime": "2016-03-31 14:28:33",
+        "startDescription" : "测试遏制功能",
+        "startOperator" : "1133:周宇庭",    
+        "endTime": "2016-03-31 14:28:33",
+        "endDescription" : "测试遏制功能",
+        "endOperator" : "1133:周宇庭",
+        "personCode" : "1133"
+      }
+    ]
+}
