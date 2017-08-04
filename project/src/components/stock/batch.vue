@@ -319,7 +319,7 @@
 		.btn-restrain {
 			position: absolute;
 			right: 0;
-			top: 10px;
+			top: 15px;
 		}
 		
 		.content-title {

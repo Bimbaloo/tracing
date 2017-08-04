@@ -155,7 +155,7 @@
 		.btn-restrain {
 			position: absolute;
 			right: 0;
-			top: 45px;
+		//	top: 45px;
 		}
 		
 		.condition {
