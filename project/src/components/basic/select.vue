@@ -8,6 +8,7 @@
     	remote
     	:remote-method="remoteMethod"
     	:loading="loading"
+    	@visible-change ="showSelect"
     	@change="handleChange">
         <el-option
             v-for="option in options"
@@ -25,7 +26,9 @@
     	:placeholder="hint" 
     	style="width: 100%;" 
     	filterable 
-    	clearable 
+    	clearable
+    	:loading="loading"
+    	@visible-change ="showSelect"
     	@change="handleChange">
         <el-option
             v-for="option in options"
@@ -41,29 +44,29 @@
 	const oAjax = {
 		// 物料。
 		"materialCode": {
-			url: HOST + "/api/v1/basicinfo/materials",// "/api/v1/customized/materials",
+			url: HOST + "/api/v1/basicinfo/materials",
 			code: "material"
 		},
 		// 设备。
 		"equipmentCode": {
-			url: HOST + "/api/v1/basicinfo/equipments",//"/api/v1/customized/equipments",
+			url: HOST + "/api/v1/basicinfo/equipments",
 			code: "equipment"
 		},
 		// 工序
 		"processCode": {
-			url: HOST + "/api/v1/basicinfo/processes", //"/api/v1/customized/processes",
+			url: HOST + "/api/v1/basicinfo/processes",
 			code: "process"
 		},
 		// 人员
 		"personCode": {
-			url: HOST + "/api/v1/basicinfo/persons",//"/api/v1/customized/persons",
+			url: HOST + "/api/v1/basicinfo/persons",
 			code: "person"
 		}
 	};
 	const sSessionSelectStorageKey = "selectStorageKey";
 	
     export default {
-        props: ['formData', 'placeholderData', 'keyData','listData'],
+        props: ["formData", "placeholderData", "keyData", "listData"],
         data() {
             return {
                 form: this.formData,
@@ -79,61 +82,7 @@
                 loading: false
             }
         },
-        created() {
-        	// 判断是否存在。如果存在
-        	let sKey = this.key,
-        		sStorage = sessionStorage.getItem(sSessionSelectStorageKey),
-        		oStorage = sStorage? JSON.parse(sStorage): {},
-        		nLen = this.nMax;
-        	
-        	if(oStorage && oStorage[sKey]) {
-        		this.list = oStorage[sKey];
-        		
-        		// 如果是物料，则获取部分数据。
-        		if(sKey === "materialCode") {
-        			// 物料只取其中一部分。
-        			this.options = this.list.filter((o,index)=>{
-        				return index<nLen;
-        			});
-        			this.oInit = this.options;
-        		}else {
-        			// 默认为所有、
-	        		this.options = this.list;
-        		}
-        		
-        	}else {
-	        	this.$ajax.get(oAjax[sKey].url).then((res) => {
-	        		
-	        		if(res.data.errorCode == "0") {
-	        			// 成功。
-		        	 	this.list = res.data.data.map(o=>{
-		        	 		return {
-		        	 			label: o[oAjax[sKey].code+"Name"],
-		        	 			value: o[oAjax[sKey].code+"Code"]
-		        	 		}
-		        	 	});
-	        		}else {
-	        			this.list = [];
-	        		}
-	        		
-					// 如果是物料，则获取部分数据。
-	        		if(sKey === "materialCode") {
-	        			// 物料只取其中一部分。并保存起来。当搜索时恢复
-	        			this.options = this.list.filter((o,index)=>{
-	        				return index<nLen;
-	        			});
-	        			this.oInit = this.options;
-	        		}else {
-	        			// 默认为所有、
-		        		this.options = this.list;
-	        		}
-	        		
-	        	 	oStorage[sKey] = this.list;
-	        	 	// 保存数据。
-	        	 	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
-	        	});
-        	}
-        },
+        created() {},
         methods: {
             handleChange(value) {
                 console.log(value);
@@ -141,6 +90,70 @@
             // 获取显示label
             getDisplayName(item) {
             	return item.value+":"+item.label;
+            },
+            // 下拉框点击事件。
+            showSelect(bShow) {
+            	if(bShow) {
+            		// 先判断是否存在数据，不存在数据，则通过ajax请求。
+//          		this.loading = true;
+            		
+            		// 判断是否存在。如果存在
+		        	let sKey = this.key,
+		        		sStorage = sessionStorage.getItem(sSessionSelectStorageKey),
+		        		oStorage = sStorage? JSON.parse(sStorage): {},
+		        		nLen = this.nMax;
+		        	
+		        	// 数据存在。
+		        	if(oStorage && oStorage[sKey]) {
+		        		this.list = oStorage[sKey];
+		        		
+		        		// 如果是物料，则获取部分数据。
+		        		if(sKey === "materialCode") {
+		        			// 物料只取其中一部分。
+		        			this.options = this.list.filter((o,index)=>{
+		        				return index<nLen;
+		        			});
+		        			this.oInit = this.options;
+		        		}else {
+		        			// 默认为所有、
+			        		this.options = this.list;
+		        		}
+		        		
+		        	}else {
+		        		// 通过请求获取数据。
+			        	this.$ajax.get(oAjax[sKey].url).then((res) => {
+			        		
+			        		if(!res.data.errorCode) {
+			        			// 成功。
+				        	 	this.list = res.data.data.map(o=>{
+				        	 		return {
+				        	 			label: o[oAjax[sKey].code + "Name"],
+				        	 			value: o[oAjax[sKey].code + "Code"]
+				        	 		}
+				        	 	});
+			        		}else {
+			        			this.list = [];
+			        		}
+			        		
+							// 如果是物料，则获取部分数据。
+			        		if(sKey === "materialCode") {
+			        			// 物料只取其中一部分。并保存起来。当搜索时恢复
+			        			this.options = this.list.filter((o,index)=>{
+			        				return index<nLen;
+			        			});
+			        			this.oInit = this.options;
+			        		}else {
+			        			// 默认为所有、
+				        		this.options = this.list;
+			        		}
+			        		
+			        	 	oStorage[sKey] = this.list;
+			        	 	// 保存数据。
+			        	 	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
+			        	});
+		        	}
+            		
+            	}
             },
             // 外部查询。
             remoteMethod(query) {
