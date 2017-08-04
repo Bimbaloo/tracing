@@ -2,6 +2,10 @@
 	// 函数扩展
 	// 日期函数
 	Date.prototype.Format = function(fmt){ 
+		if(fmt == null) {
+			// 若未设置格式。
+			fmt = "yyyy-MM-dd hh:mm:ss"
+		}
 		var o = {   
 			"M+" : this.getMonth()+1,                 //月份   
 			"d+" : this.getDate(),                    //日   
@@ -206,7 +210,7 @@
 	 * @param {Boolean} isClear 是否清空，默认不清空 -- 查出库中的表格print内容是复制的内容需清空
 	 * @return {void}
 	 */
-	window.Rt.utils.printHtml = function(element, option, isClear) {
+	window.Rt.utils.printHtml = function(html2canvas,element, option, isClear) {
 		// 将页面转换为图片。
 		html2canvas(element, Object.assign(option || {}, {
 			onrendered: function(canvas) {
@@ -232,18 +236,18 @@
 	
 	/**
 	 *  将页面中的数据下载。 rasterizeHTML
-	 *  @param {Element} element
+	 *  @param {Element} sHtml	 需打印的内容
 	 *  @param {Object} option
 	 *  @return {void}
 	 */
-	window.Rt.utils.rasterizeHTML = function(rasterizeHTML,element, option) {
+	window.Rt.utils.rasterizeHTML = function(rasterizeHTML,sHtml, option) {
 		let canvas = document.createElement("canvas");
 		
-        rasterizeHTML.drawHTML(element.innerHTML, canvas, option || {}).then(function(res) {
+        rasterizeHTML.drawHTML(sHtml, canvas, option || {}).then(function(res) {
         	var w = window.open("about:blank","image from cancas");
 			
 			w.document.body.appendChild(res.image);
-		
+			
 			setTimeout(function() {
 				// 打印图片。
 				w.print();
@@ -260,7 +264,7 @@
 	 * @param {Object} option
 	 * @return {void}
 	 */
-	window.Rt.utils.downloadHtml = function(element, filename, option) {
+	window.Rt.utils.downloadHtml = function(html2canvas, element, filename, option) {
 		// 将页面转换为图片。
 		html2canvas(element, Object.assign(option || {}, {
 			onrendered: function(canvas) {
