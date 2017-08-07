@@ -1,47 +1,6 @@
 <template>
     <div class="router-content" v-loading="loading">
         <div class="innner-content" :style="styleObject">
-            <h2 class="content-title">
-            	产出
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('outputTable', '产出', $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
-            </h2>	
-			<div class="content-table">
-				<!--el-table :data="outData" border style="width: 100%" class="table">
-					<el-table-column v-for="(item, index) in outItems" align="center" :label="item.name" :width="item.width" :key="index">
-						<template scope="props">
-							<div class="cell" v-for="a in props.row[item.prop]">{{a}}</div>
-						</template>
-					</el-table-column>
-					<el-table-column label="操作" align="center" width="300">
-						<template scope="props">
-							<div v-for="code in props.row.rowNum" class="cell">
-								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
-								<el-button type="text" size="small">单件追踪</el-button>
-								<el-button @click="handleClick(code)" type="text" size="small">批次追踪</el-button>
-								<el-button type="text" size="small">链路修复</el-button>
-							</div>
-
-						</template>
-					</el-table-column>
-				</el-table--> 
-
-                <table class="raw-table" v-loading="loading" ref="outputTable">
-            		<tr>
-            			<th v-for="column in outItems" :style="{width: column.width}" v-if="!column.hide">
-            				{{column.name}}
-            			</th>
-            		</tr>
-            		<tr v-for="row in product.out">
-            			<td v-for="column in outItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-            				{{row[column.prop]}}
-            			</td>
-            		</tr>
-            	</table>
-				<div v-if="!product.out.length" class="empty">
-					{{ empty }}
-				</div>
-			</div>
 			
             <h2 class="content-title">
             	投入
@@ -83,7 +42,49 @@
 				<div v-if="!product.in.length" class="empty">
 					{{ empty }}
 				</div>
-			</div>			
+			</div>	        
+            <h2 class="content-title">
+            	产出
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('outputTable', '产出', $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
+            </h2>	
+			<div class="content-table">
+				<!--el-table :data="outData" border style="width: 100%" class="table">
+					<el-table-column v-for="(item, index) in outItems" align="center" :label="item.name" :width="item.width" :key="index">
+						<template scope="props">
+							<div class="cell" v-for="a in props.row[item.prop]">{{a}}</div>
+						</template>
+					</el-table-column>
+					<el-table-column label="操作" align="center" width="300">
+						<template scope="props">
+							<div v-for="code in props.row.rowNum" class="cell">
+								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
+								<el-button type="text" size="small">单件追踪</el-button>
+								<el-button @click="handleClick(code)" type="text" size="small">批次追踪</el-button>
+								<el-button type="text" size="small">链路修复</el-button>
+							</div>
+
+						</template>
+					</el-table-column>
+				</el-table--> 
+
+                <table class="raw-table" v-loading="loading" ref="outputTable">
+            		<tr>
+            			<th v-for="column in outItems" :style="{width: column.width}" v-if="!column.hide">
+            				{{column.name}}
+            			</th>
+            		</tr>
+            		<tr v-for="row in product.out">
+            			<td v-for="column in outItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
+            				{{row[column.prop]}}
+            			</td>
+            		</tr>
+            	</table>
+				<div v-if="!product.out.length" class="empty">
+					{{ empty }}
+				</div>
+			</div>
+		
 					
         </div>
     </div>  
