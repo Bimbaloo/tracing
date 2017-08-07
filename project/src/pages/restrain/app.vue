@@ -123,17 +123,17 @@
 				},
 				activeName: 'first',
 				radioNumber: '0',
-				rules: {
-					batchNo: [
-						{ required: true, message: '请输入批次号', trigger: 'blur' }
-					],
-					materialCode: [
-						{ required: true, message: '请选择物料编号', trigger: 'change' }
-					]
-				},
+				// rules: {
+				// 	batchNo: [
+				// 		{ required: true, message: '请输入批次号', trigger: 'blur' }
+				// 	],
+				// 	materialCode: [
+				// 		{ required: true, message: '请选择物料编号', trigger: 'change' }
+				// 	]
+				// },
 				equipmentRules: {
-					equipmentCode: [
-						{ required: true, message: '请选择物料编号', trigger: 'change' }
+					personCode: [
+						{ required: true, message: '请选择人员', trigger: 'change' }
 					],
 					startTime: [
 						{ type: 'date', required: true, message: '请选择开始日期', trigger: 'change' }
@@ -195,6 +195,54 @@
 				return  ruleForms
 				
 			},
+			rules:function(){
+				let orules = {},
+				//	_that = this,
+            		oForm = this.ruleForms,
+				// 验证开始时间。
+				validateStartTime = (rule, value, callback) => {
+	            	if(!value) {
+	            		callback(new Error("请输入开始时间"));
+	            	}else {
+	            		callback();
+	            	}
+				},
+				// 验证结束时间。
+            	validateEndTime = (rule, value, callback) => {
+	            	let sStart = oForm.startTime;
+	            	if(!value) {
+	            		callback(new Error("请输入结束时间"));
+	            	}else if(sStart && sStart > value) {
+	            		// 如果开始时间存在，而且开始时间大于结束时间。
+	            		callback(new Error("结束时间必须大于开始时间"));
+	            	}else {
+	            		callback();
+	            	}
+	            };
+				if(this.radioNumber === "0"){
+					orules = {
+						batchNo: [
+							{ required: true, message: '请输入批次号', trigger: 'blur' }
+						],
+						materialCode: [
+							{ required: true, message: '请选择物料编号', trigger: 'change' }
+						]
+					}
+				}else{
+					orules = {
+						equipmentCode: [
+							{ required: true, message: '请选择设备编号', trigger: 'change' }
+						],
+						startTime:[
+							{ validator: validateStartTime , required: true, message: '请选择开始日期', trigger: 'change' }
+						],
+						endTime:[
+							{ validator: validateEndTime , required: true, trigger: 'change' }
+						]
+					}
+				}
+				return orules
+			}
 
         },
 		// 创建时处理。mounted
