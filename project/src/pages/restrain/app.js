@@ -17,15 +17,16 @@ Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
 Vue.prototype.$post = axios.post;
 
-const list = r => require.ensure([], () => r(require('components/restrain/list.vue')), 'group-datail')
-const suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-datail')
-const detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-datail')
+const list = r => require.ensure([], () => r(require('components/restrain/list.vue')), 'group-detail')
+const suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-detail')
+const chart = r => require.ensure([], () => r(require('components/restrain/chart.vue')), 'group-detail')
+
 
 // 定义路由
 const routes = [
   { path: '/list/:key', component: list },
   { path: '/suspicious/0/', component: suspicious },
-  { path: '/suspicious/1/', component: detail }  // 设备查询
+  { path: '/suspicious/1/', component: chart }  // 设备查询
 ]
 
 // 创建 router 实例，然后传 `routes` 配置
