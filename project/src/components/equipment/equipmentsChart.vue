@@ -3,6 +3,10 @@
     <div class="content-list" v-loading="loading">
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis" id="equipments"></div>
+        <div class="buttons" v-if="selectedEquipment">
+		    <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
+		    <el-button  @click="gotoTrack" class="btn btn-plain" >追踪</el-button>
+        </div>
         <div class="links" v-if="selectedEquipment">
             <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item']">
                 <div v-for="item in obj.list" @click="listButtonClick(item)">{{item.name}}</div>
@@ -40,7 +44,7 @@
                 </ul>
             </div>
         </div>        
-		<div class="setting clear" v-if="!sErrorMessage&&!loading">
+		<div class="setting clear" v-if="!sErrorMessage&&!loading&&process">
             <div class="start">	    
                 <span v-if="startIf" @click="startIf=false">{{datetime.start}}</span>
                 <div v-else class="edit">
@@ -75,8 +79,11 @@
     export default {
 		props: {
 			equipments: Array,
-			datetime: [Object],
-            process: String
+			datetime: Object,
+            process: {
+                required: false,
+            	type: String
+            }
 		},
 		components: {
 			'v-datetime': DateTime
@@ -760,7 +767,7 @@
 							oParam[param] = this.datetime.end;
 							break;
 						case "processCode":
-							oParam[param] = this.process;
+							oParam[param] = this.process||'';
 							break;
 						default:;
 					}
@@ -1265,6 +1272,20 @@
                     // option 中 itemStyle 的配置和视觉映射得到的颜色。
                     style: api.style()
                 };
+            },
+            // 可疑品列表。
+			showSuspiciousList() {
+                // 根据设备+开始时间+结束时间，查询可疑品列表。
+                this.$router.push({ path: "/stock/restrain", query: {
+                    equipmentId: this.selectedEquipment,
+                    startTime: this.datetime.start,
+                    endTime: this.datetime.end
+                }})				
+			},
+            // 跳转到追踪页面。
+            gotoTrack() {
+                
+                // "{"keys":{"barcode":"020400067"},"radio":"1","tab":"trace"}"                
             }
         }
     }  
@@ -1306,7 +1327,12 @@
     	.content-list {
 			// padding-top: 30px;
             position: relative;
-
+            
+            .buttons {
+                position: absolute;
+                top: 0;
+                left: 0;
+            }
             .tooltip {
                 padding: 10px 20px;
                 background-color: rgba(44,52,60,0.7);

@@ -6,7 +6,7 @@
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
         </div>
         <div class="router-path">
-            <span class="path-item" @click="checkEquipment">设备列表</span>
+            <span class="path-item" @click="checkEquipment">设备分析</span>
             <!--span class="path-item" @click="checkDetail" v-if="detailIf">>设备详情</span-->          
             <span class="path-item" @click="checkProduction" v-if="productIf">>投产表</span>
             <span class="path-item" v-if="restrainIf">>遏制</span>

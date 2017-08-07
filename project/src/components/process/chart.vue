@@ -7,7 +7,7 @@
             </h2>			
 			<v-equipment v-if="bShowEq" 
 				:equipments="equipments"
-				:process="node.process"  
+				:process="node.code"  
 				:datetime="datetime">
 			</v-equipment>
 			<div v-else class="empty">{{empty}}</div>
@@ -157,6 +157,6 @@
 <style lang="less"> 
 
 	#router-echart	{
-		overflow-y: hidden;
+		overflow: hidden;
 	}
 </style>
