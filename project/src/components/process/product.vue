@@ -106,7 +106,7 @@ export default {
             sErrorMessage: "",
             empty: "暂无数据。",
 			styleObject: {
-				"min-width": "2000px"
+				"max-width": "1000px"
 			},
             product: {
                 out: [],
@@ -504,4 +504,10 @@ export default {
         }
     }
 }
+</style>
+
+<style lang="less" scoped>
+    .raw-table {
+        min-width:1500px
+    }
 </style>
