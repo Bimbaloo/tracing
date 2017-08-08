@@ -188,9 +188,12 @@
     }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
     .el-select-dropdown {
         border-radius: 0;
         margin: 0;
+    }
+	.el-select {
+        width: 180px
     }
 </style>

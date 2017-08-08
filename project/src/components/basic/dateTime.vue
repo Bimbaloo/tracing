@@ -25,3 +25,9 @@
         }
     }
 </script>
+
+<style lang="less" scoped>
+    .el-date-editor {
+        width: 180px
+    }
+</style>
