@@ -226,3 +226,29 @@
 		background-position: -@px24 -@px24;
 	}
 }
+
+
+/*
+ * 16x16 图标。
+ */
+.icon.icon-16 {
+	width: @px16;
+	height: @px16;
+	background-image: url(../img/icon-16.png);
+
+    // 隐藏。
+	&.icon-hide {
+		background-position: 0 0;
+	}
+	&.icon-hide:hover {
+		background-position: -@px16 0;
+	}
+
+    // 显示。
+	&.icon-show {
+		background-position: 0 -@px16;
+	}
+	&.icon-show:hover {
+		background-position: -@px16 -@px16;
+	}
+}
