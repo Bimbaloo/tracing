@@ -84,11 +84,15 @@
         panelHeight: "100%",
         tip: true,
         handleSubmit: this._submitForm,
-        sErrorMessage: ""
+        sErrorMessage: "",
+        tag: ""
+
       }
     },
     created() {
-      let oData = sessionStorage.getItem("searchConditions");
+
+      this.tag = location.search.split("=")[1];
+      let oData = sessionStorage.getItem("searchConditions-" + this.tag);
       
 			// session 中获取
       if(oData) {
@@ -212,13 +216,12 @@
           
           let sPath = '/' + this.activeKey;
           oConditions.tab = this.activeKey;
-         // console.log(oConditions);
-
-          sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
+          // console.log(oConditions);
+          sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions));
 
 //        if(this.activeKey == "stock") {
-            // 若为查出库。
-            sPath = sPath + '/' + oConditions.radio;
+          // 若为查出库。
+          sPath = sPath + '/' + oConditions.radio;
 //        }
         
           this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
@@ -235,9 +238,7 @@
             this.collapse = false
           }
         }
-       
-        
-       
+
       },
       dragend(e){ //鼠标松开，结束拖动
 

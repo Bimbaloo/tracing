@@ -228,6 +228,8 @@
         		}
         	};
 			return {
+				// 查询标记。
+				tag: "",
 				// 默认测试数据。
 				sText: "a",
 				// 默认工序层级的间距。
@@ -380,7 +382,9 @@
 		// 创建时处理。mounted
 		created() {
 			// 获取所需的查询参数。
-			let oData = sessionStorage.getItem("searchConditions");
+			this.tag = location.search.split("=")[1]
+
+          	let oData = sessionStorage.getItem("searchConditions-" + this.tag)
 
 			// 履历模块。
 		    if(oData) {

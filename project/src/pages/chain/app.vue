@@ -259,6 +259,8 @@
     	},
     	data() {
     		return {
+				// 查询标记。
+				tag: "",
     			// 获取页面数据。
     			pageData: {
     				"processData":[],
@@ -448,7 +450,9 @@
     	// 创建
     	created() {
     		// 获取所需的查询参数。
-			let oData = sessionStorage.getItem("searchConditions");
+      		this.tag = location.search.split("=")[1]
+
+          	let	oData = sessionStorage.getItem("searchConditions-" + this.tag)
 
 			// 断链模块。
 		    if(oData) {
@@ -1227,14 +1231,16 @@
 		    			_that.initData();
 		    			
 		    			// 更新form中的值。
-						let oData = sessionStorage.getItem("searchConditions");
+						// let oData = sessionStorage.getItem("searchConditions");
+						let oData = sessionStorage.getItem("searchConditions-" + this.tag);
 		
 						// 断链模块。
 					    if(oData) {
 					        oData = JSON.parse(oData);
 					        if(oData.tab === "chain") {
 						        oData.keys = this.searchParam;
-						        sessionStorage.setItem("searchConditions", JSON.stringify(oData));
+						        // sessionStorage.setItem("searchConditions", JSON.stringify(oData));
+          						sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions));
 					        }
 					    }
 					    

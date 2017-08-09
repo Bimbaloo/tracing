@@ -142,11 +142,6 @@
 						{ type: 'date', required: true, message: '请选择结束日期', trigger: 'change' }
 					]
 				},
-
-
-
-
-
 				/* 遏制列表页面数据 */
 				equipmentFrom:{
 					startTime:'',		//开始时间
@@ -179,7 +174,9 @@
 
 
 			/* 保存上次查询的数据 */
-				defaultConditions:{}
+				defaultConditions:{},
+				// 查询标记。
+				tag: ""
 
 			}
 		},
@@ -251,7 +248,9 @@
 			sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
 
 			/* 获取传入的查询条件 */
-			let oData = sessionStorage.getItem("searchConditions");
+			this.tag = location.search.split("=")[1];
+
+          	let oData = sessionStorage.getItem("searchConditions-" + this.tag);
 
 			if(oData) {									//如果该条件在 session 中有保存
 				oData = JSON.parse(oData);
@@ -406,7 +405,9 @@
 				oConditions.tab = this.activeKey;
 
 				this.defaultConditions = oConditions
-				sessionStorage.setItem('searchConditions', JSON.stringify(oConditions));
+
+          		sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions))
+
 				sPath = sPath + '/' + oConditions.radio;
 				
 				this.$router.push({ path: sPath, query: this.getKeys() })

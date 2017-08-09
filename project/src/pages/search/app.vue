@@ -89,11 +89,13 @@
 
       },
       _submitForm(oConditions) {
-          console.log(oConditions);
           oConditions.tab = this.activeKey;
-          sessionStorage.setItem('searchConditions',JSON.stringify(oConditions));
+
+          let sTage = (+new Date()).toString().substr(-5);
+
+          sessionStorage.setItem('searchConditions-' + sTage,JSON.stringify(oConditions));
           // 跳转。       
-          location.assign(this.categories.filter(o => o.key==this.activeKey)[0].url + ".html");
+          location.assign(this.categories.filter(o => o.key==this.activeKey)[0].url + ".html?tag="+ sTage);
       }
     }
   }
