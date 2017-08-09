@@ -1,24 +1,64 @@
 <!--设备-->
 <template>
-    <div class="content-list" v-loading="loading">
+    <div class="content-list" v-loading="loading" element-loading-text="拼命加载中">
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
-		<div v-else class="analysis" id="equipments"></div>
-        <div class="buttons" v-if="selectedEquipment">
-		    <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
-		    <el-button  @click="gotoTrack" class="btn btn-plain" >追踪</el-button>
-        </div>
-        <div class="links" v-if="selectedEquipment">
-            <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item']">
-                <div v-for="item in obj.list" @click="listButtonClick(item)">{{item.name}}</div>
+		<div v-else class="analysis">
+            <div id="equipments"></div>
+            <div class="legend" v-if="!loading">
+                <span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
+            </div>
+            <div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment">
+                <span class="icon icon-circle"></span><span>工艺</span>
+            </div>
+            <div class="switch" v-if="!loading">
+                <div v-if="show" @click="hideTooltip" class="switch-eye">
+                    <i class="icon icon-16 icon-show"></i>
+                    <div class="tip">隐藏悬浮框</div>
+                </div>
+                <div v-else @click="showTooltip" class="switch-eye">
+                    <i class="icon icon-16 icon-hide"></i>
+                    <div class="tip">显示悬浮框</div>
+                </div>
+            </div>
+            <div class="links" v-if="selectedEquipment">
+                <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item']">
+                    <div v-for="item in obj.list" @click="listButtonClick(item)">{{item.name}}</div>
+                </div>	
+            </div>
+            <div class="setting clear" v-if="!loading&&process">
+                <div class="start">	    
+                    <span v-if="startIf" @click="startIf=false">{{datetime.start}}</span>
+                    <div v-else class="edit">
+                        <v-datetime :form-data="datetime" key-data="start"></v-datetime>
+                        <span class="edit-icon">
+                            <i class="el-icon-circle-check" @click="saveStart"></i>
+                            <i class="el-icon-circle-cross" @click="cancelStart"></i>
+                        </span>
+                    </div>
+                </div>
+                <div class="end">
+                    <span v-if="endIf" @click="endIf=false">{{datetime.end}}</span>
+                    <div v-else class="edit">
+                        <v-datetime :form-data="datetime" key-data="end"></v-datetime>
+                        <span class="edit-icon">
+                            <i class="el-icon-circle-check" @click="saveEnd"></i>
+                            <i class="el-icon-circle-cross" @click="cancelEnd"></i>
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <div class="buttons" v-if="selectedEquipment">
+                <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
+                <el-button  @click="gotoTrack" class="btn btn-plain" >追踪</el-button>
             </div>	
         </div>
-        <div class="tooltip left" v-if="compareData.left.time" :style="{'max-height': (chartHeight-60-20) + 'px'}">
+        <div class="tooltip left" v-if="compareData.left.time">
             <div class="tooltip-time">{{compareData.left.time}}</div>
-            <div class="tooltip-list" v-for="equipment in compareData.left.list">
-                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;&nbsp;&nbsp;{{equipment.quantity}}</div>
+            <div class="tooltip-list" v-for="equipment in compareData.left.list" :style="{'max-height': (chartHeight-140) + 'px'}">
+                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                 <ul class="event-list">
                     <li v-for="(event,index) in equipment.event">
-                        <div>{{index+1}}.{{event.title}}</div>
+                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}</div>
                         <ul class="content-list">
                             <li v-for="content in event.content">
                                 {{content.name}}:&nbsp;&nbsp;{{content.value}}
@@ -28,13 +68,13 @@
                 </ul>
             </div>
         </div>
-        <div class="tooltip right" v-if="compareData.right.time" :style="{'max-height': (chartHeight-60-20) + 'px'}">
+        <div class="tooltip right" v-if="compareData.right.time">
             <div class="tooltip-time">{{compareData.right.time}}</div>
-            <div class="tooltip-list" v-for="equipment in compareData.right.list">
-                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;&nbsp;&nbsp;{{equipment.quantity}}</div>
+            <div class="tooltip-list" v-for="equipment in compareData.right.list" :style="{'max-height': (chartHeight-140) + 'px'}">
+                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                 <ul class="event-list">
                     <li v-for="(event,index) in equipment.event">
-                        <div>{{index+1}}.{{event.title}}</div>
+                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}</div>
                         <ul class="content-list">
                             <li v-for="content in event.content">
                                 {{content.name}}:&nbsp;&nbsp;{{content.value}}
@@ -44,28 +84,7 @@
                 </ul>
             </div>
         </div>        
-		<div class="setting clear" v-if="!sErrorMessage&&!loading&&process">
-            <div class="start">	    
-                <span v-if="startIf" @click="startIf=false">{{datetime.start}}</span>
-                <div v-else class="edit">
-                    <v-datetime :form-data="datetime" key-data="start"></v-datetime>
-                    <span class="edit-icon">
-                        <i class="el-icon-circle-check" @click="saveStart"></i>
-                        <i class="el-icon-circle-cross" @click="cancelStart"></i>
-                    </span>
-                </div>
-            </div>
-            <div class="end">
-                <span v-if="endIf" @click="endIf=false">{{datetime.end}}</span>
-                <div v-else class="edit">
-                    <v-datetime :form-data="datetime" key-data="end"></v-datetime>
-                    <span class="edit-icon">
-                        <i class="el-icon-circle-check" @click="saveEnd"></i>
-                        <i class="el-icon-circle-cross" @click="cancelEnd"></i>
-                    </span>
-                </div>
-            </div>
-		</div>					 
+				 
     </div>      
 </template>
 
@@ -90,6 +109,8 @@
 		},
         data () {
             return {
+                // 悬浮框是否展示。
+                show: true,
                 // 选中的设备id。
                 selectedEquipment: "",
 				loading: false,
@@ -228,7 +249,7 @@
                         // itemWidth: ,
                         // itemGap: 40,
                         // width: 320,
-                        right: 70,
+                        right: 80,
                         align: 'left' 
                         // padding: [
                         //     5,  // 上
@@ -241,20 +262,52 @@
                         left: 100,
                         right: 100
                     },
+                    // 悬浮框。
                     tooltip: {
                         trigger: 'none',
-                        padding: [10, 20, 10, 20],
-                        backgroundColor: 'rgba(44,52,60,0.7)',
+                        padding: 10,
+                        backgroundColor: 'rgba(245, 245, 245, 0.8)',//'rgba(44,52,60,0.7)',
                         borderColor: '#ccc',
-                        borderWidth: 2,
+                        borderWidth: 1,
                         borderRadius: 4,
                         transitionDuration: 0,
+                        // 鼠标是否可进入悬浮框。
+                        // enterable: true,
+                        // show: function (value, index) {
+                        //     console.log(arguments)
+
+                        //     return true
+                        // },
                         // extraCssText: 'width: 300px; white-space: normal',
                         textStyle: {
-                            fontSize: 12
+                            fontSize: 12,
+                            color: '#000'
                         },
-                        formatter: this.tooltipFormatter
-                    },             
+                        show: this.show,
+                        formatter: this.tooltipFormatter,
+                        position: (pos, params, el, elRect, size) => {
+                            if(this.markLine.filter(o => o.xAxis == params[0].axisValue).length) {
+                                // 若该提示数据已存在。
+                                // 隐藏tooltip
+                                return {
+                                    left: -1000
+                                }
+                            }
+                            
+                            pos[0] = pos[0] + 20;
+                            pos[1] = 30;
+                            
+                            if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
+                                // 若超出x轴范围
+                                pos[0] = pos[0] - 20*2 - size.contentSize[0]
+                            }
+                            // obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 60;
+                            // obj[['top', 'bottom'][+(pos[1] < size.viewSize[1] / 2)]] = 20;
+
+                            return pos;                            
+                        }
+                    },    
+                    // 缩放轴。         
                     dataZoom: [
                         {
                             type: 'slider',
@@ -376,9 +429,16 @@
                         } 
                         
                     },
+                    // 工具箱
                     toolbox: {
+                        top: -3,
                         feature: {
                             dataZoom: {}
+                        },
+                        iconStyle: {
+                            emphasis: {
+                                borderColor: '#42AF8F',
+                            }
                         }
                     },
                     series: [{
@@ -424,6 +484,14 @@
                                 return `${params.marker}${params.name}：${time}<br/>
                                     ${params.value[4]}<br/>
                                     ${params.value[5]}`;
+                            },
+                            // 设置显示位置。
+                            position: (pos, params, el, elRect, size) => {                             
+                                if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
+                                    // 若超出x轴范围
+                                    pos[0] = pos[0] - size.contentSize[0]
+                                }
+                                return pos;                            
                             }
                         }               
                     }]
@@ -433,7 +501,8 @@
                     name: o.name,
                     type: 'scatter',
                     symbol: 'circle', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
-                    // symbolSize: function (val) {
+                    symbolSize: 14,
+                    // function (val) {
                     //      return val[2];
                     // },
                     data: [],
@@ -459,9 +528,9 @@
                                 return value[2];                        
                                 // return value[2] > 1 ? value[2]: "";
                             },
-                            // textStyle: {
-                            //     color: "#333"
-                            // }
+                            textStyle: {
+                                fontSize: 14
+                            }
                         }
                     }
                 }))
@@ -542,12 +611,11 @@
             },
             // 设置图形高度。
             setChartHeight () {
-                
                 let jContent = $(".material-stock .router-content"),
                     jTitle = jContent.find(".content-title");
                 
-                this.chartHeight = jContent.height() - jTitle.outerHeight(true);
-                $("#equipments").height(jContent.height() - jTitle.outerHeight(true));
+                this.chartHeight = jContent.height() - jTitle.outerHeight(true) - 20;
+                $("#equipments").height(this.chartHeight);
             },
             // 设置图表事件。
             setChartEvent () {
@@ -720,7 +788,6 @@
                     }
                 })
             },
-
             /**
 			 * 跳转按钮点击事件。
 			 * @param {Object} oData
@@ -745,7 +812,6 @@
 					window.open(sPath , "_blank");
 				}
 			},
-
             /**
 			 * @param {Array}
 			 * @return {Object}
@@ -1066,7 +1132,6 @@
                 }
                 return oResult;
             },
-
             // 获取事件维度数据。
             getDimensionData (sDimension) {
                 let aoData = [],
@@ -1190,8 +1255,7 @@
 			cancelEnd () {
 				this.datetime.end = this.datetime.initEnd;
 				this.endIf=true;
-			},
-			
+			},			
 			/**
 			 * 数据刷新。
 			 * @return {void}
@@ -1219,7 +1283,7 @@
                         })
                     })
                     // 设备列表
-                    sHtml += `<div style="margin-top:10px">
+                    sHtml += `<div>
                         <div style="color:${param.color};font-weight:bold">${param.name.split("+")[0]}&nbsp;&nbsp;&nbsp;&nbsp;${param.seriesName}&nbsp;&nbsp;&nbsp;&nbsp;${aoValue[2]}</div>
                         <div style="margin-top:10px">${sList}</div>
                     </div>`
@@ -1227,6 +1291,25 @@
                 })
                 return sHtml;             
             },
+            // 显示悬浮框。
+            showTooltip () {
+                this.show = true;
+                this.chart.setOption({
+                    tooltip: {
+                        show: true
+                    }
+                })
+            },
+            // 隐藏悬浮框。
+            hideTooltip () {
+                this.show = false;
+                this.chart.setOption({
+                    tooltip: {
+                        show: false
+                    }
+                })                
+            },
+            // 数据格式化。
             parseData(value) {
                 if(value == null) {
                     return "-";
@@ -1284,8 +1367,25 @@
 			},
             // 跳转到追踪页面。
             gotoTrack() {
-                
-                // "{"keys":{"barcode":"020400067"},"radio":"1","tab":"trace"}"                
+                let oCondition = {
+                        "keys": {
+                            "equipmentCode": this.selectedEquipment,
+                            "startTime": this.datetime.start,
+                            "endTime": this.datetime.end
+                        }, 
+                        "radio": "3",
+                        "tab":"track"
+                    },
+                    sTag = (+new Date()).toString().substr(-5);
+
+                sessionStorage.setItem('searchConditions-' + sTag, JSON.stringify(oCondition))
+
+                // "{"keys":{"barcode":"020400067"},"radio":"1","tab":"trace"}"    
+      
+            },
+            // 工艺参数跳转按钮。
+            parameterButtonClick () {
+
             }
         }
     }  
@@ -1328,25 +1428,82 @@
 			// padding-top: 30px;
             position: relative;
             
-            .buttons {
-                position: absolute;
-                top: 0;
-                left: 0;
+            .analysis {
+                position: relative;
             }
+
+            .legend {
+                position: absolute;
+                top: 2px;
+                left: 81px;
+
+                span {
+                    font-size: 12px;
+                    display: inline-block;
+                    width: 40px;
+                    height: 20px;
+                    line-height: 20px;
+                    text-align: center;
+                    color: #fff;
+                    margin-left: 20px;
+                }
+            }				
+            .buttons {
+                width: 100%;
+                text-align: center;
+                position: absolute;
+                bottom: -19px;
+                left: 0;
+
+                .btn-plain {
+                    width: 50px;
+                    height: 24px;
+                    font-size: 12px;
+                }
+            }
+            // 悬浮框显示隐藏开关。
+            .switch {
+                position: absolute;
+                top: 5px;
+                right: 55px;
+
+                .switch-eye {
+                    position: relative;
+                    cursor: pointer;
+                }
+                .tip {
+                    font-size: 12px;
+                    color: #42af8f;
+                    display: none;
+                    position: absolute;
+                    top: 22px;
+                    left: -23px;
+                    width: 60px;
+                }
+                &:hover {
+                    .tip {
+                        display: block;
+                    }
+                    .icon-show {
+                        background-position: -16px 0;
+                    }
+                    .icon-show {
+                        background-position: -16px -16px;
+                    }
+                }
+            }
+            // 左右提示框。
             .tooltip {
-                padding: 10px 20px;
-                background-color: rgba(44,52,60,0.7);
-                border-color: #ccc;
-                border-width: 2px;
-                border-radius: 4px;
+                // padding: 10px;
+                background-color: rgba(245, 245, 245, 0.8);//rgba(44,52,60,0.7);
                 font-size: 12px;
                 position: absolute;
                 top: 60px;
-                width: 200px;
+                width: 220px;
                 z-index: 100;
-                color: #fff;
-                overflow-y: auto;
-
+                color: #000;//#fff;
+                margin-right: 20px;
+                
                 &.left {
                     left: 0;
                 }
@@ -1355,10 +1512,20 @@
                 }
 
                 .tooltip-time {
-                    // color: #D53A35;
-                    font-size: 14px;
+                    color: #fff;
+                    // font-size: 12px;
+                    background-color: #D53A35;
                     // font-weight: bold;
-                    padding-bottom: 5px;
+                    // padding-bottom: 5px;
+                    text-align: center;
+                    height: 20px;
+                    line-height: 20px;
+                }
+
+                .tooltip-list {
+                    padding: 10px;
+                    overflow-y: auto;
+                    border: 1px solid #ccc;
                 }
 
                 .content-list {
@@ -1371,16 +1538,40 @@
 
                 .tooltip-title {
                     font-weight: bold;
-                    font-size: 14px;
+                    // font-size: 14px;
                     padding-bottom: 5px;
                 }
 
             }
+            // 工艺按钮
+            .parameter {
+                position: absolute;
+                cursor: pointer;
+                top: 4px;
+                right: 380px;
+                font-size: 12px;
 
+                .icon-circle {
+                    width: 14px;
+                    height: 14px;
+                    border-radius: 7px;
+                    background-color: #FAC41B;
+                    margin-right: 5px;
+                }
+
+                &:hover {
+                    color: #FAC41B;
+                }
+
+                span {
+                    vertical-align: middle;
+                }
+            }
+            // 链接。
             .links {
                 position: absolute;
                 top: 18px;
-                right: 50px;
+                right: 60px;
                 width: 300px;
                 // text-align: center;
                 font-size: 0;
