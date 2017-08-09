@@ -2,7 +2,7 @@
 	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
 		<v-header></v-header>
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
-		<div class="content" v-loading.fullscreen.lock="fullscreenLoading">
+		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
 			<div @click="goToInit" :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>

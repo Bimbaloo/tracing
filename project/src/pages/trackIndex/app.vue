@@ -2,7 +2,7 @@
 	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
 		<v-header></v-header>
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
-		<div class="content" v-loading.fullscreen.lock="fullscreenLoading">
+		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col class="router" ref="router"> -->
 			<div  class="router" ref="router">
 				<div @mouseenter="showTable" @mouseleave="unShowTable" v-if="false">  <!--!fullscreen-->
