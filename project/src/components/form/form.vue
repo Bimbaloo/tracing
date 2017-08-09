@@ -285,4 +285,10 @@
         margin-top: 30px;
         margin-bottom: 30px;
     }
+	.el-form-item__content {
+		.el-input {
+			width: 100%
+		}
+	}
+	
 </style>

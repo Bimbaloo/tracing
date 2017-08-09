@@ -19,3 +19,9 @@
         }
     }
 </script>
+
+<style lang="less" scoped>
+    .el-input {
+        width: 180px
+    }
+</style>

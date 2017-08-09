@@ -137,7 +137,9 @@ const config = {
         changeOrigin: true,
         pathRewrite: { '^/api': '' }
       }
-    }
+    },
+    open: true,
+    openPage: 'search.html'
   },
   devtool: '#eval-source-map'
 }

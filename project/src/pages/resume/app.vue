@@ -9,8 +9,8 @@
 			<div class="resume-content-wrap" :class="{full:bFullScreen}">
 				<div class="clone"></div>
 				<div class="resume-content">
-					<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="80px">
-						<el-form-item class="filters-code" label="成品条码:" prop="barcode">
+					<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" >
+						<el-form-item class="filters-code" label="成品条码：" prop="barcode">
 							<v-input placeholder-data="请输入条码或扫码" key-data="barcode" :form-data="ruleForm"></v-input>
 						</el-form-item>
 						<el-form-item>
@@ -1015,12 +1015,20 @@
 				
 				.filters {
 					padding: 20px 20px 0;
+					font-size: 0;
 					
 					.el-form-item {
 						display: inline-block;
-						
-						&.filters-code {
-							width: 600px;
+						.el-form-item__content {
+							margin-left: 101px;
+						}
+					}
+					.filters-code {
+						.el-form-item__content {
+							margin-left: 73px;
+						}
+						.el-form-item__label {
+							padding-right: 0;
 						}
 					}
 				}
@@ -1041,7 +1049,7 @@
 					.resume-handler {
 						margin-bottom: 20px;
 						
-						.resume-tabs {}
+
 						.resume-icons {
 							text-align: right;
 							margin-top: -26px;
@@ -1252,4 +1260,10 @@
 		
 	}
 	
+</style>
+
+<style lang="less" scoped>
+	.el-form-item {
+		margin-bottom: 20px;
+	}
 </style>
