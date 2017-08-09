@@ -1,5 +1,5 @@
 <template>
-    <div class="router-content" v-loading="loading">
+    <div class="router-content">
         <div class="innner-content" :style="styleObject">
 			
             <h2 class="content-title">
@@ -27,19 +27,21 @@
 						</template>
 					</el-table-column>
 				</el-table-->
-                <table class="raw-table" v-loading="loading" ref="inputTable">
+                <table class="raw-table" v-loading="loading" ref="inputTable" element-loading-text="拼命加载中">
             		<tr>
             			<th v-for="column in inItems" :style="{width: column.width}" v-if="!column.hide">
             				{{column.name}}
             			</th>
             		</tr>
-            		<tr v-for="row in product.in">
-            			<td v-for="column in inItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-            				{{row[column.prop]}}
-            			</td>
-            		</tr>
+                    <tbody>
+                        <tr v-for="row in product.in">
+                            <td v-for="column in inItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
+                                {{row[column.prop]}}
+                            </td>
+                        </tr>
+                    </tbody>
             	</table>
-				<div v-if="!product.in.length" class="empty">
+				<div v-if="!product.in.length&&!loading" class="error">
 					{{ empty }}
 				</div>
 			</div>	        
@@ -68,19 +70,21 @@
 					</el-table-column>
 				</el-table--> 
 
-                <table class="raw-table" v-loading="loading" ref="outputTable">
+                <table class="raw-table" v-loading="loading" ref="outputTable" element-loading-text="拼命加载中">
             		<tr>
             			<th v-for="column in outItems" :style="{width: column.width}" v-if="!column.hide">
             				{{column.name}}
             			</th>
             		</tr>
-            		<tr v-for="row in product.out">
-            			<td v-for="column in outItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-            				{{row[column.prop]}}
-            			</td>
-            		</tr>
+                    <tbody>
+                        <tr v-for="row in product.out">
+                            <td v-for="column in outItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
+                                {{row[column.prop]}}
+                            </td>
+                        </tr>
+                    </tbody>
             	</table>
-				<div v-if="!product.out.length" class="empty">
+				<div v-if="!product.out.length&&!loading" class="error">
 					{{ empty }}
 				</div>
 			</div>
@@ -107,72 +111,72 @@ export default {
             sErrorMessage: "",
             empty: "暂无数据。",
 			styleObject: {
-				"max-width": "1000px"
+				"min-width": "1500px"
 			},
             product: {
                 out: [],
                 in: []
             },
-            outData: [{
-                equipmentName: ['装配线2.2线GP1'],
-                moldCode: ['2331'],
-                doCode: ['D201705050004'],
-                barcode: ['UN654574375200'],
-                batchNo: ['20170505A'],
-                materialCode:['bbbbbbbbb'],
-                materialName: ['半成品活塞'],
-                qualifiedNum: ['69'],
-                scrapNum: ['10'],
-                unqualifiedNum: ['1',],
-                shiftName: ['白天'],
-                personName: ['王小虎'],
-                happenTime: ['2017-06-29 12:24:24'],
-                rowNum: ['UN654574375200']
-            }, {
-                equipmentName: ['装配线2.2线GP1'],
-                moldCode: ['2331'],
-                doCode: ['D201705050004'],
-                barcode: ['UN654574375200'],
-                batchNo: ['20170505A'],
-                materialCode:['aaaaaaaaa'],
-                materialName: ['半成品活塞'],
-                qualifiedNum: ['69'],
-                scrapNum: ['10'],
-                unqualifiedNum: ['1',],
-                shiftName: ['白天'],
-                personName: ['王小虎'],
-                happenTime: ['2017-06-29 12:24:24'],
-                rowNum: ['UN654574375200']
-            },{
-                equipmentName: ['装配线2.2线GP1'],
-                moldCode: ['2331'],
-                doCode: ['D201705050004', 'D201705050003'],
-                barcode: ['UN654574375200', 'UN654574375201'],
-                batchNo: ['20170505A', '20170505B'],
-                materialCode:['aaaaaaaaa','bbbbbbbbb'],
-                materialName: ['半成品活塞', '配料'],
-                qualifiedNum: ['49', '190'],
-                scrapNum: ['10','0'],
-                unqualifiedNum: ['1', '10'],
-                shiftName: ['白天', '晚上'],
-                personName: ['王小虎', '张三'], 
-                happenTime: ['2017-06-29 12:24:24', ''],
-                rowNum: ['UN654574375200', '2222']
-            }],
-            inData: [{
-                equipmentName: ['装配线2.2线GP1'],
-                moldCode: ['2331'],
-                doCode: ['D201705050004'],
-                barcode: ['UN654574375200'],
-                batchNo: ['20170505A'],
-                materialCode:['bbbbbbbbb'],
-                materialName: ['半成品活塞'],
-                quantity: ['1'],
-                shiftName: ['白天'],
-                personName: ['王小虎'],
-                happenTime: ['2017-06-29 12:24:24'],
-                rowNum: ['UN654574375200']
-            }],
+            // outData: [{
+            //     equipmentName: ['装配线2.2线GP1'],
+            //     moldCode: ['2331'],
+            //     doCode: ['D201705050004'],
+            //     barcode: ['UN654574375200'],
+            //     batchNo: ['20170505A'],
+            //     materialCode:['bbbbbbbbb'],
+            //     materialName: ['半成品活塞'],
+            //     qualifiedNum: ['69'],
+            //     scrapNum: ['10'],
+            //     unqualifiedNum: ['1',],
+            //     shiftName: ['白天'],
+            //     personName: ['王小虎'],
+            //     happenTime: ['2017-06-29 12:24:24'],
+            //     rowNum: ['UN654574375200']
+            // }, {
+            //     equipmentName: ['装配线2.2线GP1'],
+            //     moldCode: ['2331'],
+            //     doCode: ['D201705050004'],
+            //     barcode: ['UN654574375200'],
+            //     batchNo: ['20170505A'],
+            //     materialCode:['aaaaaaaaa'],
+            //     materialName: ['半成品活塞'],
+            //     qualifiedNum: ['69'],
+            //     scrapNum: ['10'],
+            //     unqualifiedNum: ['1',],
+            //     shiftName: ['白天'],
+            //     personName: ['王小虎'],
+            //     happenTime: ['2017-06-29 12:24:24'],
+            //     rowNum: ['UN654574375200']
+            // },{
+            //     equipmentName: ['装配线2.2线GP1'],
+            //     moldCode: ['2331'],
+            //     doCode: ['D201705050004', 'D201705050003'],
+            //     barcode: ['UN654574375200', 'UN654574375201'],
+            //     batchNo: ['20170505A', '20170505B'],
+            //     materialCode:['aaaaaaaaa','bbbbbbbbb'],
+            //     materialName: ['半成品活塞', '配料'],
+            //     qualifiedNum: ['49', '190'],
+            //     scrapNum: ['10','0'],
+            //     unqualifiedNum: ['1', '10'],
+            //     shiftName: ['白天', '晚上'],
+            //     personName: ['王小虎', '张三'], 
+            //     happenTime: ['2017-06-29 12:24:24', ''],
+            //     rowNum: ['UN654574375200', '2222']
+            // }],
+            // inData: [{
+            //     equipmentName: ['装配线2.2线GP1'],
+            //     moldCode: ['2331'],
+            //     doCode: ['D201705050004'],
+            //     barcode: ['UN654574375200'],
+            //     batchNo: ['20170505A'],
+            //     materialCode:['bbbbbbbbb'],
+            //     materialName: ['半成品活塞'],
+            //     quantity: ['1'],
+            //     shiftName: ['白天'],
+            //     personName: ['王小虎'],
+            //     happenTime: ['2017-06-29 12:24:24'],
+            //     rowNum: ['UN654574375200']
+            // }],
             outItems: [{
                 name: "设备名称",
                 prop: "equipmentName",
@@ -507,8 +511,18 @@ export default {
 }
 </style>
 
-<style lang="less" scoped>
+<style lang="less">
     .raw-table {
-        min-width:1500px
+        tbody {
+            tr{
+                &:nth-child(even) {
+                    // 偶数行。
+                    background-color: #fafafa;
+                }
+                &:hover {
+                    background-color: #eef6f6;
+                }
+            }
+        }
     }
 </style>
