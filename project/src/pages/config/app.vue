@@ -61,11 +61,16 @@
         display: flex;
         flex-direction: column;
         height:100%;
-    .pbody{
-        display: flex;
-        flex:1;
-        flex-direction: row;
-    }
+        .pbody{
+            display: flex;
+            flex:1;
+            flex-direction: row;
+        }
+        .el-dialog__headerbtn, .el-pagination__rightwrapper {
+            border-width: 0;
+            background-color: transparent;
+            outline: none;
+        }
         .sidebar{
             display: flex;
             flex-direction: column;
