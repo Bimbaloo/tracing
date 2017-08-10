@@ -602,16 +602,18 @@
 					// 若为快速报告，根据物料+批次+bucketNo获取数据。
 					this.url = "/api/v1/trace/report/by-start-points";
 					
-					oQuery = this.query;
+					// oQuery = this.query;
 				}else {
+					oQuery = this.$route.query
 					if(oQuery && ("equipmentId" in oQuery)) {
 						// 若根据设备查询。
 						this.url = "/api/v1/trace/report/by-equipment";
 					}
-					oQuery ={
-						"materialCode":this.$route.query.materialCode,
-						"batchNo":this.$route.query.batchNo
-					}
+
+					// oQuery ={
+					// 	"materialCode":this.$route.query.materialCode,
+					// 	"batchNo":this.$route.query.batchNo
+					// }
 				}
 				
 				// oQuery = [

@@ -4,8 +4,11 @@
 		<div class="innner-content" :style="styleObject">
 			<h2 class="title">遏制详情</h2>
 			<h2 class="content-title">查询条件</h2>
-			<div class="condition">
+			<div class="condition" v-if="'materialCode' in $route.query">>
 				<span>物料编码：{{$route.query.materialCode}}</span><span>批次：{{$route.query.batchNo}}</span>
+			</div>
+			<div class="condition" v-if="'equipmentId' in $route.query">
+				<span>设备名称：{{$route.query.equipmentName}}</span><span>开始时间：{{$route.query.startTime}}</span><span>结束时间：{{$route.query.endTime}}</span>
 			</div>
 			<h2 class="title">可疑品列表</h2>
 			<v-report :hasData="setWidth" :noData="removeWidth" ></v-report>
