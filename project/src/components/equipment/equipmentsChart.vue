@@ -274,13 +274,12 @@
                         borderRadius: 4,
                         transitionDuration: 0,
                         // 鼠标是否可进入悬浮框。
-                        // enterable: true,
+                        enterable: true,
                         // show: function (value, index) {
                         //     console.log(arguments)
 
                         //     return true
                         // },
-                        // extraCssText: 'width: 300px; white-space: normal',
                         textStyle: {
                             fontSize: 12,
                             color: '#000'
@@ -295,9 +294,15 @@
                                     left: -1000
                                 }
                             }
-                            
+
+                            if(pos[1] > this.chart.getHeight()/2) {
+                                // 若鼠标位置在下半部分,将悬浮框靠近上面显示。
+                                pos[1] = 0;
+                            }else {
+                                // 若鼠标位置在上半部分,将悬浮框靠近下面显示。
+                                pos[1] = size.viewSize[1]-size.contentSize[1];
+                            }
                             pos[0] = pos[0] + 20;
-                            pos[1] = 30;
                             
                             if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
                                 // 若超出x轴范围
@@ -307,7 +312,8 @@
                             // obj[['top', 'bottom'][+(pos[1] < size.viewSize[1] / 2)]] = 20;
 
                             return pos;                            
-                        }
+                        },
+                        extraCssText: 'max-height:200px;overflow-y:auto'
                     },    
                     // 缩放轴。         
                     dataZoom: [{
@@ -413,7 +419,7 @@
                                 let time = params.value[3]/1000,    
                                     hour = 0,
                                     munite = 0,
-                                    secend = 0;
+                                    second = 0;
                                 
                                 if(time/3600 >= 1) {
                                     hour = Math.floor(time/3600);
@@ -423,14 +429,14 @@
                                     munite = Math.floor(time%3600/60);
                                 }
 
-                                secend = time%60;
+                                second = time%60;
                                 
                                 if(hour) {
-                                    time = hour+"h"+munite+"\'"+secend+"\'\'"
+                                    time = hour+"h"+munite+"\'"+second+"\'\'"
                                 }else if(munite) {
-                                    time = munite+"\'"+secend+"\'\'"
+                                    time = munite+"\'"+second+"\'\'"
                                 }else {
-                                    time = secend+"\'\'"
+                                    time = second+"\'\'"
                                 }
                                 
                                 return `${params.marker}${params.name}：${time}<br/>
@@ -438,13 +444,17 @@
                                     ${params.value[5]}`;
                             },
                             // 设置显示位置。
-                            position: (pos, params, el, elRect, size) => {                             
+                            position: (pos, params, el, elRect, size) => {       
+                                pos[0] = pos[0] + 20;
+                                
                                 if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
                                     // 若超出x轴范围
-                                    pos[0] = pos[0] - size.contentSize[0]
+                                    pos[0] = pos[0] - 20*2 - size.contentSize[0]
                                 }
+
                                 return pos;                            
-                            }
+                            },
+                            extraCssText: 'height:auto;'
                         }               
                     }]
                 };
@@ -596,11 +606,24 @@
                     }
                     this.selectedEquipment = '';
                 }        
+
             },
             // 重置图形大小。
             resizeChart () {
                 this.setChartHeight();
                 this.chart && this.chart.resize();
+                // 设置提示框的最大高度。
+                this.setTooltipHeight();
+            },
+            // 设置提示框高度。
+            setTooltipHeight () {
+                let nHeight = (this.chartHeight-80)*0.8;
+                nHeight = nHeight > 20 ? nHeight:20;
+                this.chart.setOption({
+                    tooltip: {
+                        extraCssText: `max-height:${nHeight}px;overflow-y:auto`
+                    }
+                })
             },
             // 设置图形高度。
             setChartHeight () {
@@ -957,6 +980,8 @@
                 })
     
                 this.chart.setOption(this.option, true);
+                // 设置提示框的最大高度。
+                this.setTooltipHeight();
             },
             // 获取数组顺序。
             getIndex (arr, key, value) {
@@ -1277,8 +1302,8 @@
                     let aoValue = param.value,
                         sList = "";
                     // 事件列表
-                    aoValue[3].forEach(o => {
-                        sList += `<div style="color:${param.color}">${o.title}</div>`;
+                    aoValue[3].forEach((o,index) => {
+                        sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
                         o.tooltipData.forEach(tip => {
                             sList += `<div><span>${tip.name}:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`                
                         })
