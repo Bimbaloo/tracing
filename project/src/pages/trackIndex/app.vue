@@ -66,7 +66,7 @@
 				// filter: {},
 				// 起点集
 				points: {},
-				tip: "暂无数据" 
+				// tip: "暂无数据" 
 			}
 		},
 		computed: {
@@ -425,11 +425,11 @@
 					font-size: 16px;
 					cursor: pointer;
 				}
-				.tip {
-					position: absolute;
-					top: 100px;
-					left: 100px;
-				}
+				// .tip {
+				// 	position: absolute;
+				// 	top: 100px;
+				// 	left: 100px;
+				// }
 			}
 			.router-container {
 				/*border: 1px solid #ccc;
