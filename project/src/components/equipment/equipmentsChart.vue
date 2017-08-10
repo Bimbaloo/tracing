@@ -590,7 +590,6 @@
                 if(!this.chart) {
                     this.chart = this.$echarts.init(document.getElementById('equipments'));
                     this.setChartEvent();
-                    
                 }else {
                     this.chart.clear();
                     this.markLine = [];
@@ -610,20 +609,26 @@
             },
             // 重置图形大小。
             resizeChart () {
-                this.setChartHeight();
-                this.chart && this.chart.resize();
-                // 设置提示框的最大高度。
-                this.setTooltipHeight();
+                if(this.chart) {
+                    this.setChartHeight();
+                    this.chart.resize();
+                    // 设置提示框的最大高度。
+                    this.setTooltipHeight();
+                }
             },
             // 设置提示框高度。
             setTooltipHeight () {
-                let nHeight = (this.chartHeight-80)*0.8;
-                nHeight = nHeight > 20 ? nHeight:20;
-                this.chart.setOption({
-                    tooltip: {
-                        extraCssText: `max-height:${nHeight}px;overflow-y:auto`
-                    }
-                })
+                if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
+                    // 若数据加载已完成。
+                    let nHeight = (this.chartHeight-80)*0.8;
+                    nHeight = nHeight > 20 ? nHeight:20;
+                    this.chart.setOption({
+                        tooltip: {
+                            extraCssText: `max-height:${nHeight}px;overflow-y:auto`
+                        }
+                    })
+                }
+
             },
             // 设置图形高度。
             setChartHeight () {
