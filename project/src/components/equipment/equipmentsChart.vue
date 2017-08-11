@@ -54,7 +54,7 @@
         </div>
         <div class="tooltip left" v-if="compareData.left.time">
             <div class="tooltip-time">{{compareData.left.time}}</div>
-            <div class="tooltip-list" v-for="equipment in compareData.left.list" :style="{'max-height': (chartHeight-140) + 'px'}">
+            <div class="tooltip-list" v-for="equipment in compareData.left.list" :style="{'max-height': (chartHeight) + 'px'}">
                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                 <ul class="event-list">
                     <li v-for="(event,index) in equipment.event">
@@ -70,7 +70,7 @@
         </div>
         <div class="tooltip right" v-if="compareData.right.time">
             <div class="tooltip-time">{{compareData.right.time}}</div>
-            <div class="tooltip-list" v-for="equipment in compareData.right.list" :style="{'max-height': (chartHeight-140) + 'px'}">
+            <div class="tooltip-list" v-for="equipment in compareData.right.list" :style="{'max-height': (chartHeight) + 'px'}">
                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                 <ul class="event-list">
                     <li v-for="(event,index) in equipment.event">
@@ -92,8 +92,19 @@
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
 
+    // 设备状态。
     const CHART_STATE_NAME = "状态"
+    // 图形下margin。
+    const CHART_MARGIN_BOTTOM = 20
+    // tooltip距离鼠标的水平位置。
+    const TOOLTIP_X_DISTANCE = 20
+    // 悬浮框最小高度。
+    const TOOLTIP_MIN_HEIGHT = 20
+    // legend距右侧的距离。
+    const LEGEND_RIGHT = 80
+    // finereport跳转地址。
     const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
+
 
     export default {
 		props: {
@@ -251,7 +262,7 @@
                         // itemWidth: ,
                         // itemGap: 40,
                         // width: 320,
-                        right: 80,
+                        right: LEGEND_RIGHT,
                         align: 'left' 
                         // padding: [
                         //     5,  // 上
@@ -302,11 +313,11 @@
                                 // 若鼠标位置在上半部分,将悬浮框靠近下面显示。
                                 pos[1] = size.viewSize[1]-size.contentSize[1];
                             }
-                            pos[0] = pos[0] + 20;
+                            pos[0] = pos[0] + TOOLTIP_X_DISTANCE;
                             
                             if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
                                 // 若超出x轴范围
-                                pos[0] = pos[0] - 20*2 - size.contentSize[0]
+                                pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - size.contentSize[0]
                             }
                             // obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 60;
                             // obj[['top', 'bottom'][+(pos[1] < size.viewSize[1] / 2)]] = 20;
@@ -445,11 +456,11 @@
                             },
                             // 设置显示位置。
                             position: (pos, params, el, elRect, size) => {       
-                                pos[0] = pos[0] + 20;
+                                pos[0] = pos[0] + TOOLTIP_X_DISTANCE;
                                 
                                 if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
                                     // 若超出x轴范围
-                                    pos[0] = pos[0] - 20*2 - size.contentSize[0]
+                                    pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - size.contentSize[0]
                                 }
 
                                 return pos;                            
@@ -619,9 +630,10 @@
             // 设置提示框高度。
             setTooltipHeight () {
                 if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
+                    this.chartHeight = this.chart.getHeight()-this.chart.getOption().grid[0].top-this.chart.getOption().grid[0].bottom;
                     // 若数据加载已完成。
-                    let nHeight = (this.chartHeight-80)*0.8;
-                    nHeight = nHeight > 20 ? nHeight:20;
+                    let nHeight = this.chartHeight;//(this.chartHeight-80)*0.8;
+                    nHeight = nHeight > TOOLTIP_MIN_HEIGHT ? nHeight:TOOLTIP_MIN_HEIGHT;
                     this.chart.setOption({
                         tooltip: {
                             extraCssText: `max-height:${nHeight}px;overflow-y:auto`
@@ -635,8 +647,8 @@
                 let jContent = $(".material-stock .router-content"),
                     jTitle = jContent.find(".content-title");
                 
-                this.chartHeight = jContent.height() - jTitle.outerHeight(true) - 20;
-                $("#equipments").height(this.chartHeight);
+                // this.chartHeight = jContent.height() - jTitle.outerHeight(true) - 20;
+                $("#equipments").height(jContent.height() - jTitle.outerHeight(true) - CHART_MARGIN_BOTTOM);
             },
             // 设置图表事件。
             setChartEvent () {
