@@ -7,7 +7,7 @@
             <div class="legend" v-if="!loading">
                 <span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
             </div>
-            <div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment">
+            <div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment&&!loading">
                 <span class="icon icon-circle"></span><span>工艺</span>
             </div>
             <div class="switch" v-if="!loading">
@@ -20,7 +20,7 @@
                     <div class="tip">显示悬浮框</div>
                 </div>
             </div>
-            <div class="links" v-if="selectedEquipment">
+            <div class="links" v-if="selectedEquipment&&!loading">
                 <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item']">
                     <div v-for="item in obj.list" @click="listButtonClick(item)">{{item.name}}</div>
                 </div>	
@@ -47,14 +47,14 @@
                     </div>
                 </div>
             </div>
-            <div class="buttons" v-if="selectedEquipment">
+            <div class="buttons" v-if="selectedEquipment&&!loading">
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
-                <el-button  @click="gotoTrack" class="btn btn-plain" >追踪</el-button>
+                <el-button  @click="gotoTrack" class="btn btn-plain" v-if="trace">追踪</el-button>
             </div>	
         </div>
         <div class="tooltip left" v-if="compareData.left.time">
             <div class="tooltip-time">{{compareData.left.time}}</div>
-            <div class="tooltip-list" v-for="equipment in compareData.left.list" :style="{'max-height': (chartHeight-140) + 'px'}">
+            <div class="tooltip-list" v-for="equipment in compareData.left.list" :style="{'max-height': (chartHeight) + 'px'}">
                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                 <ul class="event-list">
                     <li v-for="(event,index) in equipment.event">
@@ -70,7 +70,7 @@
         </div>
         <div class="tooltip right" v-if="compareData.right.time">
             <div class="tooltip-time">{{compareData.right.time}}</div>
-            <div class="tooltip-list" v-for="equipment in compareData.right.list" :style="{'max-height': (chartHeight-140) + 'px'}">
+            <div class="tooltip-list" v-for="equipment in compareData.right.list" :style="{'max-height': (chartHeight) + 'px'}">
                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                 <ul class="event-list">
                     <li v-for="(event,index) in equipment.event">
@@ -92,8 +92,19 @@
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
 
+    // 设备状态。
     const CHART_STATE_NAME = "状态"
+    // 图形下margin。
+    const CHART_MARGIN_BOTTOM = 20
+    // tooltip距离鼠标的水平位置。
+    const TOOLTIP_X_DISTANCE = 20
+    // 悬浮框最小高度。
+    const TOOLTIP_MIN_HEIGHT = 20
+    // legend距右侧的距离。
+    const LEGEND_RIGHT = 80
+    // finereport跳转地址。
     const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
+
 
     export default {
 		props: {
@@ -109,6 +120,8 @@
 		},
         data () {
             return {
+                // 判断是否为溯源页。
+                trace: location.pathname.indexOf('traceIndex') > -1,
                 // 悬浮框是否展示。
                 show: true,
                 // 选中的设备id。
@@ -249,7 +262,7 @@
                         // itemWidth: ,
                         // itemGap: 40,
                         // width: 320,
-                        right: 80,
+                        right: LEGEND_RIGHT,
                         align: 'left' 
                         // padding: [
                         //     5,  // 上
@@ -272,13 +285,12 @@
                         borderRadius: 4,
                         transitionDuration: 0,
                         // 鼠标是否可进入悬浮框。
-                        // enterable: true,
+                        enterable: true,
                         // show: function (value, index) {
                         //     console.log(arguments)
 
                         //     return true
                         // },
-                        // extraCssText: 'width: 300px; white-space: normal',
                         textStyle: {
                             fontSize: 12,
                             color: '#000'
@@ -293,77 +305,34 @@
                                     left: -1000
                                 }
                             }
-                            
-                            pos[0] = pos[0] + 20;
-                            pos[1] = 30;
+
+                            if(pos[1] > this.chart.getHeight()/2) {
+                                // 若鼠标位置在下半部分,将悬浮框靠近上面显示。
+                                pos[1] = 0;
+                            }else {
+                                // 若鼠标位置在上半部分,将悬浮框靠近下面显示。
+                                pos[1] = size.viewSize[1]-size.contentSize[1];
+                            }
+                            pos[0] = pos[0] + TOOLTIP_X_DISTANCE;
                             
                             if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
                                 // 若超出x轴范围
-                                pos[0] = pos[0] - 20*2 - size.contentSize[0]
+                                pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - size.contentSize[0]
                             }
                             // obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 60;
                             // obj[['top', 'bottom'][+(pos[1] < size.viewSize[1] / 2)]] = 20;
 
                             return pos;                            
-                        }
+                        },
+                        extraCssText: 'max-height:200px;overflow-y:auto'
                     },    
                     // 缩放轴。         
-                    dataZoom: [
-                        {
-                            type: 'slider',
-                            // 让 dataItem 部分超出坐标系边界的时候，不会整体被过滤掉。
-                            filterMode: 'weakFilter',
-                            xAxisIndex: [0],
-                            // show: true,
-                            // 展示图像缩略轴。
-                            showDataShadow: true,
-                            // top: 400,
-                            height: 16,
-                            // borderColor: 'transparent',
-                            // backgroundColor: '#e2e2e2',
-                            handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
-                            handleSize: 16,
-                            handleStyle: {
-                                shadowBlur: 6,
-                                shadowOffsetX: 1,
-                                shadowOffsetY: 2,
-                                shadowColor: '#fff'
-                            },
-                            labelFormatter: function(value) {
-                                return new Date(value).Format()
-                            }
-                        }, 
-                        {
-                            type: 'slider',
-                            filterMode: 'weakFilter',
-                            // show: true,
-                            yAxisIndex: [0],
-                            showDataShadow: true,
-                            width: 16,
-                            // borderColor: 'transparent',
-                            // backgroundColor: '#e2e2e2',
-                            handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
-                            handleSize: 16,
-                            handleStyle: {
-                                shadowBlur: 6,
-                                shadowOffsetX: 1,
-                                shadowOffsetY: 2,
-                                shadowColor: '#fff'
-                            },
-                            labelFormatter: function(index, value) {
-                                return value.split("+")[0]
-                            }
-                        }, {
-                            type: 'inside',
-                            filterMode: 'weakFilter',
-                            xAxisIndex: [0],
-                        },
-                        {
-                            type: 'inside',
-                            filterMode: 'weakFilter',
-                            yAxisIndex: [0],
-                        }
-                    ],
+                    dataZoom: [{
+                        // x轴滚轮缩放。
+                        type: 'inside',
+                        filterMode: 'weakFilter',
+                        xAxisIndex: [0]
+                    }],
                     xAxis: {
                         type: 'value',
                         min: 'dataMin',
@@ -461,7 +430,7 @@
                                 let time = params.value[3]/1000,    
                                     hour = 0,
                                     munite = 0,
-                                    secend = 0;
+                                    second = 0;
                                 
                                 if(time/3600 >= 1) {
                                     hour = Math.floor(time/3600);
@@ -471,14 +440,14 @@
                                     munite = Math.floor(time%3600/60);
                                 }
 
-                                secend = time%60;
+                                second = time%60;
                                 
                                 if(hour) {
-                                    time = hour+"h"+munite+"\'"+secend+"\'\'"
+                                    time = hour+"h"+munite+"\'"+second+"\'\'"
                                 }else if(munite) {
-                                    time = munite+"\'"+secend+"\'\'"
+                                    time = munite+"\'"+second+"\'\'"
                                 }else {
-                                    time = secend+"\'\'"
+                                    time = second+"\'\'"
                                 }
                                 
                                 return `${params.marker}${params.name}：${time}<br/>
@@ -486,13 +455,17 @@
                                     ${params.value[5]}`;
                             },
                             // 设置显示位置。
-                            position: (pos, params, el, elRect, size) => {                             
+                            position: (pos, params, el, elRect, size) => {       
+                                pos[0] = pos[0] + TOOLTIP_X_DISTANCE;
+                                
                                 if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
                                     // 若超出x轴范围
-                                    pos[0] = pos[0] - size.contentSize[0]
+                                    pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - size.contentSize[0]
                                 }
+
                                 return pos;                            
-                            }
+                            },
+                            extraCssText: 'height:auto;'
                         }               
                     }]
                 };
@@ -534,6 +507,47 @@
                         }
                     }
                 }))
+
+                let oAxis = {
+                    type: 'slider',
+                    // 让 dataItem 部分超出坐标系边界的时候，不会整体被过滤掉。
+                    filterMode: 'weakFilter',
+                    // show: true,
+                    // 展示图像缩略轴。
+                    showDataShadow: true,
+                    // top: 400,
+                    // borderColor: 'transparent',
+                    // backgroundColor: '#e2e2e2',
+                    handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+                    handleSize: 16,
+                    handleStyle: {
+                        shadowBlur: 6,
+                        shadowOffsetX: 1,
+                        shadowOffsetY: 2,
+                        shadowColor: '#fff'
+                    }
+                };
+
+                // 添加x轴缩放。
+                oData.dataZoom.push(Object.assign({
+                    xAxisIndex: [0],
+                    height: 16,
+                    labelFormatter: function(value) {
+                        return new Date(value).Format()
+                    }
+                },oAxis))
+
+                if(this.equipments.length > 1) {
+                    // 若大于一台设备。
+                    // 添加y轴缩放。
+                    oData.dataZoom.push(Object.assign({
+                        yAxisIndex: [0],
+                        width: 16,
+                        labelFormatter: function(index, value) {
+                            return value.split("+")[0]
+                        }
+                    },oAxis))
+                }
 
                 return oData
             }
@@ -587,7 +601,6 @@
                 if(!this.chart) {
                     this.chart = this.$echarts.init(document.getElementById('equipments'));
                     this.setChartEvent();
-                    
                 }else {
                     this.chart.clear();
                     this.markLine = [];
@@ -603,19 +616,39 @@
                     }
                     this.selectedEquipment = '';
                 }        
+
             },
             // 重置图形大小。
             resizeChart () {
-                this.setChartHeight();
-                this.chart && this.chart.resize();
+                if(this.chart) {
+                    this.setChartHeight();
+                    this.chart.resize();
+                    // 设置提示框的最大高度。
+                    this.setTooltipHeight();
+                }
+            },
+            // 设置提示框高度。
+            setTooltipHeight () {
+                if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
+                    this.chartHeight = this.chart.getHeight()-this.chart.getOption().grid[0].top-this.chart.getOption().grid[0].bottom;
+                    // 若数据加载已完成。
+                    let nHeight = this.chartHeight;//(this.chartHeight-80)*0.8;
+                    nHeight = nHeight > TOOLTIP_MIN_HEIGHT ? nHeight:TOOLTIP_MIN_HEIGHT;
+                    this.chart.setOption({
+                        tooltip: {
+                            extraCssText: `max-height:${nHeight}px;overflow-y:auto`
+                        }
+                    })
+                }
+
             },
             // 设置图形高度。
             setChartHeight () {
                 let jContent = $(".material-stock .router-content"),
                     jTitle = jContent.find(".content-title");
                 
-                this.chartHeight = jContent.height() - jTitle.outerHeight(true) - 20;
-                $("#equipments").height(this.chartHeight);
+                // this.chartHeight = jContent.height() - jTitle.outerHeight(true) - 20;
+                $("#equipments").height(jContent.height() - jTitle.outerHeight(true) - CHART_MARGIN_BOTTOM);
             },
             // 设置图表事件。
             setChartEvent () {
@@ -817,6 +850,7 @@
 			 * @return {Object}
 			 */
 			getParamter (aQuery) {
+                let oDate = this.getRealTime();
 				let oParam = {};
 				aQuery.forEach(param => {
 					switch (param) {
@@ -827,10 +861,10 @@
 							oParam[param] = this.selectedEquipment;
 							break;
 						case "startTime":
-							oParam[param] = this.datetime.start;
+							oParam[param] = oDate.start;
 							break;
 						case "endTime":
-							oParam[param] = this.datetime.end;
+							oParam[param] = oDate.end;
 							break;
 						case "processCode":
 							oParam[param] = this.process||'';
@@ -891,11 +925,18 @@
 						if(!aoData.length) {
 							return;
 						}
-                        
-                        aoData.forEach(o => {
+
+                        // 更改顺序。
+                        aoData.reverse();
+                        let nLength = aoData.length - 1; 
+                        aoData.forEach((o,index) => {
+                            if(index === nLength) {
+                                // 默认选中第一台设备。
+                                this.selectedEquipment = o.equipmentId;
+                            }
                             this.categories.push({
                                 id: o.equipmentId,
-                                value: `${o.equipmentName}+${o.equipmentId}+0`
+                                value: `${o.equipmentName}+${o.equipmentId}+`+(index===nLength?1:0)// 默认选中第一台设备。
                             })
                             let oData = this.equipmentData[o.equipmentId];
                             if(oData) {
@@ -956,6 +997,8 @@
                 })
     
                 this.chart.setOption(this.option, true);
+                // 设置提示框的最大高度。
+                this.setTooltipHeight();
             },
             // 获取数组顺序。
             getIndex (arr, key, value) {
@@ -1276,8 +1319,8 @@
                     let aoValue = param.value,
                         sList = "";
                     // 事件列表
-                    aoValue[3].forEach(o => {
-                        sList += `<div style="color:${param.color}">${o.title}</div>`;
+                    aoValue[3].forEach((o,index) => {
+                        sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
                         o.tooltipData.forEach(tip => {
                             sList += `<div><span>${tip.name}:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`                
                         })
@@ -1356,22 +1399,35 @@
                     style: api.style()
                 };
             },
+            // 获取实际缩放后的时间。
+            getRealTime () {
+                
+                let oDate = this.chart.getOption().dataZoom.filter(o => o.type === "slider" && o.xAxisIndex.length === 1)[0];   
+
+                return {
+                    start: new Date(oDate.startValue).Format(),
+                    end: new Date(oDate.endValue).Format()
+                }  
+            },
             // 可疑品列表。
 			showSuspiciousList() {
+                let oDate = this.getRealTime();
                 // 根据设备+开始时间+结束时间，查询可疑品列表。
-                this.$router.push({ path: "/stock/restrain", query: {
+                this.$router.push({ path: "/process/restrain", query: {
+                    equipmentName: this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName,
                     equipmentId: this.selectedEquipment,
-                    startTime: this.datetime.start,
-                    endTime: this.datetime.end
+                    startTime: oDate.start,
+                    endTime: oDate.end
                 }})				
 			},
             // 跳转到追踪页面。
             gotoTrack() {
+                let oDate = this.getRealTime();
                 let oCondition = {
                         "keys": {
-                            "equipmentCode": this.selectedEquipment,
-                            "startTime": this.datetime.start,
-                            "endTime": this.datetime.end
+                            "equipmentCode": this.selectedEquipment,//'493-017-2',
+                            "startTime": oDate.start,
+                            "endTime": oDate.end
                         }, 
                         "radio": "3",
                         "tab":"track"
@@ -1380,7 +1436,7 @@
 
                 sessionStorage.setItem('searchConditions-' + sTag, JSON.stringify(oCondition))
 
-                // "{"keys":{"barcode":"020400067"},"radio":"1","tab":"trace"}"    
+                window.open('detail.html?tag='+sTag, "_blank");   
       
             },
             // 工艺参数跳转按钮。
