@@ -1,14 +1,14 @@
 <template>
-    <div class="router-content" :data-height="routerContent" ref='content'>
+    <div class="router-content">
         <div class="innner-content" :style="styleObject">
-            <div class="condition">
+            <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
                     <span v-for="filter in inItems.filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
             </div>
-            <h2 class="content-title">
+            <h2 class="content-title inTitle">
             	投入
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
@@ -18,7 +18,7 @@
 			</div>
 
                   
-            <h2 class="content-title">
+            <h2 class="content-title outTitle">
             	产出
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('outputTable', '产出', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
@@ -38,7 +38,6 @@
     import FileSaver from 'file-saver'
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
-    import $ from "jquery"
 	
 const url = HOST + "/api/v1/trace/inout/by-equipment";
 
@@ -119,7 +118,9 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "200",
-                    fixed: true
+                    fixed: true,
+                    class: "barcode",
+                    cellClick: this.barcodeClick
                 }, {
                     name: "批次号",
                     prop: "batchNo",
@@ -166,35 +167,47 @@ export default {
                 filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
             },
           //  viewHeight:0
-          //routerContent:0
+          routerContent:0
 
         }
 
     },
     created() {
-        this.routerContent = $(".router-content").height();
-     //   this.viewHeight = $(".innner-content").height();
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+
         this.fetchData();
        
     },
     computed:{
-        routerContent: function(){
-            return $(".router-content").height()
-        },
+
         viewHeight: function(){
-            return this.routerContent-50
+            return this.routerContent
+        },
+        resizeY: function(){
+            return this.$store.state.resizeY
+        },
+        fullscreen: function(){
+            return this.$store.state.fullscreen
         }
     },
     mounted(){
        this.inItems.height = this.outItems.height = this.adjustHeight()
-       console.log(this.$refs.content)
+       
+    },
+    updated(){
+
+        this.setTitle(".barcode","单件追踪")
+        this.setTitle(".batch","批次追踪")
+        this.setTitle(".material","遏制")
+        
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
         '$route': 'fetchData',
-        "routerContent":function(){
-            console.log('1')
-        }
+        /* 上下拖动时，重新设置table大小变化 */
+        "resizeY":'setTbaleHeight',
+         /* 全屏大小时，重新设置table大小 */
+        "fullscreen": 'setTbaleHeight'
     },
     methods: {
         // 判断调用接口是否成功。
@@ -301,19 +314,14 @@ export default {
         },
         // 获取高度。
         adjustHeight() {
-            let $content = $(".innner-content"),
-        		$title = $content.find(".content-title"),
-            	$condition = $content.find(".condition"),
-                ntable = 0;
-                debugger
-            	ntable = Math.floor(
-                    this.viewHeight
-                    -$title.eq(0).outerHeight()-$title.eq(0).css("marginTop").split("px")[0]-$title.eq(0).css("marginBottom").split ("px")[0]
-                    -$title.eq(1).outerHeight()-$title.eq(1).css("marginTop").split("px")[0]-$title.eq(1).css("marginBottom").split ("px")[0]
-                    -$condition.outerHeight()-$condition.css("marginTop").split ("px")[0]-$condition.css("marginBottom").split ("px")[0]-40
-                    );
-                //debugger
-                console.log(ntable)
+
+            let ntable = 0;
+            ntable = Math.floor(
+                        this.viewHeight
+                        -this.outerHeight(document.querySelector(".condition"))
+                        -this.outerHeight(document.querySelector(".inTitle"))
+                        -this.outerHeight(document.querySelector(".outTitle"))
+                    )/2;
             return ntable;
         },
         /* 获取元素实际高度(含margin) */
@@ -323,6 +331,20 @@ export default {
 
             height += parseInt(style.marginTop) + parseInt(style.marginBottom);
             return height;
+        },
+        /* 设置table实际高度 */
+        setTbaleHeight(){
+            this.routerContent = document.querySelector(".router-content").offsetHeight
+            this.inItems.height = this.outItems.height = this.adjustHeight()
+        },
+        /* 设置title */
+        setTitle(el,title){
+            let elTds = document.querySelectorAll(el)
+            elTds.forEach((el,index)=>{
+                if(elTds[index].tagName.toLocaleLowerCase() === 'td'){
+                        el.setAttribute('title', title);
+                }
+            })
         }
     }
 }
