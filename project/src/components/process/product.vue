@@ -1,92 +1,30 @@
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
-			
-            <h2 class="content-title">
+            <div class="condition" ref='condition'>
+                <div class='condition-messsage'>
+                    <span v-for="filter in inItems.filters">
+                        {{filter[0]}} : {{filter[1]}}
+                    </span> 
+                </div>
+            </div>
+            <h2 class="content-title inTitle">
             	投入
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
             </h2>
-	
 			<div class="content-table">
-				<!--el-table :data="inData" border style="width: 100%" class="table">
-					<el-table-column v-for="(item,index) in inItems" align="center" :label="item.name" :width="item.width" :key="index">
-						<template scope="props">
-							<div class="cell" v-for=" a in props.row[item.prop]">{{a}}</div>
-						</template>
-					</el-table-column>
-					<el-table-column label="操作" align="center" width="300">
-						<template scope="props">
-							<div v-for="code in props.row.rowNum" class="cell">
-								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
-								<el-button type="text" size="small">单件追踪</el-button>
-								<el-button @click="handleClick(code)" type="text" size="small">批次追踪</el-button>
-								<el-button type="text" size="small">链路修复</el-button>
-							</div>
+                <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
+			</div>
 
-						</template>
-					</el-table-column>
-				</el-table-->
-                <table class="raw-table" v-loading="loading" ref="inputTable" element-loading-text="拼命加载中">
-            		<tr>
-            			<th v-for="column in inItems" :style="{width: column.width}" v-if="!column.hide">
-            				{{column.name}}
-            			</th>
-            		</tr>
-                    <tbody>
-                        <tr v-for="row in product.in">
-                            <td v-for="column in inItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-                                {{row[column.prop]}}
-                            </td>
-                        </tr>
-                    </tbody>
-            	</table>
-				<div v-if="!product.in.length&&!loading" class="error">
-					{{ empty }}
-				</div>
-			</div>	        
-            <h2 class="content-title">
+                  
+            <h2 class="content-title outTitle">
             	产出
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('outputTable', '产出', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
-            </h2>	
+            </h2>		  
 			<div class="content-table">
-				<!--el-table :data="outData" border style="width: 100%" class="table">
-					<el-table-column v-for="(item, index) in outItems" align="center" :label="item.name" :width="item.width" :key="index">
-						<template scope="props">
-							<div class="cell" v-for="a in props.row[item.prop]">{{a}}</div>
-						</template>
-					</el-table-column>
-					<el-table-column label="操作" align="center" width="300">
-						<template scope="props">
-							<div v-for="code in props.row.rowNum" class="cell">
-								<el-button @click="handleClick(code)" type="text" size="small">遏制</el-button>
-								<el-button type="text" size="small">单件追踪</el-button>
-								<el-button @click="handleClick(code)" type="text" size="small">批次追踪</el-button>
-								<el-button type="text" size="small">链路修复</el-button>
-							</div>
-
-						</template>
-					</el-table-column>
-				</el-table--> 
-
-                <table class="raw-table" v-loading="loading" ref="outputTable" element-loading-text="拼命加载中">
-            		<tr>
-            			<th v-for="column in outItems" :style="{width: column.width}" v-if="!column.hide">
-            				{{column.name}}
-            			</th>
-            		</tr>
-                    <tbody>
-                        <tr v-for="row in product.out">
-                            <td v-for="column in outItems" :class="column.class" @click="column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-                                {{row[column.prop]}}
-                            </td>
-                        </tr>
-                    </tbody>
-            	</table>
-				<div v-if="!product.out.length&&!loading" class="error">
-					{{ empty }}
-				</div>
+                <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
 			</div>
 		
 					
@@ -98,206 +36,178 @@
 	import XLSX from 'xlsx'
     import Blob from 'blob'
     import FileSaver from 'file-saver'
-	import html2canvas from 'html2canvas'
+    import html2canvas from 'html2canvas'
+    import table from "components/basic/table.vue"
 	
 const url = HOST + "/api/v1/trace/inout/by-equipment";
 
 export default {
+    components: {
+		'v-table': table
+	},
     data() {
         return {
             excel: true,
-			print: true,
+            print: true,
             loading: false,
             sErrorMessage: "",
             empty: "暂无数据。",
-			styleObject: {
-				"min-width": "1500px"
-			},
-            product: {
-                out: [],
-                in: []
+            styleObject: {
+              //  "min-width": "2000px"
             },
-            // outData: [{
-            //     equipmentName: ['装配线2.2线GP1'],
-            //     moldCode: ['2331'],
-            //     doCode: ['D201705050004'],
-            //     barcode: ['UN654574375200'],
-            //     batchNo: ['20170505A'],
-            //     materialCode:['bbbbbbbbb'],
-            //     materialName: ['半成品活塞'],
-            //     qualifiedNum: ['69'],
-            //     scrapNum: ['10'],
-            //     unqualifiedNum: ['1',],
-            //     shiftName: ['白天'],
-            //     personName: ['王小虎'],
-            //     happenTime: ['2017-06-29 12:24:24'],
-            //     rowNum: ['UN654574375200']
-            // }, {
-            //     equipmentName: ['装配线2.2线GP1'],
-            //     moldCode: ['2331'],
-            //     doCode: ['D201705050004'],
-            //     barcode: ['UN654574375200'],
-            //     batchNo: ['20170505A'],
-            //     materialCode:['aaaaaaaaa'],
-            //     materialName: ['半成品活塞'],
-            //     qualifiedNum: ['69'],
-            //     scrapNum: ['10'],
-            //     unqualifiedNum: ['1',],
-            //     shiftName: ['白天'],
-            //     personName: ['王小虎'],
-            //     happenTime: ['2017-06-29 12:24:24'],
-            //     rowNum: ['UN654574375200']
-            // },{
-            //     equipmentName: ['装配线2.2线GP1'],
-            //     moldCode: ['2331'],
-            //     doCode: ['D201705050004', 'D201705050003'],
-            //     barcode: ['UN654574375200', 'UN654574375201'],
-            //     batchNo: ['20170505A', '20170505B'],
-            //     materialCode:['aaaaaaaaa','bbbbbbbbb'],
-            //     materialName: ['半成品活塞', '配料'],
-            //     qualifiedNum: ['49', '190'],
-            //     scrapNum: ['10','0'],
-            //     unqualifiedNum: ['1', '10'],
-            //     shiftName: ['白天', '晚上'],
-            //     personName: ['王小虎', '张三'], 
-            //     happenTime: ['2017-06-29 12:24:24', ''],
-            //     rowNum: ['UN654574375200', '2222']
-            // }],
-            // inData: [{
-            //     equipmentName: ['装配线2.2线GP1'],
-            //     moldCode: ['2331'],
-            //     doCode: ['D201705050004'],
-            //     barcode: ['UN654574375200'],
-            //     batchNo: ['20170505A'],
-            //     materialCode:['bbbbbbbbb'],
-            //     materialName: ['半成品活塞'],
-            //     quantity: ['1'],
-            //     shiftName: ['白天'],
-            //     personName: ['王小虎'],
-            //     happenTime: ['2017-06-29 12:24:24'],
-            //     rowNum: ['UN654574375200']
-            // }],
-            outItems: [{
-                name: "设备名称",
-                prop: "equipmentName",
-                width: "150",
-                merge: true
-            }, {
-                name: "模号",
-                prop: "moldCode",
-                width: "120",
-                merge: true
-            }, {
-                name: "派工单号",
-                prop: "doCode",
-                width: "200"
-            }, {
-                name: "条码",
-                prop: "barcode",
-                width: "200"
-            }, {
-                name: "批次号",
-                prop: "batchNo",
-                width: "200"
-            }, {
-                name: "物料编码",
-                prop: "materialCode",
-                width: "120"
-            }, {
-                name: "物料名称",
-                prop: "materialName",
-                width: "120"
-            }, {
-                name: "合格数",
-                prop: "qualifiedNum",
-                width: ""
-            }, {
-                name: "报废数",
-                prop: "scrapNum",
-                width: ""
-            }, {
-                name: "不合格数",
-                prop: "unqualifiedNum",
-                width: ""
-            }, {
-                name: "班次",
-                prop: "shiftName",
-                width: ""
-            }, {
-                name: "操作人",
-                prop: "personName",
-                width: ""
-            }, {
-                name: "产出时间",
-                prop: "happenTime",
-                width: "200"
-            }],
-            inItems: [{
-                name: "设备名称",
-                prop: "equipmentName",
-                width: "150",
-                merge: true
-            }, {
-                name: "模号",
-                prop: "moldCode",
-                width: "120",
-                merge: true
-            }, {
-                name: "派工单号",
-                prop: "doCode",
-                width: "200"
-            }, {
-                name: "条码",
-                prop: "barcode",
-                width: "200"
-            }, {
-                name: "批次号",
-                prop: "batchNo",
-                width: "200"
-            }, {
-                name: "物料编码",
-                prop: "materialCode",
-                width: "120"
-            }, {
-                name: "物料名称",
-                prop: "materialName",
-                width: "120"
-            }, {
-                name: "数量",
-                prop: "quantity",
-                width: ""
-            }, {
-                name: "班次",
-                prop: "shiftName",
-                width: ""
-            }, {
-                name: "操作人",
-                prop: "personName",
-                width: ""
-            }, {
-                name: "投入时间",
-                prop: "happenTime",
-                width: "200"
-            }]
+         
+            loading: false,
+            tdResize: true, //是否允许拖动table大小
+            /* 投入 */
+            inItems: {
+                columns: [{
+                    name: "条码",
+                    prop: "barcode",
+                    width: "200",
+                    fixed: true,
+                    class: "barcode",
+                    cellClick: this.barcodeClick
+                }, {
+                    name: "箱码",
+                    prop: "",
+                    width: "200"
+                }, {
+                    name: "派工单号",
+                    prop: "doCode",
+                    width: "200"
+                }, {
+                    name: "批次号",
+                    prop: "batchNo",
+                    width: "200",
+                    class: "batch",
+                    cellClick: this.batchClick
+                }, {
+                    name: "物料编码",
+                    prop: "materialCode",
+                    width: "200",
+                    class: "material",
+                    cellClick: this.materialClick
+                }, {
+                    name: "物料名称",
+                    prop: "materialName",
+                    width: "300"
+                }, {
+                    name: "数量",
+                    prop: "quantity",
+                    width: "120"
+                }, {
+                    name: "班次",
+                    prop: "shiftName",
+                    width: "200"
+                }, {
+                    name: "操作人",
+                    prop: "personName",
+                    width: "120"
+                }, {
+                    name: "投入时间",
+                    prop: "happenTime",
+                    width: "200"
+                }],
+                height: 1,
+                data: [],
+                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+            },
+            /* 产出 */
+            outItems: {
+                columns: [{
+                    name: "条码",
+                    prop: "barcode",
+                    width: "200",
+                    fixed: true,
+                    class: "barcode",
+                    cellClick: this.barcodeClick
+                }, {
+                    name: "批次号",
+                    prop: "batchNo",
+                    width: "200"
+                }, {
+                    name: "派工单号",
+                    prop: "doCode",
+                    width: "200"
+                }, {
+                    name: "物料编码",
+                    prop: "materialCode",
+                    width: "200"
+                }, {
+                    name: "物料名称",
+                    prop: "materialName",
+                     width: "300"
+                }, {
+                    name: "合格数",
+                    prop: "qualifiedNum",
+                    width: "120"
+                }, {
+                    name: "报废数",
+                    prop: "scrapNum",
+                    width: "120"
+                }, {
+                    name: "不合格数",
+                    prop: "unqualifiedNum",
+                    width: "120"
+                }, {
+                    name: "班次",
+                    prop: "shiftName",
+                   width: "200"
+                }, {
+                    name: "操作人",
+                    prop: "personName",
+                    width: "120"
+                }, {
+                    name: "产出时间",
+                    prop: "happenTime",
+                    width: "200"
+                }],
+                data: [],
+                height: 1,
+                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+            },
+          //  viewHeight:0
+          routerContent:0
 
         }
+
     },
     created() {
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+
         this.fetchData();
-        // this.$get('http://rapapi.org/mockjsdata/21533/a?').
-        //     then((response) => {
-        //         let _outDatas = response.data.out;
+       
+    },
+    computed:{
 
-        //         this.outData = this.dataChange(_outDatas)
+        viewHeight: function(){
+            return this.routerContent
+        },
+        resizeY: function(){
+            return this.$store.state.resizeY
+        },
+        fullscreen: function(){
+            return this.$store.state.fullscreen
+        }
+    },
+    mounted(){
+       this.inItems.height = this.outItems.height = this.adjustHeight()
+       
+    },
+    updated(){
 
-        //         let _inData = response.data.in;
-
-        //         this.inData = this.dataChange(_inData)
-        //     })
+        this.setTitle(".barcode","单件追踪")
+        this.setTitle(".batch","批次追踪")
+        this.setTitle(".material","遏制")
+        
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': 'fetchData'
+        '$route': 'fetchData',
+        /* 上下拖动时，重新设置table大小变化 */
+        "resizeY":'setTbaleHeight',
+         /* 全屏大小时，重新设置table大小 */
+        "fullscreen": 'setTbaleHeight'
     },
     methods: {
         // 判断调用接口是否成功。
@@ -307,8 +217,6 @@ export default {
             // 判断是否调用成功。
             if(bRight != "0") {
                 // 提示信息。
-//              this.sErrorMessage = param.data.errorMsg.message;
-//              this.showMessage();
                 console.log(param.data.errorMsg.message)
                 // 失败后的回调函。
                 fnFail && fnFail();
@@ -326,9 +234,8 @@ export default {
         },		       
         // 获取数据。
         fetchData() {    
+            
             this.loading = true;
-            this.product.out = [];
-            this.product.in = [];
             let oQuery = this.$route.query;
 
             this.$post(url, oQuery)
@@ -336,20 +243,12 @@ export default {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    // 保存数据。
-                    // debugger
-                    // let _outDatas = res.data.data.out;
-                    // this.outData = this.dataChange(_outDatas)
-                    // let _inData = res.data.data.in;
-                    // this.inData = this.dataChange(_inData)
-                    this.product.out = this.formatData(res.data.data.out, this.outItems);
-                    this.product.in = this.formatData(res.data.data.in, this.inItems);
+                    this.outItems.data = res.data.data.out
+                    this.inItems.data = res.data.data.in
                 });				 
             })
             .catch((err) => {
                 this.loading = false;
-//              this.sErrorMessage = "查询出错。"
-//              this.showMessage();
                 this.styleObject.minWidth = 0;   
                 console.log("数据库查询出错。")
             })
@@ -389,40 +288,16 @@ export default {
         
             return aoData;
         },
-        handleClick(a) {
+        batchClick() {
+            console.log("批次号")
         },
-        dataChange(Datas) {
-            /* 格式转化，转化为数组 */
-            Datas.forEach(o => {
-                for (let p in o) {
-                    o[p] = [o[p]]
-                }
-            });
-            /* 相同id单元格合并 */
-            for (let i = 0; i < Datas.length; i++) {
-                for (let j = 0; j < Datas.length - i - 1; j++) {
-                    let a = Datas[i + j],
-                        b = Datas[i + j + 1];
-                    if (a.equipmentId[0] === b.equipmentId[0]) {  //判断id是否相同，相同的则合并
-                        if (a.moldCode[0] !== b.moldCode[0]) {    //id相同的情况下判断模块号是否相同  
-                            for (let prop in b) {                 //模块号相同的时候
-                                if (prop !== "equipmentName") {
-                                    a[prop].push(b[prop][0])
-                                }
-                            }
-                        } else {                                  //模块号不相同的时候
-                            for (let prop in b) {
-                                if (prop !== "equipmentName" && prop !== "moldCode") {
-                                    a[prop].push(b[prop][0])
-                                }
-                            }
-                        }                                         //合并完成后删除一行
-                        Datas.splice(i + j + 1, 1)
-                    }
-                }
-            }
-            return Datas
+        barcodeClick() {
+            console.log("条码")
         },
+        materialClick() {
+            console.log("物料编码")
+        },
+
         // 表格导出。
         exportExcelHandle (sTable, sFileName, event) {
 
@@ -436,14 +311,48 @@ export default {
                 return;
             }
             window.Rt.utils.printHtml(html2canvas, oTable);              
+        },
+        // 获取高度。
+        adjustHeight() {
+
+            let ntable = 0;
+            ntable = Math.floor(
+                        this.viewHeight
+                        -this.outerHeight(document.querySelector(".condition"))
+                        -this.outerHeight(document.querySelector(".inTitle"))
+                        -this.outerHeight(document.querySelector(".outTitle"))
+                    )/2;
+            return ntable;
+        },
+        /* 获取元素实际高度(含margin) */
+         outerHeight(el) {
+            var height = el.offsetHeight;
+            var style = el.currentStyle || getComputedStyle(el);
+
+            height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+            return height;
+        },
+        /* 设置table实际高度 */
+        setTbaleHeight(){
+            this.routerContent = document.querySelector(".router-content").offsetHeight
+            this.inItems.height = this.outItems.height = this.adjustHeight()
+        },
+        /* 设置title */
+        setTitle(el,title){
+            let elTds = document.querySelectorAll(el)
+            elTds.forEach((el,index)=>{
+                if(elTds[index].tagName.toLocaleLowerCase() === 'td'){
+                        el.setAttribute('title', title);
+                }
+            })
         }
     }
 }
 </script>
 
-<style lang="less"  >
+<style lang="less">
 .content-title.table-title {
-    margin-top: 30px;
+    margin-top: 10px;
     margin-bottom: 0;
     color: #333;
     font-size: 14px;
@@ -456,73 +365,55 @@ export default {
         }
     }
 }
+
 .content-title {
     .icon-print {
         right: auto;
     }
 }
+
 .table {
-    th {
-        height: 36px;
-        background-color: #42af8f; // white-space: nowrap;
-        &>div {
-            background-color: #42af8f;
-            color: #fff;
-            font-weight: 600;
-
-            &.cell {
-                padding: 0;
-                white-space: nowrap;
-                text-align: center
-            }
-        }
-    }
-
-    td {
-        height: 30px;
+    .batch,
+    .barcode,
+    .material {
+        cursor: pointer;
+        color: #f90;
 
         .cell {
-            padding: 0;
-            text-align: center;
-            &.cell {
-                line-height: 30px;
-                min-height: 30px;
-                border-bottom: 1px solid rgb(223, 236, 233);
-                span {
-                    font-size: 14px;
-                    font-weight: bold;
-                    text-decoration: underline #ff9900;
-                    color: #ff9900;
-                }
-            }
-            &.ok {
-                font-weight: bold;
-                color: #31bc00;
-            }
-            &.ng {
-                font-weight: bold;
-                color: #f10000;
-            }
-            &.cell:last-child {
-                border-bottom: none
+            font-weight: 600;
+
+            &:empty {
+                cursor: default;
             }
         }
+    }
+    .clicked {
+        cursor: pointer;
+        color: #f90;
     }
 }
+
 </style>
 
-<style lang="less">
-    .raw-table {
-        tbody {
-            tr{
-                &:nth-child(even) {
-                    // 偶数行。
-                    background-color: #fafafa;
-                }
-                &:hover {
-                    background-color: #eef6f6;
-                }
-            }
-        }
-    }
-</style>
+// <style lang="less" scoped>
+// .innner-content {
+//     display: flex;
+//     flex-direction: column;
+//     .content-title,
+//     .condition {
+//         flex: 0 0 auto;
+//     }
+//     .content-table + .content-title {
+//         margin-top: 0px;
+//     }
+// }
+// .condition {
+//     margin-bottom: 0;
+//     padding-top: 10px;
+//     padding-bottom: 10px;
+    
+// }
+// </style>
+
+
+
