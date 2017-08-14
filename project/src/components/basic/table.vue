@@ -12,7 +12,7 @@
     element-loading-text="拼命加载中"
     style="width: 100%">
         <el-table-column 
-        v-for="column in columns"       
+        v-for="column in columns"
         align="center"
         :fixed="bFixed && column.fixed?true:false"
         :sortable="column.sortable"
@@ -28,6 +28,24 @@
         :filter-method="column.filterMethod"
         :filter-placement="column.filterPlacement"
         :width="column.width">
+            <el-table-column  
+                align="center"
+                v-if="!!column.lists"  
+                v-for='list in column.lists'
+                :sortable="list.sortable"
+                :type="list.type"
+                :resizable="resize"
+                :prop="list.prop"
+                :label="list.name"
+                :sort-method="list.sortMethod"
+                :key="list.prop" 
+                :class-name="list.class"
+                :formatter="list.formatter"
+                :filters="list.filters"
+                :filter-method="list.filterMethod"
+                :filter-placement="list.filterPlacement"
+                :width="list.width">
+            </el-table-column> 
         </el-table-column>
         
     </el-table>
