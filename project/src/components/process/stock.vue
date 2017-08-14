@@ -8,7 +8,8 @@
         <div class="router-path">
             <span class="path-item" @click="checkEquipment">设备分析</span>
             <!--span class="path-item" @click="checkDetail" v-if="detailIf">>设备详情</span-->          
-            <span class="path-item" @click="checkProduction" v-if="productIf">>投产表</span>
+            <!-- <span class="path-item" @click="checkProduction" v-if="productIf">>投产表</span> -->
+            <span class="path-item" @click="checkRoute" v-if=" !(operationName === '') ">>{{operationName}}</span>
             <span class="path-item" v-if="restrainIf">>遏制</span>
         </div> 
         <router-view></router-view>  
@@ -31,13 +32,27 @@
                 product: {},
                 detailIf: false,
                 productIf: false,
-                restrainIf: false    
+                restrainIf: false,
+                operationNames:"",
+                operations: {
+                    "process":"",
+                    "product":"投产表",
+                    "qtReport":"质检",
+                    "qcReport":"送检",
+                    "fgbReport":"fgb质检",
+                    "tool":"工具记录",
+                    "event":"事件记录",
+                    "repair":"维护记录"
+                }    
             }
         },
         computed: {
 			fullscreen () {
 		    	return this.$store.state.fullscreen
-		    }
+            },
+            operationName() {
+                return this.operations[this.operationNames]
+            }
 		},
         created () {
             this.setRouteQuery();
@@ -69,6 +84,14 @@
                 }
                 this.$router.push({ path: `/process/detail/product`, query: this.product})
             },
+             // 面包屑导航点击功能
+            checkRoute() {
+                if(event.target.parentNode.lastElementChild == event.target) {
+                    // 若为最后一个节点，则不可点击。
+                    return false;
+                }
+                this.$router.push({ path: `/process/detail/`+this.operationName, query: this[this.operationNames]})
+            },
             setRouteQuery() {
                 let aLocation = location.href.split("?"),
                     aHref = aLocation[1].split("/"),
@@ -78,6 +101,7 @@
                 // if(sType == "detail") {
                 //     this.detail = this.$route.query;
                 // }else 
+                this.operationNames = sType
                 if(sType == "product") {
                     this.product = this.$route.query;
                 }else if(sType == "restrain") {
@@ -95,6 +119,7 @@
                 //     this.productIf = false;
                 //     this.restrainIf = false;
                 // }else 
+                this.operationNames = sType
                 if(sType == "product") {
                     // this.detailIf = true;
                     // 添加开始时间，结束时间。因为可以跳转到设备分析的时候，开始时间结束时间有修改。
