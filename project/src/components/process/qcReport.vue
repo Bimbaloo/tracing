@@ -3,7 +3,7 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in tableData.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
@@ -29,8 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
-
+// const url = HOST + "/api/v1/trace/inout/by-equipment";
+const url =  `http://rapapi.org/mockjs/24404/quality/send-inspect/by-equipment-time?`
 export default {
     components: {
 		'v-table': table
@@ -47,7 +47,20 @@ export default {
             },
          
             loading: false,
-            tdResize: true, //是否允许拖动table大小
+            tdResize: true, // 是否允许拖动table大小
+            condition:{},   // 查询条件    
+            dataName:[      // 条件对应中文名
+                {
+                    itemCode:"equipmentIdList",
+                    itemName:"物料编码"
+                },{
+                    itemCode:"startTime",
+                    itemName:"开始时间"
+                },{
+                    itemCode:"endTime",
+                    itemName:"结束时间"
+                },
+            ],
             /* 投入 */
             tableData: {
                 columns: [{
@@ -56,11 +69,11 @@ export default {
                     width: "50"
                 }, {
                     name: "送检ID",
-                    prop: "barcode",
+                    prop: "requestId",
                     width: "200",
                 }, {
                     name: "设备名称",
-                    prop: "",
+                    prop: "equipmentName",
                     width: "200"
                 }, {
                     name: "派工单号",
@@ -68,15 +81,15 @@ export default {
                     width: "200"
                 }, {
                     name: "工序",
-                    prop: "batchNo",
+                    prop: "processName",
                     width: "200",
                 }, {
                     name: "式样号",
-                    prop: "materialCode",
+                    prop: "sampleIdentification",
                     width: "200",
                 }, {
                     name: "物料批次",
-                    prop: "quantity",
+                    prop: "batchNo",
                     width: "120"
                 }, {
                     name: "物料名称",
@@ -84,35 +97,33 @@ export default {
                     width: "300"
                 }, {
                     name: "送检时间",
-                    prop: "shiftName",
+                    prop: "createTime",
                     width: "200"
                 }, {
                     name: "送检结果",
-                    prop: "personName",
+                    prop: "passTypeName",
                     width: "120"
                 }, {
                     name: "送检报告名称",
-                    prop: "happenTime",
+                    prop: "reportName",
                     width: "300"
                 }, {
                     name: "文件名称",
-                    prop: "happenTime",
+                    prop: "fileName",
                     width: "300"
                 }, {
                     name: "文件大小",
-                    prop: "happenTime",
+                    prop: "fileSize",
                     width: "300"
                 }, {
                     name: "操作",
-                    prop: "happenTime",
+                    prop: "reportPath",
                     width: "300"
                 }],
                 height: 1,
-                data: [],
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+                data: []
             },
-           
-          routerContent:0
+            routerContent:0
 
         }
 
@@ -133,7 +144,29 @@ export default {
         },
         fullscreen: function(){
             return this.$store.state.fullscreen
-        }
+        },
+        /* 查询条件转数组中文 */
+        filters: function() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		}
     },
     mounted(){
        this.tableData.height  = this.adjustHeight()
@@ -178,13 +211,13 @@ export default {
             
             this.loading = true;
             let oQuery = this.$route.query;
-
-            this.$post(url, oQuery)
+            this.condition = this.$route.query
+            this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    this.tableData.data = res.data.data.in
+                    this.tableData.data = res.data.data
                 });				 
             })
             .catch((err) => {

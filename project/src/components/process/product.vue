@@ -98,7 +98,7 @@ export default {
                 }, {
                     name: "操作人",
                     prop: "personName",
-                    width: "120"
+                    width: "200"
                 }, {
                     name: "投入时间",
                     prop: "happenTime",
@@ -115,8 +115,6 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
-                    class: "barcode",
-                    cellClick: this.barcodeClick
                 }, {
                     name: "批次号",
                     prop: "batchNo",
@@ -132,7 +130,9 @@ export default {
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
-                    width: "200"
+                    width: "200",
+                    class: "barcode",
+                    cellClick: this.barcodeClick
                 }, {
                     name: "物料名称",
                     prop: "materialName",
@@ -395,25 +395,7 @@ export default {
 
 </style>
 
-// <style lang="less" scoped>
-// .innner-content {
-//     display: flex;
-//     flex-direction: column;
-//     .content-title,
-//     .condition {
-//         flex: 0 0 auto;
-//     }
-//     .content-table + .content-title {
-//         margin-top: 0px;
-//     }
-// }
-// .condition {
-//     margin-bottom: 0;
-//     padding-top: 10px;
-//     padding-bottom: 10px;
-    
-// }
-// </style>
+
 
 
 

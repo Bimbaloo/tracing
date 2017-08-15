@@ -3,13 +3,13 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in tableData.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	送检
+            	维护记录
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
             </h2>
@@ -29,7 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
+//const url = HOST + "/repair/by-equipment-time";
+const url = `http://rapapi.org/mockjs/24404/repair/by-equipment-time?`
 
 export default {
     components: {
@@ -48,6 +49,19 @@ export default {
          
             loading: false,
             tdResize: true, //是否允许拖动table大小
+            condition:{},   // 查询条件    
+            dataName:[      // 条件对应中文名
+                {
+                    itemCode:"equipmentIdList",
+                    itemName:"物料编码"
+                },{
+                    itemCode:"startTime",
+                    itemName:"开始时间"
+                },{
+                    itemCode:"endTime",
+                    itemName:"结束时间"
+                },
+            ],
             /* 投入 */
             tableData: {
                 columns: [{
@@ -56,19 +70,19 @@ export default {
                     width: "50"
                 }, {
                     name: "维护人",
-                    prop: "barcode"
+                    prop: "personName"
                 }, {
-                    name: "维护原因"
+                    name: "维护原因",
+                    prop: "reason"
                 }, {
                     name: "开始时间",
-                    prop: "doCode"
+                    prop: "startTime"
                 }, {
                     name: "结束时间",
-                    prop: "batchNo"
+                    prop: "endTime"
                 }],
                 height: 1,
                 data: [],
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
             },
            
           routerContent:0
@@ -92,7 +106,29 @@ export default {
         },
         fullscreen: function(){
             return this.$store.state.fullscreen
-        }
+        },
+        /* 查询条件转数组中文 */
+        filters: function() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		}
     },
     mounted(){
        this.tableData.height  = this.adjustHeight()
@@ -137,13 +173,13 @@ export default {
             
             this.loading = true;
             let oQuery = this.$route.query;
-
-            this.$post(url, oQuery)
+            this.condition = this.$route.query
+            this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    this.tableData.data = res.data.data.in
+                    this.tableData.data = res.data.data
                 });				 
             })
             .catch((err) => {
