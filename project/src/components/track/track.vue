@@ -11,7 +11,7 @@
 	                {{ gridData.error }}
 	            </div>
 	            <div v-if="!gridData.error" class="content-table" >
-	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading"></v-table>    
+	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter"></v-table>    
 	            </div>     
 	       </div>   
     	</div> 
@@ -28,6 +28,8 @@
         },
         data () {
             return {
+                tdResize: true,       // 是否允许拖动table大小
+                dataFilter: true,    // 是否启用过滤功能    
                 gridData: {
                     url:  HOST + "/api/v1/trace/down/start-points",
                     loading: false,
@@ -166,7 +168,7 @@
 
 						// 当前是由于数据过多的提示，则显示出来。
                     	let sError = res.data.errorMsg.message;
-                    	if(sError == "起点记录太多，请更换查询条件") {
+                    	if(sError == "记录数量超过了2000，请缩小查询范围") {
                     		oData.error = sError;
                     	}else {
                     		// 其他错误，则直接console
