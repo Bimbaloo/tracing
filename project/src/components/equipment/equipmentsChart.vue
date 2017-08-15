@@ -65,7 +65,7 @@
                                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                                 <ul class="event-list">
                                     <li v-for="(event,index) in equipment.event">
-                                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}</div>
+                                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}&nbsp;&nbsp;{{event.group}}</div>
                                         <ul class="content-list">
                                             <li v-for="content in event.content">
                                                 {{content.name}}:&nbsp;&nbsp;{{content.value}}
@@ -176,6 +176,8 @@
                 // }
                 categories: [],
                 axisTooltipData: [],
+                // 高亮的节点。
+                highlightedData: null,
 				dimension: [{
 					name: "质量",
                     key: "quality",
@@ -202,7 +204,7 @@
                     list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentIdList", "startTime", "endTime"]  
+						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "processCode"]  
                     }]
 				}, {
 					name: "事件",
@@ -703,6 +705,7 @@
                         // 事件列表
                         aoValue[3].forEach(o => {
                             oData.event.push({
+                                group: o.groupId == null?'':o.groupId,
                                 title: o.title,
                                 content: o.tooltipData
                             })
@@ -941,9 +944,13 @@
 			 * @return {Object}
 			 */
 			getParamter (aQuery) {
-				let oParam = {};
+				let oParam = {},
+                    oDate = this.getRealTime()
 				aQuery.forEach(param => {
 					switch (param) {
+                        case "equipmentName":
+                            oParam[param] = this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName;
+                            break;
 						case "equipmentIdList":
 							oParam[param] = this.selectedEquipment;
 							break;
@@ -1118,7 +1125,7 @@
                         // 开始加工
                     case "startWorkList": 
                         oResult.time = +new Date(o.happenTime);
-                        
+                        o.timePoint = o.happenTime;
                         oResult.title = "加工";
                         oResult.tooltipData = [
                             {name: "开始时间", value: o.happenTime},
@@ -1130,6 +1137,7 @@
                         // 完工
                     case "finishWorkList":
                         oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
                         oResult.title = "完工";
                         oResult.tooltipData = [
                             {name: "完工时间", value: o.happenTime},
@@ -1139,6 +1147,7 @@
                         // 投料
                     case "poolInList": 
                         oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
                         oResult.title = "投料";
                         oResult.tooltipData = [
                             {name: "开始时间", value: o.happenTime},
@@ -1152,6 +1161,7 @@
                         // 产出
                     case "poolOutList":
                         oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
                         oResult.title = "产出";
                         oResult.tooltipData = [
                             {name: "产出时间", value: o.happenTime},
@@ -1165,6 +1175,7 @@
                         // 质检
                     case "qcList": 
                         oResult.time = +new Date(o.startTime);
+                        o.timePoint = o.startTime;
                         oResult.title = "质检";
                         oResult.tooltipData = [
                             {name: "质检时间", value: o.startTime},
@@ -1176,6 +1187,7 @@
                         // 送检
                     case "submitQcList":
                         oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
                         oResult.title = "送检";
                         oResult.tooltipData = [
                             {name: "送检时间", value: o.happenTime},
@@ -1189,6 +1201,7 @@
                         // 事件开始
                     case "startEquipWarningList": 
                         oResult.time = +new Date(o.startTime);
+                        o.timePoint = o.startTime;
                         oResult.title = "事件开始";
                         oResult.tooltipData = [
                             {name: "发生时间", value: o.startTime},
@@ -1202,6 +1215,7 @@
                         // 事件结束
                     case "endEquipWarningList":
                         oResult.time = +new Date(o.endTime);
+                        o.timePoint = o.endTime;
                         oResult.title = "事件结束";
                         oResult.tooltipData = [
                             {name: "结束时间", value: o.endTime}
@@ -1210,6 +1224,7 @@
                         // 设备点检
                     case "spotCheckList": 
                         oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
                         oResult.title = "设备点检";
                         oResult.tooltipData = [
                             {name: "发生时间", value: o.happenTime},
@@ -1220,6 +1235,7 @@
                         // 设备维护开始                                
                     case "startEquipRepairList":
                         oResult.time = +new Date(o.startTime);
+                        o.timePoint = o.startTime;
                         oResult.title = "设备维护开始";
                         oResult.tooltipData = [
                             {name: "开始时间", value: o.startTime},
@@ -1230,6 +1246,7 @@
                         // 设备维护结束  
                     case "endEquipRepairList":
                         oResult.time = +new Date(o.endTime);
+                        o.timePoint = o.endTime;
                         oResult.title = "设备维护结束";
                         oResult.tooltipData = [
                             {name: "结束时间", value: o.endTime}
@@ -1238,6 +1255,7 @@
                         // 上刀/模具
                     case "installToolList":
                         oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
                         if(o.toolType == "刀具") {
                             sTitle = "上刀";
                         }else {
@@ -1255,6 +1273,7 @@
                         // 下刀/模具
                     case "removeToolList": 
                         oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
                         if(o.toolType == "刀具") {
                             sTitle = "上刀";
                         }else {
@@ -1410,14 +1429,29 @@
             tooltipFormatter (params) {
                 // 保存提示框数据。            
                 this.axisTooltipData = params;
-                
-                let sHtml = "";
+
+                let sHtml = "",
+                    oGroupId = {}
+                    
                 params.forEach(param => {
                     let aoValue = param.value,
-                        sList = "";
+                        sList = "",
+                        yAxisIndex = aoValue[1],
+                        oGroupIdList = new Set()
+
+                    // 第一级设备。
+                    oGroupId[yAxisIndex] = {}
+
                     // 事件列表
                     aoValue[3].forEach((o,index) => {
-                        sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
+                        let sGroup = "";
+                        // 保存分组id。
+                        if(o.groupId != null && o.groupId !== "") {
+                            oGroupIdList.add(o.groupId)
+                            sGroup = o.groupId
+                        }
+                        
+                        sList += `<div style="color:${param.color}">${index+1}.${o.title}&nbsp;&nbsp;${sGroup}</div>`;
                         o.tooltipData.forEach(tip => {
                             sList += `<div><span>${tip.name}:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`                
                         })
@@ -1428,10 +1462,97 @@
                         <div style="margin-top:10px">${sList}</div>
                     </div>`
 
+                    // 第二级事件。
+                    oGroupId[yAxisIndex][param.seriesIndex] = [...oGroupIdList]
                 })
 
                 sHtml = `<div class="suspend-tooltip-wrapper" style="padding: 10px;">${sHtml}</div>`
+
+                this.highlightGroup(oGroupId)
+
                 return sHtml;             
+            },
+            // 设置组高亮。
+            highlightGroup (oGroupId) {
+                let aoSeries = this.chart.getOption().series,
+                    highlightData = {}
+                
+                for(let eqId in oGroupId) {
+                    for(let dim in oGroupId[eqId]) {
+                        // 维度-1，因为绘图的数据维度多了状态这一维度。
+                        // 找到设备维度。
+                        let oEquipmentData = this.equipmentData[this.categories[eqId>>0].id],
+                            // 事件类型。
+                            sType = this.dimension[(dim>>0)-1].key,
+                            // 事件数据。
+                            oDimensionData = oEquipmentData[sType],
+                            // 事件组id。
+                            aGroupId = oGroupId[eqId][dim],
+                            // 时间点。
+                            sTime = new Set(),
+                            aTime = []
+
+                        // let aoGroupId = {}
+
+                        for(let key in oDimensionData) {
+                            let aoEvent = oDimensionData[key]
+                            for(let i = 0, l = aoEvent.length; i < l ; i++) {
+                                let oEvent = aoEvent[i]
+                                if(aGroupId.indexOf(oEvent.groupId) > -1) {
+                                    // if(!aoGroupId[oEvent.groupId]) {
+                                    //     aoGroupId[oEvent.groupId] = []
+                                    // }
+                                    
+                                    // 保存时间点。
+                                    // aoGroupId[oEvent.groupId].push(+new Date(oEvent.timePoint))
+                                    sTime.add(+new Date(oEvent.timePoint))
+                                }
+                            }
+                            // oGroupId[eqId][dim] = aoGroupId
+                        }
+
+                        aTime = [...sTime]
+                        // 找到散点图中应该高亮的点。 
+                        aoSeries[dim].data.forEach((arr,index) => {
+                            if(arr[1]==eqId && aTime.indexOf(arr[0])>-1) {
+                                if(!highlightData[dim]) {
+                                    highlightData[dim] = []
+                                }
+                                highlightData[dim].push(index)
+                            }
+                        })
+                    }
+     
+                }
+
+                this.setChartDataHighlight(highlightData)
+
+            },
+            // 设置图形高亮。
+            setChartDataHighlight (highlightData) {
+                if(this.highlightedData) {
+                    // 取消之前设置的高亮。
+                    this.chartHighlightSwitch(this.highlightedData, 'downplay')
+
+                }
+                // 设置新的高亮节点。
+                this.chartHighlightSwitch(highlightData, 'highlight')
+                this.highlightedData = Object.assign({}, highlightData)
+            },
+            // 节点高亮开关。
+            chartHighlightSwitch (oData, sType) {                  
+                Object.keys(oData).forEach(dim => {
+                    // 若至少有一组数据才高亮显示。
+                    if(oData[dim].length > 1) {
+                        this.chart.dispatchAction({
+                            type: sType,
+                            // 可选，系列 index，可以是一个数组指定多个系列
+                            seriesIndex: dim>>0,
+                            // 可选，数据的 index
+                            dataIndex: oData[dim]
+                        }) 
+                    }                
+                })
             },
             // 显示悬浮框。
             showTooltip () {
@@ -1524,21 +1645,20 @@
 			},
             // 跳转到追踪页面。
             gotoTrack() {
-                let oDate = this.getRealTime();
-                let oCondition = {
+                let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+                    oDate = this.getRealTime(),
+                    oCondition = {
                         "keys": {
-                            "equipmentCode": this.selectedEquipment,//'493-017-2',
+                            "equipmentId": this.selectedEquipment,//'493-017-2',
                             "startTime": oDate.start,
                             "endTime": oDate.end
                         }, 
                         "radio": "3",
                         "tab":"track"
-                    },
-                    sTag = (+new Date()).toString().substr(-5);
+                    }
 
-                sessionStorage.setItem('searchConditions-' + sTag, JSON.stringify(oCondition))
-
-                window.open('detail.html?tag='+sTag, "_blank");   
+                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+                window.open("trackIndex.html?tag="+tag);
       
             },
             // 工艺参数跳转按钮。
