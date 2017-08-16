@@ -546,9 +546,13 @@
 		        background-color: #fff;
 		        padding: 0 20px;*/
 				box-sizing: border-box;
-				width: 100%;
-				height: 100%;
+				//width: 100%;
+				//height: 100%;
 				position: absolute;
+				left: 20px;
+				right: 20px;
+				top: 20px;
+				bottom: 20px;
 				/*overflow: auto;*/
 				display: flex;
 				flex-direction: column;

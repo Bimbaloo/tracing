@@ -10,7 +10,7 @@
             <!--span class="path-item" @click="checkDetail" v-if="detailIf">>设备详情</span-->          
             <!-- <span class="path-item" @click="checkProduction" v-if="productIf">>投产表</span> -->
             <span class="path-item" @click="checkRoute" v-if=" !(operationName === '') ">>{{operationName}}</span>
-            <span class="path-item" v-if="restrainIf">>遏制</span>
+            <span class="path-item" v-if="restrainIf">遏制</span>
         </div> 
         <router-view></router-view>  
         <!--el-breadcrumb separator="/" class="router-path">
