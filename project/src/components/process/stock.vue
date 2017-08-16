@@ -100,7 +100,9 @@
                     // 添加开始时间，结束时间。因为可以跳转到设备分析的时候，开始时间结束时间有修改。
                     Object.assign(this.equipment, {
                         startTime: to.query.startTime,
-                        endTime: to.query.endTime
+                        endTime: to.query.endTime,
+                        shiftStartTime: to.query.shiftStartTime,
+                        shiftEndTime: to.query.shiftEndTime
                     })
                     this.productIf = true;
                     this.restrainIf = false;

@@ -62,8 +62,8 @@
         methods: {
 			setDateTime () {
 				let oQuery = this.$route.query || {},
-					start = oQuery.startTime,
-					end = oQuery.endTime;	
+					start = oQuery.shiftStartTime,
+					end = oQuery.shiftEndTime	
 
 				if(!start || !end) {
 					this.equipments.forEach((equipment, index) => {
@@ -90,7 +90,9 @@
 					start: start,
 					initStart: start,
 					end: end,
-					initEnd: end
+					initEnd: end,
+					realStart: oQuery.startTime || '',
+					realEnd: oQuery.endTime || ''
 				}
 			},
 			/**
@@ -123,10 +125,18 @@
 				this.node = oNode || {};	
 
 				let oEquipments = {}; 	
+				
 				this.node.processInfoList && this.node.processInfoList.forEach(o => {
 					if(!oEquipments[o.equipmentId]) {
 						oEquipments[o.equipmentId] = [];
 					}
+					// if(o.equipmentId == 234) {
+					// 	o.inHappenTimeList = ["2017-06-12 21:18:00", "2017-06-12 09:01:09"]
+					// 	o.outHappenTimeList = ["2017-06-12 21:39:16", "2017-06-12 09:20:10"]
+					// }else {
+					// 	o.inHappenTimeList = ["2017-06-13 06:22:08"]
+					// 	o.outHappenTimeList = ["2017-06-13 06:41:10"]
+					// }
 					oEquipments[o.equipmentId].push(o);
 				})
 
@@ -141,11 +151,25 @@
 					// 最晚班次结束时间。
 					sEnd = oEquipments[p][0].shiftEndTime;
 
+					let aoPoolInTime = [],
+						aoPoolOutTime = []
+
+					oEquipments[p].forEach(o => {
+						aoPoolInTime = aoPoolInTime.concat(o.inHappenTimeList)
+						aoPoolOutTime = aoPoolOutTime.concat(o.outHappenTimeList)
+					})
+					
+					// 去重。
+					aoPoolInTime = [...new Set(aoPoolInTime)]
+					aoPoolOutTime = [...new Set(aoPoolOutTime)]
+
 					this.equipments.push({
 						equipmentId: oEquipments[p][0].equipmentId,
 						equipmentName: oEquipments[p][0].equipmentName,
 						shiftStartTime: sStart,
-						shiftEndTime:　sEnd
+						shiftEndTime:　sEnd,
+						poolInTime:	aoPoolInTime,
+						poolOutTime: aoPoolOutTime
 					})
 				}
 

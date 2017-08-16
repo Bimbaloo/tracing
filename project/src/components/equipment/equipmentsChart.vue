@@ -178,6 +178,8 @@
                 axisTooltipData: [],
                 // 高亮的节点。
                 highlightedData: null,
+                // 只展示与起点相关的投产数据。
+                onlyShowRelatedData: false,
 				dimension: [{
 					name: "质量",
                     key: "quality",
@@ -186,15 +188,15 @@
                     list: [{
 						name: "质检",
 						cpt: "/QTReport.cpt",
-						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
+						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "送检",
 						cpt: "/QCReport.cpt",
-						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
+						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "FGB",
 						cpt: "/FGBReport.cpt&__bypagesize__=false",
-						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
+						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "processCode"]  
                     }]
 				}, {
 					name: "加工",
@@ -204,7 +206,7 @@
                     list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "processCode"]  
+						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }]
 				}, {
 					name: "事件",
@@ -214,7 +216,7 @@
                     list: [{
 						name: "事件记录",
 						path: "",
-						parameter: ["equipmentId", "startTime", "endTime"]  
+						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}, {
 					name: "维护",
@@ -224,7 +226,7 @@
                     list: [{
 						name: "维护记录",
 						path: "",
-						parameter: ["equipmentId", "startTime", "endTime"]  
+						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}, {
 					name: "工具",
@@ -234,7 +236,7 @@
                     list: [{
 						name: "工具记录",
 						path: "",
-						parameter: ["equipmentId", "startTime", "endTime"]  
+						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}]
             }
@@ -418,6 +420,44 @@
                             }
                         }
                     },
+                    graphic: [{
+                        type: 'group',
+                        id: 'group',
+                        cursor: "pointer",
+                        children: [{
+                            // 箭头。
+                            type: 'polygon',
+                            id: 'polygon',
+                            cursor: "pointer",
+                            shape: {
+                                points:[[5, 0], [10, 14], [5, 10], [0,14]],
+                                
+                            },
+                            style: {
+                                fill: "#D53A35",
+                                lineWidth: 1,
+                                stroke: "#D53A35"
+                            },
+                            left: 0,
+                            top: 0
+                        },{
+                            // 文字。
+                            type: 'text',
+                            id: 'text',
+                            cursor: "pointer",
+                            style: {
+                                text: "追溯相关投产",
+                                fill: this.onlyShowRelatedData ? "#D53A35":"#333"
+                            },
+                            left: 15,
+                            top: 0
+                        }],     
+                        left: 350,
+                        top: 5,
+                        width: 100,
+                        height: 20,
+                        onclick: this.setPoolInAndOutVisibility
+                    }],              
                     series: [{
                         type: 'custom',
                         name: CHART_STATE_NAME,
@@ -506,13 +546,27 @@
                 this.dimension.forEach(o => oData.series.push({
                     name: o.name,
                     type: 'scatter',
-                    symbol: 'circle', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
+                    symbol: 'circle', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'               
                     symbolSize: 14,
-                    // function (val) {
-                    //      return val[2];
-                    // },
+                    // 标注点。
+                    markPoint: {
+                        symbol: 'arrow', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'  
+                        symbolSize: [8,14],
+                        symbolOffset: [0, '50%'],
+                        label: {
+                            normal: {
+                                show: false
+                            }
+                        },             
+                        data: [],
+                        itemStyle: {
+                            normal: {
+                                color: "#D53A35"
+                            }
+                        }
+                    },
                     data: [],
-                    animationDelay: function (idx) {
+                    animationDelay: function(idx) {
                         return idx * 10;
                     },
                     itemStyle: {
@@ -531,8 +585,10 @@
                             // offset: [0, 10],
                             // 标签内容格式器。
                             formatter: function({value}) {
-                                return value[2];                        
-                                // return value[2] > 1 ? value[2]: "";
+                                if(typeof value[2] === "object") {
+                                    return value[2].value
+                                }
+                                return value[2];     
                             },
                             textStyle: {
                                 fontSize: 14
@@ -559,16 +615,24 @@
                         shadowOffsetY: 2,
                         shadowColor: '#fff'
                     }
-                };
-
-                // 添加x轴缩放。
-                oData.dataZoom.push(Object.assign({
+                },
+                // x轴缩放设置。
+                xOAxis = {
                     xAxisIndex: [0],
                     height: 16,
                     labelFormatter: function(value) {
                         return new Date(value).Format()
                     }
-                },oAxis))
+                }
+                
+                if(this.datetime.realStart) {
+                    xOAxis.startValue = +new Date(this.datetime.realStart)
+                }
+                if(this.datetime.realEnd) {
+                    xOAxis.endValue = +new Date(this.datetime.realEnd)
+                }
+                // 添加x轴缩放。
+                oData.dataZoom.push(Object.assign(xOAxis,oAxis))
 
                 if(this.equipments.length > 1) {
                     // 若大于一台设备。
@@ -713,6 +777,33 @@
                         return oData;
                     })
                 }   
+            },
+            // 设置投产可见性。
+            setPoolInAndOutVisibility () {
+                let sColor = "#333",
+                    raletedData = Object.assign([], this.dimension.filter(o=> o.key === 'work')[0].data)
+
+                // 切换可见性。
+                this.onlyShowRelatedData = !this.onlyShowRelatedData
+
+                if(this.onlyShowRelatedData) {
+                    // 若只展示起点相关。
+                    sColor = "#D53A35"
+                    raletedData = raletedData.filter(arr => arr[4])
+                }
+
+                this.chart.setOption({
+                    series: [{
+                        name: "加工",
+                        data: raletedData
+                    }],
+                    graphic: {
+                        id: 'text',
+                        style: {
+                            fill: sColor
+                        }
+                    }
+                });       
             },
             // 散点图点击事件处理。
             scatterClickHandle (value) {
@@ -963,6 +1054,12 @@
 						case "endTime":
 							oParam[param] = oDate.end;
 							break;
+                        case "shiftStartTime":
+							oParam[param] = this.datetime.start;
+							break;
+						case "shiftEndTime":
+							oParam[param] = this.datetime.end;
+							break;
 						case "processCode":
 							oParam[param] = this.process||'';
 							break;
@@ -1098,7 +1195,10 @@
                 this.dimension.forEach(item => {
                     let oFilter = this.option.series.filter(o => o.name==item.name)[0];
                     let oResult = this.getDimensionData(item.key);
-                    oFilter.data = oResult
+                    if(oResult.markPoint.length) {
+                        oFilter.markPoint.data = oResult.markPoint
+                    }
+                    oFilter.data = oResult.data
                 })
     
                 this.chart.setOption(this.option, true);
@@ -1295,6 +1395,7 @@
             // 获取事件维度数据。
             getDimensionData (sDimension) {
                 let aoData = [],
+                    aoMarkPoint = [],
                     oMap = {};
                 this.equipments.forEach((item, index) => {
                     // 拿到维度数据。
@@ -1305,7 +1406,7 @@
                     if(nIndex == null) {
                         return;
                     }
-     
+                    
                     for(let key in singleData) {
                         // 事件列表。
                         let aoList = singleData[key];
@@ -1314,6 +1415,7 @@
                             // 拼接scatter数据。[x, y, value, tooltip-data]
                             let oData = this.getToolTipData(key, o),
                                 sKey = oData.time + '' + nIndex;
+
                             if(oMap[sKey]) {
                                 // 若存在。
                                 oMap[sKey]++                          
@@ -1322,21 +1424,35 @@
                                 oFilter[3].push(oData);
                             }else {
                                 oMap[sKey] = 1;
-                                
+
+                                let aPointer = [oData.time, nIndex, 1, [oData]];
+
+                                if(sDimension === "work") {
+                                    if((key === "poolInList" && item.poolInTime.indexOf(o.happenTime) > -1) ||
+                                    (key === "poolOutList" && item.poolOutTime.indexOf(o.happenTime) > -1)) {
+                                        // 若为属于起点的投入或产出。
+                                        // 设置标记点。
+                                        aoMarkPoint.push({
+                                            coord: [oData.time, nIndex]
+                                        })
+                                        // 设置与起点相关。
+                                        aPointer.push(true)
+                                    }
+                                }
                                 // 增加节点。
-                                aoData.push([
-                                    oData.time,
-                                    nIndex,
-                                    1,
-                                    [oData]
-                                ])
+                                aoData.push(aPointer)
                             }                          
                         }) 
                     }
 
                 })
 
-                return aoData;
+                this.dimension.filter(o=> o.key === sDimension)[0].data = aoData;
+
+                return {
+                    markPoint: aoMarkPoint,
+                    data: aoData
+                };
             },
             // 获取设备状态。
             getStatusData () {
@@ -1367,22 +1483,44 @@
                     }else {
                         singleData.map(o => {
                             let oState = this.states.filter(state => state.key === o.type)[0];
-                            aoData.push({
-                                name: oState.name,
-                                value: [
-                                    index,
-                                    +new Date(o.startTime),
-                                    +new Date(o.endTime),
-                                    +new Date(o.endTime) - +new Date(o.startTime),
-                                    o.startTime,
-                                    o.endTime
-                                ],
-                                itemStyle: {
-                                    normal: {
-                                        color: oState.color
+
+                            if(oState) {
+                                aoData.push({
+                                    name: oState.name,
+                                    value: [
+                                        index,
+                                        +new Date(o.startTime),
+                                        +new Date(o.endTime),
+                                        +new Date(o.endTime) - +new Date(o.startTime),
+                                        o.startTime,
+                                        o.endTime
+                                    ],
+                                    itemStyle: {
+                                        normal: {
+                                            color: oState.color
+                                        }
                                     }
-                                }
-                            });        
+                                });  
+                            }else {
+                                // 若不存在，即为未知状态。
+                                aoData.push({
+                                    name: '',
+                                    value: [
+                                        index,
+                                        +new Date(o.startTime),
+                                        +new Date(o.endTime),
+                                        +new Date(o.endTime) - +new Date(o.startTime),
+                                        o.startTime,
+                                        o.endTime
+                                    ],
+                                    itemStyle: {
+                                        normal: {
+                                            color: '#dedede'
+                                        }
+                                    }
+                                });                                
+                            }
+      
                         })
                     }
                     
@@ -1640,7 +1778,9 @@
                     equipmentName: this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName,
                     equipmentId: this.selectedEquipment,
                     startTime: oDate.start,
-                    endTime: oDate.end
+                    endTime: oDate.end,
+                    shiftStartTime: this.datetime.start,
+                    shiftEndTime: this.datetime.end
                 }})				
 			},
             // 跳转到追踪页面。
