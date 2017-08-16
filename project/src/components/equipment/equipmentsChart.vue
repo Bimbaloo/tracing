@@ -191,18 +191,21 @@
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                         router: "/process/qtReport",
 						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+
                     },{
 						name: "送检",
 						// cpt: "/QCReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                         router: "/process/qcReport",
 						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+
                     },{
 						name: "FGB",
 						// cpt: "/FGBReport.cpt&__bypagesize__=false",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]
                         // router: "/process/fgbReport",
 						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
+
                     }]
 				}, {
 					name: "加工",
@@ -223,6 +226,7 @@
 						name: "事件记录",
 						router: "/process/event",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+
                     }]
 				}, {
 					name: "维护",
@@ -233,6 +237,7 @@
 						name: "维护记录",
 						router: "/process/repair",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+
                     }]
 				}, {
 					name: "工具",
@@ -243,6 +248,7 @@
 						name: "工具记录",
 						router: "/process/tool",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+
                     }]
 				}]
             }
