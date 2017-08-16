@@ -78,8 +78,8 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
-                    class: "barcode",
-                    cellClick: this.barcodeClick
+                //    class: "barcode",
+                //    cellClick: this.barcodeClick
                 }, {
                     name: "派工单号",
                     prop: "doCode",
@@ -88,8 +88,8 @@ export default {
                     name: "批次号",
                     prop: "batchNo",
                     width: "200",
-                    class: "batch",
-                    cellClick: this.batchClick
+                //    class: "batch",
+                //    cellClick: this.batchClick
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
@@ -143,8 +143,8 @@ export default {
                     name: "物料编码",
                     prop: "materialCode",
                     width: "200",
-                    class: "barcode",
-                    cellClick: this.barcodeClick
+                    class: "material",
+                    cellClick: this.materialClick
                 }, {
                     name: "物料名称",
                     prop: "materialName",
@@ -278,7 +278,7 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-            
+
             this.$post(url, oQuery)
             .then((res) => {
                 this.loading = false;
@@ -335,8 +335,16 @@ export default {
         barcodeClick() {
             console.log("条码")
         },
-        materialClick() {
+        materialClick(row) {
             console.log("物料编码")
+            console.log(row)
+            let oQuery = {
+                    batchNo : row.batchNo,
+                    materialCode : row.materialCode
+                },			
+                sPath = "/process/restrain"
+            console.log(oQuery)  		
+			this.$router.push({ path: sPath, query: oQuery})
         },
 
         // 表格导出。
