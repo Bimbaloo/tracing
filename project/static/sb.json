@@ -1,0 +1,44 @@
+{
+  "errorCode": 0,
+  "errorMsg": "",
+  "data": [
+    {
+      "eqipmentCode": "设备编码",
+      "eqipmentName": "设备名称",
+      "reportTime": "上报时间", // 格式：yyyy-MM-dd hh:mm:ss
+      "commitTime": "检验时间", // 格式：yyyy-MM-dd hh:mm:ss
+      "inspectedTime": "审核时间", // 格式：yyyy-MM-dd hh:mm:ss
+      "operatorName": "人员姓名",
+      "operatorCard": "人员卡号",
+      "items": [
+        {
+          "itemName": "A",
+          "value": "1111"
+        },
+        {
+          "itemName": "B",
+          "value": "aaaa"
+        }
+      ]
+    },
+    {
+      "eqipmentCode": "设备编码",
+      "eqipmentName": "设备名称",
+      "reportTime": "上报时间", // 格式：yyyy-MM-dd hh:mm:ss
+      "commitTime": "检验时间", // 格式：yyyy-MM-dd hh:mm:ss
+      "inspectedTime": "审核时间", // 格式：yyyy-MM-dd hh:mm:ss
+      "operatorName": "人员姓名",
+      "operatorCard": "人员卡号",
+      "items": [
+        {
+          "itemName": "A",
+          "value": "2222"
+        },
+        {
+          "itemName": "B",
+          "value": "bbbb"
+        }
+      ]
+    }
+  ]
+}
