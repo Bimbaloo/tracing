@@ -23,7 +23,7 @@ Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
 Vue.prototype.$post = axios.post;
 
 // 添加echarts。
-Vue.prototype.$echarts = echarts
+Vue.prototype.$echarts = echarts;
 
 const Stock = r => require.ensure([], () => r(require('components/material/stock.vue')), 'group-detail')
 const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-detail')

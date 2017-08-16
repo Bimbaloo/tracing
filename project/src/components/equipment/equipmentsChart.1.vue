@@ -51,38 +51,40 @@
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
                 <el-button  @click="gotoTrack" class="btn btn-plain" v-if="trace">追踪</el-button>
             </div>	
-            <div class="tooltip-wrapper"  :style="{width: chartWidth+'px'}">
-                <!--div class="tooltip-scroll" :style="{width:ratioW*100+'%', height:'100%', left:ratioL*100+'%'}"-->
-                    <div v-for="compareData in compareList" 
-                        :data-id="compareData.millisecond" 
-                        :key="compareData.millisecond" 
-                        @click="tooltipPanelClickHandle" 
-                        @mouseenter="tooltipPanelMouseenterHandle" >
-
-                        <div class="tooltip-panel" :style="{left:compareData.left*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
-                            <!--div class="tooltip-time">{{compareData.time}}</div-->
-                            <div class="tooltip-list" v-for="equipment in compareData.list" :style="{maxHeight: chartHeight*0.8 + 'px'}">
-                                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
-                                <ul class="event-list">
-                                    <li v-for="(event,index) in equipment.event">
-                                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}&nbsp;&nbsp;{{event.group}}</div>
-                                        <ul class="content-list">
-                                            <li v-for="content in event.content">
-                                                {{content.name}}:&nbsp;&nbsp;{{content.value}}
-                                            </li>
-                                        </ul>
-                                    </li>
-                                </ul>
-                                
-                            </div>
-                            
-                        </div>
-                        <div class="line" :style="{left:compareData.left*100+'%', top: panelTop+'px', height: chartHeight + 'px', zIndex: compareData.zIndex}"></div>
-                    </div>
-
-                <!--/div-->
-            </div> 
-        </div>        		 
+        </div>
+        <div class="tooltip left" v-if="compareData.left.time">
+            <div class="tooltip-time">{{compareData.left.time}}</div>
+            <div class="tooltip-list" v-for="equipment in compareData.left.list" :style="{'max-height': (chartHeight) + 'px'}">
+                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
+                <ul class="event-list">
+                    <li v-for="(event,index) in equipment.event">
+                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}</div>
+                        <ul class="content-list">
+                            <li v-for="content in event.content">
+                                {{content.name}}:&nbsp;&nbsp;{{content.value}}
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="tooltip right" v-if="compareData.right.time">
+            <div class="tooltip-time">{{compareData.right.time}}</div>
+            <div class="tooltip-list" v-for="equipment in compareData.right.list" :style="{'max-height': (chartHeight) + 'px'}">
+                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
+                <ul class="event-list">
+                    <li v-for="(event,index) in equipment.event">
+                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}</div>
+                        <ul class="content-list">
+                            <li v-for="content in event.content">
+                                {{content.name}}:&nbsp;&nbsp;{{content.value}}
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>        
+				 
     </div>      
 </template>
 
@@ -95,20 +97,11 @@
     // 图形下margin。
     const CHART_MARGIN_BOTTOM = 20
     // tooltip距离鼠标的水平位置。
-    const TOOLTIP_X_DISTANCE = 10
+    const TOOLTIP_X_DISTANCE = 20
     // 悬浮框最小高度。
     const TOOLTIP_MIN_HEIGHT = 20
     // legend距右侧的距离。
     const LEGEND_RIGHT = 80
-    // grid边距。
-    const GRID_LEFT = 100
-    const GRID_RIGHT = 100
-    const GRID_TOP = 60
-    const GRID_BOTTOM = 60
-    // 标记线点的大小。
-    const MARKLINE_SYSMBOL_SIZE = 8
-    // 提示框面板z轴。
-    const TOOLTIP_Z_INDEX = 100
     // finereport跳转地址。
     const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
 
@@ -137,8 +130,7 @@
 				sErrorMessage: "",
                 url: HOST + "/api/v1/trace/equipments-events",	
 				// 比例。
-                ratioW: 1,
-                ratioL: 0,
+				ratio: 1,
 				// 设备状态。
 				states: [{
 					key: "run",
@@ -161,14 +153,18 @@
 				endIf: true,
 				equipmentData: {},
                 chart: null,
-                // 图形区域宽高
                 chartHeight: 60,
-                chartWidth: 60,
                 markLine: [],
-                // 提示框top。
-                panelTop:　MARKLINE_SYSMBOL_SIZE/2,
-                // 提示框数据。
-                compareList: [],
+                compareData: {
+                    left: {
+                        time: "",
+                        list: []
+                    },
+                    right: {
+                        time: "",
+                        list: []
+                    },
+                },
                 // 设备id列表。
                 // {
                 // value: o.equipmentName+ '+' + o.equipmentId + '+' + 0, // 最后一位代表是否选中这台设备
@@ -176,8 +172,6 @@
                 // }
                 categories: [],
                 axisTooltipData: [],
-                // 高亮的节点。
-                highlightedData: null,
 				dimension: [{
 					name: "质量",
                     key: "quality",
@@ -185,22 +179,16 @@
                     color: "#d89add",
                     list: [{
 						name: "质检",
-						// cpt: "/QTReport.cpt",
-                        // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
-                        router: "/process/qtReport",
-						query: ["equipmentIdList", "startTime", "endTime"]  
+						cpt: "/QTReport.cpt",
+						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "送检",
-						// cpt: "/QCReport.cpt",
-                        // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
-                        router: "/process/qcReport",
-						query: ["equipmentIdList", "startTime", "endTime"]  
+						cpt: "/QCReport.cpt",
+						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "FGB",
-						// cpt: "/FGBReport.cpt&__bypagesize__=false",
-                        // parameter: ["equipmentId", "startTime", "endTime", "processCode"]
-                        // router: "/process/fgbReport",
-						query: ["equipmentIdList", "startTime", "endTime"]    
+						cpt: "/FGBReport.cpt&__bypagesize__=false",
+						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     }]
 				}, {
 					name: "加工",
@@ -210,7 +198,7 @@
                     list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "processCode"]  
+						query: ["equipmentIdList", "startTime", "endTime"]  
                     }]
 				}, {
 					name: "事件",
@@ -219,9 +207,8 @@
                     color: "#f9823e",
                     list: [{
 						name: "事件记录",
-                       // path: "",
-                        router: "/process/event",
-						query: ["equipmentId", "startTime", "endTime"]  
+						path: "",
+						parameter: ["equipmentId", "startTime", "endTime"]  
                     }]
 				}, {
 					name: "维护",
@@ -230,9 +217,8 @@
                     color: "#5aa7c5",
                     list: [{
 						name: "维护记录",
-                       // path: "",
-                        router: "/process/repair",
-						query: ["equipmentId", "startTime", "endTime"]  
+						path: "",
+						parameter: ["equipmentId", "startTime", "endTime"]  
                     }]
 				}, {
 					name: "工具",
@@ -241,9 +227,8 @@
                     color: "#86cccc",
                     list: [{
 						name: "工具记录",
-                      //  path: "",
-                      //  router: "/process/tool",
-						query: ["equipmentId", "startTime", "endTime"]  
+						path: "",
+						parameter: ["equipmentId", "startTime", "endTime"]  
                     }]
 				}]
             }
@@ -287,15 +272,13 @@
                         // ]
                     },
                     grid:{
-                        left: GRID_LEFT,
-                        right: GRID_RIGHT,
-                        top: GRID_TOP,
-                        bottom: GRID_BOTTOM
+                        left: 100,
+                        right: 100
                     },
                     // 悬浮框。
                     tooltip: {
                         trigger: 'none',
-                        // padding: 10,
+                        padding: 10,
                         backgroundColor: 'rgba(245, 245, 245, 0.8)',//'rgba(44,52,60,0.7)',
                         borderColor: '#ccc',
                         borderWidth: 1,
@@ -323,7 +306,7 @@
                                 }
                             }
 
-                            if(pos[1] > this.chart.getHeight()/3) {
+                            if(pos[1] > this.chart.getHeight()/2) {
                                 // 若鼠标位置在下半部分,将悬浮框靠近上面显示。
                                 pos[1] = 0;
                             }else {
@@ -441,33 +424,8 @@
                             y: 0
                         },
                         data: [],
-                        // 标记线。
-                        markLine: {
-                            symbol: 'circle',//['circle', 'arrow']
-                            symbolSize: MARKLINE_SYSMBOL_SIZE,
-                            label: {
-                                normal: {
-                                    formatter: function({value}){
-                                        return new Date(value).Format()
-                                    }
-                                },
-                                emphasis: {
-                                    formatter: function({value}){
-                                        return new Date(value).Format()
-                                    }
-                                }
-                            },
-                            lineStyle: {
-                                normal: {
-                                    type: 'solid'
-                                }
-                            },
-                            data: [],
-                            animation: false
-                        },
                         tooltip: {
                             trigger: 'item',
-                            padding: 10,
                             formatter: function (params) {
                                 let time = params.value[3]/1000,    
                                     hour = 0,
@@ -617,8 +575,6 @@
                 this.fetchAllData();
 				
                 window.addEventListener("resize", this.resizeChart)
-                
-                $("#equipments").on("click", ".suspend-tooltip-wrapper", this.suspendTooltipClickHandle)
 			},
 			// 初始化数据。
 			setInitData() {		
@@ -646,10 +602,21 @@
                     this.chart = this.$echarts.init(document.getElementById('equipments'));
                     this.setChartEvent();
                 }else {
-                    this.chart.clear()
-                    this.markLine = []
-                    this.compareList = []  
-                }      
+                    this.chart.clear();
+                    this.markLine = [];
+                    this.compareData = {
+                        left: {
+                            time: "",
+                            list: []
+                        },
+                        right: {
+                            time: "",
+                            list: []
+                        }
+                    }
+                    this.selectedEquipment = '';
+                }        
+
             },
             // 重置图形大小。
             resizeChart () {
@@ -663,8 +630,7 @@
             // 设置提示框高度。
             setTooltipHeight () {
                 if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
-                    this.chartHeight = this.chart.getHeight() - GRID_TOP - GRID_BOTTOM;
-                    this.chartWidth = this.chart.getWidth() - GRID_LEFT - GRID_RIGHT;
+                    this.chartHeight = this.chart.getHeight()-this.chart.getOption().grid[0].top-this.chart.getOption().grid[0].bottom;
                     // 若数据加载已完成。
                     let nHeight = this.chartHeight;//(this.chartHeight-80)*0.8;
                     nHeight = nHeight > TOOLTIP_MIN_HEIGHT ? nHeight:TOOLTIP_MIN_HEIGHT;
@@ -684,245 +650,176 @@
                 // this.chartHeight = jContent.height() - jTitle.outerHeight(true) - 20;
                 $("#equipments").height(jContent.height() - jTitle.outerHeight(true) - CHART_MARGIN_BOTTOM);
             },
-            // 数据转换。
-            transformTooltipDataToCompareData (nTime, zIndex) {
-                //     // 时间轴全长。
-                // let nTimeLine = window.Rt.utils.DateDiff(this.datetime.start, this.datetime.end),
-                //     // 提示框显示位置。
-                //     nTimeLineLeft = window.Rt.utils.DateDiff(this.datetime.start, nTime),
-                    // 缩放后的时间轴。
-                let oXAxis = this.getScaledxAxis(),
-                    // 缩放后的时间轴时长。
-                    nScaledTimeLine = oXAxis.endValue - oXAxis.startValue,
-
-                    nLeft = (nTime - oXAxis.startValue) / nScaledTimeLine
-
-                return {
-                    zIndex: zIndex || TOOLTIP_Z_INDEX,
-                    millisecond: nTime,
-                    left: nLeft,
-                    time: new Date(nTime).Format(),
-                    list: this.axisTooltipData.map(param => {
-                        let aoValue = param.value,
-                            oData = {};
-
-                        oData.name = param.name.split("+")[0];
-                        oData.color = param.color;
-                        oData.series = param.seriesName;
-                        oData.quantity = aoValue[2];
-                        oData.event = []
-                        // 事件列表
-                        aoValue[3].forEach(o => {
-                            oData.event.push({
-                                group: o.groupId == null?'':o.groupId,
-                                title: o.title,
-                                content: o.tooltipData
-                            })
-                        })
-                        return oData;
-                    })
-                }   
-            },
-            // 散点图点击事件处理。
-            scatterClickHandle (value) {
-                if(!this.markLine.filter(o => o.xAxis===value[0]).length) {
-                    // 若无该标记线,添加标记线。
-                    this.markLine.push({ xAxis: value[0] });
-
-                    // 设置标记线。
-                    this.chart.setOption({
-                        series: [{
-                            name: CHART_STATE_NAME,//params.seriesName,
-                            markLine: {
-                                data: this.markLine
-                            }
-                        }]
-                    }) 
-
-                    this.compareList = this.compareList.map(o => {
-                        o.zIndex = TOOLTIP_Z_INDEX
-                        return o
-                    })
-                    // 添加对比数据。
-                    this.compareList.push(this.transformTooltipDataToCompareData(value[0], TOOLTIP_Z_INDEX+1));
-                   
-                }
-            },
-            // 标记线点击事件。
-            markLineClickHandle (value) {
-                let nIndex = 0
-                this.markLine.map((o,index) => o.xAxis === value?(nIndex = index):'')
-                
-                // 删除标记线。
-                let oMark = this.markLine.splice(nIndex, 1)[0]
-                this.chart.setOption({
-                    series: [{
-                        name: CHART_STATE_NAME,//params.seriesName,
-                        markLine: {
-                            data: this.markLine
-                        }
-                    }]
-                });
-
-                // 删除提示框数据。
-                let sTime = new Date(oMark.xAxis).Format();
-                this.compareList.map((o,index) => o.time === sTime?(nIndex = index):'')
-                this.compareList.splice(nIndex, 1)
-            },
-            // y轴点击事件。
-            yAxisClickHandle (sEquipment) {
-                let aValue = sEquipment.split("+"),
-                    sName = aValue[0],
-                    sId = aValue[1],
-                    nSelected = Number(aValue[2]);
-
-                if(nSelected) {
-                    // 若已经选中，则取消选中。
-                    this.selectedEquipment = '';
-                    this.categories = this.categories.map(o => {                              
-                        if(sEquipment === o.value) {
-                            o.value = o.value.slice(0,-1)+0;
-                        }
-                        return o;
-                    })
-
-                }else {
-                    // 若未选中，则选中。
-                    this.selectedEquipment = sId;
-                    this.categories = this.categories.map(o => {
-                        if(sEquipment === o.value) {
-                            o.value = o.value.slice(0,-1)+1;
-                        }else {
-                            o.value = o.value.slice(0,-1)+0;
-                        }
-                        return o;
-                    })
-                }
-                this.chart.setOption({
-                    yAxis: {
-                        data: this.categories
-                    }
-                })
-            },
-            // 悬浮框点击事件。
-            suspendTooltipClickHandle (event) {
-                let nTime = this.axisTooltipData[0].value[0]
-                // 添加标记线。
-                this.markLine.push({ xAxis: nTime });
-
-                // 设置标记线。
-                this.chart.setOption({
-                    series: [{
-                        name: CHART_STATE_NAME,//params.seriesName,
-                        markLine: {
-                            data: this.markLine
-                        }
-                    }]
-                }) 
-
-                this.compareList = this.compareList.map(o => {
-                    o.zIndex = TOOLTIP_Z_INDEX
-                    return o
-                })
-                // 添加对比数据。
-                this.compareList.push(this.transformTooltipDataToCompareData(nTime, TOOLTIP_Z_INDEX+1));                
-            },
-            // echarts 点击事件。
-            chartClickHandle (params) {
-                let value = params.value
-
-                if(params.componentType=="series" && params.seriesType=="scatter") {
-                    // 若为散点图系列。
-                    this.scatterClickHandle(value)
-
-                }else if(params.componentType=="markLine") {
-                    // 若为标记线。
-                    this.markLineClickHandle(value)
-
-                }else if(params.componentType=="yAxis") {
-                    // 若为y轴。
-                    this.yAxisClickHandle(value)
-
-                }
-            },
-            chartZoomHandle (params) {
-                if((params.dataZoomId && params.dataZoomId.indexOf("1")) || params.type === "datazoom") {
-                    // x轴缩放 || 工具栏缩放按钮。
-                    let oXAxis = this.getScaledxAxis(),
-                    // 缩放后的时间轴时长。
-                    nScaledTimeLine = oXAxis.endValue - oXAxis.startValue
-
-                    this.compareList = this.compareList.map(o => {
-                        o.left = (o.millisecond - oXAxis.startValue) / nScaledTimeLine
-                        return o
-                    })
-                }
-            },
-            // 鼠标悬停事件。
-            chartMouseoverHandle (params) {
-                // 若为标记线。
-                if(params.componentType === "markLine") {
-                    this.setCompareTooltipZIndex(params.value);
-                }
-            },
-            // 设置提示框层级。
-            setCompareTooltipZIndex(value) {
-                this.compareList = this.compareList.map(o => {
-                    if(o.millisecond === value) {
-                        // 选中点。
-                        o.zIndex = TOOLTIP_Z_INDEX + 1;
-                    }else {
-                        o.zIndex = TOOLTIP_Z_INDEX;
-                    }   
-                    return o; 
-                })
-            },
-            // 删除提示框对比数据。
-            deleteCompareListData (nTime) {
-                // 获取该事件点在提示列表中的顺序。
-                let nIndex = this.getIndex(this.compareList, "millisecond", nTime)
-                this.compareList.splice(nIndex, 1)
-            },
-            // 删除标记线。
-            deleteMarkLine (nTime) {
-                // 获取该事件点在标记线中的顺序。
-                let nIndex = this.getIndex(this.markLine, "xAxis", nTime)
-                this.markLine.splice(nIndex, 1)
-
-                this.chart.setOption({
-                    series: [{
-                        name: CHART_STATE_NAME,
-                        markLine: {
-                            data: this.markLine
-                        }
-                    }]
-                })
-            },
-            // 提示面板点击事件。
-            tooltipPanelClickHandle (event) {
-
-                // 面板对应时间点。
-                let nTime = Number(event.currentTarget.getAttribute("data-id"));
-
-                // 删除提示框对比数据。
-                this.deleteCompareListData(nTime)
-
-                // 删除标记线。
-                this.deleteMarkLine(nTime);
-
-            },
-            // 提示面板鼠标移入事件。
-            tooltipPanelMouseenterHandle (event) {
-                
-                // 面板对应时间点。
-                let nTime = Number(event.currentTarget.getAttribute("data-id"))
-                this.setCompareTooltipZIndex(nTime);
-            },
             // 设置图表事件。
             setChartEvent () {
-                this.chart.on("click", this.chartClickHandle)
-                this.chart.on("datazoom", this.chartZoomHandle)
-                this.chart.on("mouseover", this.chartMouseoverHandle)
+                let self = this;
+                this.chart.on("click", function(params) {
+                    // console.log(params);
+                    if(params.componentType=="series" && params.seriesType=="scatter") {
+                        // 若为散点图系列。
+                        if(!self.markLine.filter(o => o.xAxis===params.value[0]).length) {
+                            // 若无该标记线。
+                            self.markLine.push({ xAxis: params.value[0] });
+                            
+                            // 数据格式转换。
+                            let oTooltipData = {
+                                time: new Date(params.value[0]).Format(),
+                                list: self.axisTooltipData.map(param => {
+                                    let aoValue = param.value,
+                                        oData = {};
+
+                                    oData.name = param.name.split("+")[0];
+                                    oData.color = param.color;
+                                    oData.series = param.seriesName;
+                                    oData.quantity = aoValue[2];
+                                    oData.event = []
+                                    // 事件列表
+                                    aoValue[3].forEach(o => {
+                                        oData.event.push({
+                                            title: o.title,
+                                            content: o.tooltipData
+                                        })
+                                    })
+                                    return oData;
+                                })
+                            }                          
+
+                            if(self.markLine.length == 1) {
+                                // 若只有一条数据，设置左侧提示框。
+                                self.compareData.left =  oTooltipData;
+                            }else if(self.markLine.length == 2) {
+                                if(self.markLine[1].xAxis > self.markLine[0].xAxis) {
+                                    // 新增数据较大，设置右侧提示框。
+                                    if(self.compareData.right.time) {
+                                        // 若有设置，先将数据换到左侧。
+                                        self.compareData.left = Object.assign({}, self.compareData.right)
+                                    }
+                                    self.compareData.right = oTooltipData;                                  
+                                }else {
+                                    // 新增数据较小，设置左侧数据。
+                                     if(self.compareData.left.time) {
+                                        // 若有设置，先将数据换到右侧。
+                                        self.compareData.right = Object.assign({}, self.compareData.left)
+                                    }
+                                    self.compareData.left = oTooltipData;
+                                }
+                            }else {
+                                // 大于两条数据。
+                                // 删除第一条数据。
+                                let oShift = self.markLine.shift();
+
+                                if(new Date(oShift.xAxis).Format() === self.compareData.left.time) {
+                                    // 若左侧删除，保留右侧数据。
+                                    if(self.markLine[0].xAxis > self.markLine[1].xAxis) {
+                                        // 若新增的数据小于右侧的数据。
+                                        self.compareData.left = oTooltipData;
+                                    }else {
+                                        // 若新增的数据大于右侧的数据。
+                                        self.compareData.left = Object.assign({}, self.compareData.right)
+                                        self.compareData.right = oTooltipData;          
+                                    }
+                                }else {
+                                    // 若右侧删除，保留左侧数据。
+                                    if(self.markLine[0].xAxis < self.markLine[1].xAxis) {
+                                        // 若新增的数据大于左侧的数据。
+                                        self.compareData.right = oTooltipData;
+                                    }else {
+                                        // 若新增的数据小于左侧的数据。
+                                        self.compareData.right = Object.assign({}, self.compareData.left)
+                                        self.compareData.left = oTooltipData;          
+                                    }
+                                }
+                            }
+                            
+                            
+                            self.chart.setOption({
+                                series: [{
+                                    name: CHART_STATE_NAME,//params.seriesName,
+                                    markLine: {
+                                        symbol: ['circle','arrow'],
+                                        symbolSize: [8, 12],
+                                        label: {
+                                            normal: {
+                                                formatter: function({value}){
+                                                    return new Date(value).Format()
+                                                }
+                                            },
+                                            emphasis: {
+                                                formatter: function({value}){
+                                                    return new Date(value).Format()
+                                                }
+                                            }
+                                        },
+                                        lineStyle: {
+                                            normal: {
+                                                type: 'solid'
+                                            }
+                                        },
+                                        data: self.markLine
+                                    }
+                                }]
+                            })
+                        }
+                    }else if(params.componentType=="markLine") {
+                        // 若为标记线。
+                        let nIndex = 0;
+                        self.markLine.map((o,index) => o.xAxis === params.value?(nIndex = index):'')
+                        let oMark = self.markLine.splice(nIndex, 1)[0];
+                        // 删除提示框数据。
+                        let sTime = new Date(oMark.xAxis).Format();
+                        ["left", "right"].forEach(position => {
+                            if(self.compareData[position].time === sTime) {
+                                self.compareData[position].time = "";
+                                self.compareData[position].list = [];
+                            }
+                        })
+   
+                        self.chart.setOption({
+                            series: [{
+                                name: CHART_STATE_NAME,//params.seriesName,
+                                markLine: {
+                                    data: self.markLine
+                                }
+                            }]
+                        });
+                    }else if(params.componentType=="yAxis") {
+                        // 若为y轴。
+                        let sEquipment = params.value,
+                            aValue = sEquipment.split("+"),
+                            sName = aValue[0],
+                            sId = aValue[1],
+                            nSelected = Number(aValue[2]);
+
+                        if(nSelected) {
+                            // 若已经选中，则取消选中。
+                            self.selectedEquipment = '';
+                            self.categories = self.categories.map(o => {                              
+                                if(sEquipment === o.value) {
+                                    o.value = o.value.slice(0,-1)+0;
+                                }
+                                return o;
+                            })
+
+                        }else {
+                            // 若未选中，则选中。
+                            self.selectedEquipment = sId;
+                            self.categories = self.categories.map(o => {
+                                if(sEquipment === o.value) {
+                                    o.value = o.value.slice(0,-1)+1;
+                                }else {
+                                    o.value = o.value.slice(0,-1)+0;
+                                }
+                                return o;
+                            })
+                        }
+                        self.chart.setOption({
+                            yAxis: {
+                                data: self.categories
+                            }
+                        })
+                        
+                    }
+                })
             },
             /**
 			 * 跳转按钮点击事件。
@@ -953,13 +850,10 @@
 			 * @return {Object}
 			 */
 			getParamter (aQuery) {
-				let oParam = {},
-                    oDate = this.getRealTime()
+                let oDate = this.getRealTime();
+				let oParam = {};
 				aQuery.forEach(param => {
 					switch (param) {
-                        case "equipmentName":
-                            oParam[param] = this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName;
-                            break;
 						case "equipmentIdList":
 							oParam[param] = this.selectedEquipment;
 							break;
@@ -1032,9 +926,55 @@
 							return;
 						}
 
-                        // 初始化图形数据。
-                        this.initChartData(aoData);
-                        // 添加图形数据。
+                        // 更改顺序。
+                        aoData.reverse();
+                        let nLength = aoData.length - 1; 
+                        aoData.forEach((o,index) => {
+                            if(index === nLength) {
+                                // 默认选中第一台设备。
+                                this.selectedEquipment = o.equipmentId;
+                            }
+                            this.categories.push({
+                                id: o.equipmentId,
+                                value: `${o.equipmentName}+${o.equipmentId}+`+(index===nLength?1:0)// 默认选中第一台设备。
+                            })
+                            let oData = this.equipmentData[o.equipmentId];
+                            if(oData) {
+                                Object.assign(oData, {
+                                    // 状态
+                                    status: o.equipStatusList||[],
+                                    // 加工
+                                    work: {
+                                        startWorkList: o.startWorkList||[],
+                                        finishWorkList: o.finishWorkList||[],
+                                        poolInList: o.poolInList||[],
+                                        poolOutList: o.poolOutList||[]
+                                    },
+                                    // 质量
+                                    quality: {
+                                        qcList: o.qcList||[],
+							            submitQcList: o.submitQcList||[]
+                                    },
+                                    // 事件
+                                    event: {
+                                        startEquipWarningList: o.startEquipWarningList||[],
+							            endEquipWarningList: o.endEquipWarningList||[]
+                                    },
+                                    // 维护
+                                    repair: {
+                                        spotCheckList: o.spotCheckList||[],
+							            startEquipRepairList: o.startEquipRepairList||[],
+							            endEquipRepairList: o.endEquipRepairList||[]
+                                    },
+                                    // 工具
+                                    tool: {
+                                        installToolList: o.installToolList||[],
+							            removeToolList: o.removeToolList||[]
+                                    }
+                                });                           
+                            }                        
+                        })	
+
                         this.setChartData();		
 					});
 				})
@@ -1044,63 +984,9 @@
 					console.log("查询出错");
 				})
 			},
-            // 初始化图形数据。
-            initChartData (aoData) {
-                // 更改顺序。
-                aoData.reverse();
-
-                let nLength = aoData.length - 1; 
-                aoData.forEach((o,index) => {
-                    if(index === nLength) {
-                        // 默认选中第一台设备。
-                        this.selectedEquipment = o.equipmentId;
-                    }
-
-                    // 设置y轴数据。
-                    this.categories.push({
-                        id: o.equipmentId,
-                        value: `${o.equipmentName}+${o.equipmentId}+`+(index===nLength?1:0)// 默认选中第一台设备。
-                    })
-
-                    let oData = this.equipmentData[o.equipmentId];
-                    if(oData) {
-                        Object.assign(oData, {
-                            // 状态
-                            status: o.equipStatusList||[],
-                            // 加工
-                            work: {
-                                startWorkList: o.startWorkList||[],
-                                finishWorkList: o.finishWorkList||[],
-                                poolInList: o.poolInList||[],
-                                poolOutList: o.poolOutList||[]
-                            },
-                            // 质量
-                            quality: {
-                                qcList: o.qcList||[],
-                                submitQcList: o.submitQcList||[]
-                            },
-                            // 事件
-                            event: {
-                                startEquipWarningList: o.startEquipWarningList||[],
-                                endEquipWarningList: o.endEquipWarningList||[]
-                            },
-                            // 维护
-                            repair: {
-                                spotCheckList: o.spotCheckList||[],
-                                startEquipRepairList: o.startEquipRepairList||[],
-                                endEquipRepairList: o.endEquipRepairList||[]
-                            },
-                            // 工具
-                            tool: {
-                                installToolList: o.installToolList||[],
-                                removeToolList: o.removeToolList||[]
-                            }
-                        });                           
-                    }                        
-                })	
-            },
             // 设置图形数据。
-            setChartData () {     
+            setChartData () {
+                
                 // 设备状态。
                 this.option.series.filter(o => o.name=="状态")[0].data = this.getStatusData();
                 // 获取各事件维度数据。
@@ -1134,7 +1020,7 @@
                         // 开始加工
                     case "startWorkList": 
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
+                        
                         oResult.title = "加工";
                         oResult.tooltipData = [
                             {name: "开始时间", value: o.happenTime},
@@ -1146,7 +1032,6 @@
                         // 完工
                     case "finishWorkList":
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
                         oResult.title = "完工";
                         oResult.tooltipData = [
                             {name: "完工时间", value: o.happenTime},
@@ -1156,7 +1041,6 @@
                         // 投料
                     case "poolInList": 
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
                         oResult.title = "投料";
                         oResult.tooltipData = [
                             {name: "开始时间", value: o.happenTime},
@@ -1170,7 +1054,6 @@
                         // 产出
                     case "poolOutList":
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
                         oResult.title = "产出";
                         oResult.tooltipData = [
                             {name: "产出时间", value: o.happenTime},
@@ -1184,7 +1067,6 @@
                         // 质检
                     case "qcList": 
                         oResult.time = +new Date(o.startTime);
-                        o.timePoint = o.startTime;
                         oResult.title = "质检";
                         oResult.tooltipData = [
                             {name: "质检时间", value: o.startTime},
@@ -1196,7 +1078,6 @@
                         // 送检
                     case "submitQcList":
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
                         oResult.title = "送检";
                         oResult.tooltipData = [
                             {name: "送检时间", value: o.happenTime},
@@ -1210,7 +1091,6 @@
                         // 事件开始
                     case "startEquipWarningList": 
                         oResult.time = +new Date(o.startTime);
-                        o.timePoint = o.startTime;
                         oResult.title = "事件开始";
                         oResult.tooltipData = [
                             {name: "发生时间", value: o.startTime},
@@ -1224,7 +1104,6 @@
                         // 事件结束
                     case "endEquipWarningList":
                         oResult.time = +new Date(o.endTime);
-                        o.timePoint = o.endTime;
                         oResult.title = "事件结束";
                         oResult.tooltipData = [
                             {name: "结束时间", value: o.endTime}
@@ -1233,7 +1112,6 @@
                         // 设备点检
                     case "spotCheckList": 
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
                         oResult.title = "设备点检";
                         oResult.tooltipData = [
                             {name: "发生时间", value: o.happenTime},
@@ -1244,7 +1122,6 @@
                         // 设备维护开始                                
                     case "startEquipRepairList":
                         oResult.time = +new Date(o.startTime);
-                        o.timePoint = o.startTime;
                         oResult.title = "设备维护开始";
                         oResult.tooltipData = [
                             {name: "开始时间", value: o.startTime},
@@ -1255,7 +1132,6 @@
                         // 设备维护结束  
                     case "endEquipRepairList":
                         oResult.time = +new Date(o.endTime);
-                        o.timePoint = o.endTime;
                         oResult.title = "设备维护结束";
                         oResult.tooltipData = [
                             {name: "结束时间", value: o.endTime}
@@ -1264,7 +1140,6 @@
                         // 上刀/模具
                     case "installToolList":
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
                         if(o.toolType == "刀具") {
                             sTitle = "上刀";
                         }else {
@@ -1282,7 +1157,6 @@
                         // 下刀/模具
                     case "removeToolList": 
                         oResult.time = +new Date(o.happenTime);
-                        o.timePoint = o.happenTime;
                         if(o.toolType == "刀具") {
                             sTitle = "上刀";
                         }else {
@@ -1436,31 +1310,17 @@
 			},
             // 数据提示。
             tooltipFormatter (params) {
-                // 保存提示框数据。            
+                // 保存提示框数据。
+                
                 this.axisTooltipData = params;
-
-                let sHtml = "",
-                    oGroupId = {}
-                    
+                
+                let sHtml = "";
                 params.forEach(param => {
                     let aoValue = param.value,
-                        sList = "",
-                        yAxisIndex = aoValue[1],
-                        oGroupIdList = new Set()
-
-                    // 第一级设备。
-                    oGroupId[yAxisIndex] = {}
-
+                        sList = "";
                     // 事件列表
                     aoValue[3].forEach((o,index) => {
-                        let sGroup = "";
-                        // 保存分组id。
-                        if(o.groupId != null && o.groupId !== "") {
-                            oGroupIdList.add(o.groupId)
-                            sGroup = o.groupId
-                        }
-                        
-                        sList += `<div style="color:${param.color}">${index+1}.${o.title}&nbsp;&nbsp;${sGroup}</div>`;
+                        sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
                         o.tooltipData.forEach(tip => {
                             sList += `<div><span>${tip.name}:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`                
                         })
@@ -1471,97 +1331,8 @@
                         <div style="margin-top:10px">${sList}</div>
                     </div>`
 
-                    // 第二级事件。
-                    oGroupId[yAxisIndex][param.seriesIndex] = [...oGroupIdList]
                 })
-
-                sHtml = `<div class="suspend-tooltip-wrapper" style="padding: 10px;">${sHtml}</div>`
-
-                this.highlightGroup(oGroupId)
-
                 return sHtml;             
-            },
-            // 设置组高亮。
-            highlightGroup (oGroupId) {
-                let aoSeries = this.chart.getOption().series,
-                    highlightData = {}
-                
-                for(let eqId in oGroupId) {
-                    for(let dim in oGroupId[eqId]) {
-                        // 维度-1，因为绘图的数据维度多了状态这一维度。
-                        // 找到设备维度。
-                        let oEquipmentData = this.equipmentData[this.categories[eqId>>0].id],
-                            // 事件类型。
-                            sType = this.dimension[(dim>>0)-1].key,
-                            // 事件数据。
-                            oDimensionData = oEquipmentData[sType],
-                            // 事件组id。
-                            aGroupId = oGroupId[eqId][dim],
-                            // 时间点。
-                            sTime = new Set(),
-                            aTime = []
-
-                        // let aoGroupId = {}
-
-                        for(let key in oDimensionData) {
-                            let aoEvent = oDimensionData[key]
-                            for(let i = 0, l = aoEvent.length; i < l ; i++) {
-                                let oEvent = aoEvent[i]
-                                if(aGroupId.indexOf(oEvent.groupId) > -1) {
-                                    // if(!aoGroupId[oEvent.groupId]) {
-                                    //     aoGroupId[oEvent.groupId] = []
-                                    // }
-                                    
-                                    // 保存时间点。
-                                    // aoGroupId[oEvent.groupId].push(+new Date(oEvent.timePoint))
-                                    sTime.add(+new Date(oEvent.timePoint))
-                                }
-                            }
-                            // oGroupId[eqId][dim] = aoGroupId
-                        }
-
-                        aTime = [...sTime]
-                        // 找到散点图中应该高亮的点。 
-                        aoSeries[dim].data.forEach((arr,index) => {
-                            if(arr[1]==eqId && aTime.indexOf(arr[0])>-1) {
-                                if(!highlightData[dim]) {
-                                    highlightData[dim] = []
-                                }
-                                highlightData[dim].push(index)
-                            }
-                        })
-                    }
-     
-                }
-
-                this.setChartDataHighlight(highlightData)
-
-            },
-            // 设置图形高亮。
-            setChartDataHighlight (highlightData) {
-                if(this.highlightedData) {
-                    // 取消之前设置的高亮。
-                    this.chartHighlightSwitch(this.highlightedData, 'downplay')
-
-                }
-                // 设置新的高亮节点。
-                this.chartHighlightSwitch(highlightData, 'highlight')
-                this.highlightedData = Object.assign({}, highlightData)
-            },
-            // 节点高亮开关。
-            chartHighlightSwitch (oData, sType) {                  
-                Object.keys(oData).forEach(dim => {
-                    // 若至少有一组数据才高亮显示。
-                    if(oData[dim].length > 1) {
-                        this.chart.dispatchAction({
-                            type: sType,
-                            // 可选，系列 index，可以是一个数组指定多个系列
-                            seriesIndex: dim>>0,
-                            // 可选，数据的 index
-                            dataIndex: oData[dim]
-                        }) 
-                    }                
-                })
             },
             // 显示悬浮框。
             showTooltip () {
@@ -1628,13 +1399,10 @@
                     style: api.style()
                 };
             },
-            // 获取缩放后的X轴
-            getScaledxAxis () {
-                return this.chart.getOption().dataZoom.filter(o => o.type === "slider" && o.xAxisIndex.length === 1)[0]
-            },
             // 获取实际缩放后的时间。
-            getRealTime () {          
-                let oDate = this.getScaledxAxis()
+            getRealTime () {
+                
+                let oDate = this.chart.getOption().dataZoom.filter(o => o.type === "slider" && o.xAxisIndex.length === 1)[0];   
 
                 return {
                     start: new Date(oDate.startValue).Format(),
@@ -1654,20 +1422,21 @@
 			},
             // 跳转到追踪页面。
             gotoTrack() {
-                let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-                    oDate = this.getRealTime(),
-                    oCondition = {
+                let oDate = this.getRealTime();
+                let oCondition = {
                         "keys": {
-                            "equipmentId": this.selectedEquipment,//'493-017-2',
+                            "equipmentCode": this.selectedEquipment,//'493-017-2',
                             "startTime": oDate.start,
                             "endTime": oDate.end
                         }, 
                         "radio": "3",
                         "tab":"track"
-                    }
+                    },
+                    sTag = (+new Date()).toString().substr(-5);
 
-                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
-                window.open("trackIndex.html?tag="+tag);
+                sessionStorage.setItem('searchConditions-' + sTag, JSON.stringify(oCondition))
+
+                window.open('detail.html?tag='+sTag, "_blank");   
       
             },
             // 工艺参数跳转按钮。
@@ -1779,44 +1548,25 @@
                     }
                 }
             }
-
-            .tooltip-wrapper {
-                position: absolute;
-                top: 0;
-                margin: 60px 100px;
-
-                
-                .line {
-                    // left: 0;
-                    // top: 0;
-                    position: absolute;
-                    width: 1px;
-                    background-color: #D53A35;
-                }
-            }
-
-            .tooltip-panel {
+            // 左右提示框。
+            .tooltip {
                 // padding: 10px;
                 background-color: rgba(245, 245, 245, 0.8);//rgba(44,52,60,0.7);
                 font-size: 12px;
                 position: absolute;
-                // top: 60px;
+                top: 60px;
                 width: 220px;
-                // z-index: 100;
+                z-index: 100;
                 color: #000;//#fff;
-                border: 1px solid #D53A35;
-                cursor: pointer;
-                // margin-right: 20px;
+                margin-right: 20px;
                 
-                // &.left {
-                //     left: 0;
-                // }
-                // &.right {
-                //     right: 0;
-                // }
-                &:hover {
-                    background-color: #fff;
+                &.left {
+                    left: 0;
                 }
+                &.right {
+                    right: 0;
+                }
+
                 .tooltip-time {
                     color: #fff;
                     // font-size: 12px;
@@ -1831,8 +1581,7 @@
                 .tooltip-list {
                     padding: 10px;
                     overflow-y: auto;
-                    position: relative;
-                    // border: 1px solid #D53A35;
+                    border: 1px solid #ccc;
                 }
 
                 .content-list {
