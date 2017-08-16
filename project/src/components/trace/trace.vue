@@ -47,7 +47,8 @@
                     },{
                         prop: "barcode",
                         name: "条码",
-                        sortable: true
+                        sortable: true,
+                        fixed: true
                     },{
                         prop: "processName",
                         name: "工序名称",
