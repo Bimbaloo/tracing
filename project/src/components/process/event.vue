@@ -29,8 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-//const url = HOST + "/eventrecord/by-equipment-time`";
-const url = `http://rapapi.org/mockjsdata/24404/eventrecord/by-equipment-time?`;
+const url = HOST + `/api/v1/eventrecord/by-equipment-time`;
+//const url = `http://rapapi.org/mockjsdata/24404/eventrecord/by-equipment-time?`;
 export default {
     components: {
 		'v-table': table
@@ -70,15 +70,15 @@ export default {
                 }, {
                     name: "状态",
                     prop: "statusName",
-                    width: "200",
+                    width: "120",
                 }, {
                     name: "事件类型",
                     prop: "eTypeName",
-                    width: "200"
+                    width: "120"
                 }, {
                     name: "事件原因",
                     prop: "eReasonName",
-                    width: "200"
+                    width: "120"
                 }, {
                     name: "发生时间",
                     prop: "happenTime",
@@ -94,27 +94,27 @@ export default {
                 }, {
                     name: "确认时间",
                     prop: "checkTime",
-                    width: "300"
+                    width: "200"
                 }, {
                     name: "确认人",
                     prop: "checkName",
-                    width: "200"
+                    width: "120"
                 }, {
                     name: "处理时间",
                     prop: "manageTime",
-                    width: "120"
+                    width: "200"
                 }, {
                     name: "处理人",
                     prop: "manageName",
-                    width: "300"
+                    width: "120"
                 }, {
                     name: "关闭时间",
                     prop: "closeTime",
-                    width: "300"
+                    width: "200"
                 }, {
                     name: "关闭人",
                     prop: "closeName",
-                    width: "300"
+                    width: "120"
                 }],
                 height: 1,
                 data: []
