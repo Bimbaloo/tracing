@@ -29,8 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-//const url = HOST + "/repair/by-equipment-time";
-const url = `http://rapapi.org/mockjs/24404/repair/by-equipment-time?`
+const url = HOST + "/api/v1/repair/by-equipment-time";
+//const url = `http://rapapi.org/mockjs/24404/repair/by-equipment-time?`
 
 export default {
     components: {
