@@ -3,28 +3,18 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in inItems.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
             </div>
-            <h2 class="content-title inTitle">
-            	投入
+            <h2 class="content-title tableData">
+            	事件记录
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
             </h2>
 			<div class="content-table">
-                <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
-			</div>
-
-                  
-            <h2 class="content-title outTitle">
-            	产出
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('outputTable', '产出', $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
-            </h2>		  
-			<div class="content-table">
-                <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
+                <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
 			</div>
 		
 					
@@ -39,8 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
-
+//const url = HOST + "/eventrecord/by-equipment-time`";
+const url = `http://rapapi.org/mockjsdata/24404/eventrecord/by-equipment-time?`;
 export default {
     components: {
 		'v-table': table
@@ -58,115 +48,78 @@ export default {
          
             loading: false,
             tdResize: true, //是否允许拖动table大小
+            condition:{},   // 查询条件    
+            dataName:[      // 条件对应中文名
+                {
+                    itemCode:"equipmentIdList",
+                    itemName:"物料编码"
+                },{
+                    itemCode:"startTime",
+                    itemName:"开始时间"
+                },{
+                    itemCode:"endTime",
+                    itemName:"结束时间"
+                },
+            ],
             /* 投入 */
-            inItems: {
+            tableData: {
                 columns: [{
-                    name: "条码",
-                    prop: "barcode",
-                    width: "200",
-                    fixed: true,
-                    class: "barcode",
-                    cellClick: this.barcodeClick
+                    name: "序号",
+                    type:"index",
+                    width: "50"
                 }, {
-                    name: "派工单号",
-                    prop: "doCode",
+                    name: "状态",
+                    prop: "statusName",
+                    width: "200",
+                }, {
+                    name: "事件类型",
+                    prop: "eTypeName",
                     width: "200"
                 }, {
-                    name: "批次号",
-                    prop: "batchNo",
-                    width: "200",
-                    class: "batch",
-                    cellClick: this.batchClick
+                    name: "事件原因",
+                    prop: "eReasonName",
+                    width: "200"
                 }, {
-                    name: "物料编码",
-                    prop: "materialCode",
+                    name: "发生时间",
+                    prop: "happenTime",
                     width: "200",
-                    class: "material",
-                    cellClick: this.materialClick
                 }, {
-                    name: "物料名称",
-                    prop: "materialName",
+                    name: "上报时间",
+                    prop: "reportTime",
+                    width: "200",
+                }, {
+                    name: "上报人",
+                    prop: "reportName",
+                    width: "120"
+                }, {
+                    name: "确认时间",
+                    prop: "checkTime",
                     width: "300"
                 }, {
-                    name: "数量",
-                    prop: "quantity",
+                    name: "确认人",
+                    prop: "checkName",
+                    width: "200"
+                }, {
+                    name: "处理时间",
+                    prop: "manageTime",
                     width: "120"
                 }, {
-                    name: "班次",
-                    prop: "shiftName",
-                    width: "200"
+                    name: "处理人",
+                    prop: "manageName",
+                    width: "300"
                 }, {
-                    name: "操作人",
-                    prop: "personName",
-                    width: "200"
+                    name: "关闭时间",
+                    prop: "closeTime",
+                    width: "300"
                 }, {
-                    name: "投入时间",
-                    prop: "happenTime",
-                    width: "200"
+                    name: "关闭人",
+                    prop: "closeName",
+                    width: "300"
                 }],
                 height: 1,
-                data: [],
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+                data: []
             },
-            /* 产出 */
-            outItems: {
-                columns: [{
-                    name: "条码",
-                    prop: "barcode",
-                    width: "200",
-                    fixed: true,
-                }, {
-                    name: "批次号",
-                    prop: "batchNo",
-                    width: "200"
-                }, {
-                    name: "箱码",
-                    prop: "",
-                    width: "200"
-                }, {
-                    name: "派工单号",
-                    prop: "doCode",
-                    width: "200"
-                }, {
-                    name: "物料编码",
-                    prop: "materialCode",
-                    width: "200",
-                    class: "barcode",
-                    cellClick: this.barcodeClick
-                }, {
-                    name: "物料名称",
-                    prop: "materialName",
-                     width: "300"
-                }, {
-                    name: "合格数",
-                    prop: "qualifiedNum",
-                    width: "120"
-                }, {
-                    name: "报废数",
-                    prop: "scrapNum",
-                    width: "120"
-                }, {
-                    name: "不合格数",
-                    prop: "unqualifiedNum",
-                    width: "120"
-                }, {
-                    name: "班次",
-                    prop: "shiftName",
-                   width: "200"
-                }, {
-                    name: "操作人",
-                    prop: "personName",
-                    width: "120"
-                }, {
-                    name: "产出时间",
-                    prop: "happenTime",
-                    width: "200"
-                }],
-                data: [],
-                height: 1,
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
-            },
-          //  viewHeight:0
+           
           routerContent:0
 
         }
@@ -188,17 +141,35 @@ export default {
         },
         fullscreen: function(){
             return this.$store.state.fullscreen
-        }
+        },
+         /* 查询条件转数组中文 */
+        filters: function() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		}
     },
     mounted(){
-       this.inItems.height = this.outItems.height = this.adjustHeight()
+       this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
-
-        this.setTitle(".barcode","单件追踪")
-        this.setTitle(".batch","批次追踪")
-        this.setTitle(".material","遏制")
         
     },
     watch: {
@@ -237,14 +208,13 @@ export default {
             
             this.loading = true;
             let oQuery = this.$route.query;
-
-            this.$post(url, oQuery)
+            this.condition = this.$route.query
+            this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    this.outItems.data = res.data.data.out
-                    this.inItems.data = res.data.data.in
+                    this.tableData.data = res.data.data
                 });				 
             })
             .catch((err) => {
@@ -252,50 +222,6 @@ export default {
                 this.styleObject.minWidth = 0;   
                 console.log("数据库查询出错。")
             })
-        },
-        /**
-        * 格式化数据。
-        * @param {Array} aoData
-        * @return {Array}
-        */
-        formatData (aoData, aocolumns) {
-            // 按照条码进行排序。
-            aoData.sort((a, b) => a.equipmentId>b.equipmentId);
-            
-            let oEquipmentId = {},
-                nRow = 0,
-                nIndex = 1;
-            aoData.forEach((o, index) => {
-                if(oEquipmentId[o.equipmentId]) {							
-                    oEquipmentId[o.equipmentId]++;
-                    aoData[nRow].rowspan = oEquipmentId[o.equipmentId];
-                    o.hide = true;
-                }else {
-                    o.index = nIndex;
-                    oEquipmentId[o.equipmentId] = 1;
-                    nRow = index;
-                    nIndex ++;
-                    o.rowspan = oEquipmentId[o.equipmentId];
-                }
-            })   
-            
-            aocolumns.forEach(column => {					
-                if(aoData.every(o => o[column.prop] === "" || o[column.prop] == undefined)) {
-                // 若每一行都为空，设置隐藏。
-                    column.hide = true;
-                }
-            })
-        
-            return aoData;
-        },
-        batchClick() {
-            console.log("批次号")
-        },
-        barcodeClick() {
-            console.log("条码")
-        },
-        materialClick() {
-            console.log("物料编码")
         },
 
         // 表格导出。
@@ -319,9 +245,8 @@ export default {
             ntable = Math.floor(
                         this.viewHeight
                         -this.outerHeight(document.querySelector(".condition"))
-                        -this.outerHeight(document.querySelector(".inTitle"))
-                        -this.outerHeight(document.querySelector(".outTitle"))
-                    )/2;
+                        -this.outerHeight(document.querySelector(".tableData"))
+                    );
             return ntable;
         },
         /* 获取元素实际高度(含margin) */
@@ -335,7 +260,7 @@ export default {
         /* 设置table实际高度 */
         setTbaleHeight(){
             this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.inItems.height = this.outItems.height = this.adjustHeight()
+            this.tableData.height = this.adjustHeight()
         },
         /* 设置title */
         setTitle(el,title){

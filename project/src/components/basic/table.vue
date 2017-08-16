@@ -12,7 +12,7 @@
     element-loading-text="拼命加载中"
     style="width: 100%">
         <el-table-column 
-        v-for="column in columns"       
+        v-for="column in columns"
         align="center"
         :fixed="bFixed && column.fixed?true:false"
         :sortable="column.sortable"
@@ -27,7 +27,27 @@
         :filters="column.filters"
         :filter-method="column.filterMethod"
         :filter-placement="column.filterPlacement"
-        :width="column.width">
+        :width="column.width"
+        :data-filte="dataFilter"
+        :selectable="checkSelectable">
+            <el-table-column  
+                align="center"
+                v-if="!!column.lists"  
+                v-for='list in column.lists'
+                :sortable="list.sortable"
+                :type="list.type"
+                :resizable="resize"
+                :prop="list.value"
+                :label="list.itemName"
+                :sort-method="list.sortMethod"
+                :key="list.value" 
+                :class-name="list.class"
+                :formatter="list.formatter"
+                :filters="list.filters"
+                :filter-method="list.filterMethod"
+                :filter-placement="list.filterPlacement"
+                :width="list.width">
+            </el-table-column> 
         </el-table-column>
         
     </el-table>
@@ -50,6 +70,11 @@
                 required: false,
                 type: Boolean,
             	default: false
+            },
+            dataFilter:{
+                required: false,
+                type: Boolean,
+            	default: false
             }
         },
         data() {
@@ -60,8 +85,11 @@
             }
         },
         computed: {
+            selectedData: function(){
+                return this.tableData.selected
+            },
         	dataArray: function() {
-        		return this.tableData.data
+                return this.tableData.data
         	}
         },
         methods: {    
@@ -72,10 +100,22 @@
                 oColumn.cellClick && oColumn.cellClick(row);                
             },
             selectionChange (selection) {
-            	this.tableData.selected = selection;
+                this.tableData.selected = selection;
             },
             filterChange (filters) {
                 this.tableData.filterChange && this.tableData.filterChange(filters);
+            },
+            /* 是否禁选 */
+            checkSelectable (row,index) {
+                if(!this.dataFilter){   // 不启用过滤功能
+                    return true
+                }else if(this.selectedData.length !== 0){                 // 勾选后
+                    let batchNo   = this.selectedData[0].batchNo             // 获取当前勾选行编码  
+                    let equipmentType = this.selectedData[0].equipmentType   // 获取当前勾选行工序 
+                    return (row.batchNo ===batchNo && row.equipmentType === equipmentType )
+                }else{
+                    return true
+                }
             }
         }
     }
