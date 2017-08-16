@@ -188,19 +188,19 @@
 						// cpt: "/QTReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                         router: "/process/qtReport",
-						query: ["equipmentIdList", "startTime", "endTime"]  
+						query: ["equipmentName","equipmentId", "startTime", "endTime","processCode"]  
                     },{
 						name: "送检",
 						// cpt: "/QCReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                         router: "/process/qcReport",
-						query: ["equipmentIdList", "startTime", "endTime"]  
+						query: ["equipmentName","equipmentId", "startTime", "endTime","processCode"]  
                     },{
 						name: "FGB",
 						// cpt: "/FGBReport.cpt&__bypagesize__=false",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]
                         // router: "/process/fgbReport",
-						query: ["equipmentIdList", "startTime", "endTime"]    
+						query: ["equipmentName","equipmentId", "startTime", "endTime","processCode"]    
                     }]
 				}, {
 					name: "加工",
@@ -221,7 +221,7 @@
 						name: "事件记录",
                        // path: "",
                         router: "/process/event",
-						query: ["equipmentId", "startTime", "endTime"]  
+						query: ["equipmentName","equipmentId", "startTime", "endTime","processCode"]  
                     }]
 				}, {
 					name: "维护",
@@ -232,7 +232,7 @@
 						name: "维护记录",
                        // path: "",
                         router: "/process/repair",
-						query: ["equipmentId", "startTime", "endTime"]  
+						query: ["equipmentName","equipmentId", "startTime", "endTime","processCode"]  
                     }]
 				}, {
 					name: "工具",
@@ -243,7 +243,7 @@
 						name: "工具记录",
                       //  path: "",
                       //  router: "/process/tool",
-						query: ["equipmentId", "startTime", "endTime"]  
+						query: ["equipmentName","equipmentId", "startTime", "endTime","processCode"]  
                     }]
 				}]
             }
