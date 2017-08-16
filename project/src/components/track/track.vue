@@ -185,8 +185,8 @@
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		//({ batchNo: oSelected.batchNo,iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
             		({ doId: oSelected.doId, barcode: oSelected.barcode, batchNo: oSelected.batchNo, iokey: oSelected.iokey, productionMode: oSelected.productionMode, materialName: oSelected.materialName, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            			
             		aSelected.push(oSelected);
             	})
                     

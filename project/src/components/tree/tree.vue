@@ -15,7 +15,6 @@
 	import material from 'assets/img/material.png'
 	import process from 'assets/img/process.png'
 	import {onNodeSelectionChange, onClickNode, onContextClickNode, onDoubleClickNode, tooltipTextConverter, zoomDiagram} from 'assets/js/go-util'
-    import {ParallelLayout} from 'assets/js/ParallelLayout.js'
 	
 	export default {
 		props: {
