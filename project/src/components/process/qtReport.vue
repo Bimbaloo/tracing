@@ -3,13 +3,13 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in tableData.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	送检
+            	质检报告
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
             </h2>
@@ -29,7 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
+//const url = HOST + `/quality/inspect/by-equipment-time`;
+const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
 
 export default {
     components: {
@@ -48,6 +49,18 @@ export default {
 
             loading: false,
             tdResize: true, //是否允许拖动table大小
+            dataName:[      // 条件对应中文名
+                {
+                    itemCode:"equipmentIdList",
+                    itemName:"物料编码"
+                },{
+                    itemCode:"startTime",
+                    itemName:"开始时间"
+                },{
+                    itemCode:"endTime",
+                    itemName:"结束时间"
+                },
+            ],
             /* 投入 */
             tableData: {
                 columns: [{
@@ -56,55 +69,61 @@ export default {
                     width: "200",
                 }, {
                     name: "设备编码",
-                    prop: "",
+                    prop: "eqipmentCode",
                     width: "200"
                 }, {
                     name: "设备名称",
-                    prop: "doCode",
+                    prop: "eqipmentName",
                     width: "200"
                 }, {
                     name: "上报时间",
-                    prop: "batchNo",
+                    prop: "reportTime",
                     width: "200",
                 }, {
                     name: "检验时间",
-                    prop: "materialCode",
+                    prop: "commitTime",
                     width: "200",
                 }, {
                     name: "审核时间",
-                    prop: "quantity",
+                    prop: "inspectedTime",
                     width: "120"
                 }, {
                     name: "人员姓名",
-                    prop: "materialName",
+                    prop: "operatorName",
                     width: "300"
                 }, {
                     name: "员工号",
-                    prop: "shiftName",
+                    prop: "operatorCard",
                     width: "200"
+                },{
+                    name: "审核时间",
+                    prop: "inspectedTime",
+                    width: "120"
                 }, {
                     name: "检验结果",
-                    prop: "personName",
+                    prop: "operatorCard",
                     width: "120"
-                },{
-                    name: "检验项目",
-                    prop: "happenTime",
-                    width: "500",
-                    lists: [
-                        {
-                            name: "项目1",
-                            prop: "happenTime",
-                            width: "200"
-                        },
-                        {
-                            name: "项目2",
-                            prop: "doCode",
-                            width: "300"
-                        }]
-                }],
+                }
+                // ,{
+                //     name: "检验项目",
+                //     prop: "happenTime",
+                //     width: "500",
+                //     lists: [
+                //         {
+                //             itemName: "项目1",
+                //             value: "valeu0",
+                //            // width: "200"
+                //         },
+                //         {
+                //             itemName: "项目2",
+                //             value: "valeu1",
+                //            // width: "300"
+                //         }]
+                // }
+                
+                ],
                 height: 1,
                 data: [],
-                filters: [["条码", "xxxx"], ["开始时间", "xxxx-xx-xx xx:xx:xx"], ["结束时间", "xxxx-xx-xx xx:xx:xx"]]
             },
 
             routerContent: 0
@@ -128,7 +147,29 @@ export default {
         },
         fullscreen: function(){
             return this.$store.state.fullscreen
-        }
+        },
+        /* 查询条件转数组中文 */
+        filters: function() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		}
     },
     mounted(){
        this.tableData.height  = this.adjustHeight()
@@ -146,7 +187,7 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
-        // 判断调用接口是否成功。
+       // 判断调用接口是否成功。
         judgeLoaderHandler(param, fnSu, fnFail) {
             let bRight = param.data.errorCode;
             
@@ -167,19 +208,51 @@ export default {
                 message: this.sErrorMessage,
                 duration: 3000
             });
-        },		       
+        },		              
         // 获取数据。
         fetchData() {    
             
             this.loading = true;
             let oQuery = this.$route.query;
-
-            this.$post(url, oQuery)
+            this.condition = this.$route.query
+            this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    this.tableData.data = res.data.data.in
+                    
+                    let odata = res.data.data,  //获取到的data
+                        tdata = [],             //想要的data 
+                     //   lists = [];          //想要的lists 
+                        obj = {
+                            name: "检验项目",
+                            width: "500",
+                            lists: []
+                        };
+                                                                
+                       odata.forEach((el) => {  /* 处理columns */
+                            let items = el.items
+                            items.forEach(function (el, index) {
+                                obj.lists[index] = {
+                                    itemName: `${el.itemName}`,
+                                    value: `value` + index
+                                }
+                            })
+                        })
+                        this.tableData.columns.push(obj)
+
+                        odata.forEach((el,index) => {       /* 处理data */
+                            let items = el.items
+                            items.forEach((el,index)=>{
+                                tdata[`valeu`+index] = el.value
+                            })
+                            let obj = Object.assign(el, tdata);
+                            console.log(obj)
+                            //debugger
+                            this.tableData.data.push(obj)
+                        })
+
+                   
                 });				 
             })
             .catch((err) => {
