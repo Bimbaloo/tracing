@@ -209,10 +209,10 @@ export default {
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el)=>{
-                if(el !== "equipmentName" && el !== "processCode"){
+                if(el === "equipmentId" || el === "startTime" || el === "endTime"){
                     oQuery[el] = this.$route.query[el]
                 }
-                if(el !== "equipmentId" && el !== "processCode"){
+                if(el === "equipmentName" || el === "startTime" || el === "endTime"){
                     this.condition[el] = this.$route.query[el]
                 }
             })
