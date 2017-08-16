@@ -278,20 +278,7 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
-            // let oQuery = this.$route.query;
-            // Object.keys(oQuery).forEach((el)=>{
-            //     debugger
-            //     if(el === "equipmentName" || el === "processCode"){
-            //         delete(oQuery[el])
-            //     }
-            // })
-            // this.condition = this.$route.query
-            // Object.keys(this.condition).forEach((el)=>{
-            //     if(el === "equipmentIdList" || el === "processCode"){
-            //         delete(this.condition[el])
-            //     }
-            // })
+            
             this.$post(url, oQuery)
             .then((res) => {
                 this.loading = false;
