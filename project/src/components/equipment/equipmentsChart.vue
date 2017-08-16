@@ -189,7 +189,7 @@
 						name: "质检",
 						// cpt: "/QTReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
-                        router: "/process/qtReport",
+                        // router: "/process/qtReport",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
@@ -214,7 +214,7 @@
                     color: "#66bc84",
                     list: [{
 						name: "投产表",
-						router: "/process/product",
+					//	router: "/process/product",
 						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }]
 				}, {
@@ -246,7 +246,7 @@
                     color: "#86cccc",
                     list: [{
 						name: "工具记录",
-						router: "/process/tool",
+					//	router: "/process/tool",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     }]
