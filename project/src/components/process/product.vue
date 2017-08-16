@@ -3,7 +3,7 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in inItems.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
@@ -58,6 +58,19 @@ export default {
          
             loading: false,
             tdResize: true, //是否允许拖动table大小
+            condition:{},   // 显示的查询条件    
+            dataName:[      // 条件对应中文名
+                {
+                    itemCode:"equipmentName",
+                    itemName:"物料"
+                },{
+                    itemCode:"startTime",
+                    itemName:"开始时间"
+                },{
+                    itemCode:"endTime",
+                    itemName:"结束时间"
+                },
+            ],
             /* 投入 */
             inItems: {
                 columns: [{
@@ -105,8 +118,7 @@ export default {
                     width: "200"
                 }],
                 height: 1,
-                data: [],
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+                data: []
             },
             /* 产出 */
             outItems: {
@@ -163,8 +175,7 @@ export default {
                     width: "200"
                 }],
                 data: [],
-                height: 1,
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+                height: 1
             },
           //  viewHeight:0
           routerContent:0
@@ -188,7 +199,29 @@ export default {
         },
         fullscreen: function(){
             return this.$store.state.fullscreen
-        }
+        },
+        /* 查询条件转数组中文 */
+        filters: function() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		}
     },
     mounted(){
        this.inItems.height = this.outItems.height = this.adjustHeight()
@@ -236,8 +269,29 @@ export default {
         fetchData() {    
             
             this.loading = true;
-            let oQuery = this.$route.query;
+            let oQuery = {}
+            Object.keys(this.$route.query).forEach((el)=>{
+                if(el !== "equipmentName" && el !== "processCode"){
+                    oQuery[el] = this.$route.query[el]
+                }
+                if(el !== "equipmentIdList" && el !== "processCode"){
+                    this.condition[el] = this.$route.query[el]
+                }
+            })
 
+            // let oQuery = this.$route.query;
+            // Object.keys(oQuery).forEach((el)=>{
+            //     debugger
+            //     if(el === "equipmentName" || el === "processCode"){
+            //         delete(oQuery[el])
+            //     }
+            // })
+            // this.condition = this.$route.query
+            // Object.keys(this.condition).forEach((el)=>{
+            //     if(el === "equipmentIdList" || el === "processCode"){
+            //         delete(this.condition[el])
+            //     }
+            // })
             this.$post(url, oQuery)
             .then((res) => {
                 this.loading = false;
