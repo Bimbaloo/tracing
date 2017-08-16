@@ -190,21 +190,21 @@
 						// cpt: "/QTReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                         router: "/process/qtReport",
-						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
 						name: "送检",
 						// cpt: "/QCReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                         router: "/process/qcReport",
-						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
 						name: "FGB",
 						// cpt: "/FGBReport.cpt&__bypagesize__=false",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]
                         // router: "/process/fgbReport",
-						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
 
                     }]
 				}, {

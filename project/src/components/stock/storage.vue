@@ -44,6 +44,7 @@
     import Blob from 'blob'
     import FileSaver from 'file-saver'
 	import rasterizeHTML from 'rasterizehtml'
+	import fnP from "assets/js/public.js"
 	
     export default {
         components: {
@@ -256,7 +257,7 @@
                     default: break;
                 }
                 
-                this.$ajax.post(sPath, this.$route.query)
+                this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
                 .then((res) => {
                     oData.loading = false;
                     oData.height = this.adjustHeight();

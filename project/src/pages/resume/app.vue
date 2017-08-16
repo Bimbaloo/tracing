@@ -38,7 +38,7 @@
 								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
 								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
-							<!--:row-style="tableRowStyleName"-->
+							
 							<div v-if="oTab.error" :style="{height:oTab.tableHeight+'px'}" class="error">
 								{{ oTab.error }}
 							</div>
@@ -59,20 +59,12 @@
 									:min-width="column.width"
 									:label="column.name">
 									<template scope="props">
-										<div :class="[{evens:props.row.total%2},'cell-content']" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+'px'}">
-											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
+										<div class="cell-content" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+(props.row.bHasNext?0:nIconDis)+'px'}">
+											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else :class="[{evens:props.row.total%2},{isVis: !props.row.inResumes[column.prop]}, 'cell-content']">
-											{{ column.formatter(props.row.inResumes[column.prop]) }}
-										</div>
-										
-										<div class="cell-info">
-											<p 
-												v-for="(item,cellIndex) in props.row.data"
-												:class="[{isVis: !item[column.prop]},{evens:(props.row.total+cellIndex+1)%2}, 'cell-content']"
-												:style="{paddingLeft:!index?((props.row.level+1)*nLevelDis+nIconDis+nFirstDis)+'px':0}"> 
-												{{ column.formatter(item[column.prop]) }}</p>
+										<div v-else :class="[{isVis: !props.row.data[column.prop]}, 'cell-content']">
+											{{ column.formatter(props.row.data[column.prop]) }}
 										</div>
 									</template>
 								</el-table-column>
@@ -98,20 +90,12 @@
 									:min-width="column.width"
 									:label="column.name">
 									<template scope="props">
-										<div :class="[{evens:props.row.total%2},'cell-content']" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+'px'}">
-											<i class="icon-down el-icon-arrow-down" @click.stop="expandOrCollapseTr"></i>
+										<div class="cell-content" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+(props.row.bHasNext?0:nIconDis)+'px'}">
+											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else :class="[{evens:props.row.total%2}, {isVis: !props.row.inResumes[column.prop]}, 'cell-content']">
-											{{ column.formatter(props.row.inResumes[column.prop]) }}
-										</div>
-										
-										<div class="cell-info">
-											<p 
-												v-for="(item,cellIndex) in props.row.data"
-												:class="[{isVis: !item[column.prop]},{evens:(props.row.total+cellIndex+1)%2}, 'cell-content']"
-												:style="{paddingLeft:!index?((props.row.level+1)*nLevelDis+nIconDis+nFirstDis)+'px':0}"> 
-												{{ column.formatter(item[column.prop]) }}</p>
+										<div v-else :class="[{isVis: !props.row.data[column.prop]}, 'cell-content']">
+											{{ column.formatter(props.row.data[column.prop]) }}
 										</div>
 									</template>
 								</el-table-column>
@@ -235,7 +219,7 @@
 				// 默认工序层级的间距。
 				nLevelDis: 10,
 				// 工序收缩图标宽度
-				nIconDis: 14,
+				nIconDis: 19,
 				// 首项默认的距离。
 				nFirstDis : 5,
 				// 是否全屏显示。
@@ -514,6 +498,7 @@
 					this.getHeight();
 					
 			    }).catch((err)=> {
+			    	console.log(err)
 			    	this.oTab.loading = false;
 					this.oTab.error = "查询出错";
 					// 设置内容的高度。
@@ -547,14 +532,15 @@
 					}, 1000)
 				}				
 			},
-			// 表格数据转换成可用于创建的数据。
+			/**
+			 * 表格数据处理函数。
+			 */
 			parseTableData() {
 				var	_that = this,
 				    aoNew = [];
 				    
 				_getData(null, 0);
 				
-				// [{name,parent,data,level}]
 				return aoNew;
 				/**
 				 * 获取表格中的数据。
@@ -570,22 +556,22 @@
 					if(aInvialid.length) {
 						aInvialid.forEach(function(oData) {
 							// 获取每一级中其上级所有数据的总和。
-							let nTotal = 0,
-								oPrev = aoNew[aoNew.length-1];
+							let oPrev = aoNew[aoNew.length-1],
+								// 是否还有下一个level。-- 如果当前数据的level大于上一次数据的level，则表示是上条数据的子集。
+								bHasNext = false;
 							
-							if(!oPrev) {
-								nTotal = 0;
-							}else {
-								nTotal = oPrev.total + oPrev.data.length+1;
+							// 判断是否有子级。
+							if(oPrev && (nLevel - oPrev.level) == 1) {
+								oPrev.bHasNext = true;
 							}
+							
 							aoNew.push({
 								id: oData.nodeId,
-								name: oData.nodeName,		// name
-								parent: oData.parentNodeId,		// parent
-								data: oData.resumes,					//data
-								inResumes: oData.inResume || {},			// 投入
+								name: oData.nodeName,					// name
+								parent: oData.parentNodeId,				// parent
+								data: oData.data || {},					//data
 								level: nLevel,
-								total: nTotal
+								bHasNext: bHasNext
 							});
 							// 循环获取数据。
 							_getData(oData.nodeId, nLevel+1);
@@ -599,13 +585,86 @@
 				var _that = this,
 					aResult = [];
 					
-				// 遍历数据。
+				// 遍历数据，并按照检验，产出，投入，出入库； 时间倒序排
 				aResult = _that.aoTable.filter(function(oData) {
-					return oData.parentNodeId == sId;		// parent
-				});
+					return oData.parentNodeId == sId;
+				})
+				
+				// 排序处理。
+				aResult = this.setDataOrder(aResult);
 				
 				// 返回数据。
 				return aResult;
+			},
+			/**
+			 * 数据排序处理。
+			 * @param {Array}
+			 * @return {Array}
+			 */
+			setDataOrder(aData) {
+				let aOrder = [{
+					type: "",
+					data: []
+				}, {
+					type: "5,6",
+					data: []
+				}, {
+					type: "4",
+					data: []
+				}, {
+					type: "3",
+					data: []
+				}, {
+					type: "1,2",
+					data: []
+				}],
+				aReturn = [];
+				
+				if(aData.length > 1) {
+					
+					aData.forEach( o=> {
+						if(o.data) {
+							// 存在数据。
+							aOrder[_getIndexByType(o.data.type)].data.push(o);
+						}else {
+							// 不存在数据。
+							aOrder[0].data.push(o);
+						}
+					})
+					
+					// 数据排序后。
+					aOrder.forEach( o => {
+						
+						if(o.data.length > 1) {
+							// 排序处理。
+							o.data = o.data.sort( (oA, oB) => +new Date(oA.data.time) < +new Date(oB.data.time) )
+						}
+						
+						aReturn = aReturn.concat(o.data);
+					})
+					
+				}else {
+					
+					aReturn = aData;
+				}
+				
+				
+				// 返回数据。
+				return aReturn;
+				
+				// 获取数据的索引。
+				function _getIndexByType(sType) {
+					let nIndex = -1;
+					
+					aOrder.filter( (o,index) => {
+						if(o.type.includes(sType)) {
+							nIndex = index;
+						}
+					})
+					
+					// 返回索引
+					return nIndex;
+				}
 			},
 			// 将时间数据转换为页面显示格式的值。
 			_parseTimeFormat(sTime) {
@@ -957,12 +1016,6 @@
 	.el-table .cell {
 		padding: 0;
 	}	
-	
-	.el-table tbody {
-		.cell-content.evens {
-			background-color: #C0CCDA;
-		}
-	}
 	
 	.domDown {
 		position: absolute;

@@ -247,7 +247,6 @@
 							"_buttonFillOver": "#b8b8b8",
 							"_buttonStrokeOver": null,
 							click: (e, button) => {
-		
 								let node = button.part;
 								if(node instanceof go.Adornment) node = node.adornedPart;
 								if(!(node instanceof go.Node)) return;
@@ -270,7 +269,7 @@
 							}
 						})
 					);
-
+				
 				// 设置选中样式。
 				this.tree.nodeTemplate.selectionAdornmentTemplate =
 					$(go.Adornment, "Spot", {

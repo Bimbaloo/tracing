@@ -1,5 +1,5 @@
 <template>
-    <el-button :type="type" @click.stop="clickHandler">{{ text }}</el-button>
+    <el-button :type="type" @click.stop.prevent="clickHandler">{{ text }}</el-button>
 </template>
 
 <script>

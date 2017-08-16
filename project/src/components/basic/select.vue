@@ -8,13 +8,14 @@
     	remote
     	:remote-method="remoteMethod"
     	:loading="loading"
+    	loading-text="加载中..."
     	@visible-change ="showSelect"
     	@change="handleChange">
         <el-option
             v-for="option in options"
             :key="option.value"
             :label="getDisplayName(option)"
-            :value="option.value">
+            :value="getDisplayName(option)">
             <div>
 		        <span>{{ option.value }}</span>:
 		      	<span>{{ option.label }}</span>
@@ -34,7 +35,7 @@
             v-for="option in options"
             :key="option.value"
             :label="getDisplayName(option)"
-            :value="option.value">
+            :value="getDisplayName(option)">
         </el-option>
     </el-select>
 </template>
@@ -61,6 +62,11 @@
 		"personCode": {
 			url: HOST + "/api/v1/basicinfo/persons",
 			code: "person"
+		},
+		// 班次
+		"shiftName": {
+			url: HOST + "/api/v1/basicinfo/shifts",
+			code: "shift"
 		}
 	};
 	const sSessionSelectStorageKey = "selectStorageKey";
@@ -89,13 +95,17 @@
             },
             // 获取显示label
             getDisplayName(item) {
-            	return item.value+":"+item.label;
+            	if(item.value === item.label) {
+            		return item.label;
+            	}else {
+	            	return item.value+":"+item.label;
+            	}
             },
             // 下拉框点击事件。
             showSelect(bShow) {
             	if(bShow) {
             		// 先判断是否存在数据，不存在数据，则通过ajax请求。
-//          		this.loading = true;
+            		this.loading = true;
             		
             		// 判断是否存在。如果存在
 		        	let sKey = this.key,
@@ -105,6 +115,9 @@
 		        	
 		        	// 数据存在。
 		        	if(oStorage && oStorage[sKey]) {
+		        		
+		        		this.loading = false;
+		        		
 		        		this.list = oStorage[sKey];
 		        		
 		        		// 如果是物料，则获取部分数据。
@@ -123,12 +136,14 @@
 		        		// 通过请求获取数据。
 			        	this.$ajax.get(oAjax[sKey].url).then((res) => {
 			        		
+			        		this.loading = false;
+			        		
 			        		if(!res.data.errorCode) {
 			        			// 成功。
 				        	 	this.list = res.data.data.map(o=>{
 				        	 		return {
 				        	 			label: o[oAjax[sKey].code + "Name"],
-				        	 			value: o[oAjax[sKey].code + "Code"]
+				        	 			value: o[oAjax[sKey].code + "Code"] || o[oAjax[sKey].code + "Name"]
 				        	 		}
 				        	 	});
 			        		}else {
@@ -192,6 +207,10 @@
     .el-select-dropdown {
         border-radius: 0;
         margin: 0;
+        
+        .el-scrollbar__wrap{
+        	max-height: 230px;	
+        }
     }
 	.el-select {
         width: 180px

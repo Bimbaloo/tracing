@@ -65,15 +65,14 @@
     		let bRight = param.data.errorCode;
         	
         	// 判断是否调用成功。
-        	if(bRight != "0") {
-        		// 提示信息。
+        	if(!bRight) {
+        		// 调用成功后的回调函数。
+        		fnSu && fnSu();
+        	}else {
         		this.sErrorMessage = param.data.errorMsg.message;
         		this.showMessage();
         		// 失败后的回调函。
         		fnFail && fnFail();
-        	}else {
-        		// 调用成功后的回调函数。
-        		fnSu && fnSu();
         	}
     	},
     	// 显示提示信息。
@@ -194,7 +193,7 @@
         }
       }
       .el-form-item {
-        margin-bottom: 15px;
+        margin-bottom: 18px;
       }
       .form-button {
         .btn:first-child {
@@ -204,6 +203,7 @@
       &>.el-tabs__content {
         /*padding: 0 300px;*/
       }
+      
     } 
   }
   @media screen and (max-width: 1400px){
@@ -211,7 +211,7 @@
       bottom: 10px;
     }
     .search-tab {
-    height: 610px;
+    height: 650px;
 
     &.el-tabs--border-card {
       &>.el-tabs__header {
@@ -232,16 +232,16 @@
       }
 
       .el-form-item {
-        margin-bottom: 14px;
+        margin-bottom: 18px;
 
         .el-form-item__label {
-          font-size: 12px;
+          font-size: 14px;
           padding: 6px 10px 6px 0;
         }
         .el-form-item__content {
           line-height: 24px;
           .el-input {
-            font-size: 12px;
+            font-size: 14px;
             .el-input__inner{
               height: 24px;
               //color: #999

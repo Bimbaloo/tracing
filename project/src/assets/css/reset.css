@@ -71,24 +71,24 @@ li {
 }
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track-piece {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: #979ba1;
   -webkit-border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:vertical {
-  height: 8px;
-  background-color: rgba(125, 125, 125, 0.7);
+  height: 10px;
+  background-color: #56565C;
   -webkit-border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:horizontal {
-  width: 8px;
-  background-color: rgba(125, 125, 125, 0.7);
+  width: 10px;
+  background-color: #56565C;
   -webkit-border-radius: 6px;
 }
 

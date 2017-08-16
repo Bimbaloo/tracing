@@ -37,7 +37,7 @@
 				
 				// 当前工序  当前工序筛选条件
 				if(this.oProcess[sType].checked) {		// jTarget.hasClass()
-					this.$emit("showPop",sType);
+					this.$emit("showPop", sType);
 				}
 			}
 		}

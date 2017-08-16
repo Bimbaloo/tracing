@@ -167,15 +167,15 @@
     		let bRight = param.data.errorCode;
         	
         	// 判断是否调用成功。
-        	if(bRight != "0") {
+        	if(!bRight) {
+        		// 调用成功后的回调函数。
+        		fnSu && fnSu();
+        	}else {
         		// 提示信息。
         		this.sErrorMessage = param.data.errorMsg.message;
         		this.showMessage();
         		// 失败后的回调函。
         		fnFail && fnFail();
-        	}else {
-        		// 调用成功后的回调函数。
-        		fnSu && fnSu();
         	}
     	},
     	// 显示提示信息。
@@ -222,7 +222,8 @@
           // 若为查出库。
           sPath = sPath + '/' + oConditions.radio;
 //        }
-        
+				
+					// 修改下拉参数值。
           this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
       },
       dragstar(e){   //鼠标按下，开始拖动

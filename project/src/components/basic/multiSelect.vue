@@ -1,7 +1,7 @@
 <template>
-    <el-select v-model="form[key]" :placeholder="hint" style="width: 100%;" multiple @change="handleChange">
+    <el-select v-model="multiValues" :placeholder="hint" style="width: 100%;" multiple @change="handleChange">
         <el-option
-            v-for="option in listData"
+            v-for="option in options"
             :key="option.value"
             :label="option.label"
             :value="option.value">
@@ -11,33 +11,41 @@
 
 <script>
     export default {
-        props: ['formData', 'placeholderData', 'keyData', 'listData'],
+        props: {
+        	formData: Object,
+        	placeholderData: String,
+        	keyData: String,
+        	listData: Array,
+        	allData: {
+        		required: false,
+        		default: 'all'
+        	}
+        },
         data() {
             return {
-                form: this.formData,
+//              form: this.formData,
                 hint: this.placeholderData,
-                key: this.keyData
-//              options: this.listData
+//              key: this.keyData,
+                multiValues: this.formData[this.keyData]
             }
         },
         computed: {
         	options: function() {
         		let aResult = this.listData || [];
-        		
-        		// 将全部按钮加入。
+
         		aResult.unshift({
-        			label: "全部",
+        			label: "鍏ㄩ儴",
         			value: "all"
         		})
-        		// 返回数据。
+        
         		return aResult;
         	}
         },
         methods: {
             handleChange(value) {
-            	// 是否选中的是全部，如果是全部则其他的不能选中其他的。
+           
             	if(value.includes("all") && value.length > 1) {
-            		// 含有全部，则将数据设置为全部。
+            	
             		this.form[this.key] = ["all"];
             	}
             }

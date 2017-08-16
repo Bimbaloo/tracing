@@ -1,5 +1,5 @@
 <template>
-	<div class="node-line" :line-edit="isEdit" :class="[lineType]" :line-data="lineData" :style="styleObj.lineObj" @click.stop="setLineState">
+	<div class="node-line" :class="[lineType]" :line-data="lineData" :style="styleObj.lineObj" @click.stop.prevent="setLineState">
 		<div class="node-arrow" :style="styleObj.arrowObj"></div>
 	</div>
 </template>
@@ -7,7 +7,7 @@
 <script>
 	import $ from "jquery"
 	export default {
-		props: ["nodeLines","nodePo","lineData","lineType","isEdit"],
+		props: ["nodeLines","nodePo","lineData","lineType"],
 		data() {
 			return {
 //				oNodePos: this.nodePo
@@ -17,7 +17,7 @@
 			styleObj: function() {
 				let oPos = this.getNodePosition(this.lineData);
 				
-				return this.getLineStyle(oPos.x1,oPos.y1,oPos.x2,oPos.y2);
+				return this.getLineStyle(oPos.x1,oPos.y1,oPos.x2,oPos.y2, oPos.positive);
 			}
 		},
 		methods: {
@@ -29,32 +29,48 @@
 					nRow2 = bP[0],
 					nCol2 = bP[1],
 					nLeft1,nLeft2,nTop1,nTop2,
-					nWidth = 200, nLDis = 10, nNode = 20,nTDis = 30,nText=0;	//20
+					// 流向，正
+					bPositive = true,
+					nWidth = 200, nLDis = 10, nNode = 22,nTDis = 30,nText = 0;	//20
 				
-				if(nCol2<nCol1) {
-					// nCol2为起点。
-					[nCol2,nCol1] = [nCol1,nCol2];
-					[nRow2,nRow1] = [nRow1,nRow2];
-				}
+//				if(nCol2<nCol1) {
+//					// nCol2为起点。
+//					[nCol2,nCol1] = [nCol1,nCol2];
+//					[nRow2,nRow1] = [nRow1,nRow2];
+//				}
 				
-				// left的起点。
-				nLeft1 = (nWidth+nLDis)*nCol1 + nWidth/2 + nNode;
-				// left的终点。
-				nLeft2 = (nWidth+nLDis)*nCol2 + nWidth/2 - nNode;
+				// left的起点。   //  + nNode
+				nLeft1 = (nWidth+nLDis)*nCol1 + nWidth/2 ;	
+				// left的终点。- nNode
+				nLeft2 = (nWidth+nLDis)*nCol2 + nWidth/2;
 				// top的起点。
 				nTop1 = nTDis*(nRow1+1) + nText + nNode*(nRow1) + nNode/2;
 				// top的终点。
 				nTop2 = nTDis*(nRow2+1) + nText + nNode*(nRow2) + nNode/2;
 				
+				// 流向反向问题。
+				if(nCol2<nCol1) {
+					// 反向
+					nLeft1 -= nNode;
+					nLeft2 += nNode;
+					bPositive = false;
+				}else {
+					// 正常
+					nLeft1 += nNode;
+					nLeft2 -= nNode;
+					bPositive = true;
+				}
+				
 				return {
 					x1: nLeft1,
 					y1: nTop1,
 					x2: nLeft2,
-					y2: nTop2
+					y2: nTop2,
+					positive: bPositive
 				}
 			},
 			// 获取线样式
-			getLineStyle(x1,y1,x2,y2) {
+			getLineStyle(x1,y1,x2,y2, bPositive) {
 				
 				var nWidth = Math.abs(x2 - x1),
 					nHeight = Math.abs(y1 - y2),
@@ -73,6 +89,11 @@
 				// 正向或逆向旋转
 				if(y1>y2) {
 					deg1 = -deg1;
+				}
+				
+				// 流向逆向。
+				if(!bPositive) {
+					deg1 = 180-deg1;
 				}
 				
 				// 返回数据。
@@ -94,10 +115,8 @@
 			},
 			// 设置链接线的状态。
 			setLineState(ev) {
-				if(this.isEdit) {
-					// 编辑状态下的点击。
-					this.$emit("nodeLineClick",ev,this.lineData);
-				}
+				// 编辑状态下的点击。
+				this.$emit("nodeLineClick", ev, this.lineData);
 			}
 		}
 	}

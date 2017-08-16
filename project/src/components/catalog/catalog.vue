@@ -9,7 +9,7 @@
 
 	export default {
 		props: {
-			catalogData: Object,	//Array
+			catalogData: Array,	//Object
 			// resize:{
 			// 	type: Number,
       		// 	required: false
@@ -44,8 +44,7 @@
 		watch: {
 		    // 如果 question 发生改变，这个函数就会运行
 		    catalogData: function () {			
-//				this.catalog && (this.catalog.model = new go.TreeModel(this.catalogData));	
-				this.catalog && (this.catalog.model = new go.GraphLinksModel(this.catalogData.node, this.catalogData.link));
+				this.catalog && (this.catalog.model = new go.TreeModel(this.catalogData));	
 		    },
 		    key: function() {
 		    	if(this.type == "tree") {
@@ -105,17 +104,9 @@
 								})
 								
 								let sRootKey = node.data.key;
-								if(node.data.groupCode) {
-									// 获取没有grop的key值。
-									let sCurrentNode = node;
-									while(sCurrentNode.findTreeParentNode().data.groupCode) {
-										sCurrentNode = sCurrentNode.findTreeParentNode();
-									}
-									sRootKey　= sCurrentNode.findTreeParentNode().data.key;
+								if(node.data.parent &&　!node.isMaterialNode) {
+									sRootKey　= node.findTreeParentNode().data.key;				
 								}
-//								if(node.data.parent &&　node.data.type != "1") {
-//									sRootKey　= node.findTreeParentNode().data.key;				
-//								}	
 								this.$store.commit({
 									type: "updateType",
 									key: "catalog"

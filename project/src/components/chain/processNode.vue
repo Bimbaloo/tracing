@@ -1,29 +1,28 @@
 <template>
-	<div class="node-outter" :node-edit="isEdit" :node-id="nodeId" @click.stop="setState">
+	<div class="node-outter" :node-id="nodeId" @click.stop.prevent="setState">
 		<div class="node-inner"></div>
 	</div>
 </template>
 
 <script>
 	
-//	import $ from "jquery"
-	
 	export default {
-		props: ["nodeId","nodeValue","isEdit"],
+//		props: {
+//			nodeId: String,
+//			nodeValue: Object,
+//			isEdit: Boolean
+//		},
+		props: ["nodeId", "nodeValue"],
 		data() {
 			return {
-//				id: this.nodeId,
 				oValue: this.nodeValue
 			}
 		},
 		methods: {
 			// 节点的点击状态。
 			setState(ev) {
-				// 当前是编辑的状态，并且，当前是断链的节点。
-				if(this.isEdit) {
-					// 出发节点的点击事件
-					this.$emit("nodeClick",ev);
-				}
+				// 出发节点的点击事件
+				this.$emit("nodeClick", ev);
 			}
 		}
 	}
@@ -34,6 +33,8 @@
 	@normal: #73b633;
 	@Broke: #db572d;
 	@Recovered: #fe9500;
+	@canDo: #42afa0;	// 可修复的
+	@actived: #7642af;		// 选中
 	
 	.node-outter {
 		width: 18px;
@@ -42,6 +43,7 @@
 		border: 2px solid @normal;
 		border-radius: 50%;
 		margin: 0 auto;
+		cursor: pointer;
 		
 		.node-inner {
 			width: 12px;
@@ -58,6 +60,16 @@
 			.node-inner {
 				background-color: @normal;
 			}
+			
+			/* 可修复的节点 */
+			&.canDo {
+				border-color: @canDo;
+			}
+			
+			/* 编辑中的节点 */
+			&.edited {
+				border-color: @actived;
+			}
 		}
 		
 		/* 断链节点 */
@@ -67,27 +79,36 @@
 			.node-inner {
 				background-color: @Broke;
 			}
+			
+			/* 可修复的节点 */
+			&.canDo {
+				border-color: @canDo;
+			}
+			
+			/* 编辑中的节点 */
+			&.edited {
+				border-color: @actived;
+			}
 		}
 		
-		/* 修复节点 */
+		/* 已修复节点 */
 		&.recovered {
 			border-color: @Recovered;
 			
 			.node-inner {
 				background-color: @Recovered;
 			}
-		}
-		
-		
-		/* 编辑中的节点 */
-		&.edited {
-			border-color: @Recovered;
 			
-			.node-inner {
-				background-color: @Broke;
+			/* 可修复的节点 */
+			&.canDo {
+				border-color: @canDo;
+			}
+			
+			/* 编辑中的节点 */
+			&.edited {
+				border-color: @actived;
 			}
 		}
-		
 		
 	}
 	
