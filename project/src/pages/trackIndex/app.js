@@ -34,7 +34,13 @@ const Process = r => require.ensure([], () => r(require('components/process/stoc
 const List = r => require.ensure([], () => r(require('components/process/list.vue')), 'group-detail')
 const Chart = r => require.ensure([], () => r(require('components/process/chart.vue')), 'group-detail')
 const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-detail')
-const Product = r => require.ensure([], () => r(require('components/process/product.vue')), 'group-detail')
+const Product = r => require.ensure([], () => r(require('components/process/product.vue')), 'group-detail')     //投产表
+const QtReport = r => require.ensure([], () => r(require('components/process/qtReport.vue')), 'group-detail')   //质检
+const QcReport = r => require.ensure([], () => r(require('components/process/qcReport.vue')), 'group-detail')   //送检检
+const FgbReport = r => require.ensure([], () => r(require('components/process/fgbReport.vue')), 'group-detail') //fgb质检
+const Tool = r => require.ensure([], () => r(require('components/process/tool.vue')), 'group-detail')           //工具
+const Event = r => require.ensure([], () => r(require('components/process/event.vue')), 'group-detail')         //事件
+const Repair = r => require.ensure([], () => r(require('components/process/repair.vue')), 'group-detail')       //维护记录
 
 const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-detail')
 const Track = r => require.ensure([], () => r(require('components/track/track.vue')), 'group-detail')
@@ -66,6 +72,24 @@ const routes = [{
     },{
       path: 'product',
       component: Product
+    },{//质检
+      path: 'qtReport',
+      component: QtReport
+    },{//送检
+      path: 'qcReport',
+      component: QcReport
+    },{//fgb
+      path: 'fgbReport',
+      component: FgbReport
+    },{//工具
+      path: 'tool',
+      component: Tool
+    },{//事件
+      path: 'event',
+      component: Event
+    },{//维护记录
+      path: 'repair',
+      component: Repair
     },{
       path: 'restrain',
       component: Suspicious

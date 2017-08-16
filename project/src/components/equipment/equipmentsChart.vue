@@ -187,16 +187,22 @@
                     color: "#d89add",
                     list: [{
 						name: "质检",
-						cpt: "/QTReport.cpt",
-						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "processCode"]  
+						// cpt: "/QTReport.cpt",
+                        // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
+                        router: "/process/qtReport",
+						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     },{
 						name: "送检",
-						cpt: "/QCReport.cpt",
-						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "processCode"]  
+						// cpt: "/QCReport.cpt",
+                        // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
+                        router: "/process/qcReport",
+						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     },{
 						name: "FGB",
-						cpt: "/FGBReport.cpt&__bypagesize__=false",
-						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "processCode"]  
+						// cpt: "/FGBReport.cpt&__bypagesize__=false",
+                        // parameter: ["equipmentId", "startTime", "endTime", "processCode"]
+                        // router: "/process/fgbReport",
+						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
                     }]
 				}, {
 					name: "加工",
@@ -215,8 +221,8 @@
                     color: "#f9823e",
                     list: [{
 						name: "事件记录",
-						path: "",
-						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+						router: "/process/event",
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}, {
 					name: "维护",
@@ -225,8 +231,8 @@
                     color: "#5aa7c5",
                     list: [{
 						name: "维护记录",
-						path: "",
-						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+						router: "/process/repair",
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}, {
 					name: "工具",
@@ -235,8 +241,8 @@
                     color: "#86cccc",
                     list: [{
 						name: "工具记录",
-						path: "",
-						parameter: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+						router: "/process/tool",
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}]
             }

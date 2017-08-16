@@ -4,7 +4,7 @@
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
 		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
-			<div @click="goToInit" :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
+			<div @click="goToInit" :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
 			</div>
 			<!-- <div :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router"> -->
@@ -528,7 +528,8 @@
 				box-sizing: border-box;
 				height: 100%;
 				position: relative;
-				flex-grow: 1;
+			//	flex-grow: 1;
+				flex: 1 1 auto;
 				.btn-collapse {
 					position: absolute;
 					left: 2px;
@@ -545,8 +546,13 @@
 		        background-color: #fff;
 		        padding: 0 20px;*/
 				box-sizing: border-box;
-				width: 100%;
-				height: 100%;
+				//width: 100%;
+				//height: 100%;
+				position: absolute;
+				left: 20px;
+				right: 20px;
+				top: 20px;
+				bottom: 20px;
 				/*overflow: auto;*/
 				display: flex;
 				flex-direction: column;

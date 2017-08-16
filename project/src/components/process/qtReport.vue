@@ -8,23 +8,13 @@
                     </span> 
                 </div>
             </div>
-            <h2 class="content-title inTitle">
-            	投入
+            <h2 class="content-title tableData">
+            	质检报告
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
             </h2>
 			<div class="content-table">
-                <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
-			</div>
-
-                  
-            <h2 class="content-title outTitle">
-            	产出
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('outputTable', '产出', $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
-            </h2>		  
-			<div class="content-table">
-                <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
+                <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
 			</div>
 		
 					
@@ -39,7 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
+//const url = HOST + `/quality/inspect/by-equipment-time`;
+const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
 
 export default {
     components: {
@@ -53,16 +44,15 @@ export default {
             sErrorMessage: "",
             empty: "暂无数据。",
             styleObject: {
-              //  "min-width": "2000px"
+                //  "min-width": "2000px"
             },
-         
+
             loading: false,
             tdResize: true, //是否允许拖动table大小
-            condition:{},   // 显示的查询条件    
             dataName:[      // 条件对应中文名
                 {
-                    itemCode:"equipmentName",
-                    itemName:"物料"
+                    itemCode:"equipmentIdList",
+                    itemName:"物料编码"
                 },{
                     itemCode:"startTime",
                     itemName:"开始时间"
@@ -72,113 +62,71 @@ export default {
                 },
             ],
             /* 投入 */
-            inItems: {
+            tableData: {
                 columns: [{
-                    name: "条码",
+                    name: "三检类型",
                     prop: "barcode",
                     width: "200",
-                    fixed: true,
-                    class: "barcode",
-                    cellClick: this.barcodeClick
                 }, {
-                    name: "派工单号",
-                    prop: "doCode",
+                    name: "设备编码",
+                    prop: "eqipmentCode",
                     width: "200"
                 }, {
-                    name: "批次号",
-                    prop: "batchNo",
-                    width: "200",
-                    class: "batch",
-                    cellClick: this.batchClick
+                    name: "设备名称",
+                    prop: "eqipmentName",
+                    width: "200"
                 }, {
-                    name: "物料编码",
-                    prop: "materialCode",
+                    name: "上报时间",
+                    prop: "reportTime",
                     width: "200",
-                    class: "material",
-                    cellClick: this.materialClick
                 }, {
-                    name: "物料名称",
-                    prop: "materialName",
+                    name: "检验时间",
+                    prop: "commitTime",
+                    width: "200",
+                }, {
+                    name: "审核时间",
+                    prop: "inspectedTime",
+                    width: "120"
+                }, {
+                    name: "人员姓名",
+                    prop: "operatorName",
                     width: "300"
                 }, {
-                    name: "数量",
-                    prop: "quantity",
+                    name: "员工号",
+                    prop: "operatorCard",
+                    width: "200"
+                },{
+                    name: "审核时间",
+                    prop: "inspectedTime",
                     width: "120"
                 }, {
-                    name: "班次",
-                    prop: "shiftName",
-                    width: "200"
-                }, {
-                    name: "操作人",
-                    prop: "personName",
-                    width: "200"
-                }, {
-                    name: "投入时间",
-                    prop: "happenTime",
-                    width: "200"
-                }],
+                    name: "检验结果",
+                    prop: "operatorCard",
+                    width: "120"
+                }
+                // ,{
+                //     name: "检验项目",
+                //     prop: "happenTime",
+                //     width: "500",
+                //     lists: [
+                //         {
+                //             itemName: "项目1",
+                //             value: "valeu0",
+                //            // width: "200"
+                //         },
+                //         {
+                //             itemName: "项目2",
+                //             value: "valeu1",
+                //            // width: "300"
+                //         }]
+                // }
+                
+                ],
                 height: 1,
-                data: []
-            },
-            /* 产出 */
-            outItems: {
-                columns: [{
-                    name: "条码",
-                    prop: "barcode",
-                    width: "200",
-                    fixed: true,
-                }, {
-                    name: "批次号",
-                    prop: "batchNo",
-                    width: "200"
-                }, {
-                    name: "箱码",
-                    prop: "",
-                    width: "200"
-                }, {
-                    name: "派工单号",
-                    prop: "doCode",
-                    width: "200"
-                }, {
-                    name: "物料编码",
-                    prop: "materialCode",
-                    width: "200",
-                    class: "barcode",
-                    cellClick: this.barcodeClick
-                }, {
-                    name: "物料名称",
-                    prop: "materialName",
-                     width: "300"
-                }, {
-                    name: "合格数",
-                    prop: "qualifiedNum",
-                    width: "120"
-                }, {
-                    name: "报废数",
-                    prop: "scrapNum",
-                    width: "120"
-                }, {
-                    name: "不合格数",
-                    prop: "unqualifiedNum",
-                    width: "120"
-                }, {
-                    name: "班次",
-                    prop: "shiftName",
-                   width: "200"
-                }, {
-                    name: "操作人",
-                    prop: "personName",
-                    width: "120"
-                }, {
-                    name: "产出时间",
-                    prop: "happenTime",
-                    width: "200"
-                }],
                 data: [],
-                height: 1
             },
-          //  viewHeight:0
-          routerContent:0
+
+            routerContent: 0
 
         }
 
@@ -224,14 +172,10 @@ export default {
 		}
     },
     mounted(){
-       this.inItems.height = this.outItems.height = this.adjustHeight()
+       this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
-
-        this.setTitle(".barcode","单件追踪")
-        this.setTitle(".batch","批次追踪")
-        this.setTitle(".material","遏制")
         
     },
     watch: {
@@ -243,7 +187,7 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
-        // 判断调用接口是否成功。
+       // 判断调用接口是否成功。
         judgeLoaderHandler(param, fnSu, fnFail) {
             let bRight = param.data.errorCode;
             
@@ -264,41 +208,51 @@ export default {
                 message: this.sErrorMessage,
                 duration: 3000
             });
-        },		       
+        },		              
         // 获取数据。
         fetchData() {    
             
             this.loading = true;
-            let oQuery = {}
-            Object.keys(this.$route.query).forEach((el)=>{
-                if(el !== "equipmentName" && el !== "processCode"){
-                    oQuery[el] = this.$route.query[el]
-                }
-                if(el !== "equipmentIdList" && el !== "processCode"){
-                    this.condition[el] = this.$route.query[el]
-                }
-            })
-
-            // let oQuery = this.$route.query;
-            // Object.keys(oQuery).forEach((el)=>{
-            //     debugger
-            //     if(el === "equipmentName" || el === "processCode"){
-            //         delete(oQuery[el])
-            //     }
-            // })
-            // this.condition = this.$route.query
-            // Object.keys(this.condition).forEach((el)=>{
-            //     if(el === "equipmentIdList" || el === "processCode"){
-            //         delete(this.condition[el])
-            //     }
-            // })
-            this.$post(url, oQuery)
+            let oQuery = this.$route.query;
+            this.condition = this.$route.query
+            this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    this.outItems.data = res.data.data.out
-                    this.inItems.data = res.data.data.in
+                    
+                    let odata = res.data.data,  //获取到的data
+                        tdata = [],             //想要的data 
+                     //   lists = [];          //想要的lists 
+                        obj = {
+                            name: "检验项目",
+                            width: "500",
+                            lists: []
+                        };
+                                                                
+                       odata.forEach((el) => {  /* 处理columns */
+                            let items = el.items
+                            items.forEach(function (el, index) {
+                                obj.lists[index] = {
+                                    itemName: `${el.itemName}`,
+                                    value: `value` + index
+                                }
+                            })
+                        })
+                        this.tableData.columns.push(obj)
+
+                        odata.forEach((el,index) => {       /* 处理data */
+                            let items = el.items
+                            items.forEach((el,index)=>{
+                                tdata[`valeu`+index] = el.value
+                            })
+                            let obj = Object.assign(el, tdata);
+                            console.log(obj)
+                            //debugger
+                            this.tableData.data.push(obj)
+                        })
+
+                   
                 });				 
             })
             .catch((err) => {
@@ -306,50 +260,6 @@ export default {
                 this.styleObject.minWidth = 0;   
                 console.log("数据库查询出错。")
             })
-        },
-        /**
-        * 格式化数据。
-        * @param {Array} aoData
-        * @return {Array}
-        */
-        formatData (aoData, aocolumns) {
-            // 按照条码进行排序。
-            aoData.sort((a, b) => a.equipmentId>b.equipmentId);
-            
-            let oEquipmentId = {},
-                nRow = 0,
-                nIndex = 1;
-            aoData.forEach((o, index) => {
-                if(oEquipmentId[o.equipmentId]) {							
-                    oEquipmentId[o.equipmentId]++;
-                    aoData[nRow].rowspan = oEquipmentId[o.equipmentId];
-                    o.hide = true;
-                }else {
-                    o.index = nIndex;
-                    oEquipmentId[o.equipmentId] = 1;
-                    nRow = index;
-                    nIndex ++;
-                    o.rowspan = oEquipmentId[o.equipmentId];
-                }
-            })   
-            
-            aocolumns.forEach(column => {					
-                if(aoData.every(o => o[column.prop] === "" || o[column.prop] == undefined)) {
-                // 若每一行都为空，设置隐藏。
-                    column.hide = true;
-                }
-            })
-        
-            return aoData;
-        },
-        batchClick() {
-            console.log("批次号")
-        },
-        barcodeClick() {
-            console.log("条码")
-        },
-        materialClick() {
-            console.log("物料编码")
         },
 
         // 表格导出。
@@ -373,9 +283,8 @@ export default {
             ntable = Math.floor(
                         this.viewHeight
                         -this.outerHeight(document.querySelector(".condition"))
-                        -this.outerHeight(document.querySelector(".inTitle"))
-                        -this.outerHeight(document.querySelector(".outTitle"))
-                    )/2;
+                        -this.outerHeight(document.querySelector(".tableData"))
+                    );
             return ntable;
         },
         /* 获取元素实际高度(含margin) */
@@ -389,7 +298,7 @@ export default {
         /* 设置table实际高度 */
         setTbaleHeight(){
             this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.inItems.height = this.outItems.height = this.adjustHeight()
+            this.tableData.height = this.adjustHeight()
         },
         /* 设置title */
         setTitle(el,title){
