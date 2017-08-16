@@ -78,7 +78,7 @@ export default {
                 }, {
                     name: "事件原因",
                     prop: "eReasonName",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "发生时间",
                     prop: "happenTime",

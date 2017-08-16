@@ -336,8 +336,8 @@ export default {
             console.log("条码")
         },
         materialClick(row) {
-            console.log("物料编码")
-            console.log(row)
+            // console.log("物料编码")
+            // console.log(row)
             let oQuery = {
                     batchNo : row.batchNo,
                     materialCode : row.materialCode

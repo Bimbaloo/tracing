@@ -29,8 +29,8 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
 	
-// const url = HOST + "/api/v1/trace/inout/by-equipment";
-const url =  `http://rapapi.org/mockjs/24404/quality/send-inspect/by-equipment-time?`
+const url = HOST + "/api/v1//quality/send-inspect/by-equipment-time";
+//const url =  `http://rapapi.org/mockjsdata/24404/quality/send-inspect/by-equipment-time?`
 export default {
     components: {
 		'v-table': table
@@ -70,23 +70,23 @@ export default {
                 }, {
                     name: "送检ID",
                     prop: "requestId",
-                    width: "200",
+                    width: "120",
                 }, {
                     name: "设备名称",
                     prop: "equipmentName",
-                    width: "200"
+                    width: "120"
                 }, {
                     name: "派工单号",
                     prop: "doCode",
-                    width: "200"
+                    width: "120"
                 }, {
                     name: "工序",
                     prop: "processName",
-                    width: "200",
+                    width: "120",
                 }, {
                     name: "式样号",
                     prop: "sampleIdentification",
-                    width: "200",
+                    width: "120",
                 }, {
                     name: "物料批次",
                     prop: "batchNo",
@@ -94,7 +94,7 @@ export default {
                 }, {
                     name: "物料名称",
                     prop: "materialName",
-                    width: "300"
+                    width: "120"
                 }, {
                     name: "送检时间",
                     prop: "createTime",
@@ -106,19 +106,21 @@ export default {
                 }, {
                     name: "送检报告名称",
                     prop: "reportName",
-                    width: "300"
+                    width: ""
                 }, {
                     name: "文件名称",
                     prop: "fileName",
-                    width: "300"
+                    width: "120"
                 }, {
                     name: "文件大小",
                     prop: "fileSize",
-                    width: "300"
+                    width: "120"
                 }, {
                     name: "操作",
-                    prop: "reportPath",
-                    width: "300"
+                    prop: "handle",
+                    width: "120",
+                    class: "handle",
+                    cellClick: this.fileDownload
                 }],
                 height: 1,
                 data: []
@@ -225,6 +227,9 @@ export default {
              
                 this.judgeLoaderHandler(res,() => {
                     this.tableData.data = res.data.data
+                    this.tableData.data.forEach((el)=>{
+                        el["handle"]="操作"
+                    })
                 });				 
             })
             .catch((err) => {
@@ -272,15 +277,14 @@ export default {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.tableData.height = this.adjustHeight()
         },
-        /* 设置title */
-        setTitle(el,title){
-            let elTds = document.querySelectorAll(el)
-            elTds.forEach((el,index)=>{
-                if(elTds[index].tagName.toLocaleLowerCase() === 'td'){
-                        el.setAttribute('title', title);
-                }
-            })
+        fileDownload(row) {
+            let src = row["reportPath"]
+         //   let src = "https://codeload.github.com/douban/douban-client/legacy.zip/master"
+            let objIframe = document.createElement("IFRAME");
+            document.body.appendChild(objIframe)
+            objIframe.outerHTML = "<iframe   name=a1   style='width:0;hieght:0'   src=" + src + "></iframe>";
         }
+
     }
 }
 </script>
@@ -308,9 +312,7 @@ export default {
 }
 
 .table {
-    .batch,
-    .barcode,
-    .material {
+    .handle {
         cursor: pointer;
         color: #f90;
 
