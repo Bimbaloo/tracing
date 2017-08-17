@@ -51,8 +51,8 @@ export default {
             tdResize: true, //是否允许拖动table大小
             dataName:[      // 条件对应中文名
                 {
-                    itemCode:"equipmentIdList",
-                    itemName:"物料编码"
+                    itemCode:"equipmentName",
+                    itemName:"物料"
                 },{
                     itemCode:"startTime",
                     itemName:"开始时间"
@@ -213,8 +213,15 @@ export default {
         fetchData() {    
             
             this.loading = true;
-            let oQuery = this.$route.query;
-            this.condition = this.$route.query
+            let oQuery = {}
+            Object.keys(this.$route.query).forEach((el)=>{
+                if(el === "equipmentId" || el === "startTime" || el === "endTime"){
+                    oQuery[el] = this.$route.query[el]
+                }
+                if(el === "equipmentName" || el === "startTime" || el === "endTime"){
+                    this.condition[el] = this.$route.query[el]
+                }
+            })
             this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
