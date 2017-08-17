@@ -502,7 +502,24 @@ var parseTreeData = function(aTreeData) {
 	
 }
 
+// 物料，设备等下拉框数据改变，查询时参数处理。
+var parseQueryParam = function(oQuery) {
+	let oParam = Object.assign({}, oQuery);
+	
+	// 修改下拉框显示的值。
+	for(let sParam in oParam) {
+		// 下拉数据
+		if(['materialCode', 'equipmentCode', 'processCode', 'personCode'].includes(sParam)) {
+			oParam[sParam] = oParam[sParam].split(":")[0];
+		}
+	}
+	
+	// 返回需要查询的参数。
+	return oParam;
+};
+
 export default {
 	parseData,
-	parseTreeData
+	parseTreeData,
+	parseQueryParam
 }

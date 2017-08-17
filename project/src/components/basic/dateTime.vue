@@ -1,7 +1,7 @@
 <template>
     <el-date-picker
       v-model="form[key]" 
-      type="datetime"
+      :type="dateType"
       :placeholder="hint" 
       style="width: 100%;"
       @change="dateChange">
@@ -10,7 +10,15 @@
 
 <script>
     export default {
-        props: ['formData', 'placeholderData', 'keyData'],
+        props: {
+        	formData: Object, 
+        	placeholderData: String, 
+        	keyData: String,
+        	dateType: {
+        		required: false,
+        		default: "datetime"
+        	}
+        },
         data() {
             return {
                 form: this.formData,

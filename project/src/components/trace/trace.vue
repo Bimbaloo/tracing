@@ -18,6 +18,7 @@
 <script>
 	import $ from "jquery"
     import table from "components/basic/table.vue"
+	import fnP from "assets/js/public.js"
 	
     export default {
         components: {
@@ -47,6 +48,7 @@
                     },{
                         prop: "barcode",
                         name: "条码",
+                        width: "120",
                         sortable: true,
                         fixed: true
                     },{
@@ -64,7 +66,7 @@
                         name: "设备编码",
                         sortable: true
                     },{
-                        prop: "equipmentType",
+                        prop: "modelName",
                         name: "设备类型",
                         sortable: true
                     },{
@@ -144,33 +146,20 @@
 
                 let sPath = oData.url;
                 
-                this.$ajax.post(sPath, this.$route.query)
+                this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
                 .then((res) => {
                     oData.loading = false;
 					oData.height = this.adjustHeight();
 					
                     if(!res.data.errorCode) {
+                    	// 正常 0
                         oData.data = res.data.data;
-//						if(oData.number > 1000) {
-//							this.$alert("查询结果集包含" + oData.number + "条数据，页面显示其中1000条，如需查询全部，请缩小条件范围进行精确查詢。", "提示", {
-//					          	confirmButtonText: "确定",
-//					          	callback: action => {
-//						            this.$message({
-//						              type: "info"
-//						            });
-//					        	}
-//					        });
-//						}
+                    }else if(res.data.errorCode == "1"){
+                    	// console 异常信息。
+                    	console.warn(res.data.errorMsg.message);
                     }else {
-//                  	oData.error = res.data.errorMsg.message;
-                    	// 当前是由于数据过多的提示，则显示出来。
-                    	let sError = res.data.errorMsg.message;
-                    	if(sError == "记录数量超过了2000，请缩小查询范围") {
-                    		oData.error = sError;
-                    	}else {
-                    		// 其他错误，则直接console
-                    		console.log(sError);
-                    	}
+                    	// 其他，显示异常信息。
+                    	oData.error = res.data.errorMsg.message;
                     }
                 })
                 .catch((err) => {

@@ -14,7 +14,8 @@
 </template>
 
 <script>
-
+	import fnP from "assets/js/public.js"
+	
     export default {
         data () {
             return { 
@@ -50,14 +51,15 @@
             },
             setRouteQuery() {
                 let aHref = location.href.split("?")[0].split("/"),
-                    sType = aHref[aHref.length-1];
+                    sType = aHref[aHref.length-1],
+                    oQuery = fnP.parseQueryParam(this.$route.query);
 
                 if(sType == "batch") {
-                    this.batch = this.$route.query;
+                    this.batch = oQuery;
                 }else if(sType == "restrain") {
-                    this.restrain = this.$route.query;
+                    this.restrain = oQuery;
                 }else {
-                    this.storage = this.$route.query;
+                    this.storage = oQuery;
                 }
             },
             setPathVisible(to) {

@@ -61,7 +61,7 @@
 				collapse: false,
 				url: HOST + "/api/v1/trace/up/trace-info",
 				treeData: {},
-				catalogData: {},//[],
+				catalogData: [],
 				params: []
 			}
 		},
@@ -147,15 +147,15 @@
 				let bRight = param.data.errorCode;
 				
 				// 判断是否调用成功。
-				if(bRight != "0") {
+				if(!bRight) {
+					// 调用成功后的回调函数。
+					fnSu && fnSu(param.data.data);
+				}else {
 					// 提示信息。
 					console.warn(param.data.errorMsg.message);
 					this.showMessage();
 					// 失败后的回调函。
 					fnFail && fnFail();
-				}else {
-					// 调用成功后的回调函数。
-					fnSu && fnSu(param.data.data);
 				}
 			},	
 			showMessage() {
@@ -188,6 +188,7 @@
 					})
 				})
 				.catch((err) => {
+					console.log(err)
 					this.fullscreenLoading = false;
 					console.warn('查询出错！')
 					this.showMessage();
@@ -277,78 +278,21 @@
 					link: aoDiagramLinkData
 				}
 			},
-
-			/**
-			 * 获取左侧目录树数据。
-			 * @return {void}
-			 */
-			parseCatalogData() {
-				let aoDiagramData = [],
-					aoDiagramLinkData = [],
-					aoData = $.extend(true, [], this.rawData); //Object.assign([], this.rawData)
-		
-					aoData.forEach(oData => {
-					
-						aoDiagramData.push(oData);
-						
-						// 物料或工序。 增加连接线。
-						let aoParents = oData.parents.split(",");
-						aoParents.forEach( sParent => {
-							aoDiagramLinkData.push({
-								from: sParent,
-								to: oData.key
-							});
-						})
-					})
-						
-					return {
-						node: aoDiagramData,
-						link: aoDiagramLinkData
-					}
-			},
 	
+		
 			/**
 			 * 获取左侧目录树数据。
-			 * @return {void}
+			 * @return {Array}
 			 */
-			parseCatalogData1() {	
-				let aoCopyData = [],
-					aoCatalogData = [],
-					oGroup = {},
-					aCopy = $.extend(true, [], this.rawData); //Object.assign([], this.rawData)
-		
-				aCopy.forEach(oData => {
-					if(oData.type != "1" && oData.subProcess && oData.subProcess.length) {
-						oData.subProcess.forEach(o => {
-							if(!o.parent) {
-								o.parent = oData.parent;
-							}
-							o.type = oData.type;
-							o.group = oData.key;
-							aoCopyData.push(o);
-							// 若当前节点在同一个group中无子节点，即为产线工序的最后一个节点
-							if(oData.subProcess.every(sub => sub.parent != o.key)) {
-								// 保存产线工序中的最后一个节点key。
-								oGroup[oData.key] = o.key;
-							}
-							
-						})
-					}else {
-						aoCopyData.push(oData);
-					}
-				})
-				
-				aoCopyData.map(o => {
-					// 若节点的父节点为产线节点，则该节点的父节点重设为产线中的最后一个节点key。					
-					if(oGroup[o.parent]) {
-						return o.parent = oGroup[o.parent];
-					}
-				});
-		
+			parseCatalogData() {	
+				let aoCatalogData = [],
+					aoCopyData = $.extend(true, [], this.rawData); //Object.assign([], this.rawData)
+						
 				for(let i = aoCopyData.length - 1; i >= 0; i--) {
 					let oData = aoCopyData[i];
 
-					if(oData.parent === "") {
+					if(oData.parents === "") {
+						oData.parent = "";
 						aoCatalogData.push(oData);
 
 						aoCopyData.splice(i, 1);
@@ -356,6 +300,7 @@
 					}
 				}
 
+				// 返回数据。
 				return aoCatalogData;
 				
 				/**
@@ -370,18 +315,19 @@
 						let oData = aoCopyData[i],
 							sNewKey = "";
 
-						if(oData && oData.parent === sKey) {
+						if(oData && oData.parents.split(",").includes(sKey)) {
+							// 当前元素的子级。
 							oData.parent = sParentKey;
 							aoCatalogData.push(oData);
-
+							
 							aoCopyData.splice(i, 1);
-
-							if(oData.type != 1) {
-								sNewKey = sParentKey;
-							} else {
+							
+							if(oData.isMaterialNode) {
 								sNewKey = oData.key;
+							}else {
+								sNewKey = sParentKey;
 							}
-
+							
 							if(aoCopyData.length) {
 								_findChildrenData(aoCopyData, oData.key, sNewKey)
 							}
@@ -389,6 +335,7 @@
 					}
 				}
 			},
+			
 			goToInit() {
 				console.log(1)
 			},

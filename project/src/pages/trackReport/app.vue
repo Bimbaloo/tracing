@@ -54,6 +54,7 @@
 	import report from "components/report/report.vue"
 	import table from "components/basic/table.vue"
 	import html2canvas from 'html2canvas'
+	import fnP from "assets/js/public.js"
 	
 	// 数据名称接口。
     const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
@@ -216,7 +217,7 @@
 				this.result.selected = (oConditions.selected && oConditions.selected.length) || 0;
 				this.result.whole = oConditions.length || 0;
 				this.result.filter = this.result.whole - this.result.selected;
-				 //debugger
+				
 				this.filters = oConditions.filters || [];
 				this.selected = oConditions.selected || [];
 			}
@@ -232,22 +233,22 @@
 				let bRight = param.data.errorCode;
 				
 				// 判断是否调用成功。
-				if(bRight != "0") {
+				if(!bRight) {
+					// 调用成功后的回调函数。
+					fnSu && fnSu(param.data.data);
+				}else {
 					// 提示信息。
 //					this.error = "查无数据";
 					console.warn(param.data.errorMsg.message);
 					// 失败后的回调函。
 					fnFail && fnFail();
-				}else {
-					// 调用成功后的回调函数。
-					fnSu && fnSu(param.data.data);
 				}
 			},	
 			fetchData () {
 				this.error = "";
 				this.gridData.data = [];
 				// url:api/v1/trace/down/start-points
-             	this.$post(this.url, this.filters)
+             	this.$post(this.url, fnP.parseQueryParam(this.filters))
              	.then((res) => {
 					//debugger
 					this.judgeLoaderHandler(res, (data) => {

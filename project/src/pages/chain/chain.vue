@@ -7,53 +7,49 @@
 			<!-- 内容部分 -->
 			<div class="strand-content-wrap">
 				<div class="strand-content">
-					
-					<!-- 过滤处理。 -->
-					<div class="filters content-filters">
-						<div class="filter-item filter-item-inline content-filter">
-							<label class="filter-name">物料:</label>
-							<v-select style="width:auto;" :form-data="searchParam" placeholder-data="请选择物料" key-data="materialCode" :list-data="materialData"></v-select>
-						</div>
-						<div class="filter-item filter-item-inline content-filter">
-							<label class="filter-name">批次:</label>
-							<v-input :form-data="searchParam" placeholder-data="请输入批次" key-data="batch"></v-input>
-						</div>
-						<div class="filter-item filter-item-inline content-filter">
-							<label class="filter-name">开始时间:</label>
-							<v-dateTime style="width: auto;" :form-data="searchParam" placeholder-data="请输入开始时间" key-data="startTime"></v-dateTime>
-						</div>
-						<div class="filter-item filter-item-inline content-filter">
-							<label class="filter-name">结束时间:</label>
-							<v-dateTime style="width: auto;" :form-data="searchParam" placeholder-data="请输入结束时间" key-data="endTime"></v-dateTime>
-						</div>
-						<v-button text-data="查询" @query="queryHandler"></v-button>
-					</div>
+					<el-form class="filters content-filters" :model="searchParam" :rules="rules" ref="searchParam" label-position="left" label-width="80px">
+						<el-form-item class="filter-item filter-item-inline content-filter" label="物料:" prop="materialCode">
+							<v-select placeholder-data="请选择物料" key-data="materialCode" :form-data="searchParam"></v-select>
+						</el-form-item>
+						<el-form-item class="filter-item filter-item-inline content-filter" label="批次:" prop="batchNo">
+							<v-input placeholder-data="请输入批次" key-data="batchNo" :form-data="searchParam"></v-input>
+						</el-form-item>
+						<el-form-item class="filter-item filter-item-inline content-filter" label="开始时间:" prop="startTime">
+							<v-dateTime style="width: auto;" date-type="date" placeholder-data="请输入开始时间" key-data="startTime" :form-data="searchParam"></v-dateTime>
+						</el-form-item>
+						<el-form-item class="filter-item filter-item-inline content-filter" label="结束时间:" prop="endTime">
+							<v-dateTime style="width: auto;" date-type="date" placeholder-data="请输入结束时间" key-data="endTime" :form-data="searchParam"></v-dateTime>
+						</el-form-item>
+						<el-form-item class="filter-item filter-item-inline content-filter">
+							<v-button text-data="查询" @query="queryHandler('searchParam')"></v-button>
+						</el-form-item>
+					</el-form>
 					
 					<div class="line"></div>
 					<!-- 内容区域 -->
-					<div class="content-main">
+					<div class="content-main" v-loading="bLoading">
 						<div class="content-title">断链数据分析</div>
 						
 						<div class="main-container">
 							<!-- 基本信息 -->
-							<div class="content-legend">
+							<div class="content-legend content-info">
 								<div class="legend-title">
 									<span class="legend-icon"></span>
 									<span class="legend-name">基本信息</span>							
 								</div> 
 								<div class="legend-main">
 									<div class="info-detail">
-										<span class="detail-item">物料名称: {{pageData.globalParameter && pageData.globalParameter.materialName}}</span>
-										<span class="detail-item">物料编码: {{pageData.globalParameter && pageData.globalParameter.materialCode}}</span>
-										<span class="detail-item">批次: {{pageData.globalParameter && pageData.globalParameter.batchNo}}</span>
-										<span class="detail-item">主生产计划号: {{pageData.globalParameter && pageData.globalParameter.orderCode}}</span>
-										<span class="detail-item">派工单号: {{pageData.globalParameter && pageData.globalParameter.doCode}}</span>
-										<span class="detail-item">工艺路线编码: {{pageData.globalParameter && pageData.globalParameter.manuProcessCode}}</span>
+										<span class="detail-item">物料名称: {{ pageData.basicInfoDto.materialName }}</span>
+										<span class="detail-item">物料编码: {{ pageData.basicInfoDto.materialCode }}</span>
+										<span class="detail-item">批次: {{ pageData.basicInfoDto.batchNo }}</span>
+										<span class="detail-item">主生产计划号: {{ pageData.basicInfoDto.orderCode }}</span>
+										<!--<span class="detail-item">派工单号: {{ pageData.basicInfoDto.doCode }}</span>-->
+										<span class="detail-item">工艺路线编码: {{ pageData.basicInfoDto.manuProcessCode }}</span>
 									</div>
 								</div>
 							</div>
 							<!-- 显示设置 -->
-							<div class="content-legend">
+							<div class="content-legend node-filter">
 								<div class="legend-title">
 									<span class="legend-icon"></span>
 									<span class="legend-name">显示设置</span>
@@ -62,11 +58,11 @@
 									<div class="filters info-filters">
 										<div class="filter-item filter-item-inline info-filter">
 											<label class="filter-name">链路类型:</label>
-											<v-multiSelect style="width:auto;" :form-data="filterParam" :list-data="nodeData" placeholder-data="请选择节点" key-data="nodeType"></v-multiSelect>
+											<v-multiSelect style="width:auto;" :form-data="filterParam" :list-data="nodeData" placeholder-data="请选择节点" key-data="nodeType" :all-data="multiAll"></v-multiSelect>
 										</div>
 										<div class="filter-item filter-item-inline info-filter">
 											<label class="filter-name">工序:</label>
-											<v-multiSelect style="width:auto;" :form-data="filterParam" :list-data="processAllData" placeholder-data="请选择工序" key-data="aFilterProcess"></v-multiSelect>
+											<v-multiSelect style="width:auto;" :form-data="filterParam" :list-data="processAllData" placeholder-data="请选择工序" key-data="aFilterProcess" :all-data="multiAll"></v-multiSelect>
 										</div>
 									</div>
 								</div>
@@ -75,7 +71,7 @@
 							<!-- 操作处理 -->
 							<div class="content-handler">
 								<v-button v-show="!bEdit" text-data="编辑" @query="editHandler"></v-button>
-								<v-button v-show="bEdit" :class={exitButtomMargin:bEdit} text-data="退出" @query="exitHandler"></v-button>
+								<v-button v-show="bEdit" :class="{exitButtomMargin:bEdit}" text-data="退出" @query="exitHandler"></v-button>
 								<v-button v-show="bEdit" text-data="保存" @query="saveHandler"></v-button>
 								<v-button v-show="bEdit && aAClickLineAllData.length" text-data="删除" @query="delHandler"></v-button>
 							</div>
@@ -87,15 +83,15 @@
 									<div  v-scrolls class="nodes-list">
 										
 										<div class="process-title">
-											<div class="process-item" v-for="item in getOrderProcess()">
+											<div class="process-item" v-for="(item,itemIndex) in orderProcess">
 												<div class="item-name" 
 													:class="{itemActivated:!bEdit && item == sCurrentProcess}" 
 													:process="item" 
-													@click.stop="showProcessFilter(item)">
+													@click.stop ="showProcessFilter(item, itemIndex)">
 													<span>{{ getProcessInfoByCode(item).processName }}</span>
 													<i class="el-icon-arrow-down"></i>
 												</div>
-												<div v-show="!bEdit &&item == sCurrentProcess" class="item-pop-filter">
+												<div v-show="!bEdit && item == sCurrentProcess" class="item-pop-filter">
 													<v-pFilter :process-data="processFilter[item]" @showPop="showPopModal"></v-pFilter>
 												</div>
 											</div>
@@ -104,23 +100,21 @@
 											<div class="process-lines">
 												<v-pLine 
 													:node-po="oNodePositon" 
-													:is-edit="bEdit"
-													v-for="line in getNodeLines()"
+													v-for="line in showNodeLine"
 													:line-type="getNodeLineType(line)"
 													:line-data="line"
 													@nodeLineClick="nodeLineClickHandler"
 												></v-pLine>
 											</div>
-											<div class="item-nodes" v-for="(item,column) in getOrderProcess()">
-												<div class="item-node" v-for="(node,row) in getFilterNodeByProcessCode(item)">
+											<div class="item-nodes" v-for="(item,column) in orderProcess">
+												<div class="item-node" :node-id="node" v-for="(node,row) in getFilterNodeByProcessCode(item)">
 													<el-tooltip placement="top">
 														<div slot="content">
 															<v-pTip :node-id="node" :node-tip="getNodeTipInfoById(node)"></v-pTip>
 														</div>
-														<v-pNode 
+														<v-pNode
 															:value="setNodePosition(node,row,column)"
-															:is-edit="bEdit" 
-															:class="{normal: getNodeType(node)=='normal', broken: getNodeType(node)=='broken',recovered: getNodeType(node)=='recovered'}" 
+															:class="{normal: getNodeType(node)=='normal', broken: getNodeType(node)=='broken',recovered: getNodeType(node)=='recovered', canDo: isNodeCanBeRecovered(node)}" 
 															:node-id="node" 
 															:node-value="getNodeInfoById(node)"
 															@nodeClick="nodeClickEvent">
@@ -129,47 +123,6 @@
 												</div>
 											</div>
 										</div>
-										<!--<div class="process-lines">
-											<v-pLine 
-												:node-po="oNodePositon" 
-												:is-edit="bEdit"
-												v-for="line in getNodeLines()"
-												:line-type="getNodeLineType(line)"
-												:line-data="line"
-												@nodeLineClick="nodeLineClickHandler"
-											></v-pLine>
-										</div>
-										<div class="process-item" v-for="(item,column) in getOrderProcess()">
-											<div class="item-name" 
-												:class="{itemActivated:!bEdit && item == sCurrentProcess}" 
-												:process="item" 
-												@click.stop="showProcessFilter(item)">
-												<span>{{ getProcessInfoByCode(item).processName }}</span>
-												<i class="el-icon-arrow-down"></i>
-											</div>
-											<div v-show="!bEdit &&item == sCurrentProcess" class="item-pop-filter">
-												<v-pFilter :process-data="processFilter[item]" @showPop="showPopModal"></v-pFilter>
-											</div>
-											<div class="item-nodes">
-												<div class="item-node" v-for="(node,row) in getFilterNodeByProcessCode(item)">
-													<el-tooltip placement="top">
-														<div slot="content">
-															<v-pTip :node-id="node" :node-tip="getNodeTipInfoById(node)"></v-pTip>
-														</div>
-														<v-pNode 
-															:value="setNodePosition(node,row,column)"
-															:is-edit="bEdit" 
-															:class="{normal: getNodeType(node)=='normal', broken: getNodeType(node)=='broken',recovered: getNodeType(node)=='recovered'}" 
-															:node-id="node" 
-															:node-value="getNodeInfoById(node)"
-															@nodeClick="nodeClickEvent">
-														</v-pNode>
-													</el-tooltip>
-												</div>
-												
-											</div>
-										</div>-->
-										
 									</div>
 								</div>
 							</div>
@@ -179,15 +132,15 @@
 				</div>
 			</div>
 		</div>
-		<v-pModal v-if="bProcessFilterModalShow" 
+		<v-pModal
 			:pop-show="bProcessFilterModalShow" 
 			:pop-type="sProcessFilterModalType"
 			:pop-recover="aRecoverInfo"
 			:pop-del="aRemoveInfo"
-			:pop-value="sProcessFilterModalType=='recoveredDes'||sProcessFilterModalType=='unRecoveredDes'?savePopFilter:processFilter[sCurrentProcess]"
+			:pop-value="popValue"
 			@hidePop = "hidePopModal"
 		></v-pModal>
-		<v-pProduce v-if="bRecoveredProduceModalShow"
+		<v-pProduce
 			:pop-show="bRecoveredProduceModalShow"
 			:pop-value="getRecoveredProducePopData()"
 			@hideProducePop="hideProducePopModal"
@@ -198,8 +151,7 @@
 <script>
 	import Vue from 'vue'
 	import $ from "jquery" 
-//	import axios from "axios"
-    import Header  from 'components/config/header.vue'
+    import Header  from 'components/header/header.vue'
 	import Input from "components/basic/input.vue"
     import Select from "components/basic/select.vue"
     import MultiSelect from "components/basic/multiSelect.vue"
@@ -224,8 +176,10 @@
     	label: "修复节点"
     }];
     
+    const LINK_NODE_URL = HOST + "/api/v1/linkrepair/links";
+    const LINK_NODE_REPAIR_URL = HOST + "/api/v1/linkrepair/repair"
+    
     export default {
-    	props: ["materialCodeData", "batchData"],
     	components: {
     		"v-header": Header,
     		"v-input": Input,
@@ -241,11 +195,43 @@
     		"v-pProduce": ProcessProduct
     	},
     	data() {
+    		let // 验证物料。
+            	validateMaterialcode = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入物料"));
+            		}else {
+            			callback();
+            		}
+            	},
+            	// 验证批次。
+            	validateBatch = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入批次"));
+            		}else {
+            			callback();
+            		}
+            	},
+        		// 验证结束时间。
+        		validateEndTime = (rule, value, callback) => {
+            		let sStart = this.searchParam.startTime;
+            		
+            		if(sStart && value && sStart > value) {
+            			// 如果开始时间存在，而且开始时间大于结束时间。
+            			callback(new Error("结束时间必须大于开始时间"));
+            		}else {
+            			callback();
+            		}
+            		
+            		
+            	};
+            	
+            let sMultiValue = "all";
+            
     		return {
     			// 获取页面数据。
     			pageData: {
-    				"processData":[],
-    				"globalParameter":{
+    				"doInOuts":[],
+    				"basicInfoDto":{
     					"materialName": "",
 						"materialCode": "",
 						"batchNo": "",							
@@ -283,11 +269,14 @@
     			oAClickNodeProduceData: {},
     			// node节点的位置。
     			oNodePositon: {},
+    			// 多选全部的提示字段。
+    			multiAll: sMultiValue,
     			// 提示信息。
     			sInfo: "",
     			// 修复时的数据。
     			aRecoverInfo: [],
     			aRemoveInfo: [],
+    			bLoading: false,
     			// 弹窗保存的修复节点的数据。
     			savePopFilter: {
     				"recoveredDes": {
@@ -301,44 +290,70 @@
     					"list": []
     				}
     			},
-    			// 当前过滤的值。
     			filterParam: {
     				// 节点类型。
-    				"nodeType": ["1","2","3"],
+    				"nodeType": [sMultiValue],		//["1","2","3"],
     				// 需过滤出工序值。
-    				"aFilterProcess": []
-    			}
+    				"aFilterProcess": [sMultiValue]
+    			},
+    			// 当前查询的值。
+    			searchParam: {
+    				"materialCode": "20000256",
+    				"batchNo": "20160420b",		//"23620170215夜班",
+    				"startTime": "",
+    				"endTime": ""
+    			},
+    			// 查询规则。
+				rules: {
+					// 物料。
+					materialCode: [{validator: validateMaterialcode, trigger: "change"}],
+					// 批次
+					batchNo: [{validator: validateBatch, trigger: "blur"}],
+					// 开始时间。
+//					startTime: [{validator: validateStartTime, trigger: "change"}],
+					// 结束时间。
+					endTime: [{validator: validateEndTime, trigger: "change"}]
+				}
     		}
-    	},
-    	beforeCreate: function() {
-    		let _that = this;
-    		// 初始化加载页面时，获取所有物料数据。
-    		// axios.get('',{param}).then().catch().bind(this)
-    		_that.$ajax.get('static/materialData.json').then((res) => {
-		       _that.materialData = _that.parseMaterialFormat(res.data.materialData);
-    		});
     	},
     	// 计算属性。
     	computed: {
-			// 当前需查询的值。
-    		searchParam: function() {
-    			return {
-    				"materialCode": "1.3T402", //this.materialCodeData,
-    				"batch": this.batchData,
-    				"startTime": "2017-04-01 19:00:00",
-    				"endTime": "2017-06-07 10:00:00"
-    			}
-    		},
+			// 获取所有的节点线。 [ [1,2,3,4],[1,3,5] ]
+			allNodeLine: function() {
+				return this.getAllNodeLines();
+			},
+			// 获取所有可连线的节点 [1,2,3,4,5]
+			allFilterNode: function() {
+				return this.getFilterNode();
+			},
+			// 获取当前节点显示的所有线。
+			displayNodeLine: function() {
+				return this.getNodeLine();
+			},
+			// 获取显示的线。--- 增加和删除的。
+			showNodeLine: function() {
+				return this.getNodeLines()
+			},
+			// 弹窗数据。
+			popValue: function() {
+				if(this.bProcessFilterModalShow) {
+					return this.sProcessFilterModalType =='recoveredDes'||this.sProcessFilterModalType=='unRecoveredDes'?this.savePopFilter:this.processFilter[this.sCurrentProcess]
+				}else {
+					return {}
+				}
+			},
+			// 排序后工序。
+			orderProcess: function() {
+				return this.getOrderProcess();
+			},
     		// 获取每道工序的过滤筛选值。
     		processFilter: function() {
     			// 当前所有的工序过滤值。
     			var oReturnFilter = {},
-    				_that = this,
-    				sFunGetNodeParam = this.getProcessNodesParam,
-    				sFunUnique = this.getDataUnique;
+    				_that = this;
     				
     			// 根据工序值过滤
-    			this.pageData.globalParameter.processArr.forEach(function(oProcess) {
+    			this.pageData.basicInfoDto.processArr.forEach(function(oProcess) {
     				// 当前工序过滤所需参数。
     				let sProcessCode = oProcess.processCode,
     					// 投入时间。
@@ -346,11 +361,11 @@
     					// 产出时间。
     					aOutTime = _that.getProcessNodesParam(sProcessCode, "outHappenTime"),
     					// 操作人。
-    					aPerson = _that.getDataUnique(oProcess.personName),
+    					aPerson = _that.getDataUnique(oProcess.personNames),
     					// 设备。
-    					aEquipment = _that.getDataUnique(oProcess.equipment),
+    					aEquipment = _that.getDataUnique(oProcess.equipmentNames),
     					// 工单。
-    					aDoCode = _that.getDataUnique(oProcess.doCode);
+    					aDoCode = _that.getDataUnique(oProcess.doCodes);
     				
     				// 返回的是每道工序筛选过滤的参数值。
 	    			let oData = {
@@ -379,22 +394,22 @@
 	    					"name": "操作人",
 							"checked": false,
 							// 默认选中第一个。
-							"selected": aPerson,  //aPerson.length ? aPerson[0]: "",
+							"selected": [_that.multiAll],	//aPerson,  //aPerson.length ? aPerson[0]: "",
 							"value": aPerson
 	    				},
 	    				// 设备。
 	    				"equipment": {
 	    					"name": "设备",
 							"checked": false,
-							"selected": aEquipment,	//aEquipment.length? aEquipment[0]: "",
+							"selected": [_that.multiAll],		//aEquipment,	//aEquipment.length? aEquipment[0]: "",
 							"value": aEquipment
 	    				},
 	    				// 工单。
 	    				"doCode": {
 	    					"name": "工单",
 							"checked": false,
-							"selected": aDoCode,	//aDoCode.length ? aDoCode[0]: "",
-							"value": aDoCode
+							"selected": [_that.multiAll],		// aDoCode,	//aDoCode.length ? aDoCode[0]: "",
+							"value":  aDoCode
 	    				}
 	    			};
     				
@@ -408,7 +423,19 @@
     	},
     	// 创建
     	created() {
-    		this.queryHandler();
+    		// 获取所需的查询参数。
+			let oData = sessionStorage.getItem("searchConditions");
+
+			// 断链模块。
+		    if(oData) {
+		        oData = JSON.parse(oData);
+		        if(oData.tab === "chain") {
+		        	this.searchParam = oData.keys;
+		        }
+		    }
+		    
+    		// 默认查询。
+    		this.getPageData();
     	},
 		directives: {
 			"scrolls" : {
@@ -421,14 +448,44 @@
 				}
 			}
 		},
+		mounted() {
+			let _that = this;
+			
+			// 按钮。
+			$(".exitBtn, .saveBtn, .delBtn").hide();
+			
+			window.onresize = () => {
+		        _that.setHeight();
+		    }
+		},
     	// 方法
     	methods: {
+    		// 设置内容的高度。
+    		setHeight() {
+    			let nContentHeight = $(".strand-content").height(),
+    				nHeight = 0;
+    				
+    			nHeight = document.body.clientHeight
+    					- $("header").outerHeight(true)
+    					- ($(".strand-content-wrap").outerHeight(true) - $(".strand-content-wrap").height())
+    					- 40
+    					- $(".content-filters").outerHeight(true)
+    					- $(".line").outerHeight(true)
+    					- $(".content-main .content-title").outerHeight(true)
+    					- $(".content-info").outerHeight(true)
+    					- $(".node-filter").outerHeight(true)
+    					- $(".content-handler").outerHeight(true)
+    					- ($(".content-nodeWraps").outerHeight(true) - $(".content-nodeWraps").height())
+    			
+    			$(".nodes-list").height(nHeight)
+//  			return nHeight
+    		},
     		// 初始化数据。恢复页面数据为初始化显示的值。
     		initData() {
     			// 获取页面数据。
     			this.pageData = {
-    				"processData":[],
-    				"globalParameter":{
+    				"doInOuts":[],
+    				"basicInfoDto":{
     					"materialName": "",
 						"materialCode": "",
 						"batchNo": "",							
@@ -446,7 +503,7 @@
     			this.nodeData = aoNodeType;
     			this.processAllData = [];
     			this.sCurrentProcess = "";
-    			this.sProcessFilterModalType =  "",
+    			this.sProcessFilterModalType = "",
     			this.bProcessFilterModalShow = false;
     			this.bRecoveredProduceModalShow = false;
     			this.oAClickNodeProduceData = {};
@@ -467,19 +524,28 @@
     				}
     			};
     			
-    			this.filterParam.nodeType = ["1","2","3"];
+    			this.filterParam.nodeType = [this.multiAll];
     		},
     		// 设置节点的位置。
     		setNodePosition(sNode,row,column) {
     			this.oNodePositon[sNode] = [row,column]
     		},
-    		// 获取节点的位置。
-    		getNodePosition(sNode) {
-    			return this.oNodePositon[sNode];
-    		},
     		// 显示提示信息。
     		showMessage() {
     			this.$message(this.sInfo);
+    		},
+    		/**
+    		 * 获取工序节点的工序值。
+    		 * @param {Object} oNode
+    		 * @return {String} sProcessCode
+    		 */
+    		getNodeProcessCode(oNode) {
+    			let sProcessCode = "";
+    			
+    			sProcessCode = oNode.parentProcessCode || oNode.inProcessCode;
+    			
+    			// 返回工序节点的工序值。
+    			return sProcessCode;
     		},
     		// 获取修复时的数据信息。
     		getRecoveredInfo(aRcover) {
@@ -489,12 +555,15 @@
     			// 修复的数据。
     			aRcover.forEach(function(aNode) {
     				var aData = [];
+    				console.log(aNode)
     				aNode.forEach(function(sNode, nIndex) {
     					// 根据索引判别上、下工序。
+    					console.log(sNode)
     					let oValue = _that.getNodeInfoById(sNode),
-    						sKey = (nIndex == 0)?"in": "out"
+    						sKey = (nIndex == 0) ?"in": "out";
+    						
     					aData.push({
-    						processName: oValue.procesName,
+    						processName: oValue.parentProcessName||oValue.inProcessName,
     						equipmentName: oValue[sKey+"EquipmentName"],
     						happenTime: oValue[sKey+"HappenTime"],
     						quantity: oValue[sKey+"Quantity"]
@@ -509,7 +578,8 @@
     		},
     		// 获取显示的线。
     		getNodeLines() {
-    			let aLines = this.getNodeLine(),
+    			console.log("--000")
+    			let aLines = this.displayNodeLine,	//this.getNodeLine(),
     				aAdd = this.aAClickNodeAllData,
     				aDel = this.aAClickLineBeforeData,
     				aNew = [],
@@ -518,7 +588,6 @@
     			// 添加线。
     			aNew = aLines.concat(aAdd);
     			// 删除线。
-    			
     			// 判断是否存在，两个 数组中存在的数据都是顺序的。
     			aDel.forEach(function(aRemove) {
     				let bFlag = false,
@@ -549,40 +618,64 @@
     				sType = "";
     			
     			// 正常节点。
-    			if(nIsBroken == "0" && nIsRecovered == "0") {
+//  			if(nIsBroken == "0" && nIsRecovered == "0") {
+//  				sType = "normal"
+//  			}else if(nIsBroken == "1" ) {
+//  				sType = "broken";
+//  			}else if(nIsRecovered != "0") {
+//  				sType = "recovered";
+//  			}
+    			
+    			if(!nIsBroken && !nIsRecovered) {
     				sType = "normal"
-    			}else if(nIsBroken == "1" ) {
+    			}else if(nIsBroken) {
     				sType = "broken";
-    			}else if(nIsRecovered != "0") {
+    			}else if(nIsRecovered) {
     				sType = "recovered";
     			}
     			
     			// 返回节点的类型。
     			return sType;
     		},
+    		// 判断节点是否可以修复
+    		isNodeCanBeRecovered(sNode) {
+    			let oNode = this.getNodeInfoById(sNode),
+    				bFlag = false;
+    			
+    			// 投入修复 或产出修复。
+    			if(oNode.isInCanRepair || oNode.isOutCanRepair) {
+    				bFlag = true;
+    			}
+    			
+    			// 返回节点的类型。
+    			return bFlag;
+    		},
     		// 判断节点之间的连线类型。
     		getNodeLineType(aLine) {
+    			console.log("22222")
     			let bFlag = false,
     				_that = this,
     				sType = "normal";
+    				
     			// 已经是顺序的。
     			aLine = _that.setNodeOrder(aLine);
     			
-    			// 上道工序修复为2，或下道工序修复为1
-    			if(_that.getNodeInfoById(aLine[0]).repairType == "2" || _that.getNodeInfoById(aLine[1]).repairType=="1") {
-    				sType = "recovered";
-    			}
+    			// 上道工序修复为2，3，或下道工序修复为1，3
+    			aLine.forEach( function(sNode, nIndex) {
+    				let sValue = _that.getNodeInfoById(sNode).repairType;
+    				
+    				if( sValue == "3" || (!nIndex && sValue == "2") || (nIndex && sValue == "1")) {
+    					sType = "recovered";
+    				}
+    			});
     			
     			// 返回节点的类型。
     			return sType;
     		},
     		// 获取工序数据。
     		getProcessData() {
-    			let _that = this,
-    				aProcess = _that.parseProcessFormat(_that.pageData.globalParameter.processArr);
-    			
     			// 返回数据。
-    			return aProcess;
+    			return this.parseProcessFormat(this.pageData.basicInfoDto.processArr);
     		},
     		getInitProcessData() {
     			let _that = this,
@@ -593,21 +686,6 @@
     				aReturn.push(oData.value);
 				});
 				return aReturn;
-    		},
-    		// 物料数据格式转换
-    		parseMaterialFormat(aoData) {
-    			console.log(aoData)
-    			var aoNewData = [];
-    			
-    			// 物料数据格式处理。select显示-- label value
-				aoData.forEach((oData) => {
-					aoNewData.push({
-						label: oData.materialName,
-						value: oData.materialCode
-					});
-				});
-    			// 返回物料转换后的数据。
-    			return aoNewData;
     		},
     		// 工序数据格式转换。
     		parseProcessFormat(aoData) {
@@ -628,7 +706,7 @@
 				// 当前节点信息。
     			let aProcess = [];
     			
-    			aProcess = this.pageData.globalParameter.processArr.filter(function(oNode) {
+    			aProcess = this.pageData.basicInfoDto.processArr.filter(function(oNode) {
     				return oNode.processCode == sCode;
     			});
     			
@@ -642,10 +720,13 @@
 			// 根据工序编码获取当前工序下所有投入或产出节点。
 			getProcessNodesByCode(sCode) {
 				// 当前数据。
-				let aMatchData = [];
+				let aMatchData = [],
+					_that = this;
 				
-				aMatchData = this.pageData.processData.filter(function(oProcess) {
-					return oProcess.processCode == sCode;
+				// 获取匹配的数据。
+				aMatchData = this.pageData.doInOuts.filter(function(oProcess) {
+					return _that.getNodeProcessCode(oProcess) == sCode;
+//					return oProcess.parentProcessCode == sCode || oProcess.inProcessCode == sCode;
 				});
 				
 				// 返回数据。
@@ -680,7 +761,7 @@
     			let aNode = [],
     				nIndex = -1;
     			
-    			aNode = this.pageData.processData.filter(function(oNode,n) {
+    			aNode = this.pageData.doInOuts.filter(function(oNode,n) {
     				if(oNode.id == sId) {
 	    				nIndex = n;
 	    				return true;
@@ -702,7 +783,7 @@
     			if(nIndex == -1) {
     				return {};
     			}else {
-    				return this.pageData.processData[nIndex];
+    				return this.pageData.doInOuts[nIndex];
     			}
     		},
     		// 获取节点投产信息的提示数据。
@@ -740,19 +821,25 @@
     		},
     		// 获取过滤后需显示的所有节点。
     		getFilterNode() {
+    			console.log("====1")
 				var aNode = [],
 					_that = this,
 					aDisplayNodeType = this.filterParam.nodeType,
-					aAllLine = this.getAllNodeLines(),
-					sFunGetNode = this.getNodeInfoById,
-					sObjFilter = this.processFilter;
+					aAllLine = this.allNodeLine;	//this.getAllNodeLines();
 				
 				// 类型节点中的过滤。--- 这是含有线的节点的判断。
 				aAllLine.forEach(function(aLine) {
 					// 判断是否合法。
-					let bFlag = aDisplayNodeType.some(function(sType) {
-						return _isLineAble(aLine,sType);
-					});
+					let bFlag = false;
+					
+					// 如果节点时全部，则不用判断。
+					if(aDisplayNodeType.includes(_that.multiAll)) {
+						bFlag = true;
+					}else {
+						bFlag = aDisplayNodeType.some(function(sType) {
+							return _isLineAble(aLine,sType);
+						});
+					}
 					
 					if(bFlag) {
 						// 合法，将节点加加入。
@@ -761,22 +848,23 @@
 				});
 				
 				// 单个节点，是断链的状态，判断当前节点类型是否含有断链。
-				if(aDisplayNodeType.indexOf("2")>-1) {
+				if(aDisplayNodeType.includes(this.multiAll) || aDisplayNodeType.indexOf("2")>-1) {
 					// 含有断链。
 					aNode = aNode.concat(this.getAllNodeNoneLine());
 				}
+				
 				aNode = this.getDataUnique(aNode);
 
 				// 工序中的节点过滤数据。
 				for(var i=0; i<aNode.length; i++) {
 					let sNodeId = aNode[i],
 						oNode = _that.getNodeInfoById(sNodeId),
-						sProcessCode = oNode.processCode,
+						sProcessCode =  _that.getNodeProcessCode(oNode),	// oNode.parentProcessCode || oNode.inProcessCode,
 						aFilterProcess = _that.filterParam.aFilterProcess;
 					
 					// 当前节点存在于aFilter中 
-					// oFilter中的过滤循环于当前节点不匹配
-					if(!(aFilterProcess.indexOf(sProcessCode) >-1 && _isFilterProcessAble(oNode,sProcessCode))) {
+					// oFilter中的过滤循环于当前节点不匹配-- 如果是所有节点，则不用过滤。
+					if(!( (aFilterProcess.includes(_that.multiAll) || aFilterProcess.indexOf(sProcessCode) >-1) && _isFilterProcessAble(oNode,sProcessCode)) ) {
 						aNode.splice(i,1);
 						i--;
 					}
@@ -869,8 +957,8 @@
 									// 当前操作人是否在选中之中。
 									let aSelectedPerson = oParam.selected;
 									
-									// 操作人是否在选中之中。
-									if(!(aSelectedPerson.indexOf(oNode.inPersonName) >-1 || aSelectedPerson.indexOf(oNode.outPersonName) > -1)) {
+									// 操作人是否在选中之中。 没有选中全部，且开始和结束都不包含。
+									if(!aSelectedPerson.includes(_that.multiAll) && !(aSelectedPerson.indexOf(oNode.inPersonName) >-1 || aSelectedPerson.indexOf(oNode.outPersonName) > -1)) {
 										bFlag = false;
 									}
 									
@@ -878,16 +966,20 @@
 								case "equipment":
 									// 当前设备是否在选中之中。
 									let aSelectedEquipment = oParam.selected;
-									if(!(aSelectedEquipment.indexOf(oNode.inEquipmentName) >-1 || aSelectedEquipment.indexOf(oNode.outEquipmentName) > -1)) {
+									
+									if(!aSelectedEquipment.includes(_that.multiAll) && !(aSelectedEquipment.indexOf(oNode.inEquipmentName) >-1 || aSelectedEquipment.indexOf(oNode.outEquipmentName) > -1)) {
 										bFlag = false;
 									}
+									
 									break;
 								case "doCode":
 									// 当前工单是否在选中之中。
 									let aSelectedCode = oParam.selected;
-									if(!(aSelectedCode.indexOf(oNode.inDoCode) >-1 || aSelectedCode.indexOf(oNode.outDoCode) > -1)) {
+									
+									if(!aSelectedCode.includes(_that.multiAll) && !(aSelectedCode.indexOf(oNode.inDoCode) >-1 || aSelectedCode.indexOf(oNode.outDoCode) > -1)) {
 										bFlag = false;
 									}
+									
 									break;
 								default:
 									break;
@@ -903,14 +995,15 @@
     		},
     		// 获取目标工序下需显示的所有过滤后的节点。
     		getFilterNodeByProcessCode(sCode) {
-    			var aNodes = this.getFilterNode(),
+    			console.log("====01")
+    			var aNodes = this.allFilterNode,		//this.getFilterNode(),
     				_that = this,
-    				aNow = [],
-    				sFun = this.getNodeInfoById;
+    				aNow = [];
     				
     			// 获取该工序下的所有节点。
     			aNow = aNodes.filter(function(sNode) {
-    				return _that.getNodeInfoById(sNode).processCode == sCode;
+    				let oNode = _that.getNodeInfoById(sNode);
+    				return _that.getNodeProcessCode(oNode) == sCode;
     			});
     			
     			// 节点的排序。
@@ -920,35 +1013,46 @@
     				
     				return sPrevInTime > sNextInTime ? 1:-1;
     			});
+    			
     			console.log(sCode + ":"+aNow)
     			// 返回数据。
     			return aNow;
     		},
     		// 获取显示的工序-- 会根据工序顺序排序。
     		getOrderProcess() {
-    			let aProcess = this.filterParam.aFilterProcess,
-    				aOrderProcess = [],
-    				sFun = this.getProcessInfoByCode;
-    				
+    			console.log("fsfsf")
+    			let _that = this,
+    				aProcess = this.filterParam.aFilterProcess,
+    				aOrderProcess = [];
+    			
+    			// 如果是all，则获取所有数据。
+    			if(aProcess.includes(this.multiAll)) {
+    				aProcess = this.getInitProcessData();
+    			}
+    			
     			aOrderProcess = $.extend(true, [], aProcess);
     			// 根据工序排序。
     			aOrderProcess.sort(function(sPrev,sNext) {
-    				let sPrevSeq = sFun(sPrev).processSeq,
-    					sNextSeq = sFun(sNext).processSeq;
+    				let sPrevSeq = _that.getProcessInfoByCode(sPrev).processSeq,
+    					sNextSeq = _that.getProcessInfoByCode(sNext).processSeq;
     				return sPrevSeq - sNextSeq; 
     			});
+    			
     			// 返回数据。
     			return aOrderProcess;
     		},
     		// 判断节点是否是其他节点的上道工序。
     		isHasTheLastLine(sNode) {
-    			let aAllData = this.pageData.processData,
+    			let aAllData = this.pageData.doInOuts,
     				// 默认不存在。
     				bFlag = false;
     				
     			// 存在某个节点的上个工序为此节点。
 				bFlag = aAllData.some(function(oData) {
-					let aSource = oData.sourceId.split(",");
+					let aSource = [];
+					if(oData.sourceIds) {
+						aSource = oData.sourceIds.split(",");
+					}
 					return aSource.indexOf(sNode) > -1;
 				});
     			
@@ -958,12 +1062,12 @@
     		// 获取所有没有线的节点。
     		getAllNodeNoneLine() {
     			let aNode = [],
-    				aAllData = this.pageData.processData,
+    				aAllData = this.pageData.doInOuts,
     				_that = this;
     				
-    			// 所有单个节点。 sourceId为空且没有数据的sourceId为其id。
+    			// 所有单个节点。 sourceIds为空且没有数据的sourceIds为其id。
     			aAllData.forEach(function(oData) {
-    				var sPrevId = oData.sourceId,
+    				var sPrevId = oData.sourceIds,
     					sCurrentId = oData.id;
     			    
     				if(!sPrevId) {
@@ -973,7 +1077,7 @@
     					bFlag = _that.isHasTheLastLine(sCurrentId);
 //  					// 存在某个节点的上个工序为此节点。
 //  					bFlag = aAllData.some(function(oData) {
-//  						let aSource = oData.sourceId.split(",");
+//  						let aSource = oData.sourceIds.split(",");
 //  						return aSource.indexOf(sCurrentId) > -1;
 //  					});
     					
@@ -991,11 +1095,12 @@
     			// 获取所有节点的线。
     			var aLine = [],
     				aNewLine = [];
-    				
+    			
+    			console.log("=====2")
     			// 获取所有的单线。
-    			this.pageData.processData.forEach(function(oData) {
-    				var sPrevId = oData.sourceId,
-    					sCurrentId = oData.id;
+    			this.pageData.doInOuts.forEach(function(oData) {
+    				var sPrevId = oData.sourceIds,
+    					sCurrentId = oData.id+"";
     			    				
     				if(sPrevId) {
     					// 存在上级工序。
@@ -1037,6 +1142,7 @@
 					// 返回数据。
 					return bFlag;
 				}
+				
 				// 获取当前节点的
 				function _getLine(aNow) {
 					var sPrev = aNow[0],
@@ -1123,15 +1229,16 @@
     		},
     		// 数据转换，获取所有的链接线值。
     		getNodeLine() {
+    			console.log("---02")
     			// 获取所有节点连线的值。
     			var aLine = [],
-    				aDisplayNode = this.getFilterNode(),
+    				aDisplayNode = this.allFilterNode,	//this.getFilterNode(),
     				_that = this;
     				
     			// 获取所有节点的线。
     			aDisplayNode.forEach(function(sNodeId) {
     				let oData = _that.getNodeInfoById(sNodeId),
-    					sPrevId = oData.sourceId,
+    					sPrevId = oData.sourceIds,
     					sCurrentId = sNodeId;
     			    				
     				if(sPrevId) {
@@ -1167,25 +1274,72 @@
     			return aNewData;
     		},
     		// 物料查询操作。
-    		queryHandler() {
+    		queryHandler(formName) {
     			let _that = this;
-    			
-    			// 设置初始化显示的值。
-    			_that.initData();
-    			// 查询的参数。
+    			this.$refs[formName].validate((valid) => {
+    				if (valid) {
+		    			// 设置初始化显示的值。
+		    			_that.initData();
+		    			
+//		    			// 更新form中的值。
+//						let oData = sessionStorage.getItem("searchConditions");
+//		
+//						// 断链模块。
+//					    if(oData) {
+//					        oData = JSON.parse(oData);
+//					        if(oData.tab === "chain") {
+//						        oData.keys = this.searchParam;
+//						        sessionStorage.setItem("searchConditions", JSON.stringify(oData));
+//					        }
+//					    }
+					    
+					    // 获取创建数据。
+						this.getPageData();
+    				}
+    			});
+    		},
+    		// 判断调用接口是否成功。
+			judgeLoaderHandler(param, fnSu, fnFail) {
+				let bRight = param.data.errorCode;
+				
+				// 判断是否调用成功。
+				if(bRight) {
+					// 提示信息。
+					this.$message.error(param.data.errorMsg.message);
+					// 失败后的回调函。
+					fnFail && fnFail();
+				}else {
+					// 调用成功后的回调函数。
+					fnSu && fnSu(param.data.data);
+				}
+			},
+    		// 获取数据。
+    		getPageData() {
+    			let _that = this;
     			// 根据输入值，获取页面中的所有数据。
-				_that.$ajax.get('static/searchData1.json').then((res) => {
-			       _that.pageData = res.data.data;
-			       _that.processAllData = _that.getProcessData();
-			       _that.filterParam.aFilterProcess = _that.getInitProcessData();
-			   });
-			   console.log(_that)
+			   	this.bLoading = true;
+			   	this.$ajax.post(LINK_NODE_URL, this.searchParam).then((res) => {
+			   		_that.bLoading = false;
+					_that.judgeLoaderHandler(res, (data) => {
+						// 格式化数据。
+						_that.pageData = data;
+				        _that.processAllData = _that.getProcessData();
+				        
+				        _that.$nextTick(() => {
+				          _that.setHeight()           
+				        })
+					})
+				})
+				.catch((err) => {
+					_that.bLoading = false;
+					_that.$message.error('查询出错')
+				})
     		},
     		// 点击是否显示当前显示工序的下拉框 -- 更改sCurrentProcess的值
-    		showProcessFilter(sNow) {
+    		showProcessFilter(sNow, index) {
     			// 根据sNow，即当前点击的值，判断是否显示。
-    			var // 目前正在显示的工序。
-    				sPrev = this.sCurrentProcess;
+    			var sPrev = this.sCurrentProcess;
+    			
     			if(!this.bEdit) {
     				// 非编辑状态中才处理
 					if(sNow == sPrev) {
@@ -1195,32 +1349,35 @@
 						this.sCurrentProcess = sNow;
 					}
     			}
+    			
+//				$(".nodes-list .process-item").eq(index).find(".item-pop-filter").show();
     		},
     		// 根据编辑的筛选项显示弹窗。
     		showPopModal(sType) {
 				// 设置弹窗的显示类型。
-				this.sProcessFilterModalType = sType;
 				// 显示弹窗。
 				this.bProcessFilterModalShow = true;
-				console.log(sType)
+				this.sProcessFilterModalType = sType;
     		},
     		// 隐藏弹窗。
     		hidePopModal(data) {
     			// 隐藏弹窗。
 				this.bProcessFilterModalShow = false;
+				
 				if(data) {
+					//　断链修改保存弹窗。
 					if(this.sProcessFilterModalType == "recoveredDes") {
 						// 保存弹窗中的类型。 -- 保存断链修复的操作。
 						this.saveNodeHandler(data);
-					}else if(this.sProcessFilterModalType == "unRecoveredDes"){
-						// 删除断链中的节点操作。
-						this.delNodeLineHandler(data);
-					}else{
+					}else　{
+						//　工序过滤弹窗。
+						
 						// 数据存在，表示是保存的处理，会将数据都设置。更新数据。
-						Vue.set(this.processFilter[this.sCurrentProcess], this.sProcessFilterModalType, data)
+						this.$set(this.processFilter[this.sCurrentProcess], this.sProcessFilterModalType, data)
 					}
 				}
-				console.log(1)
+				
+				this.sProcessFilterModalType = "";
     		},
     		// 隐藏修复时弹窗数据。
     		hideProducePopModal(aData) {
@@ -1252,18 +1409,6 @@
     			}
     		},
     		// 判断两个节点是否在同一道工序中。
-    		judgeNodeIsRight(sNode1,sNode2) {
-    			let oNode1 = this.getNodeInfoById(sNode1),
-    				oNode2 = this.getNodeInfoById(sNode2),
-    				bRight = false;
-    			
-    			// 当前节点是否在一个工序中。
-    			if(oNode1.processCode == oNode2.processCode) {
-    				bRight = true;
-    			}
-    			// 返回判断值。
-    			return bRight;
-    		},
     		// 节点编辑时，判断点击的节点是否已经连接成线。 --- 即是否已经与其他点匹配。
     		isNodeBeLined(sNode) {
     			// 默认不存在。
@@ -1303,6 +1448,12 @@
     			return bFlag;
     		},
     		// 判断是否可以增加该节点，（点击时）--- 两个点在同一个工序 或 上道工序存在产出，下道工序存在投入。
+    		/**
+    		 * 节点点击时，判断是否可以连接线
+    		 * 不在同一道工序 且 上道工序产出 | 下道工序投入 可修复
+    		 * @param {String} sNodeId
+    		 * @return {Boolean}
+    		 */
     		setNodeData(sNodeId) {
     			let bResult = true,
     				// 获取如果加入时的顺序值。
@@ -1315,67 +1466,70 @@
 	    				sNext = aNode[1],
 	    				oPrev = this.getNodeInfoById(sPrev),
 	    				oNext = this.getNodeInfoById(sNext);
-	    				
+	    			
+	    			// 两个节点不在统一道工序 且 （上产 或下投）可修复
+	    			
 	    			// 两个节点在同一道工序中。
-	    			if(oPrev.processCode == oNext.processCode) {
+	    			if(this.getNodeProcessCode(oPrev) == this.getNodeProcessCode(oNext)) {
 	    				this.sInfo = "两个节点不能在一道工序中。"
 	    				bResult = false;
-	    			}else if(oPrev.outBucketNo && oNext.inBucketNo) {
-	    				// 上道工序流水号为空，或下道工序流水号为空
-	    				this.sInfo = "上道工序流水号或下道工序流水号至少其中一个为空";
+	    			}else if(!oPrev.isOutCanRepair && !oNext.isInCanRepair) {
+	    				this.sInfo = "上道节点产出源或下道节点投入源不可修复";
 	    				bResult = false;
 	    			}
 	    			
-//	    			if(oPrev.processCode == oNext.processCode) {
-//	    				this.sInfo = "两个节点不能在一道工序中。"
-//	    				bResult = false;
-//	    			}else if(oPrev.isRework == "1" && !oPrev.reDoInId && !oPrev.reDoOutId) {
-//	    				// 上道工序为返工且re_do_in_id re_do_out_id为空。aNode[0]
-//	    				this.sInfo = "上道工序不能为返工且返工投产为空。";
-//	    				bResult = false;
-//	    			}else if(this.isHasTheLastLine(sPrev) || this.isNodeIsTheStartInCustomLine(sPrev)) {
-//	    				// 上道工序存在产出。 --- 1,数据库中存在的数据。 2,新增的连线数据
-//	    				this.sInfo = "上道工序节点已存在产出记录。";
-//	    				bResult = false;
-//	    			}else if(oNext.sourceId != "" || this.isNodeIsTheEndInCustomLine(sNext)) {
-//		    			// 下道工序存在投入。--- 1,数据库中存在sourceId。2，新增的连线数据。
-//	    				this.sInfo = "下道工序节点已存在投入记录。";
-//	    				bResult = false;
-//	    			}
     			}
     			
     			// 返回操作是否成功。
     			return bResult;
     		},
-    		// 设置修复时产出信息弹窗中的数据。
+    		/**
+    		 * 设置修复时产出信息弹窗中的数据。
+    		 * @param {Array} aNode
+    		 * @return {void}
+    		 */
     		setRecoveredProducePopData(aNode) {
-    			let _that = this,
-    				sKey = aNode+"",
+    			let sKey = aNode+"",
     				aNodeProduce = [],
-    				oPrev = _that.getNodeInfoById(aNode[0]),
-    				oNext = _that.getNodeInfoById(aNode[1]);
+    				oPrev = this.getNodeInfoById(aNode[0]),
+    				oNext = this.getNodeInfoById(aNode[1]);
     			
     			// 获取数据。
-    			aNodeProduce.push({
-    				id: oPrev.id,
-    				materialCode: oPrev.materialCode,
-					batchNo: oPrev.batchNo,
-					inDoCode: oPrev.inDoCode,
-					inProcessCode: oPrev.inProcessCode,
-					inQuantity: oPrev.inQuantity,
-					inEquipmentId: oPrev.inEquipmentId,
-					inEquipmentName: oPrev.inEquipmentName,
-					inPersonName: oPrev.inPersonName,
-					inShiftName: oPrev.inShiftName
-    			});
-    			aNodeProduce.push({
-    				id: oNext.id,
-    				inBarcode: oNext.inBarcode,
-					inHappenTime: oNext.inHappenTime
-    			});
-    			
+				let oProduce = {
+					id: oPrev.id,
+					doOutId: null,
+					outProcessId: oPrev.inProcessId,
+					outProcessName: oPrev.inProcessName,
+					outProcessSeq: oPrev.inProcessSeq,
+					outMaterialName: oNext.inMaterialName,
+					outMaterialSpec: oNext.inMaterialSpec,
+					outMaterialUnit: oNext.inMaterialUnit,
+					outEquipmentId: oPrev.inEquipmentId,
+					outEquipmentName: oPrev.inEquipmentName,
+					outEquipmentType: oPrev.inEquipmentType,
+					outShiftDate: oPrev.inShiftDate,
+					outShiftStartTime: oPrev.inShiftStartTime,
+					outShiftEndTime: oPrev.inShiftEndTime,
+					outPersonName: oPrev.inPersonName,
+					outType: 1,
+					outIokey: oPrev.inIokey,
+					outBucketNo: oNext.inBucketNo,
+					outProcessUid: oPrev.inProcessUid,
+					moldCode: "",
+					doCode: oPrev.inDoCode,
+					processCode: oPrev.inProcessCode,
+					materialCode: oNext.inMaterialCode,
+					batchNo: oNext.inBatchNo,
+					barcode: oNext.inBarcode,
+					quantity: oPrev.inQuantity,
+					equipmentCode: oPrev.inEquipmentCode,
+					personCode: oPrev.inPersonCode,
+					happenTime: oNext.inHappenTime,
+					shiftName: oPrev.inShiftName
+				}
+				
     			// 设置数据。
-    			_that.oAClickNodeProduceData[sKey] = aNodeProduce;
+    			this.oAClickNodeProduceData[sKey] = oProduce;//	aNodeProduce;
     		},
     		// 获取值。
     		getRecoveredProducePopData() {
@@ -1397,10 +1551,12 @@
     				
     				let oPrev = _that.getNodeInfoById(_that.aBrokenNode[0]);
     				
+    				// 判断当前点是否是多次在上道工序或下道工序修复。
+    				
+    				
     				// 判断是否需要显示产出弹窗。
-    				//判断上工序是否为有投无产，(doOutId为空) 或 (isRework为1 且 re_do_in_id非空、re_do_out_id为空)
-
-    				if(!oPrev.doOutId || (oPrev.isRework==1&&oPrev.reDoInId&&!oPrev.reDoOutId)) {
+    				// 上道工序isRework为0 且doOutId为空  或 上道工序isRework 且reDoOutId为空
+    				if( (!oPrev.isRework && !oPrev.doOutId) || (oPrev.isRework && !oPrev.reDoOutId) )  {
     					// 显示修复产出信息弹窗框。
     					_that.bRecoveredProduceModalShow = true;
     					// 设置数据。
@@ -1408,6 +1564,7 @@
     				}else {
     					// 不显示弹窗。 -- 直接保存数据
     					// 保存记录的值。链接成线。 --- 这个是顺序的 上-下
+    					
 						_that.aAClickNodeAllData.push(_that.aBrokenNode);
 						// 并将选中去掉
 						_that.removeNodeEditState(_that.aBrokenNode);
@@ -1424,35 +1581,33 @@
     				_that = this;
     			
     			// 只有断链的节点才能点击。并且当前节点不在新增的连线中。---- 当前节点可以存在已点击的点中。
-//  			if(jNode.hasClass("broken")) {
+    			if(this.bEdit) {
     				if(jNode.hasClass("edited")) {
     					// 取消选中 。删除当前值。
     					jNode.removeClass("edited");
     					// 删除当前的数据。
-    					_that.aBrokenNode.splice(_that.aBrokenNode.indexOf(sNodeId),1);
+    					_that.aBrokenNode.splice(_that.aBrokenNode.indexOf(sNodeId), 1);
     				}else {
     					// 选中。新增当前值。-- 如果当前不是在统一道工序中，则可以增加
     					if(_that.setNodeData(sNodeId)) {
 		    				jNode.addClass("edited");
 		    				_that.aBrokenNode.push(sNodeId);
-		    				// 如果选中的节点大于2个，则将
+//		    				 如果选中的节点大于2个，则将
 		    				_that.setNodeLine();
 	    				}else {
 	    					// 不能连线，提示。
 	    					_that.showMessage();
 	    				}
     				}
-//  			}
+    			}
     		},
     		// 节点链接线点击事件。  
     		nodeLineClickHandler(ev,aLineData) {
     			var jTarget = $(ev.target);
-    			
     			// 将数据转成顺序。 -- 已经是拍好序的。
     			aLineData = this.setNodeOrder(aLineData);
     			// 如果是修复线，才能点击。
-//  			if(jTarget.hasClass("recovered")) {
-    				
+    			if(this.bEdit) {
     				if(jTarget.hasClass("edited")) {
     					// 取消选中- 并删除记录的值。
     					this.aAClickLineAllData.splice(this.aAClickLineAllData.indexOf(aLineData),1);
@@ -1461,7 +1616,7 @@
     					this.aAClickLineAllData.push(aLineData);
     				}
     				jTarget.toggleClass("edited");
-//  			}
+    			}
     		},
     		// 取消节点的选中状态。
     		removeNodeEditState(aNode) {
@@ -1472,8 +1627,13 @@
     		},
     		removeLineEditState(aNode) {
     			// 取消节点线的选中状态。
+    			$(".node-line").removeClass("edited");
     		},
-    		// 将两个节点排序。
+    		/**
+    		 * 节点线上节点的排序。
+    		 * @param {Array} aLine
+    		 * @return {Array} 排序后的节点线
+    		 */
     		setNodeOrder(aLine) {
     			// 节点的排序。
     			var aNewLine = $.extend(true, [], aLine),
@@ -1483,7 +1643,7 @@
     				oNext = this.getNodeInfoById(sNext);
 
 				// 默认是顺序显示，
-				if(oPrev.processSeq-oNext.processSeq>0) {
+				if(oPrev.inProcessSeq-oNext.inProcessSeq>0) {
 					aNewLine = aNewLine.reverse();
 				}
     			
@@ -1500,7 +1660,7 @@
     			return sButNo;
     		},
     		// 编辑处理操作。
-    		editHandler() {
+    		editHandler(ev) {
     			// 编辑按钮点击后，页面处理点击状态。
     			this.bEdit = true;
     		},
@@ -1523,15 +1683,14 @@
     		saveHandler() {
     			// 断链修改函数调用处理。 --- 将已形成的锻炼保存。
     			// 保存 aAClickNodeAllData中自己创建的节点线。
-    			var _that = this;
     			
     			// 需要调用接口才会调用。- 又保存的或删除的。
-    			if(_that.aAClickNodeAllData.length || _that.aAClickLineBeforeData.length) {
+    			if(this.aAClickNodeAllData.length || this.aAClickLineBeforeData.length) {
 	    			// 显示弹窗。
-	    			_that.bProcessFilterModalShow = true;
-	    			_that.sProcessFilterModalType = "recoveredDes";
-	    			_that.aRecoverInfo = _that.getRecoveredInfo(_that.aAClickNodeAllData);
-	    			_that.aRemoveInfo = _that.getRecoveredInfo(_that.aAClickLineBeforeData);
+	    			this.bProcessFilterModalShow = true;
+	    			this.sProcessFilterModalType = "recoveredDes";
+	    			this.aRecoverInfo = this.getRecoveredInfo(this.aAClickNodeAllData);
+	    			this.aRemoveInfo = this.getRecoveredInfo(this.aAClickLineBeforeData);
     			}else {
     				this.sInfo="没有提交的操作";
     				this.showMessage();
@@ -1541,9 +1700,9 @@
     		saveNodeHandler(oSave) {
     			var _that = this,
     				oSaveData = {
-	    				"description": oSave.description,
+	    				"repairDesc": oSave.discription,
 	    				// 删除的数据。
-	    				"cancelData": function() {
+	    				"cancelList": function() {
 	    					// 获取连接线的bactNo值。
 	    					let aList = [];
 	    					
@@ -1561,7 +1720,7 @@
 	    					return aList;
 	    				}(),
 	    				// 修复新增的数据。
-	    				"repairData": function() {
+	    				"repairList": function() {
 	    					let aList = [];
 	    					
 	    					// 循环数据。
@@ -1569,14 +1728,16 @@
 	    						let aValue = [],
 	    							sKey = aNode+"";
 	    						
-	    						aNode.forEach(function(sNodeId,nIndex) {
+	    						aNode.forEach(function(sNodeId, nIndex) {
 	    							// 还需与弹窗中的数据合并。-- 存在合并，不存在，不处理。
 	    							let oNode = _that.getNodeInfoById(sNodeId),
 	    								oProduce = _that.oAClickNodeProduceData[sKey],
 	    								oNew = {};
 	    							
-	    							if(oProduce) {
-	    								oNew = $.extend({},oNode,oProduce[nIndex]);
+	    							// 修复数据，只修复上道工序。
+	    							
+	    							if(!nIndex &&　oProduce) {
+	    								oNew = $.extend({}, oNode, oProduce);
 	    							}else {
 	    								oNew = oNode;
 	    							}
@@ -1594,19 +1755,23 @@
     			
     			console.log(oSaveData);
     			
-    			// 调用接口处理函数。------
-//  			this.$ajax.get("", function() {
-    				
-    				// 保存成功后的处理函数。 [[{},{}],[]] -- 更新pageData
-    				// 测试数据。
-//  				let aTest = [[{id:1},{id:2}]];
-//  				_that.updatePageData(aTest);
-//  				
-//  				// 清空记录数据。
-//  				_that.aAClickNodeAllData = [];
-//  				_that.oAClickNodeProduceData = {};
-//  				_that.aAClickLineBeforeData = [];
-//  			});
+//	  			this.$ajax.put(LINK_NODE_REPAIR_URL, oSaveData).then((res) => {
+//					_that.judgeLoaderHandler(res, (data) => {
+//				        
+//		  				console.log(data)
+//				        // 更新数据。
+//				        _that.updatePageData(data);
+//				        
+//				        // 清空记录数据。
+//		  				_that.aAClickNodeAllData = [];
+//		  				_that.oAClickNodeProduceData = {};
+//		  				_that.aAClickLineBeforeData = [];
+//					});
+//				})
+//				.catch((err) => {
+//					_that.$message.error("保存出错")
+//				})
+	  			
     		},
     		// 保存或删除接口后更新数据。 [[{},{}],[{},{}]]
     		updatePageData(aNewData) {
@@ -1618,7 +1783,7 @@
 					aResultNode.forEach(function(oNewNode) {
 						let nIndex = _that.getNodeIndexById(oNewNode.id);
 						// 修改数据。
-						_that.pageData.processData[nIndex] = oNewNode;
+						_that.pageData.doInOuts[nIndex] = oNewNode;
 					});
 				});
     		},
@@ -1645,14 +1810,16 @@
     					_that.aAClickLineAllData.splice(nLineIndex,1);
     					_that.aAClickNodeAllData.splice(nNodeIndex,1);
     					delete _that.oAClickNodeProduceData[aNodeLine+""];
-    					// 删除当前节点的编辑状态。
-//  					_that.removeNodeEditState(aNodeLine);
     				}
     			});
 				
-				// 再将已存在的数据保存。
-				_that.aAClickLineBeforeData = _that.aAClickLineAllData;
-				_that.aAClickLineAllData = [];
+				if(this.aAClickLineAllData.length) {
+					// 删除线的选中状态。
+					this.removeLineEditState(this.aAClickLineAllData);
+					// 再将已存在的数据保存。
+					this.aAClickLineBeforeData = this.aAClickLineBeforeData.concat(this.aAClickLineAllData);
+					this.aAClickLineAllData = [];
+				}
     		}
     		
     	}
@@ -1663,6 +1830,9 @@
 <style lang="less">
 	@green: #42af8f;
 	
+	html,body {
+		height: 100%;
+	}
 	body {
 		background-color: #f2f2f2;
 		font-size: 14px;
@@ -1704,7 +1874,7 @@
 					width: 100%;
 					height: 1px;
 					background-color: #CCCCCC;
-					margin: 20px 0;
+					margin: 0px 0px 20px;
 				}
 				.content-filters {
 				}
@@ -1759,7 +1929,7 @@
 								overflow: hidden;
 								
 								.nodes-list {
-									height: 330px;
+									/*height: 330px;*/
 									overflow: auto;
 								
 									.process-title {
@@ -1768,7 +1938,7 @@
 										position: absolute;  
 										background-color: #FFFFFF;
 										z-index: 6;
-										margin-bottom: 20px;
+										/*margin-bottom: 20px;*/
 										
 										.process-item {
 											display: inline-block;
@@ -1818,51 +1988,6 @@
 									}
 								}
 							}
-							/*.nodesWrap {
-								position: relative;
-								height: 400px;
-								overflow: auto;
-								
-								.nodes-list {
-									display: flex;
-									
-									.process-item {
-										min-width: 200px;
-										margin-right: 10px;
-										text-align:center;
-										position:relative;
-										cursor: pointer;
-										
-										.item-name {
-											font-size: 16px;
-											margin-bottom: 20px;
-											
-											&.itemActivated {
-												color: @green;
-											}
-										}
-										
-										.item-pop-filter {
-											position: absolute;
-											left: 18px;
-										}
-										.item-nodes {
-											height: 500px;
-											.item-node {
-												margin: 30px;
-											}
-										}
-										
-										&:last-child {
-											margin-right: 0;
-										}
-									}
-								}								
-							}*/
-							
-							
-							
-							
 							
 						}
 					}

@@ -1,7 +1,7 @@
 <template>
-    <el-select v-model="form[key]" :placeholder="hint" style="width: 100%;" multiple @change="handleChange">
+    <el-select v-model="multiValues" :placeholder="hint" style="width: 100%;" multiple @change="handleChange">
         <el-option
-            v-for="option in listData"
+            v-for="option in options"
             :key="option.value"
             :label="option.label"
             :value="option.value">
@@ -11,34 +11,47 @@
 
 <script>
     export default {
-        props: ['formData', 'placeholderData', 'keyData', 'listData'],
+        props: {
+        	formData: Object,
+        	placeholderData: String,
+        	keyData: String,
+        	listData: Array,
+        	allData: {
+        		required: false,
+        		default: 'all'
+        	}
+        },
         data() {
             return {
-                form: this.formData,
+//              form: this.formData,
                 hint: this.placeholderData,
-                key: this.keyData
-//              options: this.listData
+//              key: this.keyData,
+                multiValues: this.formData[this.keyData]
             }
         },
         computed: {
         	options: function() {
-        		let aResult = this.listData || [];
-        		
-        		// ½«È«²¿°´Å¥¼ÓÈë¡£
+        		let aResult = JSON.parse(JSON.stringify(this.listData || []));
+        		// å°†å…¨éƒ¨æŒ‰é’®åŠ å…¥ã€‚
         		aResult.unshift({
-        			label: "È«²¿",
-        			value: "all"
+        			label: "å…¨éƒ¨",
+        			value: this.allData
         		})
-        		// ·µ»ØÊı¾İ¡£
+        		// è¿”å›æ•°æ®ã€‚
         		return aResult;
         	}
         },
         methods: {
             handleChange(value) {
-            	// ÊÇ·ñÑ¡ÖĞµÄÊÇÈ«²¿£¬Èç¹ûÊÇÈ«²¿ÔòÆäËûµÄ²»ÄÜÑ¡ÖĞÆäËûµÄ¡£
-            	if(value.includes("all") && value.length > 1) {
-            		// º¬ÓĞÈ«²¿£¬Ôò½«Êı¾İÉèÖÃÎªÈ«²¿¡£
-            		this.form[this.key] = ["all"];
+            	console.log("1")
+            	// æ˜¯å¦é€‰ä¸­çš„æ˜¯å…¨éƒ¨ï¼Œå¦‚æœæ˜¯å…¨éƒ¨åˆ™å…¶ä»–çš„ä¸èƒ½é€‰ä¸­å…¶ä»–çš„|| å¦‚æœé€‰ä¸­çš„æ˜¯é™¤å…¨éƒ¨ä»¥å¤–å…¶ä»–çš„ï¼Œåˆ™è®¾ç½®ä¸ºå…¨éƒ¨
+            	if((value.includes(this.allData) && value.length > 1) || (!value.includes(this.allData) && value.length === this.listData.length )) {
+            		// å«æœ‰å…¨éƒ¨ï¼Œåˆ™å°†æ•°æ®è®¾ç½®ä¸ºå…¨éƒ¨ã€‚
+            		this.multiValues = [this.allData];
+            	}
+            	
+            	if(this.formData[this.keyData].toString() != this.multiValues.toString()) {
+	            	this.formData[this.keyData] = this.multiValues;
             	}
             }
         }  

@@ -141,7 +141,7 @@
         }
 
         td {
-            height: 30px;   
+            /*height: 30px;*/   
 
             .cell {
                 padding: 0;
