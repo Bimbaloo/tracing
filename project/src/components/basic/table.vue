@@ -110,9 +110,9 @@
                 if(!this.dataFilter){   // 不启用过滤功能
                     return true
                 }else if(this.selectedData.length !== 0){                 // 勾选后
-                    let batchNo   = this.selectedData[0].batchNo             // 获取当前勾选行编码  
-                    let equipmentType = this.selectedData[0].equipmentType   // 获取当前勾选行工序 
-                    return (row.batchNo ===batchNo && row.equipmentType === equipmentType )
+                    let materialCode = this.selectedData[0].materialCode             // 获取当前勾选行 物料编码  
+                    let processName = this.selectedData[0].processName   // 获取当前勾选行 工序名称 
+                    return (row.materialCode ===materialCode && row.processName === processName )
                 }else{
                     return true
                 }
