@@ -6,3 +6,5 @@ npm-debug.log
 .cache-loader
 .vscode
 npm-debug.log
+project/src/assets/js/configs.js
+.gitignore

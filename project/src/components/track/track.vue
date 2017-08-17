@@ -97,8 +97,8 @@
                     },{
                         prop: "materialUnit",
                         name: "单位",
-                        width: "50",
-                        sortable: true
+                         width: "50",
+                         sortable: true
                     },{
                         prop: "quantity",
                         name: "数量",
@@ -161,21 +161,8 @@
                     	// 错误显示无数据。
                     	console.warn(res.data.errorMsg.message);
                     }else {
-<<<<<<< HEAD
                     	// 其他，显示提示信息。
                     	oData.error = res.data.errorMsg.message;
-=======
-//                  	oData.error = res.data.errorMsg.message;
-
-						// 当前是由于数据过多的提示，则显示出来。
-                    	let sError = res.data.errorMsg.message;
-                    	if(sError == "记录数量超过了2000，请缩小查询范围") {
-                    		oData.error = sError;
-                    	}else {
-                    		// 其他错误，则直接console
-                    		console.log(sError);
-                    	}
->>>>>>> dev
                     }
                 })
                 .catch((err) => {

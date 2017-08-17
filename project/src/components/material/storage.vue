@@ -131,15 +131,15 @@
 				let bRight = param.data.errorCode;
 				
 				// 判断是否调用成功。
-				if(bRight != "0") {
+				if(!bRight) {
+					// 调用成功后的回调函数。
+					fnSu && fnSu(param.data.data);
+				}else {
 					// 提示信息。
 					this.error = "查无数据";
 					console.warn(param.data.errorMsg.message);
 					// 失败后的回调函。
 					fnFail && fnFail();
-				}else {
-					// 调用成功后的回调函数。
-					fnSu && fnSu(param.data.data);
 				}
 			},			
 

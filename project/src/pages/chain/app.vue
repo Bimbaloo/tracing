@@ -1295,18 +1295,16 @@
 		    			_that.initData();
 		    			
 		    			// 更新form中的值。
-						// let oData = sessionStorage.getItem("searchConditions");
-						let oData = sessionStorage.getItem("searchConditions-" + this.tag);
-		
-						// 断链模块。
-					    if(oData) {
-					        oData = JSON.parse(oData);
-					        if(oData.tab === "chain") {
-						        oData.keys = this.searchParam;
-						        // sessionStorage.setItem("searchConditions", JSON.stringify(oData));
-          						sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions));
-					        }
-					    }
+//						let oData = sessionStorage.getItem("searchConditions-" + this.tag);
+//		
+//						// 断链模块。
+//					    if(oData) {
+//					        oData = JSON.parse(oData);
+//					        if(oData.tab === "chain") {
+//						        oData.keys = this.searchParam;
+//        						sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions));
+//					        }
+//					    }
 					    
 					    // 获取创建数据。
 						this.getPageData();

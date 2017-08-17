@@ -31,22 +31,27 @@
         },
         computed: {
         	options: function() {
-        		let aResult = this.listData || [];
-
+        		let aResult = JSON.parse(JSON.stringify(this.listData || []));
+        		// 将全部按钮加入。
         		aResult.unshift({
         			label: "全部",
-        			value: "all"
+        			value: this.allData
         		})
-        
+        		// 返回数据。
         		return aResult;
         	}
         },
         methods: {
             handleChange(value) {
-           
-            	if(value.includes("all") && value.length > 1) {
+            	console.log("1")
+            	// 是否选中的是全部，如果是全部则其他的不能选中其他的|| 如果选中的是除全部以外其他的，则设置为全部
+            	if((value.includes(this.allData) && value.length > 1) || (!value.includes(this.allData) && value.length === this.listData.length )) {
+            		// 含有全部，则将数据设置为全部。
+            		this.multiValues = [this.allData];
+            	}
             	
-            		this.form[this.key] = ["all"];
+            	if(this.formData[this.keyData].toString() != this.multiValues.toString()) {
+	            	this.formData[this.keyData] = this.multiValues;
             	}
             }
         }  

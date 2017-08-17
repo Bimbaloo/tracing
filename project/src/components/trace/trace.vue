@@ -158,15 +158,8 @@
                     	// console 异常信息。
                     	console.warn(res.data.errorMsg.message);
                     }else {
-//                  	oData.error = res.data.errorMsg.message;
-                    	// 当前是由于数据过多的提示，则显示出来。
-                    	let sError = res.data.errorMsg.message;
-                    	if(sError == "记录数量超过了2000，请缩小查询范围") {
-                    		oData.error = sError;
-                    	}else {
-                    		// 其他错误，则直接console
-                    		console.log(sError);
-                    	}
+                    	// 其他，显示异常信息。
+                    	oData.error = res.data.errorMsg.message;
                     }
                 })
                 .catch((err) => {

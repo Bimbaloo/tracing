@@ -211,8 +211,10 @@
         .el-scrollbar__wrap{
         	max-height: 230px;	
         }
+	
     }
-	.el-select {
-        width: 180px
+    
+    .el-select {
+        width: 180px;
     }
 </style>
