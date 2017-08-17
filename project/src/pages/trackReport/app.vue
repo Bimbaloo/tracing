@@ -34,8 +34,9 @@
 	            <div v-if="error" class="error">
 	                {{ error }}
 	            </div>
-	            <div v-else class="content-table">
-	                <v-table :table-data="showData" :loading="loading" :heights="500"></v-table>    
+	            <div v-else class="content-table" >
+	                <v-table :table-data="showData" :loading="!dialogState" :heights="500" v-if="dialogState"></v-table>  <!-- 真正的显示内容的table -->
+					<v-table :table-data="gridData" :loading="!dialogState" :heights="500" v-else></v-table>              <!-- 为了在table组件未加载数据前撑开高度 -->
 	            </div>     
 			</el-dialog>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
@@ -169,7 +170,8 @@
 					selected: 0,
 					filter: 0
 				},
-				filters: {}
+				filters: {},
+				dialogState:false
 			}
 		},
 		computed: {
@@ -271,7 +273,8 @@
                         this.showData = {
                         	columns: this.gridData.columns,
                         	data: this.gridData.data
-                        }						
+                        }
+						this.dialogState = true						
 					})
              })
              .catch((err) => {
@@ -304,9 +307,12 @@
 				}			
 			},
 			dialogVisible(value){
-				this.dialogTableVisible = true;
-				this.radio = value
-				this.radioChange(value)
+				
+					this.dialogTableVisible = true;
+					this.radio = value
+					this.radioChange(value)
+				
+				
 			},
 			// 页面下载。
             downloadHandle (refHtml, event) {
@@ -455,5 +461,8 @@
 		height: 60px;
 		line-height: 60x;
 		text-align: center;
+	}
+	.el-loading-mask {
+		z-index: 100 ;
 	}
 </style>
