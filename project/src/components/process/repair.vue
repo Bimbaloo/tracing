@@ -53,7 +53,7 @@ export default {
             dataName:[      // 条件对应中文名
                 {
                     itemCode:"equipmentName",
-                    itemName:"物料"
+                    itemName:"设备"
                 },{
                     itemCode:"startTime",
                     itemName:"开始时间"
