@@ -37,9 +37,9 @@
 		},
 		watch: {
 		    // 如果 发生改变，这个函数就会运行
-		    treeData: function() {
-		    	this.data = Object.assign({}, this.treeData);
-		    },
+//		    treeData: function() {
+//		    	this.data = Object.assign({}, this.treeData);
+//		    },
 		    data: function () {	
 		    	if(this.tree) {		  
   		
@@ -400,10 +400,15 @@
 				      // 设置初始时节点在中间显示。
 				    let self = this;
 				    this.tree.addDiagramListener("LayoutCompleted", function(e){
-					  	let node = self.tree.findNodeForKey("1");
-					  	if(node) {
-							self.tree.centerRect(node.actualBounds);
-					  	}
+				    	
+				    	if(self.treeData.node) {
+				    		
+					    	let oData = self.treeData.node.filter(o => o.parents == "")[0]
+						  	let node = self.tree.findNodeForKey(oData.key);
+						  	if(node) {
+								self.tree.centerRect(node.actualBounds);
+						  	}
+				    	}
 					});
 			},
 

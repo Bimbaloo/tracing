@@ -207,11 +207,6 @@
     .el-select-dropdown {
         border-radius: 0;
         margin: 0;
-        
-        .el-scrollbar__wrap{
-        	max-height: 230px;	
-        }
-	
     }
     
     .el-select {

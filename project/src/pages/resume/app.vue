@@ -1076,6 +1076,10 @@
 							width: 600px;
 						}
 					}
+					
+					.el-input {
+						width: 500px;
+					}
 				}
 				
 				.line {

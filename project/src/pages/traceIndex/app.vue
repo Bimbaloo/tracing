@@ -4,7 +4,7 @@
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
 		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
-			<div @click="goToInit" :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
+			<div :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
 			</div>
 			<!-- <div :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router"> -->
@@ -291,7 +291,7 @@
 				for(let i = aoCopyData.length - 1; i >= 0; i--) {
 					let oData = aoCopyData[i];
 
-					if(oData.parents === "") {
+					if(oData && oData.parents === "") {
 						oData.parent = "";
 						aoCatalogData.push(oData);
 
@@ -334,10 +334,6 @@
 						}
 					}
 				}
-			},
-			
-			goToInit() {
-				console.log(1)
 			},
 			// 收缩左侧树。
 			collapseTree() {
