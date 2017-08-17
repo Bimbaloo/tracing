@@ -373,8 +373,6 @@
 
   .panel-title {
       padding: 30px 0;
-      padding-left: 0;
-      padding-right: 0;
       .el-radio+.el-radio {
           margin-left: 20px;
       }
