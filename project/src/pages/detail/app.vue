@@ -73,7 +73,7 @@
         /* 拖动功能添加属性 */
         _pageX:null,
         changeWidth:0,
-        LayoutLeftWidth: 325,
+        LayoutLeftWidth: 360,   //修改detail页面左侧默认宽度
         dragging: false,
 
       	collapse: false, // 侧栏是否收缩。
@@ -268,7 +268,7 @@
         if(!this.collapse){
         		// 修改当展开时，每次都是原始宽度
         		this.changeWidth = 0;
-            this.LayoutLeftWidth = 325;
+            this.LayoutLeftWidth = 360;
         }
       }
     },
@@ -373,6 +373,8 @@
 
   .panel-title {
       padding: 30px 0;
+      padding-left: 0;
+      padding-right: 0;
       .el-radio+.el-radio {
           margin-left: 20px;
       }
@@ -435,9 +437,7 @@
         }
       }
 
-      &>.el-tabs__content {
-        /*padding: 0 28px;*/
-      }
+
     } 
 
     .form-button {
@@ -445,3 +445,5 @@
     }
   }
 </style>
+
+
