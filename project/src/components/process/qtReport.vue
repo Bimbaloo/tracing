@@ -62,6 +62,7 @@ export default {
                     itemName:"结束时间"
                 },
             ],
+            condition: {},
             /* 投入 */
             tableData: {
                 filename: "质检记录",
@@ -253,7 +254,7 @@ export default {
                         odata.forEach((el,index) => {       /* 处理data */
                             let items = el.items
                             items.forEach((el,index)=>{
-                                tdata[`valeu`+index] = el.value
+                                tdata[`value`+index] = el.value
                             })
                             let obj = Object.assign(el, tdata);
                             console.log(obj)
