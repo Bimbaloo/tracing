@@ -189,7 +189,7 @@
 						name: "质检",
 						// cpt: "/QTReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
-                        // router: "/process/qtReport",
+                        router: "/process/qtReport",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
@@ -214,7 +214,7 @@
                     color: "#66bc84",
                     list: [{
 						name: "投产表",
-					//	router: "/process/product",
+						router: "/process/product",
 						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }]
 				}, {
@@ -627,24 +627,16 @@
                         shadowOffsetY: 2,
                         shadowColor: '#fff'
                     }
-                },
-                // x轴缩放设置。
-                xOAxis = {
+                }
+
+                // 添加x轴缩放。
+                oData.dataZoom.push(Object.assign({
                     xAxisIndex: [0],
                     height: 16,
                     labelFormatter: function(value) {
                         return new Date(value).Format()
                     }
-                }
-                
-                if(this.datetime.realStart) {
-                    xOAxis.startValue = +new Date(this.datetime.realStart)
-                }
-                if(this.datetime.realEnd) {
-                    xOAxis.endValue = +new Date(this.datetime.realEnd)
-                }
-                // 添加x轴缩放。
-                oData.dataZoom.push(Object.assign(xOAxis,oAxis))
+                },oAxis))
 
                 if(this.equipments.length > 1) {
                     // 若大于一台设备。
@@ -658,6 +650,13 @@
                     },oAxis))
                 }
 
+                // 为缩放轴添加开始时间结束时间。
+                if(this.datetime.realStart) {
+                    oData.dataZoom[0].startValue = +new Date(this.datetime.realStart)
+                }
+                if(this.datetime.realEnd) {
+                    oData.dataZoom[0].endValue = +new Date(this.datetime.realEnd)
+                }
                 return oData
             }
         },
@@ -677,7 +676,8 @@
             resizeY: 'resizeChart'
         },
         methods: {
-			init() {
+			init() {      
+                         
 				this.setInitData();
 
                 // 获取所有数据。
@@ -716,6 +716,7 @@
                     this.chart.clear()
                     this.markLine = []
                     this.compareList = []  
+                    this.onlyShowRelatedData = false
                 }      
             },
             // 重置图形大小。
@@ -1212,7 +1213,8 @@
                     }
                     oFilter.data = oResult.data
                 })
-    
+
+                console.log(this.option)
                 this.chart.setOption(this.option, true);
                 // 设置提示框的最大高度。
                 this.setTooltipHeight();
