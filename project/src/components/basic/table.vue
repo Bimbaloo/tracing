@@ -92,6 +92,8 @@
                 return this.tableData.data
         	}
         },
+        created () {
+        },
         methods: {    
             cellClick (row, column, cell, event) {
 
@@ -100,17 +102,16 @@
                 oColumn.cellClick && oColumn.cellClick(row);                
             },
             selectionChange (selection) {
-                this.tableData.selected = selection;
+                this.tableData.selected = selection;      
             },
             filterChange (filters) {
                 this.tableData.filterChange && this.tableData.filterChange(filters);
             },
             /* 是否禁选 */
             checkSelectable (row,index) {
-                if(!this.dataFilter){   // 不启用过滤功能
-                    return true
-                }else if(this.selectedData.length !== 0){                 // 勾选后
-                    let materialCode = this.selectedData[0].materialCode             // 获取当前勾选行 物料编码  
+                if(this.dataFilter && this.selectedData.length !== 0){ 
+                    // 启用过滤功能，勾选后。
+                    let materialCode = this.selectedData[0].materialCode  // 获取当前勾选行 物料编码  
                     let processName = this.selectedData[0].processName   // 获取当前勾选行 工序名称 
                     return (row.materialCode ===materialCode && row.processName === processName )
                 }else{

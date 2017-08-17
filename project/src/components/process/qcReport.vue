@@ -9,11 +9,11 @@
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	送检
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('inputTable', '投入', $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
+            	送检记录
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('qcTable', $event)"></i>
             </h2>
-			<div class="content-table">
+			<div class="content-table" ref="qcTable">
                 <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
 			</div>
 		
@@ -28,7 +28,8 @@
     import FileSaver from 'file-saver'
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
-	
+    import rasterizeHTML from 'rasterizehtml'	
+
 const url = HOST + "/api/v1//quality/send-inspect/by-equipment-time";
 //const url =  `http://rapapi.org/mockjsdata/24404/quality/send-inspect/by-equipment-time?`
 export default {
@@ -63,6 +64,7 @@ export default {
             ],
             /* 投入 */
             tableData: {
+                filename: "送检",
                 columns: [{
                     name: "序号",
                     type:"index",
@@ -239,20 +241,62 @@ export default {
                 console.log("数据库查询出错。")
             })
         },
-
         // 表格导出。
-        exportExcelHandle (sTable, sFileName, event) {
-
+        exportExcelHandle (oData, event) {
+            if(!oData) {
+                return;
+            }
             // 下载表格。
-            window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      
+            window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);      
         },
         // 表格打印。
         printHandle (refTable, event) {
             let oTable = this.$refs[refTable];
+            
             if(!oTable) {
                 return;
             }
-            window.Rt.utils.printHtml(html2canvas, oTable);              
+            
+            let sHtml = `
+                <div class="table el-table">
+                    <div class="el-table__header-wrapper">
+                        ${oTable.querySelector(".el-table__header-wrapper").innerHTML}
+                    </div>
+                    <div class="el-table__body-wrapper">
+                        ${oTable.querySelector(".el-table__body-wrapper").innerHTML}
+                    </div>
+                    <style>
+                        .el-table td.is-center, .el-table th.is-center {
+                            text-align: center;
+                        }
+                        .table thead th {
+                            height: 36px;
+                            background-color: #42af8f;
+                        }
+                        .table thead th .cell {
+                            color: #fff;
+                        }
+                        .el-table__body-wrapper tr:nth-child(even) {
+                            background-color: #fafafa;
+                        }
+                        .el-table__body-wrapper tr:nth-child(odd) {
+                            background-color: #fff;
+                        }
+                        .el-table__body-wrapper .cell {
+                            min-height: 30px;
+                            line-height: 30px;
+                            // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+//	        					border: 1px solid #e4efec;
+                            box-sizing: border-box;
+                        }
+                        .el-table__empty-block {
+                            text-align: center;	
+                        }
+                    </style>
+                </div>
+            `;
+            
+            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
         },
         // 获取高度。
         adjustHeight() {

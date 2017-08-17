@@ -8,7 +8,7 @@
 	                {{ gridData.error }}
 	            </div>
 	            <div v-if="!gridData.error" class="content-table">
-	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter"></v-table>    
+	                <v-table v-on:selectChange="selectChange" :table-data="gridData" :data-array="gridData.data" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter"></v-table>    
 	            </div>   
 	       </div>   
     	</div> 
@@ -112,6 +112,8 @@
                     }],
                     data: []
                 },
+                // 表格完整数据。
+                rawData: []
             }
         },
         created () {
@@ -153,7 +155,9 @@
 					
                     if(!res.data.errorCode) {
                     	// 正常 0
-                        oData.data = res.data.data;
+                        this.rawData = res.data.data
+                        // 深度拷贝。
+                        oData.data = $.extend(true, [], this.rawData)
                     }else if(res.data.errorCode == "1"){
                     	// console 异常信息。
                     	console.warn(res.data.errorMsg.message);
@@ -187,6 +191,19 @@
             	}else {
             		this.$message("没有数据溯源");
             	}
+            },
+            // 表格选中行改变。
+            selectChange () {
+                console.log(this.gridData.selected)
+                if(!this.gridData.selected.length) {
+                    // 若取消选中。
+                    this.gridData.data = $.extend(true, [], this.rawData)
+                }else if(this.gridData.selected.length === 1) {
+                    // 若选中一行。
+                    // debugger
+                    let oData = this.gridData.selected[0]
+                    this.gridData.data = $.extend(true, [], this.rawData.filter(o => o.materialCode === oData.materialCode && o.processName === oData.processName))
+                }
             }
         }
     }  

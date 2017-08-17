@@ -1884,7 +1884,7 @@
                 width: 100%;
                 text-align: center;
                 position: absolute;
-                bottom: -19px;
+                bottom: -10px;
                 left: 0;
 
                 .btn-plain {
