@@ -131,7 +131,7 @@ export default {
 
     },
     created() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        
 
         this.fetchData();
        
@@ -171,7 +171,8 @@ export default {
 		}
     },
     mounted(){
-       this.tableData.height  = this.adjustHeight()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
@@ -215,7 +216,6 @@ export default {
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el)=>{
                 if(el === "equipmentId" || el === "startTime" || el === "endTime"){
-                    debugger
                     oQuery[el] = this.$route.query[el]
                 }
                 if(el === "equipmentName" || el === "startTime" || el === "endTime"){
@@ -229,7 +229,7 @@ export default {
                 this.judgeLoaderHandler(res,() => {
                     this.tableData.data = res.data.data
                     this.tableData.data.forEach((el)=>{
-                        el["handle"]="操作"
+                        el["handle"]="下载"
                     })
                 });				 
             })

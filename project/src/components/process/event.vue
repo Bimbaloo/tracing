@@ -126,7 +126,7 @@ export default {
 
     },
     created() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        
 
         this.fetchData();
        
@@ -166,7 +166,8 @@ export default {
 		}
     },
     mounted(){
-       this.tableData.height  = this.adjustHeight()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
