@@ -214,7 +214,7 @@
                     color: "#66bc84",
                     list: [{
 						name: "投产表",
-					//	router: "/process/product",
+						router: "/process/product",
 						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }]
 				}, {
