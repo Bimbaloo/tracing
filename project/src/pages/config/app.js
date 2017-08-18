@@ -5,6 +5,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-green/index.css';
 import App from './app.vue';
 import axios from 'axios';
+import 'babel-polyfill'
 
 import 'assets/css/reset.css'
 import 'assets/css/common.less'

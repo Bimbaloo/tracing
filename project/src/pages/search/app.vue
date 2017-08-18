@@ -160,6 +160,10 @@
     margin-bottom: 0;
   }
   
+  .el-select-dropdown__wrap {
+		max-height: 230px;	
+	}
+  
   .search-tab {
     width: 1080px;
     height: 750px;
@@ -209,6 +213,9 @@
   @media screen and (max-width: 1400px){
     footer{
       bottom: 10px;
+    }
+    .el-select-dropdown__wrap {
+    	max-height: 230px;	
     }
     .search-tab {
     height: 650px;

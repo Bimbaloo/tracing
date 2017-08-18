@@ -63,6 +63,7 @@ export default {
                     itemName:"结束时间"
                 },
             ],
+            condition: {},
             /* 投入 */
             tableData: {
                 filename: "质检记录",

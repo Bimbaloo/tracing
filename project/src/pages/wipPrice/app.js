@@ -4,6 +4,7 @@ import 'element-ui/lib/theme-green/index.css'
 import App from './app.vue'
 import axios from 'axios'
 import 'assets/css/reset.css'
+import 'babel-polyfill'
 
 Vue.use(ElementUI)
 

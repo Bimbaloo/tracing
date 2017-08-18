@@ -8,6 +8,7 @@ import App from './app.vue'
 import axios from 'axios'
 import echarts  from 'echarts'
 import Vuex from 'vuex'
+import 'babel-polyfill'
 
 //import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'
