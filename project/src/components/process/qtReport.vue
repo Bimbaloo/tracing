@@ -251,7 +251,7 @@ export default {
                                 ) {
                                     obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
                                         itemName: `${item.itemName}`,
-                                        value: encodeURI(`${item.itemName}`)
+                                        prop: encodeURI(`${item.itemName}`)
                                     })
                                 }
                                 tdata[encodeURI(`${item.itemName}`)] = item.value
