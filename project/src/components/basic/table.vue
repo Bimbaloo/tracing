@@ -109,11 +109,13 @@
             },
             /* 是否禁选 */
             checkSelectable (row,index) {
-                if(this.dataFilter && this.selectedData.length !== 0){ 
+                if(!this.dataFilter) {
+                    return true
+                }else if(this.selectedData.length !== 0){ 
                     // 启用过滤功能，勾选后。
                     let materialCode = this.selectedData[0].materialCode  // 获取当前勾选行 物料编码  
-                    let processName = this.selectedData[0].processName   // 获取当前勾选行 工序名称 
-                    return (row.materialCode ===materialCode && row.processName === processName )
+                    let processCode = this.selectedData[0].processCode   // 获取当前勾选行 工序编码 
+                    return (row.materialCode ===materialCode && row.processCode === processCode )
                 }else{
                     return true
                 }
