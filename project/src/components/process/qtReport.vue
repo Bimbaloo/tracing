@@ -49,7 +49,8 @@ export default {
             },
 
             loading: false,
-            tdResize: true, //是否允许拖动table大小
+            tdResize: true, // 是否允许拖动table大小
+            condition:{},   // 查询条件    
             dataName:[      // 条件对应中文名
                 {
                     itemCode:"equipmentName",
@@ -113,12 +114,12 @@ export default {
                 //     lists: [
                 //         {
                 //             itemName: "项目1",
-                //             value: "valeu0",
+                //             value: "value0",
                 //            // width: "200"
                 //         },
                 //         {
                 //             itemName: "项目2",
-                //             value: "valeu1",
+                //             value: "value1",
                 //            // width: "300"
                 //         }]
                 // }
@@ -134,7 +135,7 @@ export default {
 
     },
     created() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        
 
         this.fetchData();
        
@@ -174,7 +175,8 @@ export default {
 		}
     },
     mounted(){
-       this.tableData.height  = this.adjustHeight()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
@@ -253,7 +255,7 @@ export default {
                         odata.forEach((el,index) => {       /* 处理data */
                             let items = el.items
                             items.forEach((el,index)=>{
-                                tdata[`valeu`+index] = el.value
+                                tdata[`value`+index] = el.value
                             })
                             let obj = Object.assign(el, tdata);
                             console.log(obj)

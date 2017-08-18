@@ -189,7 +189,7 @@
 						name: "质检",
 						// cpt: "/QTReport.cpt",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
-                        // router: "/process/qtReport",
+                        router: "/process/qtReport",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
