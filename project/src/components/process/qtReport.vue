@@ -241,15 +241,15 @@ export default {
                                 lists: []
                             };
 
-                        odata.forEach((el) => {  /* 处理columns */
+                        odata.forEach((el) => {  /* 处理columns和data */
                             let items = el.items,
                                 tdata = []              //储存items里面的data
                             items.forEach((item) => {
                                 if (obj.lists.every((list) => {
-                                    return list.itemName !== item.itemName
-                                })
+                                        return list.itemName !== item.itemName
+                                    })
                                 ) {
-                                    obj.lists.push({
+                                    obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
                                         itemName: `${item.itemName}`,
                                         value: encodeURI(`${item.itemName}`)
                                     })
