@@ -37,10 +37,10 @@
                 :sortable="list.sortable"
                 :type="list.type"
                 :resizable="resize"
-                :prop="list.value"
+                :prop="list.prop"
                 :label="list.itemName"
                 :sort-method="list.sortMethod"
-                :key="list.value" 
+                :key="list.prop" 
                 :class-name="list.class"
                 :formatter="list.formatter"
                 :filters="list.filters"
@@ -96,9 +96,8 @@
         },
         methods: {    
             cellClick (row, column, cell, event) {
-
-                let oColumn = this.columns.filter(o => o.prop==column.property)[0];
-                // && row[column.property]
+                
+                let oColumn = this.columns.filter(o => o.prop==column.property)[0] || this.columns.find( o=> o.lists).lists.filter(o => o.prop==column.property)[0];
                 oColumn.cellClick && oColumn.cellClick(row);                
             },
             selectionChange (selection) {

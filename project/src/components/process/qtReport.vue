@@ -30,8 +30,9 @@
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
 	
-//const url = HOST + `/quality/inspect/by-equipment-time`;
-const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
+const url = HOST + `/api/v1/quality/inspect/by-equipment-time`;
+//const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
+//const url = `static/sb.json`
 
 export default {
     components: {
@@ -49,7 +50,8 @@ export default {
             },
 
             loading: false,
-            tdResize: true, //是否允许拖动table大小
+            tdResize: true, // 是否允许拖动table大小
+            condition:{},   // 查询条件    
             dataName:[      // 条件对应中文名
                 {
                     itemCode:"equipmentName",
@@ -114,12 +116,12 @@ export default {
                 //     lists: [
                 //         {
                 //             itemName: "项目1",
-                //             value: "valeu0",
+                //             value: "value0",
                 //            // width: "200"
                 //         },
                 //         {
                 //             itemName: "项目2",
-                //             value: "valeu1",
+                //             value: "value1",
                 //            // width: "300"
                 //         }]
                 // }
@@ -135,7 +137,7 @@ export default {
 
     },
     created() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        
 
         this.fetchData();
        
@@ -175,7 +177,8 @@ export default {
 		}
     },
     mounted(){
-       this.tableData.height  = this.adjustHeight()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
@@ -213,63 +216,61 @@ export default {
             });
         },		              
         // 获取数据。
-        fetchData() {    
-            
+        fetchData() {
+
             this.loading = true;
             let oQuery = {}
-            Object.keys(this.$route.query).forEach((el)=>{
-                if(el === "equipmentId" || el === "startTime" || el === "endTime"){
+            Object.keys(this.$route.query).forEach((el) => {
+                if (el === "equipmentId" || el === "startTime" || el === "endTime") {
                     oQuery[el] = this.$route.query[el]
                 }
-                if(el === "equipmentName" || el === "startTime" || el === "endTime"){
+                if (el === "equipmentName" || el === "startTime" || el === "endTime") {
                     this.condition[el] = this.$route.query[el]
                 }
             })
             this.$get(url, oQuery)
-            .then((res) => {
-                this.loading = false;
-             
-                this.judgeLoaderHandler(res,() => {
-                    
-                    let odata = res.data.data,  //获取到的data
-                        tdata = [],             //想要的data 
-                     //   lists = [];          //想要的lists 
-                        obj = {
-                            name: "检验项目",
-                            width: "500",
-                            lists: []
-                        };
-                                                                
-                       odata.forEach((el) => {  /* 处理columns */
-                            let items = el.items
-                            items.forEach(function (el, index) {
-                                obj.lists[index] = {
-                                    itemName: `${el.itemName}`,
-                                    value: `value` + index
+                .then((res) => {
+                    console.log(res)
+                    this.loading = false;
+                    this.judgeLoaderHandler(res, () => {
+                        let odata = res.data.data,  //获取到的data
+
+                            obj = {
+                                name: "检验项目",
+                                width: "500",
+                                lists: []
+                            };
+
+                        odata.forEach((el) => {  /* 处理columns和data */
+                            let items = el.items,
+                                tdata = []              //储存items里面的data
+                            items.forEach((item) => {
+                                if (obj.lists.every((list) => {
+                                        return list.itemName !== item.itemName
+                                    })
+                                ) {
+                                    obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
+                                        itemName: `${item.itemName}`,
+                                        prop: encodeURI(`${item.itemName}`)
+                                    })
                                 }
+                                tdata[encodeURI(`${item.itemName}`)] = item.value
+
                             })
+                            let objData = Object.assign(el, tdata);   // 合并获取正在的data
+                            this.tableData.data.push(objData)
                         })
+
                         this.tableData.columns.push(obj)
 
-                        odata.forEach((el,index) => {       /* 处理data */
-                            let items = el.items
-                            items.forEach((el,index)=>{
-                                tdata[`value`+index] = el.value
-                            })
-                            let obj = Object.assign(el, tdata);
-                            console.log(obj)
-                            //debugger
-                            this.tableData.data.push(obj)
-                        })
 
-                   
-                });				 
-            })
-            .catch((err) => {
-                this.loading = false;
-                this.styleObject.minWidth = 0;   
-                console.log("数据库查询出错。")
-            })
+                    });
+                })
+                .catch((err) => {
+                    this.loading = false;
+                    this.styleObject.minWidth = 0;
+                    console.log("数据库查询出错。")
+                })
         },
         // 表格导出。
         exportExcelHandle (oData, event) {
