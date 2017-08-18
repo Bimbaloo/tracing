@@ -1,44 +1,44 @@
 {
-  "errorCode": 0,
   "errorMsg": "",
+  "errorCode": 0,
   "data": [
     {
-      "eqipmentCode": "设备编码",
-      "eqipmentName": "设备名称",
-      "reportTime": "上报时间", // 格式：yyyy-MM-dd hh:mm:ss
-      "commitTime": "检验时间", // 格式：yyyy-MM-dd hh:mm:ss
-      "inspectedTime": "审核时间", // 格式：yyyy-MM-dd hh:mm:ss
-      "operatorName": "人员姓名",
-      "operatorCard": "人员卡号",
       "items": [
         {
-          "itemName": "A",
-          "value": "1111"
+          "value": "1111",
+          "itemName": "A"
         },
         {
-          "itemName": "B",
-          "value": "aaaa"
+          "value": "",
+          "itemName": "B"
         }
-      ]
+      ],
+      "eqipmentName": "\u8bbe\u5907\u540d\u79f0",
+      "operatorName": "\u4eba\u5458\u59d3\u540d",
+      "reportTime": "\u4e0a\u62a5\u65f6\u95f4",
+      "commitTime": "\u68c0\u9a8c\u65f6\u95f4",
+      "inspectedTime": "\u5ba1\u6838\u65f6\u95f4",
+      "eqipmentCode": "\u8bbe\u5907\u7f16\u7801",
+      "operatorCard": "\u4eba\u5458\u5361\u53f7"
     },
     {
-      "eqipmentCode": "设备编码",
-      "eqipmentName": "设备名称",
-      "reportTime": "上报时间", // 格式：yyyy-MM-dd hh:mm:ss
-      "commitTime": "检验时间", // 格式：yyyy-MM-dd hh:mm:ss
-      "inspectedTime": "审核时间", // 格式：yyyy-MM-dd hh:mm:ss
-      "operatorName": "人员姓名",
-      "operatorCard": "人员卡号",
       "items": [
         {
-          "itemName": "A",
-          "value": "2222"
+          "value": "",
+          "itemName": "A"
         },
         {
-          "itemName": "B",
-          "value": "bbbb"
+          "value": "bbbb",
+          "itemName": "B"
         }
-      ]
+      ],
+      "eqipmentName": "\u8bbe\u5907\u540d\u79f0",
+      "operatorName": "\u4eba\u5458\u59d3\u540d",
+      "reportTime": "\u4e0a\u62a5\u65f6\u95f4",
+      "commitTime": "\u68c0\u9a8c\u65f6\u95f4",
+      "inspectedTime": "\u5ba1\u6838\u65f6\u95f4",
+      "eqipmentCode": "\u8bbe\u5907\u7f16\u7801",
+      "operatorCard": "\u4eba\u5458\u5361\u53f7"
     }
   ]
 }
