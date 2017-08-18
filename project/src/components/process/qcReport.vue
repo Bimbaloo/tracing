@@ -30,7 +30,7 @@
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'	
 
-const url = HOST + "/api/v1//quality/send-inspect/by-equipment-time";
+const url = HOST + "/api/v1/quality/send-inspect/by-equipment-time";
 //const url =  `http://rapapi.org/mockjsdata/24404/quality/send-inspect/by-equipment-time?`
 export default {
     components: {
@@ -227,7 +227,9 @@ export default {
             this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
-             
+                console.log(url)
+                console.log(oQuery)
+                debugger
                 this.judgeLoaderHandler(res,() => {
                     this.tableData.data = res.data.data
                     this.tableData.data.forEach((el)=>{

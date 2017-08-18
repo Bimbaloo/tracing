@@ -30,8 +30,9 @@
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
 	
-const url = HOST + `/quality/inspect/by-equipment-time`;
+const url = HOST + `/api/v1/quality/inspect/by-equipment-time`;
 //const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
+//const url = `static/sb.json`
 
 export default {
     components: {
@@ -229,6 +230,7 @@ export default {
             })
             this.$get(url, oQuery)
                 .then((res) => {
+                    console.log(res)
                     this.loading = false;
                     this.judgeLoaderHandler(res, () => {
                         let odata = res.data.data,  //获取到的data
@@ -240,11 +242,10 @@ export default {
                             };
 
                         odata.forEach((el) => {  /* 处理columns */
-                            let items = el.items
-                            items.forEach(function (item) {
-                                // debugger
-                                if (obj.lists.every(function (list) {
-                                    //  debugger
+                            let items = el.items,
+                                tdata = []              //储存items里面的data
+                            items.forEach((item) => {
+                                if (obj.lists.every((list) => {
                                     return list.itemName !== item.itemName
                                 })
                                 ) {
@@ -253,21 +254,14 @@ export default {
                                         value: encodeURI(`${item.itemName}`)
                                     })
                                 }
-
-                            })
-                        })
-
-                        this.tableData.columns.push(obj)
-
-                        odata.forEach((el) => {       /* 处理data */
-                            let items = el.items,
-                                tdata = []              //储存items里面的data
-                            items.forEach((item) => {
                                 tdata[encodeURI(`${item.itemName}`)] = item.value
+
                             })
                             let objData = Object.assign(el, tdata);   // 合并获取正在的data
                             this.tableData.data.push(objData)
                         })
+
+                        this.tableData.columns.push(obj)
 
 
                     });
