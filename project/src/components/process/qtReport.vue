@@ -30,8 +30,8 @@
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
 	
-//const url = HOST + `/quality/inspect/by-equipment-time`;
-const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
+const url = HOST + `/quality/inspect/by-equipment-time`;
+//const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
 
 export default {
     components: {
@@ -215,63 +215,68 @@ export default {
             });
         },		              
         // 获取数据。
-        fetchData() {    
-            
+        fetchData() {
+
             this.loading = true;
             let oQuery = {}
-            Object.keys(this.$route.query).forEach((el)=>{
-                if(el === "equipmentId" || el === "startTime" || el === "endTime"){
+            Object.keys(this.$route.query).forEach((el) => {
+                if (el === "equipmentId" || el === "startTime" || el === "endTime") {
                     oQuery[el] = this.$route.query[el]
                 }
-                if(el === "equipmentName" || el === "startTime" || el === "endTime"){
+                if (el === "equipmentName" || el === "startTime" || el === "endTime") {
                     this.condition[el] = this.$route.query[el]
                 }
             })
             this.$get(url, oQuery)
-            .then((res) => {
-                this.loading = false;
-             
-                this.judgeLoaderHandler(res,() => {
-                    
-                    let odata = res.data.data,  //获取到的data
-                        tdata = [],             //想要的data 
-                     //   lists = [];          //想要的lists 
-                        obj = {
-                            name: "检验项目",
-                            width: "500",
-                            lists: []
-                        };
-                                                                
-                       odata.forEach((el) => {  /* 处理columns */
+                .then((res) => {
+                    this.loading = false;
+                    this.judgeLoaderHandler(res, () => {
+                        let odata = res.data.data,  //获取到的data
+
+                            obj = {
+                                name: "检验项目",
+                                width: "500",
+                                lists: []
+                            };
+
+                        odata.forEach((el) => {  /* 处理columns */
                             let items = el.items
-                            items.forEach(function (el, index) {
-                                obj.lists[index] = {
-                                    itemName: `${el.itemName}`,
-                                    value: `value` + index
+                            items.forEach(function (item) {
+                                // debugger
+                                if (obj.lists.every(function (list) {
+                                    //  debugger
+                                    return list.itemName !== item.itemName
+                                })
+                                ) {
+                                    obj.lists.push({
+                                        itemName: `${item.itemName}`,
+                                        value: encodeURI(`${item.itemName}`)
+                                    })
                                 }
+
                             })
                         })
+
                         this.tableData.columns.push(obj)
 
-                        odata.forEach((el,index) => {       /* 处理data */
-                            let items = el.items
-                            items.forEach((el,index)=>{
-                                tdata[`value`+index] = el.value
+                        odata.forEach((el) => {       /* 处理data */
+                            let items = el.items,
+                                tdata = []              //储存items里面的data
+                            items.forEach((item) => {
+                                tdata[encodeURI(`${item.itemName}`)] = item.value
                             })
-                            let obj = Object.assign(el, tdata);
-                            console.log(obj)
-                            //debugger
-                            this.tableData.data.push(obj)
+                            let objData = Object.assign(el, tdata);   // 合并获取正在的data
+                            this.tableData.data.push(objData)
                         })
 
-                   
-                });				 
-            })
-            .catch((err) => {
-                this.loading = false;
-                this.styleObject.minWidth = 0;   
-                console.log("数据库查询出错。")
-            })
+
+                    });
+                })
+                .catch((err) => {
+                    this.loading = false;
+                    this.styleObject.minWidth = 0;
+                    console.log("数据库查询出错。")
+                })
         },
         // 表格导出。
         exportExcelHandle (oData, event) {
