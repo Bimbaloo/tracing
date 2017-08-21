@@ -22,8 +22,10 @@
   import panel from 'components/panel/panel.vue'
 	import fnP from "assets/js/public.js"
 	
-	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
-	
+  const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules"
+  // 登录跳转。
+  const LOGIN_URL = MI_HOST + "/page/login.html?redirectUrl="
+  
   export default {
     components: {
       'v-panel': panel
@@ -56,8 +58,6 @@
 	        })
       	});
       });
-      
-      
     },
     methods: {
     	// 判断调用接口是否成功。
@@ -204,9 +204,6 @@
           margin-left: 100px;
         }
       }
-      &>.el-tabs__content {
-        /*padding: 0 300px;*/
-      }
       
     } 
   }
@@ -255,10 +252,6 @@
             }
           }
         }
-      }
-
-      &>.el-tabs__content {
-        /*padding: 0 300px;*/
       }
     } 
   }
