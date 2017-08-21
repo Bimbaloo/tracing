@@ -61,6 +61,11 @@
                         width: "120",
                         sortable: true
                     },{
+                        prop: "processCode",
+                        name: "工序编码",
+                        width: "80",
+                        sortable: true
+                    },{
                         prop: "equipmentName",
                         name: "设备名称",
                         width: "120",
@@ -97,8 +102,8 @@
                     },{
                         prop: "materialUnit",
                         name: "单位",
-                         width: "50",
-                         sortable: true
+                        width: "50",
+                        sortable: true
                     },{
                         prop: "quantity",
                         name: "数量",
@@ -142,6 +147,9 @@
             	
             	return nHeight;
             },
+            sortByTime (a, b) {
+                return Date.parse(b.happenTime.replace(/-/g,"/"))-Date.parse(a.happenTime.replace(/-/g,"/"));
+            },
         	// 获取数据。
             fetchData (oData) {
                 oData.error = null;
@@ -156,7 +164,8 @@
                     
                     if(!res.data.errorCode) {
                     	// 正常 0
-                        oData.data = res.data.data;
+                        oData.data = $.extend(true, [], res.data.data)
+                        oData.data = oData.data.sort(this.sortByTime);
                     }else if(res.data.errorCode == "1"){
                     	// 错误显示无数据。
                     	console.warn(res.data.errorMsg.message);

@@ -3,11 +3,15 @@
     <div class="content-list" v-loading="loading" element-loading-text="拼命加载中">
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis">
-            <div id="equipments"></div>
+            <div id="equipments" :style="{height: panelHeight + 'px'}"></div>
             <div class="legend" v-if="!loading">
                 <span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
             </div>
-            <div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment&&!loading">
+            <div class="selected-info" v-if="!loading">
+                <div v-if="selectedEquipment">选中设备：{{this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName}}</div>
+                <div>选中时间范围：{{datetime.realStart}}~{{datetime.realEnd}}</div>
+            </div>
+            <div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment&&!loading" :style="{right: (legendRight+300) + 'px'}">
                 <span class="icon icon-circle"></span><span>工艺</span>
             </div>
             <div class="switch" v-if="!loading">
@@ -19,8 +23,8 @@
                     <i class="icon icon-16 icon-hide"></i>
                     <div class="tip">显示悬浮框</div>
                 </div>
-            </div>
-            <div class="links" v-if="selectedEquipment&&!loading">
+            </div> 
+            <div class="links" v-if="selectedEquipment&&!loading" :style="{right: (legendRight-20) + 'px'}">
                 <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item']">
                     <div v-for="item in obj.list" @click="listButtonClick(item)">{{item.name}}</div>
                 </div>	
@@ -51,16 +55,15 @@
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
                 <el-button  @click="gotoTrack" class="btn btn-plain" v-if="trace">追踪</el-button>
             </div>	
-            <div class="tooltip-wrapper"  :style="{width: chartWidth+'px'}">
+            <div class="tooltip-wrapper" :style="{width: chartWidth+'px', margin: grid[0] + 'px ' + grid[1] + 'px ' + grid[2] + 'px ' + grid[3] + 'px'}">
                 <!--div class="tooltip-scroll" :style="{width:ratioW*100+'%', height:'100%', left:ratioL*100+'%'}"-->
                     <div v-for="compareData in compareList" 
-                        :data-id="compareData.millisecond" 
-                        :key="compareData.millisecond" 
-                        @click="tooltipPanelClickHandle" 
-                        @mouseenter="tooltipPanelMouseenterHandle" >
-
+                        :key="compareData.millisecond"              
+                        @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)" >
+                        
                         <div class="tooltip-panel" :style="{left:compareData.left*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
                             <!--div class="tooltip-time">{{compareData.time}}</div-->
+                            <i class="btn-close el-icon-circle-close" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
                             <div class="tooltip-list" v-for="equipment in compareData.list" :style="{maxHeight: chartHeight*0.8 + 'px'}">
                                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                                 <ul class="event-list">
@@ -99,12 +102,14 @@
     // 悬浮框最小高度。
     const TOOLTIP_MIN_HEIGHT = 20
     // legend距右侧的距离。
-    const LEGEND_RIGHT = 80
+    const LEGEND_RIGHT = 140
     // grid边距。
-    const GRID_LEFT = 100
-    const GRID_RIGHT = 100
+    const GRID_LEFT = 140
+    const GRID_RIGHT = 140
     const GRID_TOP = 60
     const GRID_BOTTOM = 60
+    // y轴标签换行的字符个数
+    const Y_LABEL_LENGTH = 11
     // 标记线点的大小。
     const MARKLINE_SYSMBOL_SIZE = 8
     // 提示框面板z轴。
@@ -127,6 +132,10 @@
 		},
         data () {
             return {
+                // legend距右侧的距离。
+                legendRight: LEGEND_RIGHT,
+                // grid边距。
+                grid: [GRID_TOP, GRID_RIGHT, GRID_BOTTOM, GRID_LEFT],
                 // 判断是否为溯源页。
                 trace: location.pathname.indexOf('traceIndex') > -1,
                 // 悬浮框是否展示。
@@ -161,7 +170,9 @@
 				endIf: true,
 				equipmentData: {},
                 chart: null,
-                // 图形区域宽高
+                // 图形区域高
+                panelHeight: 100,　
+                // 提示框区域宽高
                 chartHeight: 60,
                 chartWidth: 60,
                 markLine: [],
@@ -403,16 +414,15 @@
                                 
                                 let sValue = value.split("+")[0].trim(),
                                     aValue = [],
-                                    nLength = 7,
                                     i = 0,
-                                    l = Math.floor(sValue.length/nLength);
-                                // 设置大于7个字符换行。
+                                    l = Math.floor(sValue.length/Y_LABEL_LENGTH);
+                                // 设置大于10个字符换行。
                                 for(; i < l; i++) {
-                                    aValue.push(sValue.substr(i*nLength, nLength))                                    
+                                    aValue.push(sValue.substr(i*Y_LABEL_LENGTH, Y_LABEL_LENGTH))                                    
                                 }
-                                let nLeft = sValue.length - i*nLength;
+                                let nLeft = sValue.length - i*Y_LABEL_LENGTH;
                                 if(nLeft > 0) {
-                                    aValue.push(sValue.substr(i*nLength, nLeft))
+                                    aValue.push(sValue.substr(i*Y_LABEL_LENGTH, nLeft))
                                 }
                                 
                                 return aValue.join("\n");
@@ -464,7 +474,7 @@
                             left: 15,
                             top: 0
                         }],     
-                        left: 350,
+                        left: '40%',
                         top: 5,
                         width: 100,
                         height: 20,
@@ -646,7 +656,8 @@
                         width: 16,
                         labelFormatter: function(index, value) {
                             return value.split("+")[0]
-                        }
+                        },
+                        right: 50
                     },oAxis))
                 }
 
@@ -676,8 +687,8 @@
             resizeY: 'resizeChart'
         },
         methods: {
-			init() {      
-                         
+			init() { 
+                              
 				this.setInitData();
 
                 // 获取所有数据。
@@ -749,7 +760,7 @@
                 let jContent = $(".material-stock .router-content"),
                     jTitle = jContent.find(".content-title");
                 
-                // this.chartHeight = jContent.height() - jTitle.outerHeight(true) - 20;
+                this.panelHeight = jContent.height() - jTitle.outerHeight(true) - CHART_MARGIN_BOTTOM;
                 $("#equipments").height(jContent.height() - jTitle.outerHeight(true) - CHART_MARGIN_BOTTOM);
             },
             // 数据转换。
@@ -944,8 +955,13 @@
                 if((params.dataZoomId && params.dataZoomId.indexOf("1")) || params.type === "datazoom") {
                     // x轴缩放 || 工具栏缩放按钮。
                     let oXAxis = this.getScaledxAxis(),
-                    // 缩放后的时间轴时长。
-                    nScaledTimeLine = oXAxis.endValue - oXAxis.startValue
+                        // 缩放后的时间轴时长。
+                        nScaledTimeLine = oXAxis.endValue - oXAxis.startValue,
+                        // 时间范围。
+                        oTime = this.getRealTime()
+
+                    this.datetime.realStart = oTime.start;
+                    this.datetime.realEnd = oTime.end;
 
                     this.compareList = this.compareList.map(o => {
                         o.left = (o.millisecond - oXAxis.startValue) / nScaledTimeLine
@@ -994,10 +1010,10 @@
                 })
             },
             // 提示面板点击事件。
-            tooltipPanelClickHandle (event) {
+            tooltipPanelClickHandle (nTime) {
 
                 // 面板对应时间点。
-                let nTime = Number(event.currentTarget.getAttribute("data-id"));
+                // let nTime = Number(event.currentTarget.getAttribute("data-id"));
 
                 // 删除提示框对比数据。
                 this.deleteCompareListData(nTime)
@@ -1007,10 +1023,10 @@
 
             },
             // 提示面板鼠标移入事件。
-            tooltipPanelMouseenterHandle (event) {
+            tooltipPanelMouseenterHandle (nTime) {
                 
                 // 面板对应时间点。
-                let nTime = Number(event.currentTarget.getAttribute("data-id"))
+                // let nTime = Number(event.currentTarget.getAttribute("data-id"))
                 this.setCompareTooltipZIndex(nTime);
             },
             // 设置图表事件。
@@ -1214,7 +1230,6 @@
                     oFilter.data = oResult.data
                 })
 
-                console.log(this.option)
                 this.chart.setOption(this.option, true);
                 // 设置提示框的最大高度。
                 this.setTooltipHeight();
@@ -1867,7 +1882,6 @@
             .legend {
                 position: absolute;
                 top: 2px;
-                left: 81px;
 
                 span {
                     font-size: 12px;
@@ -1877,9 +1891,21 @@
                     line-height: 20px;
                     text-align: center;
                     color: #fff;
-                    margin-left: 20px;
+
+                    &+span {
+                        margin-left: 20px;
+                    }
                 }
-            }				
+            }	
+
+            .selected-info {
+                position: absolute;
+                top: 22px;
+                left: 0;
+                font: 12px/18px '微软雅黑';
+                color: #D53A35;
+            }	
+
             .buttons {
                 width: 100%;
                 text-align: center;
@@ -1928,9 +1954,8 @@
             .tooltip-wrapper {
                 position: absolute;
                 top: 0;
-                margin: 60px 100px;
-
-                
+                // margin: 60px 100px;
+     
                 .line {
                     // left: 0;
                     // top: 0;
@@ -1950,7 +1975,7 @@
                 // z-index: 100;
                 color: #000;//#fff;
                 border: 1px solid #D53A35;
-                cursor: pointer;
+
                 // margin-right: 20px;
                 
                 // &.left {
@@ -1962,6 +1987,21 @@
                 &:hover {
                     background-color: #fff;
                 }
+                
+                .btn-close {
+                    position: absolute;
+                    top: -10px;
+                    right: -10px;
+                    cursor: pointer;
+                    font-size: 20px;
+                    color: rgba(0,0,0,0.4);
+                    z-index: 1;
+
+                    &:hover {
+                        color: rgba(0,0,0,0.8);
+                    }
+                }
+
                 .tooltip-time {
                     color: #fff;
                     // font-size: 12px;
@@ -2023,7 +2063,7 @@
             .links {
                 position: absolute;
                 top: 18px;
-                right: 60px;
+                // right: 60px;
                 width: 300px;
                 // text-align: center;
                 font-size: 0;

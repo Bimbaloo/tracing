@@ -8,7 +8,7 @@
 	                {{ gridData.error }}
 	            </div>
 	            <div v-if="!gridData.error" class="content-table">
-	                <v-table v-on:selectChange="selectChange" :table-data="gridData" :data-array="gridData.data" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter"></v-table>    
+	                <v-table :table-data="gridData" :data-array="gridData.data" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter"></v-table>    
 	            </div>   
 	       </div>   
     	</div> 
@@ -55,6 +55,11 @@
                         prop: "processName",
                         name: "工序名称",
                         width: "120",
+                        sortable: true
+                    },{
+                        prop: "processCode",
+                        name: "工序编码",
+                        width: "80",
                         sortable: true
                     },{
                         prop: "equipmentName",
