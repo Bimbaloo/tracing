@@ -7,10 +7,12 @@
     @selection-change="selectionChange"
     @cell-click="cellClick"
     class="table"
+    :row-key="tableData.data.prop"
     :height="heights"
     v-loading="loading"
     element-loading-text="拼命加载中"
-    style="width: 100%">
+    style="width: 100%"
+    ref="multipleTable">
         <el-table-column 
         v-for="column in columns"
         align="center"
@@ -29,7 +31,8 @@
         :filter-placement="column.filterPlacement"
         :width="column.width"
         :data-filte="dataFilter"
-        :selectable="checkSelectable">
+        :selectable="checkSelectable"
+        :reserve-selection="true">
             <el-table-column  
                 align="center"
                 v-if="!!column.lists"  
@@ -79,8 +82,6 @@
         },
         data() {
             return {
-//              resize: false,
-//              dataArray: this.tableData.data,
                 columns: this.tableData.columns
             }
         },
@@ -89,8 +90,17 @@
                 return this.tableData.selected
             },
         	dataArray: function() {
+                if (!this.dataFilter) {
+                    return this.tableData.data
+                } else if (this.selectedData.length !== 0) {
+                    let materialCode = this.selectedData[0].materialCode  // 获取当前勾选行 物料编码  
+                    let processCode = this.selectedData[0].processCode   // 获取当前勾选行 工序编码 
+                    return this.tableData.data.filter(el => el.materialCode === materialCode && el.processCode === processCode)
+                } else {
+                    return this.tableData.data
+                }
                 return this.tableData.data
-        	}
+            }
         },
         created () {
         },
@@ -101,14 +111,20 @@
                 oColumn.cellClick && oColumn.cellClick(row);                
             },
             selectionChange (selection) {
-                this.tableData.selected = selection;      
+                if(selection.length !== 0 && selection.length !== (this.selectedData.length-this.dataArray.length) ){  //选中的行数不为0且不等于未显示的行数
+                    this.tableData.selected = []    
+                    this.tableData.selected = selection.map((el) => { return el })  
+                }else{
+                    this.tableData.selected = []
+                    this.$refs.multipleTable.clearSelection();
+                }
             },
             filterChange (filters) {
                 this.tableData.filterChange && this.tableData.filterChange(filters);
             },
             /* 是否禁选 */
             checkSelectable (row,index) {
-                if(!this.dataFilter) {
+                if(!this.selectable) {
                     return true
                 }else if(this.selectedData.length !== 0){ 
                     // 启用过滤功能，勾选后。
@@ -118,7 +134,7 @@
                 }else{
                     return true
                 }
-            }
+             }
         }
     }
 </script>
