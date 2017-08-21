@@ -6,7 +6,8 @@
       "items": [
         {
           "value": "熔炼1",
-          "itemName": "熔炼1"
+          "itemName": "熔炼1",
+          "cellClick": "fileDownload"
         },
         {
           "value": "锻造1",
