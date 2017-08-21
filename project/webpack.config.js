@@ -1,3 +1,5 @@
+'use strict'
+
 const { join, resolve } = require('path')
 const webpack = require('webpack')
 const glob = require('glob')
@@ -20,6 +22,7 @@ const entries = {}
 const chunks = []
 glob.sync('./src/pages/**/app.js').forEach(path => {
   const chunk = path.split('./src/pages/')[1].split('/app.js')[0]
+  entries[chunk] = path
   entries[chunk] = ['babel-polyfill', path]
   chunks.push(chunk)
 })
@@ -43,81 +46,68 @@ const config = {
     rules: [
       {
         test: /\.vue$/,
-        use: [
-          'cache-loader',
-          {
-            loader: 'vue-loader',
-            options: {
-              loaders: {
-                css: ExtractTextPlugin.extract({
-                  use: ['cache-loader', 'css-loader'],
-                  fallback: 'style-loader'
-                }),
-                less: ExtractTextPlugin.extract({
-                  use: ['cache-loader', 'css-loader', 'postcss-loader', 'less-loader'],
-                  fallback: 'style-loader'
-                }),
-                postcss: ExtractTextPlugin.extract({
-                  use: ['cache-loader', 'css-loader', 'postcss-loader'],
-                  fallback: 'style-loader'
-                })
-              }
-            }
+        loader: 'vue-loader',
+        options: {
+          loaders: {
+            css: ['css-hot-loader'].concat(ExtractTextPlugin.extract({
+              use: 'css-loader',
+              fallback: 'style-loader'
+            })),
+            less: ['css-hot-loader'].concat(ExtractTextPlugin.extract({
+              use: ['css-loader', 'postcss-loader', 'less-loader'],
+              fallback: 'style-loader'
+            })),
+            postcss: ['css-hot-loader'].concat(ExtractTextPlugin.extract({
+              use: ['css-loader', 'postcss-loader'],
+              fallback: 'style-loader'
+            }))
           }
-        ]
+        }
       },
       {
         test: /\.js$/,
-        use: [
-          'cache-loader',
-          'babel-loader'
-        ],
-        include: resolve('src'),
+        use: 'babel-loader',
         exclude: /node_modules/
       },
       {
         test: /\.css$/,
-        use: ExtractTextPlugin.extract({
-          use: ['cache-loader', 'css-loader', 'postcss-loader'],
+        use: ['css-hot-loader'].concat(ExtractTextPlugin.extract({
+          use: ['css-loader', 'postcss-loader'],
           fallback: 'style-loader'
-        })
+        }))
       },
       {
         test: /\.less$/,
-        use: ExtractTextPlugin.extract({
-          use: ['cache-loader', 'css-loader', 'postcss-loader', 'less-loader'],
+        use: ['css-hot-loader'].concat(ExtractTextPlugin.extract({
+          use: ['css-loader', 'postcss-loader', 'less-loader'],
           fallback: 'style-loader'
-        })
+        }))
       },
       {
-        test: /\.(html|tpl)$/,///\.html$/,
-        use: [
-          'cache-loader',
-          {
-            loader: 'html-loader',
-            options: {
-              root: resolve(__dirname, 'src'),
-              attrs: ['img:src', 'link:href']
-            }
+        test: /\.html$/,
+        use: [{
+          loader: 'html-loader',
+          options: {
+            root: resolve(__dirname, 'src'),
+            attrs: ['img:src', 'link:href']
           }
-        ]
+        }]
       },
       {
         test: /\.(png|jpg|jpeg|gif|eot|ttf|woff|woff2|svg|svgz)(\?.+)?$/,
         exclude: /favicon\.png$/,
-        use: [
-          'cache-loader',
-          {
-            loader: 'url-loader',
-            options: {
-              limit: 1000000
-            }
+        use: [{
+          loader: 'url-loader',
+          options: {
+            limit: 10000,
+            name: 'assets/img/[name].[hash:7].[ext]'
           }
-        ]
+        }]
       }
     ]
   },
   plugins: [
+    new webpack.optimize.ModuleConcatenationPlugin(),
     new CommonsChunkPlugin({
       name: 'vendors',
       filename: 'assets/js/vendors.js',
@@ -173,7 +163,8 @@ if (process.env.NODE_ENV === 'production') {
     new webpack.optimize.UglifyJsPlugin({
       compress: {
         warnings: false
-      }
+      },
+      sourceMap: true
     }),
     new OptimizeCSSPlugin()
   ])
