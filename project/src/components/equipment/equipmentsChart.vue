@@ -11,9 +11,9 @@
                 <div v-if="selectedEquipment">选中设备：{{this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName}}</div>
                 <div>选中时间范围：{{datetime.realStart}}~{{datetime.realEnd}}</div>
             </div>
-            <div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment&&!loading" :style="{right: (legendRight+300) + 'px'}">
+            <!--div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment&&!loading" :style="{right: (legendRight+300) + 'px'}">
                 <span class="icon icon-circle"></span><span>工艺</span>
-            </div>
+            </div-->
             <div class="switch" v-if="!loading">
                 <div v-if="show" @click="hideTooltip" class="switch-eye">
                     <i class="icon icon-16 icon-show"></i>
@@ -24,9 +24,10 @@
                     <div class="tip">显示悬浮框</div>
                 </div>
             </div> 
-            <div class="links" v-if="selectedEquipment&&!loading" :style="{right: (legendRight-20) + 'px'}">
-                <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item']">
-                    <div v-for="item in obj.list" @click="listButtonClick(item)">{{item.name}}</div>
+            <!--各维度链接跳转按钮-->
+            <div class="links" v-if="selectedEquipment&&!loading" :style="{right: (legendRight-10) + 'px'}">
+                <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item', {'no-border':obj.list.length?false:true}]">
+                    <div v-for="(item,index) in obj.list" @click="listButtonClick(item)" :key="index">{{item.name}}</div>
                 </div>	
             </div>
             <div class="setting clear" v-if="!loading&&process">
@@ -55,6 +56,7 @@
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
                 <el-button  @click="gotoTrack" class="btn btn-plain" v-if="trace">追踪</el-button>
             </div>	
+            <!--提示面板数据-->
             <div class="tooltip-wrapper" :style="{width: chartWidth+'px', margin: grid[0] + 'px ' + grid[1] + 'px ' + grid[2] + 'px ' + grid[3] + 'px'}">
                 <!--div class="tooltip-scroll" :style="{width:ratioW*100+'%', height:'100%', left:ratioL*100+'%'}"-->
                     <div v-for="compareData in compareList" 
@@ -64,13 +66,13 @@
                         <div class="tooltip-panel" :style="{left:compareData.left*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
                             <!--div class="tooltip-time">{{compareData.time}}</div-->
                             <i class="btn-close el-icon-circle-close" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
-                            <div class="tooltip-list" v-for="equipment in compareData.list" :style="{maxHeight: chartHeight*0.8 + 'px'}">
+                            <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8 + 'px'}">
                                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                                 <ul class="event-list">
-                                    <li v-for="(event,index) in equipment.event">
-                                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}&nbsp;&nbsp;{{event.group}}</div>
+                                    <li v-for="(event,index) in equipment.event" :key="index">
+                                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}&nbsp;&nbsp;<span v-if="event.group">事件组：{{event.group}}</span></div>
                                         <ul class="content-list">
-                                            <li v-for="content in event.content">
+                                            <li v-for="(content,index) in event.content" :key="index">
                                                 {{content.name}}:&nbsp;&nbsp;{{content.value}}
                                             </li>
                                         </ul>
@@ -190,8 +192,18 @@
                 // 高亮的节点。
                 highlightedData: null,
                 // 只展示与起点相关的投产数据。
-                onlyShowRelatedData: false,
+                onlyShowRelatedData: true,
 				dimension: [{
+					name: "工艺",
+                    key: "parameter",
+					type: "0",
+                    color: "#FAC41B",
+                    list: [{
+						name: "工艺参数",
+                        router: "",
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+                    }]
+				}, {
 					name: "质量",
                     key: "quality",
 					type: "3",
@@ -219,10 +231,16 @@
 
                     }]
 				}, {
-					name: "加工",
+					name: "工单",
                     key: "work",
 					type: "2",
                     color: "#66bc84",
+                    list: []
+				}, {
+					name: "投产",
+                    key: "pool",
+					type: "7",
+                    color: "#00a5a7",
                     list: [{
 						name: "投产表",
 						router: "/process/product",
@@ -478,7 +496,7 @@
                         top: 5,
                         width: 100,
                         height: 20,
-                        onclick: this.setPoolInAndOutVisibility
+                        onclick: this.changePoolInAndOutVisibility
                     }],              
                     series: [{
                         type: 'custom',
@@ -636,7 +654,8 @@
                         shadowOffsetX: 1,
                         shadowOffsetY: 2,
                         shadowColor: '#fff'
-                    }
+                    },
+                    showDataShadow: false
                 }
 
                 // 添加x轴缩放。
@@ -727,7 +746,7 @@
                     this.chart.clear()
                     this.markLine = []
                     this.compareList = []  
-                    this.onlyShowRelatedData = false
+                    this.onlyShowRelatedData = true
                 }      
             },
             // 重置图形大小。
@@ -803,9 +822,9 @@
                 }   
             },
             // 设置投产可见性。
-            setPoolInAndOutVisibility () {
+            changePoolInAndOutVisibility () {
                 let sColor = "#333",
-                    raletedData = Object.assign([], this.dimension.filter(o=> o.key === 'work')[0].data)
+                    raletedData = Object.assign([], this.dimension.filter(o=> o.key === 'pool')[0].data)
 
                 // 切换可见性。
                 this.onlyShowRelatedData = !this.onlyShowRelatedData
@@ -818,7 +837,7 @@
 
                 this.chart.setOption({
                     series: [{
-                        name: "加工",
+                        name: "投产",
                         data: raletedData
                     }],
                     graphic: {
@@ -1152,7 +1171,8 @@
                         // 初始化图形数据。
                         this.initChartData(aoData);
                         // 添加图形数据。
-                        this.setChartData();		
+                        this.setChartData();	
+
 					});
 				})
 				.catch((err) => {
@@ -1184,10 +1204,13 @@
                         Object.assign(oData, {
                             // 状态
                             status: o.equipStatusList||[],
-                            // 加工
+                            // 工单
                             work: {
                                 startWorkList: o.startWorkList||[],
-                                finishWorkList: o.finishWorkList||[],
+                                finishWorkList: o.finishWorkList||[]
+                            },
+                            // 投产投产
+                            pool: {
                                 poolInList: o.poolInList||[],
                                 poolOutList: o.poolOutList||[]
                             },
@@ -1227,7 +1250,14 @@
                     if(oResult.markPoint.length) {
                         oFilter.markPoint.data = oResult.markPoint
                     }
-                    oFilter.data = oResult.data
+                    
+                    if(item.key === 'pool' &&　this.onlyShowRelatedData) {
+                        // 设置可见性，若只展示起点相关。              
+                        oFilter.data = oResult.data.filter(arr => arr[4])                                                
+                    }else {
+                        oFilter.data = oResult.data
+                    }
+                    
                 })
 
                 this.chart.setOption(this.option, true);
@@ -1255,11 +1285,11 @@
                     case "startWorkList": 
                         oResult.time = +new Date(o.happenTime);
                         o.timePoint = o.happenTime;
-                        oResult.title = "加工";
+                        oResult.title = "工单启动";
                         oResult.tooltipData = [
-                            {name: "开始时间", value: o.happenTime},
-                            {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
+                            {name: "开始时间", value: o.happenTime},
+                            {name: "操作人", value: o.personName},                       
                             {name: "工序", value: o.processName}
                         ];                                
                         break;
@@ -1267,8 +1297,9 @@
                     case "finishWorkList":
                         oResult.time = +new Date(o.happenTime);
                         o.timePoint = o.happenTime;
-                        oResult.title = "完工";
+                        oResult.title = "工单结束";
                         oResult.tooltipData = [
+                            {name: "工单号", value: o.doCode},
                             {name: "完工时间", value: o.happenTime},
                             {name: "操作人", value: o.personName}
                         ];  
@@ -1279,6 +1310,7 @@
                         o.timePoint = o.happenTime;
                         oResult.title = "投料";
                         oResult.tooltipData = [
+                            {name: "条码", value: o.barcode},
                             {name: "开始时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
@@ -1293,6 +1325,7 @@
                         o.timePoint = o.happenTime;
                         oResult.title = "产出";
                         oResult.tooltipData = [
+                            {name: "条码", value: o.barcode},
                             {name: "产出时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
@@ -1320,11 +1353,12 @@
                         oResult.title = "送检";
                         oResult.tooltipData = [
                             {name: "送检时间", value: o.happenTime},
-                            {name: "检验人", value: o.checkPersonName},
+                            {name: "送检人", value: o.personName},                
                             {name: "工单号", value: o.doCode},
                             {name: "物料", value: o.materialName},
                             {name: "批次", value: o.batchNo},
-                            {name: "送检结果", value: o.result}
+                            {name: "检验人", value: o.checkPersonName},
+                            {name: "检验结果", value: o.result}
                         ];
                         break;   
                         // 事件开始
@@ -1456,7 +1490,7 @@
 
                                 let aPointer = [oData.time, nIndex, 1, [oData]];
 
-                                if(sDimension === "work") {
+                                if(sDimension === "pool") {
                                     if((key === "poolInList" && item.poolInTime.indexOf(o.happenTime) > -1) ||
                                     (key === "poolOutList" && item.poolOutTime.indexOf(o.happenTime) > -1)) {
                                         // 若为属于起点的投入或产出。
@@ -1617,8 +1651,13 @@
                             oGroupIdList.add(o.groupId)
                             sGroup = o.groupId
                         }
+
+                        if(sGroup) {
+                            sList += `<div style="color:${param.color}">${index+1}.${o.title}&nbsp;&nbsp;事件组：${sGroup}</div>`;
+                        }else {
+                            sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
+                        }
                         
-                        sList += `<div style="color:${param.color}">${index+1}.${o.title}&nbsp;&nbsp;${sGroup}</div>`;
                         o.tooltipData.forEach(tip => {
                             sList += `<div><span>${tip.name}:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`                
                         })
@@ -1867,6 +1906,10 @@
                     background-color: @color;
                 }
             }
+
+            &.no-border {
+                border-left: none;
+            }
         }     
     }
 
@@ -2036,40 +2079,44 @@
 
             }
             // 工艺按钮
-            .parameter {
-                position: absolute;
-                cursor: pointer;
-                top: 4px;
-                right: 380px;
-                font-size: 12px;
+            // .parameter {
+            //     position: absolute;
+            //     cursor: pointer;
+            //     top: 4px;
+            //     right: 380px;
+            //     font-size: 12px;
 
-                .icon-circle {
-                    width: 14px;
-                    height: 14px;
-                    border-radius: 7px;
-                    background-color: #FAC41B;
-                    margin-right: 5px;
-                }
+            //     .icon-circle {
+            //         width: 14px;
+            //         height: 14px;
+            //         border-radius: 7px;
+            //         background-color: #FAC41B;
+            //         margin-right: 5px;
+            //     }
 
-                &:hover {
-                    color: #FAC41B;
-                }
+            //     &:hover {
+            //         color: #FAC41B;
+            //     }
 
-                span {
-                    vertical-align: middle;
-                }
-            }
+            //     span {
+            //         vertical-align: middle;
+            //     }
+            // }
             // 链接。
             .links {
                 position: absolute;
                 top: 18px;
                 // right: 60px;
-                width: 300px;
+                // width: 300px;
                 // text-align: center;
                 font-size: 0;
-
+                // 工单
                 .work {
                     .item-color(@work)
+                }
+                // 投产
+                .pool {
+                    .item-color(@pool)
                 }
                 .quality {
                     .item-color(@quality)
@@ -2082,6 +2129,9 @@
                 }
                 .tool {
                     .item-color(@tool)
+                }
+                .parameter {
+                    .item-color(@parameter)
                 }
             }
 

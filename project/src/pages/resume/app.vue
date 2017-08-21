@@ -205,7 +205,7 @@
 			// 验证条码。
 			let self = this;
         	var validateBarcode = (rule, value, callback) => {
-        		if(!value) {
+        		if(!value.trim()) {
         			callback(new Error("请输入条码或扫码"));
         		}else {
         			callback();
@@ -345,7 +345,7 @@
 				// 规则。
 				rules: {
 					barcode: [
-						{validator: validateBarcode,trigger: "blur"}
+						{validator: validateBarcode, trigger: "change"}
 					]
 				}
 			}
@@ -633,10 +633,9 @@
 					})
 					
 					// 数据排序后。
-					aOrder.forEach( o => {
-						
-						if(o.data.length > 1) {
-							// 排序处理。
+					aOrder.forEach( (o, index) => {
+						if(index && o.data.length > 1) {
+							// data存在，非第一条数据 进行排序处理。
 							o.data = o.data.sort( (oA, oB) => +new Date(oA.data.time) < +new Date(oB.data.time) )
 						}
 						
@@ -644,7 +643,6 @@
 					})
 					
 				}else {
-					
 					aReturn = aData;
 				}
 				

@@ -245,12 +245,9 @@
 		        			this.oBefore[sModule].bEdit = false;
 	        				this.sErrorMessage="保存成功！";
 	        				this.showMessage();
-	        			},()=>{
-//	        				this.oBefore[sModule].bEdit = false;
-	        				// 更新失败。则重置显示值。
-	//      				let oData = JSON.parse(sessionStorage.getItem(sModule));
-	        				let oData = this.oBefore[sModule].value;
-	        				this.$set(this.category,this.getModuleIndexByModule(sModule),oData);
+//	        			},()=>{
+//	        				let oData = this.oBefore[sModule].value;
+//	        				this.$set(this.category,this.getModuleIndexByModule(sModule),oData);
 	        			});
 	        		});
 				}
