@@ -223,7 +223,7 @@
             	},
             	// 验证批次。
             	validateBatch = (rule, value, callback) => {
-            		if(!value) {
+            		if(!value.trim()) {
             			callback(new Error("请输入批次"));
             		}else {
             			callback();
@@ -326,7 +326,7 @@
 					// 物料。
 					materialCode: [{validator: validateMaterialcode, trigger: "change"}],
 					// 批次
-					batchNo: [{validator: validateBatch, trigger: "blur"}],
+					batchNo: [{validator: validateBatch, trigger: "change"}],
 					// 结束时间。
 					endTime: [{validator: validateEndTime, trigger: "change"}]
 				}

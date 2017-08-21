@@ -98,11 +98,9 @@
         	// 行点击事件。
             cellCllickHandler(row, column, cell, event){
                 this.currentRow=row;
-                console.log(this.currentRow);
             },
             // 名称修改事件。
             labelChangeHandler(value){
-                console.log(value);
                 this.currentRow.itemName=value;
             },
             // 保存事件。
@@ -124,10 +122,11 @@
 									this.aBefore = $.extend(true,[],this.tableData);
 				            		this.sErrorMessage="更新成功！";
 			        				this.showMessage();
-				            	},()=>{
-				            		// 恢复更新数据。
-									let aData = this.aBefore;
-				            		this.tableData = aData?aData:[];
+//				            	},()=>{
+//									// 失败不用恢复到以前状态
+//				            		// 恢复更新数据。
+//									let aData = this.aBefore;
+//				            		this.tableData = aData?aData:[];
 				            	});
 			                });
 	            			

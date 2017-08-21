@@ -78,7 +78,7 @@
             		aParams = ["barcode","materialCode","equipmentCode","doCode"],
             		// 验证条码
 	            	validateBarcode = (rule, value, callback) => {
-	            		if(!value) {
+	            		if(!value.trim()) {
 	            			callback(new Error("请输入条码"));
 	            		}else {
 	            			callback();
@@ -86,7 +86,7 @@
 	            	},
 	            	// 验证批次。
 	            	validateBatch = (rule, value, callback) => {
-	            		if(!value) {
+	            		if(!value.trim()) {
 	            			callback(new Error("请输入批次"));
 	            		}else {
 	            			callback();
@@ -135,7 +135,6 @@
 	            			aJudgeName.push(_that.getNameByKey(param));
 	            		}
 	            	}
-	            	
 	            	// 如果judge的参数中所有的都为空。则提示
 	            	if(window.Rt.utils.getObjectValues(oJudge).some(o=>o)) {
 	            		// 只要一个有数据。

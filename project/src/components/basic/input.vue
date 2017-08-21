@@ -1,5 +1,5 @@
 <template>
-    <el-input v-model="form[key]" :placeholder="hint" :disabled="disabled"></el-input> 
+    <el-input v-model="formData[keyData]" :placeholder="hint" :disabled="disabled" @change="update"></el-input>
 </template>
 
 <script>
@@ -7,15 +7,19 @@
         props: ['formData', 'placeholderData', 'keyData','disabledData'],
         data() {
             return {
-                form: this.formData,
-                key: this.keyData,
                 hint: this.placeholderData,
-                disabled: this.disabledData?true:false
+                disabled: this.disabledData?true:false,
+                value: this.formData[this.keyData]
             }
         },
         methods: {
             // 不是直接更新值，而是使用此方法来对输入值进行格式化和位数限制
-            update: function (event) {}
+            update: function (value) {
+                let formattedValue = value.trim()
+
+                // 如果值不统一，手动覆盖以保持一致
+                this.formData[this.keyData] = formattedValue;
+            }
         }
     }
 </script>
