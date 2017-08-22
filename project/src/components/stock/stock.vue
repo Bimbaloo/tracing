@@ -1,5 +1,6 @@
+<!--查出库路由-->
 <template>
-    <div class="post">
+    <div class="stock">
         <div class="router-path">
             <span class="path-item" @click="checkStock">查出库</span>
             <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
@@ -13,7 +14,8 @@
 </template>
 
 <script>
-
+	import fnP from "assets/js/public.js"
+	
     export default {
         data () {
             return { 
@@ -29,7 +31,6 @@
             this.setRouteQuery();
         },
         watch: {
-            // '$route': 'fetchData'
         },
         methods: {
             // 查出库
@@ -50,14 +51,15 @@
             },
             setRouteQuery() {
                 let aHref = location.href.split("?")[0].split("/"),
-                    sType = aHref[aHref.length-1];
+                    sType = aHref[aHref.length-1],
+                    oQuery = fnP.parseQueryParam(this.$route.query);
 
                 if(sType == "batch") {
-                    this.batch = this.$route.query;
+                    this.batch = oQuery;
                 }else if(sType == "restrain") {
-                    this.restrain = this.$route.query;
+                    this.restrain = oQuery;
                 }else {
-                    this.storage = this.$route.query;
+                    this.storage = oQuery;
                 }
             },
             setPathVisible(to) {
@@ -106,13 +108,40 @@
     }  
 </script>
 
-<style lang="less" scoped>
-    .router-path {
-    	flex: 0 50px;
-    	height: 50px;
-    	line-height: 50px;
-    	border-bottom: 1px solid #ccc;
-    	font-size: 16px;
-    	box-sizing: border-box;
-    }
+<style lang="less">
+	.stock {	
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		position: relative;
+
+        .router-path {
+			flex: 0 50px;
+			height: 50px;
+			line-height: 50px;
+			border-bottom: 1px solid #ccc;
+			font-size: 16px;
+			box-sizing: border-box;
+		}
+		.router-content {
+			flex: 1 1;
+			overflow: auto;
+			
+			.btn-restrain {
+				position: absolute;
+				right: 0;
+				top: 15px;
+			}
+			.table {
+	    	    .batch {
+	    	    	cursor: pointer;
+		            color: #f90;
+		            .cell {
+		                font-weight: 600;
+		            } 
+		        }         
+	    	   
+	    	}
+		}
+	}
 </style>

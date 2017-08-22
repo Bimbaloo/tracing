@@ -2,4 +2,7 @@
 node_modules/
 dist/
 npm-debug.log
-.cache-loader/
+.idea
+.cache-loader
+.static
+

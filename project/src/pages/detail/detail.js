@@ -5,9 +5,12 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-green/index.css'
 import App from './app.vue'
 import axios from 'axios'
+import 'babel-polyfill'
 
 import 'assets/css/reset.css'
-import 'assets/css/common.css'
+import 'assets/css/common.less'
+//import 'assets/js/html2canvas.js'
+import 'assets/js/global.js'
 
 Vue.use(VueRouter)
 Vue.use(ElementUI)
@@ -42,8 +45,8 @@ const routes = [{
       component: Suspicious
     }]
   },
-  { path: '/trace', component: Trace },
-  { path: '/track', component: Track }
+  { path: '/trace/:key', component: Trace },
+  { path: '/track/:key', component: Track }
 ]
 
 // 创建 router 实例，然后传 `routes` 配置

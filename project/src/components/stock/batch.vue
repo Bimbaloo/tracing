@@ -1,64 +1,87 @@
+<!--同批出入库-->
 <template>
 	<div class="router-content">
-		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList">可疑品</el-button>
-		<div class="innner-content" :style="styleObject">
-			<h2 class="content-title">{{batch}}出库信息</h2>
-			<div class="loading" v-if="outstockData.loading">
-				Loading...
-			</div>
-			<div v-if="outstockData.error" class="error">
+		<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>
+		<div class="innner-content">
+			<h2 class="content-title">
+				<span class="tag">{{batch}}</span>出库信息
+				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
+			</h2>
+			<div v-if="outstockData.error" class="error" :style="styleError">
 				{{ outstockData.error }}
 			</div>
-			<div v-if="outstockData.data" class="content-table">
-				<v-table :table-data="outstockData"></v-table>
+			<div v-else class="content-table" ref="outstockTable">
+				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
 			</div>
-			<h2 class="content-title">{{batch}}在库信息</h2>
-			<div class="loading" v-if="instockData.loading">
-				Loading...
-			</div>
-			<div v-if="instockData.error" class="error">
+			<h2 class="content-title">
+				<span class="tag">{{batch}}</span>在库信息
+				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+			</h2>
+			<div v-if="instockData.error" class="error" :style="styleError">
 				{{ instockData.error }}
 			</div>
-			<div v-if="instockData.data" class="content-table">
-				<v-table :table-data="instockData"></v-table>
+			<div v-else class="content-table" ref="instockTable">
+				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
 			</div>
+			<!-- 复制的内容 -->
+            <!--<div v-show="false" ref="outstockTable">
+            	<v-table :b-fixed="false" :table-data="outstockData" :loading="outstockData.loading"></v-table>
+            </div>
+            <div v-show="false" ref="instockTable">
+            	<v-table :b-fixed="false" :table-data="instockData" :loading="instockData.loading"></v-table>
+            </div>-->
 		</div>
 	</div>
 
 </template>
 
 <script>
+	import $ from "jquery"
 	import table from "components/basic/table.vue"
-
+	import XLSX from 'xlsx'
+    import Blob from 'blob'
+    import FileSaver from 'file-saver'
+	import rasterizeHTML from 'rasterizehtml'
+	
 	export default {
 		components: {
 			'v-table': table
 		},
 		data() {
 			return {
-				styleObject: {
-					"min-width": "1200px"
-				},
+				excel: true,
+				print: true,
+				btnShow: false,  //根据需要是否隐藏‘可疑品’按钮
+				styleError: {
+                	"max-height": "200px"
+                },
 				batch: this.$route.query.batchNo,
 				outstockData: {
-					url: "/outstock/bybatch",
+					url: HOST + "/api/v1/outstock/bybatch",
 					loading: false,
 					error: null,
+					height: "100%",
+					filename: this.$route.query.batchNo + "出库",
 					columns: [{
 						prop: "barcode",
-						name: "条码"
-					}, {
-						prop: "barcodeType", //1-单件条码 2-箱条码 3-流转框条码 999-其他
-						name: "条码类型"
+						name: "条码",
+						fixed: true
+//					}, {
+//						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
+//						name: "条码类型"
 					}, {
 						prop: "batchNo",
-						name: "批次号"
+						name: "批次号",
+						width: "150"
 					}, {
 						prop: "materialCode",
 						name: "物料编码"
 					}, {
 						prop: "materialName",
-						name: "物料名字"
+						name: "物料名称",
+						width: "300"
 					}, {
 						prop: "quantity",
 						name: "数量"
@@ -72,50 +95,42 @@
 						prop: "customer",
 						name: "客户"
 					}, {
-						prop: "outstockType",
+						prop: "stockType",
 						name: "出库类型"
 					}, {
 						prop: "person",
 						name: "出库人"
 					}, {
-						prop: "outstockTime", //格式：yyyy-MM-dd hh:mm:ss
+						prop: "createTime", //格式：yyyy-MM-dd hh:mm:ss
 						name: "出库时间",
 						width: "160"
 					}],
-					data: [{
-						"barcode": "单件条码",
-						"barcodeType": "箱条码",
-						"batchNo": "20160331A",
-						"materialCode": "021",
-						"materialName": "物料名字",
-						"quantity": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "客户名",
-						"outstockType": "出库类型",
-						"person": "出库人",
-						"outstockTime": "2016-03-31 14:28:33"
-					}]
+					data: []
 				},
 				instockData: {
-					url: "/stock/bybatch",
+					url: HOST + "/api/v1/stock/bybatch",
 					loading: false,
 					error: null,
+					height: "100%",
+					filename: this.$route.query.batchNo + "在库",
 					columns: [{
 						prop: "barcode",
-						name: "条码"
-					}, {
-						prop: "barcodeType", //1-单件条码 2-箱条码 3-流转框条码 999-其他
-						name: "条码类型"
+						name: "条码",
+						fixed: true
+//					}, {
+//						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
+//						name: "条码类型"
 					}, {
 						prop: "batchNo",
-						name: "批次号"
+						name: "批次号",
+						width: "150"
 					}, {
 						prop: "materialCode",
 						name: "物料编码"
 					}, {
 						prop: "materialName",
-						name: "物料名字"
+						name: "物料名称",
+						width:　"300"
 					}, {
 						prop: "quantity",
 						name: "数量"
@@ -128,89 +143,200 @@
 					}, {
 						prop: "stocklot",
 						name: "库位"
+//					}, {
+//						prop: "customer",
+//						name: "客户"
 					}, {
-						prop: "customer",
-						name: "客户"
-					}, {
-						prop: "instockType",
+						prop: "stockType",
 						name: "入库类型"
 					}, {
 						prop: "person",
 						name: "入库人"
 					}, {
-						prop: "instockTime", //格式：yyyy-MM-dd hh:mm:ss
+						prop: "createTime", //格式：yyyy-MM-dd hh:mm:ss
 						name: "入库时间",
 						width: "160"
 					}],
-					data: [{
-						"barcode": "单件条码",
-						"barcodeType": "箱条码",
-						"batchNo": "批次号",
-						"materialCode": "031",
-						"materialName": "物料名字",
-						"quantity": 16,
-						// "remainingNum": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "客户名",
-						"instockType": "入库类型",
-						"person": "入库人",
-						"instockTime": "2016-03-31 14:28:33"
-					}]
+					data: []
 				},
 			}
 		},
 		created() {
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
-			// this.fetchData(this.outstockData);
-			// this.fetchData(this.instockData);
+			this.fetchPage();
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
-			// '$route': 'fetchData'
+			'$route': 'fetchPage',
+			// 在物料仓储时，放大处理。
+			'$store.state.fullscreen': function() {
+				// 修改页面的内容的高度。
+				this.outstockData.height = this.instockData.height=this.adjustHeight();
+			}
 		},
 		methods: {
+			 // 查询。
+            fetchPage() {
+            	this.fetchData(this.outstockData);
+                this.fetchData(this.instockData);
+            },
+            // 获取高度。
+            adjustHeight() {
+            	let jRouter = $(".router-content"),
+            		jTitle = jRouter.find(".content-title"),
+            		jTable = jRouter.find(".content-table"),
+            		nHeight = 0;
+            	
+            	nHeight = Math.floor((jRouter.height()
+            						- jTitle.outerHeight(true)*jTitle.length
+            						- (jTable.outerHeight(true) - jTable.height()))/2);
+            	
+            	return nHeight;
+            },
+            // 获取参数。
 			fetchData(oData) {
-				oData.error = oData.data = null
-				oData.loading = true
+				oData.error = null;
+				oData.data = [];
+				oData.loading = true;
 
 				let sPath = oData.url;
 
-				this.$get(sPath, this.$route.query)
+				this.$ajax.post(sPath, this.$route.query)
 					.then((res) => {
 						oData.loading = false;
-						if(!res.errorCode) {
-							oData.data = res.outStocks;
-							this.styleObject.minWidth = "1200px";
+						oData.height = this.adjustHeight();
+						
+						if(!res.data.errorCode) {
+							oData.data = res.data.data;
+						}else {
+							this.styleError.maxHeight = this.adjustHeight()-50+"px";
+//							oData.error = res.data.errorMsg.message;
+							console.log(res.data.errorMsg.message);
 						}
 					})
 					.catch((err) => {
 						oData.loading = false;
-						oData.error = "查询出错。"
-						if(this.outstockData.error && this.outstockData.error) {
-							this.styleObject.minWidth = 0;
+//						oData.error = "查询出错。"
+						console.log("接口查询出错。");
+						if(this.outstockData.error && this.instockData.error) {
+							this.styleError.maxHeight = this.adjustHeight()-50+"px"
 						}
 					})
 			},
 			// 可疑品列表。
 			showSuspiciousList() {
-                this.$router.push({ path: `/stock/${this.$route.params.key}/restrain`, query: this.$route.query})
-			}
+				if(!this.btnShow){
+					let sKey = this.$route.params.key,
+					sPath = "";				
+					if(sKey != undefined && sKey !== "") {
+						sPath = `/stock/${sKey}/restrain`;			
+					}else {
+						sPath = "/stock/restrain"
+					}		
+					this.$router.push({ path: sPath, query: this.$route.query})
+				}else{
+					console.log("该功能将在后续开发，敬请期待...")
+				}
+				
+			},
+			// 表格导出。
+            exportExcelHandle (oData, event) {
+                if(!oData) {
+                    return;
+                }
+                // 下载表格。
+                window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);      
+            },
+            // 表格打印。
+            printHandle (refTable, event) {
+                let oTable = this.$refs[refTable];
+                
+                if(!oTable) {
+                    return;
+                }
+				
+				let sHtml = `
+	        		<div class="table el-table">
+						<div class="el-table__header-wrapper">
+							${oTable.querySelector(".el-table__header-wrapper").innerHTML}
+						</div>
+						<div class="el-table__body-wrapper">
+							${oTable.querySelector(".el-table__body-wrapper").innerHTML}
+						</div>
+	        			<style>
+	            			.el-table td.is-center, .el-table th.is-center {
+	        					text-align: center;
+	            			}
+	        				.table thead th {
+	        					height: 36px;
+								background-color: #42af8f;
+	        				}
+	        				.table thead th .cell {
+	        					color: #fff;
+	        				}
+	        				.el-table__body-wrapper tr:nth-child(even) {
+	        				 	background-color: #fafafa;
+	        				}
+	        				.el-table__body-wrapper tr:nth-child(odd) {
+	        				 	background-color: #fff;
+	        				}
+	        				.el-table__body-wrapper .cell {
+	        					min-height: 30px;
+	        					line-height: 30px;
+	        					// 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+//	        					border: 1px solid #e4efec;
+	        					box-sizing: border-box;
+	        				}
+	        				.el-table__empty-block {
+	        					text-align: center;	
+	        				}
+	        			</style>
+	        		</div>
+	        	`;
+				
+                window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+            }
+
 		}
 	}
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+		
 	.router-content {
 		flex: 1 1;
 		overflow: auto;
-		
+
+		.nobtn {
+			background: rgb(204,204,204);
+			border: none;
+			color: #fff;
+			// cursor: no-drop;
+			cursor:auto;
+		}
+
 		.btn-restrain {
 			position: absolute;
 			right: 0;
-			top: 65px;
+			top: 15px;
 		}
+		
+		.content-title {
+			.tag {
+				color: #f90;
+			}
+		}
+
+		
+		
+		.error {
+    		border: 2px solid #42AF8F;
+		    padding: 20px 12px;
+		    margin-bottom: 30px;
+		    font-size: 14px;
+		    color: red;
+		    overflow: auto;
+    	}
 	}
-	
 </style>

@@ -5,11 +5,15 @@
 <script>
 	import material from 'assets/img/material.png'
 	import process from 'assets/img/process.png'
-	import {onNodeSelectionChange, onClickNode, onContextClickNode, onDoubleClickNode, tooltipTextConverter, zoomDiagram} from 'assets/js/go-util'
+	import {onDoubleClickNode} from 'assets/js/go-util'
 
 	export default {
 		props: {
-			catalogData: Array
+			catalogData: Array,	//Object
+			// resize:{
+			// 	type: Number,
+      		// 	required: false
+			// }
 		},
 		data() {
 			return {			
@@ -17,12 +21,22 @@
 			}
 		},
 		computed: {
+			resize () {
+		    	return this.$store.state.resize
+		    },
 		    key () {
 		      return this.$store.state.key
 		    },
 		    chrome () {
 		    	return this.$store.state.chrome
+		    },
+		    root () {
+		    	return this.$store.state.root
+		    }, 
+		    type () {
+		    	return this.$store.state.type
 		    }
+		    
 		},
 		mounted() {
 			this.drawCatalog();
@@ -33,8 +47,13 @@
 				this.catalog && (this.catalog.model = new go.TreeModel(this.catalogData));	
 		    },
 		    key: function() {
-		    	console.log(this.key);
-		    }
+		    	if(this.type == "tree") {
+		    		// 若点击树节点。
+		    		this.setCatalogSelection();
+		    	}
+		    },
+			/* 外部父div大小变化，视图大小更新 */
+			resize: 'updateCanvas'
 		},
 		methods: {
 			/**
@@ -66,18 +85,61 @@
 							nodeSpacing: 0,
 							setsPortSpot: false,
 							setsChildPortSpot: false
-						})
+						}),
+						click: (e) => {
+							this.$emit("init");
+						}
 					});
 
 				this.catalog.nodeTemplate =
 					$(go.Node, {
 							// no Adornment: instead change panel background color by binding to Node.isSelected	            
 							click: (e, node) => {
+								this.catalog.nodes.each(o => {
+									if(o.data.key != node.data.key) {										
+										o.isSelected = false;
+										o.background = null;
+										o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
+									}
+								})
+								
+								let sRootKey = node.data.key;
+								if(node.data.parent &&　!node.isMaterialNode) {
+									sRootKey　= node.findTreeParentNode().data.key;				
+								}
 								this.$store.commit({
-									type: "updateCatalogKey",
+									type: "updateType",
+									key: "catalog"
+								});
+								this.$store.commit({
+									type: "updateKey",
 									key: node.data.key
 								});
+								this.$store.commit({
+									type: "updateRoot",
+									key: sRootKey
+								});
 								
+								if(node.data.isMaterialNode) {		// node.data.type == "1"
+									// 根据物料节点查询仓储信息。        
+									this.$router.push({ 
+										path: "/stock", 
+										query: {
+											"key": node.data.key,
+											"_tag":  new Date().getTime().toString().substr(-5)
+										}
+									})
+								}else {
+									// debugger
+									this.$router.push({ 
+										path: "/process",
+										query: {
+											"key": node.data.key,
+											"_tag":  new Date().getTime().toString().substr(-5)
+										}										
+									})
+								}
+
 							},
 							doubleClick: onDoubleClickNode
 						},
@@ -104,7 +166,7 @@
 									margin: new go.Margin(0, 0, 0, 2),
 									imageStretch: go.GraphObject.Uniform,
 								},
-								new go.Binding("source", "type", s => s == 1 ? material : process)
+								new go.Binding("source", "isMaterialNode", s => s ? material : process)
 							),
 							$(go.TextBlock, {
 									name: "TB",
@@ -112,7 +174,7 @@
 									stroke: "#fff",
 									margin: new go.Margin(4, 5, 4, 5)
 								},
-								new go.Binding("text", "show_name", s => s)
+								new go.Binding("text", "name", s => s)
 							)
 						) // end Horizontal Panel
 					); // end Node
@@ -136,7 +198,7 @@
 									margin: new go.Margin(0, 5, 0, 2),
 									imageStretch: go.GraphObject.Uniform
 								},
-								new go.Binding("source", "type", s => s == 1 ? material : process)
+								new go.Binding("source", "isMaterialNode", s => s ? material : process)
 							),
 							$(go.Placeholder) // this represents the selected Node
 						),
@@ -147,7 +209,7 @@
 								stroke: "#333333",
 								margin: 5
 							},
-							new go.Binding("text", "show_name")
+							new go.Binding("text", "name")
 						)
 					);
 
@@ -166,10 +228,66 @@
 						})
 					);
 
+			},
+			// 设置选中节点样式。
+			setCatalogSelection() {
+				let oNode = this.catalog.findNodeForKey(this.key);
+				
+				this.catalog.nodes.each(o => {
+					o.isSelected = false;
+					o.background = null;
+					o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
+				})
+				
+				if(oNode) {
+					oNode.background = "white";
+					oNode.isSelected = true;
+					oNode.findObject("TB").stroke = "#333";
+				}
+//				let nodeInmenutree = null;
+//				if(oCatalog) {
+//					nodeInmenutree = oCatalog.findNodeForKey(node.data.key);
+//			
+//					oCatalog.nodes.each(obj => {
+//						obj.isSelected = false;
+//				    	obj.background = null;
+//				    	obj.findObject("TB").stroke = "#fff";
+//				    });
+//				}
+//			    
+//			    if(node.isSelected){
+//			//  	goPage.pageHandler.getVerboseInfo(node);
+//			    	
+//			    	if(nodeInmenutree) {
+//				    	nodeInmenutree.background = "white";
+//				    	nodeInmenutree.isSelected = true;
+//				    	nodeInmenutree.findObject("TB").stroke = "#333";    		
+//			    	}
+//			
+//			        node.background = "#40484a";
+//			        node.findObject("TB") && (node.findObject("TB").stroke = "#fff");
+//			
+//			    }else {    	
+//					node.background = null;
+//			        
+//			        if(nodeInmenutree) {
+//			        	nodeInmenutree.isSelected = false;
+//			        }
+//			    }				
+			},
+			/* 大小自适应 */
+			updateCanvas(){
+				//debugger
+				this.catalog.requestUpdate()
 			}
 		}
 	}
 </script>
 
-<style>
+<style lang="less">
+	#catalog {
+		canvas {
+			outline: none;
+		}
+	}
 </style>

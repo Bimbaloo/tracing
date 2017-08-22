@@ -1,0 +1,79 @@
+{
+  "errorMsg": "",
+  "errorCode": 0,
+  "data": [
+    {
+      "items": [
+        {
+          "value": "熔炼1",
+          "itemName": "熔炼1",
+          "cellClick": "fileDownload"
+        },
+        {
+          "value": "锻造1",
+          "itemName": "锻造2"
+        },
+        {
+          "value": "ng1",
+          "itemName": "废弃品"
+        },
+        {
+          "value": "ok1",
+          "itemName": "合格品"
+        }
+      ],
+      "eqipmentName": "\u8bbe\u5907\u540d\u79f0",
+      "operatorName": "\u4eba\u5458\u59d3\u540d",
+      "reportTime": "\u4e0a\u62a5\u65f6\u95f4",
+      "commitTime": "\u68c0\u9a8c\u65f6\u95f4",
+      "inspectedTime": "\u5ba1\u6838\u65f6\u95f4",
+      "eqipmentCode": "\u8bbe\u5907\u7f16\u7801",
+      "operatorCard": "\u4eba\u5458\u5361\u53f7"
+    },
+    {
+      "items": [
+
+        
+        {
+          "value": "熔炼2",
+          "itemName": "熔炼1"
+        },
+        {
+          "value": "锻造2",
+          "itemName": "锻造2"
+        }
+      ],
+      "eqipmentName": "\u8bbe\u5907\u540d\u79f0",
+      "operatorName": "\u4eba\u5458\u59d3\u540d",
+      "reportTime": "\u4e0a\u62a5\u65f6\u95f4",
+      "commitTime": "\u68c0\u9a8c\u65f6\u95f4",
+      "inspectedTime": "\u5ba1\u6838\u65f6\u95f4",
+      "eqipmentCode": "\u8bbe\u5907\u7f16\u7801",
+      "operatorCard": "\u4eba\u5458\u5361\u53f7"
+    },
+    {
+      "items": [
+
+        {
+          "value": "锻造3",
+          "itemName": "锻造2"
+        },
+        {
+          "value": "ng3",
+          "itemName": "废弃品"
+        },
+        {
+          "value": "ok3",
+          "itemName": "合格品"
+        }
+      ],
+      "eqipmentName": "\u8bbe\u5907\u540d\u79f0",
+      "operatorName": "\u4eba\u5458\u59d3\u540d",
+      "reportTime": "\u4e0a\u62a5\u65f6\u95f4",
+      "commitTime": "\u68c0\u9a8c\u65f6\u95f4",
+      "inspectedTime": "\u5ba1\u6838\u65f6\u95f4",
+      "eqipmentCode": "\u8bbe\u5907\u7f16\u7801",
+      "operatorCard": "\u4eba\u5458\u5361\u53f7"
+    }
+  ]
+}

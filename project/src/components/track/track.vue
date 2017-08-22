@@ -6,15 +6,12 @@
     		<el-button class="btn btn-plain" @click="onReport">快速报告</el-button>
     	</div>
         <div class="router-content">
-	        <div class="innner-content" style="min-width: 1500px;">
-	            <!--div class="loading" v-if="gridData.loading">
-	                Loading...
-	            </div-->
-	            <div v-if="gridData.error" class="error">
+	        <div class="innner-content">
+	            <div v-if="gridData.error" class="error" style="margin-top: 10px;">
 	                {{ gridData.error }}
 	            </div>
-	            <div v-if="gridData.data" class="content-table">
-	                <v-table :table-data="gridData" :loading="gridData.loading"></v-table>    
+	            <div v-if="!gridData.error" class="content-table" >
+	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter"></v-table>    
 	            </div>     
 	       </div>   
     	</div> 
@@ -22,181 +19,219 @@
 </template>
 
 <script>
+	import $ from "jquery"
     import table from "components/basic/table.vue"
-
+	import fnP from "assets/js/public.js"
+	
     export default {
         components: {
             'v-table': table
         },
         data () {
             return {
+                tdResize: true,       // 是否允许拖动table大小
+                dataFilter: true,    // 是否启用过滤功能    
                 gridData: {
-                    url: "/tracereverse/startpoint",
+                    url:  HOST + "/api/v1/trace/down/start-points",
                     loading: false,
                     error: null,
+                    height: "100%",
                     selected: [],
                     columns: [{
                         prop: "bucketNo",
                         name: "",
                         type: "selection",
-                        width: "30"
+                        width: "30",
+                        fixed: true
                     },{
 //                      prop: "index",
                         type: "index",
                         name: "序号",
-                        width: "50"
+                        width: "50",
+                        fixed: true
                     },{
                         prop: "barcode",
-                        name: "条码"
-                    },{
-                        prop: "batchNo",
-                        name: "批次号"
-                    },{
-                        prop: "materialCode",
-                        name: "物料编码"
-                    },{
-                        prop: "materialName",
-                        name: "物料名字"
-                    },{
-                        prop: "materialSpec",
-                        name: "物料规格"
-                    },{
-                        prop: "materialUnit",
-                        name: "物料单位"
-                    },{
-                        prop: "quantity",
-                        name: "数量"
-                    },{
-                        prop: "happenTime",
-                        name: "加工时间"
-                    },{
-                        prop: "personName",
-                        name: "操作人"
-                    },{
-                        prop: "equipmentName",
-                        name: "设备名称"
-                    },{
-                        prop: "equipmentCode",
-                        name: "设备编码"
-                    },{
-                        prop: "equipmentType",
-                        name: "设备类型"
+                        name: "条码",
+                        width: "120",
+                        sortable: true,
+                        fixed: true
                     },{
                         prop: "processName",
-                        name: "工序名称"
+                        name: "工序名称",
+                        width: "120",
+                        sortable: true
+                    },{
+                        prop: "processCode",
+                        name: "工序编码",
+                        width: "80",
+                        sortable: true
+                    },{
+                        prop: "equipmentName",
+                        name: "设备名称",
+                        width: "120",
+                        sortable: true
+                    },{
+                        prop: "equipmentCode",
+                        name: "设备编码",
+                        sortable: true
+                    },{
+                        prop: "modelName",
+                        name: "设备类型",
+                        sortable: true
                     },{
                         prop: "moldCode",
-                        name: "模号"
+                        name: "模号",
+                        sortable: true
+                    },{
+                        prop: "batchNo",
+                        name: "批次号",
+                        width: "150",
+                        sortable: true
+                    },{
+                        prop: "materialCode",
+                        name: "物料编码",
+                        sortable: true
+                    },{
+                        prop: "materialName",
+                        name: "物料名称",
+                        width: "300",
+                        sortable: true
+                    // },{
+                    //     prop: "materialSpec",
+                    //     name: "物料规格"
+                    },{
+                        prop: "materialUnit",
+                        name: "单位",
+                        width: "50",
+                        sortable: true
+                    },{
+                        prop: "quantity",
+                        name: "数量",
+                        width: "50",
+                        sortable: true
+                    },{
+                        prop: "happenTime",
+                        name: "加工时间",
+                        width: "160",
+                        sortable: true
+                    },{
+                        prop: "personName",
+                        name: "操作人",
+                        sortable: true
                     }],
-                    data: [{
-				      "barcode": "UN65457437520007057", 
-				      "batchNo": "20160331A", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "materialCode": "10000515", 
-				      "materialSpec": "", 
-				      "materialUnit": "kg", 
-				      "quantity": 16, 
-				      "happenTime": "2016-03-31 14:28:33", 
-				      "personName": "李瑞娇", 
-				      "equipmentName": "装配2.2线GP12", 
-				      "equipmentCode": "RLSB1", 
-				      "equipmentType": "", 
-				      "processName": "GP12", 
-				      "moldCode": "",
-				      "bucketNo": ""
-				    }, {
-				      "barcode": "UN65457437520007066", 
-				      "batchNo": "20160331A", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "materialCode": "10000515", 
-				      "materialSpec": "", 
-				      "materialUnit": "kg", 
-				      "quantity": 16, 
-				      "happenTime": "2016-03-31 14:28:33", 
-				      "personName": "李瑞娇", 
-				      "equipmentName": "装配2.2线GP12", 
-				      "equipmentCode": "RLSB1", 
-				      "equipmentType": "", 
-				      "processName": "GP12", 
-				      "moldCode": "",
-				      "bucketNo": ""
-				    }]
+                    data: []
                 },
             }
         },
         created () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
-            // this.fetchData(this.gridData);
+            this.fetchPage();
+        },
+        watch: {
+        	// 如果路由有变化，会再次执行该方法
+			'$route': 'fetchPage'
         },
         methods: {
+        	// 查询。
+            fetchPage() {
+            	this.fetchData(this.gridData);
+            },
+        	// 获取高度。
+            adjustHeight() {
+            	let jRouter = $(".router-content"),
+            		jTable = jRouter.find(".content-table"),
+            		nHeight = 0;
+            	
+            	nHeight = Math.floor(jRouter.height() - (jTable.outerHeight(true) - jTable.height()));
+            	
+            	return nHeight;
+            },
+            sortByTime (a, b) {
+                return Date.parse(b.happenTime.replace(/-/g,"/"))-Date.parse(a.happenTime.replace(/-/g,"/"));
+            },
+        	// 获取数据。
             fetchData (oData) {
-                oData.error = oData.data = null;
+                oData.error = null;
+                oData.data = [];
                 oData.loading = true;
 
                 let sPath = oData.url;
-
-                this.$get(sPath, this.$route.query)
+                this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
                 .then((res) => {
                     oData.loading = false;
-                    if(!res.errorCode) {
-                        oData.data = res.data;
-//                      oData.data.map((o, index) => {o.index = index+1;})
-						if(oData.number > 1000) {
-							this.$alert("查询结果集包含" + oData.number + "条数据，页面显示其中1000条，如需查询全部，请缩小条件范围进行精确查詢。", "提示", {
-					          	confirmButtonText: "确定",
-					          	callback: action => {
-						            this.$message({
-						              type: "info"
-						            });
-					        	}
-					        });
-						}
+                    oData.height = this.adjustHeight();
+                    
+                    if(!res.data.errorCode) {
+                    	// 正常 0
+                        oData.data = $.extend(true, [], res.data.data)
+                        oData.data = oData.data.sort(this.sortByTime);
+                    }else if(res.data.errorCode == "1"){
+                    	// 错误显示无数据。
+                    	console.warn(res.data.errorMsg.message);
+                    }else {
+                    	// 其他，显示提示信息。
+                    	oData.error = res.data.errorMsg.message;
                     }
                 })
                 .catch((err) => {
                     oData.loading = false;
-                    oData.error = "查询出错。"
+//                  oData.error = "查询出错。"
+                    console.log("接口查询出错。")
                 })
             },
-            onTrack (event) {
+            setSession () {
             	let aSelected = [];
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
+            		({ doId: oSelected.doId, barcode: oSelected.barcode, batchNo: oSelected.batchNo, productionMode: oSelected.productionMode, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
             			
             		aSelected.push(oSelected);
             	})
-
-            	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
-            	            	
-            	sessionStorage.setItem("track_" + tag, JSON.stringify(aSelected));
-            	window.open("track/index.html?tag="+tag);  
+                    
+                return {
+                    length: this.gridData.data.length,
+                    selected: aSelected,
+                    filters: this.$route.query
+                }
+            },
+            onTrack (event) {
+                // 保存参数。
+                if(this.gridData.data && this.gridData.selected.length) {
+		            let oReportFilter = this.setSession(),
+		                tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。
+		        	            	
+		        	sessionStorage.setItem("track_" + tag, JSON.stringify(oReportFilter));
+//		            window.open("track/index.html?tag="+tag);  
+					window.open("trackIndex.html?tag="+tag);
+				}else {
+					this.$message("没有数据追踪");
+				}
             },
             onReport (event) {
-            	let aSelected = [];
-            	this.gridData.selected.forEach(o => {
-            		let oSelected = {};
-            		// 解构赋值。
-            		({ batchNo: oSelected.batchNo, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-            			
-            		aSelected.push(oSelected);
-            	})
-
-            	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-            		oReportFilter = {
-            			length: this.gridData.data.length,
-            			selected: aSelected,
-            			filters: this.$route.query
-            		}
-            	
-            	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(oReportFilter));
-            	window.open("track/report.html?tag="+tag);
+            	// 当gridData.data 为null时处理
+            	if(this.gridData.data && this.gridData.selected.length) {
+	            	let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+	            		oReportFilter = this.setSession();
+	            	
+	            	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(oReportFilter));
+//	          		window.open("track/report.html?tag="+tag);
+	            	window.open("trackReport.html?tag="+tag);
+            	}else {
+            		this.$message("没有数据报告");
+            	}
             }
         }
     }  
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+	.error {
+		border: 2px solid #42AF8F;
+	    padding: 20px 12px;
+	    margin-bottom: 30px;
+	    font-size: 14px;
+	    color: red;
+	}
 </style>

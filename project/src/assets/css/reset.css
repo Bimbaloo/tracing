@@ -7,6 +7,7 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   margin: 0;
   padding: 0;
   border: 0;
+  font-family: "微软雅黑";
   font-size: 100%;
   font-weight: normal;
   vertical-align: baseline;
@@ -20,6 +21,12 @@ html, body, div, span, applet, object, iframe, h1, h2, h3, h4, h5, h6, p, blockq
   border-bottom: 1px solid rgba(7, 17, 27, 0.1);
 }
 
+.clear:after {
+    content: '\20';
+    height: 0;
+    display: block;
+    clear: both;
+}
 
 /* HTML5 display-role reset for older browsers */
 
@@ -57,25 +64,31 @@ li {
   list-style: none;
 }
 
+/* 表格下载。 */
+.tableClone {
+	position: absolute;
+	z-index: -1;
+}
+
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track-piece {
-  background-color: rgba(0, 0, 0, 0.2);
+  background-color: #979ba1;
   -webkit-border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:vertical {
-  height: 5px;
-  background-color: rgba(125, 125, 125, 0.7);
+  height: 10px;
+  background-color: #56565C;
   -webkit-border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb:horizontal {
-  width: 5px;
-  background-color: rgba(125, 125, 125, 0.7);
+  width: 10px;
+  background-color: #56565C;
   -webkit-border-radius: 6px;
 }
 

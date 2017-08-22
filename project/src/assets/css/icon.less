@@ -1,0 +1,254 @@
+// 图标样式管理
+
+// 引用基础定义。
+@import "base.less";
+
+/*
+ * 图标基础。
+ */
+.icon {
+	display: inline-block;
+	vertical-align: middle;
+	overflow: hidden;
+	background-repeat: no-repeat;
+}
+
+/*
+ * 20x20 图标。
+ */
+.icon.icon-20 {
+	width: @px20;
+	height: @px20;
+	background-image: url(../img/icon-20.png);
+
+    // 打印。
+	&.icon-print {
+		background-position: 0 0;
+	}
+	&.icon-print:hover {
+		background-position: -@px20 0;
+	}
+
+    // 导出。
+	&.icon-export {
+		background-position: 0 -@px20;
+	}
+	&.icon-export:hover {
+		background-position: -@px20 -@px20;
+	}
+
+    // 导出excel。
+	&.icon-excel {
+		background-position: 0 -2*@px20;
+	}
+	&.icon-excel:hover {
+		background-position: -@px20 -2*@px20;
+	}
+
+	// 全屏。
+	&.icon-fullScreen {
+		background-position: 0 -3*@px20;
+	}
+	&.icon-fullScreen:hover {
+		background-position: -@px20 -3*@px20;
+	}
+
+    // 缩小。
+	&.icon-restoreScreen {
+		background-position: 0 -4*@px20;
+	}
+	&.icon-restoreScreen:hover {
+		background-position: -@px20 -4*@px20;
+	}
+
+    // 编辑。
+	&.icon-edit {
+		background-position: 0 -5*@px20;
+	}
+	&.icon-edit:hover {
+		background-position: -@px20 -5*@px20;
+	}
+
+    // 过滤。
+	&.icon-filter {
+		background-position: 0 -6*@px20;
+	}
+	&.icon-filter:hover {
+		background-position: -@px20 -6*@px20;
+	}
+
+	// 下载
+	&.icon-download {
+		background-position: 0 -7*@px20;
+	}
+	&.icon-download:hover {
+		background-position: -@px20 -7*@px20;
+	}
+
+    // 上传。
+	&.icon-upload {
+		background-position: 0 -8*@px20;
+	}
+	&.icon-upload:hover {
+		background-position: -@px20 -8*@px20;
+	}
+
+    // 隐藏。
+	&.icon-hide {
+		background-position: 0 -9*@px20;
+	}
+	&.icon-hide:hover {
+		background-position: -@px20 -9*@px20;
+	}
+
+    // 显示。
+	&.icon-show {
+		background-position: 0 -10*@px20;
+	}
+	&.icon-show:hover {
+		background-position: -@px20 -10*@px20;
+	}
+
+    // 图片导出。
+	&.icon-exportImg {
+		background-position: 0 -11*@px20;
+	}
+	&.icon-exportImg:hover {
+		background-position: -@px20 -11*@px20;
+	}
+
+	// 开始时间。
+	&.icon-start {
+		background-position: 0 -12*@px20;
+	}
+	// 结束时间。
+	&.icon-end {
+		background-position: -@px20 -12*@px20;
+	}
+
+	// 开始时间。
+	&.icon-start {
+		background-position: 0 -12*@px20;
+	}
+	// 结束时间。
+	&.icon-end {
+		background-position: -@px20 -12*@px20;
+	}
+	
+	// 退出
+	&.icon-exit {
+	    background-position: 0 -13*@px20;
+	}
+	
+	// 保存
+	&.icon-save {
+	    background-position: 0 -14*@px20;
+	}
+
+	// 物料平衡。
+	&.icon-balance {
+		background-position: 0 -15*@px20;
+	}
+	&.icon-balance:hover {
+		background-position: -@px20 -15*@px20;
+	}
+
+	// 质量。
+	&.icon-quality {
+		background-position: 0 -16*@px20;
+		&:hover {
+			background-position: -@px20 -16*@px20;
+		}
+	}
+
+	// 事件。
+	&.icon-event {
+		background-position: 0 -17*@px20;
+		&:hover {
+			background-position: -@px20 -17*@px20;
+		}
+	}
+
+	// 维护。
+	&.icon-repair {
+		background-position: 0 -18*@px20;
+		&:hover {
+			background-position: -@px20 -18*@px20;
+		}
+	}
+
+	// 工具。
+	&.icon-tool {
+		background-position: 0 -19*@px20;
+		&:hover {
+			background-position: -@px20 -19*@px20;
+		}
+	}
+
+	// 加工。
+	&.icon-work {
+		background-position: 0 -20*@px20;
+		&:hover {
+			background-position: -@px20 -20*@px20;
+		}
+	}
+
+	// 快速报告。
+	&.icon-report {
+		background-position: 0 -21*@px20;
+		&:hover {
+			background-position: -@px20 -21*@px20;
+		}
+	}
+}
+
+/*
+ * 24x24 图标。
+ */
+.icon.icon-24 {
+	width: @px24;
+	height: @px24;
+	background-image: url(../img/icon-24.png);
+
+    // 返回。
+	&.icon-back {
+		background-position: 0 0;
+	}
+	&.icon-back:hover {
+		background-position: -@px24 0;
+	}
+
+    // 设置。
+	&.icon-config {
+		background-position: 0 -@px24;
+	}
+	&.icon-config:hover {
+		background-position: -@px24 -@px24;
+	}
+}
+
+
+/*
+ * 16x16 图标。
+ */
+.icon.icon-16 {
+	width: @px16;
+	height: @px16;
+	background-image: url(../img/icon-16.png);
+
+    // 隐藏。
+	&.icon-hide {
+		background-position: 0 0;
+	}
+	&.icon-hide:hover {
+		background-position: -@px16 0;
+	}
+
+    // 显示。
+	&.icon-show {
+		background-position: 0 -@px16;
+	}
+	&.icon-show:hover {
+		background-position: -@px16 -@px16;
+	}
+}

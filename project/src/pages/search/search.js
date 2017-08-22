@@ -6,7 +6,9 @@ import axios from 'axios'
 
 
 import 'assets/css/reset.css'
-import 'assets/css/common.css'
+import 'assets/css/common.less'
+import 'assets/js/global.js'
+import 'babel-polyfill'
 
 Vue.use(ElementUI)
 
