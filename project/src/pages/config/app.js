@@ -5,6 +5,7 @@ import ElementUI from 'element-ui';
 import 'element-ui/lib/theme-green/index.css';
 import App from './app.vue';
 import axios from 'axios';
+import Vuex from 'vuex'
 import 'babel-polyfill'
 
 import 'assets/css/reset.css'
@@ -32,8 +33,24 @@ const router = new VueRouter({
     routes // （缩写）相当于 routes: routes
 });
 
+
+Vue.use(Vuex) 
+// 定义统一状态。
+const store = new Vuex.Store({
+  state: {
+    edit: false
+  },
+  mutations: {  
+    updateEdit (state, payload) {
+      state.edit = payload.key;
+    }
+  },
+  actions: {}
+})
+
 new Vue({
     el: '#app',
     router,
+    store,
     render: h => h(App)
 });

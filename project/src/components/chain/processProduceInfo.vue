@@ -103,7 +103,7 @@
 						{required: true, message: "请选择班次",trigger: "change"}
 					],
 					barcode: [
-						{required: true, message: "请选择条码",trigger: "change"}
+						{required: true, message: "请输入条码",trigger: "change"}
 					],
 					happenTime: [
 						{required: true, message: "请选择时间",trigger: "change"}

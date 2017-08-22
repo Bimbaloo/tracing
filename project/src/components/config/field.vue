@@ -58,6 +58,11 @@
 	        }
 	    },
         created() {
+        	this.$store.commit({
+				type: "updateEdit",
+				key: false
+			});
+			
           //获取字段接口数据 TABLE_DATA_URL
             this.$ajax.get(TABLE_DATA_URL).then((res) => {
             	this.judgeLoaderHandler(res,() => {
@@ -71,7 +76,45 @@
             	console.log(error)
             });
         },
+        computed: {
+	        // 是否编辑的状态。
+	        edit () {
+	          return this.$store.state.edit
+	        }
+	    },
+	    mounted() {
+          // 离开改页面处理
+          	let self = this
+          	window.onbeforeunload = () => {
+          		if(self.edit) {
+          			// 提示需要保存。
+          			return false
+          		}
+          	}
+        },
+        watch: {
+        	tableData: {
+        		handler: "changeState",
+        		deep: true
+        	}
+        },
         methods: {
+        	changeState: function(oldValue, newValue) {
+        		// 判断是否一致。
+        		let bEdit = false,
+        			self = this;
+        		
+        		this.tableData.forEach( (o, index) => {
+        			if(o.itemName != self.aBefore[index].itemName) {
+        				bEdit = true;
+        			}
+        		})
+        		
+        		this.$store.commit({
+					type: "updateEdit",
+					key: bEdit
+				});
+        	},
         	// 判断调用接口是否成功。
         	judgeLoaderHandler(param,fnSu,fnFail) {
         		let bRight = param.data.errorCode;
@@ -101,7 +144,7 @@
             },
             // 名称修改事件。
             labelChangeHandler(value){
-                this.currentRow.itemName=value;
+                this.currentRow.itemName=value.trim();
             },
             // 保存事件。
             saveClickHandler(formName){

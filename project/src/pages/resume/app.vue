@@ -48,6 +48,7 @@
 								:data="aParsedData" 
 								:height = "oTab.tableHeight"
 								stripe
+								border
 								style="width: 100%;"
 								v-loading="oTab.loading"
 								element-loading-text="拼命加载中"
@@ -56,6 +57,7 @@
 									v-for="(column,index) in oTab.columns"
 									:align="index?'center':'left'"
 									:fixed="!index?true:false"
+									:resizable="true"
 									:min-width="column.width"
 									:label="column.name">
 									<template scope="props">
@@ -82,6 +84,7 @@
 								class="table-main" 
 								:data="aParsedData" 
 								stripe
+								border
 								style="width: 100%;"
 								row-class-name="table-item">
 								<el-table-column

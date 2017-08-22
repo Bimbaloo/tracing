@@ -1745,7 +1745,7 @@
     			if(this.aBrokenNode.length) {
 	    			this.aBrokenNode = [];
     			}
-    			if(!$.isEmptyObject(this.oAClickNodeProduceData)) {
+    			if(!window.Rt.utils.isEmptyObject(this.oAClickNodeProduceData)) {
 	    			this.oAClickNodeProduceData = {};
     			}
     			
