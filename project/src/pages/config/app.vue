@@ -44,10 +44,36 @@
         created() {
             this.$router.push('query');
         },
+        computed: {
+        	// 是否编辑的状态。
+	        edit () {
+	          return this.$store.state.edit
+	        }
+        },
         methods: {
             turnTo(routerLink,index){
-                this.isActive=index;
-                this.$router.push({path:routerLink});
+            	let self = this
+            	if(self.edit && self.isActive != index) {
+					// 存在未保存，是否处理。  
+					self.$confirm('内容未保存, 是否继续?', '提示', {
+			          	confirmButtonText: '确定',
+			          	cancelButtonText: '取消',
+			          	type: 'warning'
+			        }).then(() => {
+			        	// 确定操作。离开当前页面
+			        	self.isActive=index;
+                		self.$router.push({path:routerLink});
+                		
+			        	return true
+			        }).catch(() => {
+			        	// 取消操作。还在当前页面。
+			        	return false
+			        });
+            	}else {
+            		self.isActive=index;
+                	self.$router.push({path:routerLink});
+            	}
+                
             }
         }
     }
@@ -71,6 +97,7 @@
             background-color: transparent;
             outline: none;
         }
+        
         .sidebar{
             display: flex;
             flex-direction: column;
@@ -128,6 +155,9 @@
             }
         }
     }
-
+	.el-message-box__headerbtn {
+    	background: transparent;
+    	border: none;
+    }
 
 </style>

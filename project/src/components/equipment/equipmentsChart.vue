@@ -146,7 +146,7 @@
                 selectedEquipment: "",
 				loading: false,
 				sErrorMessage: "",
-                url: HOST + "/api/v1/trace/equipments-events",	
+                url: HOST + "/api/v1/trace/equipments-events/by-id",	
 				// 比例。
                 ratioW: 1,
                 ratioL: 0,
@@ -451,8 +451,11 @@
                     // 工具箱
                     toolbox: {
                         top: -3,
+                        right: 30,
                         feature: {
-                            dataZoom: {}
+                             dataZoom: {
+                                yAxisIndex: 'none'
+                            },
                         },
                         iconStyle: {
                             emphasis: {
@@ -1152,7 +1155,7 @@
 				// }, 1000)	
 				
 				this.$post(this.url, {
-					equipmentIdList: this.equipments.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(','),
+					equipmentList: this.equipments.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(','),
 					startTime: this.datetime.start,
 					endTime: this.datetime.end,
 					type: 0
@@ -1966,7 +1969,7 @@
             .switch {
                 position: absolute;
                 top: 5px;
-                right: 55px;
+                right: 85px;
 
                 .switch-eye {
                     position: relative;

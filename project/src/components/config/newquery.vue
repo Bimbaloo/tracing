@@ -103,6 +103,11 @@
             }
         },
         created() {
+        	this.$store.commit({
+				type: "updateEdit",
+				key: false
+			});
+			
         	// 获取表格中的数据。  TABLE_DATA_URL
         	this.$ajax.get(TABLE_DATA_URL).then((res) => {
         		this.judgeLoaderHandler(res,() => {
@@ -121,7 +126,42 @@
         	});
             
         },
+        computed: {
+	        // 是否编辑的状态。
+	        edit () {
+	          return this.$store.state.edit
+	        }
+	    },
+	    watch: {
+          	oBefore: {
+            	handler: "changeState",
+            	deep: true
+          	}
+        },
+        mounted() {
+          // 离开改页面处理
+          	let self = this
+          	window.onbeforeunload = () => {
+          		if(self.edit) {
+          			// 提示需要保存。
+          			return false
+          		}
+          	}
+        },
         methods: {
+        	// 编辑状态。
+        	changeState(oldValue, newValue) {
+        		let isEdit = false;
+        		for(let o in newValue) {
+        			if(newValue[o].bEdit) {
+        				isEdit = true;
+        			}
+        		}
+    			this.$store.commit({
+					type: "updateEdit",
+					key: isEdit
+				});
+        	},
         	// 判断调用接口是否成功。
         	judgeLoaderHandler(param,fnSu,fnFail) {
         		let bRight = param.data.errorCode;
