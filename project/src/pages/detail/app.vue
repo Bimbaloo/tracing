@@ -103,27 +103,6 @@
 					oData = this.getSearchData();
 					this.activeKey = oData.tab;
       }
-<<<<<<< HEAD
-
-      this.$ajax.get('../static/data.json').then((res) => {
-        this.categories = res.data.categories.filter(o => o.url==="detail");
-        this.categories.forEach(o => {
-          if(oData && oData.tab == o.key) {
-            o.active = oData;
-          }else {
-            o.active = {
-              radio: "1",
-              keys: {}
-            }            
-          }
-        })
-
-        this.$nextTick(() => {
-          if(oData) {
-            this._submitForm(oData);
-          }            
-        })
-=======
       
       this.$ajax.get(MODULE_ITEM_URL).then((res) => {
       	this.judgeLoaderHandler(res,() => {
@@ -147,7 +126,6 @@
 	        })
       		
       	});
->>>>>>> backup
       });
       
     },

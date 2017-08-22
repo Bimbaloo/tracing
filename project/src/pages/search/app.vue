@@ -28,8 +28,7 @@
   
   export default {
     components: {
-      'v-panel': panel,
-      logo
+      'v-panel': panel
     },
     data() {
       return {
@@ -51,21 +50,6 @@
 
 	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
 
-<<<<<<< HEAD
-      this.$ajax.get('../static/data.json').then((res) => {
-        this.categories = res.data.categories;
-        this.categories.forEach(o => {
-          if(oData && oData.tab == o.key) {
-            o.active = oData;
-          }else {
-            o.active = {
-              radio: "1",
-              keys: {}
-            }            
-          }
-        })
-      });    
-=======
 	        this.categories.forEach(o => {
 	            o.active = {
 	              radio: "1",
@@ -74,7 +58,6 @@
 	        })
       	});
       });
->>>>>>> backup
     },
     methods: {
     	// 判断调用接口是否成功。
