@@ -147,6 +147,7 @@
             	
             	return nHeight;
             },
+            // 根据时间排序。
             sortByTime (a, b) {
                 return Date.parse(b.happenTime.replace(/-/g,"/"))-Date.parse(a.happenTime.replace(/-/g,"/"));
             },

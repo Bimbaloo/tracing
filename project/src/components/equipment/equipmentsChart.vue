@@ -118,11 +118,19 @@
     const TOOLTIP_Z_INDEX = 100
     // finereport跳转地址。
     const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
-
+    // 设备分析接口地址。
+    const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events"
 
     export default {
 		props: {
-			equipments: Array,
+			equipmentsId: {
+                required: false,
+            	type: Array
+            },
+            equipmentsCode: {
+                required: false,
+            	type: Object
+            },
 			datetime: Object,
             process: {
                 required: false,
@@ -134,6 +142,9 @@
 		},
         data () {
             return {
+                equipments: [],
+                // 判断是否为遏制页面。
+                bRestrain: location.pathname.indexOf("restrain") > -1,
                 // legend距右侧的距离。
                 legendRight: LEGEND_RIGHT,
                 // grid边距。
@@ -146,7 +157,7 @@
                 selectedEquipment: "",
 				loading: false,
 				sErrorMessage: "",
-                url: HOST + "/api/v1/trace/equipments-events/by-id",	
+                url: EQUIPMENTS_EVENTS_URL,	
 				// 比例。
                 ratioW: 1,
                 ratioL: 0,
@@ -284,26 +295,18 @@
         },
         computed: {
 			rawData () {
-		    	return this.$store.state.rawData
+		    	return this.$store && this.$store.state.rawData
 		  	},
 			resize () {
-		    	return this.$store.state.resize
+		    	return this.$store && this.$store.state.resize
 		    },
 			resizeY () {
-				return this.$store.state.resizeY
+				return this.$store && this.$store.state.resizeY
 			},
 			fullscreen () {
 				// 是否全屏
-		    	return this.$store.state.fullscreen
+		    	return this.$store && this.$store.state.fullscreen
 		    },
-            // categories () {
-            //     return this.equipments.map(o => {
-            //         return {
-            //             value: o.equipmentName+ '+' + o.equipmentId + '+' + 0, 
-            //             id: o.equipmentId    
-            //         }
-            //     })
-            // },
             option () {
                 let oData = {
                     legend: {
@@ -462,45 +465,7 @@
                                 borderColor: '#42AF8F',
                             }
                         }
-                    },
-                    graphic: [{
-                        type: 'group',
-                        id: 'group',
-                        cursor: "pointer",
-                        children: [{
-                            // 箭头。
-                            type: 'polygon',
-                            id: 'polygon',
-                            cursor: "pointer",
-                            shape: {
-                                points:[[5, 0], [10, 14], [5, 10], [0,14]],
-                                
-                            },
-                            style: {
-                                fill: "#D53A35",
-                                lineWidth: 1,
-                                stroke: "#D53A35"
-                            },
-                            left: 0,
-                            top: 0
-                        },{
-                            // 文字。
-                            type: 'text',
-                            id: 'text',
-                            cursor: "pointer",
-                            style: {
-                                text: "追溯相关投产",
-                                fill: this.onlyShowRelatedData ? "#D53A35":"#333"
-                            },
-                            left: 15,
-                            top: 0
-                        }],     
-                        left: '40%',
-                        top: 5,
-                        width: 100,
-                        height: 20,
-                        onclick: this.changePoolInAndOutVisibility
-                    }],              
+                    },             
                     series: [{
                         type: 'custom',
                         name: CHART_STATE_NAME,
@@ -690,6 +655,49 @@
                 if(this.datetime.realEnd) {
                     oData.dataZoom[0].endValue = +new Date(this.datetime.realEnd)
                 }
+
+                if(!this.bRestrain) {
+                    // 若不为遏制页面。
+                    oData.graphic = [{
+                        type: 'group',
+                        id: 'group',
+                        cursor: "pointer",
+                        children: [{
+                            // 箭头。
+                            type: 'polygon',
+                            id: 'polygon',
+                            cursor: "pointer",
+                            shape: {
+                                points:[[5, 0], [10, 14], [5, 10], [0,14]],
+                                
+                            },
+                            style: {
+                                fill: "#D53A35",
+                                lineWidth: 1,
+                                stroke: "#D53A35"
+                            },
+                            left: 0,
+                            top: 0
+                        },{
+                            // 文字。
+                            type: 'text',
+                            id: 'text',
+                            cursor: "pointer",
+                            style: {
+                                text: "追溯相关投产",
+                                fill: this.onlyShowRelatedData ? "#D53A35":"#333"
+                            },
+                            left: 15,
+                            top: 0
+                        }],     
+                        left: '40%',
+                        top: 5,
+                        width: 100,
+                        height: 20,
+                        onclick: this.changePoolInAndOutVisibility
+                    }]
+                }
+
                 return oData
             }
         },
@@ -710,31 +718,34 @@
         },
         methods: {
 			init() { 
-                              
+                debugger
+                // 初始化图形。              
 				this.setInitData();
-
                 // 获取所有数据。
                 this.fetchAllData();
-				
-                window.addEventListener("resize", this.resizeChart)
-                
-                $("#equipments").on("click", ".suspend-tooltip-wrapper", this.suspendTooltipClickHandle)
+				// 添加事件监听。
+                this.addEvent();
 			},
 			// 初始化数据。
 			setInitData() {		
 				this.startIf = true;
 				this.endIf = true;
-					
-				let oData = {};
-				this.equipments.forEach(o => {
-					let sId = o.equipmentId;
-					oData[sId] = {			
-						status: []
-					}
-                    // 添加事件维度数据。
-                    this.dimension.forEach(d => oData[sId][d.key] = {})
-				})	
-				this.equipmentData = oData;
+		
+                if(!this.bRestrain) {
+                    this.equipments = this.equipmentsId
+                }else {
+                    this.equipments = []
+                }			
+				// let oData = {};
+				// this.equipments.forEach(o => {
+				// 	let sId = o.equipmentId;
+				// 	oData[sId] = {			
+				// 		status: []
+				// 	}
+                //     // 添加事件维度数据。
+                //     this.dimension.forEach(d => oData[sId][d.key] = {})
+				// })	
+				// this.equipmentData = oData;
                 
                 this.initChart();
 			},
@@ -751,6 +762,12 @@
                     this.compareList = []  
                     this.onlyShowRelatedData = true
                 }      
+            },
+            // 添加事件监听。
+            addEvent() {
+                window.addEventListener("resize", this.resizeChart)
+                
+                $("#equipments").on("click", ".suspend-tooltip-wrapper", this.suspendTooltipClickHandle)
             },
             // 重置图形大小。
             resizeChart () {
@@ -1146,16 +1163,22 @@
 			fetchAllData() {
 				this.loading = true;	
                 this.sErrorMessage = "";
-				// setTimeout(() => {
-				// 	this.loading = false;
-					
-				// 	this.eventData = Object.assign({}, this.oTest);;
-				// 	["1", "2", "3", "4", "5", "6"].forEach(type => this.formatEquipmentData(type, this.eventData[type]));
-					
-				// }, 1000)	
-				
-				this.$post(this.url, {
-					equipmentList: this.equipments.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(','),
+
+                let equipmentList = "",
+                    sUrl = this.url
+
+                if(this.bRestrain) {
+                    // 若为设备编码。
+                    equipmentList = this.equipmentsCode.equipmentCode
+                    sUrl += "/by-code"
+                }else if(this.equipmentsId){
+                    // 若为设备id列表。
+                    equipmentList = this.equipmentsId.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(',')
+                    sUrl += "/by-id"
+                }
+                
+				this.$post(sUrl, {
+					equipmentList: equipmentList,
 					startTime: this.datetime.start,
 					endTime: this.datetime.end,
 					type: 0
@@ -1189,7 +1212,8 @@
                 // 更改顺序。
                 aoData.reverse();
 
-                let nLength = aoData.length - 1; 
+                let nLength = aoData.length - 1
+
                 aoData.forEach((o,index) => {
                     if(index === nLength) {
                         // 默认选中第一台设备。
@@ -1202,59 +1226,67 @@
                         value: `${o.equipmentName}+${o.equipmentId}+`+(index===nLength?1:0)// 默认选中第一台设备。
                     })
 
-                    let oData = this.equipmentData[o.equipmentId];
-                    if(oData) {
-                        Object.assign(oData, {
-                            // 状态
-                            status: o.equipStatusList||[],
-                            // 工单
-                            work: {
-                                startWorkList: o.startWorkList||[],
-                                finishWorkList: o.finishWorkList||[]
-                            },
-                            // 投产投产
-                            pool: {
-                                poolInList: o.poolInList||[],
-                                poolOutList: o.poolOutList||[]
-                            },
-                            // 质量
-                            quality: {
-                                qcList: o.qcList||[],
-                                submitQcList: o.submitQcList||[]
-                            },
-                            // 事件
-                            event: {
-                                startEquipWarningList: o.startEquipWarningList||[],
-                                endEquipWarningList: o.endEquipWarningList||[]
-                            },
-                            // 维护
-                            repair: {
-                                spotCheckList: o.spotCheckList||[],
-                                startEquipRepairList: o.startEquipRepairList||[],
-                                endEquipRepairList: o.endEquipRepairList||[]
-                            },
-                            // 工具
-                            tool: {
-                                installToolList: o.installToolList||[],
-                                removeToolList: o.removeToolList||[]
-                            }
-                        });                           
-                    }                        
+                    this.equipmentData[o.equipmentId] = {
+                        // 状态
+                        status: o.equipStatusList||[],
+                        // 工单
+                        work: {
+                            startWorkList: o.startWorkList||[],
+                            finishWorkList: o.finishWorkList||[]
+                        },
+                        // 投产投产
+                        pool: {
+                            poolInList: o.poolInList||[],
+                            poolOutList: o.poolOutList||[]
+                        },
+                        // 质量
+                        quality: {
+                            qcList: o.qcList||[],
+                            submitQcList: o.submitQcList||[]
+                        },
+                        // 事件
+                        event: {
+                            startEquipWarningList: o.startEquipWarningList||[],
+                            endEquipWarningList: o.endEquipWarningList||[]
+                        },
+                        // 维护
+                        repair: {
+                            spotCheckList: o.spotCheckList||[],
+                            startEquipRepairList: o.startEquipRepairList||[],
+                            endEquipRepairList: o.endEquipRepairList||[]
+                        },
+                        // 工具
+                        tool: {
+                            installToolList: o.installToolList||[],
+                            removeToolList: o.removeToolList||[]
+                        }
+                    }    
+
+                    if(this.bRestrain) {
+                        // 若为遏制页面。
+                        this.equipments.push({
+                            equipmentId: o.equipmentId,
+                            equipmentName: o.equipmentName,
+                            shiftStartTime: this.equipmentsCode.shiftStartTime,
+                            shiftEndTime: this.equipmentsCode.shiftEndTime
+                        })
+                    }            
                 })	
             },
             // 设置图形数据。
-            setChartData () {     
+            setChartData () {    
+                debugger 
                 // 设备状态。
-                this.option.series.filter(o => o.name=="状态")[0].data = this.getStatusData();
+                this.option.series.filter(o => o.name=="状态")[0].data = this.getStatusData()
                 // 获取各事件维度数据。
                 this.dimension.forEach(item => {
-                    let oFilter = this.option.series.filter(o => o.name==item.name)[0];
-                    let oResult = this.getDimensionData(item.key);
+                    let oFilter = this.option.series.filter(o => o.name==item.name)[0],
+                        oResult = this.getDimensionData(item.key)
                     if(oResult.markPoint.length) {
                         oFilter.markPoint.data = oResult.markPoint
                     }
                     
-                    if(item.key === 'pool' &&　this.onlyShowRelatedData) {
+                    if(item.key === 'pool' &&　this.onlyShowRelatedData && !this.bRestrain) {
                         // 设置可见性，若只展示起点相关。              
                         oFilter.data = oResult.data.filter(arr => arr[4])                                                
                     }else {
@@ -1493,7 +1525,7 @@
 
                                 let aPointer = [oData.time, nIndex, 1, [oData]];
 
-                                if(sDimension === "pool") {
+                                if(sDimension === "pool" && !this.bRestrain) {
                                     if((key === "poolInList" && item.poolInTime.indexOf(o.happenTime) > -1) ||
                                     (key === "poolOutList" && item.poolOutTime.indexOf(o.happenTime) > -1)) {
                                         // 若为属于起点的投入或产出。
@@ -1570,7 +1602,7 @@
                             }else {
                                 // 若不存在，即为未知状态。
                                 aoData.push({
-                                    name: '',
+                                    name: '无数据',
                                     value: [
                                         index,
                                         +new Date(o.startTime),
@@ -1871,10 +1903,6 @@
                 sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
                 window.open("trackIndex.html?tag="+tag);
       
-            },
-            // 工艺参数跳转按钮。
-            parameterButtonClick () {
-
             }
         }
     }  

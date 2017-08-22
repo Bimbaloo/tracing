@@ -10,10 +10,6 @@
 </template>
 
 
-
-
-
-
 <script>
 
 	import table from "components/basic/table.vue"
@@ -209,11 +205,6 @@
 		}
 	}
 </script>
-
-
-
-
-
 
 <style scoped lang="less">
 

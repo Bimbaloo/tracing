@@ -5,6 +5,8 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-green/index.css'
 import App from './app.vue'
 import axios from 'axios'
+import echarts  from 'echarts'
+
 import 'babel-polyfill'
 
 import 'assets/css/reset.css'
@@ -17,6 +19,9 @@ Vue.use(ElementUI)
 Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
 Vue.prototype.$post = axios.post;
+
+// 添加echarts。
+Vue.prototype.$echarts = echarts;
 
 const list = r => require.ensure([], () => r(require('components/restrain/list.vue')), 'group-detail')
 const suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-detail')

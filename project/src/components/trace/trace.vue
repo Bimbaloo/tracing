@@ -116,9 +116,7 @@
                         sortable: true
                     }],
                     data: []
-                },
-                // 表格完整数据。
-                rawData: []
+                }
             }
         },
         created () {
@@ -145,6 +143,10 @@
             	
             	return nHeight;
             },
+            // 根据时间排序。
+            sortByTime (a, b) {
+                return Date.parse(b.happenTime.replace(/-/g,"/"))-Date.parse(a.happenTime.replace(/-/g,"/"));
+            },
         	// 获取数据。
             fetchData (oData) {
                 oData.error = null;
@@ -160,9 +162,8 @@
 					
                     if(!res.data.errorCode) {
                     	// 正常 0
-                        this.rawData = res.data.data
-                        // 深度拷贝。
-                        oData.data = $.extend(true, [], this.rawData)
+                        oData.data = $.extend(true, [], res.data.data)
+                        oData.data = oData.data.sort(this.sortByTime);
                     }else if(res.data.errorCode == "1"){
                     	// console 异常信息。
                     	console.warn(res.data.errorMsg.message);
@@ -196,19 +197,6 @@
             	}else {
             		this.$message("没有数据溯源");
             	}
-            },
-            // 表格选中行改变。
-            selectChange () {
-                console.log(this.gridData.selected)
-                if(!this.gridData.selected.length) {
-                    // 若取消选中。
-                    this.gridData.data = $.extend(true, [], this.rawData)
-                }else if(this.gridData.selected.length === 1) {
-                    // 若选中一行。
-                    // debugger
-                    let oData = this.gridData.selected[0]
-                    this.gridData.data = $.extend(true, [], this.rawData.filter(o => o.materialCode === oData.materialCode && o.processName === oData.processName))
-                }
             }
         }
     }  

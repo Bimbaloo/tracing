@@ -7,7 +7,7 @@
 					<el-tab-pane label="新建遏制"  activeName="first">
 						<el-radio-group v-model="radioNumber">
 							<div class='radio'>
-								<el-radio :label="radio.key" v-for="radio in radioList">{{radio.groupName}}</el-radio>
+								<el-radio :label="radio.key" v-for="(radio,index) in radioList" :key="index">{{radio.groupName}}</el-radio>
 							</div>
 							<el-form :inline="true" ref="materialForm" :model="materialForm"  :class="[ 'demo-form-inline','form-inline']" :rules="rules">
 								 <el-form-item v-for="(item,index) in groupItems" :label="item.placeholder" v-show="item.key === radioNumber" :key="item.itemCode+index" :prop="item.itemCode">
@@ -504,10 +504,7 @@
 			}
 		}
 	}
-	
-</style>
 
-<style lang="less">  
     .el-radio {
         &:hover {
             color: #42af8f;
@@ -576,10 +573,7 @@
 			}
 		}
 	}
-	
-	
-</style>
-<style scoped lang="less">
+
 	#app {
 		height: 100%;
 		display: flex;

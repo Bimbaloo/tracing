@@ -6,7 +6,7 @@
             	工序&nbsp;—&nbsp;{{node.name}}
             </h2>			
 			<v-equipment v-if="bShowEq" 
-				:equipments="equipments"
+				:equipments-id="equipments"
 				:process="node.code"  
 				:datetime="datetime">
 			</v-equipment>
@@ -25,9 +25,6 @@
 		},
         data () {
             return {
-                styleObject: {
-                    "min-width": "1000px"
-                },
                 // 点击的工序节点信息。
                 node: {},
 				equipments: [],
@@ -112,17 +109,6 @@
 				let aoFilter = this.rawData.filter(o => o.key == this.processKey);
 				if(aoFilter.length) {
 					oNode = aoFilter[0];
-				// }else {
-				// 	// 节点在子工序中。
-				// 	this.rawData.map(o => {
-				// 		if(o.subProcess) {
-				// 			let aoNode = o.subProcess.filter(item => item.key == this.processKey);
-				// 			if(aoNode.length) {
-				// 				oNode = aoNode[0];
-				// 			}
-				// 		}			
-									
-				// 	})
 				}
 				
 				this.node = oNode || {};	
@@ -133,13 +119,7 @@
 					if(!oEquipments[o.equipmentId]) {
 						oEquipments[o.equipmentId] = [];
 					}
-					// if(o.equipmentId == 234) {
-					// 	o.inHappenTimeList = ["2017-06-12 21:18:00", "2017-06-12 09:01:09"]
-					// 	o.outHappenTimeList = ["2017-06-12 21:39:16", "2017-06-12 09:20:10"]
-					// }else {
-					// 	o.inHappenTimeList = ["2017-06-13 06:22:08"]
-					// 	o.outHappenTimeList = ["2017-06-13 06:41:10"]
-					// }
+
 					oEquipments[o.equipmentId].push(o);
 				})
 
@@ -182,7 +162,6 @@
 </script>
 
 <style lang="less"> 
-
 	#router-echart	{
 		overflow: hidden;
 	}
