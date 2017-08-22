@@ -146,7 +146,7 @@
                 selectedEquipment: "",
 				loading: false,
 				sErrorMessage: "",
-                url: HOST + "/api/v1/trace/equipments-events",	
+                url: HOST + "/api/v1/trace/equipments-events/by-id",	
 				// 比例。
                 ratioW: 1,
                 ratioL: 0,
@@ -1155,7 +1155,7 @@
 				// }, 1000)	
 				
 				this.$post(this.url, {
-					equipmentIdList: this.equipments.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(','),
+					equipmentList: this.equipments.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(','),
 					startTime: this.datetime.start,
 					endTime: this.datetime.end,
 					type: 0
