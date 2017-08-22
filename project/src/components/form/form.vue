@@ -102,23 +102,35 @@
 	            	},
             		// 验证开始时间。
             	    validateStartTime = (rule, value, callback) => {
-	            		if(!value) {
-	            			callback(new Error("请输入开始时间"));
+            	    	let bIsFormat = window.Rt.utils.isDateTime(value),
+            	    		nNow = +new Date();
+            	    		
+	            		if(!bIsFormat) {
+	            			callback(new Error("请输入开始时间或正确时间格式"));
+	            		}else if(+new Date(value) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
 	            		}else {
 	            			callback();
 	            		}
 	            	},
             		// 验证结束时间。
             		validateEndTime = (rule, value, callback) => {
-	            		let sStart = oForm.startTime;
-	            		if(!value) {
-	            			callback(new Error("请输入结束时间"));
-	            		}else if(sStart && sStart > value) {
+	            		let sStart = oForm.startTime,
+	            			bIsFormat = window.Rt.utils.isDateTime(value),
+	            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
+            	    		nNow = +new Date();
+            	    		
+            	    	if(!bIsFormat) {
+	            			callback(new Error("请输入结束时间或正确时间格式"));
+	            		}else if(+new Date(value) > nNow) {
+	            			callback(new Error("时间要小于当前时间"));
+	            		}else if(bIsStartFormat && +new Date(sStart) > +new Date(value)) {
 	            			// 如果开始时间存在，而且开始时间大于结束时间。
 	            			callback(new Error("结束时间必须大于开始时间"));
 	            		}else {
 	            			callback();
 	            		}
+	            		
 	            	};
 	            	
 	            // 验证是否存在
@@ -145,14 +157,51 @@
 	            	}
 	            	
 	            },
-	            // 结束时间。
-	            validateTime = (rule, value, callback) => {
-	            	if(value && oForm.startTime && value < oForm.startTime) {
-	            		// 开始时间和结束时间都存在,且结束时间小。
-	            		callback(new Error("结束时间要大于开始时间"));
-	            	}else {
+	            validateStart = (rule, value, callback) => {
+	            	let bIsFormat = window.Rt.utils.isDateTime(value),
+        	    		nNow = +new Date();
+        	    	
+        	    	if(value) {
+	            		if(!bIsFormat) {
+	            			callback(new Error("请输入正确时间格式"));
+	            		}else if(+new Date(value) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else {
+	            			callback();
+	            		}
+        	    	}else {
 	            		callback();
 	            	}
+	            },
+	            // 结束时间。
+	            validateTime = (rule, value, callback) => {
+	            	let sStart = oForm.startTime,
+            			bIsFormat = window.Rt.utils.isDateTime(value),
+            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
+        	    		nNow = +new Date();
+					
+        	    	if(value) {
+						// 存在时间。
+	        	    	if(!bIsFormat) {
+	            			callback(new Error("请输入正确时间格式"));
+	            		}else if(+new Date(value) > nNow) {
+	            			callback(new Error("时间要小于当前时间"));
+	            		}else if(bIsStartFormat && +new Date(sStart) > +new Date(value)) {
+	            			// 如果开始时间存在，而且开始时间大于结束时间。
+	            			callback(new Error("结束时间必须大于开始时间"));
+	            		}else {
+	            			callback();
+	            		}
+        	    	}else {
+        	    		callback();
+        	    	}
+	            		
+//	            	if(value && oForm.startTime && value < oForm.startTime) {
+//	            		// 开始时间和结束时间都存在,且结束时间小。
+//	            		callback(new Error("结束时间要大于开始时间"));
+//	            	}else {
+//	            		callback();
+//	            	}
 	            };
             	
             	// 所有规则。
@@ -173,6 +222,7 @@
             			"materialCode": [{validator: validateParam, trigger: "change"}],
             			"equipmentCode": [{validator: validateParam, trigger: "change"}],
             			"doCode": [{validator: validateParam, trigger: "change"}],
+            			"startTime": [{validator: validateStart, trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateTime, trigger: "change"}]
             		},
@@ -182,6 +232,7 @@
             			"materialCode": [{validator: validateParam,trigger: "change"}],
             			"equipmentCode": [{validator: validateParam,trigger: "change"}],
             			"doCode": [{validator: validateParam,trigger: "change"}],
+            			"startTime": [{validator: validateStart, trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateTime, trigger: "change"}]
             		},

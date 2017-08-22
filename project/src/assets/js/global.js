@@ -485,6 +485,40 @@
 		 */
 		hasParam: function(sName, sHref) {
 			return this.getParams(sUrl)[sName] != null;
+		},
+		
+		/**
+		 * 判断是否为正确的时间格式.
+		 * @param {String} sTime
+		 * @return {Boolean}
+		 */
+		isDateTime: function(sTime) {
+			var sReg = /^(\d+)-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})$/,
+				sRs = (sTime || "").match(sReg)
+			
+			// 返回判断是否为正确的格式结果.
+			if(sRs == null) {
+				return false
+			}else {
+				return true
+			}
+		},
+		
+		/**
+		 * 判断是否为正确的日期格式.
+		 * @param {String} sDate
+		 * @return {Boolean}
+		 */
+		isDate: function(sDate) {
+			var sReg = /^(\d+)-(\d{1,2})-(\d{1,2})$/,
+				sRs = (sDate || "").match(sReg)
+		
+			// 返回判断是否为正确的格式结果.
+			if(sRs == null) {
+				return false
+			}else {
+				return true
+			}
 		}
 	}
 

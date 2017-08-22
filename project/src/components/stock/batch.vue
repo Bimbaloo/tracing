@@ -161,7 +161,7 @@
 				},
 			}
 		},
-		created() {
+		mounted() {
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
 			this.fetchPage();
@@ -198,6 +198,7 @@
 			fetchData(oData) {
 				oData.error = null;
 				oData.data = [];
+				oData.height = this.adjustHeight();
 				oData.loading = true;
 
 				let sPath = oData.url;
@@ -205,7 +206,7 @@
 				this.$ajax.post(sPath, this.$route.query)
 					.then((res) => {
 						oData.loading = false;
-						oData.height = this.adjustHeight();
+//						oData.height = this.adjustHeight();
 						
 						if(!res.data.errorCode) {
 							oData.data = res.data.data;

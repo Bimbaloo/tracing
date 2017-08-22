@@ -58,11 +58,11 @@
 									<div class="filters info-filters">
 										<div class="filter-item filter-item-inline info-filter">
 											<label class="filter-name">链路类型:</label>
-											<v-multiSelect style="width:auto;" :form-data="filterParam" :list-data="nodeData" placeholder-data="请选择节点" key-data="nodeType" :all-data="multiAll"></v-multiSelect>
+											<v-multiSelect style="width:400px;" :form-data="filterParam" :list-data="nodeData" placeholder-data="请选择节点" key-data="nodeType" :all-data="multiAll"></v-multiSelect>
 										</div>
 										<div class="filter-item filter-item-inline info-filter">
 											<label class="filter-name">工序:</label>
-											<v-multiSelect style="width:auto;" :form-data="filterParam" :list-data="processAllData" placeholder-data="请选择工序" key-data="aFilterProcess" :all-data="multiAll"></v-multiSelect>
+											<v-multiSelect style="width:400px;" :form-data="filterParam" :list-data="processAllData" placeholder-data="请选择工序" key-data="aFilterProcess" :all-data="multiAll"></v-multiSelect>
 										</div>
 									</div>
 								</div>
@@ -1935,7 +1935,7 @@
 						}
 						
 						.el-select, .el-input {
-							width: auto;
+							/*width: auto;*/
 							display: inline-block;
 						}
 					}
@@ -1992,6 +1992,7 @@
 						}
 						
 						.content-nodeWraps {
+							min-height: 300px;
 							margin-top: 20px;
 							
 							.nodesWrap {

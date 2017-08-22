@@ -5,7 +5,7 @@
     		<el-button class="btn btn-plain" @click="onTrack">追踪</el-button>
     		<el-button class="btn btn-plain" @click="onReport">快速报告</el-button>
     	</div>
-        <div class="router-content">
+        <div class="router-content" ref="routerContent">
 	        <div class="innner-content">
 	            <div v-if="gridData.error" class="error" style="margin-top: 10px;">
 	                {{ gridData.error }}
@@ -124,7 +124,7 @@
                 },
             }
         },
-        created () {
+        mounted () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
             this.fetchPage();
@@ -144,7 +144,8 @@
             		jTable = jRouter.find(".content-table"),
             		nHeight = 0;
             	
-            	nHeight = Math.floor(jRouter.height() - (jTable.outerHeight(true) - jTable.height()));
+//          	nHeight = Math.floor(jRouter.height() - (jTable.outerHeight(true) - jTable.height()));
+            	nHeight = this.$refs.routerContent.clientHeight - 50
             	
             	return nHeight;
             },
@@ -156,13 +157,14 @@
             fetchData (oData) {
                 oData.error = null;
                 oData.data = [];
+                oData.height = this.adjustHeight();
                 oData.loading = true;
 
                 let sPath = oData.url;
                 this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
                 .then((res) => {
                     oData.loading = false;
-                    oData.height = this.adjustHeight();
+//                  oData.height = this.adjustHeight();
                     
                     if(!res.data.errorCode) {
                     	// 正常 0

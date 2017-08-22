@@ -367,7 +367,7 @@
 			}
 		},
 		// 创建时处理。mounted
-		created() {
+		mounted() {
 			// 获取所需的查询参数。
 			this.tag = location.search.split("=")[1]
 
@@ -464,6 +464,8 @@
 			},
 			// 获取数据。
 			getPageData() {
+				// 设置内容的高度。
+				this.getHeight();
 				// 获取数据。-- 根据当前显示的tab创建数据。
 				this.oTab.loading = true;
 				// 设置barcode。
@@ -606,49 +608,52 @@
 			 */
 			setDataOrder(aData) {
 				let aOrder = [{
-					type: "",
-					data: []
-				}, {
+					// 送检
 					type: "5,6",
 					data: []
 				}, {
+					// 产出
 					type: "4",
 					data: []
 				}, {
+					// 投入
 					type: "3",
 					data: []
 				}, {
+					// 出入库
 					type: "1,2",
+					data: []
+				}, {
+					type: "",
 					data: []
 				}],
 				aReturn = [];
 				
 				if(aData.length > 1) {
 					
-					aData.forEach( o=> {
+					aData.forEach( o => {
 						if(o.data) {
 							// 存在数据。
 							aOrder[_getIndexByType(o.data.type)].data.push(o);
 						}else {
 							// 不存在数据。
-							aOrder[0].data.push(o);
+							aOrder[aOrder.length-1].data.push(o);
 						}
 					})
 					
 					// 数据排序后。
 					aOrder.forEach( (o, index) => {
-						if(index && o.data.length > 1) {
+						if(index!= aOrder.length-1 && o.data.length > 1) {
 							// data存在，非第一条数据 进行排序处理。
-							o.data = o.data.sort( (oA, oB) => +new Date(oA.data.time) < +new Date(oB.data.time) )
+//							o.data = o.data.sort( (oA, oB) =>  oA.data.time < oB.data.time ? 1:-1 )
+							o.data = o.data.sort( (oA, oB) => +new Date(oA.data.time) - +new Date(oB.data.time) < 0? 1:-1)
 						}
-						
 						aReturn = aReturn.concat(o.data);
 					})
 					
 				}else {
 					aReturn = aData;
 				}
-				
 				
 				// 返回数据。
 				return aReturn;
