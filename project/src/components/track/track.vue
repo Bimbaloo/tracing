@@ -11,7 +11,8 @@
 	                {{ gridData.error }}
 	            </div>
 	            <div v-if="!gridData.error" class="content-table" >
-	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter"></v-table>    
+	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter" v-if="!gridData.loading" ></v-table>
+                    <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter" v-show="gridData.loading" ></v-table>        
 	            </div>     
 	       </div>   
     	</div> 

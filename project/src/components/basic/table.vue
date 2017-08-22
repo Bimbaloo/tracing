@@ -103,6 +103,7 @@
             }
         },
         created () {
+            this.tableData.selected = []
         },
         methods: {    
             cellClick (row, column, cell, event) {
