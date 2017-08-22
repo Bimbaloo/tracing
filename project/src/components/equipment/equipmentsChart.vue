@@ -451,8 +451,11 @@
                     // 工具箱
                     toolbox: {
                         top: -3,
+                        right: 30,
                         feature: {
-                            dataZoom: {}
+                             dataZoom: {
+                                yAxisIndex: 'none'
+                            },
                         },
                         iconStyle: {
                             emphasis: {
@@ -1966,7 +1969,7 @@
             .switch {
                 position: absolute;
                 top: 5px;
-                right: 55px;
+                right: 85px;
 
                 .switch-eye {
                     position: relative;
