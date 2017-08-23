@@ -1,7 +1,7 @@
 <template>
 	<div id="app">
 		<v-header></v-header>
-		<div class="panel">
+		<div class="panel" id="restrain">
 			<div class='panel-title'>
 				<el-tabs  element-loading-text="拼命加载中"   class="search-tab" @tab-click="handleClick">
 					<el-tab-pane label="新建遏制"  activeName="first">
@@ -348,7 +348,7 @@
 			  this.$refs[formName].validate((valid) => {
 					if (valid) {
 						sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
-						this.$router.push({ 
+						this.$router.replace({ 
 							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变，子组件监听路由触发事件
 							
 						})
@@ -387,7 +387,7 @@
 				
 				if(tab.index === '1'){
 					sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
-					this.$router.push({ 
+					this.$router.replace({ 
 							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变(不可见)，子组件监听路由触发事件
 							
 						})
@@ -410,7 +410,10 @@
 
 				sPath = sPath + '/' + oConditions.radio;
 				
-				this.$router.push({ path: sPath, query: this.getKeys() })
+				if(this.activeKey  === 'suspicious' && oConditions.radio == 1) {
+					sPath = '/process'
+				}
+				this.$router.replace({ path: sPath, query: this.getKeys() })
 			},
 			
 			getKeys() {
@@ -592,6 +595,12 @@
 			.router-container {
 				height: 100%;
 			}
+		}
+	}
+
+	#restrain {
+		.router-path {
+			border-bottom-width: 0;
 		}
 	}
 </style>

@@ -147,7 +147,7 @@
             batchClick (row) {
             	if(row.batchNo) {
             		// 批次存在可点击
-	                this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+	                this.$router.replace({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
             	}
             },
             fetchData () {

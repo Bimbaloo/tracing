@@ -115,7 +115,7 @@
 			// 组件创建完后获取数据
 			// 此时 data 已经被 observed 了
 			// 重置路由。
-			this.$router.push("/");
+			this.$router.replace("/");
 			let sSelected = sessionStorage.getItem("trace_" + this.query.tag);
 			if(sSelected) {
 				this.params = JSON.parse(sSelected);
@@ -133,7 +133,7 @@
 			treeDataInit() {
 				this.treeData = this.parseTreeData();
 				// 重置路由。
-				this.$router.push("/");
+				this.$router.replace("/");
 			},
 			/**
 			 * 设置面板高度。

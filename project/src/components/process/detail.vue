@@ -13,7 +13,7 @@
 							<el-checkbox-button :label="obj.type">{{obj.name}}</el-checkbox-button>
 							<div class="link-line" v-show="obj.show"></div>
 							<div class="list-btn-wrap" v-show="obj.show">
-								<span v-for="item in obj.list" @click="listButtonClick(item)" :class="{fgb: item.name=='FGB'}">{{item.name}}</span>
+								<span v-for="(item,index) in obj.list" :key="index" @click="listButtonClick(item)" :class="{fgb: item.name=='FGB'}">{{item.name}}</span>
 							</div>
 						</div>						
 					</el-checkbox-group>
@@ -185,7 +185,7 @@
 				if(oData.router) {				
 					let oQuery = this.getParamter(oData.query);
 					
-					this.$router.push({path: oData.router, query: oQuery});
+					this.$router.replace({path: oData.router, query: oQuery});
 				}
 
 				if(oData.cpt) {

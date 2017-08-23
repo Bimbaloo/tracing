@@ -235,7 +235,7 @@
 					}else {
 						sPath = "/stock/restrain"
 					}		
-					this.$router.push({ path: sPath, query: this.$route.query})
+					this.$router.replace({ path: sPath, query: this.$route.query})
 				}else{
 					console.log("该功能将在后续开发，敬请期待...")
 				}

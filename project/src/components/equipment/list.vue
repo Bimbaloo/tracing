@@ -643,7 +643,7 @@
 				let self = this;				
 				if(this.bList) {
 					// 若为设备列表页面。
-					this.$router.push({ 
+					this.$router.replace({ 
 						path: `/process/detail`, 
 						query: {
 							equipmentId: oData.equipmentId,

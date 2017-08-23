@@ -104,10 +104,10 @@ export default {
             return this.routerContent
         },
         resizeY: function(){
-            return this.$store.state.resizeY
+            return this.$store && this.$store.state.resizeY
         },
         fullscreen: function(){
-            return this.$store.state.fullscreen
+            return this.$store && this.$store.state.fullscreen
         },
         /* 查询条件转数组中文 */
         filters: function() {

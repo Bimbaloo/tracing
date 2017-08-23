@@ -32,7 +32,7 @@ const config = {
   output: {
     path: resolve(__dirname, './dist'),
     filename: 'assets/js/[name].js',
-    publicPath: '/'
+//  publicPath: '/'
   },
   resolve: {
     extensions: ['.js', '.vue'],
@@ -99,7 +99,7 @@ const config = {
         use: [{
           loader: 'url-loader',
           options: {
-            limit: 10000,
+            limit: 1000000,
             name: 'assets/img/[name].[hash:7].[ext]'
           }
         }]

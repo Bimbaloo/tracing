@@ -48,7 +48,7 @@
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock`, query: this.material})
+                this.$router.replace({ path: `/stock`, query: this.material})
             },
             // 同批出入库
             checkBatch(event) {
@@ -56,7 +56,7 @@
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock/batch`, query: this.batch})
+                this.$router.replace({ path: `/stock/batch`, query: this.batch})
             },
             setRouteQuery() {
                 let aHref = location.href.split("?")[0].split("/"),

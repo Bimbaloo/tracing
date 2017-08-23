@@ -42,7 +42,7 @@
             }
         },
         created() {
-            this.$router.push('query');
+            this.$router.replace('query');
         },
         computed: {
         	// 是否编辑的状态。
@@ -62,7 +62,7 @@
 			        }).then(() => {
 			        	// 确定操作。离开当前页面
 			        	self.isActive=index;
-                		self.$router.push({path:routerLink});
+                		self.$router.replace({path:routerLink});
                 		
 			        	return true
 			        }).catch(() => {
@@ -71,7 +71,7 @@
 			        });
             	}else {
             		self.isActive=index;
-                	self.$router.push({path:routerLink});
+                	self.$router.replace({path:routerLink});
             	}
                 
             }

@@ -224,7 +224,7 @@
 //        }
 				
 					// 修改下拉参数值。
-          this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
+          this.$router.replace({ path: sPath, query: this.getKeys(this.activeKey) })
       },
       dragstar(e){   //鼠标按下，开始拖动
       //  console.log('开始')

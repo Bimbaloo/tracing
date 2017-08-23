@@ -277,8 +277,8 @@
                     list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentName", "equipmentIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
-                    }]
+						query: ["equipmentName", "equipmentList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
+                    }]//equipmentIdList
 				}, {
 					name: "事件",
                     key: "event",
@@ -1072,7 +1072,7 @@
 				if(oData.router) {				
 					let oQuery = this.getParamter(oData.query);
 					
-					this.$router.push({path: oData.router, query: oQuery});
+					this.$router.replace({path: oData.router, query: oQuery});
 				}
 
 				if(oData.cpt) {
@@ -1099,7 +1099,7 @@
                         case "equipmentName":
                             oParam[param] = this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName;
                             break;
-						case "equipmentIdList":
+						case "equipmentList"://equipmentIdList
 							oParam[param] = this.selectedEquipment;
 							break;
 						case "equipmentId": 
@@ -1163,11 +1163,11 @@
                 }else if(this.equipmentsId){
                     // 若为设备id列表。
                     equipmentList = this.equipmentsId.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(',')
-                    // sUrl += "/by-id"
+                    sUrl += "/by-id"
                 }
                 
 				this.$post(sUrl, {
-					equipmentIdList: equipmentList, //equipmentList
+					equipmentList: equipmentList, //equipmentIdList
 					startTime: this.datetime.start,
 					endTime: this.datetime.end,
 					type: 0
@@ -1345,7 +1345,7 @@
                         o.timePoint = o.happenTime;
                         oResult.title = "投料";
                         oResult.tooltipData = [
-                            // {name: "条码", value: o.barcode},
+                            {name: "条码", value: o.barcode},
                             {name: "开始时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
@@ -1360,7 +1360,7 @@
                         o.timePoint = o.happenTime;
                         oResult.title = "产出";
                         oResult.tooltipData = [
-                            // {name: "条码", value: o.barcode},
+                            {name: "条码", value: o.barcode},
                             {name: "产出时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
@@ -1877,7 +1877,7 @@
 			showSuspiciousList() {
                 let oDate = this.getRealTime();
                 // 根据设备+开始时间+结束时间，查询可疑品列表。
-                this.$router.push({ path: "/process/restrain", query: {
+                this.$router.replace({ path: "/process/restrain", query: {
                     equipmentName: this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName,
                     equipmentId: this.selectedEquipment,
                     startTime: oDate.start,

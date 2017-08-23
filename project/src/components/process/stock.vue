@@ -1,16 +1,17 @@
 <!--查出库路由-->
 <template>
     <div class="material-stock" ref="stock">
-        <div class="view-icon">
+        <div class="view-icon" v-if="!bRestrain">
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
         </div>
         <div class="router-path">
-            <span class="path-item" @click="checkEquipment">设备分析</span>
-            <!--span class="path-item" @click="checkDetail" v-if="detailIf">>设备详情</span-->          
-            <!-- <span class="path-item" @click="checkProduction" v-if="productIf">>投产表</span> -->
-            <span class="path-item" @click="checkRoute" v-if=" !(operationName === '') ">>{{operationName}}</span>
-            <!-- <span class="path-item" v-if="restrainIf">遏制</span> -->
+            <router-link 
+                class="path-item" 
+                v-for="(oRoute,index) in aoRoute" 
+                :key="index" 
+                :to="{path: oRoute.path, query: oRoute.query}" 
+                replace><span v-if="index">></span>{{oRoute.name}}</router-link>
         </div> 
         <router-view></router-view>  
         <!--el-breadcrumb separator="/" class="router-path">
@@ -24,18 +25,13 @@
     export default {
         data () {
             return { 
+                // 是否为遏制页面。
+                bRestrain: location.pathname.indexOf("restrain") > -1,
                 // 右下详情内容区域全屏标识。
                 key: this.$route.params.key,
-                equipment: {},
-                detail: {},
-                restrain: {},
-                product: {},
-                detailIf: false,
-                productIf: false,
-                restrainIf: false,
-                operationNames:"",
+                oQuery: {},
                 operations: {
-                    "process":"",
+                    "process":"设备分析",
                     "product":"投产表",
                     "qtReport":"质检",
                     "qcReport":"送检",
@@ -44,102 +40,82 @@
                     "event":"事件记录",
                     "repair":"维护记录",
                     "restrain":"遏制"
-                }    
+                },
+                aoRoute: []    
             }
         },
         computed: {
 			fullscreen () {
-		    	return this.$store.state.fullscreen
-            },
-            operationName() {
-                return this.operations[this.operationNames]
+		    	return this.$store && this.$store.state.fullscreen
             }
 		},
         created () {
-            this.setRouteQuery();
+            let sRoute = this.$route.path,
+                aPath = sRoute.split("/"),
+                sType = aPath[aPath.length -1]
+
+            // 保存查询条件。
+            this.oQuery[sType] = this.$route.query
+
+            // 设置面包屑路由。
+            this.aoRoute.push({
+                name: this.operations[sType],
+                path: sRoute,
+                query: this.oQuery[sType]
+            })
         },
         watch: {
         },
         methods: {
-            // 查设备列表
-            checkEquipment(event) {
-                if(event.target.parentNode.lastElementChild == event.target) {
-                    // 若为最后一个节点，则不可点击。
-                    return false;
-                }
-                this.$router.push({ path: `/process`, query: this.equipment})
-            },
-            // 单台设备详情
-            checkDetail(event) {
-                if(event.target.parentNode.lastElementChild == event.target) {
-                    // 若为最后一个节点，则不可点击。
-                    return false;
-                }
-                this.$router.push({ path: `/process/detail`, query: this.detail})
-            },
-            // 投产表
-            checkProduction(event) {
-                if(event.target.parentNode.lastElementChild == event.target) {
-                    // 若为最后一个节点，则不可点击。
-                    return false;
-                }
-                this.$router.push({ path: `/process/detail/product`, query: this.product})
-            },
-             // 面包屑导航点击功能
-            checkRoute() {
-                if(event.target.parentNode.lastElementChild == event.target) {
-                    // 若为最后一个节点，则不可点击。
-                    return false;
-                }
-                this.$router.push({ path: `/process/detail/`+this.operationName, query: this[this.operationNames]})
-            },
-            setRouteQuery() {
-                let aLocation = location.href.split("?"),
-                    aHref = aLocation[1].split("/"),
-                    sType = aHref[aHref.length-1];
+            // 设置路由。
+            setRouteQuery(from, to) {
+                let sFromRoute = from.path,
+                    sToRoute = to.path,
+                    aFromPath = sFromRoute.split("/"),
+                    aToPath = sToRoute.split("/"),
+                    sFromType = aFromPath[aFromPath.length -1],
+                    sToType = aToPath[aToPath.length -1]
+                    
+                // 保存查询条件。
+                this.oQuery[sToType] = this.$route.query
                 
-                // debugger
-                // if(sType == "detail") {
-                //     this.detail = this.$route.query;
-                // }else 
-                this.operationNames = sType
-                if(sType == "product") {
-                    this.product = this.$route.query;
-                }else if(sType == "restrain") {
-                    this.restrain = this.$route.query;
-                }else {
-                    this.equipment = this.$route.query;
-                }  
-
-            },
-            setPathVisible(to) {
-                let aPath = to.path.split("/"),
-                    sType = aPath[aPath.length - 1];
-                // if(sType == "detail") {
-                //     this.detailIf = true;
-                //     this.productIf = false;
-                //     this.restrainIf = false;
-                // }else 
-                this.operationNames = sType
-                if(sType == "product") {
-                    // this.detailIf = true;
+                if(sFromType === "process") {
+                    // 从设备分析跳转到其他页面。
                     // 添加开始时间，结束时间。因为可以跳转到设备分析的时候，开始时间结束时间有修改。
-                    Object.assign(this.equipment, {
+                    Object.assign(this.oQuery[sFromType], {
                         startTime: to.query.startTime,
                         endTime: to.query.endTime,
                         shiftStartTime: to.query.shiftStartTime,
                         shiftEndTime: to.query.shiftEndTime
                     })
-                    this.productIf = true;
-                    this.restrainIf = false;
-                }else if(sType == "restrain") {
-                    // this.detailIf = true;
-                    // this.productIf = true;
-                    this.restrainIf = true;
-                }else {
-                    this.restrainIf = false;
-                    this.productIf = false;
-                }  
+                    this.aoRoute.push({
+                        name: this.operations[sToType],
+                        path: sToRoute,
+                        query: this.oQuery[sToType]
+                    })
+                    
+                    if(sToType === "product") {
+                        // 到投产表，添加设备id。
+                        Object.assign(this.oQuery[sFromType], {
+                            equipmentList: to.query.equipmentList,
+                            equipmentName: to.query.equipmentName
+                        })
+                    }
+                }else if(sToType === "process") {
+                    // 从其他页面跳回设备分析。
+                    this.aoRoute = [this.aoRoute.shift()]
+                }else if(sFromType === "product") {
+                    // 从投产表跳到其他页面。
+                    this.aoRoute.push({
+                        name: this.operations[sToType],
+                        path: sToRoute,
+                        query: this.oQuery[sToType]
+                    }) 
+                }else if(sToType === "product") {
+                    // 从其他页面跳到投产表
+                    this.aoRoute.pop()
+                }
+
             },
             fullScreenClick() {
                 // 详情全屏按钮点击事件。
@@ -174,9 +150,7 @@
 //          console.log(next);
 
             this.key = this.$route.params.key;
-            this.setRouteQuery(to);
-            // 设置path可见性。
-            this.setPathVisible(to);
+            this.setRouteQuery(from, to);
             next();
         },
         // beforeRouteLeave (to, from, next) {

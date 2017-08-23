@@ -3,7 +3,7 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in filters">
+                    <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
@@ -196,10 +196,10 @@ export default {
             return this.routerContent
         },
         resizeY: function(){
-            return this.$store.state.resizeY
+            return this.$store && this.$store.state.resizeY
         },
         fullscreen: function(){
-            return this.$store.state.fullscreen
+            return this.$store && this.$store.state.fullscreen
         },
         /* 查询条件转数组中文 */
         filters: function() {
@@ -273,7 +273,7 @@ export default {
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el)=>{
-                if(el === "equipmentIdList" || el === "startTime" || el === "endTime"){
+                if(el === "equipmentList" || el === "startTime" || el === "endTime"){//equipmentIdList
                     oQuery[el] = this.$route.query[el]
                 }
                 if(el === "equipmentName" || el === "startTime" || el === "endTime"){
@@ -346,7 +346,7 @@ export default {
                 },			
                 sPath = "/process/restrain"
             console.log(oQuery)  		
-			this.$router.push({ path: sPath, query: oQuery})
+			this.$router.replace({ path: sPath, query: oQuery})
         },
         // 表格导出。
         exportExcelHandle (oData, event) {

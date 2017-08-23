@@ -41,10 +41,11 @@ const Repair = r => require.ensure([], () => r(require('components/process/repai
 const routes = [
   { path: '/list/:key', component: list },
   { path: '/suspicious/0/', component: Suspicious },
-  { path: '/suspicious/1/', component: Chart },  // 设备查询
+  // { path: '/suspicious/1/', component: Process },  // 设备查询
   { 
     path: '/process', 
     component: Process,
+    // alias: '/suspicious/1/',
     children: [{
       path: '',
       component: Chart

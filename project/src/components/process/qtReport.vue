@@ -148,10 +148,10 @@ export default {
             return this.routerContent
         },
         resizeY: function(){
-            return this.$store.state.resizeY
+            return this.$store && this.$store.state.resizeY
         },
         fullscreen: function(){
-            return this.$store.state.fullscreen
+            return this.$store && this.$store.state.fullscreen
         },
         /* 查询条件转数组中文 */
         filters: function() {
@@ -230,7 +230,7 @@ export default {
             })
             this.$get(url, oQuery)
                 .then((res) => {
-                    console.log(res)
+                    // console.log(res)
                     this.loading = false;
                     this.judgeLoaderHandler(res, () => {
                         let odata = res.data.data,  //获取到的data

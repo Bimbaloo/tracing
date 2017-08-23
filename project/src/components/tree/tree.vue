@@ -185,7 +185,7 @@
 								
 								if(node.data.isMaterialNode) {   // node.data.type == "1"
 									// 根据物料节点查询仓储信息。        
-									this.$router.push({ 
+									this.$router.replace({ 
 										path: "/stock", 
 										query: {
 											"key": node.data.key,
@@ -194,7 +194,7 @@
 									})
 								}else {
 									
-									this.$router.push({ 
+									this.$router.replace({ 
 										path: "/process",
 										query: {
 											"key": node.data.key,
