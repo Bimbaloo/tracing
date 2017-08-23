@@ -85,5 +85,6 @@
 <style lang="less"> 
 	#router-echart	{
 		overflow: hidden;
+		height: 100%;
 	}
 </style>

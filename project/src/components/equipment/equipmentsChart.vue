@@ -121,6 +121,28 @@
     // 设备分析接口地址。
     const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events"
 
+    // 缩放轴
+    var oAxis = {
+        type: 'slider',
+        // 让 dataItem 部分超出坐标系边界的时候，不会整体被过滤掉。
+        filterMode: 'weakFilter',
+        // show: true,
+        // 展示图像缩略轴。
+        showDataShadow: true,
+        // top: 400,
+        // borderColor: 'transparent',
+        // backgroundColor: '#e2e2e2',
+        handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+        handleSize: 16,
+        handleStyle: {
+            shadowBlur: 6,
+            shadowOffsetX: 1,
+            shadowOffsetY: 2,
+            shadowColor: '#fff'
+        },
+        showDataShadow: false
+    }
+
     export default {
 		props: {
 			equipmentsId: {
@@ -605,27 +627,6 @@
                     }
                 }))
 
-                let oAxis = {
-                    type: 'slider',
-                    // 让 dataItem 部分超出坐标系边界的时候，不会整体被过滤掉。
-                    filterMode: 'weakFilter',
-                    // show: true,
-                    // 展示图像缩略轴。
-                    showDataShadow: true,
-                    // top: 400,
-                    // borderColor: 'transparent',
-                    // backgroundColor: '#e2e2e2',
-                    handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
-                    handleSize: 16,
-                    handleStyle: {
-                        shadowBlur: 6,
-                        shadowOffsetX: 1,
-                        shadowOffsetY: 2,
-                        shadowColor: '#fff'
-                    },
-                    showDataShadow: false
-                }
-
                 // 添加x轴缩放。
                 oData.dataZoom.push(Object.assign({
                     xAxisIndex: [0],
@@ -634,19 +635,6 @@
                         return new Date(value).Format()
                     }
                 },oAxis))
-
-                if(this.equipments.length > 1) {
-                    // 若大于一台设备。
-                    // 添加y轴缩放。
-                    oData.dataZoom.push(Object.assign({
-                        yAxisIndex: [0],
-                        width: 16,
-                        labelFormatter: function(index, value) {
-                            return value.split("+")[0]
-                        },
-                        right: 50
-                    },oAxis))
-                }
 
                 // 为缩放轴添加开始时间结束时间。
                 if(this.datetime.realStart) {
@@ -718,7 +706,7 @@
         },
         methods: {
 			init() { 
-                debugger
+                
                 // 初始化图形。              
 				this.setInitData();
                 // 获取所有数据。
@@ -796,11 +784,12 @@
             },
             // 设置图形高度。
             setChartHeight () {
-                let jContent = $(".material-stock .router-content"),
+                
+                let jContent = $(".router-content"),
                     jTitle = jContent.find(".content-title");
                 
-                this.panelHeight = jContent.height() - jTitle.outerHeight(true) - CHART_MARGIN_BOTTOM;
-                $("#equipments").height(jContent.height() - jTitle.outerHeight(true) - CHART_MARGIN_BOTTOM);
+                this.panelHeight = jContent.height() - (jTitle.outerHeight(true)||0) - CHART_MARGIN_BOTTOM;
+                $("#equipments").height(this.panelHeight);
             },
             // 数据转换。
             transformTooltipDataToCompareData (nTime, zIndex) {
@@ -1174,11 +1163,11 @@
                 }else if(this.equipmentsId){
                     // 若为设备id列表。
                     equipmentList = this.equipmentsId.reduce((prev, curr)=>[...prev, curr.equipmentId], []).join(',')
-                    sUrl += "/by-id"
+                    // sUrl += "/by-id"
                 }
                 
 				this.$post(sUrl, {
-					equipmentList: equipmentList,
+					equipmentIdList: equipmentList, //equipmentList
 					startTime: this.datetime.start,
 					endTime: this.datetime.end,
 					type: 0
@@ -1274,8 +1263,7 @@
                 })	
             },
             // 设置图形数据。
-            setChartData () {    
-                debugger 
+            setChartData () {     
                 // 设备状态。
                 this.option.series.filter(o => o.name=="状态")[0].data = this.getStatusData()
                 // 获取各事件维度数据。
@@ -1295,6 +1283,18 @@
                     
                 })
 
+                if(this.equipments.length > 1) {
+                    // 若大于一台设备。
+                    // 添加y轴缩放。
+                    this.option.dataZoom.push(Object.assign({
+                        yAxisIndex: [0],
+                        width: 16,
+                        labelFormatter: function(index, value) {
+                            return value.split("+")[0]
+                        },
+                        right: 50
+                    },oAxis))
+                }
                 this.chart.setOption(this.option, true);
                 // 设置提示框的最大高度。
                 this.setTooltipHeight();
@@ -1345,7 +1345,7 @@
                         o.timePoint = o.happenTime;
                         oResult.title = "投料";
                         oResult.tooltipData = [
-                            {name: "条码", value: o.barcode},
+                            // {name: "条码", value: o.barcode},
                             {name: "开始时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
@@ -1360,7 +1360,7 @@
                         o.timePoint = o.happenTime;
                         oResult.title = "产出";
                         oResult.tooltipData = [
-                            {name: "条码", value: o.barcode},
+                            // {name: "条码", value: o.barcode},
                             {name: "产出时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
@@ -1944,7 +1944,7 @@
         }     
     }
 
-	.material-stock  {	  	
+	#router-echart  {	  	
     	.content-list {
 			// padding-top: 30px;
             position: relative;
