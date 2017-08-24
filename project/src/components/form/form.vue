@@ -102,11 +102,13 @@
 	            	},
             		// 验证开始时间。
             	    validateStartTime = (rule, value, callback) => {
-            	    	let bIsFormat = window.Rt.utils.isDateTime(value),
-            	    		nNow = +new Date();
-            	    		
-	            		if(!bIsFormat) {
-	            			callback(new Error("请输入开始时间或正确时间格式"));
+	            		let sTime = value.trim(),
+	            			nNow = +new Date();
+	            		
+	            		if(!sTime) {
+	            			callback(new Error("请输入开始时间"))
+	            		}else if(!window.Rt.utils.isDateTime(sTime)) {
+	            			callback(new Error("请输入正确的时间格式"));
 	            		}else if(+new Date(value) > nNow) {
 	            			callback(new Error("时间不能超过当前时间"));
 	            		}else {
@@ -116,15 +118,18 @@
             		// 验证结束时间。
             		validateEndTime = (rule, value, callback) => {
 	            		let sStart = oForm.startTime,
-	            			bIsFormat = window.Rt.utils.isDateTime(value),
+	            			sTime = value.trim(),
+	            			bIsFormat = window.Rt.utils.isDateTime(sTime),
 	            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
             	    		nNow = +new Date();
             	    		
-            	    	if(!bIsFormat) {
-	            			callback(new Error("请输入结束时间或正确时间格式"));
-	            		}else if(+new Date(value) > nNow) {
-	            			callback(new Error("时间要小于当前时间"));
-	            		}else if(bIsStartFormat && +new Date(sStart) > +new Date(value)) {
+	            		if(!sTime) {
+	            			callback(new Error("请输入结束时间"))
+	            		}else if(!bIsFormat) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(sTime) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else if(sStart && bIsStartFormat && +new Date(sStart) > +new Date(sTime) ){
 	            			// 如果开始时间存在，而且开始时间大于结束时间。
 	            			callback(new Error("结束时间必须大于开始时间"));
 	            		}else {
@@ -158,12 +163,13 @@
 	            	
 	            },
 	            validateStart = (rule, value, callback) => {
-	            	let bIsFormat = window.Rt.utils.isDateTime(value),
+	            	let sTime = value.trim(),
+	            		bIsFormat = window.Rt.utils.isDateTime(sTime),
         	    		nNow = +new Date();
         	    	
-        	    	if(value) {
+        	    	if(sTime) {
 	            		if(!bIsFormat) {
-	            			callback(new Error("请输入正确时间格式"));
+	            			callback(new Error("请输入正确的时间格式"));
 	            		}else if(+new Date(value) > nNow) {
 	            			callback(new Error("时间不能超过当前时间"));
 	            		}else {
@@ -176,17 +182,18 @@
 	            // 结束时间。
 	            validateTime = (rule, value, callback) => {
 	            	let sStart = oForm.startTime,
-            			bIsFormat = window.Rt.utils.isDateTime(value),
+	            		sTime = value.trim(),
+            			bIsFormat = window.Rt.utils.isDateTime(sTime),
             			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
         	    		nNow = +new Date();
 					
-        	    	if(value) {
+        	    	if(sTime) {
 						// 存在时间。
 	        	    	if(!bIsFormat) {
-	            			callback(new Error("请输入正确时间格式"));
-	            		}else if(+new Date(value) > nNow) {
-	            			callback(new Error("时间要小于当前时间"));
-	            		}else if(bIsStartFormat && +new Date(sStart) > +new Date(value)) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(sTime) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else if(bIsStartFormat && +new Date(sStart) > +new Date(sTime)) {
 	            			// 如果开始时间存在，而且开始时间大于结束时间。
 	            			callback(new Error("结束时间必须大于开始时间"));
 	            		}else {

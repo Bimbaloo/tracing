@@ -54,20 +54,24 @@
             turnTo(routerLink,index){
             	let self = this
             	if(self.edit && self.isActive != index) {
-					// 存在未保存，是否处理。  
-					self.$confirm('内容未保存, 是否继续?', '提示', {
+					// 存在未保存，是否处理。  ---- 确定与取消按钮交换
+					self.$confirm('内容未保存，是否离开本页?', '提示', {
+			          	cancelButtonText: '取消',	
 			          	confirmButtonText: '确定',
-			          	cancelButtonText: '取消',
-			          	type: 'warning'
-			        }).then(() => {
-			        	// 确定操作。离开当前页面
-			        	self.isActive=index;
-                		self.$router.replace({path:routerLink});
-                		
-			        	return true
-			        }).catch(() => {
-			        	// 取消操作。还在当前页面。
-			        	return false
+			          	cancelButtonClass: 'button-cancel el-button--primary',
+			          	confirmButtonClass: 'button-confirm',
+			          	type: 'warning',
+			          	callback: (action, instance) => {
+			          		if( action === 'cancel') {
+			          			// 取消操作。还在当前页面。
+			        			return false
+			          		}else {
+			          			// 确定操作。离开当前页面
+					        	self.isActive=index;
+		                		self.$router.replace({path:routerLink});
+					        	return true
+			          		}
+			          	}
 			        });
             	}else {
             		self.isActive=index;
@@ -158,6 +162,18 @@
 	.el-message-box__headerbtn {
     	background: transparent;
     	border: none;
+    }
+    .el-message-box__btns {
+    	.button-cancel {
+    		float: right;
+    		margin-left: 10px;
+    	}
+    	.button-confirm {
+    		margin-left: 0;
+    		background: #FFFFFF;
+    		border-color: rgb(191, 217, 212);
+    		color: rgb(31, 61, 55);
+    	}
     }
 
 </style>

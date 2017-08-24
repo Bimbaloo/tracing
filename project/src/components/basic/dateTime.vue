@@ -1,10 +1,11 @@
 <template>
     <el-date-picker
-      v-model="form[key]" 
+      v-model="sTime" 
       :type="dateType"
       :placeholder="hint" 
       style="width: 100%;"
-      @change="dateChange">
+      @change.native = "dateChange"
+      @change = "dateClick">
     </el-date-picker>
 </template>
 
@@ -23,12 +24,29 @@
             return {
                 form: this.formData,
                 hint: this.placeholderData || '',
-                key: this.keyData
+                key: this.keyData,
+                sTime: this.formData[this.keyData],
+                sInput: ''
             }
         },
         methods: {
-        	dateChange(sVal) {
-        		this.form[this.key] = sVal;
+        	// 输入处理
+        	dateChange(event) {
+        		let sVal = event.target.value
+        		this.formData[this.keyData] = sVal;
+        		this.sTime = sVal;
+        		this.sInput = sVal
+        	},
+        	// 选中确定处理
+        	dateClick(value) {
+        		// 第一次输入非正确时，会清空。
+        		if(value != undefined) {
+        			this.formData[this.keyData] = value;
+        			this.sTime = value || this.sInput
+        		}else {
+        			// 点击插件自动清空，返回是undefined 
+        			this.formData[this.keyData] = '';
+        		}
         	}
         }
     }

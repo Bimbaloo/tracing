@@ -157,7 +157,6 @@
                 oData.loading = true;
                 let sPath = oData.url;
 		                
-		        console.log(oData.height)
                 this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
                 .then((res) => {
                     oData.loading = false;
