@@ -50,25 +50,34 @@
             }
 		},
         created () {
-            let sRoute = this.$route.path,
-                aPath = sRoute.split("/"),
-                sType = aPath[aPath.length -1]
-
-            // 保存查询条件。
-            this.oQuery[sType] = this.$route.query
-
-            // 设置面包屑路由。
-            this.aoRoute.push({
-                name: this.operations[sType],
-                path: sRoute,
-                query: this.oQuery[sType]
-            })
+            this.initRoute()
         },
         watch: {
         },
         methods: {
+            // 初始化路由设置。
+            initRoute() {
+                
+                let sRoute = this.$route.path,
+                    aPath = sRoute.split("/"),
+                    sType = aPath[aPath.length -1]
+                
+                this.aoRoute = []
+                this.oQuery = {}
+                
+                // 保存查询条件。
+                this.oQuery[sType] = this.$route.query
+
+                // 设置面包屑路由。
+                this.aoRoute.push({
+                    name: this.operations[sType],
+                    path: sRoute,
+                    query: this.oQuery[sType]
+                })
+            },
             // 设置路由。
             setRouteQuery(from, to) {
+                
                 let sFromRoute = from.path,
                     sToRoute = to.path,
                     aFromPath = sFromRoute.split("/"),
@@ -79,7 +88,18 @@
                 // 保存查询条件。
                 this.oQuery[sToType] = this.$route.query
                 
-                if(sFromType === "process") {
+                if(sToType === "process" && to.query.key && !to.query.startTime) {
+                    // 树节点跳转。
+                    this.oQuery = {}
+                    this.oQuery[sToType] = to.query
+                    this.aoRoute = []
+
+                    this.aoRoute.push({
+                        name: this.operations[sToType],
+                        path: sToRoute,
+                        query: to.query
+                    })                  
+                }else if(sFromType === "process") {
                     // 从设备分析跳转到其他页面。
                     // 添加开始时间，结束时间。因为可以跳转到设备分析的时候，开始时间结束时间有修改。
                     Object.assign(this.oQuery[sFromType], {
@@ -88,12 +108,13 @@
                         shiftStartTime: to.query.shiftStartTime,
                         shiftEndTime: to.query.shiftEndTime
                     })
+
                     this.aoRoute.push({
                         name: this.operations[sToType],
                         path: sToRoute,
                         query: this.oQuery[sToType]
                     })
-                    
+
                     if(sToType === "product") {
                         // 到投产表，添加设备id。
                         Object.assign(this.oQuery[sFromType], {
@@ -101,6 +122,7 @@
                             equipmentName: to.query.equipmentName
                         })
                     }
+
                 }else if(sToType === "process") {
                     // 从其他页面跳回设备分析。
                     this.aoRoute = [this.aoRoute.shift()]

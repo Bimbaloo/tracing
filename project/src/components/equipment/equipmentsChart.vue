@@ -15,7 +15,7 @@
                 <span class="icon icon-circle"></span><span>工艺</span>
             </div-->
             <div class="switch" v-if="!loading">
-                <div v-if="show" @click="hideTooltip" class="switch-eye">
+                <div v-if="show&&!zoomActive" @click="hideTooltip" class="switch-eye">
                     <i class="icon icon-16 icon-show"></i>
                     <div class="tip">隐藏悬浮框</div>
                 </div>
@@ -61,12 +61,13 @@
                 <!--div class="tooltip-scroll" :style="{width:ratioW*100+'%', height:'100%', left:ratioL*100+'%'}"-->
                     <div v-for="compareData in compareList" 
                         :key="compareData.millisecond"              
-                        @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)" >
+                        @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)" 
+                        v-show="dimension.filter(o => o.key === compareData.dimension)[0].show && (compareData.dimension==='pool'?(!onlyShowRelatedData || (compareData.related && onlyShowRelatedData)):true)">
                         
                         <div class="tooltip-panel" :style="{left:compareData.left*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
-                            <!--div class="tooltip-time">{{compareData.time}}</div-->
-                            <i class="btn-close el-icon-circle-close" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
-                            <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8 + 'px'}">
+                            <div class="tooltip-time">{{compareData.time}}</div>
+                            <i class="btn-close el-icon-close" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
+                            <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
                                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                                 <ul class="event-list">
                                     <li v-for="(event,index) in equipment.event" :key="index">
@@ -82,7 +83,7 @@
                             </div>
                             
                         </div>
-                        <div class="line" :style="{left:compareData.left*100+'%', top: panelTop+'px', height: chartHeight + 'px', zIndex: compareData.zIndex}"></div>
+                        <div class="line" :style="{left:compareData.left*100+'%', top: panelTop+'px', height: chartHeight-3 + 'px', zIndex: compareData.zIndex}"></div>
                     </div>
 
                 <!--/div-->
@@ -175,6 +176,8 @@
                 trace: location.pathname.indexOf('traceIndex') > -1,
                 // 悬浮框是否展示。
                 show: true,
+                // 区域缩放是否激活。
+                zoomActive: false,
                 // 选中的设备id。
                 selectedEquipment: "",
 				loading: false,
@@ -227,6 +230,7 @@
                 // 只展示与起点相关的投产数据。
                 onlyShowRelatedData: true,
 				dimension: [{
+                    show: true,
 					name: "工艺",
                     key: "parameter",
 					type: "0",
@@ -237,6 +241,7 @@
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}, {
+                    show: true,
 					name: "质量",
                     key: "quality",
 					type: "3",
@@ -264,12 +269,14 @@
 
                     }]
 				}, {
+                    show: true,
 					name: "工单",
                     key: "work",
 					type: "2",
                     color: "#66bc84",
                     list: []
 				}, {
+                    show: true,
 					name: "投产",
                     key: "pool",
 					type: "7",
@@ -280,6 +287,7 @@
 						query: ["equipmentName", "equipmentList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }]//equipmentIdList
 				}, {
+                    show: true,
 					name: "事件",
                     key: "event",
 					type: "4",
@@ -291,6 +299,7 @@
 
                     }]
 				}, {
+                    show: true,
 					name: "维护",
                     key: "repair",
 					type: "5",
@@ -302,6 +311,7 @@
 
                     }]
 				}, {
+                    show: true,
 					name: "工具",
                     key: "tool",
 					type: "6",
@@ -316,6 +326,10 @@
             }
         },
         computed: {
+            // 与起点相关的标记线。
+            relatedMarkLine () {
+                return this.markLine.filter(o => o.related)
+            },
 			rawData () {
 		    	return this.$store && this.$store.state.rawData
 		  	},
@@ -376,29 +390,60 @@
                         position: (pos, params, el, elRect, size) => {
                             if(this.markLine.filter(o => o.xAxis == params[0].axisValue).length) {
                                 // 若该提示数据已存在。
-                                // 隐藏tooltip
+                                // 隐藏tooltip。
+                                return {
+                                    left: -1000
+                                }
+                            }
+                  
+                            // 缩放时间轴。
+                            let oScaledxAxis = this.getScaledxAxis(),
+                                // 当前时间轴的时长差。
+                                nDiffTime = oScaledxAxis.endValue - oScaledxAxis.startValue,
+                                // 面板大小。
+                                aViewSize = size.viewSize,
+                                // 提示框大小。
+                                aContentSize = size.contentSize,
+                                // 当前数据点离面板左侧距离。
+                                nLeft = aViewSize[0]*(params[0].axisValue-oScaledxAxis.startValue)/nDiffTime
+                                
+                            if(Math.abs(nLeft - pos[0]) > 150) {//aViewSize[0]/10
+                                // 若鼠标数据数据点比较远，隐藏tooltip。
                                 return {
                                     left: -1000
                                 }
                             }
 
-                            if(pos[1] > this.chart.getHeight()/3) {
-                                // 若鼠标位置在下半部分,将悬浮框靠近上面显示。
-                                pos[1] = 0;
-                            }else {
-                                // 若鼠标位置在上半部分,将悬浮框靠近下面显示。
-                                pos[1] = size.viewSize[1]-size.contentSize[1];
+                            if(pos[1] + aContentSize[1] > aViewSize[1]){
+                                // 若提示框范围超出面板范围，设置top值
+                                pos[1] = aViewSize[1] - aContentSize[1]
                             }
+
+                            if(pos[1] < 0) {
+                                // 若提示框范围超出面板范围，设置top值
+                                pos[1] = 0;
+                            }
+                            // if(pos[1] > this.chart.getHeight()/3) {
+                            //     // 若鼠标位置在下半部分,将悬浮框靠近上面显示。
+                            //     pos[1] = 0;
+                            // }else {
+                            //     // 若鼠标位置在上半部分,将悬浮框靠近下面显示。
+                            //     pos[1] = aViewSize[1]-aContentSize[1];
+                            // }
+
                             pos[0] = pos[0] + TOOLTIP_X_DISTANCE;
                             
-                            if(pos[0] + size.contentSize[0] > size.viewSize[0]) {
+                            if(pos[0] + aContentSize[0] > aViewSize[0]) {
                                 // 若超出x轴范围
-                                pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - size.contentSize[0]
+                                pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - aContentSize[0]
                             }
+
+                            return pos; 
+                            // let obj = {}
                             // obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 60;
                             // obj[['top', 'bottom'][+(pos[1] < size.viewSize[1] / 2)]] = 20;
-
-                            return pos;                            
+                            // return obj
+                                                       
                         },
                         extraCssText: 'max-height:200px;overflow-y:auto'
                     },    
@@ -479,7 +524,10 @@
                         right: 30,
                         feature: {
                              dataZoom: {
-                                yAxisIndex: 'none'
+                                yAxisIndex: 'none',
+                                beforeClick: {
+                                    zoom: this.beforeZoom
+                                }
                             },
                         },
                         iconStyle: {
@@ -508,14 +556,16 @@
                             symbolSize: MARKLINE_SYSMBOL_SIZE,
                             label: {
                                 normal: {
-                                    formatter: function({value}){
-                                        return new Date(value).Format()
-                                    }
+                                    show: false,
+                                    // formatter: function({value}){
+                                    //     return new Date(value).Format()
+                                    // }
                                 },
                                 emphasis: {
-                                    formatter: function({value}){
-                                        return new Date(value).Format()
-                                    }
+                                    show: false,
+                                    // formatter: function({value}){
+                                    //     return new Date(value).Format()
+                                    // }
                                 }
                             },
                             lineStyle: {
@@ -767,7 +817,7 @@
                 }
             },
             // 设置提示框高度。
-            setTooltipHeight () {
+            setTooltipHeight () {       
                 if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
                     this.chartHeight = this.chart.getHeight() - GRID_TOP - GRID_BOTTOM;
                     this.chartWidth = this.chart.getWidth() - GRID_LEFT - GRID_RIGHT;
@@ -791,8 +841,16 @@
                 this.panelHeight = jContent.height() - (jTitle.outerHeight(true)||0) - CHART_MARGIN_BOTTOM;
                 $("#equipments").height(this.panelHeight);
             },
-            // 数据转换。
-            transformTooltipDataToCompareData (nTime, zIndex) {
+             
+            /**
+             * 数据转换。
+             * @param {Number} nTime 时间
+             * @param {Boolean} bRelated 是否与投产相关
+             * @param {String} sDimension 维度
+             * @param {Number} zIndex z-level
+             * @return {Object} 数据对象
+             */
+            transformTooltipDataToCompareData (nTime, bRelated, sDimension, zIndex) {
                 //     // 时间轴全长。
                 // let nTimeLine = window.Rt.utils.DateDiff(this.datetime.start, this.datetime.end),
                 //     // 提示框显示位置。
@@ -805,6 +863,8 @@
                     nLeft = (nTime - oXAxis.startValue) / nScaledTimeLine
 
                 return {
+                    related: bRelated,
+                    dimension: sDimension,
                     zIndex: zIndex || TOOLTIP_Z_INDEX,
                     millisecond: nTime,
                     left: nLeft,
@@ -833,7 +893,10 @@
             // 设置投产可见性。
             changePoolInAndOutVisibility () {
                 let sColor = "#333",
-                    raletedData = Object.assign([], this.dimension.filter(o=> o.key === 'pool')[0].data)
+                    raletedData = Object.assign([], this.dimension.filter(o=> o.key === 'pool')[0].data),
+                    oOption = {
+                        series: []
+                    }
 
                 // 切换可见性。
                 this.onlyShowRelatedData = !this.onlyShowRelatedData
@@ -841,44 +904,64 @@
                 if(this.onlyShowRelatedData) {
                     // 若只展示起点相关。
                     sColor = "#D53A35"
-                    raletedData = raletedData.filter(arr => arr[4])
+                    raletedData = raletedData.filter(arr => arr[5])
+
+                    // 标记线。
+                    // oOption.series.push({
+                    //     name: CHART_STATE_NAME,//params.seriesName,
+                    //     markLine: {
+                    //         data: Object.assign([], this.relatedMarkLine)
+                    //     }
+                    // })
+                // }else {
+                    // 标记线。
+                    // oOption.series.push({
+                    //     name: CHART_STATE_NAME,//params.seriesName,
+                    //     markLine: {
+                    //         data: Object.assign([], this.markLine)
+                    //     }
+                    // })
                 }
 
-                this.chart.setOption({
-                    series: [{
-                        name: "投产",
-                        data: raletedData
-                    }],
-                    graphic: {
-                        id: 'text',
-                        style: {
-                            fill: sColor
-                        }
+                // 投产点。
+                oOption.series.push({
+                    name: "投产",
+                    data: raletedData
+                })
+                // 按钮字体颜色。
+                oOption.graphic = {
+                    id: 'text',
+                    style: {
+                        fill: sColor
                     }
-                });       
+                }
+
+                this.chart.setOption(oOption);       
             },
             // 散点图点击事件处理。
             scatterClickHandle (value) {
+                
                 if(!this.markLine.filter(o => o.xAxis===value[0]).length) {
-                    // 若无该标记线,添加标记线。
-                    this.markLine.push({ xAxis: value[0] });
+                    let bRelated = !!value[5]
+                    // 若无该标记线，添加标记线，并标记是否与起点相关。
+                    this.markLine.push({ xAxis: value[0], related: bRelated});
 
                     // 设置标记线。
-                    this.chart.setOption({
-                        series: [{
-                            name: CHART_STATE_NAME,//params.seriesName,
-                            markLine: {
-                                data: this.markLine
-                            }
-                        }]
-                    }) 
+                    // this.chart.setOption({
+                    //     series: [{
+                    //         name: CHART_STATE_NAME,//params.seriesName,
+                    //         markLine: {
+                    //             data: Object.assign([], this.markLine)
+                    //         }
+                    //     }]
+                    // }) 
 
                     this.compareList = this.compareList.map(o => {
                         o.zIndex = TOOLTIP_Z_INDEX
                         return o
                     })
                     // 添加对比数据。
-                    this.compareList.push(this.transformTooltipDataToCompareData(value[0], TOOLTIP_Z_INDEX+1));
+                    this.compareList.push(this.transformTooltipDataToCompareData(value[0], bRelated, value[4], TOOLTIP_Z_INDEX+1));
                    
                 }
             },
@@ -889,14 +972,14 @@
                 
                 // 删除标记线。
                 let oMark = this.markLine.splice(nIndex, 1)[0]
-                this.chart.setOption({
-                    series: [{
-                        name: CHART_STATE_NAME,//params.seriesName,
-                        markLine: {
-                            data: this.markLine
-                        }
-                    }]
-                });
+                // this.chart.setOption({
+                //     series: [{
+                //         name: CHART_STATE_NAME,//params.seriesName,
+                //         markLine: {
+                //             data: Object.assign([], this.markLine)
+                //         }
+                //     }]
+                // });
 
                 // 删除提示框数据。
                 let sTime = new Date(oMark.xAxis).Format();
@@ -940,26 +1023,29 @@
             },
             // 悬浮框点击事件。
             suspendTooltipClickHandle (event) {
-                let nTime = this.axisTooltipData[0].value[0]
+                let aData = this.axisTooltipData[0].value,
+                    nTime = aData[0],
+                    bRelated = !!aData[5]
+
                 // 添加标记线。
-                this.markLine.push({ xAxis: nTime });
+                this.markLine.push({ xAxis: nTime, related: bRelated});
 
                 // 设置标记线。
-                this.chart.setOption({
-                    series: [{
-                        name: CHART_STATE_NAME,//params.seriesName,
-                        markLine: {
-                            data: this.markLine
-                        }
-                    }]
-                }) 
+                // this.chart.setOption({
+                //     series: [{
+                //         name: CHART_STATE_NAME,//params.seriesName,
+                //         markLine: {
+                //             data: Object.assign([], this.markLine)
+                //         }
+                //     }]
+                // }) 
 
                 this.compareList = this.compareList.map(o => {
                     o.zIndex = TOOLTIP_Z_INDEX
                     return o
                 })
                 // 添加对比数据。
-                this.compareList.push(this.transformTooltipDataToCompareData(nTime, TOOLTIP_Z_INDEX+1));                
+                this.compareList.push(this.transformTooltipDataToCompareData(nTime, bRelated, aData[4], TOOLTIP_Z_INDEX+1));                
             },
             // echarts 点击事件。
             chartClickHandle (params) {
@@ -979,6 +1065,22 @@
 
                 }
             },
+            // 区域缩放按钮点击之前的操作。
+            beforeZoom () {
+                // 切换区域缩放是否激活。
+                this.zoomActive = !this.zoomActive
+
+                if(this.show) {
+                    // 若本来显示。
+                    this.chart.setOption({
+                        tooltip: {
+                            show: !this.zoomActive
+                        }
+                    })  
+                  
+                }
+            },
+            // 图形缩放处理。
             chartZoomHandle (params) {
                 if((params.dataZoomId && params.dataZoomId.indexOf("1")) || params.type === "datazoom") {
                     // x轴缩放 || 工具栏缩放按钮。
@@ -1028,14 +1130,14 @@
                 let nIndex = this.getIndex(this.markLine, "xAxis", nTime)
                 this.markLine.splice(nIndex, 1)
 
-                this.chart.setOption({
-                    series: [{
-                        name: CHART_STATE_NAME,
-                        markLine: {
-                            data: this.markLine
-                        }
-                    }]
-                })
+                // this.chart.setOption({
+                //     series: [{
+                //         name: CHART_STATE_NAME,
+                //         markLine: {
+                //             data: Object.assign([], this.markLine)
+                //         }
+                //     }]
+                // })
             },
             // 提示面板点击事件。
             tooltipPanelClickHandle (nTime) {
@@ -1057,11 +1159,18 @@
                 // let nTime = Number(event.currentTarget.getAttribute("data-id"))
                 this.setCompareTooltipZIndex(nTime);
             },
+            // 选中维度改变事件。
+            legendSelectChangedHandle (event) {
+                this.dimension.forEach(o => {
+                    o.show = event.selected[o.name]
+                })
+            },
             // 设置图表事件。
             setChartEvent () {
                 this.chart.on("click", this.chartClickHandle)
                 this.chart.on("datazoom", this.chartZoomHandle)
                 this.chart.on("mouseover", this.chartMouseoverHandle)
+                this.chart.on("legendselectchanged", this.legendSelectChangedHandle)
             },
             /**
 			 * 跳转按钮点击事件。
@@ -1276,7 +1385,7 @@
                     
                     if(item.key === 'pool' &&　this.onlyShowRelatedData && !this.bRestrain) {
                         // 设置可见性，若只展示起点相关。              
-                        oFilter.data = oResult.data.filter(arr => arr[4])                                                
+                        oFilter.data = oResult.data.filter(arr => arr[5])                                                
                     }else {
                         oFilter.data = oResult.data
                     }
@@ -1523,7 +1632,7 @@
                             }else {
                                 oMap[sKey] = 1;
 
-                                let aPointer = [oData.time, nIndex, 1, [oData]];
+                                let aPointer = [oData.time, nIndex, 1, [oData], sDimension];
 
                                 if(sDimension === "pool" && !this.bRestrain) {
                                     if((key === "poolInList" && item.poolInTime.indexOf(o.happenTime) > -1) ||
@@ -1797,6 +1906,10 @@
             },
             // 显示悬浮框。
             showTooltip () {
+                if(this.zoomActive) {
+                    // 若此时区域缩放激活，则不可点。
+                    return false;
+                }
                 this.show = true;
                 this.chart.setOption({
                     tooltip: {
@@ -2034,7 +2147,7 @@
                     // left: 0;
                     // top: 0;
                     position: absolute;
-                    width: 1px;
+                    width: 2px;
                     background-color: #D53A35;
                 }
             }
@@ -2064,15 +2177,15 @@
                 
                 .btn-close {
                     position: absolute;
-                    top: -10px;
-                    right: -10px;
+                    top: 4px;
+                    right: 4px;
                     cursor: pointer;
-                    font-size: 20px;
-                    color: rgba(0,0,0,0.4);
+                    font-size: 12px;
+                    color: rgba(255,255,255,0.6);
                     z-index: 1;
 
                     &:hover {
-                        color: rgba(0,0,0,0.8);
+                        color: rgba(255,255,255,1);
                     }
                 }
 
