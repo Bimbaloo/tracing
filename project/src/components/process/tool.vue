@@ -33,8 +33,8 @@
 	
     var HOST = window.HOST ? window.HOST: host
 
-    //const url = HOST + "/api/v1/tool/by-equipment-time";
-    const url = "http://192.168.20.102:8088" + "/api/v1/tool/by-equipment-time";
+    const url = HOST + "/api/v1/tool/by-equipment-time";
+    //const url = "http://192.168.20.102:8088" + "/api/v1/tool/by-equipment-time";
 
 
 
