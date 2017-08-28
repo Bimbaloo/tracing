@@ -95,32 +95,24 @@ export default {
                     prop: "toolSpec",
                     width: "120",
                 }, {
-                    name: "工具使用时间",
-                    prop: "",
+                    name: "操作类型",
+                    prop: "operateType",
                     width: "200"
                 }, {
-                    name: "操作人(开始使用)",
-                    prop: "",
+                    name: "操作时间",
+                    prop: "operateTime",
                     width: "200"
                 }, {
-                    name: "工具结束使用时间",
-                    prop: "",
-                    width: "200"
-                }, {
-                    name: "操作人(结束时间)",
-                    prop: "",
+                    name: "操作人",
+                    prop: "operatorName",
                     width: "200"
                 }, {
                     name: "额定寿命",
                     prop: "ratedLife",
                     width: "120"
-                }, {
-                    name: "起始寿命",
-                    prop: "",
-                    width: "120"
-                }, {
-                    name: "结束寿命",
-                    prop: "",
+                },  {
+                    name: "剩余寿命",
+                    prop: "life",
                     width: "120"
                 }],
                 height: 1,
