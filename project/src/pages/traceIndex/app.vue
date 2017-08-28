@@ -32,7 +32,10 @@
 	import $ from 'jquery'
 //	import {aoTestData} from './data'
 	import fnP from "assets/js/public.js"
-	
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host
+
 	export default {
 		components: {
 			'v-header': header,

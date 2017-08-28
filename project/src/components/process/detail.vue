@@ -36,8 +36,10 @@
 
 <script>
 	import equipment from "components/equipment/list"
+	import {host} from 'assets/js/configs.js'
 
-	const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet=";
+	var HOST = window.HOST ? window.HOST: host
+	const sFineReportUrl = HOST + "/WebReport/ReportServer?reportlet=";
 
     export default {
 		components: {

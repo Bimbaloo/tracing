@@ -56,7 +56,9 @@
 	import table from "components/basic/table.vue"
 	import html2canvas from 'html2canvas'
 	import fnP from "assets/js/public.js"
-	
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host	
 	// 数据名称接口。
     const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
 

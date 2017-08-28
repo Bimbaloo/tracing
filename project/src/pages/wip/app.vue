@@ -33,7 +33,9 @@
 	import Banner from 'components/wip/banners.vue';
 	import WipTable from 'components/wip/wipTable.vue';
 	import WipTitle from 'components/wip/wipTitle.vue';
-	
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host	
     const url = HOST + '/api/v1/wip/prod';
     
     export default {

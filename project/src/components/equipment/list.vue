@@ -87,6 +87,9 @@
 <script>
 	import DateTime from 'components/basic/dateTime.vue'
 	import EquipmentLine from 'components/equipment/equipmentLine.vue'
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host
 
     export default {
 		props: {

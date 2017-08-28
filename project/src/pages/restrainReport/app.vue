@@ -14,6 +14,9 @@
 
 <script>
 	import report from "components/report/report.vue"
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host
 
 	export default {
 		components: {

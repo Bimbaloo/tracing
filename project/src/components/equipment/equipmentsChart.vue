@@ -95,7 +95,9 @@
 <script>
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
+	import {host} from 'assets/js/configs.js'
 
+	var HOST = window.HOST ? window.HOST: host
     // 设备状态。
     const CHART_STATE_NAME = "状态"
     // 图形下margin。
@@ -118,7 +120,7 @@
     // 提示框面板z轴。
     const TOOLTIP_Z_INDEX = 100
     // finereport跳转地址。
-    const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
+    // const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
     // 设备分析接口地址。
     const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events"
 
@@ -1184,17 +1186,17 @@
 					this.$router.replace({path: oData.router, query: oQuery});
 				}
 
-				if(oData.cpt) {
-					let oParam = this.getParamter(oData.parameter),
-						sPath = sFineReportUrl + oData.cpt;
+				// if(oData.cpt) {
+				// 	let oParam = this.getParamter(oData.parameter),
+				// 		sPath = sFineReportUrl + oData.cpt;
 
-					oData.parameter.forEach(p => {
-						if(oParam[p]) {
-							sPath += "&" + p + "=" + oParam[p]
-						}						
-					});
-					window.open(sPath , "_blank");
-				}
+				// 	oData.parameter.forEach(p => {
+				// 		if(oParam[p]) {
+				// 			sPath += "&" + p + "=" + oParam[p]
+				// 		}						
+				// 	});
+				// 	window.open(sPath , "_blank");
+				// }
 			},
             /**
 			 * @param {Array}

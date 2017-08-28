@@ -39,7 +39,10 @@
 <script>
 	//表格数据接口http://192.168.20.176:8080
 	import $ from "jquery"
-	
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host
+
     const TABLE_DATA_URL= HOST + "/api/v1/customized/items";
     const sSessionItemName = "sFiled"; 
     
@@ -161,6 +164,13 @@
 			                }).then((res) => {
 			                	// 判断是否更新成功。
 			                	this.judgeLoaderHandler(res,() => {
+			                		
+			                		// 修改状态。
+			                		this.$store.commit({
+										type: "updateEdit",
+										key: false
+									});
+			                		
 									// 重新设置保存的值。
 									this.aBefore = $.extend(true,[],this.tableData);
 				            		this.sErrorMessage="更新成功！";

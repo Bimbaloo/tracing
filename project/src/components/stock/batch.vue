@@ -44,7 +44,10 @@
     import Blob from 'blob'
     import FileSaver from 'file-saver'
 	import rasterizeHTML from 'rasterizehtml'
-	
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host
+
 	export default {
 		components: {
 			'v-table': table

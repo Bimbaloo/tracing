@@ -13,6 +13,9 @@
 <script>
 
 	import table from "components/basic/table.vue"
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host
 	//	const URL = HOST + "/api/v1/suppress/list";   // 正式
 	//const URL = "http://rapapi.org/mockjsdata/21533/list?";   // 测试获取遏制列表数据
 	const URL = "../static/restrain.json";   // 测试获取遏制列表数据
