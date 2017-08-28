@@ -164,6 +164,13 @@
 			                }).then((res) => {
 			                	// 判断是否更新成功。
 			                	this.judgeLoaderHandler(res,() => {
+			                		
+			                		// 修改状态。
+			                		this.$store.commit({
+										type: "updateEdit",
+										key: false
+									});
+			                		
 									// 重新设置保存的值。
 									this.aBefore = $.extend(true,[],this.tableData);
 				            		this.sErrorMessage="更新成功！";
