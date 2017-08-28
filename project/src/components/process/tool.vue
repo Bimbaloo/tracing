@@ -3,7 +3,7 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in tableData.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
@@ -29,10 +29,14 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
-	import {host} from 'assets/js/configs.js'
+    import {host} from 'assets/js/configs.js'
+	
+    var HOST = window.HOST ? window.HOST: host
 
-	var HOST = window.HOST ? window.HOST: host
-    const url = HOST + "/api/v1/trace/inout/by-equipment";
+    const url = HOST + "/api/v1/tool/by-equipment-time";
+    //const url = "http://192.168.20.102:8088" + "/api/v1/tool/by-equipment-time";
+
+
 
 export default {
     components: {
@@ -51,6 +55,19 @@ export default {
          
             loading: false,
             tdResize: true, //是否允许拖动table大小
+            condition:{},   // 查询条件    
+            dataName:[      // 条件对应中文名
+                {
+                    itemCode:"equipmentName",
+                    itemName:"设备"
+                },{
+                    itemCode:"startTime",
+                    itemName:"开始时间"
+                },{
+                    itemCode:"endTime",
+                    itemName:"结束时间"
+                },
+            ],
             /* 投入 */
             tableData: {
                 columns: [{
@@ -59,56 +76,47 @@ export default {
                     width: "50"
                 }, {
                     name: "工具位子",
-                    prop: "barcode",
-                    width: "200",
+                    prop: "toolPosition",
+                    width: "120",
                 }, {
                     name: "工具编码",
-                    prop: "",
-                    width: "200"
+                    prop: "toolCode",
+                    width: "120"
                 }, {
                     name: "工具类型",
-                    prop: "doCode",
-                    width: "200"
+                    prop: "toolTypeName",
+                    width: "120"
                 }, {
                     name: "工具名称",
-                    prop: "batchNo",
-                    width: "200",
+                    prop: "toolName",
+                    width: "120",
                 }, {
                     name: "规格",
-                    prop: "materialCode",
-                    width: "200",
+                    prop: "toolSpec",
+                    width: "120",
                 }, {
-                    name: "工具使用时间",
-                    prop: "quantity",
-                    width: "120"
-                }, {
-                    name: "操作人(开始使用)",
-                    prop: "materialName",
-                    width: "300"
-                }, {
-                    name: "工具结束使用时间",
-                    prop: "shiftName",
+                    name: "操作类型",
+                    prop: "operateType",
                     width: "200"
                 }, {
-                    name: "操作人(结束时间)",
-                    prop: "personName",
-                    width: "120"
+                    name: "操作时间",
+                    prop: "operateTime",
+                    width: "200"
+                }, {
+                    name: "操作人",
+                    prop: "operatorName",
+                    width: "200"
                 }, {
                     name: "额定寿命",
-                    prop: "happenTime",
-                    width: "300"
-                }, {
-                    name: "起始寿命",
-                    prop: "happenTime",
-                    width: "300"
-                }, {
-                    name: "结束寿命",
-                    prop: "happenTime",
-                    width: "300"
+                    prop: "ratedLife",
+                    width: "120"
+                },  {
+                    name: "剩余寿命",
+                    prop: "life",
+                    width: "120"
                 }],
                 height: 1,
-                data: [],
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+                data: []
             },
            
           routerContent:0
@@ -117,7 +125,6 @@ export default {
 
     },
     created() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
 
         this.fetchData();
        
@@ -132,10 +139,33 @@ export default {
         },
         fullscreen: function(){
             return this.$store && this.$store.state.fullscreen
-        }
+        },
+        /* 查询条件转数组中文 */
+        filters: function() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		}
     },
     mounted(){
-       this.tableData.height  = this.adjustHeight()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
@@ -176,14 +206,21 @@ export default {
         fetchData() {    
             
             this.loading = true;
-            let oQuery = this.$route.query;
-
-            this.$post(url, oQuery)
+            let oQuery = {}
+            Object.keys(this.$route.query).forEach((el)=>{
+                if(el === "equipmentId" || el === "startTime" || el === "endTime"){
+                    oQuery[el] = this.$route.query[el]
+                }
+                if(el === "equipmentName" || el === "startTime" || el === "endTime"){
+                    this.condition[el] = this.$route.query[el]
+                }
+            })
+            this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    this.tableData.data = res.data.data.in
+                    this.tableData.data = res.data.data
                 });				 
             })
             .catch((err) => {
