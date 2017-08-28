@@ -275,7 +275,7 @@ export default {
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el)=>{
-                if(el === "equipmentList" || el === "startTime" || el === "endTime"){//equipmentIdList
+                if(el === "equipmentId" || el === "startTime" || el === "endTime"){//equipmentIdList//equipmentList
                     oQuery[el] = this.$route.query[el]
                 }
                 if(el === "equipmentName" || el === "startTime" || el === "endTime"){

@@ -286,8 +286,8 @@
                     list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentName", "equipmentList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
-                    }]//equipmentIdList
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
+                    }]//equipmentIdList//equipmentList
 				}, {
                     show: true,
 					name: "事件",
@@ -1210,9 +1210,9 @@
                         case "equipmentName":
                             oParam[param] = this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName;
                             break;
-						case "equipmentList"://equipmentIdList
-							oParam[param] = this.selectedEquipment;
-							break;
+						// case "equipmentList"://equipmentIdList
+						// 	oParam[param] = this.selectedEquipment;
+						// 	break;
 						case "equipmentId": 
 							oParam[param] = this.selectedEquipment;
 							break;
