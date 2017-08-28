@@ -29,9 +29,14 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
+    import {host} from 'assets/js/configs.js'
 	
-//const url = HOST + "/api/v1/tool/by-equipment-time";
-const url = "http://192.168.20.102:8088" + "/api/v1/tool/by-equipment-time";
+    var HOST = window.HOST ? window.HOST: host
+
+    //const url = HOST + "/api/v1/tool/by-equipment-time";
+    const url = "http://192.168.20.102:8088" + "/api/v1/tool/by-equipment-time";
+
+
 
 export default {
     components: {
@@ -71,51 +76,51 @@ export default {
                     width: "50"
                 }, {
                     name: "工具位子",
-                    prop: "barcode",
+                    prop: "toolPosition",
                     width: "120",
                 }, {
                     name: "工具编码",
-                    prop: "",
+                    prop: "toolCode",
                     width: "120"
                 }, {
                     name: "工具类型",
-                    prop: "doCode",
+                    prop: "toolTypeName",
                     width: "120"
                 }, {
                     name: "工具名称",
-                    prop: "batchNo",
+                    prop: "toolName",
                     width: "120",
                 }, {
                     name: "规格",
-                    prop: "materialCode",
+                    prop: "toolSpec",
                     width: "120",
                 }, {
                     name: "工具使用时间",
-                    prop: "quantity",
+                    prop: "",
                     width: "200"
                 }, {
                     name: "操作人(开始使用)",
-                    prop: "materialName",
+                    prop: "",
                     width: "200"
                 }, {
                     name: "工具结束使用时间",
-                    prop: "shiftName",
+                    prop: "",
                     width: "200"
                 }, {
                     name: "操作人(结束时间)",
-                    prop: "personName",
+                    prop: "",
                     width: "200"
                 }, {
                     name: "额定寿命",
-                    prop: "happenTime",
+                    prop: "ratedLife",
                     width: "120"
                 }, {
                     name: "起始寿命",
-                    prop: "happenTime",
+                    prop: "",
                     width: "120"
                 }, {
                     name: "结束寿命",
-                    prop: "happenTime",
+                    prop: "",
                     width: "120"
                 }],
                 height: 1,
