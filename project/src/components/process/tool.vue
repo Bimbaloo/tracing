@@ -29,8 +29,10 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
-	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host
+    const url = HOST + "/api/v1/trace/inout/by-equipment";
 
 export default {
     components: {

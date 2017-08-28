@@ -49,9 +49,9 @@
 	import Input from 'components/basic/input.vue'
     import Select from 'components/basic/select.vue'
     import DateTime from 'components/basic/dateTime.vue'
+	import {host} from 'assets/js/configs.js'
 
-
-
+	var HOST = window.HOST ? window.HOST: host
 
 	//const URL_JOIN = "http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
 

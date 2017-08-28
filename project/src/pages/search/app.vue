@@ -21,10 +21,10 @@
   import version from 'assets/img/version.png'
   import panel from 'components/panel/panel.vue'
 	import fnP from "assets/js/public.js"
-	
+	import {host} from 'assets/js/configs.js'
+
+	var HOST = window.HOST ? window.HOST: host	
   const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules"
-  // 登录跳转。
-  const LOGIN_URL = MI_HOST + "/page/login.html?redirectUrl="
   
   export default {
     components: {

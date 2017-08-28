@@ -29,8 +29,10 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'	
+	import {host} from 'assets/js/configs.js'
 
-const url = HOST + "/api/v1/quality/send-inspect/by-equipment-time";
+	var HOST = window.HOST ? window.HOST: host
+    const url = HOST + "/api/v1/quality/send-inspect/by-equipment-time";
 //const url =  `http://rapapi.org/mockjsdata/24404/quality/send-inspect/by-equipment-time?`
 export default {
     components: {
