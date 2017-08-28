@@ -318,7 +318,7 @@
                     color: "#86cccc",
                     list: [{
 						name: "工具记录",
-					//	router: "/process/tool",
+						router: "/process/tool",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     }]
