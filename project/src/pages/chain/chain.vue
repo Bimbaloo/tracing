@@ -163,9 +163,9 @@
     import ProcessNode from "components/chain/processNode.vue"
     import ProcessLine from "components/chain/processLine.vue"
     import ProcessProduct from "components/chain/processProduceInfo.vue"
-    import {host} from 'assets/js/configs.js'
+    // import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
+	// var HOST = window.HOST ? window.HOST: host
     // 节点类型数据。
     var aoNodeType = [{
     	value: "1",

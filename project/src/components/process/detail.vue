@@ -36,10 +36,10 @@
 
 <script>
 	import equipment from "components/equipment/list"
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
-	const sFineReportUrl = HOST + "/WebReport/ReportServer?reportlet=";
+	// var HOST = window.HOST ? window.HOST: host
+	// const sFineReportUrl = HOST + "/WebReport/ReportServer?reportlet=";
 
     export default {
 		components: {
@@ -73,15 +73,15 @@
 					show: false,
                     list: [{
 						name: "质检",
-						cpt: "/QTReport.cpt",
+						// cpt: "/QTReport.cpt",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "送检",
-						cpt: "/QCReport.cpt",
+						// cpt: "/QCReport.cpt",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "FGB",
-						cpt: "/FGBReport.cpt&__bypagesize__=false",
+						// cpt: "/FGBReport.cpt&__bypagesize__=false",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     }]
 				}, {
@@ -190,17 +190,17 @@
 					this.$router.replace({path: oData.router, query: oQuery});
 				}
 
-				if(oData.cpt) {
-					let oParam = this.getParamter(oData.parameter),
-						sPath = sFineReportUrl + oData.cpt;
+				// if(oData.cpt) {
+				// 	let oParam = this.getParamter(oData.parameter),
+				// 		sPath = sFineReportUrl + oData.cpt;
 
-					oData.parameter.forEach(p => {
-						if(oParam[p]) {
-							sPath += "&" + p + "=" + oParam[p]
-						}						
-					});
-					window.open(sPath , "_blank");
-				}
+				// 	oData.parameter.forEach(p => {
+				// 		if(oParam[p]) {
+				// 			sPath += "&" + p + "=" + oParam[p]
+				// 		}						
+				// 	});
+				// 	window.open(sPath , "_blank");
+				// }
 			},
 			/**
 			 * @param {Array}

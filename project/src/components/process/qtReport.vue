@@ -29,9 +29,9 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host	
+	// var HOST = window.HOST ? window.HOST: host	
     const url = HOST + `/api/v1/quality/inspect/by-equipment-time`;
 //const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
 //const url = `static/sb.json`

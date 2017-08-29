@@ -95,9 +95,9 @@
 <script>
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
+	// var HOST = window.HOST ? window.HOST: host
     // 设备状态。
     const CHART_STATE_NAME = "状态"
     // 图形下margin。
