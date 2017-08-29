@@ -117,7 +117,7 @@ export default {
                 }, {
                     name: "投入时间",
                     prop: "happenTime",
-                    width: "200"
+                    width: "220"
                 }],
                 height: 1,
                 data: []
@@ -131,16 +131,16 @@ export default {
                     width: "200",
                     fixed: true,
                 }, {
-                    name: "批次号",
-                    prop: "batchNo",
-                    width: "200"
-                }, {
                     name: "箱码",
                     prop: "",
                     width: "200"
                 }, {
                     name: "派工单号",
                     prop: "doCode",
+                    width: "200"
+                }, {
+                    name: "批次号",
+                    prop: "batchNo",
                     width: "200"
                 }, {
                     name: "物料编码",
