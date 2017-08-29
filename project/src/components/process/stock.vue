@@ -78,6 +78,10 @@
             // 设置路由。
             setRouteQuery(from, to) {
                 
+                if(from.fullPath === to.fullPath) {
+                    // 已跳转成功。
+                    return
+                }
                 let sFromRoute = from.path,
                     sToRoute = to.path,
                     aFromPath = sFromRoute.split("/"),
@@ -86,7 +90,7 @@
                     sToType = aToPath[aToPath.length -1]
                     
                 // 保存查询条件。
-                this.oQuery[sToType] = this.$route.query
+                this.oQuery[sToType] = to.query//this.$route.query
                 
                 if(sToType === "process" && to.query.key && !to.query.startTime) {
                     // 树节点跳转。
@@ -115,17 +119,19 @@
                         query: this.oQuery[sToType]
                     })
 
-                    if(sToType === "product") {
-                        // 到投产表，添加设备id。
-                        Object.assign(this.oQuery[sFromType], {
-                            equipmentList: to.query.equipmentList,
-                            equipmentName: to.query.equipmentName
-                        })
-                    }
+                    // if(sToType === "product") {
+                    //     // 到投产表，添加设备id。
+                    //     Object.assign(this.oQuery[sFromType], {
+                    //         equipmentId: to.query.equipmentId,
+                    //         equipmentName: to.query.equipmentName
+                    //     })
+                    // }
 
                 }else if(sToType === "process") {
                     // 从其他页面跳回设备分析。
-                    this.aoRoute = [this.aoRoute.shift()]
+                    let oRoute = this.aoRoute.shift()
+                    this.aoRoute = []
+                    this.aoRoute.push(oRoute)
                 }else if(sFromType === "product") {
                     // 从投产表跳到其他页面。
                     this.aoRoute.push({
