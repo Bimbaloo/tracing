@@ -1,0 +1,90 @@
+{
+    "errorCode": 0,
+    "errorMsg": "",
+    "data": [
+      {
+        "varStdId": "不良率",
+        "description": "A图表",
+        "varUnit": "%",
+        "maxValue": 20.0,
+        "minValue": 13.5,
+        "valueType": 1,
+        "list": [
+          {
+            "pickTime": "6/1",
+            "value": "5"
+          },
+          {
+            "pickTime": "6/2",
+            "value": "4"
+          },
+          {
+            "pickTime": "6/3",
+            "value": "2"
+          },
+          {
+            "pickTime": "6/",
+            "value": "1"
+          },
+          {
+            "pickTime": "6/5",
+            "value": "8"
+          },
+          {
+            "pickTime": "6/6",
+            "value": "6"
+          },
+          {
+            "pickTime": "6/7",
+            "value": "4"
+          },
+          {
+            "pickTime": "6/8",
+            "value": "3"
+          }
+        ]
+      },
+      {
+        "varStdId": "一次合格率",
+        "description": "B图表",
+        "varUnit": "%",
+        "maxValue": 100.0,
+        "minValue": 93.5,
+        "valueType": 1,
+        "list": [
+          {
+            "pickTime": "7/1",
+            "value": "5"
+          },
+          {
+            "pickTime": "7/2",
+            "value": "94"
+          },
+          {
+            "pickTime": "7/3",
+            "value": "92"
+          },
+          {
+            "pickTime": "7/",
+            "value": "100"
+          },
+          {
+            "pickTime": "7/5",
+            "value": "98"
+          },
+          {
+            "pickTime": "7/6",
+            "value": "96"
+          },
+          {
+            "pickTime": "7/7",
+            "value": "94"
+          },
+          {
+            "pickTime": "7/8",
+            "value": "83"
+          }
+        ]
+      }
+    ]
+  }

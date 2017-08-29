@@ -39,7 +39,8 @@
                     "tool":"工具记录",
                     "event":"事件记录",
                     "repair":"维护记录",
-                    "restrain":"遏制"
+                    "restrain":"遏制",
+                    "parameter":"工艺参数"
                 },
                 aoRoute: []    
             }
