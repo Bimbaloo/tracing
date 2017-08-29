@@ -9,7 +9,7 @@
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	送检
+            	工具记录
                 <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
                 <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('toolTable', $event)"></i>
             </h2>
@@ -77,11 +77,11 @@ export default {
                 }, {
                     name: "工具位子",
                     prop: "toolPosition",
-                    width: "120",
+                    width: "200",
                 }, {
                     name: "工具编码",
                     prop: "toolCode",
-                    width: "120"
+                    width: "200"
                 }, {
                     name: "工具类型",
                     prop: "toolTypeName",
@@ -89,11 +89,11 @@ export default {
                 }, {
                     name: "工具名称",
                     prop: "toolName",
-                    width: "120",
+                    width: "200",
                 }, {
                     name: "规格",
                     prop: "toolSpec",
-                    width: "120",
+                    width: "200",
                 }, {
                     name: "操作类型",
                     prop: "operateType",
@@ -101,7 +101,7 @@ export default {
                 }, {
                     name: "操作时间",
                     prop: "operateTime",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "操作人",
                     prop: "operatorName",
