@@ -39,9 +39,9 @@
     import Blob from 'blob'
     import FileSaver from 'file-saver'
 	import html2canvas from 'html2canvas'
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
+	// var HOST = window.HOST ? window.HOST: host
 
     export default {
         // components: {

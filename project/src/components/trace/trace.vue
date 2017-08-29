@@ -20,9 +20,9 @@
 	import $ from "jquery"
     import table from "components/basic/table.vue"
 	import fnP from "assets/js/public.js"
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-    var HOST = window.HOST ? window.HOST: host
+    // var HOST = window.HOST ? window.HOST: host
     	
     export default {
         components: {

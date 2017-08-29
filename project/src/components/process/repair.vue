@@ -29,9 +29,9 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host	
+	// var HOST = window.HOST ? window.HOST: host	
     const url = HOST + "/api/v1/repair/by-equipment-time";
 //const url = `http://rapapi.org/mockjs/24404/repair/by-equipment-time?`
 

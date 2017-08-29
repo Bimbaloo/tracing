@@ -60,9 +60,9 @@
 	import "assets/css/common.less"
 	import $ from "jquery"
     import Transfer from "components/config/newTrans.vue"
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host	
+	// var HOST = window.HOST ? window.HOST: host	
     // 表格接口。
     const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
     // 自定义项列表接口。

@@ -39,9 +39,9 @@
 <script>
 	//表格数据接口http://192.168.20.176:8080
 	import $ from "jquery"
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
+	// var HOST = window.HOST ? window.HOST: host
 
     const TABLE_DATA_URL= HOST + "/api/v1/customized/items";
     const sSessionItemName = "sFiled"; 

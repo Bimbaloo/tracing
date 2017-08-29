@@ -37,9 +37,9 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host	
+	// var HOST = window.HOST ? window.HOST: host	
     const url = HOST + "/api/v1/trace/inout/by-equipment";
 
 export default {
@@ -275,7 +275,7 @@ export default {
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el)=>{
-                if(el === "equipmentList" || el === "startTime" || el === "endTime"){//equipmentIdList
+                if(el === "equipmentId" || el === "startTime" || el === "endTime"){//equipmentIdList//equipmentList
                     oQuery[el] = this.$route.query[el]
                 }
                 if(el === "equipmentName" || el === "startTime" || el === "endTime"){

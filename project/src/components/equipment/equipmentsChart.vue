@@ -95,9 +95,9 @@
 <script>
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
+	// var HOST = window.HOST ? window.HOST: host
     // 设备状态。
     const CHART_STATE_NAME = "状态"
     // 图形下margin。
@@ -286,8 +286,8 @@
                     list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentName", "equipmentList", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
-                    }]//equipmentIdList
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
+                    }]//equipmentIdList//equipmentList
 				}, {
                     show: true,
 					name: "事件",
@@ -1210,9 +1210,9 @@
                         case "equipmentName":
                             oParam[param] = this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName;
                             break;
-						case "equipmentList"://equipmentIdList
-							oParam[param] = this.selectedEquipment;
-							break;
+						// case "equipmentList"://equipmentIdList
+						// 	oParam[param] = this.selectedEquipment;
+						// 	break;
 						case "equipmentId": 
 							oParam[param] = this.selectedEquipment;
 							break;

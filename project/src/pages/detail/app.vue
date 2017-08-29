@@ -60,9 +60,9 @@
   import header from "components/header/header.vue"
   import panel from "components/panel/panel.vue"
   import fnP from "assets/js/public.js"
-  import {host} from 'assets/js/configs.js'
+  // import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
+	// var HOST = window.HOST ? window.HOST: host
 	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
 	
   export default {

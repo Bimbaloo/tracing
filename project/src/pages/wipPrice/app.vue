@@ -14,9 +14,9 @@
 	import $ from 'jquery';
 	import WipPriceTable from 'components/wip/wipPriceTable.vue';
 	import WipTitle from 'components/wip/wipTitle.vue';
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host
+	// var HOST = window.HOST ? window.HOST: host
 	const url = HOST + '/api/v1/wip/price';
 	
     export default {

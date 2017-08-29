@@ -41,9 +41,9 @@
 </template>
 
 <script>
-	import {host} from 'assets/js/configs.js'
+	// import {host} from 'assets/js/configs.js'
 
-	var HOST = window.HOST ? window.HOST: host	
+	// var HOST = window.HOST ? window.HOST: host	
 
 	const oAjax = {
 		// 物料。
