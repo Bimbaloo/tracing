@@ -62,12 +62,17 @@
 				// 页面加载中动画。
 				fullscreenLoading: false,
 				url: HOST + "/api/v1/trace/down/trace-info",
+				urlType: {
+					barcode: "/by-equipment-barcode",
+					batch: "/by-equipment-batch",
+					time: "/by-equipment-time"
+				},
 				treeData: {},
 				// params: [],
 				show: false,
                 tableData: [],
 				// filter: {},
-				// 起点集
+				// 起点集或查询条件。
 				points: {},
 				// tip: "暂无数据" 
 			}
@@ -118,11 +123,11 @@
 			// 重置路由。
 			this.$router.replace("/");
 			let oFilter = sessionStorage.getItem("track_" + this.query.tag);
+			
 			if(oFilter) {
 				this.points = JSON.parse(oFilter);
 				// this.filter = oAll.filters;
-				// this.params = oAll.selected;
-	
+				// this.params = oAll.selected;	
 			}
 			// 加载数据。
 			this.fetchData();	
@@ -175,9 +180,18 @@
 			fetchData() {
 				this.fullscreenLoading = true;
 				
-				this.$ajax.post(this.url, {
+				let sType = this.urlType[this.points.type] || '',
+					oParam =  {
 					"startPointDtos": this.points.selected || []
-				}).then((res) => {
+				}
+				
+				if(sType) {
+					// 若为溯源页面的跳转。
+					oParam = Object.assign({}, this.points.keys)
+					delete oParam.equipmentName
+				} 
+				
+				this.$ajax.post(this.url + sType, oParam).then((res) => {
 					this.fullscreenLoading = false;
 
 					this.judgeLoaderHandler(res, (data) => {
@@ -331,17 +345,14 @@
 				if(e.target.id === 'changeDiagram'){
 					this.treeHeight = this._treeHeight
 					this.changeHeight = 0
-					this.draggingY = true;
+					this.draggingY = true
 					this._pageY = e.pageY
 				}
-			
-				
-			
+
 			},
 			dragend(e){ //鼠标松开，结束拖动
 
 				this.draggingY = false  //关闭拖动功能
-
 
 			},
 			onMouseMove(e){ //拖动过程

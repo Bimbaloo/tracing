@@ -8,10 +8,10 @@
                 <span v-for="state in states" :key="state.key" :style="{backgroundColor: state.color}">{{state.name}}</span>
             </div>
             <div class="selected-info" v-if="!loading">
-                <div v-if="selectedEquipment">选中设备：{{this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName}}</div>
+                <div v-if="selectedEquipmentId">选中设备：{{selectedEquipmentName}}</div>
                 <div>选中时间范围：{{datetime.realStart}}~{{datetime.realEnd}}</div>
             </div>
-            <!--div @click="parameterButtonClick" class="parameter" v-if="selectedEquipment&&!loading" :style="{right: (legendRight+300) + 'px'}">
+            <!--div @click="parameterButtonClick" class="parameter" v-if="selectedEquipmentId&&!loading" :style="{right: (legendRight+300) + 'px'}">
                 <span class="icon icon-circle"></span><span>工艺</span>
             </div-->
             <div class="switch" v-if="!loading">
@@ -25,7 +25,7 @@
                 </div>
             </div> 
             <!--各维度链接跳转按钮-->
-            <div class="links" v-if="selectedEquipment&&!loading" :style="{right: (legendRight-10) + 'px'}">
+            <div class="links" v-if="selectedEquipmentId&&!loading" :style="{right: (legendRight-10) + 'px'}">
                 <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item', {'no-border':obj.list.length?false:true}]">
                     <div v-for="(item,index) in obj.list" @click="listButtonClick(item)" :key="index">{{item.name}}</div>
                 </div>	
@@ -52,7 +52,7 @@
                     </div>
                 </div>
             </div>
-            <div class="buttons" v-if="selectedEquipment&&!loading">
+            <div class="buttons" v-if="selectedEquipmentId&&!loading">
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
                 <el-button  @click="gotoTrack" class="btn btn-plain" v-if="trace">追踪</el-button>
             </div>	
@@ -181,7 +181,7 @@
                 // 区域缩放是否激活。
                 zoomActive: false,
                 // 选中的设备id。
-                selectedEquipment: "",
+                selectedEquipmentId: "",
 				loading: false,
 				sErrorMessage: "",
                 url: EQUIPMENTS_EVENTS_URL,	
@@ -328,6 +328,9 @@
             }
         },
         computed: {
+            selectedEquipmentName () {
+                return this.equipments.filter(o => o.equipmentId == this.selectedEquipmentId)[0].equipmentName
+            },
             // 与起点相关的标记线。
             relatedMarkLine () {
                 return this.markLine.filter(o => o.related)
@@ -390,6 +393,8 @@
                         show: this.show,
                         formatter: this.tooltipFormatter,
                         position: (pos, params, el, elRect, size) => {
+                            // console.log(pos[0])
+
                             if(this.markLine.filter(o => o.xAxis == params[0].axisValue).length) {
                                 // 若该提示数据已存在。
                                 // 隐藏tooltip。
@@ -407,9 +412,9 @@
                                 // 提示框大小。
                                 aContentSize = size.contentSize,
                                 // 当前数据点离面板左侧距离。
-                                nLeft = aViewSize[0]*(params[0].axisValue-oScaledxAxis.startValue)/nDiffTime
-                                
-                            if(Math.abs(nLeft - pos[0]) > 150) {//aViewSize[0]/10
+                                nLeft = (aViewSize[0]-GRID_LEFT-GRID_RIGHT)*(params[0].axisValue-oScaledxAxis.startValue)/nDiffTime
+ 
+                            if(Math.abs(nLeft + GRID_LEFT - pos[0]) > 150) {//aViewSize[0]/10
                                 // 若鼠标数据数据点比较远，隐藏tooltip。
                                 return {
                                     left: -1000
@@ -439,7 +444,7 @@
                                 // 若超出x轴范围
                                 pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - aContentSize[0]
                             }
-
+                            // console.log(pos[0])
                             return pos; 
                             // let obj = {}
                             // obj[['left', 'right'][+(pos[0] < size.viewSize[0] / 2)]] = 60;
@@ -525,7 +530,10 @@
                         top: -3,
                         right: 30,
                         feature: {
-                             dataZoom: {
+                            dataZoom: {
+                                title: {
+                                    zoom: !this.zoomActive ? "区域缩放":"取消区域缩放"
+                                },
                                 yAxisIndex: 'none',
                                 beforeClick: {
                                     zoom: this.beforeZoom
@@ -533,7 +541,11 @@
                             },
                         },
                         iconStyle: {
+                            normal: {
+                                borderWidth: 1
+                            },
                             emphasis: {
+                                borderWidth: 2,
                                 borderColor: '#42AF8F',
                             }
                         }
@@ -820,7 +832,7 @@
             },
             // 设置提示框高度。
             setTooltipHeight () {       
-                if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
+                // if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
                     this.chartHeight = this.chart.getHeight() - GRID_TOP - GRID_BOTTOM;
                     this.chartWidth = this.chart.getWidth() - GRID_LEFT - GRID_RIGHT;
                     // 若数据加载已完成。
@@ -831,7 +843,7 @@
                             extraCssText: `max-height:${nHeight}px;overflow-y:auto`
                         }
                     })
-                }
+                // }
 
             },
             // 设置图形高度。
@@ -997,7 +1009,7 @@
 
                 if(nSelected) {
                     // 若已经选中，则取消选中。
-                    this.selectedEquipment = '';
+                    this.selectedEquipmentId = '';
                     this.categories = this.categories.map(o => {                              
                         if(sEquipment === o.value) {
                             o.value = o.value.slice(0,-1)+0;
@@ -1007,7 +1019,7 @@
 
                 }else {
                     // 若未选中，则选中。
-                    this.selectedEquipment = sId;
+                    this.selectedEquipmentId = sId;
                     this.categories = this.categories.map(o => {
                         if(sEquipment === o.value) {
                             o.value = o.value.slice(0,-1)+1;
@@ -1071,6 +1083,19 @@
             beforeZoom () {
                 // 切换区域缩放是否激活。
                 this.zoomActive = !this.zoomActive
+
+                // 激活。
+                this.chart.setOption({
+                    toolbox: {
+                        feature: {
+                            dataZoom: {
+                                title: {
+                                    zoom: !this.zoomActive ? "区域缩放":"取消区域缩放"
+                                }
+                            },
+                        }                          
+                    }
+                })                      
 
                 if(this.show) {
                     // 若本来显示。
@@ -1208,13 +1233,13 @@
 				aQuery.forEach(param => {
 					switch (param) {
                         case "equipmentName":
-                            oParam[param] = this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName;
+                            oParam[param] = this.selectedEquipmentName;
                             break;
 						// case "equipmentList"://equipmentIdList
-						// 	oParam[param] = this.selectedEquipment;
+						// 	oParam[param] = this.selectedEquipmentId;
 						// 	break;
 						case "equipmentId": 
-							oParam[param] = this.selectedEquipment;
+							oParam[param] = this.selectedEquipmentId;
 							break;
 						case "startTime":
 							oParam[param] = oDate.start;
@@ -1317,7 +1342,7 @@
                 aoData.forEach((o,index) => {
                     if(index === nLength) {
                         // 默认选中第一台设备。
-                        this.selectedEquipment = o.equipmentId;
+                        this.selectedEquipmentId = o.equipmentId;
                     }
 
                     // 设置y轴数据。
@@ -1993,8 +2018,8 @@
                 let oDate = this.getRealTime();
                 // 根据设备+开始时间+结束时间，查询可疑品列表。
                 this.$router.replace({ path: "/process/restrain", query: {
-                    equipmentName: this.equipments.filter(o => o.equipmentId == this.selectedEquipment)[0].equipmentName,
-                    equipmentId: this.selectedEquipment,
+                    equipmentName: this.selectedEquipmentName,
+                    equipmentId: this.selectedEquipmentId,
                     startTime: oDate.start,
                     endTime: oDate.end,
                     shiftStartTime: this.datetime.start,
@@ -2007,12 +2032,12 @@
                     oDate = this.getRealTime(),
                     oCondition = {
                         "keys": {
-                            "equipmentId": this.selectedEquipment,//'493-017-2',
+                            "equipmentId": this.selectedEquipmentId,//'493-017-2',
+                            "equipmentName": this.selectedEquipmentName,
                             "startTime": oDate.start,
                             "endTime": oDate.end
                         }, 
-                        "radio": "3",
-                        "tab":"track"
+                        "type": "time"
                     }
 
                 sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
