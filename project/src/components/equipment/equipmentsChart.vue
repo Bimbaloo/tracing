@@ -26,7 +26,7 @@
             </div> 
             <!--各维度链接跳转按钮-->
             <div class="links" v-if="selectedEquipmentId&&!loading" :style="{right: (legendRight-10) + 'px'}">
-                <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item', {'no-border':obj.list.length?false:true}]" @mouseenter="linksItemMouseEnterHandle" @mouseleave="linksItemMouseLeaveHandle">
+                <div v-for="obj in dimension" :key="obj.type" :class="[obj.key, 'item', {'no-border':obj.list.length?false:true}]">
                     <div v-for="(item,index) in obj.list" @click="listButtonClick(item)" :key="index">{{item.name}}</div>
                 </div>	
             </div>
@@ -412,9 +412,9 @@
                                 // 提示框大小。
                                 aContentSize = size.contentSize,
                                 // 当前数据点离面板左侧距离。
-                                nLeft = (aViewSize[0]-GRID_LEFT-GRID_RIGHT)*(params[0].axisValue-oScaledxAxis.startValue)/nDiffTime + GRID_LEFT
+                                nLeft = (aViewSize[0]-GRID_LEFT-GRID_RIGHT)*(params[0].axisValue-oScaledxAxis.startValue)/nDiffTime
  
-                            if(Math.abs(nLeft - pos[0]) > 150) {//aViewSize[0]/10
+                            if(Math.abs(nLeft + GRID_LEFT - pos[0]) > 150) {//aViewSize[0]/10
                                 // 若鼠标数据数据点比较远，隐藏tooltip。
                                 return {
                                     left: -1000
@@ -441,8 +441,8 @@
                             pos[0] = pos[0] + TOOLTIP_X_DISTANCE;
                             
                             if(pos[0] + aContentSize[0] > aViewSize[0]) {
-                                // 若超出x轴范围                               
-                                pos[0] = pos[0] - TOOLTIP_X_DISTANCE*3 - aContentSize[0]
+                                // 若超出x轴范围
+                                pos[0] = pos[0] - TOOLTIP_X_DISTANCE*2 - aContentSize[0]
                             }
                             // console.log(pos[0])
                             return pos; 
@@ -819,7 +819,7 @@
             addEvent() {
                 window.addEventListener("resize", this.resizeChart)
                 
-                $("#equipments").on("click", ".suspend-tooltip-wrapper", this.suspendTooltipClickHandle)          
+                $("#equipments").on("click", ".suspend-tooltip-wrapper", this.suspendTooltipClickHandle)
             },
             // 重置图形大小。
             resizeChart () {
@@ -1060,14 +1060,6 @@
                 })
                 // 添加对比数据。
                 this.compareList.push(this.transformTooltipDataToCompareData(nTime, bRelated, aData[4], TOOLTIP_Z_INDEX+1));                
-            },
-            // 跳转链接鼠标移入事件。
-            linksItemMouseEnterHandle (event) {
-                document.getElementsByClassName("links")[0].style.zIndex = 1000;
-            },
-            // 跳转链接鼠标移出事件。
-            linksItemMouseLeaveHandle (event) {
-                document.getElementsByClassName("links")[0].style.zIndex = 'auto';
             },
             // echarts 点击事件。
             chartClickHandle (params) {
