@@ -339,6 +339,7 @@ export default {
                 oCondition = {
                     "keys": {
                         equipmentId: this.$route.query["equipmentId"],
+                        equipmentName: this.$route.query["equipmentName"],
                         batchNo : row.batchNo,
                         materialCode : row.materialCode
                     }, 
@@ -354,6 +355,7 @@ export default {
                 oCondition = {
                     "keys": {
                         equipmentId: this.$route.query["equipmentId"],
+                        equipmentName: this.$route.query["equipmentName"],
                         barcode : row.barcode
                     }, 
                     "type": "barcode"

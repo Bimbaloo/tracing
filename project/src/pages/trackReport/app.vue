@@ -13,7 +13,7 @@
 			<h2 class="content-title">查询条件</h2>
 			<div class="condition" ref="condition">	
 				<div class='condition-messsage'>
-					<span v-for="(filter,index) in _filters" :key="index">
+					<span v-for="(filter,index) in filtersList" :key="index">
 						{{filter[0]}} : {{filter[1]}}
 					</span> 
 				</div>	
@@ -177,6 +177,7 @@
 					filter: 0
 				},
 				filters: {},
+				filtersList: [],
 				dialogState:false
 			}
 		},
@@ -192,30 +193,6 @@
 					} 
 				} 
 				return oRequest; 
-			},
-			_filters: function() {
-				let _filters = this.filters
-				
-				for(let i in _filters){
-					if(_filters[i] === '' || i === '_tag'){
-						delete _filters[i]
-					}
-				}
-				/* 为了将获取到的 barcode等转换为对应的中文 */
-				let b = Object.entries(_filters).filter(o => o[0] !== "equipmentId"),
-					a = this.dataName;
-
-				b.forEach(o =>
-                    a.forEach(x => {
-						this.setSpecialItem(x, o)
-
-						if(o[0] === x.itemCode){
-                            o[0] = x.itemName
-						}
-                    })
-                )
-				return b
-				/* 为了将获取到的 barcode等转换为对应的中文 */
 			}
 		},
 		created() {
@@ -237,7 +214,7 @@
 				}else {
 					// 溯源页面跳转。
 					this.type = oConditions.type
-					this.filters = oConditions.keys
+					this.filters = Object.assign({}, oConditions.keys)
 					this.selected = oConditions
 				}
 
@@ -249,15 +226,44 @@
 			this.fetchData();
 		},
 		methods: {
-			setSpecialItem (correspondingName, o) {
-				let aValue = o[1].split(":")
-				if((correspondingName.itemCode === "equipmentCode" || correspondingName.itemCode === "materialCode") && aValue[1]) {
-					// 若为设备编码或物料编码,但值包含编码和名称。
-					o[1] = aValue[1]
-				}else if(correspondingName.itemCode === "equipmentCode" && o[0] === "equipmentName") {
-					// 设备名称。
-					o[1] = aValue[1]
+			setFilters () {
+				
+				let oFilters = this.filters,
+					aoFilters = []
+				
+				for(let param in oFilters){
+					if(oFilters[param] === '' || param === '_tag'){
+						delete oFilters[param]
+					}else {
+						/* 为了将获取到的 barcode等转换为对应的中文 */
+						let aValue = this.setSpecialItem(param, oFilters[param])
+						aValue && aoFilters.push(aValue)				
+					}
 				}
+				this.filtersList = aoFilters 
+			},
+			// 获取对应的中文。
+			setSpecialItem (param, sValue) {
+				
+				if(param === "equipmentName") {
+					// 设备名称。
+					param = "equipmentCode"
+				}
+
+				let oItem = this.dataName.filter(o => o.itemCode === param)[0]
+
+				if(oItem) {
+					if(typeof sValue === "string") {
+						let aValue = sValue.split(":")
+						if((param === "equipmentCode" || param === "materialCode") && aValue[1]) {
+							// 若为设备编码或物料编码,但值包含编码和名称。
+							sValue = aValue[1]
+						}
+					}
+
+					return [oItem.itemName, sValue]
+				}
+				
 			},
 			// 判断调用接口是否成功。
 			judgeLoaderHandler(param, fnSu, fnFail) {
@@ -281,7 +287,7 @@
 				// url:api/v1/trace/down/start-points
              	this.$post(this.url, fnP.parseQueryParam(this.filters))
              	.then((res) => {
-					//debugger
+	
 					this.judgeLoaderHandler(res, (data) => {
 						
 						this.gridData.data = data;
@@ -316,9 +322,8 @@
 				this.$ajax.get(TABLE_DATA_URL).then((res) => {
 					this.judgeLoaderHandler(res, () => {
 						// 获取对应的名称。
-						//debugger
-
 						this.dataName = res.data.data	
+						this.setFilters()
 					});
 				});
 			},

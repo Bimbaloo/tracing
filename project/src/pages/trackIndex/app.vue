@@ -131,20 +131,7 @@
 			}
 			// 加载数据。
 			this.fetchData();	
-	
-//			this.fullscreenLoading = true;
-//		    setTimeout(() => {
-//		    	this.fullscreenLoading = false;
-//		    	
-//				this.$store.commit({
-//					type: "updateData",
-//					data: aoTestData
-//				});
-//
-//				// 格式化数据。
-//				this.treeData = this.parseTreeData();
-//				this.tableData = this.parseTableData();
-//		    }, 1000)
+
 		},
 		mounted() {
 			// this.$refs.view.style.height = this.$refs.view.clientHeight + "px"
@@ -331,8 +318,8 @@
 			* @param {Object} event
 			* @returns {void}
 			 */
-            onReport (event) {
-            	let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。      	
+            onReport (event) {		
+				let tag = new Date().getTime().toString().substr(-5);// 生成唯一标识。     	
             	sessionStorage.setItem("fastReport_" + tag, JSON.stringify(this.points));
             	// window.open("report.html?tag="+tag);
 				window.open("trackReport.html?tag="+tag);
@@ -340,8 +327,6 @@
 
 			/* 拖动功能 */
 			dragstar(e){   //鼠标按下，开始拖动
-			//  console.log('开始')
-			//	console.log(this.treeFullscreen)
 				if(e.target.id === 'changeDiagram'){
 					this.treeHeight = this._treeHeight
 					this.changeHeight = 0

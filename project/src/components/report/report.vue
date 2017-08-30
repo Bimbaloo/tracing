@@ -102,9 +102,10 @@
 				sErrorMessage: '',
 				oUrl: {
 					points: "/api/v1/trace/report/by-start-points",
-					barcode: "/api/v1/trace/report/by-barcode",
-					batch: "/api/v1/trace/report/by-batch",
-					time: "/api/v1/trace/report/by-equiment"
+					barcode: "/api/v1/trace/report/by-equipment-barcode",
+					batch: "/api/v1/trace/report/by-equipment-batch",
+					time: "/api/v1/trace/report/by-equipment-time",
+					restrainBatch: "/api/v1/trace/report/by-batch"					
 				},
 				active: {
 					summary: true,
@@ -607,8 +608,7 @@
 				}
 
 				let oParam = {}
-				//console.log(this.$route.query.equipmentCode)
-				//debugger
+
 				if(this.type == "trace") {
 					// 若为快速报告。
 					let oQuery = this.query
@@ -617,6 +617,7 @@
 						// 若为溯源页面跳转。
 						sUrl = this.oUrl[oQuery.type]
 						oParam = oQuery.keys
+						delete oParam.equipmentName
 					}else {
 						sUrl = this.oUrl["points"]
 						oParam = oQuery
@@ -630,7 +631,7 @@
 						delete oParam.equipmentName
 					}else {
 						// 根据物料查询。
-						sUrl = this.oUrl["batch"]
+						sUrl = this.oUrl["restrainBatch"]
 					}
 				}
 
@@ -723,7 +724,7 @@
 				for(let p in filters) {
 					selected = filters[p];
 				}
-				debugger
+				
 				// 设置过滤数据。
 				selected.map(s => this.reportData[param].filteredData = this.reportData[param].data.filter(o => o.customer == s))
 						
