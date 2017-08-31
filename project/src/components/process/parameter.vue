@@ -12,9 +12,7 @@
                 工艺参数
             </h2>
             <div class="content-table" ref="inputTable">
-                <div id="charts" class="charts" style="width:100%;min-height:500px"></div>
-
-                <div class="charts" style="width:100%;min-height:500px" :id="option+index" v-for="(option,index) in options">{{index}}</div>
+                <div class="charts" :id="`charts`+index" v-for="(option,index) in options">{{index}}</div>
             </div>
 
         </div>
@@ -63,6 +61,8 @@ export default {
             ],
             /* echarts的配置文件 */
             options: [],
+            /** */
+            myEcharts: [],
             //  viewHeight:0
             routerContent: 0
         }
@@ -78,6 +78,9 @@ export default {
         },
         resizeY: function() {
             return this.$store && this.$store.state.resizeY
+        },
+        resize: function() {
+            return this.$store && this.$store.state.resize
         },
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
@@ -106,16 +109,13 @@ export default {
         }
     },
     mounted() {
-
-        //this.initOption()
-        //this.inIt()
-        // this.setEcharts()
+        this.addEvent();
     },
 
     watch: {
         // 如果路由有变化，会再次执行该方法
         '$route': 'fetchData',
-
+        resize: 'updateEcharts'
     },
     methods: {
         // 判断调用接口是否成功。
@@ -160,15 +160,18 @@ export default {
                     this.loading = false;
                     this.judgeLoaderHandler(res, () => {
                         let optionsData = res.data.data;  //获取到的data
-                        console.log(optionsData)
-                        
-                        optionsData.map((data)=>{
-                            
+                        optionsData.map((data) => {
                             optionArr.push(this.initOption(data))
                             return optionArr
                         })
-                        this.options = optionArr
+                        this.options = optionArr   // 将处理后的option放入options中
 
+                        this.$nextTick(() => {
+                            this.options.forEach((el, index) => {
+                                this.initEcharts(el, index)
+                            })
+
+                        })
                     });
                 })
                 .catch((err) => {
@@ -181,8 +184,9 @@ export default {
 
         /*  */
         setEcharts() {
-            var chart = document.getElementById('charts');
-            var echart = this.$echarts.init(chart);
+            let chart = document.getElementById('charts'),
+                echart = this.$echarts.init(chart);
+            this.myEcharts.push(echart)
             echart.setOption(option);
         },
         /* 处理每个option */
@@ -218,25 +222,27 @@ export default {
                 },
                 yAxis: {
                     type: 'value',
+                    min: 50,
+                    max: 400,
                     axisLabel: {
                         formatter: '{value} '
                     }
                 },
                 visualMap: {
-                    top: 10,
+                    top: 25,
                     right: 10,
                     pieces: [{
                         gt: 0,
                         lte: 4,
-                        color: '#ff0000'
+                        color: '#e60012'
                     }, {
                         gt: 4,
                         lte: 21,
-                        color: '#ffde33'
+                        color: '#abcc52'
                     }, {
                         gt: 21,
                         lte: 100,
-                        color: '#ff0000'
+                        color: '#e60012'
                     }],
                     outOfRange: {
                         color: '#999'
@@ -246,6 +252,9 @@ export default {
                     {
                         name: 'XX参数',
                         type: 'line',
+                        smooth: true,
+                        smoothMonotone: "x",
+                        symbol: 'circle',
                         data: [],
                         markLine: {
                             data: [
@@ -254,28 +263,72 @@ export default {
                                     name: '上限',
                                     lineStyle: {
                                         normal: {
-                                            color: "#3397fc"
+                                            color: "#febf00"
                                         }
                                     }
                                 },
-                                { yAxis: 4, name: '下限' }
+                                {
+                                    yAxis: 4,
+                                    name: '下限',
+                                    lineStyle: {
+                                        normal: {
+                                            color: "#febf00"
+                                        }
+                                    }
+                                }
                             ]
                         }
                     }
                 ]
             };
-            /*  */
-            
+
+            /* 设置option */
             optionModal.title.text = data.description //设置图表名称
             optionModal.legend.data[0] = data.varStdId //设置参数名称
-            optionModal.xAxis.data = data.list.map((el)=>{ return el.pickTime}) //设置横坐标值
-            optionModal.yAxis.axisLabel.formatter = '{value}'+data.varUnit      //设置纵坐标单位
+            optionModal.xAxis.data = data.list.map((el) => { return el.pickTime }) //设置横坐标值
+            optionModal.yAxis.axisLabel.formatter = '{value}' + data.varUnit      //设置纵坐标单位
             optionModal.series[0].name = data.varStdId //设置参数名称
-            optionModal.series[0].data = data.list.map((el)=>{ return el.value}) //设置纵坐标值
+            optionModal.series[0].data = data.list.map((el) => { return el.value }) //设置纵坐标值
             optionModal.series[0].markLine.data[0].yAxis = data.maxValue           //设置上限值
             optionModal.series[0].markLine.data[1].yAxis = data.minValue           //设置下限值
+
+            /* 设置颜色变化的上下限 */
+            optionModal.visualMap.pieces[0].gt = (data.minValue - 100) < 0 ? 0 : (data.minValue - 100)
+            optionModal.visualMap.pieces[0].lte = data.minValue  //设置下限
+            optionModal.visualMap.pieces[1].gt = data.minValue   //设置下限  
+            optionModal.visualMap.pieces[1].lte = data.maxValue  //设置上限
+            optionModal.visualMap.pieces[2].gt = data.maxValue   //设置上限
+            optionModal.visualMap.pieces[2].lte = data.maxValue + 100
+
+            /* 设置纵坐标的起始值 */
+            const arrY = optionModal.series[0].data   //Y轴的所有值
+            const yMax = Math.max(...arrY)             //获取Y轴最大值 
+            const yMin = Math.min(...arrY)             //获取Y轴最小值
+            const maximum = data.maxValue             //获取上限值 
+            const minimum = data.minValue             //获取下限值 
+
+            optionModal.yAxis.min = parseInt(Math.min(yMin, minimum) * 0.9)   //设置Y轴开始值为 最小值或最小合格值的0.9倍
+            optionModal.yAxis.max = parseInt(Math.max(yMax, maximum) * 1.1)   //设置Y轴结束值为 最大值或最大合格值的1.1倍
+
             return optionModal
-        }
+        },
+        /* 绘制图表 */
+        initEcharts(option, index) {
+            let chart = document.getElementById('charts' + index);
+            let echart = this.$echarts.init(chart);
+            echart.setOption(option);
+            this.myEcharts.push(echart)  //将生成的echarts实例对象放到 ' this.myEcharts ' 中
+        },
+        /* 当窗口大小变化，自适应大小 */
+        updateEcharts() {
+            this.myEcharts.forEach((echart) => {
+                echart.resize()
+            })
+        },
+        /* 监听窗口大小 更新echarts的大小 */
+        addEvent() {
+            window.addEventListener("resize", this.updateEcharts)
+        },
     }
 }
 </script>
@@ -321,6 +374,13 @@ export default {
         cursor: pointer;
         color: #f90;
     }
+}
+</style>
+<style lang="less" scoped>
+.charts {
+    width:100%;
+    box-sizing: border-box;
+    min-height: 314px
 }
 </style>
 

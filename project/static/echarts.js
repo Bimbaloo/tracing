@@ -39,15 +39,15 @@
             pieces: [{
                 gt: 0,
                 lte: 4,
-                color: '#ff0000'
+                color: '#e600e2'
             }, {
                 gt: 4,
                 lte: 21,
-                color: '#ffde33'
+                color: '#abcc52'
             }, {
                 gt: 21,
                 lte: 100,
-                color: '#ff0000'
+                color: '#e600e2'
             }],
             outOfRange: {
                 color: '#999'
@@ -65,11 +65,19 @@
                             name: '上限',
                             lineStyle: {
                                 normal: {
-                                    color: "#3397fc"
+                                    color: "#febf00"
                                 }
                             }
                         },
-                        { yAxis: 4, name: '下限' }
+                        { 
+                            yAxis: 4, 
+                            name: '下限',
+                            lineStyle: {
+                                normal: {
+                                    color: "#febf00"
+                                }
+                            }
+                        }
                     ]
                 }
             }

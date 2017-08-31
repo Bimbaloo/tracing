@@ -12,35 +12,35 @@
         "list": [
           {
             "pickTime": "6/1",
-            "value": "5"
+            "value": "15"
           },
           {
             "pickTime": "6/2",
-            "value": "4"
+            "value": "14"
           },
           {
             "pickTime": "6/3",
-            "value": "2"
+            "value": "12"
           },
           {
             "pickTime": "6/",
-            "value": "1"
+            "value": "21"
           },
           {
             "pickTime": "6/5",
-            "value": "8"
+            "value": "18"
           },
           {
             "pickTime": "6/6",
-            "value": "6"
+            "value": "26"
           },
           {
             "pickTime": "6/7",
-            "value": "4"
+            "value": "14"
           },
           {
             "pickTime": "6/8",
-            "value": "3"
+            "value": "13"
           }
         ]
       },
@@ -48,13 +48,13 @@
         "varStdId": "一次合格率",
         "description": "B图表",
         "varUnit": "%",
-        "maxValue": 100.0,
+        "maxValue": 96.0,
         "minValue": 93.5,
         "valueType": 1,
         "list": [
           {
             "pickTime": "7/1",
-            "value": "5"
+            "value": "95"
           },
           {
             "pickTime": "7/2",
