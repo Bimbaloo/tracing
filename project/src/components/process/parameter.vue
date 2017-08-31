@@ -8,12 +8,15 @@
                     </span>
                 </div>
             </div>
-            <h2 class="content-title inTitle">
+            <h2 class="content-title" id='content-title'>
                 工艺参数
             </h2>
-            <div class="content-table" ref="inputTable">
-                <div class="charts" :id="`charts`+index" v-for="(option,index) in options">{{index}}</div>
+            <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
+                <div class="content-table" v-for="(option,index) in options" >
+                    <div class="charts" :id="`charts`+index" >{{index}}</div>
+                </div>
             </div>
+            
 
         </div>
     </div>
@@ -64,7 +67,8 @@ export default {
             /** */
             myEcharts: [],
             //  viewHeight:0
-            routerContent: 0
+            routerContent: 0,
+            flexbase: 200
         }
 
     },
@@ -109,13 +113,19 @@ export default {
         }
     },
     mounted() {
-        this.addEvent();
+        this.addEvent(); //监听resize变化 触发 echarts.resize()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.flexbase  = this.adjustHeight()
     },
 
     watch: {
         // 如果路由有变化，会再次执行该方法
         '$route': 'fetchData',
-        resize: 'updateEcharts'
+        resize: 'updateEcharts',
+        /* 上下拖动时，重新设置flexBase大小变化 */
+        "resizeY":'setFlexBase',
+         /* 全屏大小时，重新设置flexBase大小 */
+        "fullscreen": 'setFlexBase'
     },
     methods: {
         // 判断调用接口是否成功。
@@ -144,6 +154,7 @@ export default {
         fetchData() {
 
             this.loading = true;
+            /* 设置显示信息和查询条件 */
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el) => {
                 if (el === "equipmentId" || el === "startTime" || el === "endTime") {//equipmentIdList//equipmentList
@@ -160,9 +171,17 @@ export default {
                     this.loading = false;
                     this.judgeLoaderHandler(res, () => {
                         let optionsData = res.data.data;  //获取到的data
-                        optionsData.map((data) => {
-                            optionArr.push(this.initOption(data))
-                            return optionArr
+                        optionsData.map((data,index) => {
+                            if(data.valueType === 1){
+                                console.log(index)
+                                optionArr.push(this.initOption(data))
+                                return optionArr
+                            }else{
+                                /* 做成表格 */
+                                console.log("表格")
+                                console.log(index)
+                            }
+                            
                         })
                         this.options = optionArr   // 将处理后的option放入options中
 
@@ -180,14 +199,30 @@ export default {
                     console.log("数据库查询出错。")
                 })
         },
+        /* 获取高度函数 */
+        adjustHeight() {
 
+            let getHeight = 0;
+            getHeight = Math.floor(
+                        this.viewHeight
+                        -this.outerHeight(document.querySelector(".condition"))
+                        -this.outerHeight(document.querySelector("#content-title"))
+                    );
+            return getHeight;
+        },
+        /* 获取元素实际高度(含margin) */
+         outerHeight(el) {
+            var height = el.offsetHeight;
+            var style = el.currentStyle || getComputedStyle(el);
 
-        /*  */
-        setEcharts() {
-            let chart = document.getElementById('charts'),
-                echart = this.$echarts.init(chart);
-            this.myEcharts.push(echart)
-            echart.setOption(option);
+            height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+            return height;
+        },
+        /* 设置table实际高度 */
+        setFlexBase(){
+            console.log("11")
+            this.routerContent = document.querySelector(".router-content").offsetHeight
+            this.flexbase = this.adjustHeight()
         },
         /* 处理每个option */
         initOption(data) {
@@ -327,6 +362,7 @@ export default {
         /* 监听窗口大小 更新echarts的大小 */
         addEvent() {
             window.addEventListener("resize", this.updateEcharts)
+            window.addEventListener("resize", this.setFlexBase)
         },
     }
 }
@@ -380,6 +416,19 @@ export default {
     width:100%;
     box-sizing: border-box;
     min-height: 400px
+}
+.innner-content {
+    display: flex;
+    flex-direction: column;
+    .content-title {
+        margin-top: 0
+    }
+    .contentBox {
+        display: flex;
+        flex-direction: column;
+        flex-basis: 200px;
+        overflow: auto;
+    }
 }
 </style>
 
