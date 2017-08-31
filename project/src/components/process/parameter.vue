@@ -229,8 +229,7 @@ export default {
                     }
                 },
                 visualMap: {
-                    top: 25,
-                    right: 10,
+                    show: false,
                     pieces: [{
                         gt: 0,
                         lte: 4,
@@ -380,7 +379,7 @@ export default {
 .charts {
     width:100%;
     box-sizing: border-box;
-    min-height: 314px
+    min-height: 400px
 }
 </style>
 
