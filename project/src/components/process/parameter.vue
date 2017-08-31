@@ -12,11 +12,21 @@
                 工艺参数
             </h2>
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
-                <div class="content-table" v-for="(option,index) in options" >
-                    <div class="charts" :id="`charts`+index" >{{index}}</div>
+                <div class="content-echarts" v-for="(option,index) in options">
+                    <div class="charts" :id="`charts`+index">{{index}}</div>
+                </div>
+
+                <div class="content-tables" v-for="(tableData,index) in tableDatas">
+                    <h2 class="content-title tableData">
+                        送检记录
+                        <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                        <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
+                    </h2>
+                    <div class="content-table" ref="`tableData${index}`">
+                       <v-table :table-data="tableData" :max-height="400" :loading="loading" :resize="tdResize"></v-table>
+                    </div>
                 </div>
             </div>
-            
 
         </div>
     </div>
@@ -68,7 +78,8 @@ export default {
             myEcharts: [],
             //  viewHeight:0
             routerContent: 0,
-            flexbase: 200
+            flexbase: 200,
+            tableDatas: []
         }
 
     },
@@ -115,7 +126,7 @@ export default {
     mounted() {
         this.addEvent(); //监听resize变化 触发 echarts.resize()
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
-        this.flexbase  = this.adjustHeight()
+        this.flexbase = this.adjustHeight()
     },
 
     watch: {
@@ -123,8 +134,8 @@ export default {
         '$route': 'fetchData',
         resize: 'updateEcharts',
         /* 上下拖动时，重新设置flexBase大小变化 */
-        "resizeY":'setFlexBase',
-         /* 全屏大小时，重新设置flexBase大小 */
+        "resizeY": 'setFlexBase',
+        /* 全屏大小时，重新设置flexBase大小 */
         "fullscreen": 'setFlexBase'
     },
     methods: {
@@ -168,23 +179,22 @@ export default {
             this.$get(url, oQuery)
                 .then((res) => {
                     let optionArr = [];
+                    let tableDataArr =[];
                     this.loading = false;
                     this.judgeLoaderHandler(res, () => {
                         let optionsData = res.data.data;  //获取到的data
-                        optionsData.map((data,index) => {
-                            if(data.valueType === 1){
-                                console.log(index)
+                        optionsData.map((data, index) => {
+                            if (data.valueType === 1) {
                                 optionArr.push(this.initOption(data))
                                 return optionArr
-                            }else{
+                            } else {
                                 /* 做成表格 */
-                                console.log("表格")
-                                console.log(index)
+                                tableDataArr.push(this.setTableData(data))
                             }
-                            
-                        })
-                        this.options = optionArr   // 将处理后的option放入options中
 
+                        })
+                        this.options = optionArr         // 将处理后的 option 放入 options 中
+                        this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
                         this.$nextTick(() => {
                             this.options.forEach((el, index) => {
                                 this.initEcharts(el, index)
@@ -204,14 +214,14 @@ export default {
 
             let getHeight = 0;
             getHeight = Math.floor(
-                        this.viewHeight
-                        -this.outerHeight(document.querySelector(".condition"))
-                        -this.outerHeight(document.querySelector("#content-title"))
-                    );
+                this.viewHeight
+                - this.outerHeight(document.querySelector(".condition"))
+                - this.outerHeight(document.querySelector("#content-title"))
+            );
             return getHeight;
         },
         /* 获取元素实际高度(含margin) */
-         outerHeight(el) {
+        outerHeight(el) {
             var height = el.offsetHeight;
             var style = el.currentStyle || getComputedStyle(el);
 
@@ -219,10 +229,52 @@ export default {
             return height;
         },
         /* 设置table实际高度 */
-        setFlexBase(){
-            console.log("11")
+        setFlexBase() {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.flexbase = this.adjustHeight()
+        },
+        /* 处理每个tableData */
+        setTableData(data) {
+            let tableData = {
+                filename: "送检",
+                columns: [{
+                    name: "序号",
+                    type: "index",
+                    width: "50"
+                }, {
+                    name: "工艺参数",
+                    prop: "varStdId",
+                    width: "200",
+                }, {
+                    name: "工艺参数描述",
+                    prop: "description",
+                    width: "200"
+                }, {
+                    name: "检测值",
+                    prop: "value",
+                    width: ""
+                }, {
+                    name: "单位",
+                    prop: "varUnit",
+                    width: "120",
+                }, {
+                    name: "采集时间",
+                    prop: "pickTime",
+                    width: "200",
+                }],
+                data: []
+            }
+            tableData.data =data.list.map((el)=>{
+                    let arr = {}
+                    arr.varStdId = data.varStdId
+                    arr.description = data.description
+                    arr.varUnit = data.varUnit
+                    arr.value = el.value
+                    arr.pickTime = el.pickTime
+                    return arr
+                }
+            )
+            return tableData
         },
         /* 处理每个option */
         initOption(data) {
@@ -239,7 +291,7 @@ export default {
                     data: ['XX参数']
                 },
                 toolbox: {
-                    show: true,
+                    // show: true,
                     feature: {
                         dataZoom: {
                             yAxisIndex: 'none'
@@ -286,9 +338,9 @@ export default {
                     {
                         name: 'XX参数',
                         type: 'line',
-                        smooth: true,
-                        smoothMonotone: "x",
-                        symbol: 'circle',
+                        //  smooth: true,
+                        //  smoothMonotone: "x",
+                        //  symbol: 'circle',  //曲线
                         data: [],
                         markLine: {
                             data: [
@@ -297,7 +349,8 @@ export default {
                                     name: '上限',
                                     lineStyle: {
                                         normal: {
-                                            color: "#febf00"
+                                            color: "#febf00",
+                                            width: 2
                                         }
                                     }
                                 },
@@ -306,7 +359,8 @@ export default {
                                     name: '下限',
                                     lineStyle: {
                                         normal: {
-                                            color: "#febf00"
+                                            color: "#febf00",
+                                            width: 2
                                         }
                                     }
                                 }
@@ -364,6 +418,63 @@ export default {
             window.addEventListener("resize", this.updateEcharts)
             window.addEventListener("resize", this.setFlexBase)
         },
+        // 表格导出。
+        exportExcelHandle(oData, event) {
+            if (!oData) {
+                return;
+            }
+            // 下载表格。
+            window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
+        },
+        // 表格打印。
+        printHandle(refTable, event) {
+            let oTable = this.$refs[refTable];
+
+            if (!oTable) {
+                return;
+            }
+
+            let sHtml = `
+                <div class="table el-table">
+                    <div class="el-table__header-wrapper">
+                        ${oTable.querySelector(".el-table__header-wrapper").innerHTML}
+                    </div>
+                    <div class="el-table__body-wrapper">
+                        ${oTable.querySelector(".el-table__body-wrapper").innerHTML}
+                    </div>
+                    <style>
+                        .el-table td.is-center, .el-table th.is-center {
+                            text-align: center;
+                        }
+                        .table thead th {
+                            height: 36px;
+                            background-color: #42af8f;
+                        }
+                        .table thead th .cell {
+                            color: #fff;
+                        }
+                        .el-table__body-wrapper tr:nth-child(even) {
+                            background-color: #fafafa;
+                        }
+                        .el-table__body-wrapper tr:nth-child(odd) {
+                            background-color: #fff;
+                        }
+                        .el-table__body-wrapper .cell {
+                            min-height: 30px;
+                            line-height: 30px;
+                            // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+                            // border: 1px solid #e4efec;
+                            box-sizing: border-box;
+                        }
+                        .el-table__empty-block {
+                            text-align: center;	
+                        }
+                    </style>
+                </div>
+            `;
+
+            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+        },
     }
 }
 </script>
@@ -413,10 +524,11 @@ export default {
 </style>
 <style lang="less" scoped>
 .charts {
-    width:100%;
+    width: 100%;
     box-sizing: border-box;
     min-height: 400px
 }
+
 .innner-content {
     display: flex;
     flex-direction: column;
@@ -428,6 +540,10 @@ export default {
         flex-direction: column;
         flex-basis: 200px;
         overflow: auto;
+    }
+    .content-table {
+        margin-top: 0;
+        margin-bottom: 20px
     }
 }
 </style>

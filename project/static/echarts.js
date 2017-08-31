@@ -1,4 +1,5 @@
 {
+    // echarts的option 的模板
     var option = {
         title: {
             text: 'XX 参数图表',
@@ -69,8 +70,8 @@
                                 }
                             }
                         },
-                        { 
-                            yAxis: 4, 
+                        {
+                            yAxis: 4,
                             name: '下限',
                             lineStyle: {
                                 normal: {
@@ -82,5 +83,36 @@
                 }
             }
         ]
+    },
+
+    /* tableData模板 */
+    var tableData = {
+        filename: "送检",
+        columns: [{
+            name: "序号",
+            type: "index",
+            width: "50"
+        }, {
+            name: "工艺参数",
+            prop: "varStdId",
+            width: "200",
+        }, {
+            name: "工艺参数描述",
+            prop: "equipmentName",
+            width: "200"
+        }, {
+            name: "检测值",
+            prop: "value",
+            width: ""
+        }, {
+            name: "单位",
+            prop: "varUnit",
+            width: "120",
+        }, {
+            name: "采集时间",
+            prop: "pickTime",
+            width: "200",
+        }],
+        data: []
     }
 }
