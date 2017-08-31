@@ -104,6 +104,8 @@
     const CHART_MARGIN_BOTTOM = 20
     // tooltip距离鼠标的水平位置。
     const TOOLTIP_X_DISTANCE = 10
+    // tooltip距离鼠标的水平位置。
+    const TOOLTIP_Y_DISTANCE = 10
     // 悬浮框最小高度。
     const TOOLTIP_MIN_HEIGHT = 20
     // legend距右侧的距离。
@@ -420,6 +422,8 @@
                                     left: -1000
                                 }
                             }
+
+                            pos[1] = pos[1] + TOOLTIP_Y_DISTANCE
 
                             if(pos[1] + aContentSize[1] > aViewSize[1]){
                                 // 若提示框范围超出面板范围，设置top值
@@ -803,6 +807,7 @@
 			},
             // 初始化图表。
             initChart() {
+                
                 this.setChartHeight();
 
                 if(!this.chart) {
@@ -823,7 +828,8 @@
             },
             // 重置图形大小。
             resizeChart () {
-                if(this.chart) {
+                
+                if(this.chart && this.chart.getOption()) {
                     this.setChartHeight();
                     this.chart.resize();
                     // 设置提示框的最大高度。
