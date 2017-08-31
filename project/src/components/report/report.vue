@@ -92,7 +92,7 @@
 		},
 		props: {
 			type: String,
-			query: Array
+			query: [Array, Object]
 		},
 		data() {
 			return {
@@ -100,7 +100,13 @@
 				print: true,
 				loading: false,
 				sErrorMessage: '',
-				url: "/api/v1/trace/report/by-batch",
+				oUrl: {
+					points: "/api/v1/trace/report/by-start-points",
+					barcode: "/api/v1/trace/report/by-equipment-barcode",
+					batch: "/api/v1/trace/report/by-equipment-batch",
+					time: "/api/v1/trace/report/by-equipment-time",
+					restrainBatch: "/api/v1/trace/report/by-batch"					
+				},
 				active: {
 					summary: true,
 					inStocks: false,
@@ -533,19 +539,20 @@
 							width: "150",
 							sortable: true
 						}],
-						data: [{
-							"batchNo": "批次号", 
-							"materialCode": "物料编码", 
-							"materialName": "物料名称", 
-							"processName": "工序名称",
-							"equipmentName": "设备名称",
-							"outTimeFirst": "2016-03-31 14:28:33",
-							"outTimeLast": "2016-03-31 14:28:33", //最后产出时间 格式：yyyy-MM-dd hh:mm:ss
-							"outNum": 16, //最后产出数量
-							"qualifiedNum": 14, //最后产出合格数
-							"unqualifiedNum": 1, //最后产出不合格数,
-							"disabilityNum": 1, // 最后产出报废数
-				        }]
+						data: []
+						// 	{
+						// 	"batchNo": "批次号", 
+						// 	"materialCode": "物料编码", 
+						// 	"materialName": "物料名称", 
+						// 	"processName": "工序名称",
+						// 	"equipmentName": "设备名称",
+						// 	"outTimeFirst": "2016-03-31 14:28:33",
+						// 	"outTimeLast": "2016-03-31 14:28:33", //最后产出时间 格式：yyyy-MM-dd hh:mm:ss
+						// 	"outNum": 16, //最后产出数量
+						// 	"qualifiedNum": 14, //最后产出合格数
+						// 	"unqualifiedNum": 1, //最后产出不合格数,
+						// 	"disabilityNum": 1, // 最后产出报废数
+				        // }
 					}
 				}				
 			}
@@ -593,43 +600,42 @@
 				this.sErrorMessage = '';
 				this.loading = true;
 				
+				let sUrl = ''
+
 				// 初始设置内容为空。
 				for(let param in this.reportData) {
 					this.reportData[param].data = [];
 				}
 
-				let oQuery = this.query;
-				//console.log(this.$route.query.equipmentCode)
-				//debugger
-				if(this.type == "trace") {
-					// 若为快速报告，根据物料+批次+bucketNo获取数据。
-					this.url = "/api/v1/trace/report/by-start-points";
-					
-					// oQuery = this.query;
-				}else {
-					oQuery = this.$route.query
-					if(oQuery && ("equipmentId" in oQuery)) {
-						// 若根据设备查询。
-						this.url = "/api/v1/trace/report/by-equipment";
-					}
+				let oParam = {}
 
-					// oQuery ={
-					// 	"materialCode":this.$route.query.materialCode,
-					// 	"batchNo":this.$route.query.batchNo
-					// }
+				if(this.type == "trace") {
+					// 若为快速报告。
+					let oQuery = this.query
+					
+					if(oQuery.type) {
+						// 若为溯源页面跳转。
+						sUrl = this.oUrl[oQuery.type]
+						oParam = oQuery.keys
+						delete oParam.equipmentName
+					}else {
+						sUrl = this.oUrl["points"]
+						oParam = oQuery
+					}
+				}else {
+					// 若为遏制报告。
+					oParam = this.$route.query
+					if(oParam && ("equipmentId" in oParam)) {
+						// 若根据设备查询。
+						sUrl = this.oUrl["time"]
+						delete oParam.equipmentName
+					}else {
+						// 根据物料查询。
+						sUrl = this.oUrl["restrainBatch"]
+					}
 				}
-				
-				// oQuery = [
-				// 			{
-				// 			"batchNo": "20151118A",
-				// 			"bucketNo": "28_D201511170002_20151118152959491",
-				// 			"iokey": "D201511170003_59_2015-11-18 15:49:55_6501",
-				// 			"materialCode": "20000375",
-				// 			"materialName": "MP/C15VVT-S3 活塞毛坯/074175",
-				// 			"productionMode": 0
-				// 			}
-				// 		]
-				this.$post(HOST + this.url, oQuery)
+
+				this.$post(HOST + sUrl, oParam)
 					.then((res) => {
 						this.loading = false;					
 						let bSetWidth = false;
@@ -718,7 +724,7 @@
 				for(let p in filters) {
 					selected = filters[p];
 				}
-				debugger
+				
 				// 设置过滤数据。
 				selected.map(s => this.reportData[param].filteredData = this.reportData[param].data.filter(o => o.customer == s))
 						

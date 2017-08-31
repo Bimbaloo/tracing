@@ -80,8 +80,8 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
-                //    class: "barcode",
-                //    cellClick: this.barcodeClick
+                    class: "barcode",
+                    cellClick: this.barcodeClick
                 }, {
                     name: "派工单号",
                     prop: "doCode",
@@ -90,8 +90,8 @@ export default {
                     name: "批次号",
                     prop: "batchNo",
                     width: "200",
-                //    class: "batch",
-                //    cellClick: this.batchClick
+                    class: "batch",
+                    cellClick: this.batchClick
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
@@ -333,11 +333,36 @@ export default {
         
             return aoData;
         },
-        batchClick() {
-            console.log("批次号")
+        batchClick(row) {
+            // 批次追踪。
+            let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+                oCondition = {
+                    "keys": {
+                        equipmentId: this.$route.query["equipmentId"],
+                        equipmentName: this.$route.query["equipmentName"],
+                        batchNo : row.batchNo,
+                        materialCode : row.materialCode
+                    }, 
+                    "type": "batch"
+                }
+
+            sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+            window.open("trackIndex.html?tag="+tag);
         },
-        barcodeClick() {
-            console.log("条码")
+        barcodeClick(row) {
+            // 单件追踪。
+            let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+                oCondition = {
+                    "keys": {
+                        equipmentId: this.$route.query["equipmentId"],
+                        equipmentName: this.$route.query["equipmentName"],
+                        barcode : row.barcode
+                    }, 
+                    "type": "barcode"
+                }
+
+            sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+            window.open("trackIndex.html?tag="+tag);
         },
         materialClick(row) {
             // console.log("物料编码")
@@ -347,7 +372,7 @@ export default {
                     materialCode : row.materialCode
                 },			
                 sPath = "/process/restrain"
-            console.log(oQuery)  		
+	
 			this.$router.replace({ path: sPath, query: oQuery})
         },
         // 表格导出。
