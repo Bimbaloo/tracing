@@ -9,7 +9,7 @@
                 </div>
             </div>
             <h2 class="content-title" id='content-title'>
-                工艺参数
+                <span>工艺参数</span>    
             </h2>
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
                 <div class="content-echarts" v-for="(option,index) in options">
@@ -18,7 +18,7 @@
 
                 <div class="content-tables" v-for="(tableData,index) in tableDatas">
                     <h2 class="content-title tableData">
-                        送检记录
+                        <span>{{tableData.filename}}</span>
                         <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
                         <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
                     </h2>
@@ -190,6 +190,7 @@ export default {
                             } else {
                                 /* 做成表格 */
                                 tableDataArr.push(this.setTableData(data))
+                                return tableDataArr
                             }
 
                         })
@@ -236,7 +237,7 @@ export default {
         /* 处理每个tableData */
         setTableData(data) {
             let tableData = {
-                filename: "送检",
+                filename: "名称",
                 columns: [{
                     name: "序号",
                     type: "index",
@@ -264,6 +265,7 @@ export default {
                 }],
                 data: []
             }
+            tableData.filename = data.description
             tableData.data =data.list.map((el)=>{
                     let arr = {}
                     arr.varStdId = data.varStdId
@@ -282,7 +284,12 @@ export default {
             let optionModal = {
                 title: {
                     text: 'XX 参数图表',
-                    subtext: ''
+                    textStyle: {
+                        fontSize: 16,
+                        fontFamily: "Microsoft YaHei",
+                        fontWeight: '400'
+                    },
+                    left: 4
                 },
                 tooltip: {
                     trigger: 'axis'
@@ -305,7 +312,20 @@ export default {
                 xAxis: {
                     type: 'category',
                     boundaryGap: false,
-                    data: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12', '13', '14']
+                    data: [],
+                    axisLine: {
+                        lineStyle: {
+                            color: "#999"
+                        }
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#333'
+                        }
+                    }
                 },
                 yAxis: {
                     type: 'value',
@@ -313,6 +333,19 @@ export default {
                     max: 400,
                     axisLabel: {
                         formatter: '{value} '
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: "#999"
+                        }
+                    },
+                    splitLine: {
+                        show: false
+                    },
+                    axisLabel: {
+                        textStyle: {
+                            color: '#333'
+                        }
                     }
                 },
                 visualMap: {
@@ -541,9 +574,12 @@ export default {
         flex-basis: 200px;
         overflow: auto;
     }
-    .content-table {
+    .content-tables {
         margin-top: 0;
-        margin-bottom: 20px
+        margin-bottom: 20px;
+        .tableData {
+            border-left: 0;
+        }
     }
 }
 </style>
