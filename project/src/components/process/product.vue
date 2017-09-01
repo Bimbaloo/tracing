@@ -80,8 +80,8 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
-                    class: "barcode",
-                    cellClick: this.barcodeClick
+                    // class: "barcode",
+                    // cellClick: this.barcodeClick
                 }, {
                     name: "派工单号",
                     prop: "doCode",
@@ -90,8 +90,8 @@ export default {
                     name: "批次号",
                     prop: "batchNo",
                     width: "200",
-                    class: "batch",
-                    cellClick: this.batchClick
+                    // class: "batch",
+                    // cellClick: this.batchClick
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
@@ -130,8 +130,8 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
-                    class: "barcode",
-                    cellClick: this.barcodeClick
+                    // class: "barcode",
+                    // cellClick: this.barcodeClick
                 }, {
                     name: "箱码",
                     prop: "",
@@ -144,8 +144,8 @@ export default {
                     name: "批次号",
                     prop: "batchNo",
                     width: "200",
-                    class: "batch",
-                    cellClick: this.batchClick                
+                    // class: "batch",
+                    // cellClick: this.batchClick                
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
