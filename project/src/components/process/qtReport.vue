@@ -34,7 +34,7 @@
 	// var HOST = window.HOST ? window.HOST: host	
     const url = HOST + `/api/v1/quality/inspect/by-equipment-time`;
 //const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
-//const url = `static/sb.json`
+//const url = `static/a.json`
 
 export default {
     components: {
@@ -67,49 +67,45 @@ export default {
                 },
             ],
             condition: {},
-            /* 投入 */
+            /* 质检显示数据*/
             tableData: {
                 filename: "质检记录",
                 columns: [{
                     name: "三检类型",
-                    prop: "barcode",
-                    width: "200",
+                    prop: "methodName",
+                    width: "80",
                 }, {
                     name: "设备编码",
-                    prop: "eqipmentCode",
-                    width: "200"
+                    prop: "equipmentCode",
+                    width: ""
                 }, {
                     name: "设备名称",
-                    prop: "eqipmentName",
-                    width: "200"
+                    prop: "equipmentName",
+                    width: ""
                 }, {
                     name: "上报时间",
                     prop: "reportTime",
-                    width: "200",
+                    width: "180",
                 }, {
                     name: "检验时间",
                     prop: "commitTime",
-                    width: "200",
+                    width: "180",
                 }, {
                     name: "审核时间",
                     prop: "inspectedTime",
-                    width: "120"
+                    width: "180"
                 }, {
                     name: "人员姓名",
                     prop: "operatorName",
-                    width: "300"
+                    width: "120"
                 }, {
                     name: "员工号",
                     prop: "operatorCard",
-                    width: "200"
-                },{
-                    name: "审核时间",
-                    prop: "inspectedTime",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "检验结果",
-                    prop: "operatorCard",
-                    width: "120"
+                    prop: "isPassName",
+                    width: ""
                 }
                 // ,{
                 //     name: "检验项目",

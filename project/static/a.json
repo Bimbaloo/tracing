@@ -1,0 +1,34 @@
+{
+    "errorCode": 0,
+    "errorMsg": "",
+    "data": [
+        {
+            "methodName": "首检",
+            "equipmentName": "除气02",
+            "reportTime": "2016-10-25 15:14:36",
+            "commitTime": null,
+            "inspectedTime": null,
+            "operatorCard": "05229204",
+            "operatorName": null,
+            "isPass": 9,
+            "isPassName": "未确认",
+            "items": [
+                {
+                    "itemSeq": 1,
+                    "itemName": "精炼除气",
+                    "value": "合格"
+                },
+                {
+                    "itemSeq": 2,
+                    "itemName": "成分检验",
+                    "value": "合格"
+                },
+                {
+                    "itemSeq": 3,
+                    "itemName": "除气质量检验",
+                    "value": "1.00"
+                }
+            ]
+        }
+    ]
+}

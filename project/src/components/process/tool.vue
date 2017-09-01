@@ -77,27 +77,27 @@ export default {
                 }, {
                     name: "工具位子",
                     prop: "toolPosition",
-                    width: "200",
+                    width: "",
                 }, {
                     name: "工具编码",
                     prop: "toolCode",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "工具类型",
                     prop: "toolTypeName",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "工具名称",
                     prop: "toolName",
-                    width: "200",
+                    width: "",
                 }, {
                     name: "规格",
                     prop: "toolSpec",
-                    width: "200",
+                    width: "",
                 }, {
                     name: "操作类型",
                     prop: "operateType",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "操作时间",
                     prop: "operateTime",
@@ -105,15 +105,15 @@ export default {
                 }, {
                     name: "操作人",
                     prop: "operatorName",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "额定寿命",
                     prop: "ratedLife",
-                    width: "120"
+                    width: ""
                 },  {
                     name: "剩余寿命",
                     prop: "life",
-                    width: "120"
+                    width: ""
                 }],
                 height: 1,
                 data: []
