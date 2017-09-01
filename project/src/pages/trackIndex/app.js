@@ -42,6 +42,7 @@ const FgbReport = r => require.ensure([], () => r(require('components/process/fg
 const Tool = r => require.ensure([], () => r(require('components/process/tool.vue')), 'group-detail')           //工具
 const Event = r => require.ensure([], () => r(require('components/process/event.vue')), 'group-detail')         //事件
 const Repair = r => require.ensure([], () => r(require('components/process/repair.vue')), 'group-detail')       //维护记录
+const Parameter = r => require.ensure([], () => r(require('components/process/parameter.vue')), 'group-detail') //工艺参数
 
 const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-detail')
 const Track = r => require.ensure([], () => r(require('components/track/track.vue')), 'group-detail')
@@ -91,7 +92,10 @@ const routes = [{
     },{//维护记录
       path: 'repair',
       component: Repair
-    },{
+    },{//工艺参数
+      path: 'parameter',
+      component: Parameter
+    },{//遏制
       path: 'restrain',
       component: Suspicious
     }]

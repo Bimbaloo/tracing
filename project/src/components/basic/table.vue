@@ -9,6 +9,7 @@
     class="table"
     :row-key="tableData.data.prop"
     :height="heights"
+    :max-height="maxHeight"
     v-loading="loading"
     element-loading-text="拼命加载中"
     style="width: 100%"
@@ -62,6 +63,9 @@
             tableData: Object,
             loading: Boolean,
             heights: {
+            	required: false
+            },
+            maxHeight: {
             	required: false
             },
             bFixed: {
