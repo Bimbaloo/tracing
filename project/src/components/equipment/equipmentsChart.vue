@@ -241,7 +241,7 @@
                     color: "#FAC41B",
                     list: [{
 						name: "工艺参数",
-                        router: "/process/parameter",
+                        // router: "/process/parameter",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
                     }]
 				}, {

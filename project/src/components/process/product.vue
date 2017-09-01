@@ -130,6 +130,8 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
+                    class: "barcode",
+                    cellClick: this.barcodeClick
                 }, {
                     name: "箱码",
                     prop: "",
@@ -141,7 +143,9 @@ export default {
                 }, {
                     name: "批次号",
                     prop: "batchNo",
-                    width: "200"
+                    width: "200",
+                    class: "batch",
+                    cellClick: this.batchClick                
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
@@ -233,7 +237,7 @@ export default {
     },
     updated(){
 
-        this.setTitle(".barcode","单件追踪")
+        this.setTitle(".barcode","条码追踪")
         this.setTitle(".batch","批次追踪")
         this.setTitle(".material","遏制")
         

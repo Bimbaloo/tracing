@@ -223,7 +223,7 @@
 			this.fetchDataName()  //获取名称
 		},
 		mounted() {
-			this.fetchData();
+			this.fetchStartPointsData();
 		},
 		methods: {
 			setFilters () {
@@ -281,10 +281,13 @@
 					fnFail && fnFail();
 				}
 			},	
-			fetchData () {
+			fetchStartPointsData () {
 				this.error = "";
 				this.gridData.data = [];
-				// url:api/v1/trace/down/start-points
+				
+				if(this.type) {
+					return;
+				}
              	this.$post(this.url, fnP.parseQueryParam(this.filters))
              	.then((res) => {
 	
