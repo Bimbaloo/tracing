@@ -73,7 +73,7 @@ export default {
                 columns: [{
                     name: "三检类型",
                     prop: "methodName",
-                    width: "120",
+                    width: "80",
                 }, {
                     name: "设备编码",
                     prop: "equipmentCode",
@@ -85,15 +85,15 @@ export default {
                 }, {
                     name: "上报时间",
                     prop: "reportTime",
-                    width: "200",
+                    width: "180",
                 }, {
                     name: "检验时间",
                     prop: "commitTime",
-                    width: "200",
+                    width: "180",
                 }, {
                     name: "审核时间",
                     prop: "inspectedTime",
-                    width: "200"
+                    width: "180"
                 }, {
                     name: "人员姓名",
                     prop: "operatorName",
