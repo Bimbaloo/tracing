@@ -30,9 +30,7 @@ import FileSaver from 'file-saver'
 import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
-// import {host} from 'assets/js/configs.js'
 
-// var HOST = window.HOST ? window.HOST: host
 const url = HOST + '/api/v1/eventrecord/by-equipment-time';
 //const url = `http://rapapi.org/mockjsdata/24404/eventrecord/by-equipment-time?`;
 export default {
@@ -65,7 +63,7 @@ export default {
                     itemName: "结束时间"
                 },
             ],
-            /* 投入 */
+            /* 事件 */
             tableData: {
                 filename: "事件记录",
                 columns: [{
@@ -316,15 +314,6 @@ export default {
         setTbaleHeight() {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.tableData.height = this.adjustHeight()
-        },
-        /* 设置title */
-        setTitle(el, title) {
-            let elTds = document.querySelectorAll(el)
-            elTds.forEach((el, index) => {
-                if (elTds[index].tagName.toLocaleLowerCase() === 'td') {
-                    el.setAttribute('title', title);
-                }
-            })
         }
     }
 }
