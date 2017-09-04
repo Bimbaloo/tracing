@@ -268,7 +268,7 @@
 						name: "FGB",
 						// cpt: "/FGBReport.cpt&__bypagesize__=false",
                         // parameter: ["equipmentId", "startTime", "endTime", "processCode"]
-                        // router: "/process/fgbReport",
+                        router: "/process/fgbReport",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
 
                     }]
