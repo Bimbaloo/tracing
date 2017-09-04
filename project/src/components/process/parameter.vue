@@ -18,9 +18,11 @@
 
                 <div class="content-tables" v-for="(tableData,index) in tableDatas">
                     <h2 class="content-title tableData">
-                        <span>{{tableData.filename}}</span>
-                        <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                        <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
+                        <span class='table-title'>{{tableData.filename}}</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
+                        </span>
                     </h2>
                     <div class="content-table" ref="`tableData${index}`">
                        <v-table :table-data="tableData" :max-height="400" :loading="loading" :resize="tdResize"></v-table>
@@ -298,7 +300,7 @@ export default {
                     data: ['XX参数']
                 },
                 toolbox: {
-                    // show: true,
+                    show: true,
                     feature: {
                         dataZoom: {
                             yAxisIndex: 'none'
@@ -307,7 +309,8 @@ export default {
                         magicType: { type: ['line', 'bar'] },
                         restore: {},
                         saveAsImage: {}
-                    }
+                    },
+                    right: 2
                 },
                 xAxis: {
                     type: 'category',
@@ -578,7 +581,20 @@ export default {
         margin-top: 0;
         margin-bottom: 20px;
         .tableData {
+            display: flex;
             border-left: 0;
+            justify-content: space-between;
+            .table-handle {
+                margin-right: 5px;
+                i {
+                    margin:5px;
+                }
+            }
+            .table-table {
+                i {
+                    margin:5px;
+                }
+            }
         }
     }
 }
