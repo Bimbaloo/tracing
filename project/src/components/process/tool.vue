@@ -9,9 +9,11 @@
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	工具记录
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('toolTable', $event)"></i>
+                <span class='table-title'>工具记录</span>
+                <span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('toolTable', $event)"></i>
+                </span>
             </h2>
 			<div class="content-table" ref="toolTable">
                 <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
@@ -368,6 +370,23 @@ export default {
 
 </style>
 
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        i {
+            margin: 5px;
+        }
+    }
+    .table-table {
+        i {
+            margin: 5px;
+        }
+    }
+}
+</style>
 
 
 

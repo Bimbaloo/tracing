@@ -3,15 +3,18 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in tableData.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
-                    </span> 
+                    </span>
+                    <el-input v-model="input" placeholder="请输入查询编码"  @change="filterArray"></el-input>
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	fgb检验记录
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('fgbTable', $event)"></i>
+                <span class='table-title'>fgb检验</span>
+                <span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('fgbTable', $event)"></i>
+                </span>
             </h2>
 			<div class="content-table" ref="fgbTable">
                 <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
@@ -29,14 +32,13 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
-	// import {host} from 'assets/js/configs.js'
 
-	// var HOST = window.HOST ? window.HOST: host
-    const url = HOST + "/api/v1/trace/inout/by-equipment";
+   // const url = HOST + "/api/v1/quality/fgb/detail";
+    const url = `http://rapapi.org/mockjsdata/24404/eventrecord/by-equipment-time?`;
 
 export default {
     components: {
-		'v-table': table
+        'v-table': table
 	},
     data() {
         return {
@@ -51,7 +53,20 @@ export default {
          
             loading: false,
             tdResize: true, //是否允许拖动table大小
-            /* 投入 */
+            condition: {},   // 查询条件    
+            dataName: [      // 条件对应中文名
+                {
+                    itemCode: "equipmentName",
+                    itemName: "设备"
+                }, {
+                    itemCode: "startTime",
+                    itemName: "开始时间"
+                }, {
+                    itemCode: "endTime",
+                    itemName: "结束时间"
+                },
+            ],
+            /* fgb */
             tableData: {
                 filename: 'fgb检验',
                 columns: [{
@@ -112,17 +127,17 @@ export default {
                     width: "300"
                 }],
                 height: 1,
-                data: [],
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+                data: []
             },
            
-          routerContent:0
+          routerContent:0,
+          input: ""
 
         }
 
     },
     created() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        
 
         this.fetchData();
        
@@ -137,10 +152,33 @@ export default {
         },
         fullscreen: function(){
             return this.$store && this.$store.state.fullscreen
+        },
+        /* 查询条件转数组中文 */
+        filters: function() {
+            let filters = this.condition
+            for (let i in filters) {
+                if (filters[i] === '' || i === '_tag') {
+                    delete filters[i]
+                }
+            }
+            /* 为了将获取到的 barcode等转换为对应的中文 */
+            let b = Object.entries(filters),
+                a = this.dataName;
+
+            b.forEach(o =>
+                a.forEach(function(x) {
+                    if (o[0] === x.itemCode) {
+                        o[0] = x.itemName
+                    }
+                })
+            )
+            return b
+            /* 为了将获取到的 barcode等转换为对应的中文 */
         }
     },
     mounted(){
-       this.tableData.height  = this.adjustHeight()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
@@ -181,14 +219,22 @@ export default {
         fetchData() {    
             
             this.loading = true;
-            let oQuery = this.$route.query;
+            let oQuery = {}
+            Object.keys(this.$route.query).forEach((el) => {
+                if (el === "equipmentId" || el === "startTime" || el === "endTime") {
+                    oQuery[el] = this.$route.query[el]
+                }
+                if (el === "equipmentName" || el === "startTime" || el === "endTime") {
+                    this.condition[el] = this.$route.query[el]
+                }
+            })
 
-            this.$post(url, oQuery)
+            this.$get(url, oQuery)
             .then((res) => {
                 this.loading = false;
              
                 this.judgeLoaderHandler(res,() => {
-                    this.tableData.data = res.data.data.in
+                    this.tableData.data = res.data.data
                 });				 
             })
             .catch((err) => {
@@ -242,7 +288,7 @@ export default {
                             min-height: 30px;
                             line-height: 30px;
                             // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-//	        					border: 1px solid #e4efec;
+                            // border: 1px solid #e4efec;
                             box-sizing: border-box;
                         }
                         .el-table__empty-block {
@@ -277,15 +323,6 @@ export default {
         setTbaleHeight(){
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.tableData.height = this.adjustHeight()
-        },
-        /* 设置title */
-        setTitle(el,title){
-            let elTds = document.querySelectorAll(el)
-            elTds.forEach((el,index)=>{
-                if(elTds[index].tagName.toLocaleLowerCase() === 'td'){
-                        el.setAttribute('title', title);
-                }
-            })
         }
     }
 }
@@ -336,6 +373,22 @@ export default {
 
 </style>
 
-
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        i {
+            margin: 5px;
+        }
+    }
+    .table-table {
+        i {
+            margin: 5px;
+        }
+    }
+}
+</style>
 
 
