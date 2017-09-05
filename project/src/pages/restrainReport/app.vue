@@ -75,6 +75,7 @@
 		border: 1px solid #ccc;
 		padding: 0 20px;
 		background-color: #fff;
+		box-sizing: border-box;
 		
 		.title {
 			height: 24px;

@@ -18,7 +18,7 @@
 					</span> 
 				</div>	
 				<div class='result-messsage' v-if="!type">
-					<span style="cursor:pointer">结果集:</span>
+					<span style="cursor:pointer">结果集 : </span>
 					<span @click="dialogVisible('all')" label="all" style="cursor:pointer">共<i> {{result.whole}} </i>条,</span>
 					<span @click="dialogVisible('selected')" label="selected" style="cursor:pointer">选中<i> {{result.selected}} </i>条,</span>
 					<span @click="dialogVisible('filtered')" label="filtered" style="cursor:pointer">过滤<i> {{result.filter}} </i>条。</span>
@@ -254,11 +254,9 @@
 
 				if(oItem) {
 					if(typeof sValue === "string") {
-						let aValue = sValue.split(":")
-						if((param === "equipmentCode" || param === "materialCode") && aValue[1]) {
-							// 若为设备编码或物料编码,但值包含编码和名称。
-							sValue = aValue[1]
-						}
+						let oParam = {};
+						oParam[param] = sValue;
+						sValue = fnP.parseQueryParam(oParam, 1)[param]
 					}
 
 					return [oItem.itemName, sValue]
@@ -393,6 +391,7 @@
 		padding: 0 20px;
 		background-color: #fff;
 		position: relative;
+		box-sizing: border-box;
 		
 		.page-icon {
 			position: absolute;
@@ -438,14 +437,14 @@
 		.condition-messsage {
 			line-height: 25px;
 			span {
-				margin-left: 10px
+				margin-right: 30px
 			}
 		}
 		.result-messsage {
 			line-height: 25px;
-			span:nth-child(1) {
-				margin-left: 10px
-			}
+			// span:nth-child(1) {
+			// 	margin-left: 10px
+			// }
 		}
 		span {
 			display: inline-block;
