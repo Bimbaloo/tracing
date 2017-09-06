@@ -514,9 +514,9 @@ export default {
 }
 
 .table {
-    .batch,
-    .barcode,
-    .material {
+    td.batch,
+    td.barcode,
+    td.material {
         cursor: pointer;
         color: #f90;
 
