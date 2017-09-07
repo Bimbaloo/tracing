@@ -7,7 +7,7 @@
                         {{filter[0]}} : {{filter[1]}}
                     </span>
                     <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-                        <el-form-item label="条码" > 
+                        <el-form-item label="条码：" > 
                              <el-input v-model="ruleForm.input" placeholder="请输入编码"  @change="updateRow" ></el-input>
                         </el-form-item>
                     </el-form>
@@ -156,7 +156,12 @@ export default {
         },
         /* 显示的行信息 */
         datas: function() {
-            return this.tableData.data 
+            if(this.ruleForm.input === ""){
+                return this.tableData.data 
+            }else {
+                return this.updateRow(this.ruleForm.input)
+            }
+            
         }
     },
     mounted() {
@@ -337,8 +342,17 @@ export default {
             }
         },
         /* 根据刷选条件显示行 */
-        updateRow() {
-            return 0
+        updateRow(value) {
+            let odata;
+            if(value !== ""){
+                let reg =new RegExp("\\w*" + value + "\\w*");
+                odata = this.tableData.data.filter((el)=>{
+                   return reg.test(el.value) === true
+                })
+            }else{
+                odata = this.tableData.data
+            }
+            return odata
         }
     }
 }
@@ -403,7 +417,7 @@ export default {
  .el-form-input {
      display: inline-block;
      margin-left: 60px;
-     width: 230px;
+     width: 240px;
      .el-form-item {
          margin-bottom:0;
      }
