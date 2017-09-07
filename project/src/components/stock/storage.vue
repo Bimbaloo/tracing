@@ -2,10 +2,12 @@
 <template>
     <div class="router-content">
         <div class="innner-content">
-            <h2 class="content-title">
-               	 出库信息
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>
+            <h2 class="content-title tableData">
+                <span class='table-title'>出库信息</span>
+               	<span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>
+                </span>
             </h2>
             <div v-if="outstockData.error" class="error" :style="styleError">
                 {{ outstockData.error }}
@@ -14,10 +16,12 @@
             	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>            
                 <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
-            <h2 class="content-title">
-               	 入库信息
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+            <h2 class="content-title tableData">
+                <span class='table-title'>入库信息</span>
+                <span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+                </span>
             </h2>
             <div v-if="instockData.error" class="error" :style="styleError">
                 {{ instockData.error }}
@@ -330,7 +334,7 @@
 	        				.el-table__body-wrapper .cell {
 	        					min-height: 30px;
 	        					line-height: 30px;
-//	        					border: 1px solid #e4efec;
+                            //  border: 1px solid #e4efec;
 	        				}
 	        				.batch {
 	        					color: #f90;
@@ -399,3 +403,21 @@
 
     }
 </style>
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        i {
+            margin: 5px;
+        }
+    }
+    .table-table {
+        i {
+            margin: 5px;
+        }
+    }
+}
+</style>
+
