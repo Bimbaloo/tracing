@@ -75,11 +75,13 @@ export default {
                     name: "三检类型",
                     prop: "methodName",
                     width: "80",
-                }, {
-                    name: "设备编码",
-                    prop: "equipmentCode",
-                    width: ""
-                }, {
+                }, 
+                // {
+                //     name: "设备编码",
+                //     prop: "equipmentCode",
+                //     width: ""
+                // }, 
+                {
                     name: "设备名称",
                     prop: "equipmentName",
                     width: ""
