@@ -51,10 +51,10 @@ import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
-// const url = HOST + "/api/v1/fgb/by-equipment-time";
-// const url2 = HOST + `/api/v1/fgb/by-dataid`;
-const url = "static/fgb.json"
-const url2 = "static/fgb2.json"
+const url = HOST + "/api/v1/fgb/by-equipment-time";
+const url2 = HOST + `/api/v1/fgb/by-dataid`;
+//const url = "static/fgb.json"
+//const url2 = "static/fgb2.json"
 
 export default {
     components: {
