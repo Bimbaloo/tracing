@@ -135,7 +135,7 @@ const config = {
     },
     open: true,
     openPage: 'search.html',
-    //compress: true //开启gzip压缩
+    compress: true //开启gzip压缩
   },
   devtool: '#eval-source-map'
 }
