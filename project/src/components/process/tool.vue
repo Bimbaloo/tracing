@@ -110,7 +110,7 @@ export default {
                     width: ""
                 }, {
                     name: "额定寿命",
-                    prop: "ratedLife",
+                    prop: "toolRatedLife",
                     width: ""
                 },  {
                     name: "剩余寿命",
