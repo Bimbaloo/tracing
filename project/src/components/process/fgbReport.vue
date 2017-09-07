@@ -335,6 +335,10 @@ export default {
                     console.log(err)
                 })
             }
+        },
+        /* 根据刷选条件显示行 */
+        updateRow() {
+            return 0
         }
     }
 }
@@ -361,27 +365,6 @@ export default {
         right: auto;
     }
 }
-
-.table {
-    .batch,
-    .barcode,
-    .material {
-        cursor: pointer;
-        color: #f90;
-
-        .cell {
-            font-weight: 600;
-
-            &:empty {
-                cursor: default;
-            }
-        }
-    }
-    .clicked {
-        cursor: pointer;
-        color: #f90;
-    }
-}
 .el-table__expanded-cell{
     background-color: #f4fcf9;
     padding: 0;
@@ -396,7 +379,6 @@ export default {
         }
     }
 }
-
 </style>
 
 <style lang="less" scoped>

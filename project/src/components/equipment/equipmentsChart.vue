@@ -65,7 +65,7 @@
                         v-show="dimension.filter(o => o.key === compareData.dimension)[0].show && (compareData.dimension==='pool'?(!onlyShowRelatedData || (compareData.related && onlyShowRelatedData)):true)">
                         
                         <div class="tooltip-panel" :style="{left:compareData.left*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
-                            <div class="tooltip-time">{{compareData.time}}</div>
+                            <div class="tooltip-time" @click="tooltipPanelClickHandle(compareData.millisecond)">{{compareData.time}}</div>
                             <i class="btn-close el-icon-close" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
                             <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
                                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
@@ -2233,12 +2233,13 @@
                 .tooltip-time {
                     color: #fff;
                     // font-size: 12px;
-                    background-color: #D53A35;
+                    background-color: rgb(213, 58, 53);//#D53A35;
                     // font-weight: bold;
                     // padding-bottom: 5px;
                     text-align: center;
                     height: 20px;
                     line-height: 20px;
+                    cursor: pointer;
                 }
 
                 .tooltip-list {

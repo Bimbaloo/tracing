@@ -387,26 +387,6 @@ export default {
     }
 }
 
-.table {
-    .batch,
-    .barcode,
-    .material {
-        cursor: pointer;
-        color: #f90;
-
-        .cell {
-            font-weight: 600;
-
-            &:empty {
-                cursor: default;
-            }
-        }
-    }
-    .clicked {
-        cursor: pointer;
-        color: #f90;
-    }
-}
 </style>
 
 <style lang="less" scoped>
