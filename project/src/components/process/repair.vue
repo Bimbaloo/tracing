@@ -70,10 +70,6 @@ export default {
             tableData: {
                 filename: "维护记录",
                 columns: [{
-                    name: "序号",
-                    type: "index",
-                    width: "50"
-                }, {
                     name: "维护人",
                     prop: "personName"
                 }, {

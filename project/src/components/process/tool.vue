@@ -73,10 +73,6 @@ export default {
             /* 投入 */
             tableData: {
                 columns: [{
-                    name: "序号",
-                    type:"index",
-                    width: "50"
-                }, {
                     name: "工具位子",
                     prop: "toolPosition",
                     width: "",

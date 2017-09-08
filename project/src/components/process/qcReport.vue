@@ -69,10 +69,6 @@ export default {
             tableData: {
                 filename: "送检",
                 columns: [{
-                    name: "序号",
-                    type: "index",
-                    width: "50"
-                }, {
                     name: "送检ID",
                     prop: "requestId",
                     width: "120",
