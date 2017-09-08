@@ -108,8 +108,8 @@ export default {
             routerContent: 0,
             ruleForm:{
                 input: ""
-            }
-           
+            },
+           expandedId:[] //用于保存展开过的行的id
 
         }
 
@@ -216,7 +216,12 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
+            /* 测试数据 */
+            oQuery = {
+                "equipmentId": "186",
+                "startTime": "2017-08-11 00:34:52",
+                "endTime": "2017-08-11 00:35:18"
+            }
             this.$get(url, oQuery)
                 .then((res) => {
                     this.loading = false;
@@ -321,9 +326,11 @@ export default {
         },
         /* 根据新获取的检验值，设置中文名和英文名对应关系 */
         dataEdit(row, expanded) {
-            if(!!expanded){  //如果展开的话
+            //debugger
+            let Id = row.dataId
+            if(!!expanded && !this.expandedId.some(el=>el===Id)){  //如果展开的话
                 let dataId = {
-                    "dataId": row.dataId
+                    "dataId": Id
                 }
                 this.$get(url2, dataId).then((res) => {
                     this.judgeLoaderHandler(res, () => {
@@ -333,6 +340,7 @@ export default {
                             this.tableData.columns.push(newData)
                             this.$set(row, `${el.description}`, `${el.value}${el.varUnit}`)
                         })
+                        this.expandedId.push(Id)
                         
                     });
                 })
