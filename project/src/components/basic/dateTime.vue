@@ -3,6 +3,7 @@
       v-model="sTime" 
       :type="dateType"
       :placeholder="hint" 
+      :disabled="disabled"
       style="width: 100%;"
       @change.native = "dateChange"
       @change = "dateClick">
@@ -18,6 +19,10 @@
         	dateType: {
         		required: false,
         		default: "datetime"
+        	},
+        	disabled: {
+        		required: false,
+        		default: false
         	}
         },
         data() {

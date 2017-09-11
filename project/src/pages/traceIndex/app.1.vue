@@ -256,80 +256,56 @@
 				let aoData = fnP.parseTreeData(this.rawData),		//this.rawData,
 					aoDiagramData = [],
 					aoDiagramLinkData = [];
-				
-				aoData.forEach(oData => {	
-					// 树节点。		
-					if(oData.isMaterialNode) {
-						// 若为物料节点。
-						oData.category = "simple";
-					}else {
-						// 若为工序节点。
-						if(oData.isGroup) {
-							// 若为group
-							let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.processSeq < b.processSeq)[0]
-							if(oLastGroupItem) {
-								// 取最后一道工序的产出。
-								oData.processInfoList = oLastGroupItem.processInfoList
-							}
-						}
-						if(oData.processInfoList.length) {
-							// 有数据。
-							oData.materialName = oData.processInfoList[0].materialName;
-						}
-						oData.category = "simple";
-					}	
 					
+				aoData.forEach(oData => {	
+					// 树节点。				
 					aoDiagramData.push(oData);
 					let aoParents = oData.parents.split(",");
 					aoParents.forEach( sParent => {
 						aoDiagramLinkData.push({
 							from: sParent,
-							to: oData.key,
-							fromPort: "FROM",
-							toPort: "TO"
+							to: oData.key
 						});
 					});
 
-					// // 注释节点。
-					// if(oData.isMaterialNode && oData.materialInfoList.length) {
-					// 	// 若为物料，且有数据。
-					// 	aoDiagramData.push({
-					// 		key: oData.key + "comment",
-					// 		items: oData.materialInfoList.map(o => {
-					// 			return {
-					// 				batch: o.batchNo || '-', 
-					// 				sum: o.sumQuantity
-					// 			}
-					// 		}),
-					// 		category: "materialComment"
-					// 	})
-					// 	aoDiagramLinkData.push({
-					// 		from: oData.key,
-					// 		to: oData.key + "comment",
-					// 		category: "Comment"
-					// 	});
-					// }else if(oData.processInfoList.length){
-					// 	// 若为工序，且有数据。
-					// 	aoDiagramData.push({
-					// 		key: oData.key + "comment",
-					// 		material: oData.processInfoList[0].materialName || '-',
-					// 		items: oData.processInfoList.map(o => {
-					// 			return {
-					// 				equipment: o.equipmentName || '-',
-					// 				batch: o.batchNo || '-', 
-					// 				sum: o.sumQuantity
-					// 			}
-					// 		}),
-					// 		category: "processComment"
-					// 	})
-					// 	aoDiagramLinkData.push({
-					// 		from: oData.key,
-					// 		to: oData.key + "comment",
-					// 		category: "Comment",
-					// 		fromPort: "TEXTBLOCK",
-					// 		toPort: "COMMENT"
-					// 	});
-					// }
+					// 注释节点。
+					if(oData.isMaterialNode && oData.materialInfoList.length) {
+						// 若为物料，且有数据。
+						aoDiagramData.push({
+							key: oData.key + "comment",
+							items: oData.materialInfoList.map(o => {
+								return {
+									batch: o.batchNo || '-', 
+									sum: o.sumQuantity
+								}
+							}),
+							category: "materialComment"
+						})
+						aoDiagramLinkData.push({
+							from: oData.key,
+							to: oData.key + "comment",
+							category: "Comment"
+						});
+					}else if(oData.processInfoList.length){
+						// 若为工序，且有数据。
+						aoDiagramData.push({
+							key: oData.key + "comment",
+							material: oData.processInfoList[0].materialName || '-',
+							items: oData.processInfoList.map(o => {
+								return {
+									equipment: o.equipmentName || '-',
+									batch: o.batchNo || '-', 
+									sum: o.sumQuantity
+								}
+							}),
+							category: "processComment"
+						})
+						aoDiagramLinkData.push({
+							from: oData.key,
+							to: oData.key + "comment",
+							category: "Comment"
+						});
+					}
 				})		
 				return {
 					node: aoDiagramData,
@@ -410,6 +386,8 @@
 			},
 			/* 拖动功能 */
 			dragstar(e){   //鼠标按下，开始拖动
+			//  console.log('开始')
+			//	console.log(this.treeFullscreen)
 				if(e.target.id === 'changeWidth'){
 					this.LayoutLeftWidth = this.reversedMessage
 					this.changeWidth = 0
@@ -423,9 +401,12 @@
 					this.changeHeight = 0
 					this.draggingY = true;
 					this._pageY = e.pageY
+				//	console.log(this._pageY)
 				}
 			},
 			dragend(e){ //鼠标松开，结束拖动
+
+				//console.log('结束')
 				this.draggingX = false  //关闭拖动功能
 				this.draggingY = false  //关闭拖动功能
 				// this.resizeUpdate = this.reversedMessage //改变 changeWidth 的值，触发 canvas 大小更新

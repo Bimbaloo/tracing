@@ -1,5 +1,11 @@
 <template>
-    <el-select v-model="multiValues" :placeholder="hint" style="width: 100%;" multiple @change="handleChange">
+    <el-select 
+    	v-model="formData[keyData]" 
+    	:placeholder="hint" 
+    	:disabled="disabled" 
+    	style="width: 100%;" 
+    	multiple 
+    	@change="handleChange">
         <el-option
             v-for="option in options"
             :key="option.value"
@@ -19,6 +25,10 @@
         	allData: {
         		required: false,
         		default: 'all'
+        	},
+        	disabled: {
+        		required: false,
+        		default: false
         	}
         },
         data() {
@@ -26,7 +36,7 @@
 //              form: this.formData,
                 hint: this.placeholderData,
 //              key: this.keyData,
-                multiValues: this.formData[this.keyData]
+//              multiValues: this.formData[this.keyData]
             }
         },
         computed: {
@@ -43,16 +53,21 @@
         },
         methods: {
             handleChange(value) {
-            	console.log("1")
+            	
             	// 是否选中的是全部，如果是全部则其他的不能选中其他的|| 如果选中的是除全部以外其他的，则设置为全部
             	if((value.includes(this.allData) && value.length > 1) || (!value.includes(this.allData) && value.length === this.listData.length )) {
             		// 含有全部，则将数据设置为全部。
-            		this.multiValues = [this.allData];
+            		if(value.includes(this.allData) && value[value.length-1] != this.allData) {
+            			// 已选中全部下，选中其他数据。
+//          			this.multiValues = [value[value.length-1]];
+            			this.formData[this.keyData] = [value[value.length-1]]
+            		}else {
+						// 1、点击的是全部 2、选中了除全部外的数据            			
+//	            		this.multiValues = [this.allData];
+	            		this.formData[this.keyData] = [this.allData];
+            		}
             	}
             	
-            	if(this.formData[this.keyData].toString() != this.multiValues.toString()) {
-	            	this.formData[this.keyData] = this.multiValues;
-            	}
             }
         }  
     }

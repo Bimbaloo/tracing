@@ -376,7 +376,9 @@
 	            
 	            .cell {
 	                font-weight: 600;
-	                
+	                height: 100%;
+	                line-height:40px; 
+	                 
 	                &:empty {
 	                	cursor: default;
 	                }

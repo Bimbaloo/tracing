@@ -22,7 +22,10 @@
 	import DateTime from "components/basic/dateTime.vue"
 	
 	export default {
-		props: ["popShow","popValue"],
+		props: {
+			popShow: Boolean,
+			popValue: Object
+		},
 		components: {
 			"v-input": Input,
     		"v-select": Select,
@@ -30,6 +33,22 @@
     		"v-button": Button
 		},
 		data() {
+			let validateTime = (rule, value, callback) => {
+				let sTime = value.trim(),
+        			nNow = +new Date();
+        		
+        		if(!sTime) {
+        			callback(new Error("请输入时间"))
+        		}else if(!window.Rt.utils.isDateTime(sTime)) {
+        			callback(new Error("请输入正确的时间格式"));
+        		}else if(+new Date(value) > nNow) {
+        			callback(new Error("时间不能超过当前时间"));
+        		}else {
+        			callback();
+        		}
+        	    
+			};
+			
 			return {
 				aList: [{
 					key: "materialCode",
@@ -106,7 +125,7 @@
 						{required: true, message: "请输入条码",trigger: "change"}
 					],
 					happenTime: [
-						{required: true, message: "请选择时间",trigger: "change"}
+						{validator: validateTime, trigger: "change"}
 					]
 				}
 			}
@@ -118,7 +137,7 @@
 			}
 		},
 		watch: {
-			popValue: function() {
+			popShow: function() {
 				this.dialogVisible = this.popShow;
 				this.ruleForm = this.getForm()
 			}

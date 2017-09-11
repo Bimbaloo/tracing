@@ -27,7 +27,6 @@
         methods: {
         	// 跳转到搜索页。
         	goToSearch() {
-//      		console.log(window.location.origin)
         		window.open("search.html", "_self");
         		// 返回上一级目录。
         	},

@@ -179,7 +179,7 @@
           height: 42px;
           line-height: 42px;     
           /*width: 180px;*/
-          width: 270px;
+          width: 216px;		// 270
           text-align: center;
           font-size: 16px;
           border-top: 4px solid transparent;

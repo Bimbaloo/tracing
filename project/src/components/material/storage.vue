@@ -13,12 +13,18 @@
             <div class="content-table"> 
             	<table class="raw-table" v-loading="loading" ref="rawTable">
             		<tr>
-            			<th v-for="column in materialData.columns" :style="{width: column.width}" v-if="!column.hide">
+            			<th v-for="(column,index) in materialData.columns" :style="{width: column.width}" v-if="!column.hide" :key="index">
             				{{column.name}}
             			</th>
             		</tr>
-            		<tr v-for="row in materialData.data">
-            			<td v-for="column in materialData.columns" :style="{cursor: column.click && !row[column.prop]?'default':'cursor'}" :class="column.class" @click="column.click && column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
+            		<tr v-for="(row,index) in materialData.data" :key="index">
+            			<td v-for="(column,index) in materialData.columns" 
+						:key="index"
+						:style="{cursor: column.click && !row[column.prop]?'default':'cursor'}" 
+						:class="column.class" 
+						@click="column.click && column.click(row)" 
+						v-if="!(column.hide||(column.merge && row.hide))" 
+						:rowspan="`${column.merge ? row.rowspan : ''}`">
             				{{row[column.prop]}}
             			</td>
             		</tr>

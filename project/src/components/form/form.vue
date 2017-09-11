@@ -95,7 +95,7 @@
 	            	// 验证物料。
 	            	validateMaterialcode = (rule, value, callback) => {
 	            		if(!value) {
-	            			callback(new Error("请输入物料"));
+	            			callback(new Error("请选择物料"));
 	            		}else {
 	            			callback();
 	            		}
@@ -203,12 +203,6 @@
         	    		callback();
         	    	}
 	            		
-//	            	if(value && oForm.startTime && value < oForm.startTime) {
-//	            		// 开始时间和结束时间都存在,且结束时间小。
-//	            		callback(new Error("结束时间要大于开始时间"));
-//	            	}else {
-//	            		callback();
-//	            	}
 	            };
             	
             	// 所有规则。
@@ -246,6 +240,14 @@
             		// 履历。
             		"resume": {
             			"barcode": [{validator: validateBarcode, trigger: "change"}]
+            		},
+            		// 断链
+            		"link": {
+            			"batchNo": [{validator: validateBatch,trigger: "change"}],
+	                	"materialCode": [{validator: validateMaterialcode,trigger: "change"}],
+	                	"startTime": [{validator: validateStart, trigger: "change"}],
+            			// 结束时间。
+            			"endTime": [{validator: validateTime, trigger: "change"}]
             		}
                 };
                 

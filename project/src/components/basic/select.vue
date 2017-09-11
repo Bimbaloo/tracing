@@ -177,7 +177,7 @@
             remoteMethod(query) {
             	if(this.key === "materialCode") {
             		// 物料数据，则通过搜索。
-            		let sQuery = query.trim();
+            		let sQuery = (query || "").trim();
             		
             		if(sQuery !== "") {
             			this.loading = true;

@@ -194,7 +194,6 @@
 							// 格式化数据。
 							this.treeData = this.parseTreeData();
 							this.tableData = this.parseTableData();
-							// console.log(this.treeData)
 						}						
 					})
 				})
@@ -202,7 +201,6 @@
 					this.fullscreenLoading = false;
 					console.warn('查询出错！')
 					this.showMessage();
-					// this.$message.error('查询出错！');
 				})
 			},
 
@@ -267,20 +265,37 @@
 					aoDiagramLinkData = [];
 					
 				aoData.forEach(oData => {
-					
-					aoDiagramData.push(oData);
-					
-					// 非组数据的处理。
-//					if(!oData.isGroup) {
-						// 物料或工序。 增加连接线。
-						let aoParents = oData.parents.split(",");
-						aoParents.forEach( sParent => {
-							aoDiagramLinkData.push({
-								from: sParent,
-								to: oData.key
-							});
-						})
-//					}
+					if(oData.isMaterialNode) {
+						// 若为物料节点。
+						oData.category = "simple";
+					}else {
+						// 若为工序节点。
+						if(oData.isGroup) {
+							// 若为group
+							let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.processSeq < b.processSeq)[0]
+							if(oLastGroupItem) {
+								// 取最后一道工序的产出。
+								oData.processInfoList = oLastGroupItem.processInfoList
+							}
+						}
+						if(oData.processInfoList.length) {
+							// 有数据。
+							oData.materialName = oData.processInfoList[0].materialName;
+						}
+						oData.category = "simple";
+					}	
+										
+					aoDiagramData.push(oData);					
+
+					// 物料或工序。 增加连接线。
+					let aoParents = oData.parents.split(",");
+					aoParents.forEach( sParent => {
+						aoDiagramLinkData.push({
+							from: sParent,
+							to: oData.key
+						});
+					})
+
 					
 				})
 					
