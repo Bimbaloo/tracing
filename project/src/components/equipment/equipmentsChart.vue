@@ -64,9 +64,10 @@
                         @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)" 
                         v-show="dimension.filter(o => o.key === compareData.dimension)[0].show && (compareData.dimension==='pool'?(!onlyShowRelatedData || (compareData.related && onlyShowRelatedData)):true)">
                         
-                        <div class="tooltip-panel" :style="{left:compareData.left*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
-                            <div class="tooltip-time" @click="tooltipPanelClickHandle(compareData.millisecond)">{{compareData.time}}</div>
-                            <i class="btn-close el-icon-close" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
+                        <div :class="['tooltip-panel', compareData.reverse ? 'left':'right']" :style="{left:compareData.position*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
+                            <div class="tooltip-time">{{compareData.time}}</div>
+                            <i class="btn-delete icon icon-12 icon-delete" title="删除" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
+                            <i class="btn-reverse icon icon-12 icon-reverse" title="翻转" @click="reversePanelClickHandle(compareData)" ></i>
                             <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
                                 <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
                                 <ul class="event-list">
@@ -121,6 +122,8 @@
     const MARKLINE_SYSMBOL_SIZE = 8
     // 提示框面板z轴。
     const TOOLTIP_Z_INDEX = 100
+    // 提示框面板宽度。
+    const TOOLTIP_WIDTH = 220
     // finereport跳转地址。
     // const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
     // 设备分析接口地址。
@@ -146,7 +149,7 @@
             shadowColor: '#fff'
         },
         showDataShadow: false
-    }
+    };
 
     export default {
 		props: {
@@ -396,7 +399,7 @@
                         formatter: this.tooltipFormatter,
                         position: (pos, params, el, elRect, size) => {
                             // console.log(pos[0])
-
+                            
                             if(this.markLine.filter(o => o.xAxis == params[0].axisValue).length) {
                                 // 若该提示数据已存在。
                                 // 隐藏tooltip。
@@ -792,16 +795,6 @@
                 }else {
                     this.equipments = []
                 }			
-				// let oData = {};
-				// this.equipments.forEach(o => {
-				// 	let sId = o.equipmentId;
-				// 	oData[sId] = {			
-				// 		status: []
-				// 	}
-                //     // 添加事件维度数据。
-                //     this.dimension.forEach(d => oData[sId][d.key] = {})
-				// })	
-				// this.equipmentData = oData;
                 
                 this.initChart();
 			},
@@ -860,8 +853,7 @@
                 
                 this.panelHeight = jContent.height() - (jTitle.outerHeight(true)||0) - CHART_MARGIN_BOTTOM;
                 $("#equipments").height(this.panelHeight);
-            },
-             
+            },            
             /**
              * 数据转换。
              * @param {Number} nTime 时间
@@ -879,15 +871,31 @@
                 let oXAxis = this.getScaledxAxis(),
                     // 缩放后的时间轴时长。
                     nScaledTimeLine = oXAxis.endValue - oXAxis.startValue,
+                    // 距左侧距离。
+                    nLeft = (nTime - oXAxis.startValue) / nScaledTimeLine,
+                    nRealLeft = nLeft,
+                    // 数据面板宽度。
+                    nViewWidth = document.getElementById("equipments").clientWidth - GRID_LEFT - GRID_RIGHT,
+                    // 提示框距左侧距离。
+                    nPanelLeft = nLeft -TOOLTIP_WIDTH/nViewWidth,
+                    nRealPanelLeft = nPanelLeft;
 
-                    nLeft = (nTime - oXAxis.startValue) / nScaledTimeLine
 
+                if(nLeft < 0) {
+                    nRealLeft = -1;
+                }else if(nLeft > 1) {
+                    nRealLeft = 2;
+                }
+                
                 return {
+                    reverse: false,
                     related: bRelated,
                     dimension: sDimension,
                     zIndex: zIndex || TOOLTIP_Z_INDEX,
                     millisecond: nTime,
-                    left: nLeft,
+                    position: nRealLeft,
+                    left: nRealLeft,
+                    panelLeft: nRealPanelLeft,
                     time: new Date(nTime).Format(),
                     list: this.axisTooltipData.map(param => {
                         let aoValue = param.value,
@@ -1129,14 +1137,48 @@
                         // 缩放后的时间轴时长。
                         nScaledTimeLine = oXAxis.endValue - oXAxis.startValue,
                         // 时间范围。
-                        oTime = this.getRealTime()
+                        oTime = this.getRealTime(),
+                        
+                        // 数据面板宽度。
+                        nViewWidth = document.getElementById("equipments").clientWidth - GRID_LEFT - GRID_RIGHT,
+                        // 提示框宽度占比。
+                        nViewLeft = TOOLTIP_WIDTH/nViewWidth;
 
                     this.datetime.realStart = oTime.start;
                     this.datetime.realEnd = oTime.end;
 
                     this.compareList = this.compareList.map(o => {
-                        o.left = (o.millisecond - oXAxis.startValue) / nScaledTimeLine
-                        return o
+                        // 距左侧距离。            
+                        let nLeft = (o.millisecond - oXAxis.startValue) / nScaledTimeLine,
+                            nRealLeft = nLeft,
+                            // 提示框距左侧距离。
+                            nPanelLeft = nLeft -nViewLeft,
+                            nRealPanelLeft = nPanelLeft;
+
+                        if(!o.reverse) {
+                            // 若朝右。
+                            if(nLeft < 0) {
+                                nRealLeft = -1;
+                            }else if(nLeft > 1) {
+                                nRealLeft = 2;
+                            }
+
+                            o.position = nRealLeft
+                        }else {
+                            // 若朝作左。
+                            if(nLeft < 0) {
+                                nRealLeft = -1;
+                                nRealPanelLeft = -1;
+                            }else if(nLeft > 1) {
+                                nRealLeft = 2;
+                                nRealPanelLeft = 2
+                            }
+                            o.position = nRealPanelLeft
+                        }
+
+                        o.left = nRealLeft;
+                        o.panelLeft = nRealPanelLeft;
+                        return o;
                     })
                 }
             },
@@ -1192,6 +1234,10 @@
                 // 删除标记线。
                 this.deleteMarkLine(nTime);
 
+            },
+            reversePanelClickHandle (compareData) {
+                compareData.reverse = !compareData.reverse;                
+                compareData.position = compareData.reverse ? compareData.panelLeft:compareData.left;
             },
             // 提示面板鼠标移入事件。
             tooltipPanelMouseenterHandle (nTime) {
@@ -2216,19 +2262,43 @@
                     background-color: #fff;
                 }
                 
-                .btn-close {
+                .btn-delete,.btn-reverse {
                     position: absolute;
-                    top: 4px;
-                    right: 4px;
                     cursor: pointer;
-                    font-size: 12px;
-                    color: rgba(255,255,255,0.6);
-                    z-index: 1;
+                    top: 4px;
+                }
 
-                    &:hover {
-                        color: rgba(255,255,255,1);
+                &.right {
+                    .btn-delete {
+                        left: 20px;
+                    }
+                    .btn-reverse {
+                        left: 4px;
                     }
                 }
+
+                &.left {
+                    .btn-delete {
+                        right: 4px;
+                    }
+                    .btn-reverse {
+                        right: 20px;
+                    }
+                }
+
+                // .btn-close {
+                //     position: absolute;
+                //     top: 4px;
+                //     right: 4px;
+                //     cursor: pointer;
+                //     font-size: 12px;
+                //     color: rgba(255,255,255,0.6);
+                //     z-index: 1;
+
+                //     &:hover {
+                //         color: rgba(255,255,255,1);
+                //     }
+                // }
 
                 .tooltip-time {
                     color: #fff;
