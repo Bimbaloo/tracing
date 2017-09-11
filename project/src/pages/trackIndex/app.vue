@@ -500,7 +500,7 @@
 		position: absolute;
 		cursor: pointer;
 		z-index: 100;
-		right: 180px;
+		right: 225px;
 		top: 30px;
 	}
 	.table-line {
