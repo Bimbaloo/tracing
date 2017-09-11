@@ -1,0 +1,636 @@
+{
+    "errorCode": 0,
+    "errorMsg": "",
+    "data": [
+        {
+            "varStdId": 7,
+            "description": "电压值3",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "83.9"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "1.3"
+                }
+            ]
+        },
+        {
+            "varStdId": 12,
+            "description": "流量4",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "1.5"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "3.2"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "5.4"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "5.4"
+                }
+            ]
+        },
+        {
+            "varStdId": 8,
+            "description": "电压值4",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": -1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": ""
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": ""
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": ""
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": ""
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": ""
+                }
+            ]
+        },
+        {
+            "varStdId": 10,
+            "description": "流量2",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "1.6"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "4.2"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "4.1"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "4.1"
+                }
+            ]
+        },
+        {
+            "varStdId": 6,
+            "description": "电压值2",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "76.2"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "1.8"
+                }
+            ]
+        },
+        {
+            "varStdId": 16,
+            "description": "电量值5",
+            "varUnit": null,
+            "maxValue": 40.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "10.1"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "9.0"
+                }
+            ]
+        },
+        {
+            "varStdId": 18,
+            "description": "电压值5",
+            "varUnit": null,
+            "maxValue": 150.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "19.2"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "89.4"
+                }
+            ]
+        },
+        {
+            "varStdId": 4,
+            "description": "电量值4",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "8.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "9.3"
+                }
+            ]
+        },
+        {
+            "varStdId": 13,
+            "description": "PH值",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "11.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "11.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "11.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "11.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "11.0"
+                }
+            ]
+        },
+        {
+            "varStdId": 3,
+            "description": "电量值3",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "12.9"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "9.5"
+                }
+            ]
+        },
+        {
+            "varStdId": 20,
+            "description": "流量值5",
+            "varUnit": null,
+            "maxValue": 8.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "1.4"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "4.9"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "5.1"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "5.2"
+                }
+            ]
+        },
+        {
+            "varStdId": 15,
+            "description": "封闭温度",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "67.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "65.9"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "66.6"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "66.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "65.9"
+                }
+            ]
+        },
+        {
+            "varStdId": 2,
+            "description": "电量值2",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "6.9"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "6.5"
+                }
+            ]
+        },
+        {
+            "varStdId": 9,
+            "description": "流量1",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "1.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "5.6"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "5.6"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "5.6"
+                }
+            ]
+        },
+        {
+            "varStdId": 19,
+            "description": "电压值6",
+            "varUnit": null,
+            "maxValue": 90.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "84.3"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "3.6"
+                }
+            ]
+        },
+        {
+            "varStdId": 1,
+            "description": "电量值1",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "12.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "9.9"
+                }
+            ]
+        },
+        {
+            "varStdId": 14,
+            "description": "溶液温度",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "26.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "26.9"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "26.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "26.2"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "26.8"
+                }
+            ]
+        },
+        {
+            "varStdId": 5,
+            "description": "电压值1",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "53.6"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "0.5"
+                }
+            ]
+        },
+        {
+            "varStdId": 11,
+            "description": "流量3",
+            "varUnit": null,
+            "maxValue": 0.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "3.2"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "5.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "5.1"
+                }
+            ]
+        },
+        {
+            "varStdId": 21,
+            "description": "流量值6",
+            "varUnit": null,
+            "maxValue": 9.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "1.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "3.7"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "5.8"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "5.8"
+                }
+            ]
+        },
+        {
+            "varStdId": 17,
+            "description": "电量值6",
+            "varUnit": null,
+            "maxValue": 50.000000,
+            "minValue": 0.000000,
+            "valueType": 1,
+            "list": [
+                {
+                    "pickTime": "2017-08-11 01:27:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:29:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:31:37",
+                    "value": "12.2"
+                },
+                {
+                    "pickTime": "2017-08-11 01:33:37",
+                    "value": "0.0"
+                },
+                {
+                    "pickTime": "2017-08-11 01:35:37",
+                    "value": "9.3"
+                }
+            ]
+        }
+    ]
+}
