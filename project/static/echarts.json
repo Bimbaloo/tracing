@@ -3,32 +3,44 @@
   "errorMsg": "",
   "data": [
     {
-      "varStdId": 13,
-      "description": "PH值",
-      "varUnit": null,
-      "maxValue": 0.000000,
-      "minValue": 0.000000,
+      "varStdId": "不良率",
+      "description": "A图表",
+      "varUnit": "%",
+      "maxValue": 20.0,
+      "minValue": 13.5,
       "valueType": 1,
       "list": [
         {
-          "pickTime": "2017-08-11 01:27:37",
-          "value": "11.0"
+          "pickTime": "6/1",
+          "value": "15"
         },
         {
-          "pickTime": "2017-08-11 01:29:37",
-          "value": "11.0"
+          "pickTime": "6/2",
+          "value": "14"
         },
         {
-          "pickTime": "2017-08-11 01:31:37",
-          "value": "11.0"
+          "pickTime": "6/3",
+          "value": "12"
         },
         {
-          "pickTime": "2017-08-11 01:33:37",
-          "value": "11.0"
+          "pickTime": "6/",
+          "value": "21"
         },
         {
-          "pickTime": "2017-08-11 01:35:37",
-          "value": "11.0"
+          "pickTime": "6/5",
+          "value": "18"
+        },
+        {
+          "pickTime": "6/6",
+          "value": "26"
+        },
+        {
+          "pickTime": "6/7",
+          "value": "14"
+        },
+        {
+          "pickTime": "6/8",
+          "value": "13"
         }
       ]
     },
