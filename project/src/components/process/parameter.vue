@@ -43,6 +43,7 @@ import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
 const url = HOST + "/api/v1/processparameter/by-equipment-time";
+//const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
 //const url = "static/echarts.json"
 
 export default {
@@ -177,7 +178,12 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
+            /* 测试数据 */
+            // oQuery = {
+            //     "equipmentId": "25",
+            //     "startTime": "2017-08-11 01:27:37",
+            //     "endTime": "2017-08-11 01:35:37"
+            // }
             this.$get(url, oQuery)
                 .then((res) => {
                     let optionArr = [];
@@ -353,19 +359,20 @@ export default {
                 },
                 visualMap: {
                     show: false,
-                    pieces: [{
-                        gt: 0,
-                        lte: 4,
-                        color: '#e60012'
-                    }, {
-                        gt: 4,
-                        lte: 21,
-                        color: '#abcc52'
-                    }, {
-                        gt: 21,
-                        lte: 100,
-                        color: '#e60012'
-                    }],
+                    // pieces: [
+                    // {
+                    //     gt: 0,
+                    //     lte: 4,
+                    //     color: '#e60012'
+                    // }, {
+                    //     gt: 4,
+                    //     lte: 21,
+                    //     color: '#abcc52'
+                    // }, {
+                    //     gt: 21,
+                    //     lte: 100,
+                    //     color: '#e60012'
+                    // }],
                     outOfRange: {
                         color: '#999'
                     }
@@ -379,28 +386,28 @@ export default {
                         //  symbol: 'circle',  //曲线
                         data: [],
                         markLine: {
-                            data: [
-                                {
-                                    yAxis: 21,
-                                    name: '上限',
-                                    lineStyle: {
-                                        normal: {
-                                            color: "#febf00",
-                                            width: 2
-                                        }
-                                    }
-                                },
-                                {
-                                    yAxis: 4,
-                                    name: '下限',
-                                    lineStyle: {
-                                        normal: {
-                                            color: "#febf00",
-                                            width: 2
-                                        }
-                                    }
-                                }
-                            ]
+                            // data: [
+                            //     {
+                            //         yAxis: 21,
+                            //         name: '上限',
+                            //         lineStyle: {
+                            //             normal: {
+                            //                 color: "#febf00",
+                            //                 width: 2
+                            //             }
+                            //         }
+                            //     },
+                            //     {
+                            //         yAxis: 4,
+                            //         name: '下限',
+                            //         lineStyle: {
+                            //             normal: {
+                            //                 color: "#febf00",
+                            //                 width: 2
+                            //             }
+                            //         }
+                            //     }
+                            // ]
                         }
                     }
                 ]
@@ -408,32 +415,84 @@ export default {
 
             /* 设置option */
             optionModal.title.text = data.description //设置图表名称
-            optionModal.legend.data[0] = data.varStdId //设置参数名称
+            optionModal.legend.data[0] = data.description //设置参数名称
             optionModal.xAxis.data = data.list.map((el) => { return el.pickTime }) //设置横坐标值
-            optionModal.yAxis.axisLabel.formatter = '{value}' + data.varUnit      //设置纵坐标单位
-            optionModal.series[0].name = data.varStdId //设置参数名称
+            optionModal.yAxis.axisLabel.formatter = data.varUnit?('{value}' + data.varUnit):'{value}'      //设置纵坐标单位
+            optionModal.series[0].name = data.description //设置参数名称
             optionModal.series[0].data = data.list.map((el) => { return el.value }) //设置纵坐标值
-            optionModal.series[0].markLine.data[0].yAxis = data.maxValue           //设置上限值
-            optionModal.series[0].markLine.data[1].yAxis = data.minValue           //设置下限值
-
-            /* 设置颜色变化的上下限 */
-            optionModal.visualMap.pieces[0].gt = (data.minValue - 100) < 0 ? 0 : (data.minValue - 100)
-            optionModal.visualMap.pieces[0].lte = data.minValue  //设置下限
-            optionModal.visualMap.pieces[1].gt = data.minValue   //设置下限  
-            optionModal.visualMap.pieces[1].lte = data.maxValue  //设置上限
-            optionModal.visualMap.pieces[2].gt = data.maxValue   //设置上限
-            optionModal.visualMap.pieces[2].lte = data.maxValue + 100
 
             /* 设置纵坐标的起始值 */
-            const arrY = optionModal.series[0].data   //Y轴的所有值
+            const arrY = optionModal.series[0].data    //Y轴的所有值
             const yMax = Math.max(...arrY)             //获取Y轴最大值 
             const yMin = Math.min(...arrY)             //获取Y轴最小值
             const maximum = data.maxValue             //获取上限值 
             const minimum = data.minValue             //获取下限值 
+            //debugger
+            if( data.minValue === data.maxValue ){          // 没有上下限的时候（上限值 === 下限值）
+                optionModal.visualMap.pieces = []
+                optionModal.visualMap.pieces.push({
+                    gt: yMin-1,         //设置下限 
+                    lte: yMax+1,        //设置上限
+                    color: '#abcc52'  //设置颜色
+                })
+                // optionModal.visualMap.pieces[0].gt = yMin   //设置下限  
+                // optionModal.visualMap.pieces[0].lte = yMax  //设置上限
+                // optionModal.visualMap.pieces[0].color = '#abcc52' //设置颜色
+            }else{
+                //debugger
+                optionModal.series[0].markLine.data = []
+                optionModal.series[0].markLine.data.push({
+                    yAxis: data.maxValue,           //设置上限值
+                    name: '上限',
+                    lineStyle: { normal:{color: "#febf00",width: 2}}  //上限的样式
+                })
+                // optionModal.series[0].markLine.data[0].yAxis = data.maxValue           //设置上限值
+                // optionModal.series[0].markLine.data[0].name = '上限'                   
+                // optionModal.series[0].markLine.data[0].lineStyle = { normal:{color: "#febf00",width: 2}}  //上限的样式
 
-            optionModal.yAxis.min = parseInt(Math.min(yMin, minimum) * 0.9)   //设置Y轴开始值为 最小值或最小合格值的0.9倍
-            optionModal.yAxis.max = parseInt(Math.max(yMax, maximum) * 1.1)   //设置Y轴结束值为 最大值或最大合格值的1.1倍
+                optionModal.series[0].markLine.data.push({
+                    yAxis: data.minValue,           //设置上限值
+                    name: '下限',
+                    lineStyle: { normal:{color: "#febf00",width: 2}}  //下限的样式
+                })
+                // optionModal.series[0].markLine.data[1].yAxis = data.minValue           //设置下限值
+                // optionModal.series[0].markLine.data[1].name = '下限'                   
+                // optionModal.series[0].markLine.data[1].lineStyle = { normal:{color: "#febf00",width: 2}}  //下限的样式
 
+                /* 设置颜色变化的上下限 */
+                optionModal.visualMap.pieces = []
+                optionModal.visualMap.pieces.push({
+                    gt: (data.minValue - 100) < 0 ? 0 : (data.minValue - 100),  
+                    lte: data.minValue,                                         //设置下限 
+                    color: '#e60012'                                            //设置低于下限颜色
+                })
+                // optionModal.visualMap.pieces[0].gt = (data.minValue - 100) < 0 ? 0 : (data.minValue - 100)
+                // optionModal.visualMap.pieces[0].lte = data.minValue  //设置下限
+                // optionModal.visualMap.pieces[0].color = '#e60012'    //设置低于下限颜色  
+
+                optionModal.visualMap.pieces.push({
+                    gt: data.minValue,      //设置下限
+                    lte: data.maxValue,     //设置上限
+                    color: '#abcc52'        //设置正常颜色
+                })
+                // optionModal.visualMap.pieces[1].gt = data.minValue   //设置下限
+                // optionModal.visualMap.pieces[1].lte = data.maxValue  //设置上限
+                // optionModal.visualMap.pieces[1].color = '#abcc52'    //设置正常颜色  
+
+                optionModal.visualMap.pieces.push({
+                    gt: data.minValue,            //设置上限
+                    lte: data.maxValue + 100,
+                    color: '#e60012'        //设置正常颜色
+                })
+
+                // optionModal.visualMap.pieces[2].gt = data.maxValue   //设置上限
+                // optionModal.visualMap.pieces[2].lte = data.maxValue + 100
+                // optionModal.visualMap.pieces[2].color = '#e60012'    //设置高于上限颜色
+            }
+
+            optionModal.yAxis.min = Math.ceil(Math.min(yMin, minimum) * 0.9)   //设置Y轴开始值为 最小值或最小合格值的0.9倍
+            optionModal.yAxis.max = Math.ceil(Math.max(yMax, maximum) * 1.1)   //设置Y轴结束值为 最大值或最大合格值的1.1倍
+            //console.log(optionModal)
             return optionModal
         },
         /* 绘制图表 */
