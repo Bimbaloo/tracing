@@ -8,26 +8,47 @@
                     </span>
                 </div>
             </div>
-            <h2 class="content-title inTitle">
-                <span class='table-title'>投入</span>
-                <span class='table-handle'>
-                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inItems, $event)"></i>
-                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
-                </span>
-            </h2>
-            <div class="content-table" ref="inputTable">
-                <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
-            </div>
-            <h2 class="content-title outTitle">
-                <span class='table-title'>产出</span>
-                <span class='table-handle'>
-                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outItems, $event)"></i>
-                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
-                </span>
-            </h2>
-            <div class="content-table" ref="outputTable">
-                <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
-            </div>
+            <el-tabs type="card">
+                <el-tab-pane label="关联表">
+                    <el-table class="table-main" :data="tableData.data" :height="200" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <el-table-column v-for="(column,index) in tableData.columns" :align="'left'" :fixed="false" :resizable="true" :label="column.name">
+                            <template scope="props">
+                                <div class="cell-content" v-if="column.prop === 'id'">
+                                    <i v-if="props.$index%2 === 0" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
+                                    <span>{{ props.row[column.prop]}}</span>
+                                </div>
+                                <div class="cell-content" v-else>
+                                    <span>{{ props.row[column.prop] }}</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="明细表">
+                    <h2 class="content-title inTitle">
+                        <span class='table-title'>投入</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
+                        </span>
+                    </h2>
+                    <div class="content-table" ref="inputTable">
+                        <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
+                    </div>
+                    <h2 class="content-title outTitle">
+                        <span class='table-title'>产出</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
+                        </span>
+                    </h2>
+                    <div class="content-table" ref="outputTable">
+                        <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
+                    </div>
+                </el-tab-pane>
+                <el-tab-pane label="汇总表">汇总表</el-tab-pane>
+            </el-tabs>
+
         </div>
     </div>
 </template>
@@ -42,7 +63,8 @@ import rasterizeHTML from 'rasterizehtml'
 // import {host} from 'assets/js/configs.js'
 
 // var HOST = window.HOST ? window.HOST: host	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
+//const url = HOST + "/api/v1/trace/inout/by-equipment";
+const url = "http://rapapi.org/mockjsdata/21533/qqq?"
 
 export default {
     components: {
@@ -59,7 +81,6 @@ export default {
                 //  "min-width": "2000px"
             },
 
-            loading: false,
             tdResize: true, //是否允许拖动table大小
             condition: {},   // 显示的查询条件    
             dataName: [      // 条件对应中文名
@@ -80,48 +101,48 @@ export default {
                 columns: [{
                     name: "条码",
                     prop: "barcode",
-                    width: "200",
+                    width: "",
                     fixed: true,
-                    // class: "barcode",
-                    // cellClick: this.barcodeClick
                 }, {
                     name: "派工单号",
                     prop: "doCode",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "批次号",
                     prop: "batchNo",
-                    width: "200",
-                    // class: "batch",
-                    // cellClick: this.batchClick
+                    width: "",
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
-                    width: "200",
+                    width: "",
                     class: "material",
                     cellClick: this.materialClick
                 }, {
                     name: "物料名称",
                     prop: "materialName",
-                    width: "300"
+                    width: ""
+                }, {
+                    name: "模号",
+                    prop: "moldCode",
+                    width: ""
                 }, {
                     name: "数量",
                     prop: "quantity",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "班次",
                     prop: "shiftName",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "操作人",
                     prop: "personName",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "投入时间",
                     prop: "happenTime",
-                    width: "220"
+                    width: ""
                 }],
-                height: 1,
+                height: 200,
                 data: []
             },
             /* 产出 */
@@ -184,19 +205,74 @@ export default {
                     width: "200"
                 }],
                 data: [],
-                height: 1
+                height: 200
             },
             //  viewHeight:0
-            routerContent: 0
+            routerContent: 0,
+
+            tableData: {
+                filename: "投入",
+                columns: [{
+                    name: "条码",
+                    prop: "barcode",
+                    width: "200",
+                    fixed: true,
+                }, {
+                    name: "派工单号",
+                    prop: "doCode",
+                    width: "200"
+                }, {
+                    name: "批次号",
+                    prop: "batchNo",
+                    width: "200",
+                }, {
+                    name: "物料编码",
+                    prop: "materialCode",
+                    width: "200",
+                    class: "material",
+                    cellClick: this.materialClick
+                }, {
+                    name: "物料名称",
+                    prop: "materialName",
+                    width: "300"
+                }, {
+                    name: "数量",
+                    prop: "quantity",
+                    width: "120"
+                }, {
+                    name: "合格数",
+                    prop: "qualifiedNum",
+                    width: "120"
+                }, {
+                    name: "报废数",
+                    prop: "scrapNum",
+                    width: "120"
+                }, {
+                    name: "不合格数",
+                    prop: "unqualifiedNum",
+                    width: "120"
+                }, {
+                    name: "班次",
+                    prop: "shiftName",
+                    width: "200"
+                }, {
+                    name: "操作人",
+                    prop: "personName",
+                    width: "120"
+                }, {
+                    name: "产出时间",
+                    prop: "happenTime",
+                    width: "200"
+                }],
+                height: 200,
+                data: []
+            }
 
         }
 
     },
     created() {
-
-
         this.fetchData();
-
     },
     computed: {
 
@@ -292,10 +368,22 @@ export default {
             this.$post(url, oQuery)
                 .then((res) => {
                     this.loading = false;
+                    let outDatas = []
+                    let inDatas = []
+                    let allDatas = []
 
                     this.judgeLoaderHandler(res, () => {
-                        this.outItems.data = res.data.data.out
-                        this.inItems.data = res.data.data.in
+                        let oData = res.data.data
+                        oData.forEach((e,index)=>{
+                            inDatas.push(e.in[0])
+                            delete e["in"]
+                            outDatas.push(e)
+                            allDatas.push(outDatas[index])
+                            allDatas.push(inDatas[index])
+                        });
+                        this.outItems.data = outDatas
+                        this.inItems.data = inDatas
+                        this.tableData.data = allDatas
                     });
                 })
                 .catch((err) => {
@@ -486,6 +574,18 @@ export default {
                     el.setAttribute('title', title);
                 }
             })
+        },
+        handleEdit(index, row) {
+            const tr = document.querySelectorAll(".el-table__row")
+            const el = tr[index + 1]
+            const icon = tr[index].querySelectorAll(".icon-down")[0]
+            if (el.classList.contains("hide")) {
+                el.classList.remove('hide');
+                icon.classList.remove('actived');
+            } else {
+                el.classList.add('hide');
+                icon.classList.add('actived');
+            }
         }
     }
 }
@@ -531,6 +631,22 @@ export default {
     .clicked {
         cursor: pointer;
         color: #f90;
+    }
+}
+
+.show {
+    transition: display 400ms;
+}
+
+.hide {
+    opacity: 0;
+    display: none
+}
+
+.icon-down {
+    transition: transfrom 1s linear;
+    &.actived {
+        transform: rotate(-90deg);
     }
 }
 </style>
