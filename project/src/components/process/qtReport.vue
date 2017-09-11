@@ -75,11 +75,13 @@ export default {
                     name: "三检类型",
                     prop: "methodName",
                     width: "80",
-                }, {
-                    name: "设备编码",
-                    prop: "equipmentCode",
-                    width: ""
-                }, {
+                },
+                // {
+                //     name: "设备编码",
+                //     prop: "equipmentCode",
+                //     width: ""
+                // }, 
+                {
                     name: "设备名称",
                     prop: "equipmentName",
                     width: ""
@@ -115,12 +117,12 @@ export default {
                     //     lists: [
                     //         {
                     //             itemName: "项目1",
-                    //             value: "value0",
+                    //             prop: "value0",
                     //            // width: "200"
                     //         },
                     //         {
                     //             itemName: "项目2",
-                    //             value: "value1",
+                    //             prop: "value1",
                     //            // width: "300"
                     //         }]
                     // }
@@ -276,8 +278,22 @@ export default {
             if (!oData) {
                 return;
             }
+            /* 将传入的json格式转化 */
+            let copyData = this.cloneObj(oData)
+            copyData.columns.forEach((column,index) => {
+                if (column.lists && column.lists.length !== 0) {
+                    column.lists.forEach(function(el) {
+                        copyData.columns.push({
+                            name: `${el.itemName}`,
+                            prop: `${el.prop}`,
+                            width: `${el.width}`
+                        })
+                    })
+                    copyData.columns.splice(index, 1)
+                }
+            })
             // 下载表格。
-            window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
+            window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, copyData);
         },
         // 表格打印。
         printHandle(refTable, event) {
@@ -316,7 +332,7 @@ export default {
                             min-height: 30px;
                             line-height: 30px;
                             // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-//	        					border: 1px solid #e4efec;
+                            //	border: 1px solid #e4efec;
                             box-sizing: border-box;
                         }
                         .el-table__empty-block {
@@ -360,6 +376,22 @@ export default {
                     el.setAttribute('title', title);
                 }
             })
+        },
+        /* 数组与对象深拷贝 */
+        cloneObj(obj) {
+            var str, newobj = obj.constructor === Array ? [] : {};
+            if (typeof obj !== 'object') {
+                return;
+            } else if (window.JSON) {
+                str = JSON.stringify(obj), //系列化对象
+                    newobj = JSON.parse(str); //还原
+            } else {
+                for (var i in obj) {
+                    newobj[i] = typeof obj[i] === 'object' ?
+                        this.cloneObj(obj[i]) : obj[i];
+                }
+            }
+            return newobj;
         }
     }
 }
@@ -386,7 +418,6 @@ export default {
         right: auto;
     }
 }
-
 </style>
 
 <style lang="less" scoped>

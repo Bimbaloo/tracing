@@ -1,0 +1,25 @@
+{
+	"errorCode": 0,
+	"errorMsg": "",
+	"data" : [
+		{
+            "dataId": "string", 
+            "dataIdGroup": "string", 
+            "dcLocName": "string", 
+            "description": "高度",
+            "doCode": "string",
+            "equipmentId": 0, 
+            "equipmentName": "string",
+            "id": 0, 
+            "locationName": "string",
+            "maxValue": 0,
+            "minValue": 0, 
+            "pickTime": "2017-09-05 08:28:51", 
+            "processEquipmentId": 0,
+            "value": "20",
+            "varId": 0,
+            "varStdId": 0,
+            "varUnit": "cm" 
+		}
+	]
+}

@@ -67,10 +67,6 @@ export default {
             tableData: {
                 filename: "事件记录",
                 columns: [{
-                    name: "序号",
-                    type: "index",
-                    width: "50"
-                }, {
                     name: "状态",
                     prop: "statusName",
                     width: "120",

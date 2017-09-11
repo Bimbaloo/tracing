@@ -42,8 +42,8 @@ import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
-//const url = HOST + "/api/v1/processparameter/by-equipment-time";
-const url = "static/echarts.json"
+const url = HOST + "/api/v1/processparameter/by-equipment-time";
+//const url = "static/echarts.json"
 
 export default {
     components: {

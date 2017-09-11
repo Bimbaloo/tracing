@@ -73,10 +73,6 @@ export default {
             /* 投入 */
             tableData: {
                 columns: [{
-                    name: "序号",
-                    type:"index",
-                    width: "50"
-                }, {
                     name: "工具位子",
                     prop: "toolPosition",
                     width: "",
@@ -110,7 +106,7 @@ export default {
                     width: ""
                 }, {
                     name: "额定寿命",
-                    prop: "ratedLife",
+                    prop: "toolRatedLife",
                     width: ""
                 },  {
                     name: "剩余寿命",

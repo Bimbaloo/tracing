@@ -3,10 +3,13 @@
 	<div class="router-content">
 		<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>
 		<div class="innner-content">
-			<h2 class="content-title">
-				<span class="tag">{{batch}}</span>出库信息
-				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
+			<h2 class="content-title tableData">
+				
+				<span class='table-title'><span class="tag">{{batch}}</span>出库信息</span>
+				<span class='table-handle'>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
+				</span>
 			</h2>
 			<div v-if="outstockData.error" class="error" :style="styleError">
 				{{ outstockData.error }}
@@ -14,10 +17,12 @@
 			<div v-else class="content-table" ref="outstockTable">
 				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
 			</div>
-			<h2 class="content-title">
-				<span class="tag">{{batch}}</span>在库信息
-				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+			<h2 class="content-title tableData">
+				<span class='table-title'><span class="tag">{{batch}}</span>在库信息</span>
+				<span class='table-handle'>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+				</span>
 			</h2>
 			<div v-if="instockData.error" class="error" :style="styleError">
 				{{ instockData.error }}
@@ -289,7 +294,7 @@
 	        					min-height: 30px;
 	        					line-height: 30px;
 	        					// 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-//	        					border: 1px solid #e4efec;
+								//  border: 1px solid #e4efec;
 	        					box-sizing: border-box;
 	        				}
 	        				.el-table__empty-block {
@@ -343,4 +348,27 @@
 		    overflow: auto;
     	}
 	}
+</style>
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        i {
+            margin: 5px;
+        }
+    }
+    .table-table {
+        i {
+            margin: 5px;
+        }
+    }
+}
+.router-content {
+	.btn-restrain {
+		right: 100px;
+	}
+}
+
 </style>
