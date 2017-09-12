@@ -10,11 +10,11 @@
             </div>
             <el-tabs type="card">
                 <el-tab-pane label="关联表">
-                    <el-table class="table-main" :data="tableData.data" :height="200" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                        <el-table-column v-for="(column,index) in tableData.columns" :align="'left'" :fixed="false" :resizable="true" :label="column.name">
+                    <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <el-table-column v-for="(column,index) in uniteItems.columns" :align="'left'" :fixed="false" :resizable="true" :label="column.name">
                             <template scope="props">
-                                <div class="cell-content" v-if="column.prop === 'id'">
-                                    <i v-if="props.$index%2 === 0" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
+                                <div class="cell-content" v-if="column.prop === 'barcode'">
+                                    <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
                                     <span>{{ props.row[column.prop]}}</span>
                                 </div>
                                 <div class="cell-content" v-else>
@@ -46,7 +46,28 @@
                         <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
                     </div>
                 </el-tab-pane>
-                <el-tab-pane label="汇总表">汇总表</el-tab-pane>
+                <el-tab-pane label="汇总表">
+                    <h2 class="content-title inTitle">
+                        <span class='table-title'>投入汇总</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inAllItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputAllTable', $event)"></i>
+                        </span>
+                    </h2>
+                    <div class="content-table" ref="inputAllTable">
+                        <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table>
+                    </div>
+                    <h2 class="content-title outTitle">
+                        <span class='table-title'>产出汇总</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outAllItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputAllTable', $event)"></i>
+                        </span>
+                    </h2>
+                    <div class="content-table" ref="outputAllTable">
+                        <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table>
+                    </div>
+                </el-tab-pane>
             </el-tabs>
 
         </div>
@@ -60,11 +81,12 @@ import FileSaver from 'file-saver'
 import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
-// import {host} from 'assets/js/configs.js'
+
 
 // var HOST = window.HOST ? window.HOST: host	
 //const url = HOST + "/api/v1/trace/inout/by-equipment";
-const url = "http://rapapi.org/mockjsdata/21533/qqq?"
+//const url = "http://rapapi.org/mockjsdata/21533/qqq?"
+const url = `static/aaa.json`
 
 export default {
     components: {
@@ -114,9 +136,7 @@ export default {
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
-                    width: "",
-                    class: "material",
-                    cellClick: this.materialClick
+                    width: ""
                 }, {
                     name: "物料名称",
                     prop: "materialName",
@@ -142,7 +162,7 @@ export default {
                     prop: "happenTime",
                     width: ""
                 }],
-                height: 200,
+                height: 1,
                 data: []
             },
             /* 产出 */
@@ -205,13 +225,13 @@ export default {
                     width: "200"
                 }],
                 data: [],
-                height: 200
+                height: 1
             },
             //  viewHeight:0
             routerContent: 0,
-
-            tableData: {
-                filename: "投入",
+            /* 关联表 */
+            uniteItems: {
+                filename: "关联表",
                 columns: [{
                     name: "条码",
                     prop: "barcode",
@@ -263,6 +283,60 @@ export default {
                     name: "产出时间",
                     prop: "happenTime",
                     width: "200"
+                }],
+                height: 600,
+                data: []
+            },
+            /* 投入汇总 */
+            inAllItems: {
+                filename: "投入汇总",
+                columns: [{
+                    name: "批次号",
+                    prop: "batchNo",
+                    width: "",
+                }, {
+                    name: "物料编码",
+                    prop: "materialCode",
+                    width: ""
+                }, {
+                    name: "物料名称",
+                    prop: "materialName",
+                    width: ""
+                }, {
+                    name: "数量",
+                    prop: "quantity",
+                    width: ""
+                }],
+                height: 200,
+                data: []
+            },
+            /* 产出汇总 */
+            outAllItems: {
+                filename: "产出汇总",
+                columns: [{
+                    name: "批次号",
+                    prop: "batchNo",
+                    width: "",
+                }, {
+                    name: "物料编码",
+                    prop: "materialCode",
+                    width: ""
+                }, {
+                    name: "物料名称",
+                    prop: "materialName",
+                    width: ""
+                }, {
+                    name: "合格数",
+                    prop: "qualifiedNum",
+                    width: ""
+                }, {
+                    name: "报废数",
+                    prop: "scrapNum",
+                    width: ""
+                }, {
+                    name: "不合格数",
+                    prop: "unqualifiedNum",
+                    width: ""
                 }],
                 height: 200,
                 data: []
@@ -365,30 +439,68 @@ export default {
                 }
             })
 
-            this.$post(url, oQuery)
+            this.$get(url, oQuery)
                 .then((res) => {
+
                     this.loading = false;
                     let outDatas = []
                     let inDatas = []
-                    let allDatas = []
+                    let uniteDatas = []
+                    let outAllDatas = []
+                    let inAllDatas = []
+                    let j
 
                     this.judgeLoaderHandler(res, () => {
+                        
                         let oData = res.data.data
-                        oData.forEach((e,index)=>{
-                            inDatas.push(e.in[0])
-                            delete e["in"]
-                            outDatas.push(e)
-                            allDatas.push(outDatas[index])
-                            allDatas.push(inDatas[index])
+                        oData.forEach((e, index) => {
+                            inDatas.push(...e.in)               // 获取投入数据
+                            outDatas.push(e)                    // 获取产出数据
+                            uniteDatas.push(e)                  // 获取汇总数据
+                            uniteDatas.push(...e.in)
                         });
-                        this.outItems.data = outDatas
-                        this.inItems.data = inDatas
-                        this.tableData.data = allDatas
+
+                        inDatas.forEach((el, i) => {                                   // 投入汇总
+                            for (j = i + 1; j < inDatas.length; j++) {
+                                if (el["batchNo"] === inDatas[j]["batchNo"]) {
+                                    inAllDatas.push({
+                                        batchNo: inDatas[i]["batchNo"],             // 批次号
+                                        quantity: parseInt(inDatas[i]["quantity"]) + parseInt(inDatas[j]["quantity"]),  // 数量
+                                        materialName: inDatas[i]["materialName"],   // 物料名称
+                                        materialCode: inDatas[i]["materialCode"],   // 物料编码
+                                    })
+                                }
+                            }
+                        })
+
+                        outDatas.forEach((el, i) => {                                    // 产出汇总
+                            for (j = i + 1; j < outDatas.length; j++) {
+                                if (el["batchNo"] === outDatas[j]["batchNo"]) {
+                                    outAllDatas.push({
+                                        batchNo: outDatas[i]["batchNo"],              // 批次号
+                                        qualifiedNum: parseInt(outDatas[i]["qualifiedNum"]) + parseInt(outDatas[j]["qualifiedNum"]),       // 合格数
+                                        scrapNum: parseInt(outDatas[i]["scrapNum"]) + parseInt(outDatas[j]["scrapNum"]),                   // 报废数
+                                        unqualifiedNum: parseInt(outDatas[i]["unqualifiedNum"]) + parseInt(outDatas[j]["unqualifiedNum"]), // 不合格数
+                                        materialName: outDatas[i]["materialName"],   // 物料名称
+                                        materialCode: outDatas[i]["materialCode"]    // 物料编码
+                                    })
+                                }
+                            }
+                        })
+
+
+                        this.outItems.data = outDatas    // 产出明细
+                        this.inItems.data = inDatas      // 投入明细
+                        this.uniteItems.data = uniteDatas   // 关联明细
+                        this.outAllItems.data = outAllDatas // 产出汇总
+                        this.inAllItems.data = inAllDatas   // 投入汇总
+
                     });
                 })
                 .catch((err) => {
                     this.loading = false;
                     this.styleObject.minWidth = 0;
+                    console.log(err)
                     console.log("数据库查询出错。")
                 })
         },
@@ -575,15 +687,26 @@ export default {
                 }
             })
         },
-        handleEdit(index, row) {
+        /* 点击产出 展开或收拢投入 */
+        handleEdit(index, props) {
+            //debugger
+            //console.log(props)
+            let elArr = []
+            const num = props.row.in.length
             const tr = document.querySelectorAll(".el-table__row")
-            const el = tr[index + 1]
+            for(let i =0 ;  i< num ; i++ ){
+                elArr.push(tr[index+i+1])
+            }
             const icon = tr[index].querySelectorAll(".icon-down")[0]
-            if (el.classList.contains("hide")) {
-                el.classList.remove('hide');
+            if (icon.classList.contains("actived")) {  // 判断是否隐藏
+                elArr.forEach((el)=>{
+                    return el.classList.remove('hide');
+                })
                 icon.classList.remove('actived');
             } else {
-                el.classList.add('hide');
+                elArr.forEach((el)=>{
+                    return el.classList.add('hide');
+                })
                 icon.classList.add('actived');
             }
         }
