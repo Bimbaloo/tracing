@@ -117,6 +117,10 @@
 								});
 								this.$store.commit({
 									type: "updateRoot",
+									key: ""
+								});
+								this.$store.commit({
+									type: "updateRoot",
 									key: sRootKey
 								});
 								

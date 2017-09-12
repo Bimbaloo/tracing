@@ -137,6 +137,7 @@
 				this.treeData = this.parseTreeData();
 				// 重置路由。
 				this.$router.replace("/");
+
 			},
 			/**
 			 * 设置面板高度。

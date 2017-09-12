@@ -5,6 +5,9 @@
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
         </div>
+        <div class="path-btn">
+        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="restrainIf">遏制</el-button>
+        </div>
         <div class="router-path">
             <router-link 
                 class="path-item" 
@@ -42,7 +45,10 @@
                     "restrain":"遏制",
                     "parameter":"工艺参数"
                 },
-                aoRoute: []    
+                aoRoute: [],
+                restrainIf: false,
+                description: "",
+				url: "/trace/v1/materialbatchsuppress"
             }
         },
         computed: {
@@ -75,6 +81,17 @@
                     path: sRoute,
                     query: this.oQuery[sType]
                 })
+            },
+            setPathVisible(to) {
+                let aPath = to.path.split("/"),
+                    sType = aPath[aPath.length - 1];
+				
+				// 遏制
+               	if(sType == "restrain") {
+                    this.restrainIf = true;
+                }else {
+                	this.restrainIf = false;
+                }
             },
             // 设置路由。
             setRouteQuery(from, to) {
@@ -146,6 +163,82 @@
                 }
 
             },
+            showRestrain() {
+		        const h = this.$createElement;
+		        let bSucess = false;
+		        let self = this;
+		        this.$msgbox({
+		          title: "提示",
+		          message: h("el-input", {
+		          	  	attrs: {
+		          	  		type: "textarea",
+		          			rows: 4,
+		          			placeholder: "请输入遏制描述信息"
+					  	},
+					  	class: {
+						    message: true
+						},
+						domProps: {
+					      	value: self.description
+					    },
+					    on: {
+						    blur: function (event) {
+						        self.description = event.target.value
+						    }
+					    }
+		          }),
+		          showCancelButton: true,
+		          confirmButtonText: '确定',
+		          cancelButtonText: '取消',
+		          beforeClose: (action, instance, done) => {   
+		
+		            if (action === 'confirm') {
+		              	instance.confirmButtonLoading = true;
+		              	instance.confirmButtonText = '执行中...';
+		     		
+		     			let oConditions = Object.assign({description: self.description}, this.$route.query);
+		     			
+//		              	this.$post(this.url, oConditions)
+//		        		.then((res) => { 		        			
+		        			done();
+		        			instance.confirmButtonLoading = false;
+//		        			if(!res.errorCode) {			
+		        				bSucess = true;
+		        				// 隐藏遏制按钮。
+		        				self.restrainIf = false;
+		        				let sSerializion = "";
+		        				for(let p in oConditions) {
+		        					sSerializion += `&${p}=${oConditions[p]}`;
+		        				}
+		        				sSerializion = sSerializion.substring(1);
+		        				// 遏制成功，打开到遏制报告。
+		        				window.open("/restrain/report.html?" +　sSerializion);
+		        				
+//		        			}
+//		        		})
+//		        		.catch((err) => {        
+//		        			done();
+//		        			instance.confirmButtonLoading = false;
+//		        		});
+		
+		            } else {            
+		              	done();
+		//            	instance.$slots.default[0].elm.children[0].value = "";
+		            }
+		            
+		          }
+		        }).then(action => {
+		        	if(action == 'confirm') {
+		        		if(bSucess) {
+		        			this.$message.success('提交成功！');
+		        		}else {
+		        			this.$message.error('提交失败！');
+		        		}
+		        	}
+		//      	self.description = "";
+		        })
+    
+			},
             fullScreenClick() {
                 // 详情全屏按钮点击事件。
 				this.$store.commit({
@@ -180,6 +273,8 @@
 
             this.key = this.$route.params.key;
             this.setRouteQuery(from, to);
+            // 设置path可见性。
+            this.setPathVisible(to);
             next();
         },
         // beforeRouteLeave (to, from, next) {
@@ -201,6 +296,13 @@
             cursor: pointer;
             top: 15px;
             right: 10px;
+            z-index: 10;
+        }
+        
+        .path-btn {
+        	position: absolute;
+            top: 10px;
+            right: 50px;
             z-index: 10;
         }
 

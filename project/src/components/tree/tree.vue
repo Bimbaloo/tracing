@@ -45,10 +45,14 @@
 		},
 		watch: {
 		    data: function () {	
-		    	if(this.tree) {	
+		    	if(this.tree) {					
+					if(this.tipsShow) {
+						// 若需要显示详情。
+						this.data.node.forEach(o => o.isMaterialNode ? (o.category = 'material'):(o.category = 'process'))
+					}
 					this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    	
 					this.tree.model.linkFromPortIdProperty = "fromPort";
-  					this.tree.model.linkToPortIdProperty = "toPort"	
+					this.tree.model.linkToPortIdProperty = "toPort";
 		    	}				
 		    },
 		    key: function() {

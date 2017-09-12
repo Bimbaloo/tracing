@@ -10,7 +10,8 @@
       </el-tab-pane>
     </el-tabs>
     <footer>
-      <img :src="version"/>
+      <img class="version" :src="version"/>
+      <span class="version-info">版本: {{ v }}</span>
     </footer>
   </div>
 </template>
@@ -35,6 +36,7 @@
       return {
         logo,
         version,
+        v: VERSION,
         activeKey: "stock",
         categories: [],
         labelWidth: "100px",
@@ -65,7 +67,7 @@
         .then((res) => {
           this.loading = false;
           this.judgeLoaderHandler(res,() => {
-            this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+            this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain");	// && o.key!="link"
 
             this.categories.forEach(o => {
                 o.active = {
@@ -152,7 +154,16 @@
    position: fixed;
    left: 50%;
    margin-left: -150px;
-   bottom: 30px
+   bottom: 30px;
+   
+   .version {
+   	vertical-align: middle;
+   }
+   .version-info {
+   	font-size: 13px;
+   	color: #cccccc;
+   	vertical-align: middle;
+   }
  }
   .panel-title {
       padding: 10px 0;		// 19

@@ -353,6 +353,10 @@
 				// 是否全屏
 		    	return this.$store && this.$store.state.fullscreen
 		    },
+		    // 树的数据全屏。
+		   	treeFullscreen () {
+		   		return this.$store && this.$store.state.treeFullscreen
+			},
             option () {
                 let oData = {
                     legend: {
@@ -772,6 +776,7 @@
 			// 为了每次点击都会查询。
 			'$route': 'init',
             fullscreen: 'resizeChart',
+            treeFullscreen: 'resizeChart',
             resize: 'resizeChart',
             resizeY: 'resizeChart'
         },
@@ -821,7 +826,6 @@
             },
             // 重置图形大小。
             resizeChart () {
-                
                 if(this.chart && this.chart.getOption()) {
                     this.setChartHeight();
                     this.chart.resize();

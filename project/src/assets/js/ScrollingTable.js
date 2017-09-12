@@ -41,7 +41,7 @@ go.GraphObject.defineBuilder("AutoRepeatButton", function(args) {
     }
   }
 
-  return $("Button",
+  return $(go.Panel,
            { actionDown: delayClicking, actionUp: endClicking });
 });
 
@@ -84,22 +84,22 @@ go.GraphObject.defineBuilder("ScrollingTable", function(args) {
   }
 
   function updateScrollBar(table) {
+  	var up = table.panel.elt(0);
     var bar = table.panel.elt(1);  // the scrollbar is a sibling of the table
+    var down = table.panel.elt(2);
+    
     if (!bar) return;
     var idx = table.topIndex;
+    
+    if (up) up.opacity = (idx > 0) ? 1.0 : 0.0;
+    if (down) down.opacity = (idx < table.rowCount - 1) ? 1.0 : 0.0;
 
-    var up = bar.findObject("UP");
-    if (up) up.opacity = (idx > 0) ? 1.0 : 0.3;
-
-    var down = bar.findObject("DOWN");
-    if (down) down.opacity = (idx < table.rowCount - 1) ? 1.0 : 0.3;
-
-    var tabh = bar.actualBounds.height;
-    var rowh = table.elt(idx).actualBounds.height;  //?? assume each row has same height?
-    if (rowh === 0 && idx < table.rowCount-2) rowh = table.elt(idx + 1).actualBounds.height;
-    var numVisibleRows = Math.max(1, Math.ceil(tabh / rowh) - 1);
-    var needed = idx > 0 || idx + numVisibleRows <= table.rowCount;
-    bar.opacity = needed ? 1.0 : 0.0;
+//  var tabh = bar.actualBounds.height;
+//  var rowh = table.elt(idx).actualBounds.height;  //?? assume each row has same height?
+//  if (rowh === 0 && idx < table.rowCount-2) rowh = table.elt(idx + 1).actualBounds.height;
+//  var numVisibleRows = Math.max(1, Math.ceil(tabh / rowh) - 1);
+//  var needed = idx > 0 || idx + numVisibleRows <= table.rowCount;
+//  bar.opacity = needed ? 1.0 : 0.0;
   }
 
   return $(go.Panel, "Table",
@@ -107,46 +107,38 @@ go.GraphObject.defineBuilder("ScrollingTable", function(args) {
         _updateScrollBar: updateScrollBar
       },
       // this actually holds the item elements
-      $(go.Panel, "Table",
-        {
-          name: tablename,
-          column: 0,
-          stretch: go.GraphObject.Fill,
-          background: "whitesmoke",
-          rowSizing: go.RowColumnDefinition.None,
-          defaultAlignment: go.Spot.Top
-        }),
-
-      // this is the scrollbar
-      $(go.RowColumnDefinition,
-        { column: 1, sizing: go.RowColumnDefinition.None }),
-      $(go.Panel, "Table",
-        { column: 1, stretch: go.GraphObject.Vertical, background: "#DDDDDD" },
-        // the scroll up button
-        $("AutoRepeatButton",
-          {
-            name: "UP",
-            row: 0,
-            alignment: go.Spot.Top,
-            "ButtonBorder.figure": "Rectangle",
-            "ButtonBorder.fill": "lightgray",
-            click: function(e, obj) { incrTableIndex(obj, -1); }
-          },
-          $(go.Shape, "TriangleUp",
-            { stroke: null, desiredSize: new go.Size(6, 6) })),
-        // (someday implement a thumb here and support dragging to scroll)
-        // the scroll down button
-        $("AutoRepeatButton",
-          {
-            name: "DOWN",
-            row: 2,
-            alignment: go.Spot.Bottom,
-            "ButtonBorder.figure": "Rectangle",
-            "ButtonBorder.fill": "lightgray",
-            click: function(e, obj) { incrTableIndex(obj, +1); }
-          },
-          $(go.Shape, "TriangleDown",
-            { stroke: null, desiredSize: new go.Size(6, 6) }))
+      $(go.Panel, "Vertical",
+          // the scroll up button
+          $("AutoRepeatButton",
+              {
+                  name: "UP",
+                  row: 0,
+                  alignment: go.Spot.Top,
+                  height: 16,
+                  opacity: 0,
+                  click: function(e, obj) { incrTableIndex(obj, -1); }
+              },
+              $(go.Shape, "TriangleUp",
+                  {figure: "Chevron", margin: new go.Margin(1,0,0,0),  fill: "#928f8f", width: 12, height: 25, alignment: go.Spot.Center, stroke: null, angle: -90, stretch: go.GraphObject.Fill})),
+          // this actually holds the item elements
+          $(go.Panel, "Table",
+              {
+                  name: tablename,
+                  row: 1,
+                  rowSizing: go.RowColumnDefinition.None,
+                  background: "transparent"	// "whitesmoke"
+              }),
+          // the scroll down button
+          $("AutoRepeatButton",
+              {
+                  name: "DOWN",
+                  row: 2,
+                  alignment: go.Spot.Bottom,
+                  height: 16,
+                  click: function(e, obj) { incrTableIndex(obj, +1); }
+              },
+              $(go.Shape,
+                  {figure: "Chevron", fill: "#928f8f", width: 12, height: 25, alignment: go.Spot.Center, stroke: null, angle: 90, stretch: go.GraphObject.Fill}))
       )
     );
     

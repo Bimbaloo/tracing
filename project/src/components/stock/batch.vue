@@ -1,7 +1,7 @@
 <!--同批出入库-->
 <template>
 	<div class="router-content">
-		<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>
+		<!--<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>-->
 		<div class="innner-content">
 			<h2 class="content-title tableData">
 				
@@ -30,13 +30,6 @@
 			<div v-else class="content-table" ref="instockTable">
 				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
 			</div>
-			<!-- 复制的内容 -->
-            <!--<div v-show="false" ref="outstockTable">
-            	<v-table :b-fixed="false" :table-data="outstockData" :loading="outstockData.loading"></v-table>
-            </div>
-            <div v-show="false" ref="instockTable">
-            	<v-table :b-fixed="false" :table-data="instockData" :loading="instockData.loading"></v-table>
-            </div>-->
 		</div>
 	</div>
 
@@ -237,7 +230,7 @@
 			showSuspiciousList() {
 				if(!this.btnShow){
 					let sKey = this.$route.params.key,
-					sPath = "";				
+					sPath = "";		
 					if(sKey != undefined && sKey !== "") {
 						sPath = `/stock/${sKey}/restrain`;			
 					}else {
