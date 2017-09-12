@@ -11,9 +11,9 @@
             <el-tabs type="card">
                 <el-tab-pane label="关联表">
                     <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                        <el-table-column v-for="(column,index) in uniteItems.columns" :align="'left'" :fixed="false" :resizable="true" :label="column.name">
+                        <el-table-column v-for="(column,index) in uniteItems.columns" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name">
                             <template scope="props">
-                                <div class="cell-content" v-if="column.prop === 'barcode'">
+                                <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 25 +'px'}" >
                                     <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
                                     <span>{{ props.row[column.prop]}}</span>
                                 </div>
@@ -83,10 +83,9 @@ import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
 
-// var HOST = window.HOST ? window.HOST: host	
-//const url = HOST + "/api/v1/trace/inout/by-equipment";
+const url = HOST + "/api/v1/trace/inout/by-trace";
 //const url = "http://rapapi.org/mockjsdata/21533/qqq?"
-const url = `static/aaa.json`
+//const url = `static/produce.json`
 
 export default {
     components: {
@@ -160,7 +159,7 @@ export default {
                 }, {
                     name: "投入时间",
                     prop: "happenTime",
-                    width: ""
+                    width: "200"
                 }],
                 height: 1,
                 data: []
@@ -227,54 +226,52 @@ export default {
                 data: [],
                 height: 1
             },
-            //  viewHeight:0
-            routerContent: 0,
             /* 关联表 */
             uniteItems: {
                 filename: "关联表",
                 columns: [{
                     name: "条码",
                     prop: "barcode",
-                    width: "200",
+                    width: "120",
                     fixed: true,
                 }, {
                     name: "派工单号",
                     prop: "doCode",
-                    width: "200"
+                    width: "120"
                 }, {
                     name: "批次号",
                     prop: "batchNo",
-                    width: "200",
+                    width: "120",
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
-                    width: "200",
+                    width: "120",
                     class: "material",
                     cellClick: this.materialClick
                 }, {
                     name: "物料名称",
                     prop: "materialName",
-                    width: "300"
+                    width: "120"
                 }, {
                     name: "数量",
                     prop: "quantity",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "合格数",
                     prop: "qualifiedNum",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "报废数",
                     prop: "scrapNum",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "不合格数",
                     prop: "unqualifiedNum",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "班次",
                     prop: "shiftName",
-                    width: "200"
+                    width: ""
                 }, {
                     name: "操作人",
                     prop: "personName",
@@ -340,7 +337,9 @@ export default {
                 }],
                 height: 200,
                 data: []
-            }
+            },
+             //  viewHeight:0
+            routerContent: 0
 
         }
 
@@ -431,15 +430,17 @@ export default {
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el) => {
-                if (el === "equipmentId" || el === "startTime" || el === "endTime") {//equipmentIdList//equipmentList
+                if (el === "doOutIdList" ) {//equipmentIdList//equipmentList
                     oQuery[el] = this.$route.query[el]
                 }
                 if (el === "equipmentName" || el === "startTime" || el === "endTime") {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
-            this.$get(url, oQuery)
+            oQuery = {
+                "doOutIdList":[1031769]
+            }
+            this.$post(url, oQuery)
                 .then((res) => {
 
                     this.loading = false;
@@ -451,8 +452,8 @@ export default {
                     let j
 
                     this.judgeLoaderHandler(res, () => {
-                        
-                        let oData = res.data.data
+                        //debugger
+                        let oData = res.data.data.out
                         oData.forEach((e, index) => {
                             inDatas.push(...e.in)               // 获取投入数据
                             outDatas.push(e)                    // 获取产出数据
@@ -460,30 +461,40 @@ export default {
                             uniteDatas.push(...e.in)
                         });
 
-                        inDatas.forEach((el, i) => {                                   // 投入汇总
-                            for (j = i + 1; j < inDatas.length; j++) {
-                                if (el["batchNo"] === inDatas[j]["batchNo"]) {
-                                    inAllDatas.push({
-                                        batchNo: inDatas[i]["batchNo"],             // 批次号
-                                        quantity: parseInt(inDatas[i]["quantity"]) + parseInt(inDatas[j]["quantity"]),  // 数量
-                                        materialName: inDatas[i]["materialName"],   // 物料名称
-                                        materialCode: inDatas[i]["materialCode"],   // 物料编码
-                                    })
+                        let inDatasCopy = JSON.parse(JSON.stringify(inDatas))
+                        inDatasCopy.forEach((el, i) => {
+                            inAllDatas.push({
+                                batchNo: inDatasCopy[i]["batchNo"],             // 批次号
+                                quantity: parseInt(inDatasCopy[i]["quantity"]), // 数量
+                                materialName: inDatasCopy[i]["materialName"],   // 物料名称
+                                materialCode: inDatasCopy[i]["materialCode"],   // 物料编码
+                            })                                   // 投入汇总
+                            for (j = i + 1; j < inDatasCopy.length; j++) {
+                                if (el["batchNo"] === inDatasCopy[j]["batchNo"]) {
+                                    inAllDatas.quantity = parseInt(inDatasCopy[i]["quantity"]) + parseInt(inDatasCopy[j]["quantity"])  // 数量
+                                    inDatasCopy.splice(j, 1)
+                                    j=j-1 
                                 }
                             }
                         })
 
-                        outDatas.forEach((el, i) => {                                    // 产出汇总
-                            for (j = i + 1; j < outDatas.length; j++) {
-                                if (el["batchNo"] === outDatas[j]["batchNo"]) {
-                                    outAllDatas.push({
-                                        batchNo: outDatas[i]["batchNo"],              // 批次号
-                                        qualifiedNum: parseInt(outDatas[i]["qualifiedNum"]) + parseInt(outDatas[j]["qualifiedNum"]),       // 合格数
-                                        scrapNum: parseInt(outDatas[i]["scrapNum"]) + parseInt(outDatas[j]["scrapNum"]),                   // 报废数
-                                        unqualifiedNum: parseInt(outDatas[i]["unqualifiedNum"]) + parseInt(outDatas[j]["unqualifiedNum"]), // 不合格数
-                                        materialName: outDatas[i]["materialName"],   // 物料名称
-                                        materialCode: outDatas[i]["materialCode"]    // 物料编码
-                                    })
+                        let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
+                        outDatasCopy.forEach((el, i) => {                                    // 产出汇总
+                                outAllDatas.push({
+                                    batchNo: outDatasCopy[i]["batchNo"],              // 批次号
+                                    qualifiedNum: parseInt(outDatasCopy[i]["qualifiedNum"]),       // 合格数
+                                    scrapNum: parseInt(outDatasCopy[i]["scrapNum"]),                   // 报废数
+                                    unqualifiedNum: parseInt(outDatasCopy[i]["unqualifiedNum"]), // 不合格数
+                                    materialName: outDatasCopy[i]["materialName"],   // 物料名称
+                                    materialCode: outDatasCopy[i]["materialCode"]    // 物料编码
+                                })
+                            for (j = i + 1; j < outDatasCopy.length; j++) {
+                                if (el["batchNo"] === outDatasCopy[j]["batchNo"]) {
+                                    outAllDatas.qualifiedNum = parseInt(outDatasCopy[i]["qualifiedNum"]) + parseInt(outDatasCopy[j]["qualifiedNum"])        // 合格数
+                                    outAllDatas.scrapNum = parseInt(outDatasCopy[i]["scrapNum"]) + parseInt(outDatasCopy[j]["scrapNum"])                    // 报废数
+                                    outAllDatas.unqualifiedNum = parseInt(outDatasCopy[i]["unqualifiedNum"]) + parseInt(outDatasCopy[j]["unqualifiedNum"])  // 不合格数
+                                    outAllDatas.splice(j, 1)
+                                    j=j-1 
                                 }
                             }
                         })
@@ -693,11 +704,14 @@ export default {
             //console.log(props)
             let elArr = []
             const num = props.row.in.length
-            const tr = document.querySelectorAll(".el-table__row")
+            const trs = document.querySelectorAll(".el-table__body-wrapper")[0].querySelectorAll("tr")
+            const trsFix = document.querySelectorAll(".el-table__fixed-body-wrapper")[0].querySelectorAll("tr")
+            //const tr = document.querySelectorAll(".el-table__row")
             for(let i =0 ;  i< num ; i++ ){
-                elArr.push(tr[index+i+1])
+                elArr.push(trs[index+i+1])
+                elArr.push(trsFix[index+i+1])
             }
-            const icon = tr[index].querySelectorAll(".icon-down")[0]
+            const icon = trsFix[index].querySelectorAll(".icon-down")[0]
             if (icon.classList.contains("actived")) {  // 判断是否隐藏
                 elArr.forEach((el)=>{
                     return el.classList.remove('hide');
@@ -756,6 +770,41 @@ export default {
         color: #f90;
     }
 }
+
+@green: #42af8f;
+	@blue: #0099ff;
+	@yellow: #fcc433;
+	@red: #e86b59;
+	@inVent: #00a656;
+	
+	body {
+		background-color: #f2f2f2;
+		font-size: 14px;
+		overflow: hidden;
+	}
+	
+	.el-button--text {
+		border: 1px solid #42af8f;
+		padding: 10px 15px;
+	}
+	
+	.el-table .el-table__header thead tr th {
+		background-color: @green;
+		.cell {
+			background-color: @green;
+			color: #FFFFFF;
+		}	
+	}
+	
+	.el-table .cell {
+		padding: 0;
+    }
+    .cell {
+        .ltext {
+            text-align: left;
+            padding-left: 8px;
+        }
+    }
 
 .show {
     transition: display 400ms;
