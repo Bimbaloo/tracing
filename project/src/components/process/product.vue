@@ -8,7 +8,7 @@
                     </span>
                 </div>
             </div>
-            <el-tabs type="card">
+            <el-tabs type="border-card">
                 <el-tab-pane label="关联表">
                     <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                         <el-table-column v-for="(column,index) in uniteItems.columns" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name">
@@ -438,9 +438,9 @@ export default {
                 }
             })
             /* 测试条件 */
-            // oQuery = {
-            //     "doOutIdList":[1034214] //1034214  1031769
-            // }
+            oQuery = {
+                "doOutIdList":[1034214] //1034214  1031769
+            }
             this.$post(url, oQuery)
                 .then((res) => {
 
@@ -821,6 +821,39 @@ export default {
         transform: rotate(-90deg);
     }
 }
+.el-tabs--border-card>.el-tabs__content {
+  padding-top: 30px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.el-popover, .el-tabs--border-card {
+  box-shadow: none
+}
+.el-tabs--border-card {
+  border-color: #ccc;
+  border-bottom: none;
+  border-left: none;
+  border-right: none;
+}
+.el-tabs__nav-scroll {
+  border-left: solid 1px #ccc;
+  border-right: solid 1px #ccc
+}
+.el-tabs--border-card>.el-tabs__header {
+  background-color: #f0f0f0;
+  border-color: #ccc;
+}
+.el-tabs__item {
+  color: #666;
+  &:hover {
+      color: #333
+  }
+}
+.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
+    border-right-color: #ccc;
+    border-left-color: #ccc;
+}
+
 </style>
 
 <style lang="less" scoped>
