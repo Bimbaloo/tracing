@@ -518,7 +518,68 @@ var parseQueryParam = function(oQuery, index) {
 	return oParam;
 };
 
+var login = function(oStore) {
+	if(!window.Rt.utils.cookie("token")) {
+		// 若cookie中无token，
+		let oParams = window.Rt.utils.getParams();
+
+		if(oParams.token) {
+		  // 若地址中有token,设置cookie。
+		  window.Rt.utils.cookie("token", oParams.token);
+		  window.Rt.utils.cookie("userId", oParams.userId || '');
+		  window.Rt.utils.cookie("userName", oParams.userName || '');
+
+		  // 更新数据。
+		  oStore.commit({
+				type: "updateLoginInfo"
+		  });            
+		}         
+	}
+}
+
+/**
+ * 登录失败处理函数。
+ * @param {String} sUrl 
+ * @return {void}
+ */
+var loginFail = function(sUrl) {
+	// 清cookie。
+	window.Rt.utils.cookie("token", null)
+	window.Rt.utils.cookie("userId", null)
+	window.Rt.utils.cookie("userName", null)
+
+	let sTag = "?";
+	if(location.search) {
+		sTag = "&";
+	}
+
+	// 登录跳转。
+	location.href = sUrl + "redirectUrl=" + 
+	encodeURIComponent(location.host + location.pathname + location.search + sTag + "token={token}&userId={userId}&userName={userName}");
+}
+
+var beforeRequest = function(oStore, oAxio) {
+	// 更新数据。
+	oStore.commit({
+		type: "updateLoginInfo"
+	});  
+
+	let oLoginInfo = oStore.state.loginModule;
+
+	// 设置请求头。
+	return oAxio.create({
+        headers: {
+			token: oLoginInfo.token,
+			userId: oLoginInfo.userId,
+			userName: encodeURIComponent(oLoginInfo.userName)
+		}
+	})
+}
+
 export default {
+	login,
+	loginFail,
+	beforeRequest,
 	parseData,
 	parseTreeData,
 	parseQueryParam

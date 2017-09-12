@@ -525,19 +525,23 @@
 			showTips() {
 				this.tipsShow = !this.tipsShow;
 				this.tree.nodes.each(node=> {
-					let cat = node.data.isMaterialNode ? "material": "process";
+					let bVisible = node.visible,	
+						cat = node.data.isMaterialNode ? "material": "process";
 
 					if(!(node.data.isGroup && node.isSubGraphExpanded)) {
 						// 如果不为组且展开。
 						this.tree.model.setCategoryForNodeData(node.data, cat);
+						node.visible = 	bVisible
 					}
-													
+															
 				})
 			},
 			hideTips() {
 				this.tipsShow = !this.tipsShow;
 				this.tree.nodes.each(node=> {
-					this.tree.model.setCategoryForNodeData(node.data, "simple");									
+					let bVisible = node.visible				
+					this.tree.model.setCategoryForNodeData(node.data, "simple");
+					node.visible = 	bVisible								
 				})
 			},
 			fullScreenClick() {
