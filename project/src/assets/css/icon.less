@@ -14,6 +14,31 @@
 }
 
 /*
+ * 12x12 图标。
+ */
+ .icon.icon-12 {
+	width: @px12;
+	height: @px12;
+	background-image: url(../img/icon-12.png);
+
+    // 删除。
+	&.icon-delete {
+		background-position: 0 0;
+	}
+	&.icon-delete:hover {
+		background-position: -@px12 0;
+	}
+
+	// 翻转。
+	&.icon-reverse {
+		background-position: 0 -@px12;
+	}
+	&.icon-reverse:hover {
+		background-position: -@px12 -@px12;
+	}
+}
+
+/*
  * 20x20 图标。
  */
 .icon.icon-20 {

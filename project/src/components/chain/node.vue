@@ -116,6 +116,7 @@
         		this.updateGoCharts()
 			},
 			nodeHeight() {
+				
 				this.nodesData = this.getNodesData();
 				this.allNodeLine = this.getAllNodeLines();
 				// 更新图形。
@@ -245,46 +246,58 @@
 		          $(go.Part, "Table",
 		              { position: new go.Point(0, -8), selectable: false },
 		              $(go.Panel, "Horizontal",
-		                  { column: 0, alignment: go.Spot.Left },
+		                  { column: 0, alignment: go.Spot.Left , margin: new go.Margin(0,10,0,0)},
+		                   $(go.TextBlock, "正常节点:",
+		                      { font: "700 13px Droid Serif, sans-serif" }),
 		                  $(go.Shape, "Ellipse",
-		                      { width: 12, height: 12, strokeWidth: 2, fill: sNormal, stroke:sNormal, margin: 4}),
-		                  $(go.TextBlock, "正常节点",
-		                      { font: "700 13px Droid Serif, sans-serif" })
+		                      { width: 12, height: 12, strokeWidth: 2, fill: sNormal, stroke:sNormal, margin: 4})
 		               ),	//end column 0 
 		              $(go.Panel, "Horizontal",
-		                  { column: 1, alignment: go.Spot.Left },
+		                  { column: 1, alignment: go.Spot.Left, margin: new go.Margin(0,10,0,0) },
+		                  $(go.TextBlock, "断链节点:",
+		                      { font: "700 13px Droid Serif, sans-serif" }),
 		                  $(go.Shape, "Ellipse",
-		                      { width: 12, height: 12, strokeWidth: 2, fill: sBroke, stroke:sBroke, margin: 4 }),
-		                  $(go.TextBlock, "正常节点",
-		                      { font: "700 13px Droid Serif, sans-serif" })
+		                      { width: 12, height: 12, strokeWidth: 2, fill: sBroke, stroke:sBroke, margin: 4 })
 		              ),  // end column 1
 		              $(go.Panel, "Horizontal",
-		                  { column: 2, alignment: go.Spot.Left },
+		                  { column: 2, alignment: go.Spot.Left, margin: new go.Margin(0,10,0,0) },
+		                  $(go.TextBlock, "已修复节点:",
+		                      { font: "700 13px Droid Serif, sans-serif" }),
 		                  $(go.Shape, "Ellipse",
-		                      {width:12, height: 12, strokeWidth: 2, fill: sRecovered, stroke: sRecovered, margin: 4 }),
-		                  $(go.TextBlock, "已修复节点",
-		                      { font: "700 13px Droid Serif, sans-serif" })
+		                      {width:12, height: 12, strokeWidth: 2, fill: sRecovered, stroke: sRecovered, margin: 4 })
 		              ),  // end column 2
 		              $(go.Panel, "Horizontal",
-		                  { column: 3, alignment: go.Spot.Left },
-		                  $(go.Shape, "Ellipse",
-		                      {width:12, height: 12, strokeWidth: 2, fill: sBroke, stroke: sInCanDo, margin: 4 }),
-		                  $(go.TextBlock, "投入可修复节点",
-		                      { font: "700 13px Droid Serif, sans-serif" })
+		                  { column: 3, alignment: go.Spot.Left , margin: new go.Margin(0,10,0,0)},
+		                  $(go.TextBlock, "投入可修复节点:",
+		                      { font: "700 13px Droid Serif, sans-serif" }),
+		                  $(go.Shape, "TriangleUp",
+		                      {width:12,  height: 12, angle: -90, strokeWidth: 2, fill: sNormal, stroke: sNormal, margin: 4 }),
+		                  $(go.Shape, "TriangleUp",
+		                      {width:12,  height: 12, angle: -90, strokeWidth: 2, fill: sBroke, stroke: sBroke, margin: 4 }),
+		                      $(go.Shape, "TriangleUp",
+		                      {width:12,  height: 12, angle: -90, strokeWidth: 2, fill: sRecovered, stroke: sRecovered, margin: 4 })
 		              ),  // end column 3
 		              $(go.Panel, "Horizontal",
-		                  { column: 4, alignment: go.Spot.Left },
-		                  $(go.Shape, "Ellipse",
-		                      {width:12, height: 12, strokeWidth: 2, fill: sBroke, stroke: sOutCanDo, margin: 4 }),
-		                  $(go.TextBlock, "产出可修复节点",
-		                      { font: "700 13px Droid Serif, sans-serif" })
+		                  { column: 4, alignment: go.Spot.Left , margin: new go.Margin(0,10,0,0)},
+		                  $(go.TextBlock, "产出可修复节点:",
+		                      { font: "700 13px Droid Serif, sans-serif" }),
+		                  $(go.Shape, "TriangleUp",
+		                      {width:12, height: 12, angle: 90, strokeWidth: 2, fill: sNormal, stroke: sNormal, margin: 4 }),
+		                  $(go.Shape, "TriangleUp",
+		                      {width:12, height: 12, angle: 90, strokeWidth: 2, fill: sBroke, stroke: sBroke, margin: 4 }),
+		                      $(go.Shape, "TriangleUp",
+		                      {width:12, height: 12, angle: 90, strokeWidth: 2, fill: sRecovered, stroke: sRecovered, margin: 4 })
 		              ),  // end column 4
 		              $(go.Panel, "Horizontal",
 		                  { column: 5, alignment: go.Spot.Left },
-		                  $(go.Shape, "Ellipse",
-		                      {width:12, height: 12, strokeWidth: 2, fill: sBroke, stroke: sCanDo, margin: 4 }),
-		                  $(go.TextBlock, "可修复节点",
-		                      { font: "700 13px Droid Serif, sans-serif" })
+		                  $(go.TextBlock, "可修复节点:",
+		                      { font: "700 13px Droid Serif, sans-serif" }),
+		                  $(go.Shape, "Diamond",
+		                      {width:12, height: 12, strokeWidth: 2, fill: sNormal, stroke: sNormal, margin: 4 }),
+		                  $(go.Shape, "Diamond",
+		                      {width:12, height: 12, strokeWidth: 2, fill: sBroke, stroke: sBroke, margin: 4 }),
+		                      $(go.Shape, "Diamond",
+		                      {width:12, height: 12, strokeWidth: 2, fill: sRecovered, stroke: sRecovered, margin: 4 })
 		              ),  // end column 5
 		          ));
 				
@@ -335,6 +348,7 @@
 		              $(go.Shape,
 		                  { width: 12, height: 12, column: 0, strokeWidth: 2, margin: 4},
 		                  new go.Binding("figure", "figure"),
+		                  new go.Binding("angle", "angle"),
 		                  new go.Binding("fill", "color"),
 		                  new go.Binding("stroke", "borderColor")
 		              ),
@@ -347,38 +361,28 @@
 				let fieldTemplate =
 			          $(go.Panel, "TableRow",  // this Panel is a row in the containing Table
 			              new go.Binding("portId", "name"),  // this Panel is a "port"
+			              new go.Binding("fromLinkable", 'link'),
+			              new go.Binding("toLinkable", 'link'),
 			              {
 			                  background: "transparent",  // so this port's background can be picked by the mouse
 			                  fromSpot: go.Spot.LeftRightSides,  // links only go from the right side to the left side
 			                  toSpot: go.Spot.LeftRightSides,
-			                  fromLinkable: this.edit, 			// 编辑参数控制。
-		                  	  toLinkable: this.edit,				// 编辑参数控制。
+			                  fromLinkable: false, 			// 编辑参数控制。
+		                  	  toLinkable: false,				// 编辑参数控制。
 			                  name: 'tableRow'
 			              },
 			              { // allow the user to select items -- the background color indicates whether "selected"
-			                  //?? maybe this should be more sophisticated than simple toggling of selection
-			                  click: function(e, item) {
-			                      // assume "transparent" means not "selected", for items
-//			                      var oldskips = item.diagram.skipsUndoManager;
-//			                      item.diagram.skipsUndoManager = true;
-//			
-//			                      // 当前工序下的节点的背景为不选中
-//			                      if (item.background === "transparent") {
-//			                          item.background = "dodgerblue";
-//			                      } else {
-//			                          item.background = "transparent";
-//			                      }
-//			                      item.diagram.skipsUndoManager = oldskips;
-			                  },
 			                  toolTip: tooltipTemplate
 			              },
 			              $(go.Panel, 'Table',
 //			                  { stretch: go.GraphObject.Fill},
 							 {alignment: go.Spot.TopLeft},
+							 $(go.RowColumnDefinition,{ height: 30 }),
 			                  // the table header
 			                  $(go.Shape,
 			                      { width: 12, height: 12, row: 0, column: 0, strokeWidth: 2, margin: 4},
 			                      new go.Binding("figure", "figure"),
+		                  		  new go.Binding("angle", "angle"),
 			                      new go.Binding("fill", "color"),
 			                      new go.Binding("stroke", "borderColor")
 			                  ),
@@ -386,7 +390,7 @@
 			                      { margin: new go.Margin(3, 2), width:40, row: 0, column: 1, font: "bold 14px sans-serif"},
 			                      new go.Binding("text", "name")),
 			                  // the collapse/expand button
-			                  new go.Binding("desiredSize", "visible", function(v) { return new go.Size(NaN, NaN); }).ofObject("LIST"),
+//			                  new go.Binding("desiredSize", "visible", function(v) { return new go.Size(NaN, NaN); }).ofObject("LIST"),
 			                  $("PanelExpanderButton", "LIST",  // the name of the element whose visibility this button toggles
 			                      { row: 0, column: 2, alignment: go.Spot.RightCenter}),
 			                  // the list of Panels, each showing an attribute
@@ -419,23 +423,36 @@
 			          portSpreading: go.Node.SpreadingNone
 			        },
 			        new go.Binding("location").makeTwoWay(),
-			        $(go.TextBlock,
-			          { font: "bold 14px sans-serif" },
-			          {
-			          	click: this.showProcessFilter		// 显示工序过滤弹窗。
-			          },
-			          new go.Binding("text", "name")),
+			        $(go.Panel, 'Horizontal',
+			            {
+			            	click: this.showProcessFilter		// 显示工序过滤弹窗。
+			            },
+			            $(go.TextBlock,
+			                { font: "bold 14px sans-serif" },
+			                {
+//			                    click: this.showProcessFilter		// 显示工序过滤弹窗。
+			                },
+			                new go.Binding("text", "name")),
+			            $(go.Shape,
+			                {toArrow: "Standard", angle: 90, margin: new go.Margin(0, 0, 0, 10) })
+			        ),
+//			        $(go.TextBlock,
+//			          { font: "bold 14px sans-serif" },
+//			          {
+//			          	click: this.showProcessFilter		// 显示工序过滤弹窗。
+//			          },
+//			          new go.Binding("text", "name")),
 			        $(go.Panel, "Auto",
-			          $(go.Shape, { fill: "white" }),
+			          $(go.Shape, { fill: "white", stroke: "gray" }),
 			          $("ScrollingTable",
 			            {
 			              name: "SCROLLER",
-			              desiredSize: new go.Size(NaN, that.nodeHeight - 120),  // fixed width
+//			              desiredSize: new go.Size(NaN, that.nodeHeight - 120),  // fixed width
 			              stretch: go.GraphObject.Fill       // but stretches vertically
 			            },
 			            new go.Binding("TABLE.itemArray", "items"),
-			            new go.Binding("TABLE.column", "left", function(left) { return left ? 2 : 0; }),
             			new go.Binding("desiredSize", "size").makeTwoWay(),
+            			new go.Binding("TABLE.height", "height"),
 			            {
 			              "TABLE.itemTemplate": fieldTemplate,
 			              "TABLE.defaultColumnSeparatorStroke": "gray",
@@ -455,8 +472,6 @@
 		                  relinkableFrom: false,
 		                  relinkableTo: false,
 //		                  toShortLength: 4,
-//		                  routing: go.Link.AvoidsNodes,
-		                  click: (e, item) => {},
 		                  toolTip: 
 		                  		$(go.Adornment, "Auto", {
 		                              isShadowed: true
@@ -487,7 +502,6 @@
 						            nodeDataArray: that.nodesData,
 						            linkDataArray: that.allNodeLine
 							      });
-
 
 				// 删除事件。
 				this.tree.commandHandler.deleteSelection = this.deleteNodeLine;
@@ -558,7 +572,8 @@
 				if(this.tree) {
 			        for (var nit = this.tree.links; nit.next(); ) {
 			              	var node = nit.value;
-			              	if(node.isSelected) {
+			              	if(node.isSelected && (node.data.type === 'recovered' || node.data.type === undefined)) {
+			              		// 只有选中的且为修复的线才能删除,或者为新增的线。
 			                 	items.push(node)
 			              	}
 			        }
@@ -588,11 +603,11 @@
 			},
 			// 判断删除的连线。
 			judgeIsCanRemove(nodeLine) {
-				// 判断该线是否存在与新建之中，存在则将在新建的数据中删除，
 	            // 否则 放入删除的数据中。
 	            let bExit = false,
 	            	nIndex = -1;
 	            	
+				// 判断该线是否存在与新建之中，存在则将在新建的数据中删除，
 	            this.aNewLink.forEach( (o, index) => {
 	            	if(o.line.fromPort == nodeLine.fromPort && o.line.toPort == nodeLine.toPort) {
 	            		bExit = true;
@@ -707,7 +722,8 @@
 					aSeriesData = [],
 					aDisaplayNode = [],			// 通过节点链类型显示的节点。
 					aFilterNodeType = this.filterData.nodeType,
-					aNowNode = [];
+					aNowNode = [],
+					nIndex = 0;
 					
 				if(this.allFilterNode) {
 					
@@ -783,9 +799,10 @@
 							name: sName,
 							seq: oo.seq,
 							left: !nIn? true: false,
-							location: new go.Point(nIn*350, 10),
+//							location: new go.Point(nIn*350, 10),
 							items: [],
-							size: new go.Size(NaN, that.nodeHeight - 120)
+							size: new go.Size(NaN, that.nodeHeight - 120),
+							height: that.nodeHeight - 150
 						},
 						aDisProcess = this.filterData.aFilterProcess;
 					
@@ -801,13 +818,17 @@
 							// 判断该节点是否存在于工序中。 判断节点是否存在于节点链中
 							if(aDisaplayNode.includes(sId) && that.isFilterProcessAble(o, sCode)) {
 								
+								let oNodeType = that.getNodeType(o);
+								
 								// 返回节点数据。
 								oNode.items.push({
 									name: sId,
 									data: o,
-									figure: "Ellipse",
-									color: that.getNodeType(o).style.color,
-									borderColor: that.getNodeType(o).style.borderColor
+									figure: oNodeType.figure,	//"Ellipse",
+									angle: oNodeType.angle,
+									color: oNodeType.style.color,
+									borderColor: oNodeType.style.borderColor,
+									link: that.edit
 								})
 								
 								aNowNode.push(sId)
@@ -815,6 +836,8 @@
 							
 						});
 						
+						oNode.location = new go.Point(nIndex*350, 10),
+						nIndex ++;
 						// 返回数据。
 						aSeriesData.push(oNode)
 					}
@@ -1024,6 +1047,8 @@
     				// 返工。
     				nIsRework = o.isRework,
     				oStyle = {
+    					figure: 'Ellipse',		//　图标类型－－默认为圆形。
+    					angle: 0,				//　旋转角度－－默认为0
     					type: '',
     					style: {
     						color: '',
@@ -1034,6 +1059,8 @@
     			if(!nIsBroken && !nIsRecovered) {
     				// 正常节点。
     				oStyle = {
+    					figure: 'Ellipse',		//　图标类型－－默认为圆形。
+    					angle: 0,
     					type: 'normal',
     					style: {
     						color: sNormal,
@@ -1043,6 +1070,8 @@
     			}else if(nIsBroken) {
     				// 断链节点。
     				oStyle = {
+    					figure: 'Ellipse',		//　图标类型－－默认为圆形。
+    					angle: 0,
     					type: 'broken',
     					style: {
     						color: sBroke,
@@ -1052,6 +1081,8 @@
     			}else if(nIsRecovered) {
     				// 修复节点。
     				oStyle = {
+    					figure: 'Ellipse',		//　图标类型－－默认为圆形。
+    					angle: 0,
     					type: 'recovered',
     					style: {
     						color: sRecovered,
@@ -1063,16 +1094,21 @@
     			// 投入修复 或产出修复。
     			if(o.isInCanRepair && o.isOutCanRepair) {
     				// 投产都可修复
+    				oStyle.figure = 'Diamond';
     				oStyle.type += 'canDo';
-    				oStyle.style.borderColor = sCanDo
+//  				oStyle.style.borderColor = sCanDo
     			}else if(o.isInCanRepair) {
     				// 投入可修复
+    				oStyle.figure = 'TriangleUp';
+    				oStyle.angle = -90;
     				oStyle.type += 'inCanDo';
-    				oStyle.style.borderColor = sInCanDo
+//  				oStyle.style.borderColor = sInCanDo
     			}else if(o.isOutCanRepair) {
     				// 产出可修复
+    				oStyle.figure = 'TriangleUp';
+    				oStyle.angle = 90;
     				oStyle.type += 'outCanDo';
-    				oStyle.style.borderColor = sOutCanDo
+//  				oStyle.style.borderColor = sOutCanDo
     			}
     			
     			// 返回节点的类型。
@@ -1184,12 +1220,14 @@
 	    						// 判断节点是否存在。
 	    						if(that.aDisNode.includes(sId)) {
 	    							// 线的两个节点都存在，则加入。
+	    							let oLine = that.getNodeLineType([sId,sNode]);
 									aLine.push({
 										from: that.getNodeProcessCode(that.getNodeInfoById(sId)).processCode,
 										fromPort: sId,
 										to: that.getNodeProcessCode(oData).processCode,
 										toPort: sNode,
-										color: that.getNodeLineType([sId,sNode]).style.color
+										color: oLine.style.color,
+										type: oLine.type
 									})
 	    						}
 	    					});
@@ -1577,13 +1615,6 @@
 					
 					this.allNodeLine = this.getAllNodeLines()
 					this.updateGoCharts()
-//		    		this.tree.model = this.$(go.GraphLinksModel,
-//							      {
-//							        linkFromPortIdProperty: "fromPort",
-//							        linkToPortIdProperty: "toPort",
-//						            nodeDataArray: this.nodesData,
-//						            linkDataArray: this.allNodeLine
-//							      })	    		
 		    	}
 			},
 			// 节点保存操作。

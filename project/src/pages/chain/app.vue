@@ -464,9 +464,9 @@
 						this.otherHeight = vFilter.clientHeight + vInfo.clientHeight;
 					}
 					if(this.fullscreen) {
-						this.treeHeight =  this.contentHeight - 60
+						this.treeHeight =  this.contentHeight - 80		// 60
 					}else {
-						this.treeHeight =  this.contentHeight - this.otherHeight - 60
+						this.treeHeight =  this.contentHeight - this.otherHeight - 80		// 60
 					}
 				}else {
 					this.treeHeight = 300
@@ -598,6 +598,7 @@
 		height: 100%;
 		display: flex;
 		flex-direction: column;
+		overflow-y: auto;
 		
 		.hide {
 			display: none;
@@ -647,6 +648,7 @@
 					// 信息
 					.info-content,
 					.info-filter {
+						font-size: 14px;
 						margin-bottom: 30px;
 							
 						.legend-title {

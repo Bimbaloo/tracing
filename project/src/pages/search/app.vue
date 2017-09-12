@@ -10,7 +10,8 @@
       </el-tab-pane>
     </el-tabs>
     <footer>
-      <img :src="version"/>
+      <img class="version" :src="version"/>
+      <span class="version-info">版本: {{ v }}</span>
     </footer>
   </div>
 </template>
@@ -24,8 +25,9 @@
 	// import {host} from 'assets/js/configs.js'
 
 	// var HOST = window.HOST ? window.HOST: host	
-  const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules"
-  
+  const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+  const LOGIN_ERROR_CODE = 10;
+
   export default {
     components: {
       'v-panel': panel
@@ -34,6 +36,7 @@
       return {
         logo,
         version,
+        v: VERSION,
         activeKey: "stock",
         categories: [],
         labelWidth: "100px",
@@ -42,22 +45,38 @@
         loading: false
       }
     },
-    created() {  
-      this.loading = true;
-      this.$ajax.get(MODULE_ITEM_URL).then((res) => {
-      	this.loading = false;
-      	this.judgeLoaderHandler(res,() => {
+    computed: {
+      token() {
+        return this.$store.state.loginModule.token
+      },
+      userId() {
+        return this.$store.state.loginModule.userId
+      },
+      userName() {
+        return this.$store.state.loginModule.userName
+      },
+    },
+    created() {
+      // 登录验证。
+      fnP.login(this.$store);
 
-	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+      this.loading = true;   
+      // 请求判断。   
+      fnP.beforeRequest(this.$store, this.$ajax)
+        .get(MODULE_ITEM_URL)
+        .then((res) => {
+          this.loading = false;
+          this.judgeLoaderHandler(res,() => {
+            this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain");	// && o.key!="link"
 
-	        this.categories.forEach(o => {
-	            o.active = {
-	              radio: "1",
-	              keys: {}
-	            }            
-	        })
-      	});
-      });
+            this.categories.forEach(o => {
+                o.active = {
+                  radio: "1",
+                  keys: {}
+                }            
+            })
+          });
+        });
     },
     methods: {
     	// 判断调用接口是否成功。
@@ -69,10 +88,17 @@
         		// 调用成功后的回调函数。
         		fnSu && fnSu();
         	}else {
-        		this.sErrorMessage = param.data.errorMsg.message;
-        		this.showMessage();
-        		// 失败后的回调函。
-        		fnFail && fnFail();
+            if(bRight === LOGIN_ERROR_CODE) {
+              // 登录失败。
+              // 清cookie，跳转到登录页面。
+              this.loginFail(param.loginUrl);
+               
+            }else {
+              this.sErrorMessage = param.data.errorMsg.message;
+              this.showMessage();
+              // 失败后的回调函。
+              fnFail && fnFail();
+            }
         	}
     	},
     	// 显示提示信息。
@@ -128,7 +154,16 @@
    position: fixed;
    left: 50%;
    margin-left: -150px;
-   bottom: 30px
+   bottom: 30px;
+   
+   .version {
+   	vertical-align: middle;
+   }
+   .version-info {
+   	font-size: 13px;
+   	color: #cccccc;
+   	vertical-align: middle;
+   }
  }
   .panel-title {
       padding: 10px 0;		// 19
