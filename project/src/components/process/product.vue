@@ -448,9 +448,9 @@ export default {
                 }
             })
             /* 测试条件 */
-            oQuery = {
-                "doOutIdList":[1034214] //1034214  1031769
-            }
+            // oQuery = {
+            //     "doOutIdList":[1034214] //1034214  1031769
+            // }
             this.$post(url, oQuery)
                 .then((res) => {
 

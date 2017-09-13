@@ -345,8 +345,10 @@ export default {
     justify-content: space-between;
     .table-handle {
         margin-right: 5px;
+        display: flex;
+        align-items: center;
         i {
-            margin: 5px;
+            margin: 7.5px;
         }
     }
     .table-table {
