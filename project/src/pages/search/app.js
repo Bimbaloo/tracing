@@ -18,31 +18,17 @@ Vue.prototype.$post = axios.post;
 
 Vue.use(Vuex)
 
-const loginModule = {
-  state: {
-    token: null,
-    userId: null,
-    userName: null
-  },
-  mutations: {
-    updateLoginInfo (state, payload) {
-      state.token = window.Rt.utils.cookie("token");
-      state.userId = window.Rt.utils.cookie("userId");
-      state.userName = window.Rt.utils.cookie("userName");
-    }    
-  },
-  actions: {},
-  getters: {}
-}
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import {loginModule} from 'assets/js/loginStore.js'
 
+Vue.prototype.$register = loginFn;
 
 const store = new Vuex.Store({
   modules: {
     loginModule
   }
 })
-
-// store.state.loginModule // -> loginModule 的状态
 
 new Vue({
   el: '#app',

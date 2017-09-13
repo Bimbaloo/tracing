@@ -143,26 +143,65 @@ export default {
     },
     methods: {
         // 判断调用接口是否成功。
-        judgeLoaderHandler(param, fnSu, fnFail) {
-            let bRight = param.data.errorCode;
+        // judgeLoaderHandler(param, fnSu, fnFail) {
+        //     let bRight = param.data.errorCode;
 
-            // 判断是否调用成功。
-            if (!bRight) {
-                // 调用成功后的回调函数。
-                fnSu && fnSu();
-            } else {
-                // 提示信息。
-                console.log(param.data.errorMsg.message)
-                // 失败后的回调函。
-                fnFail && fnFail();
-            }
-        },
+        //     // 判断是否调用成功。
+        //     if (!bRight) {
+        //         // 调用成功后的回调函数。
+        //         fnSu && fnSu();
+        //     } else {
+        //         // 提示信息。
+        //         console.log(param.data.errorMsg.message)
+        //         // 失败后的回调函。
+        //         fnFail && fnFail();
+        //     }
+        // },
         // 显示提示信息。
-        showMessage() {
-            this.$message({
-                message: this.sErrorMessage,
-                duration: 3000
-            });
+        // showMessage() {
+        //     this.$message({
+        //         message: this.sErrorMessage,
+        //         duration: 3000
+        //     });
+        // },
+        // 请求成功。
+        requestSucess(oData) {
+            let optionArr = [];
+            let tableDataArr =[];
+            this.loading = false;
+
+            let optionsData = oData;  //获取到的data
+            optionsData.map((data, index) => {
+                if (data.valueType === 1) {
+                    optionArr.push(this.initOption(data))
+                    return optionArr
+                } else {
+                    /* 做成表格 */
+                    tableDataArr.push(this.setTableData(data))
+                    return tableDataArr
+                }
+
+            })
+            this.options = optionArr         // 将处理后的 option 放入 options 中
+            this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
+            this.$nextTick(() => {
+                this.options.forEach((el, index) => {
+                    this.initEcharts(el, index)
+                })
+
+            })            
+        },
+        // 请求失败。
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage);
+        },
+        // 请求错误。
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
         },
         // 获取数据。
         fetchData() {
@@ -184,39 +223,40 @@ export default {
             //     "startTime": "2017-08-11 01:27:37",
             //     "endTime": "2017-08-11 01:35:37"
             // }
-            this.$get(url, oQuery)
-                .then((res) => {
-                    let optionArr = [];
-                    let tableDataArr =[];
-                    this.loading = false;
-                    this.judgeLoaderHandler(res, () => {
-                        let optionsData = res.data.data;  //获取到的data
-                        optionsData.map((data, index) => {
-                            if (data.valueType === 1) {
-                                optionArr.push(this.initOption(data))
-                                return optionArr
-                            } else {
-                                /* 做成表格 */
-                                tableDataArr.push(this.setTableData(data))
-                                return tableDataArr
-                            }
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+            // this.$get(url, oQuery)
+            //     .then((res) => {
+            //         let optionArr = [];
+            //         let tableDataArr =[];
+            //         this.loading = false;
+            //         this.judgeLoaderHandler(res, () => {
+            //             let optionsData = res.data.data;  //获取到的data
+            //             optionsData.map((data, index) => {
+            //                 if (data.valueType === 1) {
+            //                     optionArr.push(this.initOption(data))
+            //                     return optionArr
+            //                 } else {
+            //                     /* 做成表格 */
+            //                     tableDataArr.push(this.setTableData(data))
+            //                     return tableDataArr
+            //                 }
 
-                        })
-                        this.options = optionArr         // 将处理后的 option 放入 options 中
-                        this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
-                        this.$nextTick(() => {
-                            this.options.forEach((el, index) => {
-                                this.initEcharts(el, index)
-                            })
+            //             })
+            //             this.options = optionArr         // 将处理后的 option 放入 options 中
+            //             this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
+            //             this.$nextTick(() => {
+            //                 this.options.forEach((el, index) => {
+            //                     this.initEcharts(el, index)
+            //                 })
 
-                        })
-                    });
-                })
-                .catch((err) => {
-                    this.loading = false;
-                    this.styleObject.minWidth = 0;
-                    console.log("数据库查询出错。")
-                })
+            //             })
+            //         });
+            //     })
+            //     .catch((err) => {
+            //         this.loading = false;
+            //         this.styleObject.minWidth = 0;
+            //         console.log("数据库查询出错。")
+            //     })
         },
         /* 获取高度函数 */
         adjustHeight() {

@@ -56,9 +56,7 @@
 	import table from "components/basic/table.vue"
 	import html2canvas from 'html2canvas'
 	import fnP from "assets/js/public.js"
-	// import {host} from 'assets/js/configs.js'
 
-	// var HOST = window.HOST ? window.HOST: host	
 	// 数据名称接口。
     const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
 
@@ -196,6 +194,9 @@
 			}
 		},
 		created() {
+			// 登录验证。
+			this.$register.login(this.$store);
+
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
 			let oConditions = sessionStorage.getItem("fastReport_" + this.query.tag);
@@ -263,22 +264,55 @@
 				}
 				
 			},
-			// 判断调用接口是否成功。
-			judgeLoaderHandler(param, fnSu, fnFail) {
-				let bRight = param.data.errorCode;
+// 			// 判断调用接口是否成功。
+// 			judgeLoaderHandler(param, fnSu, fnFail) {
+// 				let bRight = param.data.errorCode;
 				
-				// 判断是否调用成功。
-				if(!bRight) {
-					// 调用成功后的回调函数。
-					fnSu && fnSu(param.data.data);
+// 				// 判断是否调用成功。
+// 				if(!bRight) {
+// 					// 调用成功后的回调函数。
+// 					fnSu && fnSu(param.data.data);
+// 				}else {
+// 					// 提示信息。
+// //					this.error = "查无数据";
+// 					console.warn(param.data.errorMsg.message);
+// 					// 失败后的回调函。
+// 					fnFail && fnFail();
+// 				}
+// 			},	
+			// 起点请求成功。
+			requestStartPointsSucess(oData) {
+				this.gridData.data = oData;
+				
+				if(!oData.length) {
+					console.log('查无数据。');
 				}else {
-					// 提示信息。
-//					this.error = "查无数据";
-					console.warn(param.data.errorMsg.message);
-					// 失败后的回调函。
-					fnFail && fnFail();
+					this.gridData.data.forEach((o, index) => {
+						if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
+							// 标记为选中。
+							o.tag = "selected";
+						}else {
+							o.tag = "filtered";
+						}
+					});
 				}
-			},	
+		
+				this.showData = {
+					columns: this.gridData.columns,
+					data: this.gridData.data
+				}
+				this.dialogState = true	
+			},
+			// 请求失败。
+			requestFail(sErrorMessage) {
+				console.warn(sErrorMessage);
+			},
+			// 请求错误。
+			requestError(er) {
+              	// this.gridData.loading = false;
+				// this.error = "查无数据";
+				console.warn("查询出错。");
+			},
 			fetchStartPointsData () {
 				this.error = "";
 				this.gridData.data = [];
@@ -286,47 +320,57 @@
 				if(this.type) {
 					return;
 				}
-             	this.$post(this.url, fnP.parseQueryParam(this.filters))
-             	.then((res) => {
+
+				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", fnP.parseQueryParam(this.filters), this.requestStartPointsSucess, this.requestFail, this.requestError)
+             	// this.$post(this.url, fnP.parseQueryParam(this.filters))
+             	// .then((res) => {
 	
-					this.judgeLoaderHandler(res, (data) => {
+				// 	this.judgeLoaderHandler(res, (data) => {
 						
-						this.gridData.data = data;
+				// 		this.gridData.data = data;
 						
-						if(!data.length) {
-							console.log('查无数据。');
-						}else {
-							this.gridData.data.forEach((o, index) => {
-								if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
-									// 标记为选中。
-									o.tag = "selected";
-								}else {
-									o.tag = "filtered";
-								}
-							});
-						}
+				// 		if(!data.length) {
+				// 			console.log('查无数据。');
+				// 		}else {
+				// 			this.gridData.data.forEach((o, index) => {
+				// 				if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
+				// 					// 标记为选中。
+				// 					o.tag = "selected";
+				// 				}else {
+				// 					o.tag = "filtered";
+				// 				}
+				// 			});
+				// 		}
               
-                        this.showData = {
-                        	columns: this.gridData.columns,
-                        	data: this.gridData.data
-                        }
-						this.dialogState = true						
-					})
-             })
-             .catch((err) => {
-                this.gridData.loading = false;
-//				this.error = "查无数据";
-				console.warn("查询出错。");
-             })
+                //         this.showData = {
+                //         	columns: this.gridData.columns,
+                //         	data: this.gridData.data
+                //         }
+				// 		this.dialogState = true						
+				// 	})
+				// })
+				// .catch((err) => {
+				// 	this.gridData.loading = false;
+				// 	// this.error = "查无数据";
+				// 	console.warn("查询出错。");
+				// })
+			},
+			// 获取名称成功。
+			requestNameSucess(oData) {
+				// 获取对应的名称。
+				this.dataName = oData	
+				this.setFilters()
 			},
 			fetchDataName() {
-				this.$ajax.get(TABLE_DATA_URL).then((res) => {
-					this.judgeLoaderHandler(res, () => {
-						// 获取对应的名称。
-						this.dataName = res.data.data	
-						this.setFilters()
-					});
-				});
+				this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, this.requestNameSucess, this.requestFail, this.requestError)
+				
+				// this.$ajax.get(TABLE_DATA_URL).then((res) => {
+				// 	this.judgeLoaderHandler(res, () => {
+				// 		// 获取对应的名称。
+				// 		this.dataName = res.data.data	
+				// 		this.setFilters()
+				// 	});
+				// });
 			},
 			setWidth() {
 				this.styleObject.minWidth = "1200px";

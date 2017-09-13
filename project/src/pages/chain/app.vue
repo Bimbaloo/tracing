@@ -1,7 +1,7 @@
 <template>
 	
 	<div id="app">
-		<v-header></v-header>
+		<v-header :config="false" :back="'search.html'"></v-header>
 		<div class="content" ref="content">
 			<!-- 参数信息。 -->
 			<div class="container-filter" :class="{hide: fullscreen}" ref="containerFilter">
@@ -300,6 +300,9 @@
 			}
 		},
 		created() {
+			// 登录判断。
+			this.$register.login(this.$store);
+
 			// 获取所需的查询参数。
       		this.tag = location.search.split("=")[1]
           	let	oData = sessionStorage.getItem("searchConditions-" + this.tag)
@@ -311,7 +314,7 @@
 		        	this.searchParam = oData.keys;
 		        }
 		    }
-		    console.log(this.searchParam)
+		    // console.log(this.searchParam)
     		// 默认查询。
     		this.fetchData();
 		},
@@ -387,55 +390,61 @@
 						that.fetchData();
     				}
     			});
-    		},
+			},
     		// 获取数据。
     		fetchData() {
     			let that = this;
     			// 根据输入值，获取页面中的所有数据。
 			   	this.loading = true;
-			   	
-//			   	this.$ajax.get("static/chain.json").then( (res) => {
-//			   		that.loading = false;
-//			   		
-//			   		// 数据保存。
-//			   		this.$store.commit({
-//						type: "updateData",
-//						data: res.data.data
-//					});
-//			   		
-//			   		// 数据处理。
-//			   		that.pageData = res.data.data;
-//			        that.processAllData = that.getProcessData();
-//			        
-//			        that.$nextTick(() => {
-//			          	that.getHeight()
-//			        })
-//			   	})
-			   	
-			   	this.$ajax.post(LINK_NODE_URL, fnP.parseQueryParam(this.searchParam)).then((res) => {
-			   		that.loading = false;
-					that.judgeLoaderHandler(res, (data) => {
-						
-						// 数据保存。
-				   		this.$store.commit({
-							type: "updateData",
-							data: data
-						});
-						
-						// 格式化数据。
-						that.pageData = data;
-				        that.processAllData = that.getProcessData();
-				        
-				        that.$nextTick(() => {
-				          that.getHeight()           
-				        })
-					})
-				})
-				.catch((err) => {
+				   
+				this.$register.sendRequest(this.$store, this.$ajax, LINK_NODE_URL, "post", fnP.parseQueryParam(this.searchParam), (oData) => {
+					that.loading = false;
+					// 数据保存。
+					this.$store.commit({
+						type: "updateData",
+						data: oData
+					});
+					
+					// 格式化数据。
+					that.pageData = oData;
+					that.processAllData = that.getProcessData();
+					
+					that.$nextTick(() => {
+						that.getHeight()           
+					})					
+				}, (sErrorMessage) => {
+					that.loading = false;
+					// 提示信息。
+					this.$message.error(sErrorMessage);
+				}, (err) => {
 					that.loading = false;
 					that.getHeight();
 					that.$message.error('查询出错');
 				})
+			   	// this.$ajax.post(LINK_NODE_URL, fnP.parseQueryParam(this.searchParam)).then((res) => {
+			   	// 	that.loading = false;
+				// 	that.judgeLoaderHandler(res, (data) => {
+						
+				// 		// 数据保存。
+				//    		this.$store.commit({
+				// 			type: "updateData",
+				// 			data: data
+				// 		});
+						
+				// 		// 格式化数据。
+				// 		that.pageData = data;
+				//         that.processAllData = that.getProcessData();
+				        
+				//         that.$nextTick(() => {
+				//           that.getHeight()           
+				//         })
+				// 	})
+				// })
+				// .catch((err) => {
+				// 	that.loading = false;
+				// 	that.getHeight();
+				// 	that.$message.error('查询出错');
+				// })
 			},
 			// 获取工序的数据。
 			getProcessData() {
@@ -517,22 +526,36 @@
     			
     			if(sDes !== undefined) {
     				// 点击的确定操作，将数据传给后台。
-    				this.refresh = true;
-					this.$ajax.put(LINK_NODE_REPAIR_URL, Object.assign({
+					this.refresh = true;
+					this.$register.sendRequest(this.$store, this.$ajax, LINK_NODE_REPAIR_URL, "put", Object.assign({
 						repairDesc: sDes
-					}, this.oSave.save)).then((res) => {
+					}, this.oSave.save), (oData) => {
 						this.refresh = false;
-						
-						that.judgeLoaderHandler(res, (data) => {
-			  				console.log(data)
-					        // 更新数据。
-					        that.updatePageData(data);
-						});
-					})
-					.catch((err) => {
+						// 更新数据。
+						that.updatePageData(oData);
+					}, (sErrorMessage) => {
+						this.refresh = false;	
+						// 提示信息。
+						this.$message.error(sErrorMessage);
+					}, (err) => {
 						this.refresh = false;
 						that.$message.error("保存出错")
-					})			
+					})
+					// this.$ajax.put(LINK_NODE_REPAIR_URL, Object.assign({
+					// 	repairDesc: sDes
+					// }, this.oSave.save)).then((res) => {
+					// 	this.refresh = false;
+						
+					// 	that.judgeLoaderHandler(res, (data) => {
+			  		// 		console.log(data)
+					//         // 更新数据。
+					//         that.updatePageData(data);
+					// 	});
+					// })
+					// .catch((err) => {
+					// 	this.refresh = false;
+					// 	that.$message.error("保存出错")
+					// })			
     			}
     			
     		},

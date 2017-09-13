@@ -1,9 +1,9 @@
 <template>
     <div id="app">
-        <v-header></v-header>
+        <v-header :config="false" :back="'search.html'"></v-header>
         <div class="pbody">
             <div class="sidebar">
-                <div class="sidebar-item" v-for="(item,index) in sidebarItems" :class="{active: isActive==index}" @click="turnTo(item.src,index)">
+                <div class="sidebar-item" v-for="(item,index) in sidebarItems" :key="index" :class="{active: isActive==index}" @click="turnTo(item.src,index)">
                     <div class="logo-item" :class="item.img"></div>
                     <span class="logo-item-text">{{item.text}}</span>
                 </div>
@@ -21,8 +21,8 @@
 </template>
 
 <script>
-    import header  from 'components/header/header.vue';
-
+    import header from 'components/header/header.vue';
+    
     export default {
         components: {
             'v-header' : header
@@ -42,6 +42,8 @@
             }
         },
         created() {
+            // 登录验证。
+            this.$register.login(this.$store);
             this.$router.replace('query');
         },
         computed: {

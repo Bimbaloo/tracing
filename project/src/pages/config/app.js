@@ -6,11 +6,13 @@ import 'element-ui/lib/theme-green/index.css';
 import App from './app.vue';
 import axios from 'axios';
 import Vuex from 'vuex'
-import 'babel-polyfill'
 
+import 'assets/js/global.js'
+import 'babel-polyfill'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
 import 'assets/css/icon.less'
+
 
 Vue.use(VueRouter);
 Vue.use(ElementUI);
@@ -35,8 +37,18 @@ const router = new VueRouter({
 
 
 Vue.use(Vuex) 
+
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import {loginModule} from 'assets/js/loginStore.js'
+
+Vue.prototype.$register = loginFn;
+
 // 定义统一状态。
 const store = new Vuex.Store({
+  modules: {
+    loginModule
+  },
   state: {
     edit: false
   },

@@ -8,8 +8,8 @@
         <div class="panel-content"
         	:style="{height: sPanelHeight}">
             <!--<v-form :tab="category.key" :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>-->
-	        <div class="panel-content-wrap" v-for="item in category.list" 
-	        		:class="[category.active.radio == item.key?'':'hide']">
+	        <div class="panel-content-wrap" v-for="(item,index) in category.list" 
+	        		:class="[category.active.radio == item.key?'':'hide']" :key="index">
 	        		<v-form 
 	        			:tab="category.key"
 	        			:sub-tab="item.key"

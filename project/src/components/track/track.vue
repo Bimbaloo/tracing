@@ -164,28 +164,45 @@
                 oData.loading = true;
 
                 let sPath = oData.url;
-                this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
-                .then((res) => {
-                    oData.loading = false;
-//                  oData.height = this.adjustHeight();
+
+                this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", fnP.parseQueryParam(this.$route.query), (oResult) => {
+					// 请求成功。
+                    oData.loading = false;	
+                    oData.data = $.extend(true, [], oResult)
+                    oData.data = oData.data.sort(this.sortByTime);		   
+				}, (sErrorMessage) => {
+					// 请求失败。
+					oData.loading = false;
+					// 提示信息。
+					console.log(sErrorMessage);
+				}, (err) => {
+					// 请求错误。
+					oData.loading = false;
+					console.log("接口查询出错。");
+                })
+
+//                 this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
+//                 .then((res) => {
+//                     oData.loading = false;
+// //                  oData.height = this.adjustHeight();
                     
-                    if(!res.data.errorCode) {
-                    	// 正常 0
-                        oData.data = $.extend(true, [], res.data.data)
-                        oData.data = oData.data.sort(this.sortByTime);
-                    }else if(res.data.errorCode == "1"){
-                    	// 错误显示无数据。
-                    	console.warn(res.data.errorMsg.message);
-                    }else {
-                    	// 其他，显示提示信息。
-                    	oData.error = res.data.errorMsg.message;
-                    }
-                })
-                .catch((err) => {
-                    oData.loading = false;
-//                  oData.error = "查询出错。"
-                    console.log("接口查询出错。")
-                })
+//                     if(!res.data.errorCode) {
+//                     	// 正常 0
+//                         oData.data = $.extend(true, [], res.data.data)
+//                         oData.data = oData.data.sort(this.sortByTime);
+//                     }else if(res.data.errorCode == "1"){
+//                     	// 错误显示无数据。
+//                     	console.warn(res.data.errorMsg.message);
+//                     }else {
+//                     	// 其他，显示提示信息。
+//                     	oData.error = res.data.errorMsg.message;
+//                     }
+//                 })
+//                 .catch((err) => {
+//                     oData.loading = false;
+// //                  oData.error = "查询出错。"
+//                     console.log("接口查询出错。")
+//                 })
             },
             setSession () {
             	let aSelected = [];

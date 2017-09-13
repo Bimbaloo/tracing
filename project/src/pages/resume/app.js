@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-green/index.css'
 import App from './app.vue'
@@ -15,7 +16,22 @@ import 'assets/js/global.js'
 Vue.use(ElementUI)
 Vue.prototype.$ajax = axios;
 
+Vue.use(Vuex)
+
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import {loginModule} from 'assets/js/loginStore.js'
+
+Vue.prototype.$register = loginFn;
+
+const store = new Vuex.Store({
+  modules: {
+    loginModule
+  }
+})
+
 var vm = new Vue({
 	el: '#app',
+	store,
 	render: h => h(App)
 });

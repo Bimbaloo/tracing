@@ -170,6 +170,24 @@ export default {
                 duration: 3000
             });
         },
+        // 请求成功。
+        requestSucess(oData) {
+            this.loading = false;
+            
+            this.tableData.data = oData;        
+        },
+        // 请求失败。
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage);
+        },
+        // 请求错误。
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
+        },     
         // 获取数据。
         fetchData() {
 
@@ -183,19 +201,22 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-            this.$get(url, oQuery)
-                .then((res) => {
-                    this.loading = false;
 
-                    this.judgeLoaderHandler(res, () => {
-                        this.tableData.data = res.data.data
-                    });
-                })
-                .catch((err) => {
-                    this.loading = false;
-                    this.styleObject.minWidth = 0;
-                    console.log("数据库查询出错。")
-                })
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+
+            // this.$get(url, oQuery)
+            //     .then((res) => {
+            //         this.loading = false;
+
+            //         this.judgeLoaderHandler(res, () => {
+            //             this.tableData.data = res.data.data
+            //         });
+            //     })
+            //     .catch((err) => {
+            //         this.loading = false;
+            //         this.styleObject.minWidth = 0;
+            //         console.log("数据库查询出错。")
+            //     })
         },
         // 表格导出。
         exportExcelHandle(oData, event) {

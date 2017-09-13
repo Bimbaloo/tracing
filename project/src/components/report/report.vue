@@ -1,9 +1,9 @@
 <template>
 	<div class="report">
-		<!--div v-if="error" class="error">
-					{{ error }}
-				</div-->
-		<div v-if="!sErrorMessage" ref="content">
+		<div v-if="sErrorMessage" class="error">
+			{{ sErrorMessage }}
+		</div>
+		<div v-else ref="content">
 			<div ref="summary" :class="{ actived: active.summary }">
 				<h2 class="content-title" @click="active.summary=!active.summary">
 					<span class='table-title'>汇总信息
@@ -107,9 +107,6 @@ import XLSX from 'xlsx'
 import Blob from 'blob'
 import FileSaver from 'file-saver'
 import html2canvas from 'html2canvas'
-// import {host} from 'assets/js/configs.js'
-
-// var HOST = window.HOST ? window.HOST: host	
 
 export default {
 	components: {
@@ -599,27 +596,85 @@ export default {
 
 	methods: {
 		// 判断调用接口是否成功。
-		judgeLoaderHandler(param, fnSu, fnFail) {
-			let bRight = param.data.errorCode;
+		// judgeLoaderHandler(param, fnSu, fnFail) {
+		// 	let bRight = param.data.errorCode;
 
-			// 判断是否调用成功。
-			if (!bRight) {
-				// 调用成功后的回调函数。
-				fnSu && fnSu();
-			} else {
-				// 提示信息。
-				this.sErrorMessage = param.data.errorMsg.message;
-				this.showMessage();
-				// 失败后的回调函。
-				fnFail && fnFail();
-			}
-		},
+		// 	// 判断是否调用成功。
+		// 	if (!bRight) {
+		// 		// 调用成功后的回调函数。
+		// 		fnSu && fnSu();
+		// 	} else {
+		// 		// 提示信息。
+		// 		this.sErrorMessage = param.data.errorMsg.message;
+		// 		this.showMessage();
+		// 		// 失败后的回调函。
+		// 		fnFail && fnFail();
+		// 	}
+		// },
 		// 显示提示信息。
-		showMessage() {
-			this.$message({
-				message: this.sErrorMessage,
-				duration: 3000
-			});
+		// showMessage() {
+		// 	this.$message({
+		// 		message: this.sErrorMessage,
+		// 		duration: 3000
+		// 	});
+		// },
+		// 请求成功。
+		requestSucess(oResult) {
+			this.loading = false;
+
+			let bSetWidth = false;	
+
+			let oData = this.reportData;
+			for (let p in oData) {
+
+				oData[p].data = oResult[p];
+				oData[p].filteredData = oData[p].data;
+				if (oResult[p].length && !bSetWidth) {
+					bSetWidth = true;
+					// 设置最小宽度。
+					this.$emit("hasData");
+				}
+
+				if (p == "summary") {
+					// 若为汇总信息。
+					oData[p].data.map(o => {
+						if (o.quantity) {
+
+							o.rate = (o.qualifiedNum / o.quantity).toFixed(4);  //保留小数点后两位
+						} else {
+							o.rate = 0;
+						}
+					})
+				}
+
+				this.setFilters(oData[p]);
+			}	
+
+			if (!bSetWidth) {
+				this.$emit("noData");
+				// this.error = "查无数据。"
+				console.log("查无数据。")
+			}	
+		},
+		// 请求失败。
+		requestFail(sErrorMessage) {
+			this.loading = false;
+
+			this.sErrorMessage = sErrorMessage;
+			// this.showMessage();
+		
+			this.$emit("noData");
+			// this.error = "查无数据。"
+			console.log(this.sErrorMessage)
+		},
+		// 请求错误。
+		requestError(err) {
+
+			this.loading = false;
+			this.sErrorMessage = err;
+			this.$emit("noData");
+			console.log("查询出错。")
+			
 		},
 		fetchData() {
 			this.sErrorMessage = '';
@@ -660,54 +715,55 @@ export default {
 				}
 			}
 
-			this.$post(HOST + sUrl, oParam)
-				.then((res) => {
-					this.loading = false;
-					let bSetWidth = false;
-					this.judgeLoaderHandler(res, () => {
+			this.$register.sendRequest(this.$store, this.$ajax, HOST + sUrl, "post", oParam, this.requestSucess, this.requestFail, this.requestError)
+			// this.$post(HOST + sUrl, oParam)
+			// 	.then((res) => {
+			// 		this.loading = false;
+			// 		let bSetWidth = false;
+			// 		this.judgeLoaderHandler(res, () => {
 
-						let oData = this.reportData;
-						for (let p in oData) {
+			// 			let oData = this.reportData;
+			// 			for (let p in oData) {
 
-							oData[p].data = res.data.data[p];
-							oData[p].filteredData = oData[p].data;
-							if (res.data.data[p].length && !bSetWidth) {
-								bSetWidth = true;
-								// 设置最小宽度。
-								this.$emit("hasData");
-							}
+			// 				oData[p].data = res.data.data[p];
+			// 				oData[p].filteredData = oData[p].data;
+			// 				if (res.data.data[p].length && !bSetWidth) {
+			// 					bSetWidth = true;
+			// 					// 设置最小宽度。
+			// 					this.$emit("hasData");
+			// 				}
 
-							if (p == "summary") {
-								// 若为汇总信息。
-								oData[p].data.map(o => {
-									if (o.quantity) {
+			// 				if (p == "summary") {
+			// 					// 若为汇总信息。
+			// 					oData[p].data.map(o => {
+			// 						if (o.quantity) {
 
-										o.rate = (o.qualifiedNum / o.quantity).toFixed(4);  //保留小数点后两位
-									} else {
-										o.rate = 0;
-									}
-								})
-							}
+			// 							o.rate = (o.qualifiedNum / o.quantity).toFixed(4);  //保留小数点后两位
+			// 						} else {
+			// 							o.rate = 0;
+			// 						}
+			// 					})
+			// 				}
 
-							this.setFilters(oData[p]);
+			// 				this.setFilters(oData[p]);
 
-						}
-					})
-					if (!bSetWidth) {
-						this.$emit("noData");
-						//							this.error = "查无数据。"
-						console.log("查无数据。")
-					}
+			// 			}
+			// 		})
+			// 		if (!bSetWidth) {
+			// 			this.$emit("noData");
+			// 			//							this.error = "查无数据。"
+			// 			console.log("查无数据。")
+			// 		}
 
-				})
-				.catch((err) => {
-					this.loading = false;
+			// 	})
+			// 	.catch((err) => {
+			// 		this.loading = false;
 
-					//						this.sErrorMessage = "查询出错。";
-					//						this.showMessage();
-					this.$emit("noData");
-					console.log("查询出错。")
-				})
+			// 		//	this.sErrorMessage = "查询出错。";
+			// 		//	this.showMessage();
+			// 		this.$emit("noData");
+			// 		console.log("查询出错。")
+			// 	})
 
 		},
 		// 设置过滤。

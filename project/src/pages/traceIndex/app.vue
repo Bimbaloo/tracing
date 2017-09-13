@@ -1,6 +1,6 @@
 <template>
 	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
-		<v-header></v-header>
+		<v-header :config="false" :back="false"></v-header>
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
 		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
@@ -30,11 +30,7 @@
 	import catalog from 'components/catalog/catalog.vue'
 	
 	import $ from 'jquery'
-//	import {aoTestData} from './data'
 	import fnP from "assets/js/public.js"
-	// import {host} from 'assets/js/configs.js'
-
-	// var HOST = window.HOST ? window.HOST: host
 
 	export default {
 		components: {
@@ -115,6 +111,9 @@
 			}
 		},
 		created() {
+			// 登录验证。
+			this.$register.login(this.$store);
+
 			// 组件创建完后获取数据
 			// 此时 data 已经被 observed 了
 			// 重置路由。
@@ -152,57 +151,91 @@
 			setPanelHeight() {
 			},
 
-			// 判断调用接口是否成功。
-			judgeLoaderHandler(param, fnSu, fnFail) {
-				let bRight = param.data.errorCode;
+			// // 判断调用接口是否成功。
+			// judgeLoaderHandler(param, fnSu, fnFail) {
+			// 	let bRight = param.data.errorCode;
 				
-				// 判断是否调用成功。
-				if(!bRight) {
-					// 调用成功后的回调函数。
-					fnSu && fnSu(param.data.data);
-				}else {
-					// 提示信息。
-					console.warn(param.data.errorMsg.message);
-					this.showMessage();
-					// 失败后的回调函。
-					fnFail && fnFail();
-				}
-			},	
+			// 	// 判断是否调用成功。
+			// 	if(!bRight) {
+			// 		// 调用成功后的回调函数。
+			// 		fnSu && fnSu(param.data.data);
+			// 	}else {
+			// 		// 提示信息。
+			// 		console.warn(param.data.errorMsg.message);
+			// 		this.showMessage();
+			// 		// 失败后的回调函。
+			// 		fnFail && fnFail();
+			// 	}
+			// },	
 			showMessage() {
 				this.$alert('查无数据', '提示', {
 					type: 'warn'
 				});
 			},
-
+			// 请求成功。
+			requestSucess(oData) {
+				this.fullscreenLoading = false;
+				if(!oData.length) {
+					console.log('查无数据。');
+					this.showMessage();
+					// this.$message.warn('查无数据。');
+				} else {
+					this.$store.commit({
+						type: "updateData",
+						data: oData		//fnP.parseTreeData(data)
+					});
+					// 格式化数据。
+					this.treeData = this.parseTreeData();
+					this.catalogData = this.parseCatalogData();
+				}							
+			},
+			// 请求失败。
+			requestFail(sErrorMessage) {
+				this.fullscreenLoading = false;
+				// 提示信息。
+				console.warn(sErrorMessage);
+				this.showMessage();
+			},
+			// 请求错误。
+			requestError(err) {
+				console.log(err)
+				this.fullscreenLoading = false;
+				console.warn('查询出错！')
+				this.showMessage();
+			},
+		
 			fetchData() {
 				this.fullscreenLoading = true;
 				
-				this.$ajax.post(this.url, {
+				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
 					"startPointDtos": this.params
-				}).then((res) => {
-					this.fullscreenLoading = false;
-					this.judgeLoaderHandler(res, (data) => {
-						if(!data.length) {
-							console.log('查无数据。');
-							this.showMessage();
-							// this.$message.warn('查无数据。');
-						} else {
-							this.$store.commit({
-								type: "updateData",
-								data: data		//fnP.parseTreeData(data)
-							});
-							// 格式化数据。
-							this.treeData = this.parseTreeData();
-							this.catalogData = this.parseCatalogData();
-						}						
-					})
-				})
-				.catch((err) => {
-					console.log(err)
-					this.fullscreenLoading = false;
-					console.warn('查询出错！')
-					this.showMessage();
-				})
+				}, this.requestSucess, this.requestFail, this.requestError)
+				// this.$ajax.post(this.url, {
+				// 	"startPointDtos": this.params
+				// }).then((res) => {
+				// 	this.fullscreenLoading = false;
+				// 	this.judgeLoaderHandler(res, (data) => {
+				// 		if(!data.length) {
+				// 			console.log('查无数据。');
+				// 			this.showMessage();
+				// 			// this.$message.warn('查无数据。');
+				// 		} else {
+				// 			this.$store.commit({
+				// 				type: "updateData",
+				// 				data: data		//fnP.parseTreeData(data)
+				// 			});
+				// 			// 格式化数据。
+				// 			this.treeData = this.parseTreeData();
+				// 			this.catalogData = this.parseCatalogData();
+				// 		}						
+				// 	})
+				// })
+				// .catch((err) => {
+				// 	console.log(err)
+				// 	this.fullscreenLoading = false;
+				// 	console.warn('查询出错！')
+				// 	this.showMessage();
+				// })
 			},
 			
 			/**

@@ -1,6 +1,6 @@
 <template>
   <div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
-    <v-header></v-header>
+    <v-header :config="true" :back="'search.html'"></v-header>
      <div class="content">
       <div :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">
         <div class="flex-wraps">
@@ -60,9 +60,7 @@
   import header from "components/header/header.vue"
   import panel from "components/panel/panel.vue"
   import fnP from "assets/js/public.js"
-  // import {host} from 'assets/js/configs.js'
-
-	// var HOST = window.HOST ? window.HOST: host
+  
 	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
 	
   export default {
@@ -92,43 +90,10 @@
       }
     },
     created() {
-
-      this.tag = location.search.split("=")[1];
-      let oData = sessionStorage.getItem("searchConditions-" + this.tag);
-      
-			// session 中获取
-      if(oData) {
-          oData = JSON.parse(oData);
-          this.activeKey = oData.tab;
-      }else if(window.location.hash.length > 2) {
-					// 清空了cookie后，url中有参数。则获取url中的参数。
-					oData = this.getSearchData();
-					this.activeKey = oData.tab;
-      }
-      
-      this.$ajax.get(MODULE_ITEM_URL).then((res) => {
-      	this.judgeLoaderHandler(res,() => {
-	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
-	       //	console.log(this.categories)
-	       	this.categories.forEach(o => {
-	          if(oData && oData.tab == o.key) {
-	            o.active = oData;
-	          }else {
-	            o.active = {
-	              radio: "1",
-	              keys: {}
-	            }            
-	          }
-	        })
-      		
-      		this.$nextTick(() => {
-	          if(oData) {
-	            this._submitForm(oData);
-	          }            
-	        })
-      		
-      	});
-      });
+      // 登录判断。
+      this.$register.login(this.$store);
+      // 获取数据。
+      this.fetchData();
       
     },
     mounted() {
@@ -141,6 +106,75 @@
       }
     },
     methods: {
+      fetchData() {
+        this.tag = location.search.split("=")[1];
+        let oData = sessionStorage.getItem("searchConditions-" + this.tag);
+        
+        // session 中获取
+        if(oData) {
+            oData = JSON.parse(oData);
+            this.activeKey = oData.tab;
+        }else if(window.location.hash.length > 2) {
+            // 清空了cookie后，url中有参数。则获取url中的参数。
+            oData = this.getSearchData();
+            this.activeKey = oData.tab;
+        }
+
+        this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
+          // 请求成功。
+          this.categories = fnP.parseData(oResult).filter(o=>o.key!="restrain" && o.key!="link");
+
+          this.categories.forEach(o => {
+            if(oData && oData.tab == o.key) {
+              o.active = oData;
+            }else {
+              o.active = {
+                radio: "1",
+                keys: {}
+              }            
+            }
+          })
+          
+          this.$nextTick(() => {
+            if(oData) {
+              this._submitForm(oData);
+            }            
+          })
+        }, this.requestFail, this.requestError);
+      // this.$ajax.get(MODULE_ITEM_URL).then((res) => {
+      // 	this.judgeLoaderHandler(res,() => {
+	    //     this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+	    //    //	console.log(this.categories)
+	    //    	this.categories.forEach(o => {
+	    //       if(oData && oData.tab == o.key) {
+	    //         o.active = oData;
+	    //       }else {
+	    //         o.active = {
+	    //           radio: "1",
+	    //           keys: {}
+	    //         }            
+	    //       }
+	    //     })
+      		
+      // 		this.$nextTick(() => {
+	    //       if(oData) {
+	    //         this._submitForm(oData);
+	    //       }            
+	    //     })
+      		
+      // 	});
+      // });        
+      },
+      // 请求失败。
+      requestFail(sErrorMessage) {
+        // 提示信息。
+        this.sErrorMessage = sErrorMessage;
+        this.showMessage();
+      },
+      // 请求错误。
+      requestError(err) {
+        console.log(err);
+      },
     	getSearchData () {
 				let oData = {
 							tab: "",
@@ -164,22 +198,22 @@
 					// 返回参数。
 					return oData;
 			},
-    	// 判断调用接口是否成功。
-    	judgeLoaderHandler(param,fnSu,fnFail) {
-    		let bRight = param.data.errorCode;
+    	// // 判断调用接口是否成功。
+    	// judgeLoaderHandler(param,fnSu,fnFail) {
+    	// 	let bRight = param.data.errorCode;
         	
-        	// 判断是否调用成功。
-        	if(!bRight) {
-        		// 调用成功后的回调函数。
-        		fnSu && fnSu();
-        	}else {
-        		// 提示信息。
-        		this.sErrorMessage = param.data.errorMsg.message;
-        		this.showMessage();
-        		// 失败后的回调函。
-        		fnFail && fnFail();
-        	}
-    	},
+      //   	// 判断是否调用成功。
+      //   	if(!bRight) {
+      //   		// 调用成功后的回调函数。
+      //   		fnSu && fnSu();
+      //   	}else {
+      //   		// 提示信息。
+      //   		this.sErrorMessage = param.data.errorMsg.message;
+      //   		this.showMessage();
+      //   		// 失败后的回调函。
+      //   		fnFail && fnFail();
+      //   	}
+    	// },
     	// 显示提示信息。
 			showMessage() {
 				this.$message({

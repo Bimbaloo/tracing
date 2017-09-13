@@ -111,8 +111,17 @@ const router = new VueRouter({
 
 
 Vue.use(Vuex) 
+
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import {loginModule} from 'assets/js/loginStore.js'
+
+Vue.prototype.$register = loginFn;
 // 定义统一状态。
 const store = new Vuex.Store({
+  modules: {
+    loginModule
+  },
   state: {
     key: "",
     root: "",

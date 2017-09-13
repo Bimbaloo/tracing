@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<v-header></v-header>
+		<v-header :config="false" :back="'search.html'"></v-header>
 		<div class="panel" id="restrain">
 			<div class='panel-title'>
 				<el-tabs  element-loading-text="拼命加载中"   class="search-tab" @tab-click="handleClick">
@@ -49,11 +49,8 @@
 	import Input from 'components/basic/input.vue'
     import Select from 'components/basic/select.vue'
     import DateTime from 'components/basic/dateTime.vue'
-	// import {host} from 'assets/js/configs.js'
 
-	// var HOST = window.HOST ? window.HOST: host
-
-	//const URL_JOIN = "http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
+	const URL_JOIN = HOST + "";//"http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
 
 	export default {
 		// 页面组件。
@@ -244,6 +241,9 @@
         },
 		// 创建时处理。mounted
 		created() {
+			// 登录判断。
+			this.$register.login(this.$store);
+
 			/* 设置遏制类表的查询条件 */
 			sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
 
@@ -261,52 +261,96 @@
 			}
 
 			/* 根据传入数据 */
-			this.$ajax.get('../static/2.json').then((res) => {
-				this.judgeLoaderHandler(res,() => {
-					let datas = res.data.data
-					let _radioList = []			//用于储存radioList
-					let _groupItems = []		//用于储存groupItems
-					datas.forEach(o => {		//用于获取页面上布局信息
-						if(o.moduleCode === "restrain"){	
-							(o.groups).forEach((group,index) => {
-								_radioList.push({
-									key: `${index}`,
-									groupName: `${group.groupName}`
-								})
-								var groupItems = group.groupItems
-								groupItems.forEach(function(item){
-									if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
-										item.type = 'select'
-										item.placeholder = `请选择${item.itemName}`
-									}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
-										item.type = 'input'
-										item.placeholder = `请输入${item.itemName}`
-									}else{											//查询条件如果是'时间'
-										item.type = 'datetime'						
-										item.placeholder = `请选择${item.itemName}`
-									}
-									_groupItems.push({
-										key: `${index}`,
-										itemCode: `${item.itemCode}`,
-										groupName: `${item.groupName}`,
-										type: `${item.type}`,
-										placeholder: `${item.placeholder}`
-									})
-								})						
+			this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
+				let datas = oResult
+				let _radioList = []			//用于储存radioList
+				let _groupItems = []		//用于储存groupItems
+				datas.forEach(o => {		//用于获取页面上布局信息
+					if(o.moduleCode === "restrain"){	
+						(o.groups).forEach((group,index) => {
+							_radioList.push({
+								key: `${index}`,
+								groupName: `${group.groupName}`
 							})
-							this.radioList = _radioList
-							this.groupItems = _groupItems
+							var groupItems = group.groupItems
+							groupItems.forEach(function(item){
+								if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
+									item.type = 'select'
+									item.placeholder = `请选择${item.itemName}`
+								}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
+									item.type = 'input'
+									item.placeholder = `请输入${item.itemName}`
+								}else{											//查询条件如果是'时间'
+									item.type = 'datetime'						
+									item.placeholder = `请选择${item.itemName}`
+								}
+								_groupItems.push({
+									key: `${index}`,
+									itemCode: `${item.itemCode}`,
+									groupName: `${item.groupName}`,
+									type: `${item.type}`,
+									placeholder: `${item.placeholder}`
+								})
+							})						
+						})
+						this.radioList = _radioList
+						this.groupItems = _groupItems
 
-						}
-					})
-				 });
-				 this.$nextTick(() => {
+					}
+				})
+
+				this.$nextTick(() => {
 					if(oData) {
 						this._submitForm(oData);
 					}            
 				})
 			})
 
+			// this.$ajax.get('../static/2.json').then((res) => {
+			// 	this.judgeLoaderHandler(res,() => {
+			// 		let datas = res.data.data
+			// 		let _radioList = []			//用于储存radioList
+			// 		let _groupItems = []		//用于储存groupItems
+			// 		datas.forEach(o => {		//用于获取页面上布局信息
+			// 			if(o.moduleCode === "restrain"){	
+			// 				(o.groups).forEach((group,index) => {
+			// 					_radioList.push({
+			// 						key: `${index}`,
+			// 						groupName: `${group.groupName}`
+			// 					})
+			// 					var groupItems = group.groupItems
+			// 					groupItems.forEach(function(item){
+			// 						if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
+			// 							item.type = 'select'
+			// 							item.placeholder = `请选择${item.itemName}`
+			// 						}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
+			// 							item.type = 'input'
+			// 							item.placeholder = `请输入${item.itemName}`
+			// 						}else{											//查询条件如果是'时间'
+			// 							item.type = 'datetime'						
+			// 							item.placeholder = `请选择${item.itemName}`
+			// 						}
+			// 						_groupItems.push({
+			// 							key: `${index}`,
+			// 							itemCode: `${item.itemCode}`,
+			// 							groupName: `${item.groupName}`,
+			// 							type: `${item.type}`,
+			// 							placeholder: `${item.placeholder}`
+			// 						})
+			// 					})						
+			// 				})
+			// 				this.radioList = _radioList
+			// 				this.groupItems = _groupItems
+
+			// 			}
+			// 		})
+			// 	 });
+			// 	 this.$nextTick(() => {
+			// 		if(oData) {
+			// 			this._submitForm(oData);
+			// 		}            
+			// 	})
+			// })
 
 		},
 		// 页面方法。
