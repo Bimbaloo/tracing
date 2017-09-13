@@ -121,6 +121,12 @@
 			// 组件创建完后获取数据
 			// 此时 data 已经被 observed 了
 			// 重置路由。
+			if(window.screen.availHeight>1000){   // 根据屏幕分辨率设置 上半部默认高度
+				this.treeHeight = 300
+			}else {
+				this.treeHeight = 155
+			}
+
 			this.$router.replace("/");
 			let oFilter = sessionStorage.getItem("track_" + this.query.tag);
 			
