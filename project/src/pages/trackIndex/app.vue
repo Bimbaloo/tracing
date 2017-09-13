@@ -53,7 +53,7 @@
 		data() {
 			return {
 				/* 上下拖动功能添加属性 */
-				treeHeight:400,  	 // 默认高度tree组件高度
+				treeHeight:300,  	 // 默认高度tree组件高度
 				draggingY: false,	 //上下拖动功能启动
 				_pageY:null,     	 //鼠标的纵向位置
 				changeHeight:0,  	 //改变的高度

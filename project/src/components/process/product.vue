@@ -10,19 +10,28 @@
             </div>
             <el-tabs type="border-card">
                 <el-tab-pane label="关联表">
-                    <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                        <el-table-column v-for="(column,index) in uniteItems.columns" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name">
-                            <template scope="props">
-                                <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 25 +'px'}" >
-                                    <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
-                                    <span>{{ props.row[column.prop]}}</span>
-                                </div>
-                                <div class="cell-content" v-else>
-                                    <span>{{ props.row[column.prop] }}</span>
-                                </div>
-                            </template>
-                        </el-table-column>
-                    </el-table>
+                    <h2 class="content-title uniteTitle">
+                        <span class='table-title'>产出投入</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(uniteItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('uniteTable', $event)"></i>
+                        </span>
+                    </h2>
+                    <div class="content-table" ref="uniteTable">
+                        <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                            <el-table-column v-for="(column,index) in uniteItems.columns" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name">
+                                <template scope="props">
+                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 25 +'px'}" >
+                                        <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
+                                        <span>{{ props.row[column.prop]}}</span>
+                                    </div>
+                                    <div class="cell-content" v-else>
+                                        <span>{{ props.row[column.prop] }}</span>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+                    </div>
                 </el-tab-pane>
                 <el-tab-pane label="明细表">
                     <h2 class="content-title inTitle">
@@ -47,7 +56,7 @@
                     </div>
                 </el-tab-pane>
                 <el-tab-pane label="汇总表">
-                    <h2 class="content-title inTitle">
+                    <h2 class="content-title inAllTitle">
                         <span class='table-title'>投入汇总</span>
                         <span class='table-handle'>
                             <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inAllItems, $event)"></i>
@@ -57,7 +66,7 @@
                     <div class="content-table" ref="inputAllTable">
                         <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table>
                     </div>
-                    <h2 class="content-title outTitle">
+                    <h2 class="content-title outAllTitle">
                         <span class='table-title'>产出汇总</span>
                         <span class='table-handle'>
                             <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outAllItems, $event)"></i>
@@ -176,7 +185,7 @@ export default {
                     // cellClick: this.barcodeClick
                 }, {
                     name: "箱码",
-                    prop: "",
+                    prop: "packetBarcode",
                     width: "200"
                 }, {
                     name: "派工单号",
@@ -281,7 +290,7 @@ export default {
                     prop: "happenTime",
                     width: "200"
                 }],
-                height: 600,
+                height: 1,
                 data: []
             },
             /* 投入汇总 */
@@ -383,7 +392,8 @@ export default {
     },
     mounted() {
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
-        this.inItems.height = this.outItems.height = this.adjustHeight()
+        this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
+        this.uniteItems.height = 2*this.adjustHeight()+45
 
     },
     updated() {
@@ -671,9 +681,12 @@ export default {
             ntable = Math.floor(
                 this.viewHeight
                 - this.outerHeight(document.querySelector(".condition"))
+                - 42 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
                 - this.outerHeight(document.querySelector(".inTitle"))
                 - this.outerHeight(document.querySelector(".outTitle"))
+                - 60  //修正值
             ) / 2;
+
             return ntable;
         },
         /* 获取元素实际高度(含margin) */
@@ -687,7 +700,8 @@ export default {
         /* 设置table实际高度 */
         setTbaleHeight() {
             this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.inItems.height = this.outItems.height = this.adjustHeight()
+            this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
+            this.uniteItems.height = 2*this.adjustHeight()+45
         },
         /* 设置title */
         setTitle(el, title) {
@@ -822,9 +836,7 @@ export default {
     }
 }
 .el-tabs--border-card>.el-tabs__content {
-  padding-top: 30px;
-  padding-left: 0;
-  padding-right: 0;
+  padding: 10px 0;
 }
 .el-popover, .el-tabs--border-card {
   box-shadow: none
@@ -849,22 +861,38 @@ export default {
       color: #333
   }
 }
+.el-table {
+    th {
+        height: 36px;
+    }
+}
+
 .el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
     border-right-color: #ccc;
     border-left-color: #ccc;
+}
+.el-tab-pane {
+    .content-table:last-child {
+        margin-bottom: 0;
+    }
 }
 
 </style>
 
 <style lang="less" scoped>
 .outTitle,
-.inTitle {
+.inTitle,
+.uniteTitle,
+.inAllTitle,
+.outAllTitle {
     display: flex;
     justify-content: space-between;
     .table-handle {
         margin-right: 5px;
+        display: flex;
+        align-items: center;
         i {
-            margin: 5px;
+            margin: 7.5px;
         }
     }
     .table-table {
