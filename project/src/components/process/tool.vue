@@ -72,6 +72,7 @@ export default {
             ],
             /* 投入 */
             tableData: {
+                filename: '工具记录',
                 columns: [{
                     name: "工具位子",
                     prop: "toolPosition",
@@ -371,8 +372,10 @@ export default {
     justify-content: space-between;
     .table-handle {
         margin-right: 5px;
+        display: flex;
+        align-items: center;
         i {
-            margin: 5px;
+            margin: 7.5px;
         }
     }
     .table-table {

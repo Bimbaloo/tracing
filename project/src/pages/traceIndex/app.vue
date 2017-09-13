@@ -48,7 +48,7 @@
 				// resizeUpdate:0,       //监听父集div大小改变更新左侧图形
 
 				/* 上下拖动功能添加属性 */
-				treeHeight:400,  	 // 默认高度tree组件高度
+				treeHeight:300,  	 // 默认高度tree组件高度
 				draggingY: false,	 //上下拖动功能启动
 				_pageY:null,     	 //鼠标的纵向位置
 				changeHeight:0,  	 //改变的高度
@@ -117,6 +117,12 @@
 			// 组件创建完后获取数据
 			// 此时 data 已经被 observed 了
 			// 重置路由。
+			if(window.screen.availHeight>1000){   // 根据屏幕分辨率设置 上半部默认高度
+				this.treeHeight = 300
+			}else {
+				this.treeHeight = 155
+			}
+
 			this.$router.replace("/");
 			let sSelected = sessionStorage.getItem("trace_" + this.query.tag);
 			if(sSelected) {
