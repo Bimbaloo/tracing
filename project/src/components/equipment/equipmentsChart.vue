@@ -66,12 +66,17 @@
                         
                         <div :class="['tooltip-panel', compareData.reverse ? 'left':'right']" :style="{left:compareData.position*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
                             <div class="tooltip-time">{{compareData.time}}</div>
-                            <i class="btn-delete icon icon-12 icon-delete" title="删除" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
+                            <i class="btn-delete icon icon-12 icon-delete" title="关闭" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
                             <i class="btn-reverse icon icon-12 icon-reverse" title="翻转" @click="reversePanelClickHandle(compareData)" ></i>
                             <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
-                                <div class="tooltip-title" :style="{color: equipment.color}">{{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{equipment.quantity}}</div>
+                                <div class="tooltip-title" 
+                                :style="{color: equipment.color}">
+                                {{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{compareData.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}}
+                                </div>
                                 <ul class="event-list">
-                                    <li v-for="(event,index) in equipment.event" :key="index">
+                                    <li v-for="(event,index) in equipment.event" 
+                                    :key="index" 
+                                    v-if="compareData.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
                                         <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}&nbsp;&nbsp;<span v-if="event.group">事件组：{{event.group}}</span></div>
                                         <ul class="content-list">
                                             <li v-for="(content,index) in event.content" :key="index">
@@ -96,9 +101,7 @@
 <script>
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
-	// import {host} from 'assets/js/configs.js'
 
-	// var HOST = window.HOST ? window.HOST: host
     // 设备状态。
     const CHART_STATE_NAME = "状态"
     // 图形下margin。
@@ -291,8 +294,9 @@
                     list: [{
 						name: "投产表",
 						router: "/process/product",
-						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
-                    }]//equipmentIdList//equipmentList
+                        query: ["doOutIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        // ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
+                    }]
 				}, {
                     show: true,
 					name: "事件",
@@ -335,6 +339,9 @@
         computed: {
             selectedEquipmentName () {
                 return this.equipments.filter(o => o.equipmentId == this.selectedEquipmentId)[0].equipmentName
+            },
+            doOutIdList () {
+                return this.equipments.filter(o => o.equipmentId == this.selectedEquipmentId)[0].poolOutId
             },
             // 与起点相关的标记线。
             relatedMarkLine () {
@@ -861,7 +868,7 @@
             /**
              * 数据转换。
              * @param {Number} nTime 时间
-             * @param {Boolean} bRelated 是否与投产相关
+             * @param {Boolean} bRelated 是否与起点相关
              * @param {String} sDimension 维度
              * @param {Number} zIndex z-level
              * @return {Object} 数据对象
@@ -909,10 +916,14 @@
                         oData.color = param.color;
                         oData.series = param.seriesName;
                         oData.quantity = aoValue[2];
+                        // 起点相关数量。
+                        oData.relatedQuantity = aoValue[5];
                         oData.event = []
                         // 事件列表
                         aoValue[3].forEach(o => {
                             oData.event.push({
+                                // 起点相关标记。
+                                related: o.related,
                                 group: o.groupId == null?'':o.groupId,
                                 title: o.title,
                                 content: o.tooltipData
@@ -936,8 +947,11 @@
                 if(this.onlyShowRelatedData) {
                     // 若只展示起点相关。
                     sColor = "#D53A35"
-                    raletedData = raletedData.filter(arr => arr[5])
-
+                    raletedData = raletedData.filter(arr => arr[5]);
+                    raletedData = raletedData.map(arr => {
+                        arr[2] = arr[5];
+                        return arr;
+                    })
                     // 标记线。
                     // oOption.series.push({
                     //     name: CHART_STATE_NAME,//params.seriesName,
@@ -1301,7 +1315,10 @@
                             break;
 						// case "equipmentList"://equipmentIdList
 						// 	oParam[param] = this.selectedEquipmentId;
-						// 	break;
+                        // 	break;
+                        case "doOutIdList": 
+							oParam[param] = this.doOutIdList;
+							break;
 						case "equipmentId": 
 							oParam[param] = this.selectedEquipmentId;
 							break;
@@ -1500,7 +1517,8 @@
                 })	
             },
             // 设置图形数据。
-            setChartData () {     
+            setChartData () {  
+                   
                 // 设备状态。
                 this.option.series.filter(o => o.name=="状态")[0].data = this.getStatusData()
                 // 获取各事件维度数据。
@@ -1513,7 +1531,12 @@
                     
                     if(item.key === 'pool' &&　this.onlyShowRelatedData && !this.bRestrain) {
                         // 设置可见性，若只展示起点相关。              
-                        oFilter.data = oResult.data.filter(arr => arr[5])                                                
+                        oFilter.data = oResult.data.filter(arr => arr[5]);
+                        // 设置数值显示为起点相关的数量。     
+                        oFilter.data = oFilter.data.map(arr => {
+                            arr[2] = arr[5]
+                            return arr;
+                        })                                            
                     }else {
                         oFilter.data = oResult.data
                     }
@@ -1549,7 +1572,8 @@
             getToolTipData (key, o) {
                 
                 let oResult = {
-                        groupId: o.groupId
+                        groupId: o.groupId,
+                        doId: o.doId
                     },
                     sTitle = "";
                 switch (key) {
@@ -1603,7 +1627,8 @@
                             {name: "工单号", value: o.doCode},
                             {name: "物料", value: o.materialName},
                             {name: "批次", value: o.batchNo},
-                            {name: "数量", value: o.quantity}
+                            {name: "数量", value: o.quantity},
+                            {name: "质量", value: o.qualityType}
                         ];
                         break;
                         // 质检
@@ -1732,6 +1757,7 @@
                 let aoData = [],
                     aoMarkPoint = [],
                     oMap = {};
+                
                 this.equipments.forEach((item, index) => {
                     // 拿到维度数据。
                     let singleData = this.equipmentData[item.equipmentId][sDimension], 
@@ -1750,30 +1776,55 @@
                             // 拼接scatter数据。[x, y, value, tooltip-data]
                             let oData = this.getToolTipData(key, o),
                                 sKey = oData.time + '' + nIndex;
-
+                                
                             if(oMap[sKey]) {
                                 // 若存在。
-                                oMap[sKey]++                          
+                                oMap[sKey]++;                          
                                 let oFilter = aoData.filter(aData => aData[0]===oData.time&&aData[1]===nIndex)[0];
                                 oFilter[2]++;
-                                oFilter[3].push(oData);
-                            }else {
-                                oMap[sKey] = 1;
+   
+                                if(sDimension === "pool" && !this.bRestrain) {
+                                    // 若为投产，非遏制。
+                                    if((key === "poolInList" && item.poolInId.indexOf(o.doId) > -1) ||
+                                    (key === "poolOutList" && item.poolOutId.indexOf(o.doId) > -1)) {
+                                        // 若为属于起点的投入或产出。
+                                        if(!oFilter[5]) {
+                                            // 若未被标记。
+                                            // 设置标记点。
+                                            aoMarkPoint.push({
+                                                coord: [oData.time, nIndex]
+                                            })
+                                        }
+                                        
+                                        // 设置与起点相关。
+                                        oData.related = true;
+                                        oFilter[5]++;
+                                    }
+                                }
 
-                                let aPointer = [oData.time, nIndex, 1, [oData], sDimension];
+                                oFilter[3].push(oData);
+
+                            }else {
+                                oMap[sKey] = 1;      
+
+                                let nTag = 0;
 
                                 if(sDimension === "pool" && !this.bRestrain) {
-                                    if((key === "poolInList" && item.poolInTime.indexOf(o.happenTime) > -1) ||
-                                    (key === "poolOutList" && item.poolOutTime.indexOf(o.happenTime) > -1)) {
+                                    if((key === "poolInList" && item.poolInId.indexOf(o.doId) > -1) ||
+                                    (key === "poolOutList" && item.poolOutId.indexOf(o.doId) > -1)) {
                                         // 若为属于起点的投入或产出。
                                         // 设置标记点。
                                         aoMarkPoint.push({
                                             coord: [oData.time, nIndex]
                                         })
                                         // 设置与起点相关。
-                                        aPointer.push(true)
+                                        // aPointer.push(true)
+                                        oData.related = true;
+                                        nTag++;
                                     }
                                 }
+
+                                let aPointer = [oData.time, nIndex, 1, [oData], sDimension, nTag];
                                 // 增加节点。
                                 aoData.push(aPointer)
                             }                          
@@ -1900,6 +1951,7 @@
 			},
             // 数据提示。
             tooltipFormatter (params) {
+                    
                 // 保存提示框数据。            
                 this.axisTooltipData = params;
 
@@ -1910,33 +1962,38 @@
                     let aoValue = param.value,
                         sList = "",
                         yAxisIndex = aoValue[1],
-                        oGroupIdList = new Set()
+                        oGroupIdList = new Set();
 
                     // 第一级设备。
                     oGroupId[yAxisIndex] = {}
 
                     // 事件列表
                     aoValue[3].forEach((o,index) => {
-                        let sGroup = "";
-                        // 保存分组id。
-                        if(o.groupId != null && o.groupId !== "") {
-                            oGroupIdList.add(o.groupId)
-                            sGroup = o.groupId
+                        if(aoValue[4]!=="pool" || (aoValue[4]==="pool" && !this.onlyShowRelatedData) || (this.onlyShowRelatedData && o.related)) {
+                            // 若展示全部，或只展示与起点相关，且当前点与起点相关。
+                            let sGroup = "";
+                            // 保存分组id。
+                            if(o.groupId != null && o.groupId !== "") {
+                                oGroupIdList.add(o.groupId)
+                                sGroup = o.groupId
+                            }
+
+                            if(sGroup) {
+                                sList += `<div style="color:${param.color}">${index+1}.${o.title}&nbsp;&nbsp;事件组：${sGroup}</div>`;
+                            }else {
+                                sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
+                            }
+                            
+                            o.tooltipData.forEach(tip => {
+                                sList += `<div><span>${tip.name}:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`                
+                            })
                         }
 
-                        if(sGroup) {
-                            sList += `<div style="color:${param.color}">${index+1}.${o.title}&nbsp;&nbsp;事件组：${sGroup}</div>`;
-                        }else {
-                            sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
-                        }
-                        
-                        o.tooltipData.forEach(tip => {
-                            sList += `<div><span>${tip.name}:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`                
-                        })
                     })
+
                     // 设备列表
                     sHtml += `<div>
-                        <div style="color:${param.color};font-weight:bold">${param.name.split("+")[0]}&nbsp;&nbsp;&nbsp;&nbsp;${param.seriesName}&nbsp;&nbsp;&nbsp;&nbsp;${aoValue[2]}</div>
+                        <div style="color:${param.color};font-weight:bold">${param.name.split("+")[0]}&nbsp;&nbsp;&nbsp;&nbsp;${param.seriesName}&nbsp;&nbsp;&nbsp;&nbsp;${(this.onlyShowRelatedData&&aoValue[4]==="pool")?aoValue[5]:aoValue[2]}</div>
                         <div style="margin-top:10px">${sList}</div>
                     </div>`
 

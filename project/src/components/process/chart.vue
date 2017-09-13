@@ -134,25 +134,25 @@
 					// 最晚班次结束时间。
 					sEnd = oEquipments[p][0].shiftEndTime;
 
-					let aoPoolInTime = [],
-						aoPoolOutTime = []
+					let aoPoolInId = [], //aoPoolInTime
+						aoPoolOutId = []; //aoPoolOutTime
 
 					oEquipments[p].forEach(o => {
-						aoPoolInTime = aoPoolInTime.concat(o.inHappenTimeList)
-						aoPoolOutTime = aoPoolOutTime.concat(o.outHappenTimeList)
+						aoPoolInId = aoPoolInId.concat(o.doInIdList)//inHappenTimeList
+						aoPoolOutId = aoPoolOutId.concat(o.doOutIdList)//outHappenTimeList
 					})
 					
 					// 去重。
-					aoPoolInTime = [...new Set(aoPoolInTime)]
-					aoPoolOutTime = [...new Set(aoPoolOutTime)]
+					aoPoolInId = [...new Set(aoPoolInId)]
+					aoPoolOutId = [...new Set(aoPoolOutId)]
 
 					this.equipments.push({
 						equipmentId: oEquipments[p][0].equipmentId,
 						equipmentName: oEquipments[p][0].equipmentName,
 						shiftStartTime: sStart,
 						shiftEndTime:　sEnd,
-						poolInTime:	aoPoolInTime,
-						poolOutTime: aoPoolOutTime
+						poolInId: aoPoolInId,
+						poolOutId: aoPoolOutId
 					})
 				}
 
