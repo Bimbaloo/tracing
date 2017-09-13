@@ -72,6 +72,7 @@ export default {
             ],
             /* 投入 */
             tableData: {
+                filename: '工具记录',
                 columns: [{
                     name: "工具位子",
                     prop: "toolPosition",
