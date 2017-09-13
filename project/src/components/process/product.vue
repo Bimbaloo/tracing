@@ -1,7 +1,7 @@
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
-            <div class="condition" ref='condition'>
+            <div class="condition hide" ref='condition'>
                 <div class='condition-messsage'>
                     <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
@@ -680,7 +680,7 @@ export default {
             let ntable = 0;
             ntable = Math.floor(
                 this.viewHeight
-                - this.outerHeight(document.querySelector(".condition"))
+               // - this.outerHeight(document.querySelector(".condition"))
                 - 42 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
                 - this.outerHeight(document.querySelector(".inTitle"))
                 - this.outerHeight(document.querySelector(".outTitle"))
@@ -846,6 +846,7 @@ export default {
   border-bottom: none;
   border-left: none;
   border-right: none;
+  border-top: none;
 }
 .el-tabs__nav-scroll {
   border-left: solid 1px #ccc;
