@@ -118,9 +118,15 @@
 			}
 		},
 		computed: {
-			dialogVisable: function() {
-				let bVisable = this.dialogShow;
-				return bVisable;
+			dialogVisable: {
+				get: function() {
+					let bVisable = this.dialogShow;
+					return bVisable;
+				},
+				set: function(e){
+					let bVisable = e;
+					return bVisable;
+				}
 			},
 			ruleForm: function() {
 				return {
