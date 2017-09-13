@@ -3,7 +3,7 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in filters">
+                    <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
                     </span>
                     <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
@@ -26,7 +26,7 @@
                     <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
                         <template scope="props">
                             <el-form label-position="left" inline class="demo-table-expand table-form" v-if="column.type === 'expand'">
-                                <el-form-item v-for="(prop,index) in props.row" v-if="!!setName(index)">
+                                <el-form-item v-for="(prop,index) in props.row" v-if="!!setName(index)" :key="index">
                                     <span>{{ setName(index) }}：</span>
                                     <span>{{ prop }}</span>
                                 </el-form-item>
@@ -203,6 +203,23 @@ export default {
                 duration: 3000
             });
         },
+        // 请求成功。
+        requestSucess(oData) {
+            this.loading = false;
+            this.tableData.data = oData;
+        },
+        // 请求失败。
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage)
+        },
+        // 请求错误。
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
+        },
         // 获取数据。
         fetchData() {
 
@@ -217,24 +234,26 @@ export default {
                 }
             })
             /* 测试数据 */
-            oQuery = {
-                "equipmentId": "186",
-                "startTime": "2017-08-11 00:34:52",
-                "endTime": "2017-08-11 00:35:18"
-            }
-            this.$get(url, oQuery)
-                .then((res) => {
-                    this.loading = false;
+            // oQuery = {
+            //     "equipmentId": "186",
+            //     "startTime": "2017-08-11 00:34:52",
+            //     "endTime": "2017-08-11 00:35:18"
+            // }
 
-                    this.judgeLoaderHandler(res, () => {
-                        this.tableData.data = res.data.data
-                    });
-                })
-                .catch((err) => {
-                    this.loading = false;
-                    this.styleObject.minWidth = 0;
-                    console.log("数据库查询出错。")
-                })
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+            // this.$get(url, oQuery)
+            //     .then((res) => {
+            //         this.loading = false;
+
+            //         this.judgeLoaderHandler(res, () => {
+            //             this.tableData.data = res.data.data
+            //         });
+            //     })
+            //     .catch((err) => {
+            //         this.loading = false;
+            //         this.styleObject.minWidth = 0;
+            //         console.log("数据库查询出错。")
+            //     })
         },
         // 表格导出。
         exportExcelHandle(oData, event) {
@@ -326,27 +345,42 @@ export default {
         },
         /* 根据新获取的检验值，设置中文名和英文名对应关系 */
         dataEdit(row, expanded) {
-            //debugger
+  
             let Id = row.dataId
             if(!!expanded && !this.expandedId.some(el=>el===Id)){  //如果展开的话
                 let dataId = {
                     "dataId": Id
                 }
-                this.$get(url2, dataId).then((res) => {
-                    this.judgeLoaderHandler(res, () => {
-                        let oData= res.data.data
-                        oData.forEach(el=>{
-                            let newData = {name:`${el.description}`,prop:`${el.description}`}
-                            this.tableData.columns.push(newData)
-                            this.$set(row, `${el.description}`, `${el.value}${el.varUnit}`)
-                        })
-                        this.expandedId.push(Id)
+
+                this.sendRequest(this.$store, this.$ajax, url2, "get", dataId, (oData) => {
+                    oData.forEach(el=>{
+                        let newData = {name:`${el.description}`,prop:`${el.description}`}
+                        this.tableData.columns.push(newData)
+                        this.$set(row, `${el.description}`, `${el.value}${el.varUnit}`)
+                    })
+                    this.expandedId.push(Id)               
+                }, (sErrorMessage) => {
+                    // 提示信息。
+                    console.log(sErrorMessage);
+                }, (err) =>{
+                    console.log(err);
+                })
+
+                // this.$get(url2, dataId).then((res) => {
+                //     this.judgeLoaderHandler(res, () => {
+                //         let oData= res.data.data
+                //         oData.forEach(el=>{
+                //             let newData = {name:`${el.description}`,prop:`${el.description}`}
+                //             this.tableData.columns.push(newData)
+                //             this.$set(row, `${el.description}`, `${el.value}${el.varUnit}`)
+                //         })
+                //         this.expandedId.push(Id)
                         
-                    });
-                })
-                .catch((err) => {
-                    console.log(err)
-                })
+                //     });
+                // })
+                // .catch((err) => {
+                //     console.log(err)
+                // })
             }
         },
         /* 根据刷选条件显示行 */

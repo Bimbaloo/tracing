@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 
 import ElementUI from 'element-ui'
@@ -78,13 +79,6 @@ const routes = [
 ]
 
 
-
-
-
-
-
-
-
 // 创建 router 实例，然后传 `routes` 配置
 const router = new VueRouter({
   // base:'/restrain/',
@@ -92,9 +86,24 @@ const router = new VueRouter({
   routes // （缩写）相当于 routes: routes
 })
 
+Vue.use(Vuex)
+
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import {loginModule} from 'assets/js/loginStore.js'
+
+Vue.prototype.$register = loginFn;
+
+const store = new Vuex.Store({
+  modules: {
+    loginModule
+  }
+})
+
 
 var vm = new Vue({
 	el: '#app',
-	router,
+  router,
+  store,
 	render: h => h(App)
 });

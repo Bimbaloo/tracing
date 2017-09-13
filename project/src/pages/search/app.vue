@@ -3,6 +3,16 @@
     <header>
         <img :src="logo"/>
     </header>
+    <v-tooltip :config="true" :back="false"></v-tooltip>
+    <!--div class="tooltip-info" @mouseenter="showList=true" @mouseleave="showList=false">
+      <el-tooltip class="item" effect="light" content="Bottom Right 提示文字" placement="bottom-end">
+        <ul slot="content" class="info-list">
+            <li @click="goToConfig">设置</li>
+            <li @click="logout" v-if="userId">退出</li>
+        </ul>     
+        <div class="user-name" :style="{cursor: userName?'default':'pointer'}" @click="login">{{userName || "登录"}}<i class="el-icon-arrow-down"></i></div>
+      </el-tooltip>
+    </div-->
     <el-tabs v-loading="loading" element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab"  @tab-click="handleClick">
       <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
         <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
@@ -17,23 +27,22 @@
 </template>
 
 <script>
-  //import logo from 'assets/img/logo-w.png'
+  import tooltip from 'components/header/tooltip.vue'
   import logo from 'assets/img/kssp-logo.png'
   import version from 'assets/img/version.png'
   import panel from 'components/panel/panel.vue'
 	import fnP from "assets/js/public.js"
-	// import {host} from 'assets/js/configs.js'
 
-	// var HOST = window.HOST ? window.HOST: host	
   const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
-  const LOGIN_ERROR_CODE = 10;
 
   export default {
     components: {
-      'v-panel': panel
+      'v-panel': panel,
+      'v-tooltip': tooltip
     },
     data() {
       return {
+        showList: false,
         logo,
         version,
         v: VERSION,
@@ -46,61 +55,52 @@
       }
     },
     computed: {
-      token() {
-        return this.$store.state.loginModule.token
-      },
-      userId() {
-        return this.$store.state.loginModule.userId
-      },
-      userName() {
-        return this.$store.state.loginModule.userName
-      },
     },
     created() {
       // 登录验证。
-      fnP.login(this.$store);
+      this.$register.login(this.$store);
 
       this.loading = true;   
+      
       // 请求判断。   
-      fnP.beforeRequest(this.$store, this.$ajax)
-        .get(MODULE_ITEM_URL)
-        .then((res) => {
-          this.loading = false;
-          this.judgeLoaderHandler(res,() => {
-            this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain");	// && o.key!="link"
+      this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
+        // 请求成功。
+        this.loading = false;
+        this.categories = fnP.parseData(oData).filter(o=>o.key!="restrain");
+        this.categories.forEach(o => {
+            o.active = {
+              radio: "1",
+              keys: {}
+            }            
+        })
+      }, (sErrorMessage)=>{
+        // 请求失败。
+        this.loading = false;
+        this.sErrorMessage = sErrorMessage;
+        this.showMessage();        
+      });
+      // fnP.beforeRequest(this.$store, this.$ajax)
+      //   .get(MODULE_ITEM_URL)
+      //   .then((res) => {
+          
+      //     this.loading = false;
+      //     // 判断是否请求成功。
+      //     fnP.judgeLoaderHandler(res,() => {
+      //       this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain");	// && o.key!="link"
 
-            this.categories.forEach(o => {
-                o.active = {
-                  radio: "1",
-                  keys: {}
-                }            
-            })
-          });
-        });
+      //       this.categories.forEach(o => {
+      //           o.active = {
+      //             radio: "1",
+      //             keys: {}
+      //           }            
+      //       })
+      //     }, (sErrorMessage)=>{
+      //         this.sErrorMessage = sErrorMessage;
+      //         this.showMessage();        
+      //     });
+      //   });
     },
     methods: {
-    	// 判断调用接口是否成功。
-    	judgeLoaderHandler(param,fnSu,fnFail) {
-    		let bRight = param.data.errorCode;
-        	
-        	// 判断是否调用成功。
-        	if(!bRight) {
-        		// 调用成功后的回调函数。
-        		fnSu && fnSu();
-        	}else {
-            if(bRight === LOGIN_ERROR_CODE) {
-              // 登录失败。
-              // 清cookie，跳转到登录页面。
-              this.loginFail(param.loginUrl);
-               
-            }else {
-              this.sErrorMessage = param.data.errorMsg.message;
-              this.showMessage();
-              // 失败后的回调函。
-              fnFail && fnFail();
-            }
-        	}
-    	},
     	// 显示提示信息。
 			showMessage() {
 				this.$message({
@@ -164,7 +164,47 @@
    	color: #cccccc;
    	vertical-align: middle;
    }
- }
+  }
+
+  .login-info {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    font-size: 14px;
+    color: #fff;
+
+    .el-icon-arrow-down {
+      display: inline-block;
+      padding-left: 10px; 
+    }
+
+  } 
+
+  .el-tooltip__popper {
+    padding: 0
+  }
+  // 设置相关列表。
+  .info-list {
+    width: 90px;
+    // border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    box-shadow: 0px 3px 3px #888;
+    padding: 10px 0;
+
+    li {
+      color: #999;
+      text-align: center;
+      padding: 10px 0;
+
+      &:hover {
+        background: #dedede;
+        color: #666;
+        cursor: pointer;
+      }
+    }
+  }
+
   .panel-title {
       padding: 10px 0;		// 19
       .el-radio+.el-radio {

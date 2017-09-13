@@ -3,7 +3,7 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in filters">
+                    <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
                     </span>
                 </div>
@@ -182,27 +182,42 @@ export default {
     },
     methods: {
         // 判断调用接口是否成功。
-        judgeLoaderHandler(param, fnSu, fnFail) {
-            let bRight = param.data.errorCode;
+        // judgeLoaderHandler(param, fnSu, fnFail) {
+        //     let bRight = param.data.errorCode;
 
-            // 判断是否调用成功。
-            if (!bRight) {
-                // 调用成功后的回调函数。
-                fnSu && fnSu();
-            } else {
-                // 提示信息。
-                console.log(param.data.errorMsg.message)
-                // 失败后的回调函。
-                fnFail && fnFail();
-            }
-        },
+        //     // 判断是否调用成功。
+        //     if (!bRight) {
+        //         // 调用成功后的回调函数。
+        //         fnSu && fnSu();
+        //     } else {
+        //         // 提示信息。
+        //         console.log(param.data.errorMsg.message)
+        //         // 失败后的回调函。
+        //         fnFail && fnFail();
+        //     }
+        // },
         // 显示提示信息。
-        showMessage() {
-            this.$message({
-                message: this.sErrorMessage,
-                duration: 3000
-            });
+        // showMessage() {
+        //     this.$message({
+        //         message: this.sErrorMessage,
+        //         duration: 3000
+        //     });
+        // },
+        requestSucess(oData) {
+            this.loading = false;
+            this.tableData.data = oData;
         },
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage)
+        },
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
+        },
+
         // 获取数据。
         fetchData() {
 
@@ -216,19 +231,21 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-            this.$get(url, oQuery)
-                .then((res) => {
-                    this.loading = false;
 
-                    this.judgeLoaderHandler(res, () => {
-                        this.tableData.data = res.data.data
-                    });
-                })
-                .catch((err) => {
-                    this.loading = false;
-                    this.styleObject.minWidth = 0;
-                    console.log("数据库查询出错。")
-                })
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+            // this.$get(url, oQuery)
+            //     .then((res) => {
+            //         this.loading = false;
+
+            //         this.judgeLoaderHandler(res, () => {
+            //             this.tableData.data = res.data.data
+            //         });
+            //     })
+            //     .catch((err) => {
+            //         this.loading = false;
+            //         this.styleObject.minWidth = 0;
+            //         console.log("数据库查询出错。")
+            //     })
         },
         // 表格导出。
         exportExcelHandle(oData, event) {

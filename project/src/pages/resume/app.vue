@@ -4,7 +4,7 @@
 		<div class="domDown"></div>
 		
 		<!-- header 部分-->
-		<v-header ref="headers" v-show="!bFullScreen"></v-header>
+		<v-header ref="headers" v-show="!bFullScreen" :back="'search.html'" :config="false"></v-header>
 		<div class="resume-wraps">
 			<div class="resume-content-wrap" :class="{full:bFullScreen}">
 				<div class="clone"></div>
@@ -59,7 +59,8 @@
 									:fixed="!index?true:false"
 									:resizable="true"
 									:min-width="column.width"
-									:label="column.name">
+									:label="column.name"
+									:key="index">
 									<template scope="props">
 										<div class="cell-content" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+(props.row.bHasNext?0:nIconDis)+'px'}">
 											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr"></i>
@@ -91,7 +92,8 @@
 									v-for="(column,index) in oTab.columns"
 									:align="index?'center':'left'"
 									:min-width="column.width"
-									:label="column.name">
+									:label="column.name"
+									:key="index">
 									<template scope="props">
 										<div class="cell-content" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+(props.row.bHasNext?0:nIconDis)+'px'}">
 											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr"></i>
@@ -117,7 +119,8 @@
 							<div v-else class="time-line-content">
 								<div 
 									class="time-line-wrap"
-									v-for="(timeItem, index) in aoTimeLineData">
+									v-for="(timeItem, index) in aoTimeLineData"
+									:key="index">
 									
 									<div class="line-item">
 										<span class="item-date">{{ timeItem.date }}</span>
@@ -127,7 +130,8 @@
 									<div class="item-line"></div>
 									<div class="line-list">
 										<div class="list-sub" :class="{first:!itemIndex}"
-											v-for="(item,itemIndex) in timeItem.resumes">
+											v-for="(item,itemIndex) in timeItem.resumes"
+											:key="itemIndex">
 											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1)" class="node-line"></div>
 											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.time).Format("hh:mm:ss") }}</span>
 											<div class="sub-node">
@@ -192,9 +196,7 @@
 	import Button from "components/basic/button.vue"
 	import TimeNode from "components/resume/time-node.vue"
 	import html2canvas from 'html2canvas'
-	// import {host} from 'assets/js/configs.js'
 
-	// var HOST = window.HOST ? window.HOST: host	
 	var bFull = window.location.hash.indexOf("full")>-1?true:false;
 	
 	export default {
@@ -368,8 +370,12 @@
 				return this.sCurrentTab=="lines"?"primary":"text";
 			}
 		},
+		created() {
+			this.$register.login(this.$restore);
+		},
 		// 创建时处理。mounted
 		mounted() {
+			
 			// 获取所需的查询参数。
 			this.tag = location.search.split("=")[1]
 
@@ -475,43 +481,84 @@
 				// 需要调用接口，才将错误信息去掉
 				this.oTab.error = "";
 				
-				this.$ajax.post(this.oTab.url, this.ruleForm).then((res) => {
-					this.oTab.loading = false;
+				this.$register.sendRequest(this.$store, this.$ajax, this.oTab.url, "post", this.ruleForm, this.requestSucess, this.requestFail, this.requestError)
+				// this.$ajax.post(this.oTab.url, this.ruleForm).then((res) => {
+				// 	this.oTab.loading = false;
 					
-					if(!res.data.errorCode) {
-						// 显示标题。
-						this.bShowTitle = true;
-					    this.oTitle.materialName = res.data.data.materialName;
-					    this.oTitle.batchNo = res.data.data.batchNo;
+				// 	if(!res.data.errorCode) {
+				// 		// 显示标题。
+				// 		this.bShowTitle = true;
+				// 	    this.oTitle.materialName = res.data.data.materialName;
+				// 	    this.oTitle.batchNo = res.data.data.batchNo;
 						
-						// 数据修改。
-					    this.aoTable = res.data.data.bomResumes;
-					    this.aParsedData = this.parseTableData();
-						this.aoTimeLineData = res.data.data.timeLineResumes;
+				// 		// 数据修改。
+				// 	    this.aoTable = res.data.data.bomResumes;
+				// 	    this.aParsedData = this.parseTableData();
+				// 		this.aoTimeLineData = res.data.data.timeLineResumes;
 						
-						if(this.bCarousel) {
-							this.$nextTick(function() {
-								// 设置滚动。
-								this.setScroll();
-							})						
-						}
-					}else{
-						this.bShowTitle = false;
-					    // 根据errorCode 错误时设置。error
-						this.oTab.error = res.data.errorMsg.message;
-					}
+				// 		if(this.bCarousel) {
+				// 			this.$nextTick(function() {
+				// 				// 设置滚动。
+				// 				this.setScroll();
+				// 			})						
+				// 		}
+				// 	}else{
+				// 		this.bShowTitle = false;
+				// 	    // 根据errorCode 错误时设置。error
+				// 		this.oTab.error = res.data.errorMsg.message;
+				// 	}
 					
-					// 设置内容的高度。
-					this.getHeight();
+				// 	// 设置内容的高度。
+				// 	this.getHeight();
 					
-			    }).catch((err)=> {
-			    	console.log(err)
-			    	this.oTab.loading = false;
-					this.oTab.error = "查询出错";
-					// 设置内容的高度。
-					this.getHeight();
-			    });
+			    // }).catch((err)=> {
+			    // 	console.log(err)
+			    // 	this.oTab.loading = false;
+				// 	this.oTab.error = "查询出错";
+				// 	// 设置内容的高度。
+				// 	this.getHeight();
+			    // });
 				
+			},
+			// 请求成功。
+			requestSucess(oData) {
+				this.oTab.loading = false;
+				// 显示标题。
+				this.bShowTitle = true;
+				this.oTitle.materialName = oData.materialName;
+				this.oTitle.batchNo = oData.batchNo;
+				
+				// 数据修改。
+				this.aoTable = oData.bomResumes;
+				this.aParsedData = this.parseTableData();
+				this.aoTimeLineData = oData.timeLineResumes;
+				
+				if(this.bCarousel) {
+					this.$nextTick(function() {
+						// 设置滚动。
+						this.setScroll();
+					})						
+				}	
+				// 设置内容的高度。
+				this.getHeight();			
+			},
+			// 请求失败。
+			requestFail(sErrorMessage) {
+				this.oTab.loading = false;
+				this.bShowTitle = false;
+				// 根据errorCode 错误时设置。error
+				this.oTab.error = sErrorMessage;
+				// 设置内容的高度。
+				this.getHeight();
+
+			},
+			// 请求错误。
+			requestError(err) {
+				console.log(err)
+				this.oTab.loading = false;
+				this.oTab.error = "查询出错";
+				// 设置内容的高度。
+				this.getHeight();
 			},
 			// 设置滚动。
 			setScroll () {

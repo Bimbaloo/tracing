@@ -1326,28 +1326,58 @@
 				return oParam;
 			},
 			// 判断调用接口是否成功。
-			judgeLoaderHandler(param,fnSu,fnFail) {
-				let bRight = param.data.errorCode;
+			// judgeLoaderHandler(param,fnSu,fnFail) {
+			// 	let bRight = param.data.errorCode;
 				
-				// 判断是否调用成功。
-				if(!bRight) {
-					// 调用成功后的回调函数。
-					fnSu && fnSu();
-				}else {
-					// 提示信息。
-					this.sErrorMessage = "暂无数据";
-					console.log(param.data.errorMsg.message);
-					// 失败后的回调函。
-					fnFail && fnFail();
-				}
-			},
+			// 	// 判断是否调用成功。
+			// 	if(!bRight) {
+			// 		// 调用成功后的回调函数。
+			// 		fnSu && fnSu();
+			// 	}else {
+			// 		// 提示信息。
+			// 		this.sErrorMessage = "暂无数据";
+			// 		console.log(param.data.errorMsg.message);
+			// 		// 失败后的回调函。
+			// 		fnFail && fnFail();
+			// 	}
+			// },
 			// 显示提示信息。
 			showMessage() {
 				this.$message({
 					message: this.sErrorMessage,
 					duration: 3000
 				});
-			},
+            },
+            // 请求成功。
+            requestSucess(oData) {
+                this.loading = false;
+                this.categories = [];
+                // 保存数据。		
+                let aoData = oData;
+
+                if(!aoData.length) {
+                    return;
+                }
+
+                // 初始化图形数据。
+                this.initChartData(aoData);
+                // 添加图形数据。
+                this.setChartData();	
+            },
+            // 请求失败。
+            requestFail(sErrorMessage) {
+                this.loading = false;
+                this.categories = [];
+                // 提示信息。
+				this.sErrorMessage = "暂无数据";
+				console.log(sErrorMessage);
+            },
+            // 请求错误。
+            requestError(err) {
+                this.loading = false;
+				this.sErrorMessage = "暂无数据";
+				console.log("查询出错");
+            },
 			// 获取设备所有数据。
 			fetchAllData() {
 				this.loading = true;	
@@ -1366,35 +1396,42 @@
                     sUrl += "/by-id"
                 }
                 
-				this.$post(sUrl, {
+                this.$register.sendRequest(this.$store, this.$ajax, sUrl, "post", {
 					equipmentList: equipmentList, //equipmentIdList
 					startTime: this.datetime.start,
 					endTime: this.datetime.end,
 					type: 0
-				})
-				.then((res) => {
-					this.loading = false;
-                    this.categories = [];
-					this.judgeLoaderHandler(res, () => {
-						// 保存数据。		
-						let aoData = res.data.data;
+                }, this.requestSucess, this.requestFail, this.requestError)
+                
+				// this.$post(sUrl, {
+				// 	equipmentList: equipmentList, //equipmentIdList
+				// 	startTime: this.datetime.start,
+				// 	endTime: this.datetime.end,
+				// 	type: 0
+				// })
+				// .then((res) => {
+				// 	this.loading = false;
+                //     this.categories = [];
+				// 	this.judgeLoaderHandler(res, () => {
+				// 		// 保存数据。		
+				// 		let aoData = res.data.data;
 
-						if(!aoData.length) {
-							return;
-						}
+				// 		if(!aoData.length) {
+				// 			return;
+				// 		}
 
-                        // 初始化图形数据。
-                        this.initChartData(aoData);
-                        // 添加图形数据。
-                        this.setChartData();	
+                //         // 初始化图形数据。
+                //         this.initChartData(aoData);
+                //         // 添加图形数据。
+                //         this.setChartData();	
 
-					});
-				})
-				.catch((err) => {
-					this.loading = false;
-				 	this.sErrorMessage = "暂无数据";
-					console.log("查询出错");
-				})
+				// 	});
+				// })
+				// .catch((err) => {
+				// 	this.loading = false;
+				//  	this.sErrorMessage = "暂无数据";
+				// 	console.log("查询出错");
+				// })
 			},
             // 初始化图形数据。
             initChartData (aoData) {

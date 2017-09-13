@@ -194,7 +194,7 @@
             						- (jTable.outerHeight(true) - jTable.height()))/2);
             	
             	return nHeight;
-            },
+			},			
             // 获取参数。
 			fetchData(oData) {
 				oData.error = null;
@@ -204,27 +204,47 @@
 
 				let sPath = oData.url;
 
-				this.$ajax.post(sPath, this.$route.query)
-					.then((res) => {
-						oData.loading = false;
-//						oData.height = this.adjustHeight();
+				this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", this.$route.query, (oResult) => {
+					// 请求成功。
+					oData.loading = false;			
+					oData.data = oResult;        
+				}, (sErrorMessage) => {
+					// 请求失败。
+					oData.loading = false;
+					this.styleError.maxHeight = this.adjustHeight()-50+"px";
+					// 提示信息。
+					console.log(sErrorMessage);
+				}, (err) => {
+					// 请求错误。
+					oData.loading = false;
+					console.log("接口查询出错。");
+
+					if(this.outstockData.error && this.instockData.error) {
+						this.styleError.maxHeight = this.adjustHeight()-50+"px"
+					}
+				})
+
+				// this.$ajax.post(sPath, this.$route.query)
+				// 	.then((res) => {
+				// 		oData.loading = false;
+				// 		// oData.height = this.adjustHeight();
 						
-						if(!res.data.errorCode) {
-							oData.data = res.data.data;
-						}else {
-							this.styleError.maxHeight = this.adjustHeight()-50+"px";
-//							oData.error = res.data.errorMsg.message;
-							console.log(res.data.errorMsg.message);
-						}
-					})
-					.catch((err) => {
-						oData.loading = false;
-//						oData.error = "查询出错。"
-						console.log("接口查询出错。");
-						if(this.outstockData.error && this.instockData.error) {
-							this.styleError.maxHeight = this.adjustHeight()-50+"px"
-						}
-					})
+				// 		if(!res.data.errorCode) {
+				// 			oData.data = res.data.data;
+				// 		}else {
+				// 			this.styleError.maxHeight = this.adjustHeight()-50+"px";
+				// 			// oData.error = res.data.errorMsg.message;
+				// 			console.log(res.data.errorMsg.message);
+				// 		}
+				// 	})
+				// 	.catch((err) => {
+				// 		oData.loading = false;
+				// 		// oData.error = "查询出错。"
+				// 		console.log("接口查询出错。");
+				// 		if(this.outstockData.error && this.instockData.error) {
+				// 			this.styleError.maxHeight = this.adjustHeight()-50+"px"
+				// 		}
+				// 	})
 			},
 			// 可疑品列表。
 			showSuspiciousList() {

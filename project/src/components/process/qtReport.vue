@@ -195,27 +195,73 @@ export default {
     },
     methods: {
         // 判断调用接口是否成功。
-        judgeLoaderHandler(param, fnSu, fnFail) {
-            let bRight = param.data.errorCode;
+        // judgeLoaderHandler(param, fnSu, fnFail) {
+        //     let bRight = param.data.errorCode;
 
-            // 判断是否调用成功。
-            if (!bRight) {
-                // 调用成功后的回调函数。
-                fnSu && fnSu();
-            } else {
-                // 提示信息。
-                console.log(param.data.errorMsg.message)
-                // 失败后的回调函。
-                fnFail && fnFail();
-            }
-        },
+        //     // 判断是否调用成功。
+        //     if (!bRight) {
+        //         // 调用成功后的回调函数。
+        //         fnSu && fnSu();
+        //     } else {
+        //         // 提示信息。
+        //         console.log(param.data.errorMsg.message)
+        //         // 失败后的回调函。
+        //         fnFail && fnFail();
+        //     }
+        // },
         // 显示提示信息。
-        showMessage() {
-            this.$message({
-                message: this.sErrorMessage,
-                duration: 3000
-            });
+        // showMessage() {
+        //     this.$message({
+        //         message: this.sErrorMessage,
+        //         duration: 3000
+        //     });
+        // },
+        // 请求成功。
+        requestSucess(oData) {
+            this.loading = false;
+            
+            let odata = oData,  //获取到的data
+
+                obj = {
+                    name: "检验项目",
+                    width: "500",
+                    lists: []
+                };
+
+            odata.forEach((el) => {  /* 处理columns和data */
+                let items = el.items,
+                    tdata = []              //储存items里面的data
+                items.forEach((item) => {
+                    if (obj.lists.every((list) => {
+                        return list.itemName !== item.itemName
+                    })
+                    ) {
+                        obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
+                            itemName: `${item.itemName}`,
+                            prop: encodeURI(`${item.itemName}`)
+                        })
+                    }
+                    tdata[encodeURI(`${item.itemName}`)] = item.value
+
+                })
+                let objData = Object.assign(el, tdata);   // 合并获取正在的data
+                this.tableData.data.push(objData)
+            })
+
+            this.tableData.columns.push(obj)               
         },
+        // 请求失败。
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage);
+        },
+        // 请求错误。
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
+        },     
         // 获取数据。
         fetchData() {
 
@@ -229,49 +275,51 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-            this.$get(url, oQuery)
-                .then((res) => {
-                    // console.log(res)
-                    this.loading = false;
-                    this.judgeLoaderHandler(res, () => {
-                        let odata = res.data.data,  //获取到的data
 
-                            obj = {
-                                name: "检验项目",
-                                width: "500",
-                                lists: []
-                            };
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+            // this.$get(url, oQuery)
+            //     .then((res) => {
+            //         // console.log(res)
+            //         this.loading = false;
+            //         this.judgeLoaderHandler(res, () => {
+            //             let odata = res.data.data,  //获取到的data
 
-                        odata.forEach((el) => {  /* 处理columns和data */
-                            let items = el.items,
-                                tdata = []              //储存items里面的data
-                            items.forEach((item) => {
-                                if (obj.lists.every((list) => {
-                                    return list.itemName !== item.itemName
-                                })
-                                ) {
-                                    obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
-                                        itemName: `${item.itemName}`,
-                                        prop: encodeURI(`${item.itemName}`)
-                                    })
-                                }
-                                tdata[encodeURI(`${item.itemName}`)] = item.value
+            //                 obj = {
+            //                     name: "检验项目",
+            //                     width: "500",
+            //                     lists: []
+            //                 };
 
-                            })
-                            let objData = Object.assign(el, tdata);   // 合并获取正在的data
-                            this.tableData.data.push(objData)
-                        })
+            //             odata.forEach((el) => {  /* 处理columns和data */
+            //                 let items = el.items,
+            //                     tdata = []              //储存items里面的data
+            //                 items.forEach((item) => {
+            //                     if (obj.lists.every((list) => {
+            //                         return list.itemName !== item.itemName
+            //                     })
+            //                     ) {
+            //                         obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
+            //                             itemName: `${item.itemName}`,
+            //                             prop: encodeURI(`${item.itemName}`)
+            //                         })
+            //                     }
+            //                     tdata[encodeURI(`${item.itemName}`)] = item.value
 
-                        this.tableData.columns.push(obj)
+            //                 })
+            //                 let objData = Object.assign(el, tdata);   // 合并获取正在的data
+            //                 this.tableData.data.push(objData)
+            //             })
+
+            //             this.tableData.columns.push(obj)
 
 
-                    });
-                })
-                .catch((err) => {
-                    this.loading = false;
-                    this.styleObject.minWidth = 0;
-                    console.log("数据库查询出错。")
-                })
+            //         });
+            //     })
+            //     .catch((err) => {
+            //         this.loading = false;
+            //         this.styleObject.minWidth = 0;
+            //         console.log("数据库查询出错。")
+            //     })
         },
         // 表格导出。
         exportExcelHandle(oData, event) {

@@ -179,30 +179,47 @@ export default {
     },
     methods: {
         // 判断调用接口是否成功。
-        judgeLoaderHandler(param, fnSu, fnFail) {
-            let bRight = param.data.errorCode;
+        // judgeLoaderHandler(param, fnSu, fnFail) {
+        //     let bRight = param.data.errorCode;
             
-            // 判断是否调用成功。
-            if(!bRight) {
-                // 调用成功后的回调函数。
-                fnSu && fnSu();
-            }else {
-                // 提示信息。
-                console.log(param.data.errorMsg.message)
-                // 失败后的回调函。
-                fnFail && fnFail();
-            }
-        },	
+        //     // 判断是否调用成功。
+        //     if(!bRight) {
+        //         // 调用成功后的回调函数。
+        //         fnSu && fnSu();
+        //     }else {
+        //         // 提示信息。
+        //         console.log(param.data.errorMsg.message)
+        //         // 失败后的回调函。
+        //         fnFail && fnFail();
+        //     }
+        // },	
         // 显示提示信息。
-        showMessage() {
-            this.$message({
-                message: this.sErrorMessage,
-                duration: 3000
-            });
-        },		       
-        // 获取数据。
-        fetchData() {    
+        // showMessage() {
+        //     this.$message({
+        //         message: this.sErrorMessage,
+        //         duration: 3000
+        //     });
+        // },	
+        // 请求成功。
+        requestSucess(oData) {
+            this.loading = false;
             
+            this.tableData.data = oData;        
+        },
+        // 请求失败。
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage);
+        },
+        // 请求错误。
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
+        },  	       
+        // 获取数据。
+        fetchData() {          
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el)=>{
@@ -213,19 +230,22 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-            this.$get(url, oQuery)
-            .then((res) => {
-                this.loading = false;
+
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+
+            // this.$get(url, oQuery)
+            // .then((res) => {
+            //     this.loading = false;
              
-                this.judgeLoaderHandler(res,() => {
-                    this.tableData.data = res.data.data
-                });				 
-            })
-            .catch((err) => {
-                this.loading = false;
-                this.styleObject.minWidth = 0;   
-                console.log("数据库查询出错。")
-            })
+            //     this.judgeLoaderHandler(res,() => {
+            //         this.tableData.data = res.data.data
+            //     });				 
+            // })
+            // .catch((err) => {
+            //     this.loading = false;
+            //     this.styleObject.minWidth = 0;   
+            //     console.log("数据库查询出错。")
+            // })
         },
         // 表格导出。
         exportExcelHandle (oData, event) {

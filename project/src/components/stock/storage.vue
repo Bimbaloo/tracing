@@ -265,26 +265,46 @@
                     default: break;
                 }
                 
-                this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
-                .then((res) => {
-                    oData.loading = false;
-//                  oData.height = this.adjustHeight();
-                    if(!res.data.errorCode) {
-                        oData.data = res.data.data;
-                    }else {
-                    	this.styleError.maxHeight = this.adjustHeight()-50+"px";
-//                  	oData.error = res.data.errorMsg.message;
-                    	console.log(res.data.errorMsg.message)
-                    }
-                })
-                .catch((err) => {
-                    oData.loading = false;
-//                  oData.error = "查询出错。"
-                    console.log("接口查询出错。");
-                    if(this.outstockData.error && this.instockData.error) {
-                        this.styleError.maxHeight = this.adjustHeight()-50+"px"
-                    }           
-                })
+                this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", fnP.parseQueryParam(this.$route.query), (oResult) => {
+					// 请求成功。
+					oData.loading = false;			
+					oData.data = oResult;        
+				}, (sErrorMessage) => {
+					// 请求失败。
+					oData.loading = false;
+					this.styleError.maxHeight = this.adjustHeight()-50+"px";
+					// 提示信息。
+					console.log(sErrorMessage);
+				}, (err) => {
+					// 请求错误。
+					oData.loading = false;
+					console.log("接口查询出错。");
+
+					if(this.outstockData.error && this.instockData.error) {
+						this.styleError.maxHeight = this.adjustHeight()-50+"px"
+					}
+				})
+
+                // this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
+                // .then((res) => {
+                //     oData.loading = false;
+                // //   oData.height = this.adjustHeight();
+                //     if(!res.data.errorCode) {
+                //         oData.data = res.data.data;
+                //     }else {
+                //     	this.styleError.maxHeight = this.adjustHeight()-50+"px";
+                //   	// oData.error = res.data.errorMsg.message;
+                //     	console.log(res.data.errorMsg.message)
+                //     }
+                // })
+                // .catch((err) => {
+                //     oData.loading = false;
+                // //   oData.error = "查询出错。"
+                //     console.log("接口查询出错。");
+                //     if(this.outstockData.error && this.instockData.error) {
+                //         this.styleError.maxHeight = this.adjustHeight()-50+"px"
+                //     }           
+                // })
             },
             visibleChange () {
 //              debugger

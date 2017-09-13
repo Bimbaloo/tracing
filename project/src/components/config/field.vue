@@ -39,13 +39,10 @@
 <script>
 	//表格数据接口http://192.168.20.176:8080
 	import $ from "jquery"
-	// import {host} from 'assets/js/configs.js'
-
-	// var HOST = window.HOST ? window.HOST: host
 
     const TABLE_DATA_URL= HOST + "/api/v1/customized/items";
-    const sSessionItemName = "sFiled"; 
-    
+	const sSessionItemName = "sFiled"; 
+	
     export default{
 	    data() {
 	        return {
@@ -66,18 +63,33 @@
 				key: false
 			});
 			
-          //获取字段接口数据 TABLE_DATA_URL
-            this.$ajax.get(TABLE_DATA_URL).then((res) => {
-            	this.judgeLoaderHandler(res,() => {
-            		// 设置表格数据。
-            		this.tableData = res.data.data;
-            		// 保存当前数据。
-//          		this.aBefore = Object.assign([], this.tableData);
-            		this.aBefore = $.extend(true,[],this.tableData);
-            	});
-            }).catch(function(error) {
-            	console.log(error)
-            });
+			//获取字段接口数据 TABLE_DATA_URL	
+			this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, (oData) => {
+				// 设置表格数据。
+				this.tableData = oData;
+				// 保存当前数据。
+				this.aBefore = $.extend(true,[],this.tableData);
+			}, (sErrorMessage)=>{
+				this.sErrorMessage = sErrorMessage;
+				this.showMessage();          
+			})
+			
+
+		    // 请求判断。       
+//             fnP.beforeRequest(this.$store, this.$ajax).get(TABLE_DATA_URL).then((res) => {
+//             	fnP.judgeLoaderHandler(res, () => {
+//             		// 设置表格数据。
+//             		this.tableData = res.data.data;
+//             		// 保存当前数据。
+// //          		this.aBefore = Object.assign([], this.tableData);
+//             		this.aBefore = $.extend(true,[],this.tableData);
+//             	}, (sErrorMessage)=>{
+// 					this.sErrorMessage = sErrorMessage;
+// 					this.showMessage();          
+// 				});
+//             }).catch(function(error) {
+//             	console.log(error)
+//             });
         },
         computed: {
 	        // 是否编辑的状态。
@@ -158,30 +170,41 @@
 	            	this.$refs[formName].validate((valid) => {
 	            		if(valid) {
 	            			// 判断。
-			                //调用接口，修改数据
-			                this.$ajax.put(TABLE_DATA_URL,{
-			                	"items": this.tableData
-			                }).then((res) => {
-			                	// 判断是否更新成功。
-			                	this.judgeLoaderHandler(res,() => {
+
+							//调用接口，修改数据	
+							this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "put", {"items": this.tableData}, (oData) => {
+								// 修改状态。
+								this.$store.commit({
+									type: "updateEdit",
+									key: false
+								});
+								// 重新设置保存的值。
+								this.aBefore = $.extend(true,[],this.tableData);
+								this.sErrorMessage="更新成功！";
+								this.showMessage();
+							}, (sErrorMessage)=>{
+								this.sErrorMessage = sErrorMessage;
+								this.showMessage();          
+							})
+
+			                // this.$ajax.put(TABLE_DATA_URL,{
+			                // 	"items": this.tableData
+			                // }).then((res) => {
+			                // 	// 判断是否更新成功。
+			                // 	this.judgeLoaderHandler(res,() => {
 			                		
-			                		// 修改状态。
-			                		this.$store.commit({
-										type: "updateEdit",
-										key: false
-									});
+			                // 		// 修改状态。
+			                // 		this.$store.commit({
+							// 			type: "updateEdit",
+							// 			key: false
+							// 		});
 			                		
-									// 重新设置保存的值。
-									this.aBefore = $.extend(true,[],this.tableData);
-				            		this.sErrorMessage="更新成功！";
-			        				this.showMessage();
-//				            	},()=>{
-//									// 失败不用恢复到以前状态
-//				            		// 恢复更新数据。
-//									let aData = this.aBefore;
-//				            		this.tableData = aData?aData:[];
-				            	});
-			                });
+							// 		// 重新设置保存的值。
+							// 		this.aBefore = $.extend(true,[],this.tableData);
+				            // 		this.sErrorMessage="更新成功！";
+			        		// 		this.showMessage();
+				            // 	});
+			                // });
 	            			
 	            		}
 	            	});
@@ -201,9 +224,6 @@
     }
     .cell{
         text-align: center;
-    }
-    .table-wrapper{
-        /*margin-left: 20px;*/
     }
     .el-table__header{
         th,.cell{

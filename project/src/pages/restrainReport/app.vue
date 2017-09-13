@@ -14,9 +14,6 @@
 
 <script>
 	import report from "components/report/report.vue"
-	// import {host} from 'assets/js/configs.js'
-
-	// var HOST = window.HOST ? window.HOST: host
 
 	export default {
 		components: {
@@ -44,9 +41,7 @@
 			}
 		},
 		created() {
-			// 组件创建完后获取数据，
-			// 此时 data 已经被 observed 了
-//			 this.fetchData();
+			this.$register.login(this.$store);
 		},
 		methods: {
 			setWidth() {

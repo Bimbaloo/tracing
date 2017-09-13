@@ -60,9 +60,7 @@
 	import "assets/css/common.less"
 	import $ from "jquery"
     import Transfer from "components/config/newTrans.vue"
-	// import {host} from 'assets/js/configs.js'
 
-	// var HOST = window.HOST ? window.HOST: host	
     // 表格接口。
     const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
     // 自定义项列表接口。
@@ -110,22 +108,42 @@
 				key: false
 			});
 			
-        	// 获取表格中的数据。  TABLE_DATA_URL
-        	this.$ajax.get(TABLE_DATA_URL).then((res) => {
-        		this.judgeLoaderHandler(res,() => {
-        			// 成功后的回调函数。
-	        		this.aoTable = res.data.data;
-	        		// 调用接口数据。
-	        		this.$nextTick(() => {
-			          	this.$ajax.get(MODULE_ITEM_URL).then((res) => {//MODULE_ITEM_URL  "static/new.json"
-			          		this.judgeLoaderHandler(res,() => {
-			          			// 成功后设置参数。includes
-				                this.category = res.data.data.filter(o=> ["trace","track"].indexOf(o.moduleCode)>-1)
-			          		});
-			            });         
-			        })
-        		});
-        	});
+			this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, (oData) => {
+				// 成功后的回调函数。
+				this.aoTable = oData;
+				// 调用接口数据。
+				this.$nextTick(() => {
+					this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
+						// 成功后设置参数。includes
+						this.category = oResult.filter(o=> ["trace","track"].indexOf(o.moduleCode)>-1)
+					}, (sErrorMessage) => {
+						// 提示信息。
+						this.sErrorMessage = sErrorMessage;
+						this.showMessage();
+					})        
+				})
+			}, (sErrorMessage) => {
+				// 提示信息。
+            	this.sErrorMessage = sErrorMessage;
+        		this.showMessage();
+			});
+
+        	// // 获取表格中的数据。  TABLE_DATA_URL
+        	// this.$ajax.get(TABLE_DATA_URL).then((res) => {
+        	// 	this.judgeLoaderHandler(res,() => {
+        	// 		// 成功后的回调函数。
+	        // 		this.aoTable = res.data.data;
+	        // 		// 调用接口数据。
+	        // 		this.$nextTick(() => {
+			//           	this.$ajax.get(MODULE_ITEM_URL).then((res) => {//MODULE_ITEM_URL  "static/new.json"
+			//           		this.judgeLoaderHandler(res,() => {
+			//           			// 成功后设置参数。includes
+			// 	                this.category = res.data.data.filter(o=> ["trace","track"].indexOf(o.moduleCode)>-1)
+			//           		});
+			//             });         
+			//         })
+        	// 	});
+        	// });
             
         },
         computed: {
@@ -164,22 +182,22 @@
 					key: isEdit
 				});
         	},
-        	// 判断调用接口是否成功。
-        	judgeLoaderHandler(param,fnSu,fnFail) {
-        		let bRight = param.data.errorCode;
+        	// // 判断调用接口是否成功。
+        	// judgeLoaderHandler(param,fnSu,fnFail) {
+        	// 	let bRight = param.data.errorCode;
             	
-            	// 判断是否调用成功。
-            	if(!bRight) {
-            		// 调用成功后的回调函数。
-            		fnSu && fnSu();
-            	}else {
-            		// 提示信息。
-            		this.sErrorMessage = param.data.errorMsg.message;
-            		this.showMessage();
-            		// 失败后的回调函数。
-            		fnFail && fnFail();
-            	}
-        	},
+            // 	// 判断是否调用成功。
+            // 	if(!bRight) {
+            // 		// 调用成功后的回调函数。
+            // 		fnSu && fnSu();
+            // 	}else {
+            // 		// 提示信息。
+            // 		this.sErrorMessage = param.data.errorMsg.message;
+            // 		this.showMessage();
+            // 		// 失败后的回调函数。
+            // 		fnFail && fnFail();
+            // 	}
+        	// },
         	// 提示信息。
         	showMessage() {
         		this.$message({

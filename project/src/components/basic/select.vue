@@ -136,39 +136,74 @@
 		        		}
 		        		
 		        	}else {
-		        		// 通过请求获取数据。
-			        	this.$ajax.get(oAjax[sKey].url).then((res) => {
-			        		
-			        		this.loading = false;
-			        		
-			        		if(!res.data.errorCode) {
-			        			// 成功。
-				        	 	this.list = res.data.data.map(o=>{
-				        	 		return {
-				        	 			label: o[oAjax[sKey].code + "Name"],
-				        	 			value: o[oAjax[sKey].code + "Code"] || o[oAjax[sKey].code + "Name"]
-				        	 		}
-				        	 	});
-			        		}else {
-			        			this.list = [];
-			        		}
-			        		
-							// 如果是物料，则获取部分数据。
-			        		if(sKey === "materialCode") {
+						// 通过请求获取数据。
+						this.$register.sendRequest(this.$store, this.$ajax, oAjax[sKey].url, "get", null, (oData) => {
+							// 请求成功。
+							this.loading = false;
+							this.list = oData.map(o=>{
+								return {
+									label: o[oAjax[sKey].code + "Name"],
+									value: o[oAjax[sKey].code + "Code"] || o[oAjax[sKey].code + "Name"]
+								}
+							});
+
+							if(sKey === "materialCode") {
 			        			// 物料只取其中一部分。并保存起来。当搜索时恢复
 			        			this.options = this.list.filter((o,index)=>{
 			        				return index<nLen;
 			        			});
 			        			this.oInit = this.options;
 			        		}else {
-			        			// 默认为所有、
-				        		this.options = this.list;
-			        		}
-			        		
-			        	 	oStorage[sKey] = this.list;
+			        			// 默认为所有。
+								this.options = this.list;
+								
+							}
+							oStorage[sKey] = this.list;
 			        	 	// 保存数据。
 			        	 	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
-			        	});
+
+						}, (sErrorMessage) => {
+							// 请求失败。
+							this.loading = false;
+							this.list = [];
+							this.options = [];
+							this.oInit = [];
+							oStorage[sKey] = [];
+			        	 	// 保存数据。
+			        	 	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
+						})
+			        	// this.$ajax.get(oAjax[sKey].url).then((res) => {
+			        		
+			        	// 	this.loading = false;
+			        		
+			        	// 	if(!res.data.errorCode) {
+			        	// 		// 成功。
+				        // 	 	this.list = res.data.data.map(o=>{
+				        // 	 		return {
+				        // 	 			label: o[oAjax[sKey].code + "Name"],
+				        // 	 			value: o[oAjax[sKey].code + "Code"] || o[oAjax[sKey].code + "Name"]
+				        // 	 		}
+				        // 	 	});
+			        	// 	}else {
+			        	// 		this.list = [];
+			        	// 	}
+			        		
+						// 	// 如果是物料，则获取部分数据。
+			        	// 	if(sKey === "materialCode") {
+			        	// 		// 物料只取其中一部分。并保存起来。当搜索时恢复
+			        	// 		this.options = this.list.filter((o,index)=>{
+			        	// 			return index<nLen;
+			        	// 		});
+			        	// 		this.oInit = this.options;
+			        	// 	}else {
+			        	// 		// 默认为所有、
+				        // 		this.options = this.list;
+			        	// 	}
+			        		
+			        	//  	oStorage[sKey] = this.list;
+			        	//  	// 保存数据。
+			        	//  	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
+			        	// });
 		        	}
             		
             	}
