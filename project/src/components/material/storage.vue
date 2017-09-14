@@ -2,11 +2,15 @@
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
-            <div class="content-message">
-            	<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
-				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', '仓储表', $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
-            </div>
+            <div class="content-message tableData">
+				<span class='table-title'>
+					<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+				</span>
+				<span class='table-handle'>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', '仓储表', $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
+				</span>
+			</div>
             <!--div v-if="error" class="error">
                 {{ error }}
             </div-->
@@ -353,4 +357,24 @@
     		}
     	}
     }
+</style>
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+	justify-content: space-between;
+	margin-top: 0;
+    margin-bottom: -20px;
+	.table-title {
+		display: flex;
+        align-items: center;
+	}
+    .table-handle {
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        i {
+            margin: 7.5px;
+        }
+    }
+}
 </style>
