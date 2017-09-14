@@ -6,6 +6,11 @@ var clearLoginCookie = function() {
 	window.Rt.utils.cookie("nickname", null)
 };
 
+/**
+ * 页面登录状态保存。
+ * @param {Object} oStore 数据存储对象。
+ * @return {void}
+ */
 var login = function(oStore) {
 	
 	if(!window.Rt.utils.cookie("token")) {
@@ -38,7 +43,7 @@ var loginFail = function(sUrl) {
 	
 	let sTag = window.Rt.utils.getParam("tag");
 	if(sTag) {
-		sTag = "?" + sTag + "&";
+		sTag = "?tag=" + sTag + "&";
 	}else {
 		sTag = "?"
 	}

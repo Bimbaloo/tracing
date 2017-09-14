@@ -448,7 +448,7 @@ var parseTreeData = function(aTreeData) {
 		let aSub = [];
 		
 		// 获取组下的子工序，并排序。
-		aSub = aPrev.filter( o => o.group == sGroupKey).sort( (o1,o2) => o1.processSeq-o2.processSeq );
+		aSub = aPrev.filter( o => o.group == sGroupKey).sort( (o1,o2) => o1.key - o2.key> 0? 1: -1 );	//o1.processSeq-o2.processSeq
 		
 		// 返回组的工序。
 		return aSub;
@@ -467,7 +467,9 @@ var parseTreeData = function(aTreeData) {
 		// 循环处理数据。获取该节点同组数据的集合。
 		_getSubGroup(o);
 		
-		aSub = aSub.sort((o1,o2)=>o1.processSeq-o2.processSeq);
+//		aSub = aSub.sort((o1,o2)=>o1.processSeq-o2.processSeq);
+		// 根据key值排序
+		aSub = aSub.sort( (o1, o2) => o1.key - o2.key>0 ? 1: -1)
 		
 		return aSub;
 		

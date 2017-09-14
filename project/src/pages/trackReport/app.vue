@@ -6,7 +6,7 @@
             	<i class="icon icon-20 icon-print" title="打印" @click="printHandle('fastreport', $event)"></i>
 			</div>
 			<div class="tag">
-				<span>报告人：admin</span>
+				<span>报告人：{{nickname}}</span>
 				<span>报告时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span>
 			</div>
 			<h1 class="title">快速报告</h1>
@@ -180,6 +180,9 @@
 			}
 		},
 		computed: {
+			nickname: function() {
+				return this.$store.state.loginModule.nickname;
+			},
 			query: function() {
 				let url = location.search; //获取url中"?"符后的字串 
 				let oRequest = {}; 
