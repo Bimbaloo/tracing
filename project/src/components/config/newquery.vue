@@ -298,18 +298,32 @@
 					this.sErrorMessage = "模块下至少有一个条件组合";
 					this.showMessage();
 				}else {
+
 					// 可以保存。
-	        		this.$ajax.put(MODULE_ITEM_URL,this.getModuleDataByModule(sModule)).then((res)=>{
+					this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "put", this.getModuleDataByModule(sModule), () => {
+						this.oBefore[sModule].bEdit = false;
+						this.sErrorMessage="保存成功！";
+						this.showMessage();
+					}, (sErrorMessage)=> {
+						this.sErrorMessage = "保存失败";
+						this.showMessage();
+						console.log(sErrorMessage);
+					}, (err)=> {
+						this.sErrorMessage = "保存失败";
+						this.showMessage();
+						console.log(err);
+					})
+// 	        		this.$ajax.put(MODULE_ITEM_URL,this.getModuleDataByModule(sModule)).then((res)=>{
 	        			
-	        			this.judgeLoaderHandler(res,() => {
-		        			this.oBefore[sModule].bEdit = false;
-	        				this.sErrorMessage="保存成功！";
-	        				this.showMessage();
-//	        			},()=>{
-//	        				let oData = this.oBefore[sModule].value;
-//	        				this.$set(this.category,this.getModuleIndexByModule(sModule),oData);
-	        			});
-	        		});
+// 	        			this.judgeLoaderHandler(res,() => {
+// 		        			this.oBefore[sModule].bEdit = false;
+// 	        				this.sErrorMessage="保存成功！";
+// 	        				this.showMessage();
+// //	        			},()=>{
+// //	        				let oData = this.oBefore[sModule].value;
+// //	        				this.$set(this.category,this.getModuleIndexByModule(sModule),oData);
+// 	        			});
+// 	        		});
 				}
 				
         	},
