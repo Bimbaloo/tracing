@@ -19,9 +19,9 @@
                     </h2>
                     <div class="content-table" ref="uniteTable">
                         <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name">
+                            <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 25 +'px'}" >
+                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 50 +'px'}" >
                                         <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
                                         <span>{{ props.row[column.prop]}}</span>
                                     </div>
@@ -34,16 +34,6 @@
                     </div>
                 </el-tab-pane>
                 <el-tab-pane label="明细表">
-                    <h2 class="content-title inTitle">
-                        <span class='table-title'>投入</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
-                        </span>
-                    </h2>
-                    <div class="content-table" ref="inputTable">
-                        <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
-                    </div>
                     <h2 class="content-title outTitle">
                         <span class='table-title'>产出</span>
                         <span class='table-handle'>
@@ -54,18 +44,18 @@
                     <div class="content-table" ref="outputTable">
                         <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
                     </div>
-                </el-tab-pane>
-                <el-tab-pane label="汇总表">
-                    <h2 class="content-title inAllTitle">
-                        <span class='table-title'>投入汇总</span>
+                    <h2 class="content-title inTitle">
+                        <span class='table-title'>投入</span>
                         <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inAllItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputAllTable', $event)"></i>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
                         </span>
                     </h2>
-                    <div class="content-table" ref="inputAllTable">
-                        <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table>
+                    <div class="content-table" ref="inputTable">
+                        <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
                     </div>
+                </el-tab-pane>
+                <el-tab-pane label="汇总表">
                     <h2 class="content-title outAllTitle">
                         <span class='table-title'>产出汇总</span>
                         <span class='table-handle'>
@@ -75,6 +65,16 @@
                     </h2>
                     <div class="content-table" ref="outputAllTable">
                         <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table>
+                    </div>
+                    <h2 class="content-title inAllTitle">
+                        <span class='table-title'>投入汇总</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inAllItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputAllTable', $event)"></i>
+                        </span>
+                    </h2>
+                    <div class="content-table" ref="inputAllTable">
+                        <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table>
                     </div>
                 </el-tab-pane>
             </el-tabs>
@@ -241,12 +241,12 @@ export default {
                 columns: [{
                     name: "条码",
                     prop: "barcode",
-                    width: "120",
+                    width: "200",
                     fixed: true,
                 }, {
                     name: "派工单号",
                     prop: "doCode",
-                    width: "120"
+                    width: "200"
                 }, {
                     name: "批次号",
                     prop: "batchNo",
@@ -260,33 +260,33 @@ export default {
                 }, {
                     name: "物料名称",
                     prop: "materialName",
-                    width: "120"
+                    width: "200"
                 }, {
                     name: "数量",
                     prop: "quantity",
-                    width: ""
+                    width: "60"
                 }, {
                     name: "合格数",
                     prop: "qualifiedNum",
-                    width: ""
+                    width: "60"
                 }, {
                     name: "报废数",
                     prop: "scrapNum",
-                    width: ""
+                    width: "60"
                 }, {
                     name: "不合格数",
                     prop: "unqualifiedNum",
-                    width: ""
+                    width: "60"
                 }, {
                     name: "班次",
                     prop: "shiftName",
-                    width: ""
+                    width: "100"
                 }, {
                     name: "操作人",
                     prop: "personName",
-                    width: "120"
+                    width: ""
                 }, {
-                    name: "产出时间",
+                    name: "加工时间",
                     prop: "happenTime",
                     width: "200"
                 }],
