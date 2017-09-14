@@ -8,6 +8,7 @@
             <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
               <v-panel :active-tab="activeKey" :panel-height="panelHeight" :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
             </el-tab-pane>
+            <span class="search-barcode" v-if="activeKey === 'stock'" @click="showDialog=true">条码查询</span>
           </el-tabs>
         </div>
       </div>
@@ -26,6 +27,10 @@
         </div>
       </div>
     </div> 
+    <v-dialog 
+    	v-if="showDialog" 
+    	:dialog-visible="showDialog"
+    	@hideDialog="hideDialog"></v-dialog>
      <!-- <el-row :gutter="0" class="content">
           <el-col :xs="15" :sm="12" :md="9" :lg="5" :class="[{ collapsed: collapse }, 'nav']">      	
              <div class="flex-wraps">
@@ -59,6 +64,7 @@
 <script>
   import header from "components/header/header.vue"
   import panel from "components/panel/panel.vue"
+  import dialog from 'components/basic/dialogBarcode.vue'
   import fnP from "assets/js/public.js"
   
 	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
@@ -66,7 +72,8 @@
   export default {
     components: {
       'v-header': header,
-      'v-panel': panel
+      'v-panel': panel,
+      'v-dialog': dialog
     },
     data() {
       return {
@@ -85,8 +92,8 @@
         tip: true,
         handleSubmit: this._submitForm,
         sErrorMessage: "",
-        tag: ""
-
+        tag: "",
+        showDialog: false
       }
     },
     created() {
@@ -175,6 +182,9 @@
       requestError(err) {
         console.log(err);
       },
+    	hideDialog() {
+    		this.showDialog = false
+    	},
     	getSearchData () {
 				let oData = {
 							tab: "",
@@ -379,6 +389,15 @@
           //background-color:rgba(0,0,0,0.1);
           height:100%;
           top:0
+         }
+         
+         .search-barcode {
+         	position: absolute;
+			  	bottom: 40px;
+			  	right: 30px;
+			  	cursor: pointer;
+			  	color: #42af8f;
+			  	text-decoration: underline;
          }
 			}
 			

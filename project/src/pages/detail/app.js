@@ -18,7 +18,6 @@ Vue.use(ElementUI)
 
 Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
-
 Vue.prototype.$post = axios.post;
 
 // import Stock from 'components/stock/stock.vue'
