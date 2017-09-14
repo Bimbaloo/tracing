@@ -738,6 +738,10 @@ export default {
                         .el-table__body-wrapper tr:nth-child(odd) {
                             background-color: #fff;
                         }
+                        .el-table__body-wrapper td {
+                        	white-space: normal;
+    						word-break: break-all;
+                        }
                         .el-table__body-wrapper .cell {
                             min-height: 30px;
                             line-height: 30px;

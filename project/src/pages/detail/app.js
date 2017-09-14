@@ -8,6 +8,7 @@ import App from './app.vue'
 import axios from 'axios'
 import 'babel-polyfill'
 
+import 'assets/css/icon.less'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
 //import 'assets/js/html2canvas.js'
