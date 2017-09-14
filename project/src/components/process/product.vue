@@ -266,17 +266,9 @@ export default {
                     prop: "quantity",
                     width: "60"
                 }, {
-                    name: "合格数",
-                    prop: "qualifiedNum",
-                    width: "60"
-                }, {
-                    name: "报废数",
-                    prop: "scrapNum",
-                    width: "60"
-                }, {
-                    name: "不合格数",
-                    prop: "unqualifiedNum",
-                    width: "60"
+                    name: "质量",
+                    prop: "quality",
+                    width: "80"
                 }, {
                     name: "班次",
                     prop: "shiftName",
@@ -313,7 +305,7 @@ export default {
                     prop: "quantity",
                     width: ""
                 }],
-                height: 200,
+                height: 1,
                 data: []
             },
             /* 产出汇总 */
@@ -344,7 +336,7 @@ export default {
                     prop: "unqualifiedNum",
                     width: ""
                 }],
-                height: 200,
+                height: 1,
                 data: []
             },
             //  viewHeight:0
