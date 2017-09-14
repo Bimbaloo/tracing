@@ -84,7 +84,7 @@
                                         <span>{{ props.row[column.prop] }}</span>
                                     </div>
                                     <div class="button" v-else>
-                                        <span style="margin-right:10px"  @click="batchClick(props.row)" >追踪</span>
+                                        <span style="margin-right:10px" @click="batchClick(props.row)" v-if="!bTrack">追踪</span>
                                         <span  @click="materialClick(props.row)" >遏制</span>
                                     </div>
                                 </template>
@@ -135,7 +135,8 @@ export default {
             styleObject: {
                 //  "min-width": "2000px"
             },
-
+            // 是否为追踪页面。
+            bTrack: location.pathname.indexOf("trackIndex") > -1,
             tdResize: true, //是否允许拖动table大小
             condition: {},   // 显示的查询条件    
             dataName: [      // 条件对应中文名
@@ -373,6 +374,7 @@ export default {
 
     },
     created() {
+        this.initData();
         this.fetchData();
     },
     computed: {
@@ -431,6 +433,13 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
+        initData() {
+            
+            if(this.bTrack) {
+                // 若为追踪页面，过滤明细产出操作列。
+                this.outItems.columns = this.outItems.columns.filter(o => o.prop !== "handle");
+            }
+        },
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
@@ -537,10 +546,6 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-            /* 测试条件 */
-            // oQuery = {
-            //     "doOutIdList":[1034214] //1034214  1031769
-            // }
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
             
@@ -581,16 +586,25 @@ export default {
             return aoData;
         },
         batchClick(row) {
+            this.outItems.data
             // 批次追踪。
             let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
                 oCondition = {
-                    "keys": {
-                        equipmentId: this.$route.query["equipmentId"],
-                        equipmentName: this.$route.query["equipmentName"],
-                        batchNo: row.batchNo,
-                        materialCode: row.materialCode
-                    },
-                    "type": "batch"
+                    // "keys": {
+                    //     equipmentId: this.$route.query["equipmentId"],
+                    //     equipmentName: this.$route.query["equipmentName"],
+                    //     batchNo: row.batchNo,
+                    //     materialCode: row.materialCode
+                    // },
+                    // "type": "batch"
+                    selected: this.outItems.data.filter(o=> o.batchNo === row.batchNo).map(o => {
+                        return {
+                            materialCode: o.materialCode,
+                            batchNo: o.batchNo,
+                            barcode: o.barcode,
+                            bucketNo: o.bucketNo
+                        }
+                    })
                 }
 
             sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
@@ -600,12 +614,18 @@ export default {
             // 单件追踪。
             let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
                 oCondition = {
-                    "keys": {
-                        equipmentId: this.$route.query["equipmentId"],
-                        equipmentName: this.$route.query["equipmentName"],
-                        barcode: row.barcode
-                    },
-                    "type": "barcode"
+                    selected: [{
+                        materialCode: row.materialCode,
+                        batchNo: row.batchNo,
+                        barcode: row.barcode,
+                        bucketNo: row.bucketNo
+                    }]
+                    // "keys": {
+                    //     equipmentId: this.$route.query["equipmentId"],
+                    //     equipmentName: this.$route.query["equipmentName"],
+                    //     barcode: row.barcode
+                    // },
+                    // "type": "barcode"
                 }
 
             sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
