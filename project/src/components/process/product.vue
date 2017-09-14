@@ -262,7 +262,7 @@ export default {
                 columns: [{
                     name: "条码",
                     prop: "barcode",
-                    width: "300",
+                    width: "285",
                     fixed: true,
                 }, {
                     name: "类型",
@@ -283,7 +283,7 @@ export default {
                 }, {
                     name: "物料名称",
                     prop: "materialName",
-                    width: "300"
+                    width: "280"
                 }, {
                     name: "数量",
                     prop: "quantity",
@@ -478,7 +478,6 @@ export default {
                     }
                 }
             })
-
             let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
             outDatasCopy.forEach((el, i) => {                             // 产出汇总
                /* 设置每条记录的合格数、报废数、不合格数 */
@@ -504,7 +503,7 @@ export default {
                         outAllDatas.qualifiedNum = parseInt(outDatasCopy[i]["qualifiedNum"]) + parseInt(outDatasCopy[j]["qualifiedNum"])        // 合格数
                         outAllDatas.scrapNum = parseInt(outDatasCopy[i]["scrapNum"]) + parseInt(outDatasCopy[j]["scrapNum"])                    // 报废数
                         outAllDatas.unqualifiedNum = parseInt(outDatasCopy[i]["unqualifiedNum"]) + parseInt(outDatasCopy[j]["unqualifiedNum"])  // 不合格数
-                        outAllDatas.splice(j, 1)
+                        outDatasCopy.splice(j, 1)
                         j = j - 1
                     }
                 }
@@ -546,7 +545,6 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
             
         },
