@@ -8,7 +8,7 @@
                     </span>
                 </div>
             </div>
-            <el-tabs type="border-card">
+            <el-tabs element-loading-text="拼命加载中" class="search-tab">
                 <el-tab-pane label="关联表">
                     <h2 class="content-title uniteTitle">
                         <span class='table-title'>产出投入</span>
@@ -21,7 +21,7 @@
                         <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 50 +'px'}" >
+                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 50 +'px'}">
                                         <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
                                         <span>{{ props.row[column.prop]}}</span>
                                     </div>
@@ -347,7 +347,7 @@ export default {
                 height: 200,
                 data: []
             },
-             //  viewHeight:0
+            //  viewHeight:0
             routerContent: 0
 
         }
@@ -393,7 +393,7 @@ export default {
     mounted() {
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
         this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-        this.uniteItems.height = 2*this.adjustHeight()+45
+        this.uniteItems.height = 2 * this.adjustHeight() + 45
 
     },
     updated() {
@@ -459,33 +459,33 @@ export default {
                     quantity: parseInt(inDatasCopy[i]["quantity"]), // 数量
                     materialName: inDatasCopy[i]["materialName"],   // 物料名称
                     materialCode: inDatasCopy[i]["materialCode"],   // 物料编码
-                })                                   
-                for ( let j = i + 1; j < inDatasCopy.length; j++ ) {
+                })
+                for (let j = i + 1; j < inDatasCopy.length; j++) {
                     if (el["batchNo"] === inDatasCopy[j]["batchNo"]) {
                         inAllDatas.quantity = parseInt(inDatasCopy[i]["quantity"]) + parseInt(inDatasCopy[j]["quantity"])  // 数量
                         inDatasCopy.splice(j, 1)
-                        j=j-1 
+                        j = j - 1
                     }
                 }
             })
 
             let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
             outDatasCopy.forEach((el, i) => {                             // 产出汇总
-                    outAllDatas.push({
-                        batchNo: outDatasCopy[i]["batchNo"],              // 批次号
-                        qualifiedNum: parseInt(outDatasCopy[i]["qualifiedNum"]),       // 合格数
-                        scrapNum: parseInt(outDatasCopy[i]["scrapNum"]),               // 报废数
-                        unqualifiedNum: parseInt(outDatasCopy[i]["unqualifiedNum"]), // 不合格数
-                        materialName: outDatasCopy[i]["materialName"],   // 物料名称
-                        materialCode: outDatasCopy[i]["materialCode"]    // 物料编码
-                    })
+                outAllDatas.push({
+                    batchNo: outDatasCopy[i]["batchNo"],              // 批次号
+                    qualifiedNum: parseInt(outDatasCopy[i]["qualifiedNum"]),       // 合格数
+                    scrapNum: parseInt(outDatasCopy[i]["scrapNum"]),               // 报废数
+                    unqualifiedNum: parseInt(outDatasCopy[i]["unqualifiedNum"]), // 不合格数
+                    materialName: outDatasCopy[i]["materialName"],   // 物料名称
+                    materialCode: outDatasCopy[i]["materialCode"]    // 物料编码
+                })
                 for (let j = i + 1; j < outDatasCopy.length; j++) {
                     if (el["batchNo"] === outDatasCopy[j]["batchNo"]) {
                         outAllDatas.qualifiedNum = parseInt(outDatasCopy[i]["qualifiedNum"]) + parseInt(outDatasCopy[j]["qualifiedNum"])        // 合格数
                         outAllDatas.scrapNum = parseInt(outDatasCopy[i]["scrapNum"]) + parseInt(outDatasCopy[j]["scrapNum"])                    // 报废数
                         outAllDatas.unqualifiedNum = parseInt(outDatasCopy[i]["unqualifiedNum"]) + parseInt(outDatasCopy[j]["unqualifiedNum"])  // 不合格数
                         outAllDatas.splice(j, 1)
-                        j=j-1 
+                        j = j - 1
                     }
                 }
             })
@@ -519,7 +519,7 @@ export default {
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el) => {
-                if (el === "doOutIdList" ) {//equipmentIdList//equipmentList
+                if (el === "doOutIdList") {//equipmentIdList//equipmentList
                     oQuery[el] = this.$route.query[el]
                 }
                 if (el === "equipmentName" || el === "startTime" || el === "endTime") {
@@ -761,7 +761,7 @@ export default {
             let ntable = 0;
             ntable = Math.floor(
                 this.viewHeight
-               // - this.outerHeight(document.querySelector(".condition"))
+                // - this.outerHeight(document.querySelector(".condition"))
                 - 42 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
                 - this.outerHeight(document.querySelector(".inTitle"))
                 - this.outerHeight(document.querySelector(".outTitle"))
@@ -782,7 +782,7 @@ export default {
         setTbaleHeight() {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-            this.uniteItems.height = 2*this.adjustHeight()+45
+            this.uniteItems.height = 2 * this.adjustHeight() + 45
         },
         /* 设置title */
         setTitle(el, title) {
@@ -802,18 +802,18 @@ export default {
             const trs = document.querySelectorAll(".el-table__body-wrapper")[0].querySelectorAll("tr")
             const trsFix = document.querySelectorAll(".el-table__fixed-body-wrapper")[0].querySelectorAll("tr")
             //const tr = document.querySelectorAll(".el-table__row")
-            for(let i =0 ;  i< num ; i++ ){
-                elArr.push(trs[index+i+1])
-                elArr.push(trsFix[index+i+1])
+            for (let i = 0; i < num; i++) {
+                elArr.push(trs[index + i + 1])
+                elArr.push(trsFix[index + i + 1])
             }
             const icon = trsFix[index].querySelectorAll(".icon-down")[0]
             if (icon.classList.contains("actived")) {  // 判断是否隐藏
-                elArr.forEach((el)=>{
+                elArr.forEach((el) => {
                     return el.classList.remove('hide');
                 })
                 icon.classList.remove('actived');
             } else {
-                elArr.forEach((el)=>{
+                elArr.forEach((el) => {
                     return el.classList.add('hide');
                 })
                 icon.classList.add('actived');
@@ -867,39 +867,40 @@ export default {
 }
 
 @green: #42af8f;
-	@blue: #0099ff;
-	@yellow: #fcc433;
-	@red: #e86b59;
-	@inVent: #00a656;
-	
-	body {
-		background-color: #f2f2f2;
-		font-size: 14px;
-		overflow: hidden;
-	}
-	
-	.el-button--text {
-		border: 1px solid #42af8f;
-		padding: 10px 15px;
-	}
-	
-	.el-table .el-table__header thead tr th {
-		background-color: @green;
-		.cell {
-			background-color: @green;
-			color: #FFFFFF;
-		}	
-	}
-	
-	.el-table .cell {
-		padding: 0;
-    }
+@blue: #0099ff;
+@yellow: #fcc433;
+@red: #e86b59;
+@inVent: #00a656;
+
+body {
+    background-color: #f2f2f2;
+    font-size: 14px;
+    overflow: hidden;
+}
+
+.el-button--text {
+    border: 1px solid #42af8f;
+    padding: 10px 15px;
+}
+
+.el-table .el-table__header thead tr th {
+    background-color: @green;
     .cell {
-        .ltext {
-            text-align: left;
-            padding-left: 8px;
-        }
+        background-color: @green;
+        color: #FFFFFF;
     }
+}
+
+.el-table .cell {
+    padding: 0;
+}
+
+.cell {
+    .ltext {
+        text-align: left;
+        padding-left: 8px;
+    }
+}
 
 .show {
     transition: display 400ms;
@@ -916,49 +917,40 @@ export default {
         transform: rotate(-90deg);
     }
 }
-.el-tabs--border-card>.el-tabs__content {
-  padding: 10px 0;
-}
-.el-popover, .el-tabs--border-card {
-  box-shadow: none
-}
-.el-tabs--border-card {
-  border-color: #ccc;
-  border-bottom: none;
-  border-left: none;
-  border-right: none;
-  border-top: none;
-}
-.el-tabs__nav-scroll {
-  border-left: solid 1px #ccc;
-  border-right: solid 1px #ccc
-}
-.el-tabs--border-card>.el-tabs__header {
-  background-color: #f0f0f0;
-  border-color: #ccc;
-}
-.el-tabs__item {
-  color: #666;
-  &:hover {
-      color: #333
-  }
-}
-.el-table {
-    th {
-        height: 36px;
-    }
-}
 
-.el-tabs--border-card>.el-tabs__header .el-tabs__item.is-active{
-    border-right-color: #ccc;
-    border-left-color: #ccc;
-}
-.el-tab-pane {
-    .content-table:last-child {
+.search-tab {
+    padding-top: 20px;
+    .el-tabs__header {
+        border-bottom: none;
         margin-bottom: 0;
+        .el-tabs__item {
+            border-radius: 0;
+            width: 90px;
+            height: 30px;
+            padding: 0;
+            box-sizing: border-box;
+            font-size: 14px;
+            border: 2px solid #42af8f;
+            line-height: 26px;
+            margin-right: 20px;
+            text-align: center;
+            color: #666;
+            &:hover {
+                color: #333;
+            }
+        }
+        .el-tabs__active-bar {
+            display: none
+        }
+        .is-active {
+            background-color: #42af8f;
+            color: #fff;
+            &:hover {
+                color: #fff;
+            }
+        }
     }
 }
-
 </style>
 
 <style lang="less" scoped>
