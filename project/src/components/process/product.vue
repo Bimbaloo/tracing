@@ -21,7 +21,7 @@
                         <el-table class="table-main" :data="uniteItems.data" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 8 : 50 +'px'}">
+                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 15 : 50 +'px'}">
                                         <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
                                         <span>{{ props.row[column.prop]}}</span>
                                     </div>
@@ -42,7 +42,19 @@
                         </span>
                     </h2>
                     <div class="content-table" ref="outputTable">
-                        <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
+                        <!-- <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                        <el-table class="table-main" :data="outItems.data" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                            <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                                <template scope="props">
+                                    <div class="cell-content" v-if="column.prop !== 'handle'">
+                                        <span>{{ props.row[column.prop] }}</span>
+                                    </div>
+                                    <div class="button" v-else>
+                                        <span  @click="barcodeClick(props.row)" >追踪</span>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
                     </div>
                     <h2 class="content-title inTitle">
                         <span class='table-title'>投入</span>
@@ -64,7 +76,20 @@
                         </span>
                     </h2>
                     <div class="content-table" ref="outputAllTable">
-                        <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table>
+                        <!-- <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                        <el-table class="table-main" :data="outAllItems.data" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                            <el-table-column v-for="(column,index) in outAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                                <template scope="props">
+                                    <div class="cell-content" v-if="column.prop !== 'handle'">
+                                        <span>{{ props.row[column.prop] }}</span>
+                                    </div>
+                                    <div class="button" v-else>
+                                        <span style="margin-right:10px"  @click="batchClick(props.row)" >追踪</span>
+                                        <span  @click="materialClick(props.row)" >遏制</span>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
                     </div>
                     <h2 class="content-title inAllTitle">
                         <span class='table-title'>投入汇总</span>
@@ -150,10 +175,6 @@ export default {
                     prop: "materialName",
                     width: ""
                 }, {
-                    name: "模号",
-                    prop: "moldCode",
-                    width: ""
-                }, {
                     name: "数量",
                     prop: "quantity",
                     width: ""
@@ -181,8 +202,6 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
-                    // class: "barcode",
-                    // cellClick: this.barcodeClick
                 }, {
                     name: "箱码",
                     prop: "packetBarcode",
@@ -194,31 +213,27 @@ export default {
                 }, {
                     name: "批次号",
                     prop: "batchNo",
-                    width: "200",
-                    // class: "batch",
-                    // cellClick: this.batchClick
+                    width: "200"
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
-                    width: "200",
-                    class: "material",
-                    cellClick: this.materialClick
+                    width: "200"
                 }, {
                     name: "物料名称",
                     prop: "materialName",
                     width: "300"
                 }, {
-                    name: "合格数",
-                    prop: "qualifiedNum",
-                    width: "120"
+                    name: "模号",
+                    prop: "moldCode",
+                    width: ""
                 }, {
-                    name: "报废数",
-                    prop: "scrapNum",
-                    width: "120"
+                    name: "数量",
+                    prop: "quantity",
+                    width: "100"
                 }, {
-                    name: "不合格数",
-                    prop: "unqualifiedNum",
-                    width: "120"
+                    name: "质量",
+                    prop: "quality",
+                    width: "100"
                 }, {
                     name: "班次",
                     prop: "shiftName",
@@ -231,6 +246,11 @@ export default {
                     name: "产出时间",
                     prop: "happenTime",
                     width: "200"
+                }, {
+                    name: "操作",
+                    prop: "handle",
+                    width: "120",
+                    fixed: "right",
                 }],
                 data: [],
                 height: 1
@@ -241,42 +261,44 @@ export default {
                 columns: [{
                     name: "条码",
                     prop: "barcode",
-                    width: "200",
+                    width: "300",
                     fixed: true,
+                }, {
+                    name: "类型",
+                    prop: "productionType",
+                    width: "100"
                 }, {
                     name: "派工单号",
                     prop: "doCode",
-                    width: "200"
+                    width: "120"
                 }, {
                     name: "批次号",
                     prop: "batchNo",
-                    width: "120",
+                    width: "250",
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
-                    width: "120",
-                    class: "material",
-                    cellClick: this.materialClick
+                    width: "120"
                 }, {
                     name: "物料名称",
                     prop: "materialName",
-                    width: "200"
+                    width: "300"
                 }, {
                     name: "数量",
                     prop: "quantity",
-                    width: "60"
+                    width: "120"
                 }, {
                     name: "质量",
                     prop: "quality",
-                    width: "80"
+                    width: "120"
                 }, {
                     name: "班次",
                     prop: "shiftName",
-                    width: "100"
+                    width: "120"
                 }, {
                     name: "操作人",
                     prop: "personName",
-                    width: ""
+                    width: "120"
                 }, {
                     name: "加工时间",
                     prop: "happenTime",
@@ -326,15 +348,20 @@ export default {
                 }, {
                     name: "合格数",
                     prop: "qualifiedNum",
-                    width: ""
+                    width: "100"
                 }, {
                     name: "报废数",
                     prop: "scrapNum",
-                    width: ""
+                    width: "100"
                 }, {
                     name: "不合格数",
                     prop: "unqualifiedNum",
-                    width: ""
+                    width: "100"
+                }, {
+                    name: "操作",
+                    prop: "handle",
+                    width: "120",
+                    fixed: "right",
                 }],
                 height: 1,
                 data: []
@@ -404,28 +431,6 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
-        // 判断调用接口是否成功。
-        // judgeLoaderHandler(param, fnSu, fnFail) {
-        //     let bRight = param.data.errorCode;
-
-        //     // 判断是否调用成功。
-        //     if (!bRight) {
-        //         // 调用成功后的回调函数。
-        //         fnSu && fnSu();
-        //     } else {
-        //         // 提示信息。
-        //         console.log(param.data.errorMsg.message)
-        //         // 失败后的回调函。
-        //         fnFail && fnFail();
-        //     }
-        // },
-        // 显示提示信息。
-        // showMessage() {
-        //     this.$message({
-        //         message: this.sErrorMessage,
-        //         duration: 3000
-        //     });
-        // },
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
@@ -438,6 +443,10 @@ export default {
             let outData = oData.out;
 
             outData.forEach((e, index) => {
+                e.productionType = "产出"
+                e.in.forEach(el=>{
+                    el.productionType = "投入"
+                })
                 inDatas.push(...e.in)               // 获取投入数据
                 outDatas.push(e)                    // 获取产出数据
                 uniteDatas.push(e)                  // 获取汇总数据
@@ -463,6 +472,16 @@ export default {
 
             let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
             outDatasCopy.forEach((el, i) => {                             // 产出汇总
+               /* 设置每条记录的合格数、报废数、不合格数 */
+                el.qualifiedNum = el.scrapNum = el.unqualifiedNum = 0
+                if(el.type === 1){                                       // 合格数
+                    el.qualifiedNum = el.quantity
+                }else if(el.type === 2) {                                // 报废数
+                    el.scrapNum = el.quantity
+                }else {                                                 // 不合格数
+                    el.unqualifiedNum = el.quantity
+                }
+                /* 根据批次合并，同批次合格数、报废数、不合格数分别汇总 */
                 outAllDatas.push({
                     batchNo: outDatasCopy[i]["batchNo"],              // 批次号
                     qualifiedNum: parseInt(outDatasCopy[i]["qualifiedNum"]),       // 合格数
@@ -511,7 +530,7 @@ export default {
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el) => {
-                if (el === "doOutIdList") {//equipmentIdList//equipmentList
+                if (el === "doOutIdList") {
                     oQuery[el] = this.$route.query[el]
                 }
                 if (el === "equipmentName" || el === "startTime" || el === "endTime") {
@@ -524,79 +543,7 @@ export default {
             // }
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
-            // this.$post(url, oQuery)
-            //     .then((res) => {
-
-            //         this.loading = false;
-            //         let outDatas = []
-            //         let inDatas = []
-            //         let uniteDatas = []
-            //         let outAllDatas = []
-            //         let inAllDatas = []
-
-            //         this.judgeLoaderHandler(res, () => {
-            //             //debugger
-            //             let oData = res.data.data.out
-            //             oData.forEach((e, index) => {
-            //                 inDatas.push(...e.in)               // 获取投入数据
-            //                 outDatas.push(e)                    // 获取产出数据
-            //                 uniteDatas.push(e)                  // 获取汇总数据
-            //                 uniteDatas.push(...e.in)
-            //             });
-
-            //             let inDatasCopy = JSON.parse(JSON.stringify(inDatas))
-            //             inDatasCopy.forEach((el, i) => {                        // 投入汇总
-            //                 inAllDatas.push({
-            //                     batchNo: inDatasCopy[i]["batchNo"],             // 批次号
-            //                     quantity: parseInt(inDatasCopy[i]["quantity"]), // 数量
-            //                     materialName: inDatasCopy[i]["materialName"],   // 物料名称
-            //                     materialCode: inDatasCopy[i]["materialCode"],   // 物料编码
-            //                 })                                   
-            //                 for ( let j = i + 1; j < inDatasCopy.length; j++ ) {
-            //                     if (el["batchNo"] === inDatasCopy[j]["batchNo"]) {
-            //                         inAllDatas.quantity = parseInt(inDatasCopy[i]["quantity"]) + parseInt(inDatasCopy[j]["quantity"])  // 数量
-            //                         inDatasCopy.splice(j, 1)
-            //                         j=j-1 
-            //                     }
-            //                 }
-            //             })
-
-            //             let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
-            //             outDatasCopy.forEach((el, i) => {                             // 产出汇总
-            //                     outAllDatas.push({
-            //                         batchNo: outDatasCopy[i]["batchNo"],              // 批次号
-            //                         qualifiedNum: parseInt(outDatasCopy[i]["qualifiedNum"]),       // 合格数
-            //                         scrapNum: parseInt(outDatasCopy[i]["scrapNum"]),               // 报废数
-            //                         unqualifiedNum: parseInt(outDatasCopy[i]["unqualifiedNum"]), // 不合格数
-            //                         materialName: outDatasCopy[i]["materialName"],   // 物料名称
-            //                         materialCode: outDatasCopy[i]["materialCode"]    // 物料编码
-            //                     })
-            //                 for (let j = i + 1; j < outDatasCopy.length; j++) {
-            //                     if (el["batchNo"] === outDatasCopy[j]["batchNo"]) {
-            //                         outAllDatas.qualifiedNum = parseInt(outDatasCopy[i]["qualifiedNum"]) + parseInt(outDatasCopy[j]["qualifiedNum"])        // 合格数
-            //                         outAllDatas.scrapNum = parseInt(outDatasCopy[i]["scrapNum"]) + parseInt(outDatasCopy[j]["scrapNum"])                    // 报废数
-            //                         outAllDatas.unqualifiedNum = parseInt(outDatasCopy[i]["unqualifiedNum"]) + parseInt(outDatasCopy[j]["unqualifiedNum"])  // 不合格数
-            //                         outAllDatas.splice(j, 1)
-            //                         j=j-1 
-            //                     }
-            //                 }
-            //             })
-
-
-            //             this.outItems.data = outDatas    // 产出明细
-            //             this.inItems.data = inDatas      // 投入明细
-            //             this.uniteItems.data = uniteDatas   // 关联明细
-            //             this.outAllItems.data = outAllDatas // 产出汇总
-            //             this.inAllItems.data = inAllDatas   // 投入汇总
-
-            //         });
-            //     })
-            //     .catch((err) => {
-            //         this.loading = false;
-            //         this.styleObject.minWidth = 0;
-            //         console.log(err)
-            //         console.log("数据库查询出错。")
-            //     })
+            
         },
         /**
         * 格式化数据。
@@ -774,7 +721,7 @@ export default {
         setTbaleHeight() {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-            this.uniteItems.height = 2 * this.adjustHeight() + 45
+            this.uniteItems.height = 2 * this.adjustHeight() + 70
         },
         /* 设置title */
         setTitle(el, title) {
@@ -837,27 +784,10 @@ export default {
     }
 }
 
-.table {
-    td.batch,
-    td.barcode,
-    td.material {
-        cursor: pointer;
-        color: #f90;
-
-        .cell {
-            font-weight: 600;
-
-            &:empty {
-                cursor: default;
-            }
-        }
-    }
-    .clicked {
-        cursor: pointer;
-        color: #f90;
-    }
+.button {
+    cursor: pointer;
+    color: #f90;
 }
-
 @green: #42af8f;
 @blue: #0099ff;
 @yellow: #fcc433;
@@ -890,7 +820,7 @@ body {
 .cell {
     .ltext {
         text-align: left;
-        padding-left: 8px;
+        padding-left: 15px;
     }
 }
 
