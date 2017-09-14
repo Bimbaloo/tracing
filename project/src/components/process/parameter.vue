@@ -681,6 +681,9 @@ export default {
                 margin-right: 5px;
                 i {
                     margin:5px;
+                    &:hover {
+                    cursor: pointer
+            }
                 }
             }
             .table-table {

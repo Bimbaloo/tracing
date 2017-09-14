@@ -380,6 +380,9 @@ export default {
         align-items: center;
         i {
             margin: 7.5px;
+            &:hover {
+                cursor: pointer
+            }
         }
     }
     .table-table {
