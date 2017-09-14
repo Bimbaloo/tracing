@@ -28,6 +28,9 @@
                        <v-table :table-data="tableData" :max-height="400" :loading="loading" :resize="tdResize"></v-table>
                     </div>
                 </div>
+                <div v-if="error" class="error">
+					{{ empty }}
+				</div>
             </div>
 
         </div>
@@ -57,10 +60,10 @@ export default {
             loading: false,
             sErrorMessage: "",
             empty: "暂无数据。",
+            error: false,
             styleObject: {
                 //  "min-width": "2000px"
             },
-            loading: false,
             tdResize: true, //是否允许拖动table大小
             condition: {},   // 显示的查询条件    
             dataName: [      // 条件对应中文名
@@ -166,6 +169,11 @@ export default {
         // },
         // 请求成功。
         requestSucess(oData) {
+            if(!oData.length){  //如果查询结果为空
+                this.error = true
+            }else{
+                this.error = false
+            }
             let optionArr = [];
             let tableDataArr =[];
             this.loading = false;
@@ -194,6 +202,7 @@ export default {
         // 请求失败。
         requestFail(sErrorMessage) {
             this.loading = false;
+            this.error = true;
             // 提示信息。
             console.log(sErrorMessage);
         },
@@ -201,6 +210,7 @@ export default {
         requestError(err) {
             this.loading = false;
             this.styleObject.minWidth = 0;
+            this.error = true;
             console.log("数据库查询出错。")
         },
         // 获取数据。
