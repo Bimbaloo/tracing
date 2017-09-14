@@ -4,25 +4,23 @@
         <img :src="logo"/>
     </header>
     <v-tooltip :config="true" :back="false"></v-tooltip>
-    <!--div class="tooltip-info" @mouseenter="showList=true" @mouseleave="showList=false">
-      <el-tooltip class="item" effect="light" content="Bottom Right 提示文字" placement="bottom-end">
-        <ul slot="content" class="info-list">
-            <li @click="goToConfig">设置</li>
-            <li @click="logout" v-if="userId">退出</li>
-        </ul>     
-        <div class="user-name" :style="{cursor: userName?'default':'pointer'}" @click="login">{{userName || "登录"}}<i class="el-icon-arrow-down"></i></div>
-      </el-tooltip>
-    </div-->
-    <el-tabs v-loading="loading" element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab"  @tab-click="handleClick">
-      <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-        <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
-        <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
-      </el-tab-pane>
-    </el-tabs>
+    <div class="search-tab-content">
+	    <el-tabs v-loading="loading" element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab"   @tab-click="handleClick">
+	      <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
+	        <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
+	        <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
+	      </el-tab-pane>
+	    </el-tabs>
+		   <span class="search-barcode" v-if="activeKey === 'stock'" @click="showDialog=true">条码查询</span>
+    </div>
     <footer>
       <img class="version" :src="version"/>
       <span class="version-info">版本: {{ v }}</span>
     </footer>
+    <v-dialog 
+    	v-if="showDialog" 
+    	:dialog-visible="showDialog"
+    	@hideDialog="hideDialog"></v-dialog>
   </div>
 </template>
 
@@ -31,6 +29,7 @@
   import logo from 'assets/img/kssp-logo.png'
   import version from 'assets/img/version.png'
   import panel from 'components/panel/panel.vue'
+  import dialog from 'components/basic/dialogBarcode.vue'
 	import fnP from "assets/js/public.js"
 
   const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
@@ -38,7 +37,8 @@
   export default {
     components: {
       'v-panel': panel,
-      'v-tooltip': tooltip
+      'v-tooltip': tooltip,
+      'v-dialog': dialog
     },
     data() {
       return {
@@ -51,7 +51,8 @@
         labelWidth: "100px",
         handleSubmit: this._submitForm,
         sErrorMessage: "",
-        loading: false
+        loading: false,
+        showDialog: false
       }
     },
     computed: {
@@ -79,28 +80,33 @@
         this.sErrorMessage = sErrorMessage;
         this.showMessage();        
       });
-      // fnP.beforeRequest(this.$store, this.$ajax)
-      //   .get(MODULE_ITEM_URL)
-      //   .then((res) => {
-          
-      //     this.loading = false;
-      //     // 判断是否请求成功。
-      //     fnP.judgeLoaderHandler(res,() => {
-      //       this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain");	// && o.key!="link"
-
-      //       this.categories.forEach(o => {
-      //           o.active = {
-      //             radio: "1",
-      //             keys: {}
-      //           }            
-      //       })
-      //     }, (sErrorMessage)=>{
-      //         this.sErrorMessage = sErrorMessage;
-      //         this.showMessage();        
-      //     });
-      //   });
     },
     methods: {
+    	hideDialog() {
+    		this.showDialog = false
+    	},
+    	// 判断调用接口是否成功。
+    	// judgeLoaderHandler(param,fnSu,fnFail) {
+    	// 	let bRight = param.data.errorCode;
+        	
+      //   	// 判断是否调用成功。
+      //   	if(!bRight) {
+      //   		// 调用成功后的回调函数。
+      //   		fnSu && fnSu();
+      //   	}else {
+      //       if(bRight === LOGIN_ERROR_CODE) {
+      //         // 登录失败。
+      //         // 清cookie，跳转到登录页面。
+      //         this.loginFail(param.loginUrl);
+               
+      //       }else {
+      //         this.sErrorMessage = param.data.errorMsg.message;
+      //         this.showMessage();
+      //         // 失败后的回调函。
+      //         fnFail && fnFail();
+      //       }
+      //   	}
+    	// },
     	// 显示提示信息。
 			showMessage() {
 				this.$message({
@@ -239,10 +245,23 @@
 		max-height: 230px;	
 	}
   
+  .search-tab-content {
+  	position: relative;
+  	width: 1080px;
+  	margin: 0 auto;
+  }
+  .search-barcode {
+  	position: absolute;
+  	bottom: 40px;
+  	right: 30px;
+  	cursor: pointer;
+  	color: #42af8f;
+  	text-decoration: underline;
+  }
   .search-tab {
-    width: 1080px;
+    /*width: 1080px;*/
     height: 750px;
-    margin: 0 auto;
+    /*margin: 0 auto;*/
     border: none;
     box-shadow: none;
 

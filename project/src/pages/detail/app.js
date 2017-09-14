@@ -8,6 +8,7 @@ import App from './app.vue'
 import axios from 'axios'
 import 'babel-polyfill'
 
+import 'assets/css/icon.less'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
 //import 'assets/js/html2canvas.js'
@@ -18,7 +19,6 @@ Vue.use(ElementUI)
 
 Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
-
 Vue.prototype.$post = axios.post;
 
 // import Stock from 'components/stock/stock.vue'

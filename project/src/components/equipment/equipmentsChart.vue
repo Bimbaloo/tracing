@@ -74,10 +74,10 @@
                                 {{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{compareData.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}}
                                 </div>
                                 <ul class="event-list">
-                                    <li v-for="(event,index) in equipment.event" 
+                                    <li v-for="(event,index) in equipment.event"
                                     :key="index" 
                                     v-if="compareData.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
-                                        <div :style="{color: equipment.color}">{{index+1}}.{{event.title}}&nbsp;&nbsp;<span v-if="event.group">事件组：{{event.group}}</span></div>
+                                        <div :style="{color: equipment.color}">{{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;<span v-if="event.group">事件组：{{event.group}}</span><i v-if="!!event.related" class="icon icon-arrow-tag"></i></div>
                                         <ul class="content-list">
                                             <li v-for="(content,index) in event.content" :key="index">
                                                 {{content.name}}:&nbsp;&nbsp;{{content.value}}
@@ -126,7 +126,7 @@
     // 提示框面板z轴。
     const TOOLTIP_Z_INDEX = 100
     // 提示框面板宽度。
-    const TOOLTIP_WIDTH = 220
+    const TOOLTIP_WIDTH = 260
     // finereport跳转地址。
     // const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet="
     // 设备分析接口地址。
@@ -918,11 +918,18 @@
                         oData.quantity = aoValue[2];
                         // 起点相关数量。
                         oData.relatedQuantity = aoValue[5];
-                        oData.event = []
+                        oData.event = [];
+
+                        let relatedIndex = 0;
                         // 事件列表
-                        aoValue[3].forEach(o => {
+                        aoValue[3].forEach((o,index) => {
+                            if(o.related) {
+                                relatedIndex++;
+                            }
                             oData.event.push({
                                 // 起点相关标记。
+                                index: index+1,
+                                relatedIndex: relatedIndex,
                                 related: o.related,
                                 group: o.groupId == null?'':o.groupId,
                                 title: o.title,
@@ -935,8 +942,9 @@
             },
             // 设置投产可见性。
             changePoolInAndOutVisibility () {
+                
                 let sColor = "#333",
-                    raletedData = Object.assign([], this.dimension.filter(o=> o.key === 'pool')[0].data),
+                    raletedData = $.extend(true, [], this.dimension.filter(o=> o.key === 'pool')[0].data),
                     oOption = {
                         series: []
                     }
@@ -1524,7 +1532,7 @@
                 // 获取各事件维度数据。
                 this.dimension.forEach(item => {
                     let oFilter = this.option.series.filter(o => o.name==item.name)[0],
-                        oResult = this.getDimensionData(item.key)
+                        oResult = $.extend(true, {}, this.getDimensionData(item.key));
                     if(oResult.markPoint.length) {
                         oFilter.markPoint.data = oResult.markPoint
                     }
@@ -1962,7 +1970,8 @@
                     let aoValue = param.value,
                         sList = "",
                         yAxisIndex = aoValue[1],
-                        oGroupIdList = new Set();
+                        oGroupIdList = new Set(),
+                        nIndex = 0;
 
                     // 第一级设备。
                     oGroupId[yAxisIndex] = {}
@@ -1971,17 +1980,23 @@
                     aoValue[3].forEach((o,index) => {
                         if(aoValue[4]!=="pool" || (aoValue[4]==="pool" && !this.onlyShowRelatedData) || (this.onlyShowRelatedData && o.related)) {
                             // 若展示全部，或只展示与起点相关，且当前点与起点相关。
-                            let sGroup = "";
+                            let sGroup = "",
+                                sTag = "";
+
                             // 保存分组id。
                             if(o.groupId != null && o.groupId !== "") {
                                 oGroupIdList.add(o.groupId)
                                 sGroup = o.groupId
                             }
 
+                            if(o.related) {
+                                // 若为起点相关。
+                                sTag = `<i class="icon icon-arrow-tag"></i>`;
+                            }
                             if(sGroup) {
-                                sList += `<div style="color:${param.color}">${index+1}.${o.title}&nbsp;&nbsp;事件组：${sGroup}</div>`;
+                                sList += `<div style="color:${param.color}">${++nIndex}.${o.title}&nbsp;&nbsp;事件组：${sGroup}${sTag}</div>`;
                             }else {
-                                sList += `<div style="color:${param.color}">${index+1}.${o.title}</div>`;
+                                sList += `<div style="color:${param.color}">${++nIndex}.${o.title}${sTag}</div>`;
                             }
                             
                             o.tooltipData.forEach(tip => {
@@ -2343,7 +2358,7 @@
                 font-size: 12px;
                 position: absolute;
                 // top: 60px;
-                width: 220px;
+                width: 260px;
                 // z-index: 100;
                 color: #000;//#fff;
                 border: 1px solid #D53A35;
@@ -2537,5 +2552,13 @@
 
             }
     	}
+    }
+
+    .icon-arrow-tag {
+        margin: 0 5px;
+        width: 10px;
+        height: 12px;
+        background: url(../../assets/img/arrow.png);
+        background-size: 10px 12px;
     }
 </style>
