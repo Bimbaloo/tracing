@@ -88,7 +88,7 @@
 				
 				// 遏制
                	if(sType == "restrain") {
-                    this.restrainIf = true;
+                   // this.restrainIf = true;  //临时屏蔽
                 }else {
                 	this.restrainIf = false;
                 }

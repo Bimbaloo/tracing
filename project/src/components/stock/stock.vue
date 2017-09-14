@@ -163,8 +163,12 @@
                     this.batchIf = true;
                     this.restrainIf = false;
                 }else if(sType == "restrain") {
-                    this.batchIf = true;
-                    this.restrainIf = true;
+					/* 遏制功能未完成，临时屏蔽 */	
+                    // this.batchIf = true;
+					// this.restrainIf = true;  
+
+					this.batchIf = false;
+                    this.restrainIf = false;
                 }else {
                     this.batchIf = false;
                     this.restrainIf = false;
