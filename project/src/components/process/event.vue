@@ -77,7 +77,7 @@ export default {
                 }, {
                     name: "事件原因",
                     prop: "eReasonName",
-                    width: ""
+                    width: "200"
                 }, {
                     name: "发生时间",
                     prop: "happenTime",
@@ -89,7 +89,7 @@ export default {
                 }, {
                     name: "上报人",
                     prop: "reportName",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "确认时间",
                     prop: "checkTime",
@@ -97,7 +97,7 @@ export default {
                 }, {
                     name: "确认人",
                     prop: "checkName",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "处理时间",
                     prop: "manageTime",
@@ -105,7 +105,7 @@ export default {
                 }, {
                     name: "处理人",
                     prop: "manageName",
-                    width: "120"
+                    width: ""
                 }, {
                     name: "关闭时间",
                     prop: "closeTime",
@@ -113,7 +113,7 @@ export default {
                 }, {
                     name: "关闭人",
                     prop: "closeName",
-                    width: "120"
+                    width: ""
                 }],
                 height: 1,
                 data: []
