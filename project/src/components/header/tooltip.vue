@@ -63,7 +63,7 @@
 
                 this.$ajax.get(LOGIN_URL).then((res) => {
                     if(res.data.errorCode === 0) {
-                        // 登录成功。
+                        // 请求成功，按照登录失败的处理方式去发现登录。
                         this.$register.loginFail(res.data.data.loginUrl)
                     }else {
                         // 提示信息。
@@ -77,17 +77,7 @@
             },
             // 退出。
             logout() {
-                this.$register.beforeRequest(this.$store, this.$ajax).post(LOGOUT_URL).then((res) => {
-                    // 清cookie。
-                    this.$register.clearLoginCookie();
-                    // 更新数据。
-                    this.$store.commit({
-                        type: "updateLoginInfo"
-                    });  
-
-                    // 跳转到search。
-                    window.open("search.html", "_self");
-                })
+                this.$register.logout(this.$store, this.$ajax);
             },
         }
     }

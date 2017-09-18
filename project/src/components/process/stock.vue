@@ -6,7 +6,7 @@
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
         </div>
         <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="restrainIf">遏制</el-button>
+        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
         </div>
         <div class="router-path">
             <router-link 
@@ -47,6 +47,7 @@
                 },
                 aoRoute: [],
                 restrainIf: false,
+                btnShowRestrain: false,		// 临时屏蔽遏制
                 description: "",
 				url: "/trace/v1/materialbatchsuppress"
             }
@@ -88,7 +89,7 @@
 				
 				// 遏制
                	if(sType == "restrain") {
-                   // this.restrainIf = true;  //临时屏蔽
+                    this.restrainIf = true;
                 }else {
                 	this.restrainIf = false;
                 }

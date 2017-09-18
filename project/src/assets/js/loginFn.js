@@ -1,3 +1,8 @@
+// 登录。
+const LOGIN_URL = HOST + "/api/v1/sso/get-login-info";
+// 退出。
+const LOGOUT_URL = HOST + "/api/v1/sso/logout";
+
 // 清除登录cookie。
 var clearLoginCookie = function() {
 	window.Rt.utils.cookie("token", null)
@@ -14,15 +19,15 @@ var clearLoginCookie = function() {
 var login = function(oStore) {
 	
 	if(!window.Rt.utils.cookie("token")) {
-		// 若cookie中无token，
+		// 若cookie中无token。
 		let oParams = window.Rt.utils.getParams();
 
-		if(oParams.token) {
+		if(oParams.token && oParams.userId && oParams.username && oParams.nickname) {
 			// 若地址中有token,设置cookie。
 			window.Rt.utils.cookie("token", oParams.token);
-			window.Rt.utils.cookie("userId", oParams.userId || '');
-			window.Rt.utils.cookie("username", oParams.username || '');
-			window.Rt.utils.cookie("nickname", oParams.nickname || '');
+			window.Rt.utils.cookie("userId", oParams.userId);
+			window.Rt.utils.cookie("username", oParams.username);
+			window.Rt.utils.cookie("nickname", oParams.nickname);
 
 			// 更新数据。
 			oStore.commit({
@@ -63,7 +68,7 @@ var beforeRequest = function(oStore, oAxio) {
 
 	// 设置请求头。
 	return oAxio.create({
-        headers: {
+		headers: {
 			Authorization: JSON.stringify({
 				"token": oLoginInfo.token,
 				"userId": Number(oLoginInfo.userId),
@@ -72,6 +77,8 @@ var beforeRequest = function(oStore, oAxio) {
 			})
 		}
 	})
+
+
 };
 
 // 判断调用接口是否成功。
@@ -153,9 +160,25 @@ var sendRequest = function(oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, fn
 	}
 };
 
+// 退出。
+var logout = function (oStore, oAjax) {
+	beforeRequest(oStore, oAjax).post(LOGOUT_URL).then((res) => {
+		// 清cookie。
+		clearLoginCookie();
+		// 更新数据。
+		oStore.commit({
+			type: "updateLoginInfo"
+		});  
+
+		// 跳转到search。
+		window.open("search.html", "_self");
+	})
+};
+
 export default {
 	login,
 	loginFail,
+	logout,
 	beforeRequest,
 	clearLoginCookie,
 	judgeLoaderHandler,
