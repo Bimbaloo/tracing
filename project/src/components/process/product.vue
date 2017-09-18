@@ -495,6 +495,8 @@ export default {
             let outAllDatasFilter = []
             let inAllDatas = []
             let inAllDatasFilter = []
+            let startTime = this.condition.startTime
+            let endTime = this.condition.endTime
 
             let outData = oData.out;
 
@@ -510,16 +512,16 @@ export default {
                 uniteDatas.push(e)                  // 获取关联数据
                 uniteDatas.push(...e.in)
                 // 获取关联数据 -- 时间内
-                if (this.condition.startTime <= e.happenTime && e.happenTime <= this.condition.endTime) {
+                if (startTime <= e.happenTime && e.happenTime <= endTime) {
                     uniteDatasFilter.push(e)
                     uniteDatasFilter.push(...e.in)
                 }
 
-
+                
             });
 
-            outDatasFilter = outDatas.filter(e => {                     // 获取产出数据 -- 时间内          
-                return this.condition.startTime <= e.happenTime && e.happenTime <= this.condition.endTime
+            outDatasFilter = outDatas.filter(e => {                     // 获取产出数据 -- 时间内         
+                return startTime <= e.happenTime && e.happenTime <= endTime
             })
 
             outDatasFilter.forEach(e => {                               // 获取投入数据--时间内
