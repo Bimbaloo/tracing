@@ -1,23 +1,28 @@
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
-            <div class="condition hide" ref='condition'>
+            <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
                     <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
                     </span>
+                    <span>
+                        <el-checkbox v-model="checked">全部数据</el-checkbox>
+                    </span>
+                    <span style='margin-left:5px'>({{this.$route.query.shiftStartTime}}~~{{this.$route.query.shiftEndTime}})</span>
                 </div>
             </div>
-            <el-tabs element-loading-text="拼命加载中" class="search-tab">
+            <el-tabs element-loading-text="拼命加载中" class="search-tab" @tab-click="tabChange">
                 <el-tab-pane label="关联表">
                     <h2 class="content-title uniteTitle">
-                        <span class='table-title'>产出投入<el-checkbox v-model="checked">全部数据</el-checkbox></span>
+                        <span class='table-title'>产出投入</span>
                         <span class='table-handle'>
                             <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(uniteItems, $event)"></i>
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('uniteTable', $event)"></i>
                         </span>
                     </h2>
-                    <div class="content-table" ref="uniteTable">
+
+                    <div class="content-table" ref="uniteTable" v-if="show1">
                         <el-table class="table-main" :data="checked?uniteItems.data:uniteItems.dataFilter" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
@@ -32,6 +37,7 @@
                             </el-table-column>
                         </el-table>
                     </div>
+
                 </el-tab-pane>
                 <el-tab-pane label="明细表">
                     <h2 class="content-title outTitle">
@@ -41,7 +47,8 @@
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputTable', $event)"></i>
                         </span>
                     </h2>
-                    <div class="content-table" ref="outputTable">
+
+                    <div class="content-table" ref="outputTable" v-if="show2">
                         <!-- <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table> -->
                         <el-table class="table-main" :data="checked?outItems.data:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
@@ -50,12 +57,13 @@
                                         <span>{{ props.row[column.prop] }}</span>
                                     </div>
                                     <div class="button" v-else>
-                                        <span  @click="barcodeClick(props.row)" >追踪</span>
+                                        <span @click="barcodeClick(props.row)">追踪</span>
                                     </div>
                                 </template>
                             </el-table-column>
                         </el-table>
                     </div>
+
                     <h2 class="content-title inTitle">
                         <span class='table-title'>投入</span>
                         <span class='table-handle'>
@@ -63,7 +71,8 @@
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputTable', $event)"></i>
                         </span>
                     </h2>
-                    <div class="content-table" ref="inputTable">
+
+                    <div class="content-table" ref="inputTable" v-if="show2">
                         <!-- <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table> -->
                         <el-table class="table-main" :data="checked?inItems.data:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
@@ -72,12 +81,13 @@
                                         <span>{{ props.row[column.prop] }}</span>
                                     </div>
                                     <div class="button" v-else>
-                                        <span  @click="barcodeClick(props.row)" >追踪</span>
+                                        <span @click="barcodeClick(props.row)">追踪</span>
                                     </div>
                                 </template>
                             </el-table-column>
                         </el-table>
                     </div>
+
                 </el-tab-pane>
                 <el-tab-pane label="汇总表">
                     <h2 class="content-title outAllTitle">
@@ -87,7 +97,7 @@
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputAllTable', $event)"></i>
                         </span>
                     </h2>
-                    <div class="content-table" ref="outputAllTable">
+                    <div class="content-table" ref="outputAllTable" v-if="show3">
                         <!-- <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
                         <el-table class="table-main" :data="checked?outAllItems.data:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
@@ -97,7 +107,7 @@
                                     </div>
                                     <div class="button" v-else>
                                         <span style="margin-right:10px" @click="batchClick(props.row)" v-if="!bTrack">追踪</span>
-                                        <span  @click="materialClick(props.row)" >遏制</span>
+                                        <span @click="materialClick(props.row)">遏制</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -110,7 +120,8 @@
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputAllTable', $event)"></i>
                         </span>
                     </h2>
-                    <div class="content-table" ref="inputAllTable">
+
+                    <div class="content-table" ref="inputAllTable" v-if="show3">
                         <!-- <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
                         <el-table class="table-main" :data="checked?inAllItems.data:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
@@ -120,12 +131,13 @@
                                     </div>
                                     <div class="button" v-else>
                                         <span style="margin-right:10px" @click="batchClick(props.row)" v-if="!bTrack">追踪</span>
-                                        <span  @click="materialClick(props.row)" >遏制</span>
+                                        <span @click="materialClick(props.row)">遏制</span>
                                     </div>
                                 </template>
                             </el-table-column>
                         </el-table>
                     </div>
+
                 </el-tab-pane>
             </el-tabs>
 
@@ -164,7 +176,7 @@ export default {
             // 是否为追踪页面。
             bTrack: location.pathname.indexOf("trackIndex") > -1,
             tdResize: true, //是否允许拖动table大小
-            condition: {},   // 显示的查询条件    
+            condition: {},   // 显示的查询条件
             dataName: [      // 条件对应中文名
                 {
                     itemCode: "equipmentName",
@@ -397,7 +409,10 @@ export default {
                 data: []
             },
             //  viewHeight:0
-            routerContent: 0
+            routerContent: 0,
+            show1: true,
+            show2: false,
+            show3: false
 
         }
 
@@ -442,9 +457,7 @@ export default {
     },
     mounted() {
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
-        this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-        this.uniteItems.height = 2 * this.adjustHeight() + 45
-
+        this.setTbaleHeight()
     },
     updated() {
 
@@ -463,8 +476,8 @@ export default {
     },
     methods: {
         initData() {
-            
-            if(this.bTrack) {
+
+            if (this.bTrack) {
                 // 若为追踪页面，过滤明细产出操作列。
                 this.outItems.columns = this.outItems.columns.filter(o => o.prop !== "handle");
             }
@@ -488,7 +501,7 @@ export default {
             outData.forEach((e, index) => {
                 e.productionType = "产出"
                 e.productionID = index              //对产出做标记，方便找到对应的投入
-                e.in.forEach(el=>{
+                e.in.forEach(el => {
                     el.productionType = "投入"
                     el.productionID = index         //对投入做标记，方便找到对应的产出
                 })
@@ -497,28 +510,29 @@ export default {
                 uniteDatas.push(e)                  // 获取关联数据
                 uniteDatas.push(...e.in)
                 // 获取关联数据 -- 时间内
-                if( this.condition.startTime <= e.happenTime && e.happenTime <= this.condition.endTime ){
+                if (this.condition.startTime <= e.happenTime && e.happenTime <= this.condition.endTime) {
                     uniteDatasFilter.push(e)
-                    uniteDatasFilter.push(...e.in)  
+                    uniteDatasFilter.push(...e.in)
                 }
-                
+
 
             });
 
-            outDatasFilter = outDatas.filter(e=>{                     // 获取产出数据 -- 时间内          
+            outDatasFilter = outDatas.filter(e => {                     // 获取产出数据 -- 时间内          
                 return this.condition.startTime <= e.happenTime && e.happenTime <= this.condition.endTime
             })
 
-            outDatasFilter.forEach(e=>{                               // 获取投入数据--时间内
-                inDatas.filter(el=>{
-                    if(e.productionID = el.productionID){
+            outDatasFilter.forEach(e => {                               // 获取投入数据--时间内
+                inDatas.filter(el => {
+                    if (e.productionID === el.productionID) {
                         inDatasFilter.push(el)
                     }
                 })
             })
 
+
             /* 所有投入汇总 */
-            let inDatasCopy = JSON.parse(JSON.stringify(inDatas))  
+            let inDatasCopy = JSON.parse(JSON.stringify(inDatas))
             inDatasCopy.forEach((el, i) => {                        // 投入汇总
                 inAllDatas.push({
                     batchNo: inDatasCopy[i]["batchNo"],             // 批次号
@@ -552,16 +566,16 @@ export default {
                     }
                 }
             })
-            
 
-            outDatas.forEach(el=>{
+
+            outDatas.forEach(el => {
                 /* 设置每条记录的合格数、报废数、不合格数 */
                 el.qualifiedNum = el.scrapNum = el.unqualifiedNum = 0
-                if(el.type === 1){                                       // 合格数
+                if (el.type === 1) {                                       // 合格数
                     el.qualifiedNum = el.quantity
-                }else if(el.type === 2) {                                // 报废数
+                } else if (el.type === 2) {                                // 报废数
                     el.scrapNum = el.quantity
-                }else {                                                 // 不合格数
+                } else {                                                 // 不合格数
                     el.unqualifiedNum = el.quantity
                 }
             })
@@ -589,7 +603,7 @@ export default {
             })
 
             /* 时间内产出汇总 */
-            let outDatasCopyFilter = JSON.parse(JSON.stringify(outDatas))
+            let outDatasCopyFilter = JSON.parse(JSON.stringify(outDatasFilter))
             outDatasCopyFilter.forEach((el, i) => {                             // 产出汇总
                 /* 根据批次合并，同批次合格数、报废数、不合格数分别汇总 */
                 outAllDatasFilter.push({
@@ -610,9 +624,9 @@ export default {
                     }
                 }
             })
-            
 
-            
+
+
             this.uniteItems.data = uniteDatas                           // 关联明细
             this.uniteItems.dataFilter = uniteDatasFilter               // 关联明细--时间内
 
@@ -621,7 +635,7 @@ export default {
 
             this.inItems.data = inDatas                                 // 投入明细
             this.inItems.dataFilter = inDatasFilter                     // 投入明细--时间内
-            
+
 
             this.outAllItems.data = outAllDatas                         // 产出汇总
             this.outAllItems.dataFilter = outAllDatasFilter             // 产出汇总--时间内
@@ -660,7 +674,7 @@ export default {
                 }
             })
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
-            
+
         },
         /**
         * 格式化数据。
@@ -709,7 +723,7 @@ export default {
                     //     materialCode: row.materialCode
                     // },
                     // "type": "batch"
-                    selected: this.outItems.data.filter(o=> o.batchNo === row.batchNo).map(o => {
+                    selected: this.outItems.data.filter(o => o.batchNo === row.batchNo).map(o => {
                         return {
                             materialCode: o.materialCode,
                             batchNo: o.batchNo,
@@ -836,11 +850,11 @@ export default {
             let ntable = 0;
             ntable = Math.floor(
                 this.viewHeight
-                // - this.outerHeight(document.querySelector(".condition"))
-                - 42 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
-                - this.outerHeight(document.querySelector(".inTitle"))
-                - this.outerHeight(document.querySelector(".outTitle"))
-                - 60  //修正值
+                - this.outerHeight(document.querySelector(".condition"))
+                - 30 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
+                - this.outerHeight(document.querySelector(".content-title.outTitle"))
+                - this.outerHeight(document.querySelector(".content-title.inTitle"))
+                - 70  //修正值
             ) / 2;
 
             return ntable;
@@ -893,6 +907,29 @@ export default {
                 })
                 icon.classList.add('actived');
             }
+        },
+        /* */
+        tabChange(tab, event) {
+            //debugger
+            console.log(tab, event);
+            const index = tab.index
+            switch (index) {
+                case "0":
+                    this.show1 = true
+                    this.show2 = false
+                    this.show3 = false
+                    break;
+                case "1":
+                    this.show1 = false
+                    this.show2 = true
+                    this.show3 = false
+                    break;
+                case "2":
+                    this.show1 = false
+                    this.show2 = false
+                    this.show3 = true
+                    break;
+            }
         }
     }
 }
@@ -924,6 +961,7 @@ export default {
     cursor: pointer;
     color: #f90;
 }
+
 @green: #42af8f;
 @blue: #0099ff;
 @yellow: #fcc433;
@@ -976,8 +1014,20 @@ body {
     }
 }
 
+.router-content {
+    .condition {
+        .el-checkbox {
+            .el-checkbox__label {
+                margin-left: 0;
+                padding-left: 10px;
+            }
+        }
+    }
+}
+
+
 .search-tab {
-    padding-top: 20px;
+    // padding-top: 20px;
     .el-tabs__header {
         border-bottom: none;
         margin-bottom: 0;
