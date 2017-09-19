@@ -801,7 +801,9 @@
 			setInitData() {		
 				this.startIf = true;
 				this.endIf = true;
-		
+                this.show = true;
+                // 区域缩放是否激活。
+                this.zoomActive = false;		
                 if(!this.bRestrain) {
                     this.equipments = this.equipmentsId
                 }else {
