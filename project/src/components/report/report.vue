@@ -711,6 +711,7 @@ export default {
 					delete oParam.equipmentName
 				} else {
 					// 根据物料查询。
+					oParam.materialCode = oParam.materialCode.split(":")[0]
 					sUrl = this.oUrl["restrainBatch"]
 				}
 			}

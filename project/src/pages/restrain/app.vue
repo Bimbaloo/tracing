@@ -3,7 +3,7 @@
 		<v-header :config="false" :back="'search.html'"></v-header>
 		<div class="panel" id="restrain">
 			<div class='panel-title'>
-				<el-tabs  element-loading-text="拼命加载中"   class="search-tab" @tab-click="handleClick">
+				<el-tabs  element-loading-text="拼命加载中"   class="search-tab">
 					<el-tab-pane label="新建遏制"  activeName="first">
 						<el-radio-group v-model="radioNumber">
 							<div class='radio'>
@@ -19,17 +19,15 @@
 							</el-form>
 						</el-radio-group>
 					</el-tab-pane>
-					<el-tab-pane label="遏制列表" activeName="second">
-						
-							<el-form :inline="true" ref="equipmentFrom" :model="equipmentFrom"  :class="[ 'demo-form-inline','form-inline']" :rules="equipmentRules">
-								 <el-form-item v-for="(item,index) in groupItems2" :label="item.itemName"  :key="`item`+index" :prop="item.itemCode">
-									 <component :is="`v-${item.type}`" :form-data="equipmentFrom" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
-								</el-form-item> 
-								<el-form-item>
-									<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')">查询</el-button>
-								</el-form-item>
-							</el-form>
-					
+					<el-tab-pane label="遏制列表" activeName="second">						
+						<el-form :inline="true" ref="equipmentFrom" :model="equipmentFrom"  :class="[ 'demo-form-inline','form-inline']" :rules="equipmentRules">
+							 <el-form-item v-for="(item,index) in groupItems2" :label="item.itemName"  :key="`item`+index" :prop="item.itemCode">
+								 <component :is="`v-${item.type}`" :form-data="equipmentFrom" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+							</el-form-item> 
+							<el-form-item>
+								<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')">查询</el-button>
+							</el-form-item>
+						</el-form>
 					</el-tab-pane>
 				</el-tabs>
 			</div>
@@ -321,7 +319,7 @@
 					if (valid) {
 
                         let oConditions = {
-                            keys: fnP.parseQueryParam(this.ruleForms), // this.keys,
+                            keys: this.ruleForms, // this.keys,
 							radio: this.radioNumber,
 							tab: this.activeKey
 						};
@@ -597,14 +595,41 @@
 			flex-direction: column;
 		}
 		.panel-content {
+			display: flex;
 			flex: 1;
 			padding-left: 28px;
         	padding-right: 28px;
 			.router-container {
-				height: 100%;
+				display: flex;
+				flex: 1;
+				width: 100%;
+				flex-direction: column;
 				.tip {
 					height: 100%;
 					background: url('../../assets/img/tip.png') no-repeat center center;
+				}
+			}
+			.material-stock {
+				flex: 1;
+			}
+		}
+		.condition-messsage {
+			.el-form-input {
+				margin-left: 0;
+				width: 400px;
+				.el-form-item {
+					.el-form-item__label {
+						padding: 8px 10px 8px 0;
+					}
+					.el-form-item__content {
+						.el-input {
+							.el-input__inner {
+								height: 30px;
+								line-height: 30px;
+								border-radius: 0;
+							}
+						}
+					}
 				}
 			}
 		}
