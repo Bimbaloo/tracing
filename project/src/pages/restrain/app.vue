@@ -248,6 +248,16 @@
 			}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
 				oData = this.getSearchData();
 				this.render(oData)
+			}else {
+				oData = {
+					tab: "",
+					keys: {
+						batchNo: "",
+						materialCode: ''
+					},
+					radio: "0"
+				}
+				
 			}
 
 			/* 根据传入数据 */
@@ -577,6 +587,11 @@
 							border-color: #ddd;
 						}
 					}
+					.el-input__inner {
+						height: 30px;
+						border-radius: 0;
+						border-color: #ddd;
+					}
 				}
 			}
 		}
@@ -608,6 +623,20 @@
 					height: 100%;
 					background: url('../../assets/img/tip.png') no-repeat center center;
 				}
+				// .router-content {
+				// 	.innner-content {
+				// 		position: absolute;
+				// 		left: 28px;
+				// 		right: 28px;
+				// 		margin-bottom: 15px;
+				// 	}
+				// }
+				// .material-stock {
+				// 	.router-path {
+				// 		padding-left: 28px;
+        		// 		padding-right: 28px;
+				// 	}
+				// }
 			}
 			.material-stock {
 				flex: 1;

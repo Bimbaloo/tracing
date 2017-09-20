@@ -37,12 +37,12 @@
         	// 输入处理
         	dateChange(event) {
         		let sVal = event.target.value
-        		this.formData[this.keyData] = new Date(sVal);
+        		this.formData[this.keyData] = sVal;
         	},
         	// 选中确定处理
         	dateClick(value) {
         		if(value != undefined) {
-        			this.formData[this.keyData] = new Date(value);
+        			this.formData[this.keyData] = value;
         		}else {
         			// 点击插件自动清空，返回是undefined 
         			this.formData[this.keyData] = '';
