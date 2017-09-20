@@ -248,16 +248,6 @@
 			}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
 				oData = this.getSearchData();
 				this.render(oData)
-			}else {
-				oData = {
-					tab: "",
-					keys: {
-						batchNo: "",
-						materialCode: ''
-					},
-					radio: "0"
-				}
-				
 			}
 
 			/* 根据传入数据 */
@@ -299,6 +289,13 @@
 					}
 				})
 
+				if(oData) {
+					this.render(oData)
+				}else {
+					this.render({radio: "0"})
+				}
+
+				render({radio: "0"})
 				this.$nextTick(() => {
 					if(oData) {
 						this._submitForm(oData);
