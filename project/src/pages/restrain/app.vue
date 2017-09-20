@@ -262,7 +262,6 @@
 
 			/* 根据传入数据 */
 			this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
-				this.tip = false
 				let datas = oResult
 				let _radioList = []			//用于储存radioList
 				let _groupItems = []		//用于储存groupItems
@@ -397,8 +396,7 @@
 
 			// 数据提交
 			_submitForm(oConditions) {	
-				
-
+				this.tip = false
 				let sPath = '/' + this.activeKey;  //this.activeKey  == 'suspicious'
 				oConditions.tab = this.activeKey;
 
