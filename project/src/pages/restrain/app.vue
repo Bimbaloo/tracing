@@ -125,10 +125,10 @@
 						{ required: true, message: '请选择人员', trigger: 'change' }
 					],
 					startTime: [
-						{ type: 'date', required: true, message: '请选择开始日期', trigger: 'change' }
+						{ required: true, message: '请选择开始日期', trigger: 'change' }
 					],
 					endTime: [
-						{ type: 'date', required: true, message: '请选择结束日期', trigger: 'change' }
+						{ required: true, message: '请选择结束日期', trigger: 'change' }
 					]
 				},
 				/* 遏制列表页面数据 */
@@ -323,7 +323,7 @@
 			submitForm(formName) {
 			  this.$refs[formName].validate((valid) => {
 					if (valid) {
-
+						this.activeKey = "suspicious"
                         let oConditions = {
                             keys: this.ruleForms, // this.keys,
 							radio: this.radioNumber,
