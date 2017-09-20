@@ -39,7 +39,8 @@ const config = {
     alias: {
       assets: join(__dirname, '/src/assets'),
       components: join(__dirname, '/src/components'),
-      root: join(__dirname, 'node_modules')
+      root: join(__dirname, 'node_modules'),
+      vue: 'vue/dist/vue.js'
     }
   },
   module: {

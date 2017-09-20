@@ -8,8 +8,11 @@
 	                {{ gridData.error }}
 	            </div>
 	            <div v-if="!gridData.error" class="content-table">
-	                <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter" v-if="!gridData.loading" ></v-table>
-                    <v-table :table-data="gridData" :heights="gridData.height" :loading="gridData.loading" :resize="tdResize" :data-filter="dataFilter" v-show="gridData.loading" ></v-table>    
+	            	<v-table
+				    	:table-data="gridData"
+				    	:heights="gridData.height"
+				    	:loading="gridData.loading"
+				    ></v-table>
 	            </div>   
 	       </div>   
     	</div> 
@@ -17,12 +20,8 @@
 </template>
 
 <script>
-	import $ from "jquery"
-    import table from "components/basic/table.vue"
+    import table from "components/basic/ag-table.vue"
 	import fnP from "assets/js/public.js"
-	// import {host} from 'assets/js/configs.js'
-
-    // var HOST = window.HOST ? window.HOST: host
     	
     export default {
         components: {
@@ -36,89 +35,22 @@
                     url: HOST + "/api/v1/trace/up/start-points",
                     loading: false,
                     error: null,
-                    height: "100%",
+                    height: "200",
                     selected: [],
-                    columns: [{
-                        prop: "bucketNo",
-                        name: "",
-                        type: "selection",
-                        width: "30",
-                        fixed: true
-                    },{
-                        type: "index",
-                        name: "序号",
-                        width: "50",
-                        fixed: true
-                    },{
-                        prop: "barcode",
-                        name: "条码",
-                        width: "120",
-                        sortable: true,
-                        fixed: true
-                    },{
-                        prop: "processName",
-                        name: "工序名称",
-                        width: "120",
-                        sortable: true
-                    },{
-                        prop: "processCode",
-                        name: "工序编码",
-                        width: "80",
-                        sortable: true
-                    },{
-                        prop: "equipmentName",
-                        name: "设备名称",
-                        width: "120",
-                        sortable: true
-                    },{
-                        prop: "equipmentCode",
-                        name: "设备编码",
-                        sortable: true
-                    },{
-                        prop: "modelName",
-                        name: "设备类型",
-                        sortable: true
-                    },{
-                        prop: "moldCode",
-                        name: "模号",
-                        sortable: true
-                    },{
-                        prop: "batchNo",
-                        name: "批次号",
-                        width: "150",
-                        sortable: true
-                    },{
-                        prop: "materialCode",
-                        name: "物料编码",
-                        sortable: true
-                    },{
-                        prop: "materialName",
-                        name: "物料名称",
-                        width: "300",
-                        sortable: true
-                    // },{
-                    //     prop: "materialSpec",
-                    //     name: "物料规格"
-                    },{
-                        prop: "materialUnit",
-                        name: "单位",
-                        width: "50",
-                        sortable: true
-                    },{
-                        prop: "quantity",
-                        name: "数量",
-                        width: "50",
-                        sortable: true
-                    },{
-                        prop: "happenTime",
-                        name: "加工时间",
-                        width: "160",
-                        sortable: true
-                    },{
-                        prop: "personName",
-                        name: "操作人",
-                        sortable: true
-                    }],
+                    gridOptions: {
+//		            	enableColResize: true,
+//			    		enableSorting: true,
+//			    		rowSelection: "multiple",
+//			    		rowHeight: 40,
+//			    		headerHeight: 40,
+//			    		rowClass: 'row-style',
+//			    		rowDeselection: true,
+//			    		enableRangeSelection: true,
+//			    		suppressRowClickSelection: true,
+//			    		suppressLoadingOverlay: true,
+//			    		overlayNoRowsTemplate: "暂无数据",
+			    		columnDefs: this.getColumns()
+		            },
                     data: []
                 }
             }
@@ -133,17 +65,86 @@
 			'$route': 'fetchPage'
         },
         methods: {
+        	// 获取显示列
+        	getColumns() {
+        		return [{
+	    			width: 30, 
+	    			// 该列为checkbox
+	                checkboxSelection: true,
+	                // 开启表头checkbox
+	                headerCheckboxSelection: true,
+	                // 固定
+	                pinned: true,
+	                // 不支持sort
+	                suppressSorting: true
+                },{
+					headerName: "序号",
+            		field: "index",
+            		pinned: true,
+                    width: 50
+                },{
+                    field: "barcode",
+                    headerName: "条码",
+                    width: 120,
+                    pinned: true
+                },{
+                    field: "processName",
+                    headerName: "工序名称",
+                    width: 120
+                },{
+                    field: "processCode",
+                    headerName: "工序编码",
+                    width: 80
+                },{
+                    field: "equipmentName",
+                    headerName: "设备名称",
+                    width: 120
+                },{
+                    field: "equipmentCode",
+                    headerName: "设备编码"
+                },{
+                    field: "modelName",
+                    headerName: "设备类型"
+                },{
+                    field: "moldCode",
+                    headerName: "模号"
+                },{
+                    field: "batchNo",
+                    headerName: "批次号",
+                    width: 150
+                },{
+                    field: "materialCode",
+                    headerName: "物料编码"
+                },{
+                    field: "materialName",
+                    headerName: "物料名称",
+                    width: 300
+                },{
+                    field: "materialUnit",
+                    headerName: "单位",
+                    width: 50
+                },{
+                    field: "quantity",
+                    headerName: "数量",
+                    width: 50
+                },{
+                    field: "happenTime",
+                    headerName: "加工时间",
+                    width: 160
+//                  sort: 'asc'
+                },{
+                    field: "personName",
+                    headerName: "操作人"
+                }]
+        	},
         	// 查询。
             fetchPage() {
             	this.fetchData(this.gridData);
             },
         	// 获取高度。
             adjustHeight() {
-            	let jRouter = $(".router-content"),
-            		jTable = jRouter.find(".content-table"),
-            		nHeight = 0;
+            	let nHeight = 0;
             	
-//          	nHeight = Math.floor(jRouter.height() - (jTable.outerHeight(true) - jTable.height()));
 				nHeight = this.$refs.routerContent.clientHeight - 50
 				
             	return nHeight;
@@ -158,14 +159,20 @@
                 oData.data = [];
 				oData.height = this.adjustHeight();
                 oData.loading = true;
-                let sPath = oData.url;
+               
+               let sPath = oData.url;
 
                 this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", fnP.parseQueryParam(this.$route.query), (oResult) => {
 					// 请求成功。
                     oData.loading = false;	
-                    oData.data = $.extend(true, [], oResult)
                     oData.data = oData.data.sort(this.sortByTime);		   
-				}, (sErrorMessage) => {
+					oData.data = oResult.map((o, n) => {
+                    	return Object.assign({}, o, {
+                    		index: n+1
+                    	})
+                    })
+					
+                }, (sErrorMessage) => {
 					// 请求失败。
 					oData.loading = false;
 					// 提示信息。
@@ -175,29 +182,6 @@
 					oData.loading = false;
 					console.log("接口查询出错。");
                 })
-                
-//                 this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
-//                 .then((res) => {
-//                     oData.loading = false;
-// //					oData.height = this.adjustHeight();
-					
-//                     if(!res.data.errorCode) {
-//                     	// 正常 0
-//                         oData.data = $.extend(true, [], res.data.data)
-//                         oData.data = oData.data.sort(this.sortByTime);
-//                     }else if(res.data.errorCode == "1"){
-//                     	// console 异常信息。
-//                     	console.warn(res.data.errorMsg.message);
-//                     }else {
-//                     	// 其他，显示异常信息。
-//                     	oData.error = res.data.errorMsg.message;
-//                     }
-//                 })
-//                 .catch((err) => {
-//                     oData.loading = false;
-// //                  oData.error = "查询出错。";
-//                     console.log("接口查询出错。")
-//                 })
             },
             onTrace (event) {
             	if(this.gridData.data && this.gridData.selected.length) {
