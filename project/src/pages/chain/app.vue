@@ -226,10 +226,10 @@
 				refresh: false,
 				// 当前查询的值。
     			searchParam: {
-//  				"materialCode": "20000256:MP/SGE LFV 活塞毛坯/074189",
-//  				"batchNo": "20160420b",		//"23620170215夜班",
-//  				"startTime": "",
-//  				"endTime": ""
+    				"materialCode": "",
+    				"batchNo": "",		//"23620170215夜班",
+    				"startTime": "",
+    				"endTime": ""
     			},
     			// 查询规则。
 				rules: {
