@@ -29,7 +29,7 @@
 						</ul>
 					</div>
 				</div>
-				<div class="main-item item-sub" v-if="data.subBarcodeList.length">
+				<div class="main-item item-sub" v-if="data.subBarcodeList && data.subBarcodeList.length">
 					<div class="item-title">子级条码信息</div>
 					<div class="item-content">
 						<ul class="item-list clear">

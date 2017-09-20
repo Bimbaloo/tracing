@@ -99,7 +99,16 @@
                 } else if (this.selectedData.length !== 0) {
                     let materialCode = this.selectedData[0].materialCode  // 获取当前勾选行 物料编码  
                     let processCode = this.selectedData[0].processCode   // 获取当前勾选行 工序编码 
-                    return this.tableData.data.filter(el => el.materialCode === materialCode && el.processCode === processCode)
+                    
+                    let aFilterd = this.tableData.data.filter(el => el.materialCode === materialCode && el.processCode === processCode);
+                    
+                    // 判断是否是全选中的状态。
+                    if(this.selectedData.length === this.tableData.data.length && aFilterd.length != this.tableData.data.length) {
+                    	// 全选 且当前过滤后的数据不是所有
+                    	this.tableData.selected = aFilterd.map(el => {return el})
+                    }
+                    
+                    return aFilterd;
                 } else {
                     return this.tableData.data
                 }
@@ -109,7 +118,7 @@
         created () {
             this.tableData.selected = []
         },
-        methods: {    
+        methods: {   
             cellClick (row, column, cell, event) {
                 
                 let oColumn = this.columns.filter(o => o.prop==column.property)[0] || this.columns.find( o=> o.lists).lists.filter(o => o.prop==column.property)[0];
