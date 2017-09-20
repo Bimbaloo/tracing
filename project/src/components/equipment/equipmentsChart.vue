@@ -367,7 +367,7 @@
             option () {
                 let oData = {
                     legend: {
-                        data: this.dimension.map(o=>o.name),
+                        data: this.dimension.map(o=> o.name),
                         // itemWidth: ,
                         // itemGap: 40,
                         // width: 320,
@@ -391,9 +391,9 @@
                         trigger: 'none',
                         // padding: 10,
                         backgroundColor: 'rgba(245, 245, 245, 0.8)',//'rgba(44,52,60,0.7)',
-                        borderColor: '#ccc',
+                        borderColor: 'rgba(44,52,60,0.7)',//#ccc
                         borderWidth: 1,
-                        borderRadius: 4,
+                        borderRadius: 0,
                         transitionDuration: 0,
                         // 鼠标是否可进入悬浮框。
                         enterable: true,
@@ -659,7 +659,7 @@
                     name: o.name,
                     type: 'scatter',
                     symbol: 'circle', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'               
-                    symbolSize: 14,
+                    symbolSize: 10,
                     // 标注点。
                     markPoint: {
                         symbol: 'arrow', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'  
@@ -680,15 +680,23 @@
                     data: [],
                     animationDelay: function(idx) {
                         return idx * 10;
-                    },
+                    },        
                     itemStyle: {
                         normal: {
-                            color: o.color
+                            color: o.color,
+                            borderColor: "#fff",
+                            borderWidth: 2
+                        },
+                        emphasis: {
+                            color: o.color,
+                            borderColor: o.color,
+                            borderWidth: 2
                         }
                     },
                     // 文本标签
                     label: {
                         normal: {
+                            // color: o.color,
                             // 是否显示。
                             show: true,
                             // 显示位置。
@@ -1961,12 +1969,13 @@
 			},
             // 数据提示。
             tooltipFormatter (params) {
-                    
+                
                 // 保存提示框数据。            
                 this.axisTooltipData = params;
 
                 let sHtml = "",
-                    oGroupId = {}
+                    oGroupId = {};
+                    
                     
                 params.forEach(param => {
                     let aoValue = param.value,
@@ -1974,6 +1983,7 @@
                         yAxisIndex = aoValue[1],
                         oGroupIdList = new Set(),
                         nIndex = 0;
+                        // sColor = (this.dimension.filter(o => o.name === param.seriesName)[0]).color;
 
                     // 第一级设备。
                     oGroupId[yAxisIndex] = {}
@@ -2350,7 +2360,7 @@
                     // top: 0;
                     position: absolute;
                     width: 2px;
-                    background-color: #D53A35;
+                    background-color: rgba(44,52,60,0.7);//#D53A35;
                 }
             }
 
@@ -2363,7 +2373,7 @@
                 width: 260px;
                 // z-index: 100;
                 color: #000;//#fff;
-                border: 1px solid #D53A35;
+                border: 1px solid rgba(44,52,60,0.7);//#D53A35;
 
                 // margin-right: 20px;
                 
@@ -2418,7 +2428,7 @@
                 .tooltip-time {
                     color: #fff;
                     // font-size: 12px;
-                    background-color: rgb(213, 58, 53);//#D53A35;
+                    background-color: rgba(44,52,60,0.8);//rgb(213, 58, 53);//#D53A35;
                     // font-weight: bold;
                     // padding-bottom: 5px;
                     text-align: center;
