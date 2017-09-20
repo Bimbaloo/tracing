@@ -8,7 +8,7 @@
                     </span>
                     <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
                         <el-form-item label="条码：" > 
-                             <el-input v-model="ruleForm.input" placeholder="请输入编码"  @change="updateRow" ></el-input>
+                             <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
                         </el-form-item>
                     </el-form>
                    
