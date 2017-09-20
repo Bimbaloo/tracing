@@ -123,12 +123,12 @@ const config = {
   ],
   devServer: {
     host: '127.0.0.1',
-    port: 8080,
+    port: 8010,
     historyApiFallback: false,
     noInfo: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8080',
+        target: 'http://127.0.0.1:8010',
         changeOrigin: true,
         pathRewrite: { '^/api': '' }
       }

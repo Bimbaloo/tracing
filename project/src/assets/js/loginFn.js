@@ -17,7 +17,6 @@ var clearLoginCookie = function() {
  * @return {void}
  */
 var login = function(oStore) {
-	
 	if(!window.Rt.utils.cookie("token")) {
 		// 若cookie中无token。
 		let oParams = window.Rt.utils.getParams();
@@ -120,7 +119,6 @@ var sendRequest = function(oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, fn
 	
 	let instance = beforeRequest(oStore, oAxio),
 		fnHandle = (res) => {
-			
 			let oResult = res.data;
 			let bRight = oResult.errorCode;
 
