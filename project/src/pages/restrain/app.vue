@@ -10,7 +10,7 @@
 								<el-radio :label="radio.key" v-for="(radio,index) in radioList" :key="index">{{radio.groupName}}</el-radio>
 							</div>
 							<el-form :inline="true" ref="materialForm" :model="materialForm"  :class="[ 'demo-form-inline','form-inline']" :rules="rules">
-								 <el-form-item v-for="(item,index) in groupItems" :label="item.placeholder" v-show="item.key === radioNumber" :key="item.itemCode+index" :prop="item.itemCode">
+								 <el-form-item v-for="(item,index) in groupItems" :label="item.itemName" v-show="item.key === radioNumber" :key="item.itemCode+index" :prop="item.itemCode">
 									 <component :is="`v-${item.type}`" :form-data="materialForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
@@ -20,21 +20,22 @@
 						</el-radio-group>
 					</el-tab-pane>
 					<el-tab-pane label="遏制列表" activeName="second">
-						<el-radio-group v-model="radioNumber">
+						
 							<el-form :inline="true" ref="equipmentFrom" :model="equipmentFrom"  :class="[ 'demo-form-inline','form-inline']" :rules="equipmentRules">
-								 <el-form-item v-for="(item,index) in groupItems2" :label="item.placeholder"  :key="`item`+index" :prop="item.itemCode">
+								 <el-form-item v-for="(item,index) in groupItems2" :label="item.itemName"  :key="`item`+index" :prop="item.itemCode">
 									 <component :is="`v-${item.type}`" :form-data="equipmentFrom" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
 									<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')">查询</el-button>
 								</el-form-item>
 							</el-form>
-						</el-radio-group>
+					
 					</el-tab-pane>
 				</el-tabs>
 			</div>
 			<div class="panel-content">
 				<div class="router-container" >
+					<div v-if="tip" class='tip'></div>
 					<router-view></router-view>
 				</div>
 			</div>
@@ -48,10 +49,11 @@
 
 	import Input from 'components/basic/input.vue'
     import Select from 'components/basic/select.vue'
-    import DateTime from 'components/basic/dateTime.vue'
+	import DateTime from 'components/basic/dateTime.vue'
+	import fnP from "assets/js/public.js"
 
-	const URL_JOIN = HOST + "";//"http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
-
+	//const URL_JOIN = HOST + "";//"http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
+	const URL_JOIN = "../static/2.json"    // 测试获取刚进来的数据
 	export default {
 		// 页面组件。
 		components: {
@@ -64,51 +66,51 @@
 		data() {
 			return {
 				radioList:[
-					// {
-					// 	key:'0',
-					// 	groupName:'物料'
-					// },
-					// {
-					// 	key:'1',
-					// 	equipmentCode:'设备',
-					// }
+					{
+						key:'0',
+						groupName:'物料'
+					},
+					{
+						key:'1',
+						groupName:'设备',
+					}
 				],
 				groupItems: [
-                        // {
-						// 	key:'1',
-                        //  itemCode: "equipmentCode",
-						// 	itemName: "设备",
-						// 	type: "select",
-						// 	placeholder:"请选择设备"
-                        // }
-                        // {
-						// 	key:'1',
-                        //  itemCode: "startTime",
-						// 	itemName: "开始时间",
-						// 	type: "datetime",
-						// 	placeholder:"请选择开始时间"
-                        // },
-                        // {
-						// 	key:'1',
-                        //  itemCode: "endTime",
-						// 	itemName: "结束时间",
-						// 	type: "datetime",
-						// 	placeholder:"请选择结束时间"
-						// },
-						// {
-						// 	key:'0',
-                        //  itemCode: "materialCode",
-						// 	itemName: "物料",
-						// 	type: "select",
-						// 	placeholder:"请选择物料"
-                        // },
-                        // {
-						// 	key:'0',
-                        //  itemCode: "batchNo",
-						// 	itemName: "批次",
-						// 	type: "input",
-						// 	placeholder:"请输入批次"
-                        // }
+                        {
+							key:'1',
+                         	itemCode: "equipmentCode",
+							itemName: "设备",
+							type: "select",
+							placeholder:"请选择设备"
+                        },
+                        {
+							key:'1',
+                         	itemCode: "startTime",
+							itemName: "开始时间",
+							type: "datetime",
+							placeholder:"请选择开始时间"
+                        },
+                        {
+							key:'1',
+                         	itemCode: "endTime",
+							itemName: "结束时间",
+							type: "datetime",
+							placeholder:"请选择结束时间"
+						},
+						{
+							key:'0',
+                         	itemCode: "materialCode",
+							itemName: "物料",
+							type: "select",
+							placeholder:"请选择物料"
+                        },
+                        {
+							key:'0',
+                         	itemCode: "batchNo",
+							itemName: "批次",
+							type: "input",
+							placeholder:"请输入批次"
+                        }
 				],
 
 				materialForm:{
@@ -120,14 +122,6 @@
 				},
 				activeName: 'first',
 				radioNumber: '0',
-				// rules: {
-				// 	batchNo: [
-				// 		{ required: true, message: '请输入批次号', trigger: 'blur' }
-				// 	],
-				// 	materialCode: [
-				// 		{ required: true, message: '请选择物料编号', trigger: 'change' }
-				// 	]
-				// },
 				equipmentRules: {
 					personCode: [
 						{ required: true, message: '请选择人员', trigger: 'change' }
@@ -173,7 +167,8 @@
 			/* 保存上次查询的数据 */
 				defaultConditions:{},
 				// 查询标记。
-				tag: ""
+				tag: "",
+				tip: true
 
 			}
 		},
@@ -181,17 +176,14 @@
 		computed: {
 			// 获取当前真正的查询条件
 			ruleForms: function(){
-
 				let ruleForms = {}
 				this.groupItems.filter((o) => o.key === this.radioNumber).forEach(item => {
 					ruleForms[item.itemCode] = this.materialForm[item.itemCode]
 				})
 				return  ruleForms
-				
 			},
 			rules:function(){
 				let orules = {},
-				//	_that = this,
             		oForm = this.ruleForms,
 				// 验证开始时间。
 				validateStartTime = (rule, value, callback) => {
@@ -262,6 +254,7 @@
 
 			/* 根据传入数据 */
 			this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
+				this.tip = false
 				let datas = oResult
 				let _radioList = []			//用于储存radioList
 				let _groupItems = []		//用于储存groupItems
@@ -287,7 +280,7 @@
 								_groupItems.push({
 									key: `${index}`,
 									itemCode: `${item.itemCode}`,
-									groupName: `${item.groupName}`,
+									itemName: `${item.itemName}`,
 									type: `${item.type}`,
 									placeholder: `${item.placeholder}`
 								})
@@ -305,52 +298,6 @@
 					}            
 				})
 			})
-
-			// this.$ajax.get('../static/2.json').then((res) => {
-			// 	this.judgeLoaderHandler(res,() => {
-			// 		let datas = res.data.data
-			// 		let _radioList = []			//用于储存radioList
-			// 		let _groupItems = []		//用于储存groupItems
-			// 		datas.forEach(o => {		//用于获取页面上布局信息
-			// 			if(o.moduleCode === "restrain"){	
-			// 				(o.groups).forEach((group,index) => {
-			// 					_radioList.push({
-			// 						key: `${index}`,
-			// 						groupName: `${group.groupName}`
-			// 					})
-			// 					var groupItems = group.groupItems
-			// 					groupItems.forEach(function(item){
-			// 						if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
-			// 							item.type = 'select'
-			// 							item.placeholder = `请选择${item.itemName}`
-			// 						}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
-			// 							item.type = 'input'
-			// 							item.placeholder = `请输入${item.itemName}`
-			// 						}else{											//查询条件如果是'时间'
-			// 							item.type = 'datetime'						
-			// 							item.placeholder = `请选择${item.itemName}`
-			// 						}
-			// 						_groupItems.push({
-			// 							key: `${index}`,
-			// 							itemCode: `${item.itemCode}`,
-			// 							groupName: `${item.groupName}`,
-			// 							type: `${item.type}`,
-			// 							placeholder: `${item.placeholder}`
-			// 						})
-			// 					})						
-			// 				})
-			// 				this.radioList = _radioList
-			// 				this.groupItems = _groupItems
-
-			// 			}
-			// 		})
-			// 	 });
-			// 	 this.$nextTick(() => {
-			// 		if(oData) {
-			// 			this._submitForm(oData);
-			// 		}            
-			// 	})
-			// })
 
 		},
 		// 页面方法。
@@ -374,11 +321,10 @@
 					if (valid) {
 
                         let oConditions = {
-                            keys: this.ruleForms, // this.keys,
+                            keys: fnP.parseQueryParam(this.ruleForms), // this.keys,
 							radio: this.radioNumber,
 							tab: this.activeKey
 						};
-
                         this._submitForm(oConditions);
                         
                     } else {
@@ -527,6 +473,10 @@
 						border-bottom:1px solid #ccc
 					}
 				}
+				.form-inline {
+					display: flex;
+					border-bottom:1px solid #ccc
+				}
 			}
 			.el-form-item {
 				margin-right: 40px;
@@ -595,31 +545,45 @@
     }
     .hide {
     	display: none;
-    }
-	.search-tab {
-		padding-top: 20px;
-		.el-tabs__header {
-			border-bottom:none;
-			.el-tabs__item {
-				border-radius: 0;
-				width: 90px;
-				height: 30px;
-				padding: 0;
-				box-sizing: border-box;
-				font-size: 14px;
-				border: 2px solid #42af8f;
-				line-height: 26px;
-				margin-right: 20px;
+	}
+	.panel-title {
+		.search-tab {
+			.el-tabs__header {
+				border-bottom:none;
+				margin: 20px 0;
+				.el-tabs__item {
+					border-radius: 0;
+					width: 90px;
+					height: 30px;
+					padding: 0;
+					box-sizing: border-box;
+					font-size: 14px;
+					border: 2px solid #42af8f;
+					line-height: 26px;
+					margin-right: 20px;
+				}
+				.el-tabs__active-bar {
+					display:none
+				}
+				.is-active {
+					background-color: #42af8f;
+					color: #fff;
+				}
 			}
-			.el-tabs__active-bar {
-				display:none
-			}
-			.is-active {
-				background-color: #42af8f;
-				color: #fff;
+			.el-tabs__content {
+				.el-tab-pane {
+					.el-radio-group {
+						.el-input__inner {
+							height: 30px;
+							border-radius: 0;
+							border-color: #ddd;
+						}
+					}
+				}
 			}
 		}
 	}
+	
 
 	#app {
 		height: 100%;
@@ -638,6 +602,10 @@
         	padding-right: 28px;
 			.router-container {
 				height: 100%;
+				.tip {
+					height: 100%;
+					background: url('../../assets/img/tip.png') no-repeat center center;
+				}
 			}
 		}
 	}

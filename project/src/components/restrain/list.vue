@@ -138,7 +138,7 @@
 			// 请求错误。
 			requestError(err) {
 				this.loading = false;
-				this.styleObject.minWidth = 0;
+			//	this.styleObject.minWidth = 0;
 				console.log("数据库查询出错。")
 			},  		
 
