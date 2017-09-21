@@ -581,6 +581,10 @@ export default {
                     el.unqualifiedNum = el.quantity
                 }
             })
+            /* 如果箱码列内容为空，取消该列 */
+            if(outDatas.some((e)=> e.packetBarcode === '' || e.packetBarcode === null )){ 
+                this.outItems.columns = this.outItems.columns.filter(o => o.prop !== "packetBarcode");
+            }
             /* 所有产出汇总 */
             let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
             outDatasCopy.forEach((el, i) => {                             // 产出汇总
