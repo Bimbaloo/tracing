@@ -659,7 +659,7 @@
                     name: o.name,
                     type: 'scatter',
                     symbol: 'circle', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'               
-                    symbolSize: 10,
+                    symbolSize: 8,
                     // 标注点。
                     markPoint: {
                         symbol: 'arrow', //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'  
@@ -684,19 +684,38 @@
                     itemStyle: {
                         normal: {
                             color: o.color,
-                            borderColor: "#fff",
-                            borderWidth: 2
+                            borderColor: "rgba(255,255,255,0.7)",//rgba(44,52,60,0.7)
+                            borderWidth: 1
                         },
                         emphasis: {
                             color: o.color,
                             borderColor: o.color,
-                            borderWidth: 2
+                            borderWidth: 1
                         }
                     },
                     // 文本标签
                     label: {
-                        normal: {
-                            // color: o.color,
+                        // normal: {
+                        //     // color: o.color,
+                        //     // 是否显示。
+                        //     show: true,
+                        //     // 显示位置。
+                        //     position: 'top',
+                        //     // 显示位置偏移。
+                        //     // offset: [0, 10],
+                        //     // 标签内容格式器。
+                        //     formatter: function({value}) {
+                        //         if(typeof value[2] === "object") {
+                        //             return value[2].value
+                        //         }
+                        //         return value[2];     
+                        //     },
+                        //     textStyle: {
+                        //         fontSize: 14
+                        //     }
+                        // },
+                        emphasis: {
+                            color: o.color,
                             // 是否显示。
                             show: true,
                             // 显示位置。
@@ -1696,6 +1715,8 @@
                         o.timePoint = o.endTime;
                         oResult.title = "事件结束";
                         oResult.tooltipData = [
+                            {name: "事件类型", value: o.eventType},
+                            {name: "事件原因", value: o.reason},
                             {name: "结束时间", value: o.endTime}
                         ];
                         break; 

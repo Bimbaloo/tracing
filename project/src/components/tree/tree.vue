@@ -9,7 +9,7 @@
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
 		</div>
 		<div id="tree" style="height: 100%;"></div>
-		<div id="overview"></div>
+		<!--div id="overview"></div-->
 	</div>
 </template>
 
@@ -523,7 +523,7 @@
 		},		
 		mounted() {
 			this.drawTree();
-			this.createOverview();
+			// this.createOverview();
 		},
 		methods: {
 			showTips() {
@@ -830,7 +830,8 @@
 			 */
 			createOverview() {
 				this.overview = this.$(go.Overview, 'overview', {
-					observed: this.tree
+					observed: this.tree,
+					contentAlignment: go.Spot.Center
 				});
 			},
 			
@@ -954,6 +955,7 @@
 	.diagram {
 		display: flex;
 		flex-direction: column;
+		position: relative;
 	}
 	.icons {
 		position: relative;
@@ -991,4 +993,17 @@
 		}
 	}
 	
+	#overview {
+		width: 200px; 
+		height: 100px; 
+		position: absolute; 
+		left: 0; 
+		top: 0; 
+		border:1px solid #ccc;
+		
+		canvas {
+			outline:none;
+		}
+		
+	}
 </style>
