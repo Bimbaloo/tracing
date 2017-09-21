@@ -48,9 +48,9 @@
 //			    		enableRangeSelection: true,
 //			    		suppressRowClickSelection: true,
 //			    		suppressLoadingOverlay: true,
-//			    		overlayNoRowsTemplate: "暂无数据",
-			    		columnDefs: this.getColumns()
+//			    		overlayNoRowsTemplate: "暂无数据"
 		            },
+		            columns: [],
                     data: []
                 }
             }
@@ -87,31 +87,20 @@
                     headerName: "条码",
                     width: 120,
                     pinned: true
+//              },{
+//                  field: "processName",
+//                  headerName: "工序名称",
+//                  width: 120
+//              },{
+//                  field: "processCode",
+//                  headerName: "工序编码",
+//                  width: 80
                 },{
-                    field: "processName",
-                    headerName: "工序名称",
-                    width: 120
-                },{
-                    field: "processCode",
-                    headerName: "工序编码",
-                    width: 80
-                },{
-                    field: "equipmentName",
-                    headerName: "设备名称",
-                    width: 120
-                },{
-                    field: "equipmentCode",
-                    headerName: "设备编码"
-                },{
-                    field: "modelName",
-                    headerName: "设备类型"
-                },{
-                    field: "moldCode",
-                    headerName: "模号"
-                },{
-                    field: "batchNo",
-                    headerName: "批次号",
-                    width: 150
+                	headerName: "工序",
+                	width: 120,
+                	cellRenderer: function(params) {
+						return params.data.processCode + ":" + params.data.processName
+	                }
                 },{
                     field: "materialCode",
                     headerName: "物料编码"
@@ -123,15 +112,35 @@
                     field: "materialUnit",
                     headerName: "单位",
                     width: 50
+//              },{
+//                  field: "equipmentName",
+//                  headerName: "设备名称",
+//                  width: 120
+//              },{
+//                  field: "equipmentCode",
+//                  headerName: "设备编码"
                 },{
-                    field: "quantity",
-                    headerName: "数量",
-                    width: 50
+                	headerName: "设备",
+                	width: 150,
+                	cellRenderer: function(params) {
+						return params.data.equipmentCode + ":" + params.data.equipmentName
+	                }
+                },{
+                    field: "batchNo",
+                    headerName: "批次号",
+                    width: 150
                 },{
                     field: "happenTime",
                     headerName: "加工时间",
                     width: 160
 //                  sort: 'asc'
+                },{
+                    field: "moldCode",
+                    headerName: "模号"
+                },{
+                    field: "quantity",
+                    headerName: "数量",
+                    width: 50
                 },{
                     field: "personName",
                     headerName: "操作人"
@@ -165,12 +174,28 @@
                 this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", fnP.parseQueryParam(this.$route.query), (oResult) => {
 					// 请求成功。
                     oData.loading = false;	
-                    oData.data = oData.data.sort(this.sortByTime);		   
-					oData.data = oResult.map((o, n) => {
+                    
+                   	// 数据处理- 排序， 索引
+                   	let aResult = oResult.sort(this.sortByTime),
+                   		aColumns = this.getColumns()
+                   	
+                   	aResult = oResult.map((o, n) => {
                     	return Object.assign({}, o, {
                     		index: n+1
                     	})
                     })
+                   	
+                   	
+                    // 判断是否需要moldCode列， 数据全为null时隐藏
+					let isMold = aResult.some( o => o.moldCode)      
+                    
+                    if(!isMold) {
+                    	// 修改该列隐藏。
+                    	aColumns.filter( o => o.field === 'moldCode')[0].hide = true;
+                    }
+                    
+					oData.data = aResult;
+					oData.columns = aColumns;
 					
                 }, (sErrorMessage) => {
 					// 请求失败。

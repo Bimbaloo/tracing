@@ -57,70 +57,44 @@
         }
     } 
     
-    .ag-row-selected {
+    .ag-row-selected.ag-row-even {
         // 取消行选中样式
-        background-color: transparent;
+        background-color: #FFFFFF;
     }
-    .ag-icon-checkbox-checked-readonly {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        background: transparent url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEgyYTIgMiAwIDAgMC0yIDJ2MTRhMiAyIDAgMCAwIDIgMmgxNGEyIDIgMCAwIDAgMi0yVjJhMiAyIDAgMCAwLTItMnpNNyAxNEwyIDlsMS40MS0xLjQxTDcgMTEuMTdsNy41OS03LjU5TDE2IDVsLTkgOXoiIG9wYWNpdHk9Ii41Ii8+PC9zdmc+) center no-repeat;
-        background-size: 16px 16px;
-        opacity: 0.87;
+    .ag-row-selected.ag-row-odd {
+        // 取消行选中样式
+        background-color: #f6f6f6;
     }
+    .ag-icon-checkbox-checked-readonly,
     .ag-icon-checkbox-checked {
         display: inline-block;
         width: 16px;
         height: 16px;
-        background: transparent url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEgyYTIgMiAwIDAgMC0yIDJ2MTRhMiAyIDAgMCAwIDIgMmgxNGEyIDIgMCAwIDAgMi0yVjJhMiAyIDAgMCAwLTItMnpNNyAxNEwyIDlsMS40MS0xLjQxTDcgMTEuMTdsNy41OS03LjU5TDE2IDVsLTkgOXoiLz48L3N2Zz4=) center no-repeat;
-        background-size: 16px 16px;
-        opacity: 0.87; 
+        background: transparent url(../img/icon-16-checkbox.png) -16px 0 no-repeat;
     }
+    
+    // 有选中未全选的样式。
+    .ag-icon-checkbox-indeterminate,
     .ag-icon-checkbox-indeterminate-readonly {
         display: inline-block;
         width: 16px;
         height: 16px;
-        background: transparent url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEgyQy45IDAgMCAuOSAwIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMlYyYzAtMS4xLS45LTItMi0yem0tMiAxMEg0VjhoMTB2MnoiIGZpbGwtb3BhY2l0eT0iLjUiLz48L3N2Zz4=) center no-repeat;
-        background-size: 16px 16px;
-        opacity: 0.87; 
+        background: transparent url(../img/icon-16-checkbox.png) 0 0 no-repeat;
     }
-    .ag-icon-checkbox-indeterminate {
+    .ag-icon-checkbox-unchecked-readonly,
+    .ag-icon-checkbox-unchecked{
         display: inline-block;
         width: 16px;
         height: 16px;
-        background: transparent url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEgyQy45IDAgMCAuOSAwIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMlYyYzAtMS4xLS45LTItMi0yem0tMiAxMEg0VjhoMTB2MnoiLz48L3N2Zz4=) center no-repeat;
-        background-size: 16px 16px;
-        opacity: 0.87; 
+        background: transparent url(../img/icon-16-checkbox.png) 0 0 no-repeat;
     }
-    .ag-icon-checkbox-unchecked-readonly {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        background: transparent url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMnYxNEgyVjJoMTR6bTAtMkgyQy45IDAgMCAuOSAwIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMlYyYzAtMS4xLS45LTItMi0yeiIgZmlsbC1vcGFjaXR5PSIuNSIvPjwvc3ZnPg==) center no-repeat;
-        background-size: 16px 16px;
-        opacity: 0.87; 
-    }
-    .ag-icon-checkbox-unchecked {
-        display: inline-block;
-        width: 16px;
-        height: 16px;
-        background: transparent url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMnYxNEgyVjJoMTR6bTAtMkgyQy45IDAgMCAuOSAwIDJ2MTRjMCAxLjEuOSAyIDIgMmgxNGMxLjEgMCAyLS45IDItMlYyYzAtMS4xLS45LTItMi0yeiIvPjwvc3ZnPg==) center no-repeat;
-        background-size: 16px 16px;
-        opacity: 0.87; 
-    }
-    .ag-header-cell .ag-icon-checkbox-checked:empty {
-        background: #FFFFFF none;
-    }
-    // 
+ 
     .ag-icon-checkbox-checked:empty {
-        background: #42AF8F none;
-        -webkit-mask: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEgyYTIgMiAwIDAgMC0yIDJ2MTRhMiAyIDAgMCAwIDIgMmgxNGEyIDIgMCAwIDAgMi0yVjJhMiAyIDAgMCAwLTItMnpNNyAxNEwyIDlsMS40MS0xLjQxTDcgMTEuMTdsNy41OS03LjU5TDE2IDVsLTkgOXoiLz48L3N2Zz4=) no-repeat 50% 50%;
-        mask: url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEgyYTIgMiAwIDAgMC0yIDJ2MTRhMiAyIDAgMCAwIDIgMmgxNGEyIDIgMCAwIDAgMi0yVjJhMiAyIDAgMCAwLTItMnpNNyAxNEwyIDlsMS40MS0xLjQxTDcgMTEuMTdsNy41OS03LjU5TDE2IDVsLTkgOXoiLz48L3N2Zz4=) no-repeat 50% 50%; 
+        background: #42AF8F url(../img/icon-16-checkbox.png) -16px 0 no-repeat;
     }
     @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
         .ag-icon-checkbox-checked:empty {
-            background: transparent url(data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cGF0aCBkPSJNMTYgMEgyYTIgMiAwIDAgMC0yIDJ2MTRhMiAyIDAgMCAwIDIgMmgxNGEyIDIgMCAwIDAgMi0yVjJhMiAyIDAgMCAwLTItMnpNNyAxNEwyIDlsMS40MS0xLjQxTDcgMTEuMTdsNy41OS03LjU5TDE2IDVsLTkgOXoiLz48L3N2Zz4=); 
+            background: #42AF8F url(../img/icon-16-checkbox.png) -16px 0 no-repeat;
         } 
     } 
     

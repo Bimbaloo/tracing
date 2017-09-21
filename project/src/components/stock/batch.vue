@@ -5,7 +5,7 @@
 		<div class="innner-content">
 			<h2 class="content-title tableData">
 				
-				<span class='table-title'><span class="tag">{{batch}}</span>出库信息</span>
+				<span class='table-title'><span class="tag">{{batch + " + " + materialCode}}</span>出库信息</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
@@ -18,7 +18,7 @@
 				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
 			</div>
 			<h2 class="content-title tableData">
-				<span class='table-title'><span class="tag">{{batch}}</span>在库信息</span>
+				<span class='table-title'><span class="tag">{{batch + " + " + materialCode}}</span>在库信息</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
@@ -59,6 +59,7 @@
                 	"max-height": "200px"
                 },
 				batch: this.$route.query.batchNo,
+				materialCode: this.$route.query.materialCode,
 				outstockData: {
 					url: HOST + "/api/v1/outstock/bybatch",
 					loading: false,

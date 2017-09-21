@@ -21,11 +21,11 @@
 					<div class="item-title">条码信息</div>
 					<div class="item-content">
 						<ul class="item-list clear">
-							<li class="item-item"><label>查询码 : </label><span>{{ data.barCode }}</span></li>
-							<li class="item-item"><label>级码 : </label><span>{{ data.barcodeTypeName }}</span></li>
-							<li class="item-item"><label>物料编码 : </label><span>{{ data.materialCode }}</span></li>
-							<li class="item-item"><label>物料名称 : </label><span>{{ data.materialName }}</span></li>
-							<li class="item-item"><label>父级码 : </label><span>{{ data.packet }}</span></li>
+							<li class="item-item"><label>查询码 : </label><span :title="data.barCode">{{ data.barCode }}</span></li>
+							<li class="item-item"><label>级码 : </label><span :title="data.barcodeTypeName">{{ data.barcodeTypeName }}</span></li>
+							<li class="item-item"><label>物料编码 : </label><span :title="data.materialCode">{{ data.materialCode }}</span></li>
+							<li class="item-item"><label>物料名称 : </label><span :title="data.materialName">{{ data.materialName }}</span></li>
+							<li class="item-item" style="width: 100%;"><label>父级码 : </label><span :title="data.packet">{{ data.packet }}</span></li>
 						</ul>
 					</div>
 				</div>
@@ -193,6 +193,16 @@
 								width: 50%;
 								float: left;
 								line-height: 30px;
+								
+								span {
+									display: inline-block;
+									width: calc(100% - 22px);
+									width: -webkit-calc(100% - 22px);
+									width: -moz-calc(100% - 22px);
+									overflow: hidden;
+									text-overflow: ellipsis;
+									vertical-align: middle;
+								}
 							}
 						
 						}

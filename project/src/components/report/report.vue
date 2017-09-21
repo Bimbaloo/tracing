@@ -76,7 +76,7 @@
 				</h2>
 				<transition-group name="el-zoom-in-top" tag="div">
 					<h2 v-show="active.outStocks" key="5" class="inner-title">
-						<span class='table-title'>出库明细</span>
+						<span class='table-title'>滞留中</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.outStocks, $event)"></i>
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outStocksTable', $event)"></i>
@@ -86,7 +86,7 @@
 						<v-table v-show="active.outStocks" :table-data="reportData.outStocks" :loading="loading"></v-table>
 					</div>
 					<h2 v-show="active.outStocks" key="7" class="inner-title">
-						<span class='table-title'>发货明细</span>
+						<span class='table-title'>已发货</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.delivered, $event)"></i>
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('deliveredTable', $event)"></i>

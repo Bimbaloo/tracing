@@ -192,8 +192,8 @@
 							radio: "1"
 						},
 						aHref = location.href.split("?"),
-						aParams = aHref[1].split("&"),
-						aInfo = aHref[0].split("/");
+						aParams = aHref[2].split("&"),
+						aInfo = aHref[1].split("/");
 					
 					// 设置tab和radio
 					oData.tab = aInfo[aInfo.length-2];

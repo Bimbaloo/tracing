@@ -6,6 +6,7 @@
     	filterable 
     	clearable 
     	remote
+    	:default-first-option="true"
     	:remote-method="remoteMethod"
     	:loading="loading"
     	loading-text="加载中..."
@@ -28,6 +29,7 @@
     	style="width: 100%;" 
     	filterable 
     	clearable
+    	:default-first-option="true"
     	:loading="loading"
     	@visible-change ="showSelect"
     	@change="handleChange">

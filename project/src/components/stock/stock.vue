@@ -5,7 +5,7 @@
         	<div class="path-list">
 	            <span class="path-item" @click="checkStock">查出库</span>
 	            <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
-	            <span class="path-item" v-if="restrainIf">>遏制</span>
+	            <span class="path-item" v-if="restrainIf">>可疑品</span>
         	</div>
             <div class="path-btn">
             	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>

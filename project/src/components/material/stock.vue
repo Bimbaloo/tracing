@@ -12,7 +12,7 @@
         <div class="router-path">
             <span class="path-item" @click="checkStock">仓储信息</span>
             <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
-            <span class="path-item" v-if="restrainIf">>遏制</span>
+            <span class="path-item" v-if="restrainIf">>可疑品</span>
         </div> 
         <router-view></router-view>  
         <!--el-breadcrumb separator="/" class="router-path">

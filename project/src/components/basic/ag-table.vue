@@ -5,11 +5,11 @@
     	class="ag-table ag-fresh"
 		:style="{height: heights+'px'}"
     	:rowData="dataArray"
+    	:columnDefs="columns"
     	:selectionChanged="selectionChanged"
     	:gridOptions="option">
     </ag-grid>
 </template>
-
 <script>
 	import {AgGridVue} from "ag-grid-vue"
 	import "ag-grid/dist/styles/ag-grid.css"
@@ -51,6 +51,9 @@
         computed: {
         	dataArray() {
         		return this.tableData.data
+        	},
+        	columns() {
+        		return this.tableData.columns
         	}
         },
         created() {

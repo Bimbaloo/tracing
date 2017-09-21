@@ -5,6 +5,7 @@
     	:disabled="disabled" 
     	style="width: 100%;" 
     	multiple 
+    	:default-first-option="true"
     	@change="handleChange">
         <el-option
             v-for="option in options"
