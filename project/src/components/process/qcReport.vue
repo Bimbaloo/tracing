@@ -77,7 +77,7 @@ export default {
                     prop: "equipmentName",
                     width: "120"
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: "120"
                 }, {
@@ -85,7 +85,7 @@ export default {
                     prop: "processName",
                     width: "120",
                 }, {
-                    name: "式样号",
+                    name: "式样",
                     prop: "sampleIdentification",
                     width: "120",
                 }, {

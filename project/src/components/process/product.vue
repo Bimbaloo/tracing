@@ -198,11 +198,11 @@ export default {
                     width: "",
                     fixed: true,
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: ""
                 }, {
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "",
                 }, {
@@ -247,11 +247,11 @@ export default {
                     prop: "packetBarcode",
                     width: "200"
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: "200"
                 }, {
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "200"
                 }, {
@@ -309,11 +309,11 @@ export default {
                     prop: "productionType",
                     width: "100"
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: "120"
                 }, {
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "250",
                 }, {
@@ -353,7 +353,7 @@ export default {
             inAllItems: {
                 filename: "投入汇总",
                 columns: [{
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "",
                 }, {
@@ -376,7 +376,7 @@ export default {
             outAllItems: {
                 filename: "产出汇总",
                 columns: [{
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "",
                 }, {
