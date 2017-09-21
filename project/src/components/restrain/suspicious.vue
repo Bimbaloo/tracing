@@ -3,8 +3,8 @@
 		<!--<el-button class="btn btn-plain btn-restrain" @click="restrain" v-if="isRestrained">遏制</el-button>-->
 		<div class="innner-content" :style="styleObject">
 			<!--h2 class="title">遏制详情</h2-->
-			<h2 class="content-title">查询条件</h2>
-			<div class="condition" v-if="'materialCode' in $route.query">
+			<h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2>
+			<div class="condition" v-if="'materialCode' in $route.query && !isrestrainHtml">
 				<span>物料编码：{{$route.query.materialCode}}</span><span>批次：{{$route.query.batchNo}}</span>
 			</div>
 			<div class="condition" v-if="'equipmentId' in $route.query">
@@ -34,16 +34,22 @@
 				}
 			}
 		},
+		computed: {
+			isrestrainHtml (){
+				return window.location.pathname.includes("restrain")
+			}
+		},
 		created() {
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
-//			 this.fetchData();
+			// this.fetchData();
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
 			// '$route': 'fetchData'
 		},
-		methods: {
+		methods: {	
+
 			// 可疑品列表。
 			restrain() {
  
@@ -81,11 +87,11 @@
 		     		
 		     			let oConditions = Object.assign({description: self.description}, this.$route.query);
 		     			
-//		              	this.$post(this.url, oConditions)
-//		        		.then((res) => { 		        			
+				 //this.$post(this.url, oConditions)
+					//.then((res) => { 		        			
 		        			done();
 		        			instance.confirmButtonLoading = false;
-//		        			if(!res.errorCode) {			
+						  //if(!res.errorCode) {			
 		        				bSucess = true;
 		        				// 隐藏遏制按钮。
 		        				self.isRestrained = false;
@@ -97,16 +103,16 @@
 		        				// 遏制成功，打开到遏制报告。
 		        				window.open("/restrain/report.html?" +　sSerializion);
 		        				
-//		        			}
-//		        		})
-//		        		.catch((err) => {        
-//		        			done();
-//		        			instance.confirmButtonLoading = false;
-//		        		});
+						//	}
+						//})
+						//.catch((err) => {        
+						//	done();
+						//	instance.confirmButtonLoading = false;
+					//});
 		
 		            } else {            
 		              	done();
-		//            	instance.$slots.default[0].elm.children[0].value = "";
+					// 	instance.$slots.default[0].elm.children[0].value = "";
 		            }
 		            
 		          }
@@ -118,7 +124,7 @@
 		        			this.$message.error('提交失败！');
 		        		}
 		        	}
-		//      	self.description = "";
+					//self.description = "";
 		        })
     
 			},

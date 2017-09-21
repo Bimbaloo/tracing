@@ -125,10 +125,10 @@
 						{ required: true, message: '请选择人员', trigger: 'change' }
 					],
 					startTime: [
-						{ type: 'date', required: true, message: '请选择开始日期', trigger: 'change' }
+						{ required: true, message: '请选择开始日期', trigger: 'change' }
 					],
 					endTime: [
-						{ type: 'date', required: true, message: '请选择结束日期', trigger: 'change' }
+						{ required: true, message: '请选择结束日期', trigger: 'change' }
 					]
 				},
 				/* 遏制列表页面数据 */
@@ -248,21 +248,10 @@
 			}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
 				oData = this.getSearchData();
 				this.render(oData)
-			}else {
-				oData = {
-					tab: "",
-					keys: {
-						batchNo: "",
-						materialCode: ''
-					},
-					radio: "0"
-				}
-				
 			}
 
 			/* 根据传入数据 */
 			this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
-				this.tip = false
 				let datas = oResult
 				let _radioList = []			//用于储存radioList
 				let _groupItems = []		//用于储存groupItems
@@ -300,6 +289,13 @@
 					}
 				})
 
+				if(oData) {
+					this.render(oData)
+				}else {
+					this.render({radio: "0"})
+				}
+
+				render({radio: "0"})
 				this.$nextTick(() => {
 					if(oData) {
 						this._submitForm(oData);
@@ -327,7 +323,7 @@
 			submitForm(formName) {
 			  this.$refs[formName].validate((valid) => {
 					if (valid) {
-
+						this.activeKey = "suspicious"
                         let oConditions = {
                             keys: this.ruleForms, // this.keys,
 							radio: this.radioNumber,
@@ -397,8 +393,7 @@
 
 			// 数据提交
 			_submitForm(oConditions) {	
-				
-
+				this.tip = false
 				let sPath = '/' + this.activeKey;  //this.activeKey  == 'suspicious'
 				oConditions.tab = this.activeKey;
 

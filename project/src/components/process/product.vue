@@ -49,8 +49,8 @@
                     </h2>
 
                     <div class="content-table" ref="outputTable" v-if="show2">
-                        <!-- <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table> -->
-                        <el-table class="table-main" :data="checked?outItems.data:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
+                        <!-- <el-table class="table-main" :data="checked?outItems.data:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content" v-if="column.prop !== 'handle'">
@@ -61,7 +61,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table>
+                        </el-table> -->
                     </div>
 
                     <h2 class="content-title inTitle">
@@ -73,8 +73,8 @@
                     </h2>
 
                     <div class="content-table" ref="inputTable" v-if="show2">
-                        <!-- <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table> -->
-                        <el-table class="table-main" :data="checked?inItems.data:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
+                        <!-- <el-table class="table-main" :data="checked?inItems.data:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content" v-if="column.prop !== 'handle'">
@@ -85,7 +85,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table>
+                        </el-table> -->
                     </div>
 
                 </el-tab-pane>
@@ -98,8 +98,8 @@
                         </span>
                     </h2>
                     <div class="content-table" ref="outputAllTable" v-if="show3">
-                        <!-- <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
-                        <el-table class="table-main" :data="checked?outAllItems.data:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table>
+                        <!-- <el-table class="table-main" :data="checked?outAllItems.data:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content" v-if="column.prop !== 'handle'">
@@ -107,11 +107,10 @@
                                     </div>
                                     <div class="button" v-else>
                                         <span style="margin-right:10px" @click="batchClick(props.row)" v-if="!bTrack">追踪</span>
-                                        <span @click="materialClick(props.row)">遏制</span>
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table>
+                        </el-table> -->
                     </div>
                     <h2 class="content-title inAllTitle">
                         <span class='table-title'>投入汇总</span>
@@ -122,20 +121,16 @@
                     </h2>
 
                     <div class="content-table" ref="inputAllTable" v-if="show3">
-                        <!-- <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
-                        <el-table class="table-main" :data="checked?inAllItems.data:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table>
+                        <!-- <el-table class="table-main" :data="checked?inAllItems.data:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div class="cell-content" v-if="column.prop !== 'handle'">
+                                    <div class="cell-content">
                                         <span>{{ props.row[column.prop] }}</span>
-                                    </div>
-                                    <div class="button" v-else>
-                                        <span style="margin-right:10px" @click="batchClick(props.row)" v-if="!bTrack">追踪</span>
-                                        <span @click="materialClick(props.row)">遏制</span>
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table>
+                        </el-table> -->
                     </div>
 
                 </el-tab-pane>
@@ -198,11 +193,11 @@ export default {
                     width: "",
                     fixed: true,
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: ""
                 }, {
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "",
                 }, {
@@ -242,16 +237,18 @@ export default {
                     prop: "barcode",
                     width: "200",
                     fixed: true,
+                    class: 'barcode',
+                    cellClick: this.barcodeClick
                 }, {
                     name: "箱码",
                     prop: "packetBarcode",
                     width: "200"
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: "200"
                 }, {
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "200"
                 }, {
@@ -286,11 +283,6 @@ export default {
                     name: "产出时间",
                     prop: "happenTime",
                     width: "200"
-                }, {
-                    name: "操作",
-                    prop: "handle",
-                    width: "120",
-                    fixed: "right",
                 }],
                 data: [],
                 dataFilter: [],
@@ -309,11 +301,11 @@ export default {
                     prop: "productionType",
                     width: "100"
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: "120"
                 }, {
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "250",
                 }, {
@@ -353,7 +345,7 @@ export default {
             inAllItems: {
                 filename: "投入汇总",
                 columns: [{
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "",
                 }, {
@@ -376,9 +368,11 @@ export default {
             outAllItems: {
                 filename: "产出汇总",
                 columns: [{
-                    name: "批次号",
+                    name: "批次",
                     prop: "batchNo",
                     width: "",
+                    class: 'batchNo',
+                    cellClick: this.batchClick
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
@@ -399,11 +393,6 @@ export default {
                     name: "不合格数",
                     prop: "unqualifiedNum",
                     width: "100"
-                }, {
-                    name: "操作",
-                    prop: "handle",
-                    width: "120",
-                    fixed: "right",
                 }],
                 height: 1,
                 data: []
@@ -462,8 +451,8 @@ export default {
     updated() {
 
         this.setTitle(".barcode", "条码追踪")
-        this.setTitle(".batch", "批次追踪")
-        this.setTitle(".material", "遏制")
+        this.setTitle(".batchNo", "批次追踪")
+       // this.setTitle(".material", "遏制")
 
     },
     watch: {
@@ -479,7 +468,8 @@ export default {
 
             if (this.bTrack) {
                 // 若为追踪页面，过滤明细产出操作列。
-                this.outItems.columns = this.outItems.columns.filter(o => o.prop !== "handle");
+                this.outItems.columns[0].class = ''
+                this.outItems.columns[0].cellClick = ''
             }
         },
         // 请求成功。
@@ -581,6 +571,10 @@ export default {
                     el.unqualifiedNum = el.quantity
                 }
             })
+            /* 如果箱码列内容为空，取消该列 */
+            if(outDatas.some((e)=> e.packetBarcode === '' || e.packetBarcode === null )){ 
+                this.outItems.columns = this.outItems.columns.filter(o => o.prop !== "packetBarcode");
+            }
             /* 所有产出汇总 */
             let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
             outDatasCopy.forEach((el, i) => {                             // 产出汇总
@@ -910,10 +904,8 @@ export default {
                 icon.classList.add('actived');
             }
         },
-        /* */
+        /* tab切换 */
         tabChange(tab, event) {
-            //debugger
-            console.log(tab, event);
             const index = tab.index
             switch (index) {
                 case "0":
@@ -958,6 +950,29 @@ export default {
         right: auto;
     }
 }
+
+.table {
+    td.batch,
+    td.barcode,
+    td.material,
+    td.batchNo {
+        cursor: pointer;
+        color: #f90;
+
+        .cell {
+            font-weight: 600;
+
+            &:empty {
+                cursor: default;
+            }
+        }
+    }
+    .clicked {
+        cursor: pointer;
+        color: #f90;
+    }
+}
+
 
 .button {
     cursor: pointer;

@@ -77,7 +77,7 @@ export default {
                     prop: "equipmentName",
                     width: "120"
                 }, {
-                    name: "派工单号",
+                    name: "工单",
                     prop: "doCode",
                     width: "120"
                 }, {
@@ -85,7 +85,7 @@ export default {
                     prop: "processName",
                     width: "120",
                 }, {
-                    name: "式样号",
+                    name: "式样",
                     prop: "sampleIdentification",
                     width: "120",
                 }, {
@@ -215,7 +215,11 @@ export default {
             this.loading = false;
             this.tableData.data = oData
             this.tableData.data.forEach((el) => {
-                el["handle"] = "下载"
+                 if(el.reportPath && el.reportPath !== null && el.reportPath !== ""){
+                     el["handle"] = "下载"
+                 }else{
+                      el["handle"] = ""
+                 }
             })                     
         },
         // 请求失败。
@@ -348,11 +352,16 @@ export default {
             this.tableData.height = this.adjustHeight()
         },
         fileDownload(row) {
-            let src = row["reportPath"]
-            //   let src = "https://codeload.github.com/douban/douban-client/legacy.zip/master"
-            let objIframe = document.createElement("IFRAME");
-            document.body.appendChild(objIframe)
-            objIframe.outerHTML = "<iframe   name=a1   style='width:0;hieght:0'   src=" + src + "></iframe>";
+            //console.log(row)
+            const src = row["reportPath"]
+            const title = row["fileName"]
+            //const src = "https://bimbaloo.github.io/www/ifms/images/MAC1.png"
+            //const src = `https://bimbaloo.github.io/www/ifms/images/bg1.jpg`
+            const a = document.createElement('a');
+            a.setAttribute('href', src);
+            a.setAttribute('download', title);
+            a.click();
+
         }
 
     }
