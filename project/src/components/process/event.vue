@@ -95,6 +95,10 @@ export default {
                     prop: "checkTime",
                     width: "200"
                 }, {
+                    name: "结束时间",
+                    prop: "endTime",
+                    width: "200"
+                }, {
                     name: "确认人",
                     prop: "checkName",
                     width: ""
