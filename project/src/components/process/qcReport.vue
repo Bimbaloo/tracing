@@ -215,7 +215,8 @@ export default {
             this.loading = false;
             this.tableData.data = oData
             this.tableData.data.forEach((el) => {
-                el["handle"] = "下载"
+                // el["handle"] = "下载"
+                 el["handle"] = ""
             })                     
         },
         // 请求失败。
