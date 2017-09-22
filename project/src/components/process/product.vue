@@ -49,19 +49,16 @@
                     </h2>
 
                     <div class="content-table" ref="outputTable" v-if="show2">
-                        <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table>
-                        <!-- <el-table class="table-main" :data="checked?outItems.data:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <!-- <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                        <el-table class="table-main" :data="checked?outItems.data:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div class="cell-content" v-if="column.prop !== 'handle'">
+                                    <div class="cell-content">
                                         <span>{{ props.row[column.prop] }}</span>
-                                    </div>
-                                    <div class="button" v-else>
-                                        <span @click="barcodeClick(props.row)">追踪</span>
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table> -->
+                        </el-table>
                     </div>
 
                     <h2 class="content-title inTitle">
@@ -73,19 +70,16 @@
                     </h2>
 
                     <div class="content-table" ref="inputTable" v-if="show2">
-                        <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table>
-                        <!-- <el-table class="table-main" :data="checked?inItems.data:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <!-- <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                        <el-table class="table-main" :data="checked?inItems.data:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div class="cell-content" v-if="column.prop !== 'handle'">
+                                    <div class="cell-content">
                                         <span>{{ props.row[column.prop] }}</span>
-                                    </div>
-                                    <div class="button" v-else>
-                                        <span @click="barcodeClick(props.row)">追踪</span>
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table> -->
+                        </el-table>
                     </div>
 
                 </el-tab-pane>
@@ -98,19 +92,16 @@
                         </span>
                     </h2>
                     <div class="content-table" ref="outputAllTable" v-if="show3">
-                        <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table>
-                        <!-- <el-table class="table-main" :data="checked?outAllItems.data:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <!-- <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                        <el-table class="table-main" :data="checked?outAllItems.data:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div class="cell-content" v-if="column.prop !== 'handle'">
+                                    <div class="cell-content">
                                         <span>{{ props.row[column.prop] }}</span>
-                                    </div>
-                                    <div class="button" v-else>
-                                        <span style="margin-right:10px" @click="batchClick(props.row)" v-if="!bTrack">追踪</span>
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table> -->
+                        </el-table>
                     </div>
                     <h2 class="content-title inAllTitle">
                         <span class='table-title'>投入汇总</span>
@@ -121,8 +112,8 @@
                     </h2>
 
                     <div class="content-table" ref="inputAllTable" v-if="show3">
-                        <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table>
-                        <!-- <el-table class="table-main" :data="checked?inAllItems.data:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <!-- <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                        <el-table class="table-main" :data="checked?inAllItems.data:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content">
@@ -130,7 +121,7 @@
                                     </div>
                                 </template>
                             </el-table-column>
-                        </el-table> -->
+                        </el-table>
                     </div>
 
                 </el-tab-pane>
@@ -868,6 +859,7 @@ export default {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
             this.uniteItems.height = 2 * this.adjustHeight() + 70
+           // console.log(this.adjustHeight())
         },
         /* 设置title */
         setTitle(el, title) {
