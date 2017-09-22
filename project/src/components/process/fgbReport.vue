@@ -235,9 +235,9 @@ export default {
             })
             /* 测试数据 */
             // oQuery = {
-            //     "equipmentId": "186",
-            //     "startTime": "2017-08-11 00:34:52",
-            //     "endTime": "2017-08-11 00:35:18"
+            //     "equipmentId": "69",
+            //     "startTime": "2017-08-28 19:00:00",
+            //     "endTime": "2017-08-28 20:00:00"
             // }
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
@@ -356,7 +356,7 @@ export default {
                     "dataId": Id
                 }
 
-                this.sendRequest(this.$store, this.$ajax, url2, "get", dataId, (oData) => {
+                this.$register.sendRequest(this.$store, this.$ajax, url2, "get", dataId, (oData) => {
                     oData.forEach(el=>{
                         let newData = {name:`${el.description}`,prop:`${el.description}`}
                         this.tableData.columns.push(newData)
