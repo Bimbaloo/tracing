@@ -41,7 +41,8 @@ const QcReport = r => require.ensure([], () => r(require('components/process/qcR
 const FgbReport = r => require.ensure([], () => r(require('components/process/fgbReport.vue')), 'group-detail') //fgb质检
 const Tool = r => require.ensure([], () => r(require('components/process/tool.vue')), 'group-detail')           //工具
 const Event = r => require.ensure([], () => r(require('components/process/event.vue')), 'group-detail')         //事件
-const Repair = r => require.ensure([], () => r(require('components/process/repair.vue')), 'group-detail')       //维护记录
+const Repair = r => require.ensure([], () => r(require('components/process/repair.vue')), 'group-detail')       //维修记录
+const SpotReport = r => require.ensure([], () => r(require('components/process/spotReport.vue')), 'group-detail')//点检记录
 const Parameter = r => require.ensure([], () => r(require('components/process/parameter.vue')), 'group-detail') //工艺参数
 
 const Trace = r => require.ensure([], () => r(require('components/trace/trace.vue')), 'group-detail')
@@ -89,9 +90,12 @@ const routes = [{
     },{//事件
       path: 'event',
       component: Event
-    },{//维护记录
+    },{//维修记录
       path: 'repair',
       component: Repair
+    },{//点检记录
+      path: 'spotReport',
+      component: SpotReport
     },{//工艺参数
       path: 'parameter',
       component: Parameter

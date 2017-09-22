@@ -281,6 +281,9 @@ export default {
         },
         /* 获取元素实际高度(含margin) */
         outerHeight(el) {
+            if(!el) {
+                return 0;
+            }
             var height = el.offsetHeight;
             var style = el.currentStyle || getComputedStyle(el);
 

@@ -316,8 +316,13 @@
 					type: "5",
                     color: "#5aa7c5",
                     list: [{
-						name: "维护记录",
+						name: "维修记录",
 						router: "/process/repair",
+						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
+
+                    }, {
+						name: "点检记录",
+						router: "/process/spotReport",
 						query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     }]
@@ -744,7 +749,7 @@
                         return new Date(value).Format()
                     }
                 },oAxis))
-
+                
                 // 为缩放轴添加开始时间结束时间。
                 if(this.datetime.realStart) {
                     oData.dataZoom[0].startValue = +new Date(this.datetime.realStart)
@@ -1672,11 +1677,11 @@
                     case "qcList": 
                         oResult.time = +new Date(o.startTime);
                         o.timePoint = o.startTime;
-                        oResult.title = "质检";
+                        oResult.title = "质检-" + o.method;
                         oResult.tooltipData = [
                             {name: "质检时间", value: o.startTime},
                             {name: "操作人", value: o.personName},
-                            {name: "三检类型", value: o.method},
+                            // {name: "三检类型", value: o.method},
                             {name: "质检结果", value: o.result}
                         ];
                         break;
@@ -1748,7 +1753,9 @@
                         o.timePoint = o.endTime;
                         oResult.title = "设备维护结束";
                         oResult.tooltipData = [
-                            {name: "结束时间", value: o.endTime}
+                            {name: "结束时间", value: o.endTime},
+                            {name: "操作人", value: o.personName},
+                            {name: "维护原因", value: o.reason}
                         ]; 
                         break;
                         // 上刀/模具
@@ -1757,9 +1764,12 @@
                         o.timePoint = o.happenTime;
                         if(o.toolType == "刀具") {
                             sTitle = "上刀";
-                        }else {
+                        }else if(o.toolType == "模具") {
                             sTitle = "上模";
+                        }else {
+                            sTitle = "其他";
                         }
+
                         oResult.title = sTitle;
                         oResult.tooltipData = [
                             {name: "发生时间", value: o.happenTime},
@@ -1774,10 +1784,13 @@
                         oResult.time = +new Date(o.happenTime);
                         o.timePoint = o.happenTime;
                         if(o.toolType == "刀具") {
-                            sTitle = "上刀";
+                            sTitle = "下刀";
+                        }else if(o.toolType == "模具"){
+                            sTitle = "下模";
                         }else {
-                            sTitle = "上模";
+                            sTitle = "其他";
                         }
+
                         oResult.title = sTitle;
                         oResult.tooltipData = [
                             {name: "发生时间", value: o.happenTime},

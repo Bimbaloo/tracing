@@ -9,7 +9,7 @@
                 </div>
             </div>
             <h2 class="content-title tableData">
-                <span class='table-title'>维护记录</span>
+                <span class='table-title'>点检记录</span>
                 <span class='table-handle'>
                     <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
                     <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('repairTable', $event)"></i>

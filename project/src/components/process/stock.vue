@@ -38,11 +38,12 @@
                     "product":"投产表",
                     "qtReport":"质检",
                     "qcReport":"送检",
-                    "fgbReport":"fgb质检",
+                    "fgbReport":"fgb检验",
                     "tool":"工具记录",
                     "event":"事件记录",
-                    "repair":"维护记录",
-                    "restrain":"遏制",
+                    "repair":"维修记录",
+                    "spotReport":"点检记录",
+                    "restrain":"可疑品",
                     "parameter":"工艺参数"
                 },
                 aoRoute: [],
@@ -114,13 +115,13 @@
                 if(sToType === "process" && to.query.key && !to.query.startTime) {
                     // 树节点跳转。
                     this.oQuery = {}
-                    this.oQuery[sToType] = to.query
+                    // this.oQuery[sToType] = to.query
                     this.aoRoute = []
 
                     this.aoRoute.push({
                         name: this.operations[sToType],
                         path: sToRoute,
-                        query: to.query
+                        query: this.oQuery[sToType]
                     })                  
                 }else if(sFromType === "process") {
                     // 从设备分析跳转到其他页面。
@@ -131,7 +132,10 @@
                         shiftStartTime: to.query.shiftStartTime,
                         shiftEndTime: to.query.shiftEndTime
                     })
-
+                    
+                    // 保存跳转的时间。
+                    this.aoRoute[0].query = this.oQuery[sFromType]
+                    
                     this.aoRoute.push({
                         name: this.operations[sToType],
                         path: sToRoute,
@@ -199,11 +203,11 @@
 		     		
 		     			let oConditions = Object.assign({description: self.description}, this.$route.query);
 		     			
-//		              	this.$post(this.url, oConditions)
-//		        		.then((res) => { 		        			
+		              	//this.$post(this.url, oConditions)
+		        		//.then((res) => { 		        			
 		        			done();
 		        			instance.confirmButtonLoading = false;
-//		        			if(!res.errorCode) {			
+		        			//if(!res.errorCode) {			
 		        				bSucess = true;
 		        				// 隐藏遏制按钮。
 		        				self.restrainIf = false;
@@ -215,16 +219,16 @@
 		        				// 遏制成功，打开到遏制报告。
 		        				window.open("/restrain/report.html?" +　sSerializion);
 		        				
-//		        			}
-//		        		})
-//		        		.catch((err) => {        
-//		        			done();
-//		        			instance.confirmButtonLoading = false;
-//		        		});
+		        		//	}
+		        		//})
+		        		//.catch((err) => {        
+		        		//	done();
+		        		//	instance.confirmButtonLoading = false;
+		        		//});
 		
 		            } else {            
 		              	done();
-		//            	instance.$slots.default[0].elm.children[0].value = "";
+		            //	instance.$slots.default[0].elm.children[0].value = "";
 		            }
 		            
 		          }
@@ -236,7 +240,7 @@
 		        			this.$message.error('提交失败！');
 		        		}
 		        	}
-		//      	self.description = "";
+		      //	self.description = "";
 		        })
     
 			},
@@ -265,13 +269,6 @@
             // 举例来说，对于一个带有动态参数的路径 /foo/:id，在 /foo/1 和 /foo/2 之间跳转的时候，
             // 由于会渲染同样的 Foo 组件，因此组件实例会被复用。而这个钩子就会在这个情况下被调用。
             // 可以访问组件实例 `this`
-//          console.log("to:");
-//          console.log(to);
-//          console.log("from:");
-//          console.log(from);
-//          console.log("next:");
-//          console.log(next);
-
             this.key = this.$route.params.key;
             this.setRouteQuery(from, to);
             // 设置path可见性。

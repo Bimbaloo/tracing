@@ -61,6 +61,7 @@
         },
         methods: {
 			setDateTime () {
+				
 				let oQuery = this.$route.query || {},
 					start = oQuery.shiftStartTime,
 					end = oQuery.shiftEndTime	
