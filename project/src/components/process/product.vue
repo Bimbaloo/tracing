@@ -833,14 +833,14 @@ export default {
 
         // 获取高度。
         adjustHeight() {
-
+            
             let ntable = 0;
             ntable = Math.floor(
                 this.viewHeight
                 - this.outerHeight(document.querySelector(".condition"))
                 - 30 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
-                - this.outerHeight(document.querySelector(".content-title.outTitle"))
-                - this.outerHeight(document.querySelector(".content-title.inTitle"))
+                - 40 //   this.outerHeight(document.querySelector(".content-title.outTitle"))
+                - 40 //   this.outerHeight(document.querySelector(".content-title.inTitle"))
                 - 70  //修正值
             ) / 2;
 
