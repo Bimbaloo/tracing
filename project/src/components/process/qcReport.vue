@@ -105,21 +105,9 @@ export default {
                     prop: "passTypeName",
                     width: "120"
                 }, {
-                    name: "送检报告名称",
+                    name: "送检报告",
                     prop: "reportName",
-                    width: ""
-                }, {
-                    name: "文件名称",
-                    prop: "fileName",
-                    width: "120"
-                }, {
-                    name: "文件大小",
-                    prop: "fileSize",
-                    width: "120"
-                }, {
-                    name: "操作",
-                    prop: "handle",
-                    width: "120",
+                    width: "",
                     class: "handle",
                     cellClick: this.fileDownload
                 }],
@@ -392,15 +380,10 @@ export default {
 
 .table {
     .handle {
-        cursor: pointer;
         color: #f90;
-
         .cell {
             font-weight: 600;
-
-            &:empty {
-                cursor: default;
-            }
+            cursor: pointer;    
         }
     }
     .clicked {

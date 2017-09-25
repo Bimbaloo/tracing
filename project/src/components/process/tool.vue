@@ -74,10 +74,6 @@ export default {
             tableData: {
                 filename: '工具记录',
                 columns: [{
-                    name: "工具位子",
-                    prop: "toolPosition",
-                    width: "",
-                }, {
                     name: "工具编码",
                     prop: "toolCode",
                     width: ""
@@ -97,6 +93,10 @@ export default {
                     name: "操作类型",
                     prop: "operateType",
                     width: ""
+                }, {
+                    name: "工具位置",
+                    prop: "toolPosition",
+                    width: "",
                 }, {
                     name: "操作时间",
                     prop: "operateTime",

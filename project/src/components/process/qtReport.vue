@@ -72,7 +72,7 @@ export default {
             tableData: {
                 filename: "质检记录",
                 columns: [{
-                    name: "三检类型",
+                    name: "质检类型",
                     prop: "methodName",
                     width: "80",
                 },
@@ -94,17 +94,17 @@ export default {
                     prop: "commitTime",
                     width: "180",
                 }, {
+                    name: "质检人",
+                    prop: "operatorName",
+                    width: "120"
+                }, {
                     name: "审核时间",
                     prop: "inspectedTime",
                     width: "180"
                 }, {
-                    name: "人员姓名",
-                    prop: "operatorName",
+                    name: "审核人",
+                    prop: "",
                     width: "120"
-                }, {
-                    name: "员工号",
-                    prop: "operatorCard",
-                    width: ""
                 }, {
                     name: "检验结果",
                     prop: "isPassName",
