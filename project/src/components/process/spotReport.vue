@@ -68,19 +68,31 @@ export default {
             ],
             /* 投入 */
             tableData: {
-                filename: "维护记录",
+                filename: "点检记录",
                 columns: [{
-                    name: "维护人",
-                    prop: "personName"
+                    name: "数据更新时间",
+                    prop: ""
                 }, {
-                    name: "维护原因",
-                    prop: "reason"
+                    name: "计划名称",
+                    prop: ""
                 }, {
-                    name: "开始时间",
-                    prop: "startTime"
+                    name: "项目名称",
+                    prop: ""
                 }, {
-                    name: "结束时间",
-                    prop: "endTime"
+                    name: "点检结果",
+                    prop: ""
+                }, {
+                    name: "点检值",
+                    prop: ""
+                }, {
+                    name: "操作人姓名",
+                    prop: ""
+                }, {
+                    name: "班次（日期和名称）",
+                    prop: ""
+                }, {
+                    name: "上报时间",
+                    prop: ""
                 }],
                 height: 1,
                 data: [],
