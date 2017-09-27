@@ -26,9 +26,12 @@
                     <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
                         <template scope="props">
                             <el-form label-position="left" inline class="demo-table-expand table-form" v-if="column.type === 'expand'">
-                                <el-form-item v-for="(prop,index) in props.row" v-if="!!setName(index)" :key="index">
+                                <!-- <el-form-item v-for="(prop,index) in props.row" v-if="!!setName(index) && setName(index) !== '采集时间' && setName(index) !=='条码'" :key="index">
                                     <span>{{ setName(index) }}：</span>
                                     <span>{{ prop }}</span>
+                                </el-form-item> -->
+                                <el-form-item :label="setName(index)" v-for="(prop,index) in props.row" v-if="!!setName(index) && setName(index) !== '采集时间：' && setName(index) !=='条码：'">
+                                    <span :title="prop">{{ prop }}</span>
                                 </el-form-item>
                             </el-form>
                             <div v-else :class="[ 'cell-content']">
@@ -234,11 +237,11 @@ export default {
                 }
             })
             /* 测试数据 */
-            // oQuery = {
-            //     "equipmentId": "69",
-            //     "startTime": "2017-08-28 19:00:00",
-            //     "endTime": "2017-08-28 20:00:00"
-            // }
+            oQuery = {
+                "equipmentId": "69",
+                "startTime": "2017-08-28 19:00:00",
+                "endTime": "2017-08-28 20:00:00"
+            }
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
             // this.$get(url, oQuery)
@@ -345,7 +348,7 @@ export default {
             let cName = this.tableData.columns.find((el) => {
                 return el.prop === val
             })
-            return (cName?cName.name:false)
+            return (cName?cName.name+'：':false)
         },
         /* 根据新获取的检验值，设置中文名和英文名对应关系 */
         dataEdit(row, expanded) {
@@ -431,11 +434,34 @@ export default {
     .table-form {
         margin: 0;
         width: 100%;
+        display: flex;
+        flex-wrap: wrap;
         .el-form-item {
-            margin-left: 100px;
+            line-height: 40px;
             margin-right: 0;
             margin-bottom: 0;
-            line-height: 40px;
+            box-sizing: border-box;
+            width: 33.3%;
+            padding-left: 100px;
+            display: flex;
+            .el-form-item__label {
+                flex-basis: 100px;
+                text-align: right;
+            }
+            .el-form-item__content {
+                overflow: hidden;
+                text-overflow: ellipsis;
+                flex: 1;
+            }
+        }
+    }
+}
+@media screen and (max-width: 1400px) {
+    .el-table__expanded-cell{
+        .table-form {
+            .el-form-item {
+                padding-left: 60px;
+            }
         }
     }
 }
