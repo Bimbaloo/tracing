@@ -53,8 +53,11 @@
                         <el-table class="table-main" :data="checked?outItems.data:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div class="cell-content">
+                                    <div class="cell-content" v-if="column.prop !== 'barcode'">
                                         <span>{{ props.row[column.prop] }}</span>
+                                    </div>
+                                    <div class="cell-content" v-else>
+                                        <span :class="[ bTrack ? '' : 'barcode']" :title="[bTrack ? '' : '批次追踪']" @click="barcodeClick(props.row)">{{ props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -96,8 +99,11 @@
                         <el-table class="table-main" :data="checked?outAllItems.data:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div class="cell-content">
+                                    <div class="cell-content" v-if="column.prop !== 'batchNo'">
                                         <span>{{ props.row[column.prop] }}</span>
+                                    </div>
+                                    <div class="cell-content" v-else>
+                                        <span :class="[ bTrack ? '' : 'batchNo']" :title="[bTrack ? '' : '条码追踪']" @click="batchClick(props.row)">{{ props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -227,9 +233,7 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "200",
-                    fixed: true,
-                    class: 'barcode',
-                    cellClick: this.barcodeClick
+                    fixed: true
                 }, {
                     name: "箱码",
                     prop: "packetBarcode",
@@ -361,9 +365,7 @@ export default {
                 columns: [{
                     name: "批次",
                     prop: "batchNo",
-                    width: "",
-                    class: 'batchNo',
-                    cellClick: this.batchClick
+                    width: ""
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
@@ -439,13 +441,6 @@ export default {
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
         this.setTbaleHeight()
     },
-    updated() {
-
-        this.setTitle(".barcode", "条码追踪")
-        this.setTitle(".batchNo", "批次追踪")
-       // this.setTitle(".material", "遏制")
-
-    },
     watch: {
         // 如果路由有变化，会再次执行该方法
         '$route': 'fetchData',
@@ -456,11 +451,10 @@ export default {
     },
     methods: {
         initData() {
-
             if (this.bTrack) {
                 // 若为追踪页面，过滤明细产出操作列。
-                this.outItems.columns[0].class = ''
-                this.outItems.columns[0].cellClick = ''
+               // this.outItems.columns[0].class = ''
+               // this.outItems.columns[0].cellClick = ''
             }
         },
         // 请求成功。
@@ -661,7 +655,6 @@ export default {
                 }
             })
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
-
         },
         /**
         * 格式化数据。
@@ -699,9 +692,12 @@ export default {
             return aoData;
         },
         batchClick(row) {
-            this.outItems.data
-            // 批次追踪。
-            let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+            if(this.bTrack){
+                return 0
+            }else {
+                 this.outItems.data
+                // 批次追踪。
+                let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
                 oCondition = {
                     // "keys": {
                     //     equipmentId: this.$route.query["equipmentId"],
@@ -719,30 +715,34 @@ export default {
                         }
                     })
                 }
-
-            sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
-            window.open("trackIndex.html?tag=" + tag);
+                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+                window.open("trackIndex.html?tag=" + tag);
+            }
         },
         barcodeClick(row) {
-            // 单件追踪。
-            let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-                oCondition = {
-                    selected: [{
-                        materialCode: row.materialCode,
-                        batchNo: row.batchNo,
-                        barcode: row.barcode,
-                        bucketNo: row.bucketNo
-                    }]
-                    // "keys": {
-                    //     equipmentId: this.$route.query["equipmentId"],
-                    //     equipmentName: this.$route.query["equipmentName"],
-                    //     barcode: row.barcode
-                    // },
-                    // "type": "barcode"
-                }
+            if(this.bTrack){
+                return 0
+            }else {
+                // 单件追踪。
+                let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+                    oCondition = {
+                        selected: [{
+                            materialCode: row.materialCode,
+                            batchNo: row.batchNo,
+                            barcode: row.barcode,
+                            bucketNo: row.bucketNo
+                        }]
+                        // "keys": {
+                        //     equipmentId: this.$route.query["equipmentId"],
+                        //     equipmentName: this.$route.query["equipmentName"],
+                        //     barcode: row.barcode
+                        // },
+                        // "type": "barcode"
+                    }
 
-            sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
-            window.open("trackIndex.html?tag=" + tag);
+                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+                window.open("trackIndex.html?tag=" + tag);
+            }
         },
         materialClick(row) {
             // console.log("物料编码")
@@ -943,22 +943,21 @@ export default {
     }
 }
 
-.table {
-    td.batch,
-    td.barcode,
-    td.material,
-    td.batchNo {
-        cursor: pointer;
-        color: #f90;
-
-        .cell {
-            font-weight: 600;
-
-            &:empty {
-                cursor: default;
+.cell {
+    .cell-content {
+        .batchNo,
+        .barcode {
+            cursor: pointer;
+            color: #f90;
+            .cell {
+                font-weight: 600;
+                &:empty {
+                    cursor: default;
+                }
             }
         }
     }
+    
     .clicked {
         cursor: pointer;
         color: #f90;
