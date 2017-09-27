@@ -12,7 +12,7 @@
                 <span>工艺参数</span>
             </h2>
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
-                <el-tabs type="card" >
+                <el-tabs  >
                     <el-tab-pane :label="tableData.filename" v-for="(tableData,index) in tableDatas">
                         <div class="content-echarts" v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename">
                             <div class="charts" :id="`charts`+index"></div>
@@ -612,6 +612,7 @@ export default {
 .contentBox {
     .el-tabs {
         .el-tabs__header {
+            border-bottom-color: #ccc;
             .el-tabs__nav-wrap {
                 .el-tabs__nav-scroll {
                     .el-tabs__nav {
