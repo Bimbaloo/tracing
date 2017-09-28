@@ -30,11 +30,8 @@ import FileSaver from 'file-saver'
 import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
-// import {host} from 'assets/js/configs.js'
-
-// var HOST = window.HOST ? window.HOST: host	
-const url = HOST + "/api/v1/repair/by-equipment-time";
-//const url = `http://rapapi.org/mockjs/24404/repair/by-equipment-time?`
+	
+const url = HOST + "/api/v1/spotcheck/by-equipment-time";
 
 export default {
     components: {
@@ -70,29 +67,26 @@ export default {
             tableData: {
                 filename: "点检记录",
                 columns: [{
-                    name: "数据更新时间",
-                    prop: ""
-                }, {
                     name: "计划名称",
-                    prop: ""
+                    prop: "qePlanName"
                 }, {
                     name: "项目名称",
-                    prop: ""
+                    prop: "qeItemName"
                 }, {
                     name: "点检结果",
-                    prop: ""
+                    prop: "isPassPlanName"
                 }, {
                     name: "点检值",
-                    prop: ""
+                    prop: "value"
                 }, {
                     name: "操作人姓名",
-                    prop: ""
+                    prop: "operatorName"
                 }, {
-                    name: "班次（日期和名称）",
-                    prop: ""
+                    name: "班次",
+                    prop: "shiftData"
                 }, {
                     name: "上报时间",
-                    prop: ""
+                    prop: "reportTime"
                 }],
                 height: 1,
                 data: [],
@@ -185,7 +179,7 @@ export default {
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
-            
+            oData.forEach(el=>el.shiftData = el.shiftName + el.shiftDate)
             this.tableData.data = oData;        
         },
         // 请求失败。
@@ -198,6 +192,7 @@ export default {
         requestError(err) {
             this.loading = false;
             this.styleObject.minWidth = 0;
+            console.log(err)
             console.log("数据库查询出错。")
         },     
         // 获取数据。
@@ -213,22 +208,12 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
+            // oQuery = {
+            //     "equipmentId": "1",
+            //     "startTime": "2017-07-21 14:00:00", 
+            //     "endTime": "2017-07-22 14:00:00" 
+            // }
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
-
-            // this.$get(url, oQuery)
-            //     .then((res) => {
-            //         this.loading = false;
-
-            //         this.judgeLoaderHandler(res, () => {
-            //             this.tableData.data = res.data.data
-            //         });
-            //     })
-            //     .catch((err) => {
-            //         this.loading = false;
-            //         this.styleObject.minWidth = 0;
-            //         console.log("数据库查询出错。")
-            //     })
         },
         // 表格导出。
         exportExcelHandle(oData, event) {

@@ -30,7 +30,7 @@ import FileSaver from 'file-saver'
 import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
-// import {host} from 'assets/js/configs.js'
+
 
 // var HOST = window.HOST ? window.HOST: host
 const url = HOST + "/api/v1/quality/send-inspect/by-equipment-time";
@@ -176,28 +176,6 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
-        // 判断调用接口是否成功。
-        // judgeLoaderHandler(param, fnSu, fnFail) {
-        //     let bRight = param.data.errorCode;
-
-        //     // 判断是否调用成功。
-        //     if (!bRight) {
-        //         // 调用成功后的回调函数。
-        //         fnSu && fnSu();
-        //     } else {
-        //         // 提示信息。
-        //         console.log(param.data.errorMsg.message)
-        //         // 失败后的回调函。
-        //         fnFail && fnFail();
-        //     }
-        // },
-        // 显示提示信息。
-        // showMessage() {
-        //     this.$message({
-        //         message: this.sErrorMessage,
-        //         duration: 3000
-        //     });
-        // },
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
@@ -237,22 +215,6 @@ export default {
             })
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
-            // this.$get(url, oQuery)
-            //     .then((res) => {
-            //         this.loading = false;
-
-            //         this.judgeLoaderHandler(res, () => {
-            //             this.tableData.data = res.data.data
-            //             this.tableData.data.forEach((el) => {
-            //                 el["handle"] = "下载"
-            //             })
-            //         });
-            //     })
-            //     .catch((err) => {
-            //         this.loading = false;
-            //         this.styleObject.minWidth = 0;
-            //         console.log("数据库查询出错。")
-            //     })
         },
         // 表格导出。
         exportExcelHandle(oData, event) {

@@ -103,7 +103,7 @@ export default {
                     width: "180"
                 }, {
                     name: "审核人",
-                    prop: "",
+                    prop: "inspectorName",
                     width: "120"
                 }, {
                     name: "检验结果",
@@ -194,28 +194,6 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
-        // 判断调用接口是否成功。
-        // judgeLoaderHandler(param, fnSu, fnFail) {
-        //     let bRight = param.data.errorCode;
-
-        //     // 判断是否调用成功。
-        //     if (!bRight) {
-        //         // 调用成功后的回调函数。
-        //         fnSu && fnSu();
-        //     } else {
-        //         // 提示信息。
-        //         console.log(param.data.errorMsg.message)
-        //         // 失败后的回调函。
-        //         fnFail && fnFail();
-        //     }
-        // },
-        // 显示提示信息。
-        // showMessage() {
-        //     this.$message({
-        //         message: this.sErrorMessage,
-        //         duration: 3000
-        //     });
-        // },
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
@@ -275,51 +253,12 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
+            // oQuery = {
+            //     "equipmentId": "208",
+            //     "startTime": "2017-05-03 08:19:30", //开始时间 格式：yyyy-MM-dd hh:mm:ss
+            //     "endTime": "2017-05-03 08:19:30" //结束时间 格式：yyyy-MM-dd hh:mm:ss
+            // }
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
-            // this.$get(url, oQuery)
-            //     .then((res) => {
-            //         // console.log(res)
-            //         this.loading = false;
-            //         this.judgeLoaderHandler(res, () => {
-            //             let odata = res.data.data,  //获取到的data
-
-            //                 obj = {
-            //                     name: "检验项目",
-            //                     width: "500",
-            //                     lists: []
-            //                 };
-
-            //             odata.forEach((el) => {  /* 处理columns和data */
-            //                 let items = el.items,
-            //                     tdata = []              //储存items里面的data
-            //                 items.forEach((item) => {
-            //                     if (obj.lists.every((list) => {
-            //                         return list.itemName !== item.itemName
-            //                     })
-            //                     ) {
-            //                         obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
-            //                             itemName: `${item.itemName}`,
-            //                             prop: encodeURI(`${item.itemName}`)
-            //                         })
-            //                     }
-            //                     tdata[encodeURI(`${item.itemName}`)] = item.value
-
-            //                 })
-            //                 let objData = Object.assign(el, tdata);   // 合并获取正在的data
-            //                 this.tableData.data.push(objData)
-            //             })
-
-            //             this.tableData.columns.push(obj)
-
-
-            //         });
-            //     })
-            //     .catch((err) => {
-            //         this.loading = false;
-            //         this.styleObject.minWidth = 0;
-            //         console.log("数据库查询出错。")
-            //     })
         },
         // 表格导出。
         exportExcelHandle(oData, event) {
