@@ -46,11 +46,12 @@
 		},
 		watch: {
 		    data: function () {	
-		    	if(this.tree) {					
+		    	if(this.tree) {	
 					if(this.tipsShow) {
 						// 若需要显示详情。
 						this.data.node.forEach(o => o.isMaterialNode ? (o.category = 'material'):(o.category = 'process'))
 					}
+					
 					this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    	
 					this.tree.model.linkFromPortIdProperty = "fromPort";
 					this.tree.model.linkToPortIdProperty = "toPort";
@@ -58,10 +59,14 @@
 		    },
 		    key: function() {
 		    	if(this.type == "catalog") {
-
+//  				console.log(2)
 		    		this.$nextTick(function() {    		
+		    			this.setHighted()
 		    			this.setSelection();
 		    		})
+		    	}else {
+//		    		console.log(3)
+		    		this.setHighted()
 		    	}
 		    },
 		    root: function() {
@@ -96,6 +101,10 @@
 		   	treeFullscreen () {
 		   		return this.$store.state.treeFullscreen
 			},
+			// 高亮的数据。
+			highted() {
+				return this.$store.state.highted
+			},
 			// 选中样式。
 			selectionAdornmentTemplate () {
 				return this.$(go.Adornment, "Spot", {
@@ -108,8 +117,8 @@
 							fill: "#ffffff",
 							stroke: "#F09900",
 							strokeWidth: 1
-						}),
-
+						},
+						new go.Binding("fill", "isHighlighted", h => h ? "#6DAB80" : "#ffffff")),
 						this.$(go.Picture, {
 								position: new go.Point(0, 0),
 								width: 20,
@@ -129,7 +138,8 @@
 							stroke: "#333333",
 							margin: 5
 						},
-						new go.Binding("text", "name")
+						new go.Binding("text", "name"),
+						new go.Binding("stroke", "isHighlighted", h => h ? "#ffffff" : "#333333")
 					)
 				)
 			},
@@ -146,7 +156,15 @@
 						}, // this event handler is defined below
 						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
 						this.$(go.Panel, "Auto", 
-							this.$(go.Shape, "Rectangle", { name: "SELECTION", fill: "transparent", strokeWidth: 0, stroke: "#F09900" }),
+							this.$(go.Shape, "Rectangle", { 
+								name: "SELECTION", 
+								fill: "transparent", 
+								strokeWidth: 0, 
+								stroke: "#F09900" 
+							},
+							new go.Binding("fill", "isHighlighted", function(h) { return h ? "#6DAB80" : "transparent" }).ofObject()
+//								new go.Binding("fill", "isHighlighted", h => h ? "#6DAB80" : "transparent")
+							),
 							this.$(go.Panel, "Horizontal", 
 								this.$(go.Picture, {
 										width: 20,
@@ -166,7 +184,8 @@
 										// textValidation:onEditName
 									},
 									new go.Binding("text", "name"),//.makeTwoWay() //
-									
+									new go.Binding("stroke", "isHighlighted", function(h) { return h ? "#ffffff" : "#333333" }).ofObject()
+//									new go.Binding("stroke", "isHighlighted", h => h ? "#ffffff" : "#333333")
 								)
 							)
 						),					
@@ -265,7 +284,14 @@
 						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
 						this.$(go.Panel, "Vertical", 
 							this.$(go.Panel, "Auto",
-								this.$(go.Shape, "Rectangle", { name: "SELECTION", fill: "transparent", strokeWidth: 0, stroke: "#F09900" }),
+								this.$(go.Shape, "Rectangle", { 
+									name: "SELECTION", 
+									fill: "transparent", 
+									strokeWidth: 0, 
+									stroke: "#F09900" 
+								},
+								new go.Binding("fill", "isHighlighted", function(h) { return h ? "#6DAB80" : "transparent" }).ofObject()
+								),
 								this.$(go.Panel, "Horizontal", 
 									this.$(go.Picture, {
 											portId: "TO",
@@ -286,7 +312,8 @@
 											margin: 5,
 											// textValidation:onEditName
 										},
-										new go.Binding("text", "name"),//.makeTwoWay() //								
+										new go.Binding("text", "name"),//.makeTwoWay() //	
+										new go.Binding("stroke", "isHighlighted", function(h) { return h ? "#ffffff" : "#333333" }).ofObject()
 									),
 									// new go.Binding("editable","editable"),					
 									this.$("TreeExpanderButton", {
@@ -336,7 +363,14 @@
 						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
 						this.$(go.Panel, "Vertical", 
 							this.$(go.Panel, "Auto",
-								this.$(go.Shape, "Rectangle", { name: "SELECTION", fill: "transparent", strokeWidth: 0, stroke: "#F09900" }),
+								this.$(go.Shape, "Rectangle", { 
+									name: "SELECTION", 
+									fill: "transparent", 
+									strokeWidth: 0, 
+									stroke: "#F09900" 
+								},
+									new go.Binding("fill", "isHighlighted", function(h) { return h ? "#6DAB80" : "transparent" }).ofObject()
+								),
 								this.$(go.Panel, "Horizontal", 
 									this.$(go.Picture, {
 											portId: "TO",
@@ -358,7 +392,7 @@
 											// textValidation:onEditName
 										},
 										new go.Binding("text", "name"),//.makeTwoWay() //
-										
+										new go.Binding("stroke", "isHighlighted", function(h) { return h ? "#ffffff" : "#333333" }).ofObject()
 									),
 									// new go.Binding("editable","editable"),				
 									this.$("TreeExpanderButton", {
@@ -572,6 +606,7 @@
 					this.restoreScreenClick();
 				}
 				
+				let aHighted = this.highted;
 				this.$store.commit({
 					type: "updateType",
 					key: "tree"
@@ -580,6 +615,14 @@
 					type: "updateKey",
 					key: node.data.key
 				});
+				
+				// 如果当前点击的不是高亮的值，则将高亮清空。
+				if(aHighted.length && !aHighted.includes(node.data.key)) {
+					this.$store.commit({
+						type: "updateHeighted",
+						data: []
+					});
+				}
 				
 				if(node.data.isMaterialNode) {   // node.data.type == "1"
 					// 根据物料节点查询仓储信息。        
@@ -865,26 +908,56 @@
 				}
 			    this.tree.nodes.each(obj => {
 			    	// 取消选中样式。
-			    	obj.isSelected = false;
-					obj.background = null;
-			    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
+			    	if(obj.isSelected) {
+				    	obj.isSelected = false;
+						
+						if(obj.isHighlighted) {
+							obj.background = "#6DAB80";
+							obj.findObject("TB") && (obj.findObject("TB").stroke = "#fff");
+						}else {
+							obj.background = null;
+					    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
+						}
+			    	}
 			    });
 				
 				let oData = this.treeData.node.filter(o => o.key == this.key)[0],
 					oNode = this.tree.findNodeForKey(oData.key);
-				
+
 				if(oNode) {				
 					oNode.isSelected = true;
-					oNode.background = "white";
-					oNode.findObject("TB") && (oNode.findObject("TB").stroke = "#333");
 				}
-
+				
 				if(oData.group) {
 					// 若节点在组合中。
 					if(!this.tree.findNodeForKey(oData.group).isSubGraphExpanded) {
 						this.tree.findNodeForKey(oData.group).expandSubGraph();
 					}
 				}
+			},
+			
+			// 设置高亮。
+			setHighted() {
+				let aHighted = this.highted
+				
+				this.tree.startTransaction("highlight");
+				
+				// 清空高亮。
+				this.tree.clearHighlighteds();
+				
+				// 是否需要高亮显示。
+				this.tree.nodes.each(obj => {
+			    	// 取消选中样式。
+			    	if(aHighted.includes(obj.data.key)) {
+						obj.isHighlighted = true;
+						obj.data.isHighlighted = true;
+					}else {
+						obj.isHighlighted = false;
+						obj.data.isHighlighted = false;
+					}
+			    });
+			    
+			    this.tree.commitTransaction("highlight");
 			},
 
 			/**

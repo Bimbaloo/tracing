@@ -137,7 +137,9 @@ const store = new Vuex.Store({
     // 原始树数据。
     rawData: [],
     resize: 0,
-    resizeY: 0
+    resizeY: 0,
+    // 高亮的数据。
+    highted: []
   },
   mutations: {  
     updateKey (state, payload) {
@@ -172,6 +174,9 @@ const store = new Vuex.Store({
     updateResizeY (state, payload) {
       state.resizeY = payload.key;
     },
+    updateHeighted(state, payload) {
+    	state.highted = payload.data
+    }
   },
   actions: {
 	  updateRootAsync ({ commit }) {

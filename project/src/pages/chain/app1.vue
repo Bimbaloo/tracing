@@ -1,21 +1,27 @@
 <template>
 	
 	<div id="app">
-		<v-header :config="true" :back="'search.html'"></v-header>
+		<v-header :config="false" :back="'search.html'"></v-header>
 		<div class="content" ref="content">
 			<!-- 参数信息。 -->
 			<div class="container-filter" :class="{hide: fullscreen}" ref="containerFilter">
-				<v-form 
-					v-if="category.list"
-        			:tab="category.key"
-        			:sub-tab="category.list[0].key"
-        			:active="category.active"
-        			label-width="70px"
-        			:handle-submit="handleSubmit"
-        			:keys="keys"
-        			:show-reset-button="false"
-        			:items="category.list[0].items" >
-        		</v-form>
+				<el-form class="filters content-filters" :model="searchParam" :rules="rules" ref="searchParam" label-position="left" label-width="80px">
+					<el-form-item class="filter-item filter-item-inline content-filter" label="物料:" prop="materialCode">
+						<v-select placeholder-data="请选择物料" key-data="materialCode" :form-data="searchParam"></v-select>
+					</el-form-item>
+					<el-form-item class="filter-item filter-item-inline content-filter" label="批次:" prop="batchNo">
+						<v-input placeholder-data="请输入批次" key-data="batchNo" :form-data="searchParam"></v-input>
+					</el-form-item>
+					<el-form-item class="filter-item filter-item-inline content-filter" label="开始时间:" prop="startTime">
+						<v-dateTime style="width: auto;" placeholder-data="请输入开始时间" key-data="startTime" :form-data="searchParam"></v-dateTime>
+					</el-form-item>
+					<el-form-item class="filter-item filter-item-inline content-filter" label="结束时间:" prop="endTime">
+						<v-dateTime style="width: auto;" placeholder-data="请输入结束时间" key-data="endTime" :form-data="searchParam"></v-dateTime>
+					</el-form-item>
+					<el-form-item class="filter-item filter-item-inline content-filter">
+						<v-button text-data="查询" @query="queryHandler('searchParam')"></v-button>
+					</el-form-item>
+				</el-form>
 				<div class="line"></div>
 			</div>
 			
@@ -110,9 +116,10 @@
     import ProcessProduct from "components/chain/processProduceInfo.vue"
     import ProcessModal from "components/chain/processModal.vue"
     import ProcessFilter from "components/chain/processFilter.vue"
-    import form from 'components/form/form.vue'
     
     import fnP from "assets/js/public.js"
+//	import {host} from 'assets/js/configs.js'
+//	var HOST = window.HOST ? window.HOST: host
 	
 	 // 节点类型数据。
     var aoNodeType = [{
@@ -133,9 +140,7 @@
     }];
     
     var sMultiValue = "all";
-	
-	// 获取参数名称
-	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+				
 	const LINK_NODE_URL = HOST + '/api/v1/linkrepair/links';
 	const LINK_NODE_REPAIR_URL = HOST + "/api/v1/linkrepair/repair"
 	
@@ -150,16 +155,89 @@
     		'v-node': Node,
     		'v-pProduce': ProcessProduct,
     		'v-pModal': ProcessModal,
-    		'v-pFilter': ProcessFilter,
-    		'v-form': form
+    		'v-pFilter': ProcessFilter
 		},
 		data() {
 			let that = this;
-		           	           
+				
+			let // 验证物料。
+            	validateMaterialcode = (rule, value, callback) => {
+            		if(!value) {
+            			callback(new Error("请输入物料"));
+            		}else {
+            			callback();
+            		}
+            	},
+            	// 验证批次。
+            	validateBatch = (rule, value, callback) => {
+            		let sValue = value || "";
+            		if(!sValue.trim()) {
+            			callback(new Error("请输入批次"));
+            		}else {
+            			callback();
+            		}
+            	},
+            	validateStartTime = (rule, value, callback) => {
+            		let sTime = (value || "").trim(),
+	            		bIsFormat = window.Rt.utils.isDateTime(sTime),
+        	    		nNow = +new Date();
+        	    	
+        	    	if(sTime) {
+	            		if(!bIsFormat) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(value) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else {
+	            			callback();
+	            		}
+        	    	}else {
+	            		callback();
+	            	}
+            	},
+        		// 验证结束时间。
+        		validateEndTime = (rule, value, callback) => {
+            		let sStart = that.searchParam.startTime,
+	            		sTime = (value || "").trim(),
+            			bIsFormat = window.Rt.utils.isDateTime(sTime),
+            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
+        	    		nNow = +new Date();
+					
+        	    	if(sTime) {
+						// 存在时间。
+	        	    	if(!bIsFormat) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(sTime) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else if(bIsStartFormat && +new Date(sStart) > +new Date(sTime)) {
+	            			// 如果开始时间存在，而且开始时间大于结束时间。
+	            			callback(new Error("结束时间必须大于开始时间"));
+	            		}else {
+	            			callback();
+	            		}
+        	    	}else {
+        	    		callback();
+        	    	}
+            	};
+            	
+            
 			return {
 				loading: false,
 				// 更新操作
 				refresh: false,
+				// 当前查询的值。
+    			searchParam: {
+    				"materialCode": "",
+    				"batchNo": "",		//"23620170215夜班",
+    				"startTime": "",
+    				"endTime": ""
+    			},
+    			// 查询规则。
+				rules: {
+					materialCode: [{validator: validateMaterialcode, trigger: "change"}],
+					batchNo: [{validator: validateBatch, trigger: "change"}],
+					startTime: [{validator: validateStartTime, trigger: "change"}],
+					endTime: [{validator: validateEndTime, trigger: "change"}]
+				},
 				filterParam: {
 					// 节点类型。
     				"nodeType": [sMultiValue],
@@ -184,16 +262,10 @@
     			contentHeight: null,
     			otherHeight: null,
     			treeHeight: 300,
-    			tag: "",
     			// 所有节点类型值。
 				nodeData: aoNodeType,
 				// 所有工序
 				processAllData: [],
-				handleSubmit: this.queryHandler,
-    			category: {},
-    			keys: {},
-    			radio: '1',
-    			item: {},
 				// 修复弹窗
 				bProduce: false,
 				line: {},
@@ -232,73 +304,22 @@
 			this.$register.login(this.$store);
 
 			// 获取所需的查询参数。
-      		this.tag = window.Rt.utils.getParam("tag", location.search);
-          	let	oData = sessionStorage.getItem("searchConditions-" + this.tag),
-          		categories = [];
+      		this.tag = location.search.split("=")[1]
+          	let	oData = sessionStorage.getItem("searchConditions-" + this.tag)
 
 			// 断链模块。
 		    if(oData) {
 		        oData = JSON.parse(oData);
+		        if(oData.tab === "link") {
+		        	this.searchParam = oData.keys;
+		        }
 		    }
-		    
-		    // 获取参数名
-		    this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
-	         	 // 请求成功。
-	         	categories = fnP.parseData(oResult).filter(o=> o.key == "link");
-	
-			  	if(categories.length) {
-			  		// 存在断链。
-			  		this.category = Object.assign({}, categories[0])
-			  		let oActive = {}
-			  		
-			  		if(oData && oData.tab == categories[0].key) {
-			  			oActive = oData
-			  		}else {
-			  			oActive = {
-			  				radio: "1",
-	                		keys: {}
-			  			}
-			  		}
-			  		
-			  		this.category = Object.assign({}, this.category, {
-			  			active: oActive
-			  		})
-			  	}
-			  	
-			  	let initData = this.category.list.filter(o => o.key == this.radio)[0];    
-            	this.keys = this.getKeys(initData);
-				this.item = this.category.list[0];
-				
-	          this.$nextTick(() => {
-	            if(oData && oData.tab == 'link') {
-	              this.fetchData(oData);
-	            }            
-	          })
-	        }, this.requestFail, this.requestError);
-		    
+		    // console.log(this.searchParam)
     		// 默认查询。
-//  		this.fetchData();
+    		this.fetchData();
 		},
 		mounted() {},
 		methods: {
-			// 请求失败。
-		    requestFail(sErrorMessage) {
-		        // 提示信息。
-		        this.$message.error(sErrorMessage)
-		    },
-		      // 请求错误。
-		    requestError(err) {
-		        console.log(err);
-		    },
-		    getKeys(oData) {
-                let oKey = {};
-                
-                if(oData) {
-	                oData.items.forEach(o => oKey[o.key] = '');
-                }
-
-                return oKey;
-            },
 			// 数据初始化。
 			initData() {
 				this.refresh = false;
@@ -359,18 +380,24 @@
 				}
 			},
 			// 数据查询操作。
-			queryHandler(oParam) {
-				// 设置初始化显示的值。
-		    	this.initData();
-				this.fetchData(oParam);
+			queryHandler(formName) {
+    			let that = this;
+    			this.$refs[formName].validate((valid) => {
+    				if (valid) {
+		    			// 设置初始化显示的值。
+		    			that.initData();
+					    // 获取创建数据。
+						that.fetchData();
+    				}
+    			});
 			},
     		// 获取数据。
-    		fetchData(oParam) {
+    		fetchData() {
     			let that = this;
     			// 根据输入值，获取页面中的所有数据。
 			   	this.loading = true;
 				   
-				this.$register.sendRequest(this.$store, this.$ajax, LINK_NODE_URL, "post", fnP.parseQueryParam(oParam.keys), (oData) => {
+				this.$register.sendRequest(this.$store, this.$ajax, LINK_NODE_URL, "post", fnP.parseQueryParam(this.searchParam), (oData) => {
 					that.loading = false;
 					// 数据保存。
 					this.$store.commit({
@@ -394,6 +421,30 @@
 					that.getHeight();
 					that.$message.error('查询出错');
 				})
+			   	// this.$ajax.post(LINK_NODE_URL, fnP.parseQueryParam(this.searchParam)).then((res) => {
+			   	// 	that.loading = false;
+				// 	that.judgeLoaderHandler(res, (data) => {
+						
+				// 		// 数据保存。
+				//    		this.$store.commit({
+				// 			type: "updateData",
+				// 			data: data
+				// 		});
+						
+				// 		// 格式化数据。
+				// 		that.pageData = data;
+				//         that.processAllData = that.getProcessData();
+				        
+				//         that.$nextTick(() => {
+				//           that.getHeight()           
+				//         })
+				// 	})
+				// })
+				// .catch((err) => {
+				// 	that.loading = false;
+				// 	that.getHeight();
+				// 	that.$message.error('查询出错');
+				// })
 			},
 			// 获取工序的数据。
 			getProcessData() {
@@ -583,10 +634,11 @@
 			background-color: #FFFFFF;
 			
 			.container-filter {
-				.el-form-item,
-				.form-button {
-					display: inline-block;
-					margin-right: 40px;
+				.filter-item {
+					&.filter-item-inline {
+						display: inline-block;
+						margin-right: 40px;
+					}
 					
 					.filter-name {
 						display: inline-block;
@@ -597,10 +649,6 @@
 					.el-select, .el-input {
 						display: inline-block;
 					}
-				}
-				.form-button {
-					margin-top: 0;
-					margin-bottom: 19px;
 				}
 				.line {
 					width: 100%;

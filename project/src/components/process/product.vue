@@ -760,6 +760,7 @@ export default {
             if (!oData) {
                 return;
             }
+
             // 下载表格。
             window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
         },

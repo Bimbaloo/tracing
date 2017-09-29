@@ -136,7 +136,10 @@ const store = new Vuex.Store({
     treeFullscreen: true,
     // 原始树数据。
     rawData: [],
-    resizeY: 0
+    resize: 0,
+    resizeY: 0,
+    // 高亮的数据。
+    highted: []
   },
   mutations: {  
     updateKey (state, payload) {
@@ -158,10 +161,17 @@ const store = new Vuex.Store({
     updateTreeFullscreen (state, payload) {
     	state.treeFullscreen = payload.key;
     },
+    // 更新左右拖拽事件
+    updateResize (state, payload) {
+      state.resize = payload.key;
+    },
     // 更新上下拖拽事件
     updateResizeY (state, payload) {
       state.resizeY = payload.key;
     },
+    updateHeighted(state, payload) {
+    	state.highted = payload.data
+    }
   },
   actions: {
 	  updateRootAsync ({ commit }) {

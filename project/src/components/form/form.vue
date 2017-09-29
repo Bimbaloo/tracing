@@ -6,7 +6,7 @@
         </el-form-item>
         <div  :class="['form-button', { 'form-button-last': active.radio === '4' && items.length > 10 }]">
             <el-button class="btn" type="primary" @click="submitForm('ruleForm')">查询</el-button>
-            <el-button class="btn" type="primary" @click="resetForm('ruleForm')">重置</el-button>
+            <el-button v-show="showResetButton" class="btn" type="primary" @click="resetForm('ruleForm')">重置</el-button>
         </div>
     </el-form>
 </template>
@@ -24,7 +24,11 @@
             items: Array,
             tab: String,
             subTab: String,
-            handleSubmit: Function          
+            handleSubmit: Function,
+            showResetButton: {
+            	required: false,
+            	default: true
+            }
         },
         components: {
             'v-input': Input,

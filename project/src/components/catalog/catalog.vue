@@ -87,6 +87,11 @@
 							setsChildPortSpot: false
 						}),
 						click: (e) => {
+							// 更新高亮的数据。
+							this.$store.commit({
+								type: "updateHeighted",
+								data: []
+							})
 							this.$emit("init");
 						}
 					});
@@ -123,6 +128,11 @@
 									type: "updateRoot",
 									key: sRootKey
 								});
+								// 更新高亮的数据。
+								this.$store.commit({
+									type: "updateHeighted",
+									data: node.data.sublings
+								})
 								
 								if(node.data.isMaterialNode) {		// node.data.type == "1"
 									// 根据物料节点查询仓储信息。        

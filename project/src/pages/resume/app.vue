@@ -27,7 +27,7 @@
 							</div>
 							<div class="resume-icons">
 								<i class="resume-icon icon icon-20 icon-print" @click.stop="onPrintHandler"></i>
-								<i class="resume-icon icon icon-20 icon-download" @click.stop="onDownLoadHandler"></i>
+								<i :class="['resume-icon', 'icon', 'icon-20', {'icon-excel': sCurrentTab === 'tables','icon-download': sCurrentTab === 'lines'}]" @click.stop="onDownLoadHandler"></i>
 								<i class="resume-icon icon icon-20 icon-fullScreen" v-show="!bFullScreen" @click.stop="openFullScreen"></i>
 							</div>
 						</div>
@@ -63,44 +63,11 @@
 									:key="index">
 									<template scope="props">
 										<div class="cell-content" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+(props.row.bHasNext?0:nIconDis)+'px'}">
-											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr"></i>
+											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr(props.$index, props)"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
 										<div v-else :class="[{isVis: !props.row.data[column.prop]}, 'cell-content']">
-											{{ column.formatter(props.row.data[column.prop]) }}
-										</div>
-									</template>
-								</el-table-column>
-							</el-table>
-						</div>
-						
-						<!-- 表格的复制 -->
-						<div v-show="false" class="resume-table-clone">
-							<div class="table-title">
-								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
-								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
-								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
-							</div>
-							<el-table 
-								class="table-main" 
-								:data="aParsedData" 
-								stripe
-								border
-								style="width: 100%;"
-								row-class-name="table-item">
-								<el-table-column
-									v-for="(column,index) in oTab.columns"
-									:align="index?'center':'left'"
-									:min-width="column.width"
-									:label="column.name"
-									:key="index">
-									<template scope="props">
-										<div class="cell-content" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+(props.row.bHasNext?0:nIconDis)+'px'}">
-											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr"></i>
-											<span>{{ props.row.name }}</span>
-										</div>
-										<div v-else :class="[{isVis: !props.row.data[column.prop]}, 'cell-content']">
-											{{ column.formatter(props.row.data[column.prop]) }}
+											{{ column.formatter ? column.formatter(props.row.data[column.prop]): props.row.data[column.prop] }}
 										</div>
 									</template>
 								</el-table-column>
@@ -196,6 +163,10 @@
 	import Button from "components/basic/button.vue"
 	import TimeNode from "components/resume/time-node.vue"
 	import html2canvas from 'html2canvas'
+	import rasterizeHTML from 'rasterizehtml'
+	import XLSX from 'xlsx'
+	import Blob from 'blob'
+	import FileSaver from 'file-saver'
 
 	var bFull = window.location.hash.indexOf("full")>-1?true:false;
 	
@@ -222,7 +193,7 @@
 				// 查询标记。
 				tag: "",
 				// 默认测试数据。
-				sText: "a",
+				sText: "",
 				// 默认工序层级的间距。
 				nLevelDis: 10,
 				// 工序收缩图标宽度
@@ -261,87 +232,54 @@
 					columns: [{
 						prop: "materialName",
 						name: "",
-						width: 450,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 450
 					},{
 						prop: "type",
 						name: "类型",
 						width: 120,
 						formatter: function(sValue) {
-							return self.getTimeLineTypeInfo(sValue).text || self.sText
+							return self.getTimeLineTypeInfo(sValue).text
 						}
 					},{
 						prop: "time",
 						name: "时间",
-						width: 120,
-						formatter: function(sValue) {
-							return self._parseTimeFormat(sValue) || self.sText
-						}
+						width: 150
 					},{
 						prop: "location",
 						name: "地点",
-						width: 250,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 250
 					},{
 						prop: "batchNo",
 						name: "批次",
-						width: 300,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 300
 					},{
 						prop: "barcode",
 						name: "条码",
-						width: 300,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 300
 					},{
 						prop: "quantity",
 						name: "数量",
-						width: 120,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 120
 					},{
 						prop: "shiftName",
 						name: "班次",
-						width: 180,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 180
 					},{
 						prop: "personName",
 						name: "人员",
-						width: 120,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 120
 					},{
 						prop: "moldCode",
 						name: "模号",
-						width: 120,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 120
 					},{
 						prop: "vendorName",
 						name: "供应商/客户",
-						width: 120,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 120
 					},{
 						prop: "checkResult",
 						name: "检验结果",
-						width: 120,
-						formatter: function(sValue) {
-							return sValue || self.sText
-						}
+						width: 120
 					}],
 					bCreated: false,
 					loading: false,
@@ -482,42 +420,6 @@
 				this.oTab.error = "";
 				
 				this.$register.sendRequest(this.$store, this.$ajax, this.oTab.url, "post", this.ruleForm, this.requestSucess, this.requestFail, this.requestError)
-				// this.$ajax.post(this.oTab.url, this.ruleForm).then((res) => {
-				// 	this.oTab.loading = false;
-					
-				// 	if(!res.data.errorCode) {
-				// 		// 显示标题。
-				// 		this.bShowTitle = true;
-				// 	    this.oTitle.materialName = res.data.data.materialName;
-				// 	    this.oTitle.batchNo = res.data.data.batchNo;
-						
-				// 		// 数据修改。
-				// 	    this.aoTable = res.data.data.bomResumes;
-				// 	    this.aParsedData = this.parseTableData();
-				// 		this.aoTimeLineData = res.data.data.timeLineResumes;
-						
-				// 		if(this.bCarousel) {
-				// 			this.$nextTick(function() {
-				// 				// 设置滚动。
-				// 				this.setScroll();
-				// 			})						
-				// 		}
-				// 	}else{
-				// 		this.bShowTitle = false;
-				// 	    // 根据errorCode 错误时设置。error
-				// 		this.oTab.error = res.data.errorMsg.message;
-				// 	}
-					
-				// 	// 设置内容的高度。
-				// 	this.getHeight();
-					
-			    // }).catch((err)=> {
-			    // 	console.log(err)
-			    // 	this.oTab.loading = false;
-				// 	this.oTab.error = "查询出错";
-				// 	// 设置内容的高度。
-				// 	this.getHeight();
-			    // });
 				
 			},
 			// 请求成功。
@@ -807,7 +709,7 @@
 				return aIndex;
 			},
 			// 展开或折叠表格显示列。
-			expandOrCollapseTr(ev) {
+			expandOrCollapseTr1(ev) {
 				var _that = this,
 					jItem = $(ev.target).closest(".table-item"),
 					// 当前行的索引值。
@@ -868,32 +770,6 @@
 					})
 				});
 
-//				jItem.parent("tbody").find("tr.table-item").each(function(index) {
-//					let jTr = $(this),
-//						jArrow = jTr.find(".icon-down");
-//					
-//					// 如果当前索引存在于其子级中，则处理状态。
-//					if(aChildrenIndex.indexOf(index) > -1) {
-//						// 判断当前是否为展开的。
-//						jATr.push(jTr);
-//						
-//						// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
-//						if(jArrow.hasClass("actived")) {
-//							// 当前及其子级是隐藏的。
-//							aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
-//						}
-//						
-//						if(bCollapsed) {
-//							jTr.fadeOut(500);
-//						}else {
-//							// 显示的判断。
-//							if(aFilterIndex.indexOf(index) < 0) {
-//								jTr.fadeIn(500);
-//							}
-//						}
-//					}
-//				});
-				
 				// 内容展开或折叠。
 				if(bCollapsed) {
 					jList.slideUp();
@@ -902,6 +778,81 @@
 				}
 				
 				jAllIcon.toggleClass("actived");		// jIcon
+			},
+			// 获取某个level下，其所有子级的rowIndex 值。
+			getChildrenLenByData(oData) {
+				let sId = oData.id,
+					nLevel = oData.level;
+					
+				let bStart = false
+				let bEnd = false
+	            let num = 0
+	            
+	            // 循环数据获取当前level下子level的长度。
+	            this.aParsedData.forEach( o => {
+	            	
+	            	if(bStart && !bEnd) {
+	            		if( o.level > nLevel) {
+		            		num++
+	            		}else {
+	            			bEnd = true
+	            		}
+	            	}
+	            	
+	            	if(o.id === sId) {
+	            		// 从当前列开始
+	            		bStart = true
+	            	}
+	            })
+					
+				// 返回数据。
+				return num
+			},
+			expandOrCollapseTr(index, props) {
+				let elArr = []
+				let nLevel = props.row.level
+				
+				// 当前点击列的所有子列的个数。
+	            let num = this.getChildrenLenByData(props.row)
+	            
+	            const trs = document.querySelectorAll(".el-table__body-wrapper")[0].querySelectorAll("tr")
+	            const trsFix = document.querySelectorAll(".el-table__fixed-body-wrapper")[0].querySelectorAll("tr")
+	            for (let i = 0; i < num; i++) {
+	                elArr.push(trs[index + i + 1])
+	                elArr.push(trsFix[index + i + 1])
+	            }
+	            const icon = trsFix[index].querySelectorAll(".icon-down")[0]
+	            if (icon.classList.contains("actived")) {  // 判断是否隐藏
+	            	// 展开。
+	            	let aFilteredRowIndex = [];
+	                elArr.forEach((el) => {
+	                	// 判断该列子级是否隐藏。
+	                	
+	                	let nRowIndex = el.rowIndex
+	                	let iconArrow = el.querySelectorAll(".icon-down")[0].classList
+	                	let oData = this.aParsedData[nRowIndex]
+	                	
+	                	if(iconArrow.contains("actived")) {
+	                		// 该列的子级应该隐藏。 获取其子级的rowIndex
+	                		for(let i = 0; i< this.getChildrenLenByData(oData); i++) {
+	                			aFilteredRowIndex.push(nRowIndex + i + 1)
+	                		}
+	                	}
+	                	
+	                	// 不在过滤的数据中需显示。
+	                	if(!aFilteredRowIndex.includes(nRowIndex)) {
+		                    el.classList.remove('hide');
+	                	}
+	                })
+	                
+	                icon.classList.remove('actived');
+	            } else {
+	            	// 隐藏。
+	                elArr.forEach((el) => {
+	                    return el.classList.add('hide');
+	                })
+	                icon.classList.add('actived');
+	            }
 			},
 			// 创建表格。
 			createTable(aData) {
@@ -975,16 +926,12 @@
 				var jDown = $("#downloadImage"),
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),
-					jTableClone = $(".resume-table-clone"),
 					sFileName = "",
 					jNow = null,
 					isTable = false;
 				
 				 if(this.sCurrentTab === "tables"){
 				 	// 表格。
-				 	jClone.html(jTableClone.html());
-				 	sFileName = "BOM表格";
-				 	jNow = jClone;
 				 	isTable = true;
 				 }else {
 				 	// 时间轴。
@@ -993,48 +940,147 @@
 					jNow = jClone;
 				 }
 					
-				// 时间轴。
-				html2canvas(jNow.get(0),{
-					height: jNow.outerHeight(true) + 100,
-					background: isTable?"#fff":"#1d272f",
-					onrendered:function(canvas) {
-						var sImg = canvas.toDataURL("image/png");
-							
-						jDown.attr({
-							"href":sImg,
-							"download": sFileName +".png"
-						}).get(0).click()
-						// 重置复制内容。
-						jClone.html("");
-					}
-				});
+				if(isTable) {
+					// 表格下载
+					this.onTableExportExcel()
+				}else {
+					// 时间轴。
+					html2canvas(jNow.get(0),{
+						height: jNow.outerHeight(true) + 100,
+						background: isTable?"#fff":"#1d272f",
+						onrendered:function(canvas) {
+							var sImg = canvas.toDataURL("image/png");
+								
+							jDown.attr({
+								"href":sImg,
+								"download": sFileName +".png"
+							}).get(0).click()
+							// 重置复制内容。
+							jClone.html("");
+						}
+					});
+				}
 			},
 			// 打印功能。。
 			onPrintHandler() {
 				var jDown = $("#downloadImage"),
 					jTimeLine = $(".time-line-content"),
 					jClone = $(".clone"),
-					jTableClone = $(".resume-table-clone"),
 					jNow = null,
 					isTable = false;
 					
 				if(this.sCurrentTab === "tables"){
 				 	// 表格。
 				 	isTable = true;
-				 	jClone.html(jTableClone.html());
-				 	jNow = jClone;
 				}else {
 				 	// 时间轴。
 				 	jClone.html(jTimeLine.html());
 					jNow = jClone;
 				}
 				
+				if(isTable) {
+					this.onTablePrint()
+				}else {
+					// 时间轴。
+					window.Rt.utils.printHtml(html2canvas, jNow.get(0),{
+						height: jNow.outerHeight(true) + 200,
+						background: "#1d272f"
+	                },true);
+				}
 				
-				// 时间轴。
-				window.Rt.utils.printHtml(html2canvas, jNow.get(0),{
-					height: jNow.outerHeight(true) + 200,
-					background: isTable?"#fff":"#1d272f"
-                },true);
+			},
+			// 表格下载。
+			onTableExportExcel() {
+				let aoData = [],
+					oData = {
+						filename: "BOM表",
+						columns: this.oTab.columns,
+						data: []
+					}
+				
+				// 更新数据。
+				aoData = this.aParsedData.map( o => {
+					if(window.Rt.utils.isEmptyObject(o.data)) {
+						return {
+							materialName: o.name
+						}
+					}else {
+						return Object.assign({}, o.data, {
+							type: this.getTimeLineTypeInfo(o.data.type).text
+						})
+					}
+				})
+				
+				oData.data = aoData
+				// 下载表格。
+            	window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
+			},
+			// 表格打印。
+			onTablePrint() {
+				let oTable = this.$refs.table
+                
+                if(!oTable) {
+                    return;
+                }
+				
+				let sHtml = `
+					<div class="table-title">
+						${oTable.querySelector(".table-title").innerHTML}
+					</div>
+	        		<div class="table el-table">
+						<div class="el-table__header-wrapper">
+							${oTable.querySelector(".el-table__header-wrapper").innerHTML}
+						</div>
+						<div class="el-table__body-wrapper">
+							${oTable.querySelector(".el-table__body-wrapper").innerHTML}
+						</div>
+	        			<style>
+		        			.table-title {
+		        				text-align: center;
+		        			}
+		        			.table-title .title-text {
+		        				font-size: 24px;
+								margin-right: 10px;
+		        			}
+		        			.table-title .title-subText {
+		        				font-size: 16px;
+								margin-left: 10px;
+		        			}
+	            			.el-table td.is-center, .el-table th.is-center {
+	        					text-align: center;
+	            			}
+	        				.table thead th {
+	        					height: 36px;
+								background-color: #42af8f;
+	        				}
+	        				.table thead th .cell {
+	        					color: #fff;
+	        				}
+	        				.el-table__body-wrapper tr:nth-child(even) {
+	        				 	background-color: #fafafa;
+	        				}
+	        				.el-table__body-wrapper tr:nth-child(odd) {
+	        				 	background-color: #fff;
+	        				}
+	        				.el-table__body-wrapper td {
+	                        	white-space: normal;
+	    						word-break: break-all;
+	                        }
+	        				.el-table__body-wrapper .cell {
+	        					min-height: 30px;
+	        					line-height: 30px;
+	        					// 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+								//  border: 1px solid #e4efec;
+	        					box-sizing: border-box;
+	        				}
+	        				.el-table__empty-block {
+	        					text-align: center;	
+	        				}
+	        			</style>
+	        		</div>
+	        	`;
+				
+                window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
 			}
 		}
 		
@@ -1071,6 +1117,14 @@
 	.el-table .cell {
 		padding: 0;
 	}	
+	.show {
+	    transition: display 400ms;
+	}
+	
+	.hide {
+	    opacity: 0;
+	    display: none
+	}
 	
 	.domDown {
 		position: absolute;
@@ -1084,7 +1138,6 @@
 		.isVis {
 			// 不显示占位符. - 的话打印会错位
 			color: transparent;
-			/*visibility: hidden;*/
 		}
 		
 		.cell-content {
@@ -1191,7 +1244,6 @@
 						.table-main {
 							
 							.isVis {
-								/*visibility: hidden;*/
 								color: transparent;
 								
 								&::selection {
@@ -1207,7 +1259,7 @@
 									transition: transfrom 1s linear;
 									
 								&.actived {
-									transform: rotate(-180deg);
+									transform: rotate(-90deg);
 								}
 							}
 							.cell-info {

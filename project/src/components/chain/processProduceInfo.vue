@@ -53,7 +53,7 @@
 				aList: [{
 					key: "materialCode",
 					type: "input",
-					label: "产出物料编码",
+					label: "产出物料",
 					disabled: true
 				},{
 					key: "batchNo",
@@ -64,6 +64,11 @@
 					key: "processCode",
 					type: "input",
 					label: "产出工序",
+					disabled: true
+				},{
+					key: "barcode",
+					type: "input",
+					label: "产出条码",
 					disabled: true
 				},{
 					key: "doCode",
@@ -91,11 +96,6 @@
 					label: "产出班次",
 					placeholder: "请选择班次"
 				},{
-					key: "barcode",
-					type: "input",
-					label: "产出条码",
-					placeholder: "请输入条码"
-				},{
 					key: "happenTime",
 					type: "dateTime",
 					label: "产出时间",
@@ -120,9 +120,6 @@
 					],
 					shiftName: [
 						{required: true, message: "请选择班次",trigger: "change"}
-					],
-					barcode: [
-						{required: true, message: "请输入条码",trigger: "change"}
 					],
 					happenTime: [
 						{validator: validateTime, trigger: "change"}
@@ -175,7 +172,7 @@
 						
 						oNewValue[sParam] = oRuleForm[sKey]
 						
-						if(['equipmentCode', 'personCode'].includes(sKey)) {
+						if(['materialCode', 'processCode', 'equipmentCode', 'personCode'].includes(sKey)) {
 							oNewValue[sParam] = oNewValue[sParam].split(":")[0]
 						}
 						

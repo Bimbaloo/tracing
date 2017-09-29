@@ -213,56 +213,6 @@
 			},
 			
 			/**
-			 * 设置右侧图表树结构数据。
-			 * @param {Array} aoData
-			 * @return {void}
-			 */
-			parseTreeData1() {
-				let aoData = this.rawData,
-					aoDiagramData = [],
-					aoDiagramLinkData = [],
-					oGroup = {};
-				
-				aoData.forEach(oData => {
-					if(oData.type != "1" && oData.subProcess && oData.subProcess.length) {
-						let oGroup = Object.assign({}, oData);
-						delete oGroup.subProcess;
-						oGroup.isGroup = true;
-						
-						aoDiagramData.push(oGroup);
-						aoDiagramLinkData.push({
-							from: oData.parent,
-							to: oData.key//oData.name
-						})
-						
-						oData.subProcess.forEach(o => {
-							o.group = oData.key;
-							o.type = oData.type;
-							aoDiagramData.push(o);
-							
-							if(o.parent) {
-								aoDiagramLinkData.push({
-									from: o.parent,
-									to: o.key //o.name
-								})
-							}
-						})
-					}else {
-						aoDiagramData.push(oData);
-						aoDiagramLinkData.push({
-							from: oData.parent,
-							to: oData.key//oData.name
-						})
-					}
-				})
-					
-				return {
-					node: aoDiagramData,
-					link: aoDiagramLinkData
-				};
-			},
-			
-			/**
 			 * 物料：按照批次汇总。
 			 * @param {Array} aoList
 			 * @return {Array}
@@ -423,8 +373,15 @@
 
 					if(oData && oData.parents === "") {
 						oData.parent = "";
+						
+						let aKey = _getKeysOfSameName(oData)
+						// 修改数据。--- 修改名称，增加同层key值。
+						oData = Object.assign({}, oData, {
+							name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+							sublings: aKey
+						})
+						
 						aoCatalogData.push(oData);
-
 						aoCopyData.splice(i, 1);
 						_findChildrenData(aoCopyData, oData.key, oData.key)
 					}
@@ -447,16 +404,23 @@
 
 						if(oData && oData.parents.split(",").includes(sKey)) {
 							// 当前元素的子级。
-							oData.parent = sParentKey;
-							aoCatalogData.push(oData);
-							
-							aoCopyData.splice(i, 1);
-							
 							if(oData.isMaterialNode) {
+								oData.parent = "";
 								sNewKey = oData.key;
 							}else {
 								sNewKey = sParentKey;
+								oData.parent = sParentKey;
 							}
+							
+							let aKey = _getKeysOfSameName(oData)
+							// 修改数据。--- 修改名称，增加同层key值。
+							oData = Object.assign({}, oData, {
+								name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+								sublings: aKey
+							})
+							
+							aoCopyData.splice(i, 1);
+							aoCatalogData.push(oData);
 							
 							if(aoCopyData.length) {
 								_findChildrenData(aoCopyData, oData.key, sNewKey)
@@ -464,6 +428,53 @@
 						}
 					}
 				}
+			
+				
+				/**
+				 * 通过名称获取相同的名称的数据的key中。
+				 * @param {Object} oFilter
+				 * @return {Array}
+				 */
+				function _getKeysOfSameName(oFilter) {
+					let aKeys = [];
+					
+					for(let i = aoCopyData.length - 1; i >= 0; i--) {
+						let oData = aoCopyData[i];
+	
+						if(oData.name === oFilter.name && oData.key != oFilter.key) {
+							// 保存相同的数据。
+							aKeys.push(oData.key)
+							// 更改其他数据的parent值。-- 把相同的数据删掉后，以该数据为parent的值，将会找不到
+							_changeParentByKey(oData.key, oFilter.key);
+							// 删除其他数据。
+							aoCopyData.splice(i, 1);
+						}
+					}
+					
+					aKeys.push(oFilter.key)
+					
+					// 返回数据。
+					return aKeys
+				}
+				
+				/**
+				 * 修改parent为当前key值-> 保留下的key值。
+				 * @param {String} sKey
+				 * @param{String} sNewKey
+				 */
+				function _changeParentByKey(sKey, sNewKey) {
+					aoCopyData.filter( o => {
+						let aParent = o.parents.split(","),
+							nIndex = aParent.indexOf(sKey)
+							
+						if(nIndex > -1) {
+							// 修改parnets中key 为newkey
+							aParent[nIndex] = sNewKey
+							o.parents = aParent.join(",")
+						}
+					})
+				}
+			
 			},
 			// 收缩左侧树。
 			collapseTree() {
