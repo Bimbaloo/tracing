@@ -51,9 +51,9 @@ import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
-//const url = HOST + "/api/v1/processparameter/by-equipment-time";
+const url = HOST + "/api/v1/processparameter/by-equipment-time";
 //const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
-const url = "static/echarts.json"
+//const url = "static/echarts.json"
 
 export default {
     components: {
@@ -504,18 +504,26 @@ export default {
         },
         /* 当窗口大小变化，自适应大小 */
         updateEcharts() {
-            let echartDivs = document.querySelectorAll(".charts")
-            let index = 0
-            echartDivs.forEach((el,i)=>{
-                if(el.parentNode.parentNode.style.display !== "none"){
+
+            let tabPanes = document.querySelectorAll(".el-tab-pane")
+            let index = 0   //记录当前tab页
+            tabPanes.forEach((el,i)=>{      // 所有显示
+                if( el.style.display !== "none" ){
                     index = i
                 }
+                el.style.display = ""
             })
+            
             this.myEcharts.forEach((echart,i) => {
-                if(i === index){
-                    echart.resize()
+                echart.resize()
+            })
+
+            tabPanes.forEach((el,i)=>{
+                if(i !== index ){
+                    el.style.display = "none"
                 }
             })
+
         },
         /* 监听窗口大小 更新echarts的大小 */
         addEvent() {
