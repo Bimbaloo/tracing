@@ -9,28 +9,34 @@
                 </div>
             </div>
             <h2 class="content-title" id='content-title'>
-                <span>工艺参数</span>    
+                <span>工艺参数</span>
             </h2>
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
-                <div class="content-echarts" v-for="(option,index) in options">
-                    <div class="charts" :id="`charts`+index">{{index}}</div>
-                </div>
-
-                <div class="content-tables" v-for="(tableData,index) in tableDatas">
-                    <h2 class="content-title tableData">
-                        <span class='table-title'>{{tableData.filename}}</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
-                        </span>
-                    </h2>
-                    <div class="content-table" ref="`tableData${index}`">
-                       <v-table :table-data="tableData" :max-height="400" :loading="loading" :resize="tdResize"></v-table>
-                    </div>
-                </div>
+                <el-tabs  >
+                    <el-tab-pane :label="tableData.filename" v-for="(tableData,index) in tableDatas">
+                        <div class="content-echarts" v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename">
+                            <div class="charts" :id="`charts`+index"></div>
+                        </div>
+                        <div class="content-tables">
+                            <h2 class="content-title tableData">
+                                <span class='table-title'>
+                                    <span>检验参数：{{tableData.varStdId}}</span>
+                                    <span>单位：{{tableData.unit}}</span>
+                                </span>
+                                <span class='table-handle'>
+                                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(index, $event)"></i>
+                                </span>
+                            </h2>
+                            <div class="content-table" ref="tableDataindex">
+                                <v-table :table-data="tableData" :max-height="400" :loading="loading" :resize="tdResize"></v-table>
+                            </div>
+                        </div>
+                    </el-tab-pane>
+                </el-tabs>
                 <div v-if="error" class="error">
-					{{ empty }}
-				</div>
+                    {{ empty }}
+                </div>
             </div>
 
         </div>
@@ -145,47 +151,26 @@ export default {
         "fullscreen": 'setFlexBase'
     },
     methods: {
-        // 判断调用接口是否成功。
-        // judgeLoaderHandler(param, fnSu, fnFail) {
-        //     let bRight = param.data.errorCode;
-
-        //     // 判断是否调用成功。
-        //     if (!bRight) {
-        //         // 调用成功后的回调函数。
-        //         fnSu && fnSu();
-        //     } else {
-        //         // 提示信息。
-        //         console.log(param.data.errorMsg.message)
-        //         // 失败后的回调函。
-        //         fnFail && fnFail();
-        //     }
-        // },
-        // 显示提示信息。
-        // showMessage() {
-        //     this.$message({
-        //         message: this.sErrorMessage,
-        //         duration: 3000
-        //     });
-        // },
         // 请求成功。
         requestSucess(oData) {
-            if(!oData.length){  //如果查询结果为空
+            if (!oData.length) {  //如果查询结果为空
                 this.error = true
-            }else{
+            } else {
                 this.error = false
             }
             let optionArr = [];
-            let tableDataArr =[];
+            let tableDataArr = [];
             this.loading = false;
 
             let optionsData = oData;  //获取到的data
             optionsData.map((data, index) => {
                 if (data.valueType === 1) {
-                    optionArr.push(this.initOption(data))
+                    optionArr.push(this.initOption(data, index))
+                    tableDataArr.push(this.setTableData(data, index))
                     return optionArr
                 } else {
                     /* 做成表格 */
-                    tableDataArr.push(this.setTableData(data))
+                    tableDataArr.push(this.setTableData(data, index))
                     return tableDataArr
                 }
 
@@ -193,11 +178,18 @@ export default {
             this.options = optionArr         // 将处理后的 option 放入 options 中
             this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
             this.$nextTick(() => {
+                let tabPanes = document.querySelectorAll(".el-tab-pane")
+                tabPanes.forEach(el=>el.style.display = "")
                 this.options.forEach((el, index) => {
                     this.initEcharts(el, index)
                 })
+                tabPanes.forEach((el,i)=>{
+                    if(i !== 0){
+                        el.style.display = "none"
+                    }
+                })
 
-            })            
+            })
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -234,39 +226,7 @@ export default {
             //     "endTime": "2017-08-11 01:35:37"
             // }
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
-            // this.$get(url, oQuery)
-            //     .then((res) => {
-            //         let optionArr = [];
-            //         let tableDataArr =[];
-            //         this.loading = false;
-            //         this.judgeLoaderHandler(res, () => {
-            //             let optionsData = res.data.data;  //获取到的data
-            //             optionsData.map((data, index) => {
-            //                 if (data.valueType === 1) {
-            //                     optionArr.push(this.initOption(data))
-            //                     return optionArr
-            //                 } else {
-            //                     /* 做成表格 */
-            //                     tableDataArr.push(this.setTableData(data))
-            //                     return tableDataArr
-            //                 }
 
-            //             })
-            //             this.options = optionArr         // 将处理后的 option 放入 options 中
-            //             this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
-            //             this.$nextTick(() => {
-            //                 this.options.forEach((el, index) => {
-            //                     this.initEcharts(el, index)
-            //                 })
-
-            //             })
-            //         });
-            //     })
-            //     .catch((err) => {
-            //         this.loading = false;
-            //         this.styleObject.minWidth = 0;
-            //         console.log("数据库查询出错。")
-            //     })
         },
         /* 获取高度函数 */
         adjustHeight() {
@@ -281,7 +241,7 @@ export default {
         },
         /* 获取元素实际高度(含margin) */
         outerHeight(el) {
-            if(!el) {
+            if (!el) {
                 return 0;
             }
             var height = el.offsetHeight;
@@ -296,55 +256,42 @@ export default {
             this.flexbase = this.adjustHeight()
         },
         /* 处理每个tableData */
-        setTableData(data) {
+        setTableData(data, index) {
             let tableData = {
                 filename: "名称",
+                unit: "",
+                description: '',
+                varStdId: '',
                 columns: [{
-                    name: "序号",
-                    type: "index",
-                    width: "50"
-                }, {
-                    name: "工艺参数",
-                    prop: "varStdId",
-                    width: "200",
-                }, {
-                    name: "工艺参数描述",
-                    prop: "description",
-                    width: "200"
-                }, {
                     name: "检测值",
                     prop: "value",
                     width: ""
                 }, {
-                    name: "单位",
-                    prop: "varUnit",
-                    width: "120",
-                }, {
                     name: "采集时间",
                     prop: "pickTime",
-                    width: "200",
+                    width: "",
                 }],
+                id: 0,
                 data: []
             }
+            tableData.varStdId = data.varStdId
+            tableData.unit = data.varUnit
             tableData.filename = data.description
-            tableData.data =data.list.map((el)=>{
-                    let arr = {}
-                    arr.varStdId = data.varStdId
-                    arr.description = data.description
-                    arr.varUnit = data.varUnit
-                    arr.value = el.value
-                    arr.pickTime = el.pickTime
-                    return arr
-                }
+            tableData.data = data.list.map((el) => {
+                let arr = {}
+                arr.value = el.value
+                arr.pickTime = el.pickTime
+                return arr
+            }
             )
             return tableData
         },
         /* 处理每个option */
-        initOption(data) {
+        initOption(data, index) {
             /* 定义option模板 */
             let optionModal = {
                 title: {
-                    text: 'XX 参数图表',
+                    //text: 'XX 参数图表',
                     textStyle: {
                         fontSize: 16,
                         fontFamily: "Microsoft YaHei",
@@ -467,10 +414,10 @@ export default {
             };
 
             /* 设置option */
-            optionModal.title.text = data.description //设置图表名称
+            //optionModal.title.text = data.description //设置图表名称
             optionModal.legend.data[0] = data.description //设置参数名称
             optionModal.xAxis.data = data.list.map((el) => { return el.pickTime }) //设置横坐标值
-            optionModal.yAxis.axisLabel.formatter = data.varUnit?('{value}' + data.varUnit):'{value}'      //设置纵坐标单位
+            optionModal.yAxis.axisLabel.formatter = data.varUnit ? ('{value}' + data.varUnit) : '{value}'      //设置纵坐标单位
             optionModal.series[0].name = data.description //设置参数名称
             optionModal.series[0].data = data.list.map((el) => { return el.value }) //设置纵坐标值
 
@@ -481,23 +428,23 @@ export default {
             const maximum = data.maxValue             //获取上限值 
             const minimum = data.minValue             //获取下限值 
             //debugger
-            if( data.minValue === data.maxValue ){          // 没有上下限的时候（上限值 === 下限值）
+            if (data.minValue === data.maxValue) {          // 没有上下限的时候（上限值 === 下限值）
                 optionModal.visualMap.pieces = []
                 optionModal.visualMap.pieces.push({
-                    gt: yMin-1,         //设置下限 
-                    lte: yMax+1,        //设置上限
+                    gt: yMin - 1,         //设置下限 
+                    lte: yMax + 1,        //设置上限
                     color: '#abcc52'  //设置颜色
                 })
                 // optionModal.visualMap.pieces[0].gt = yMin   //设置下限  
                 // optionModal.visualMap.pieces[0].lte = yMax  //设置上限
                 // optionModal.visualMap.pieces[0].color = '#abcc52' //设置颜色
-            }else{
+            } else {
                 //debugger
                 optionModal.series[0].markLine.data = []
                 optionModal.series[0].markLine.data.push({
                     yAxis: data.maxValue,           //设置上限值
                     name: '上限',
-                    lineStyle: { normal:{color: "#febf00",width: 2}}  //上限的样式
+                    lineStyle: { normal: { color: "#febf00", width: 2 } }  //上限的样式
                 })
                 // optionModal.series[0].markLine.data[0].yAxis = data.maxValue           //设置上限值
                 // optionModal.series[0].markLine.data[0].name = '上限'                   
@@ -506,7 +453,7 @@ export default {
                 optionModal.series[0].markLine.data.push({
                     yAxis: data.minValue,           //设置上限值
                     name: '下限',
-                    lineStyle: { normal:{color: "#febf00",width: 2}}  //下限的样式
+                    lineStyle: { normal: { color: "#febf00", width: 2 } }  //下限的样式
                 })
                 // optionModal.series[0].markLine.data[1].yAxis = data.minValue           //设置下限值
                 // optionModal.series[0].markLine.data[1].name = '下限'                   
@@ -515,7 +462,7 @@ export default {
                 /* 设置颜色变化的上下限 */
                 optionModal.visualMap.pieces = []
                 optionModal.visualMap.pieces.push({
-                    gt: (data.minValue - 100) < 0 ? 0 : (data.minValue - 100),  
+                    gt: (data.minValue - 100) < 0 ? 0 : (data.minValue - 100),
                     lte: data.minValue,                                         //设置下限 
                     color: '#e60012'                                            //设置低于下限颜色
                 })
@@ -557,9 +504,26 @@ export default {
         },
         /* 当窗口大小变化，自适应大小 */
         updateEcharts() {
-            this.myEcharts.forEach((echart) => {
+
+            let tabPanes = document.querySelectorAll(".el-tab-pane")
+            let index = 0   //记录当前tab页
+            tabPanes.forEach((el,i)=>{      // 所有显示
+                if( el.style.display !== "none" ){
+                    index = i
+                }
+                el.style.display = ""
+            })
+            
+            this.myEcharts.forEach((echart,i) => {
                 echart.resize()
             })
+
+            tabPanes.forEach((el,i)=>{
+                if(i !== index ){
+                    el.style.display = "none"
+                }
+            })
+
         },
         /* 监听窗口大小 更新echarts的大小 */
         addEvent() {
@@ -576,7 +540,8 @@ export default {
         },
         // 表格打印。
         printHandle(refTable, event) {
-            let oTable = this.$refs[refTable];
+            //debugger
+            let oTable = this.$refs.tableDataindex[refTable];
 
             if (!oTable) {
                 return;
@@ -626,7 +591,7 @@ export default {
             `;
 
             window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
-        },
+        }
     }
 }
 </script>
@@ -652,7 +617,31 @@ export default {
         right: auto;
     }
 }
-
+.contentBox {
+    .el-tabs {
+        .el-tabs__header {
+            border-bottom-color: #ccc;
+            .el-tabs__nav-wrap {
+                .el-tabs__nav-scroll {
+                    .el-tabs__nav {
+                        .el-tabs__item {
+                            color: #666;
+                            &:hover {
+                                color: #333;
+                            }
+                        }
+                        .is-active {
+                            color: #42AF8F
+                        }
+                    }
+                }
+            }
+        }
+        .el-tabs__content {
+            overflow: auto;
+        }
+    }
+}
 </style>
 <style lang="less" scoped>
 .charts {
@@ -670,8 +659,11 @@ export default {
     .contentBox {
         display: flex;
         flex-direction: column;
-        flex-basis: 200px;
-        overflow: auto;
+        .el-tabs {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+        }
     }
     .content-tables {
         margin-top: 0;
@@ -680,18 +672,16 @@ export default {
             display: flex;
             border-left: 0;
             justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            margin-top: 20px;
             .table-handle {
                 margin-right: 5px;
                 i {
-                    margin:5px;
+                    margin: 5px;
                     &:hover {
-                    cursor: pointer
-            }
-                }
-            }
-            .table-table {
-                i {
-                    margin:5px;
+                        cursor: pointer
+                    }
                 }
             }
         }

@@ -34,7 +34,7 @@
     },
     {
       "varStdId": "一次合格率",
-      "description": "B图表",
+      "description": "A图表",
       "varUnit": "%",
       "maxValue": 96.0,
       "minValue": 93.5,
@@ -52,7 +52,7 @@
     },
     {
       "varStdId": "一次合格率",
-      "description": "B图表",
+      "description": "合格率",
       "varUnit": "%",
       "maxValue": 96.0,
       "minValue": 93.5,
@@ -94,7 +94,7 @@
     },
     {
       "varStdId": "一次合格率",
-      "description": "B图表",
+      "description": "C图表",
       "varUnit": "%",
       "maxValue": 96.0,
       "minValue": 93.5,
