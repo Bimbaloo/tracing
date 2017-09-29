@@ -20,8 +20,9 @@
 	// import BalloonLink from 'assets/js/BalloonLink.js'
 
 	// 注释背景颜色。
-	var COMMENT_BGCOLOR = "rgba(66,175,143,0.4)";
-	
+	const COMMENT_BGCOLOR = "rgba(66,175,143,0.2)";//"rgba(44,52,60,0.7)";//
+	const COMMENT_TEXTCOLOR = "#333";
+
 	export default {
 		props: {
 			treeData: Object,
@@ -304,17 +305,17 @@
 							),
 							this.$(go.Panel, "Table", 
 								{ background: COMMENT_BGCOLOR},
-								new go.Binding("itemArray", "materialInfoList"),
+								new go.Binding("itemArray", "sumList"),//materialInfoList
 								{ 
 									margin: 4,
 									defaultAlignment: go.Spot.Left,
 									itemTemplate:
 										this.$(go.Panel, "TableRow",
-										new go.Binding("background", "back"),
+										// new go.Binding("background", "back"),
 										this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
-											{ column: 0, margin: 5 }),
+											{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 										this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
-											{ column: 1, margin: 5 })
+											{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR })
 										)  // end of itemTemplate
 								}
 							)
@@ -376,26 +377,26 @@
 							),
 							this.$(go.Panel, "Table", 
 								{ background: COMMENT_BGCOLOR},
-								new go.Binding("itemArray", "processInfoList"),
+								new go.Binding("itemArray", "sumList"),//processInfoList
 								{ 
 									margin: 4,
 									defaultAlignment: go.Spot.Left,
 									itemTemplate:
 										this.$(go.Panel, "TableRow",
-											new go.Binding("background", "back"),
+											// new go.Binding("background", "back"),
 											this.$(go.TextBlock, new go.Binding("text", "equipmentName"), // 设备
-												{ column: 0, margin: 5 }),
+												{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 											this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
-												{ column: 1, margin: 5 }),
+												{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 											this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
-												{ column: 2, margin: 5 })
+												{ column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR })
 										)  // end of itemTemplate
 								},
 
 								this.$(go.Panel, "TableRow",
 									{ isPanelMain: true },  // needed to keep this element when itemArray gets an Array
 									this.$(go.TextBlock, new go.Binding("text", "materialName"), // 物料名称
-										{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif"})//new go.Margin(2, 2, 0, 2)
+										{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif", stroke: COMMENT_TEXTCOLOR})//new go.Margin(2, 2, 0, 2)font: "bold 10pt sans-serif",
 								),
 							
 								this.$(go.RowColumnDefinition,
@@ -472,7 +473,7 @@
 						),
 						this.$(go.Panel, "Table", 
 							{ background: COMMENT_BGCOLOR},
-							new go.Binding("itemArray", "processInfoList"),
+							new go.Binding("itemArray", "sumList"),//processInfoList
 							{ 
 								margin: 4,
 								defaultAlignment: go.Spot.Left,
@@ -480,18 +481,18 @@
 									this.$(go.Panel, "TableRow",
 										new go.Binding("background", "back"),
 										this.$(go.TextBlock, new go.Binding("text", "equipmentName"), // 设备
-											{ column: 0, margin: 5 }),
+											{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 										this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
-											{ column: 1, margin: 5 }),
+											{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 										this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
-											{ column: 2, margin: 5 })
+											{ column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR })
 									)  // end of itemTemplate
 							},
 
 							this.$(go.Panel, "TableRow",
 								{ isPanelMain: true },  // needed to keep this element when itemArray gets an Array
 								this.$(go.TextBlock, new go.Binding("text", "materialName"), // 物料名称
-									{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif"})//new go.Margin(2, 2, 0, 2)
+									{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif", stroke: COMMENT_TEXTCOLOR})//new go.Margin(2, 2, 0, 2) 
 							),
 						
 							this.$(go.RowColumnDefinition,

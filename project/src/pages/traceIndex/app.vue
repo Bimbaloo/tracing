@@ -210,32 +210,6 @@
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
 					"startPointDtos": this.params
 				}, this.requestSucess, this.requestFail, this.requestError)
-				// this.$ajax.post(this.url, {
-				// 	"startPointDtos": this.params
-				// }).then((res) => {
-				// 	this.fullscreenLoading = false;
-				// 	this.judgeLoaderHandler(res, (data) => {
-				// 		if(!data.length) {
-				// 			console.log('查无数据。');
-				// 			this.showMessage();
-				// 			// this.$message.warn('查无数据。');
-				// 		} else {
-				// 			this.$store.commit({
-				// 				type: "updateData",
-				// 				data: data		//fnP.parseTreeData(data)
-				// 			});
-				// 			// 格式化数据。
-				// 			this.treeData = this.parseTreeData();
-				// 			this.catalogData = this.parseCatalogData();
-				// 		}						
-				// 	})
-				// })
-				// .catch((err) => {
-				// 	console.log(err)
-				// 	this.fullscreenLoading = false;
-				// 	console.warn('查询出错！')
-				// 	this.showMessage();
-				// })
 			},
 			
 			/**
@@ -287,12 +261,65 @@
 					link: aoDiagramLinkData
 				};
 			},
+			
+			/**
+			 * 物料：按照批次汇总。
+			 * @param {Array} aoList
+			 * @return {Array}
+			 */
+			sumMaterailList(aoList) {
+				let oSumMaterial = {}; 
+
+				aoList && aoList.forEach(o => {
+					let sKey = o.batchNo;
+
+					if(!oSumMaterial[sKey]) {
+						oSumMaterial[sKey] = {
+							sumQuantity: o.sumQuantity,
+							batchNo: o.batchNo
+						}
+					}else {
+						oSumMaterial[sKey].sumQuantity += o.sumQuantity;
+					}
+												
+				});
+
+				return window.Rt.utils.getObjectValues(oSumMaterial);
+			},
+
+			/**
+			 * 工序：按照设备+批次汇总。
+			 * @param {Array} aoList
+			 * @return {Array}
+			 */
+			sumProcessList(aoList) {
+				let oSumProcess = {}; 
+
+				aoList && aoList.forEach(o => {
+					let sKey = o.batchNo + o.equipmentId;
+
+					if(!oSumProcess[sKey]) {
+						oSumProcess[sKey] = {
+							sumQuantity: o.sumQuantity,
+							batchNo: o.batchNo,
+							equipmentName: o.equipmentName
+						}
+					}else {
+						oSumProcess[sKey].sumQuantity += o.sumQuantity;
+					}
+												
+				});
+
+				return window.Rt.utils.getObjectValues(oSumProcess);
+			},
+
 			/**
 			 * 设置右侧图表树结构数据。
 			 * @param {Array} aoData
 			 * @return {void}
 			 */
 			parseTreeData() {		
+				
 				let aoData = fnP.parseTreeData(this.rawData),		//this.rawData,
 					aoDiagramData = [],
 					aoDiagramLinkData = [];
@@ -302,21 +329,26 @@
 					if(oData.isMaterialNode) {
 						// 若为物料节点。
 						oData.category = "simple";
+						// 按批次汇总物料。
+						oData.sumList = this.sumMaterailList(oData.materialInfoList);
 					}else {
+						// 按设备、批次汇总物料。
+						oData.sumList = this.sumProcessList(oData.processInfoList);
 						// 若为工序节点。
 						if(oData.isGroup) {
 							// 若为group
 							let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.processSeq < b.processSeq)[0]
 							if(oLastGroupItem) {
 								// 取最后一道工序的产出。
-								oData.processInfoList = oLastGroupItem.processInfoList
+								oData.sumList = this.sumProcessList(oLastGroupItem.processInfoList);
+								// oData.processInfoList = oLastGroupItem.processInfoList
 							}
 						}
 						if(oData.processInfoList.length) {
 							// 有数据。
 							oData.materialName = oData.processInfoList[0].materialName;
 						}
-						oData.category = "simple";
+						oData.category = "simple";		
 					}	
 					
 					aoDiagramData.push(oData);
