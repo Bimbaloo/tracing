@@ -1,41 +1,31 @@
 <template>
 	<div id="app" class="report-wrapper" >
-		<div class="report-container original" >	
+		<!-- 显示节点 -->
+		<div class="report-container original" v-show="!printReport">	
 			<div class="page-icon">
 				<i class="icon icon-20 icon-download" title="下载" @click="downloadHandle('fastreport', $event)"></i>
             	<i class="icon icon-20 icon-print" title="打印" @click="beforePrint('fastreport', $event)"></i>
 			</div>
-			<!-- <div class="tag report-time"  v-show="false" >
-				<span>报告人：{{nickname}}</span>
-				<span>报告时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span>
-			</div> -->
 			<h1 class="title">快速报告</h1>
 			<h2 class="content-title">查询条件</h2>
 			<div class='condition-messsage'>
 				<span v-for="(filter,index) in filtersList" :key="index">
 					{{filter[0]}} : {{filter[1]}}
 				</span>
-				<span class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
-				<span class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
+				<span v-show="!this.filters.materialCode && gridData.data[0]" class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
+				<span v-show="!this.filters.processName && gridData.data[0]" class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
 			</div>
 			<div class='condition-list' @click="active.message = !active.message">
 				<span>查询明细
 					<i class="el-icon-d-arrow-right icon" v-show="!active.message"></i>
 				</span>
 			</div>
-
 			<div class="content-table condition-table" v-show="active.message">
 				<v-table :table-data="gridData" :loading="loading"></v-table> 
 			</div>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
-			<h2 class="content-title condition-audit" v-show="false">备注</h2>
-			<div class="condition-audit" v-show="false" >		
-				<div class="tag">
-					<span>签名：</span>
-					<span>时间：</span>
-				</div>
-			</div>
 		</div>
+		<!-- 打印节点 -->
 		<div class='report-container clone' v-show="printReport" ref="fastreport">
 			<div class="tag report-time">
 				<span>报告人：{{nickname}}</span>
@@ -47,8 +37,8 @@
 				<span v-for="(filter,index) in filtersList" :key="index">
 					{{filter[0]}} : {{filter[1]}}
 				</span>
-				<span class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
-				<span class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
+				<span v-show="!this.filters.materialCode" class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
+				<span v-show="!this.filters.processName " class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
 			</div>
 			<div class='condition-list'>
 				<span>查询明细</span>
@@ -57,18 +47,21 @@
 				<v-table :table-data="gridData" :loading="loading"></v-table> 
 			</div>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>
-			<h2 class="content-title condition-audit" v-show="false">备注</h2>
-			<div class="condition-audit" v-show="false" >		
+			<h2 class="content-title" v-show="printRemark">备注</h2>
+			<div class="condition-audit" v-show="printRemark" >		
 				<div class="tag">
 					<span>签名：</span>
 					<span>时间：</span>
 				</div>
 			</div>
 		</div>
-		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')">
+		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" size="tiny">
             <el-form :model="form">
-                <el-form-item label="打印人" :label-width="formLabelWidth">
+                <el-form-item label="打印人：" :label-width="formLabelWidth">
                     <el-input v-model="form.name" auto-complete="off"></el-input>
+                </el-form-item>
+				<el-form-item :label-width="formLabelWidth">
+					<el-checkbox v-model="form.printRemark">是否打印备注栏</el-checkbox>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -97,7 +90,8 @@
 			return {
 				dialogFormVisible: false,
                 form: {
-                    name: '',
+					name: '',
+					printRemark: true
                 },
                 formLabelWidth: '120px',
 
@@ -373,19 +367,17 @@
 				if(!this.printReport){
 					return 0
 				}else{
-					this.printReport = true
-
-					let original = document.querySelector(".original")
-					original.style.display = 'none'
-
 					let oRef = this.$refs[refHtml];
 					if(!oRef) {
 						return;
 					}
-
+					let icons = oRef.querySelectorAll(".icon")
+					icons.forEach(e=>{
+						e.style.display = "none"
+					})
+					this.printRemark = this.form.printRemark  //是否显示备注
 					/* 报告人报告时间部分 */
 					let reportTime = oRef.querySelector(".report-time")
-					//reportTime.style.display = ""  //显示打印时间
 					let nickname = this.form.name
 					reportTime.innerHTML = `
 						<div class="tag report-time"  v-show="false" >
@@ -396,13 +388,10 @@
 					setTimeout(()=>{
 						window.Rt.utils.printHtml(html2canvas,oRef,{
 							height: this.outerHeight(oRef)
-						},true);
-					},500)
-					
-					setTimeout(function() {
-						original.style.display = ""
-						oRef.style.display = "none"
+						},false);
+						this.printReport = false
 					},1000)
+					
 				}
 			},
 			//高度函数
@@ -543,5 +532,29 @@
 	}
 	.el-loading-mask {
 		z-index: 1000 ;
+	}
+	.el-dialog--tiny {
+		max-width: 420px;
+	}
+	.el-dialog__body {
+		.el-form-item {
+			margin-bottom: 0; 
+		}
+		.el-input {
+			.el-input__inner{
+				height: 30px;
+				border-radius: 0;
+				width: 200px;
+				border-color: #ddd;
+			}
+		}
+	}
+	.el-dialog__footer {
+		text-align: center;
+		.dialog-footer {
+			.el-button {
+				border-radius: 0
+			}
+		}
 	}
 </style>
