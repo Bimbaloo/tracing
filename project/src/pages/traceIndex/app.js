@@ -20,7 +20,7 @@ Vue.use(ElementUI)
 
 Vue.prototype.$ = go.GraphObject.make;
 Vue.prototype.$ajax = axios;
-Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
+Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams});
 Vue.prototype.$post = axios.post;
 
 // 添加echarts。
@@ -115,6 +115,7 @@ const router = new VueRouter({
 
 
 Vue.use(Vuex) 
+
 // 引用登录模块。
 import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
@@ -136,7 +137,9 @@ const store = new Vuex.Store({
     // 原始树数据。
     rawData: [],
     resize: 0,
-    resizeY: 0
+    resizeY: 0,
+    // 高亮的数据。
+    highted: []
   },
   mutations: {  
     updateKey (state, payload) {
@@ -171,6 +174,9 @@ const store = new Vuex.Store({
     updateResizeY (state, payload) {
       state.resizeY = payload.key;
     },
+    updateHeighted(state, payload) {
+    	state.highted = payload.data
+    }
   },
   actions: {
 	  updateRootAsync ({ commit }) {

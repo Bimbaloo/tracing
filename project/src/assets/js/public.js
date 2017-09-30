@@ -504,6 +504,109 @@ var parseTreeData = function(aTreeData) {
 	
 }
 
+
+var getTreeData = function(oRowData) {
+	let aoData = parseTreeData(oRowData),	
+		aoDiagramData = [],
+		aoDiagramLinkData = [];
+	
+	aoData.forEach(oData => {	
+		// 树节点。		
+		if(oData.isMaterialNode) {
+			// 若为物料节点。
+			oData.category = "simple";
+			// 按批次汇总物料。
+			oData.sumList = _sumMaterailList(oData.materialInfoList);
+		}else {
+			// 按设备、批次汇总物料。
+			oData.sumList = _sumProcessList(oData.processInfoList);
+			// 若为工序节点。
+			if(oData.isGroup) {
+				// 若为group
+				let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.processSeq < b.processSeq)[0]
+				if(oLastGroupItem) {
+					// 取最后一道工序的产出。
+					oData.sumList = _sumProcessList(oLastGroupItem.processInfoList);
+					// oData.processInfoList = oLastGroupItem.processInfoList
+				}
+			}
+			if(oData.processInfoList.length) {
+				// 有数据。
+				oData.materialName = oData.processInfoList[0].materialName;
+			}
+			oData.category = "simple";		
+		}	
+		
+		aoDiagramData.push(oData);
+		let aoParents = oData.parents.split(",");
+		aoParents.forEach( sParent => {
+			aoDiagramLinkData.push({
+				from: sParent,
+				to: oData.key,
+				fromPort: "FROM",
+				toPort: "TO"
+			});
+		});
+	});
+
+	return {
+		node: aoDiagramData,
+		link: aoDiagramLinkData
+	}
+
+	/**
+	 * 物料：按照批次汇总。
+	 * @param {Array} aoList
+	 * @return {Array}
+	 */
+	function _sumMaterailList(aoList) {
+		let oSumMaterial = {}; 
+
+		aoList && aoList.forEach(o => {
+			let sKey = o.batchNo;
+
+			if(!oSumMaterial[sKey]) {
+				oSumMaterial[sKey] = {
+					sumQuantity: o.sumQuantity,
+					batchNo: o.batchNo
+				}
+			}else {
+				oSumMaterial[sKey].sumQuantity += o.sumQuantity;
+			}
+										
+		});
+
+		return window.Rt.utils.getObjectValues(oSumMaterial);
+	}
+
+	/**
+	 * 工序：按照设备+批次汇总。
+	 * @param {Array} aoList
+	 * @return {Array}
+	 */
+	function _sumProcessList(aoList) {
+		let oSumProcess = {}; 
+
+		aoList && aoList.forEach(o => {
+			let sKey = o.batchNo + o.equipmentId;
+
+			if(!oSumProcess[sKey]) {
+				oSumProcess[sKey] = {
+					sumQuantity: o.sumQuantity,
+					batchNo: o.batchNo,
+					equipmentName: o.equipmentName
+				}
+			}else {
+				oSumProcess[sKey].sumQuantity += o.sumQuantity;
+			}
+										
+		});
+
+		return window.Rt.utils.getObjectValues(oSumProcess);
+	}
+}
+
+
 // 物料，设备等下拉框数据改变，查询时参数处理。
 var parseQueryParam = function(oQuery, index) {
 	let oParam = Object.assign({}, oQuery);
@@ -524,5 +627,6 @@ var parseQueryParam = function(oQuery, index) {
 export default {
 	parseData,
 	parseTreeData,
-	parseQueryParam
+	parseQueryParam,
+	getTreeData
 }

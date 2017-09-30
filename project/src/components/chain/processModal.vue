@@ -1,26 +1,46 @@
 <template>
 	<el-dialog class="processDialog" title="断链修复原因" :visible.sync="popShow" :close-on-click-modal="false" :before-close="handleClose">
 		<!-- 断链修复原因。 -->
-		<el-form label-position="left" label-width="100px">
+		<el-form class="process-form" label-position="left" label-width="100px">
 			<el-form-item label="修复的数据">
-				<ul class="pop-list">
-					<li v-for="value in popData.link">
-						<span>{{ value.processName }}</span>
-						<span>{{ value.equipmentName }}</span>
-						<span>{{ value.happenTime }}</span>
-						<span>{{ value.quantity }}</span>
-					</li>
-				</ul>
+				<div class="pop-title" v-show="popData.link.length">
+					<span class="title-type">类型</span>
+					<span class="title-process">工序</span>
+					<span class="title-equipment">设备</span>
+					<span class="title-time">产出\投入时间</span>
+					<span class="title-quantity">数量</span>
+				</div>
+				<div class="pop-list">
+					<div class="list-item" v-for="value in popData.link">
+						<div v-for="(item, index) in value">
+							<span class="title-type">{{ index ? '→': '←' }}</span>
+							<span class="title-process">{{ item.processName }}</span>
+							<span class="title-equipment">{{ item.equipmentName }}</span>
+							<span class="title-time">{{ item.happenTime }}</span>
+							<span class="title-quantity">{{ item.quantity }}</span>
+						</div>
+					</div>
+				</div>
 			</el-form-item>
 			<el-form-item label="断开的数据">
-				<ul class="pop-list">
-					<li v-for="value in popData.cancel">
-						<span>{{ value.processName }}</span>
-						<span>{{ value.equipmentName }}</span>
-						<span>{{ value.happenTime }}</span>
-						<span>{{ value.quantity }}</span>
-					</li>
-				</ul>
+				<div class="pop-title" v-show="popData.cancel.length">
+					<span class="title-type">类型</span>
+					<span class="title-process">工序</span>
+					<span class="title-equipment">设备</span>
+					<span class="title-time">产出\投入时间</span>
+					<span class="title-quantity">数量</span>
+				</div>
+				<div class="pop-list">
+					<div class="list-item" v-for="value in popData.cancel">
+						<div v-for="(item, index) in value">
+							<span class="title-type">{{ index ? '→': '←' }}</span>
+							<span class="title-process">{{ item.processName }}</span>
+							<span class="title-equipment">{{ item.equipmentName }}</span>
+							<span class="title-time">{{ item.happenTime }}</span>
+							<span class="title-quantity">{{ item.quantity }}</span>
+						</div>
+					</div>
+				</div>
 			</el-form-item>
 			<el-form-item label="修复原因" >
 				<el-input type="textarea" :rows="2" placeholder="请输入原因" v-model="sdes"></el-input>
@@ -91,11 +111,44 @@
 	
 	.processDialog {
 		.el-dialog {
-			max-width: 600px;
+			width: auto;
 		}
+		
+		.process-form {
+			max-height: 600px;
+			overflow: auto;
+		}
+		
+		.pop-list,
+		.pop-title {
+			span {
+				display: inline-block;
+				
+				&.title-type {
+					width: 30px;		
+				}
+				&.title-process {
+					width: 80px;
+				}
+				&.title-equipment {
+					width: 160px;
+				}
+				&.title-time {
+					width: 160px;
+				}
+				&.title-quantity {
+					width: 30px;
+				}
+			}
+		}
+		
+		.pop-title {
+			text-align: center
+		}
+		
 		.pop-list {
-			li {
-				list-style: circle;
+			.list-item {
+				border: 1px solid #42af8f;
 			}
 		}
 	}

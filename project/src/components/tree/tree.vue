@@ -10,6 +10,7 @@
 		</div>
 		<div id="tree" style="height: 100%;"></div>
 		<!--div id="overview"></div-->
+		<a href="" ref="downloadImage" v-show="false"></a>
 	</div>
 </template>
 
@@ -20,19 +21,14 @@
 	// import BalloonLink from 'assets/js/BalloonLink.js'
 
 	// 注释背景颜色。
-	var COMMENT_BGCOLOR = "rgba(66,175,143,0.4)";
+	const COMMENT_BGCOLOR = "rgba(66,175,143,0.2)";//"rgba(44,52,60,0.7)";//
+	const COMMENT_TEXTCOLOR = "#333";
+	const HIGHLIGHT_BG_COLOR = "#FFF";//"#6DAB80";
+	const HIGHLIGHT_TEXT_COLOR = "#333";//"#FFF";
 	
 	export default {
 		props: {
-			treeData: Object,
-			// flexBasis:{      // 用于追溯页面上下拖动后视图大小更新
-			// 	type: Number,
-      		// 	required: false
-			// },
-			// resize: {		 // 用于追溯页面左右拖动后视图大小更新
-			// 	type: Number,
-      		// 	required: false
-			// }
+			treeData: Object
 		},
 		data() {
 			return {
@@ -45,11 +41,12 @@
 		},
 		watch: {
 		    data: function () {	
-		    	if(this.tree) {					
+		    	if(this.tree) {	
 					if(this.tipsShow) {
 						// 若需要显示详情。
 						this.data.node.forEach(o => o.isMaterialNode ? (o.category = 'material'):(o.category = 'process'))
 					}
+					
 					this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    	
 					this.tree.model.linkFromPortIdProperty = "fromPort";
 					this.tree.model.linkToPortIdProperty = "toPort";
@@ -57,10 +54,12 @@
 		    },
 		    key: function() {
 		    	if(this.type == "catalog") {
-
 		    		this.$nextTick(function() {    		
+		    			this.setHighted()
 		    			this.setSelection();
 		    		})
+		    	}else {
+		    		this.setHighted()
 		    	}
 		    },
 		    root: function() {
@@ -95,6 +94,10 @@
 		   	treeFullscreen () {
 		   		return this.$store.state.treeFullscreen
 			},
+			// 高亮的数据。
+			highted() {
+				return this.$store.state.highted
+			},
 			// 选中样式。
 			selectionAdornmentTemplate () {
 				return this.$(go.Adornment, "Spot", {
@@ -107,8 +110,8 @@
 							fill: "#ffffff",
 							stroke: "#F09900",
 							strokeWidth: 1
-						}),
-
+						},
+						new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "#ffffff")),
 						this.$(go.Picture, {
 								position: new go.Point(0, 0),
 								width: 20,
@@ -128,7 +131,8 @@
 							stroke: "#333333",
 							margin: 5
 						},
-						new go.Binding("text", "name")
+						new go.Binding("text", "name"),
+						new go.Binding("stroke", "isHighlighted", h => h ? HIGHLIGHT_TEXT_COLOR : "#333333")
 					)
 				)
 			},
@@ -145,7 +149,15 @@
 						}, // this event handler is defined below
 						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
 						this.$(go.Panel, "Auto", 
-							this.$(go.Shape, "Rectangle", { name: "SELECTION", fill: "transparent", strokeWidth: 0, stroke: "#F09900" }),
+							this.$(go.Shape, "Rectangle", { 
+								name: "SELECTION", 
+								fill: "transparent", 
+								strokeWidth: 0, 
+								stroke: "#F09900" 
+							},
+							new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
+								//new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "transparent")
+							),
 							this.$(go.Panel, "Horizontal", 
 								this.$(go.Picture, {
 										width: 20,
@@ -165,7 +177,8 @@
 										// textValidation:onEditName
 									},
 									new go.Binding("text", "name"),//.makeTwoWay() //
-									
+									new go.Binding("stroke", "isHighlighted", function(h) { return h ? HIGHLIGHT_TEXT_COLOR : "#333333" }).ofObject()
+									//new go.Binding("stroke", "isHighlighted", h => h ? "#ffffff" : "#333333")
 								)
 							)
 						),					
@@ -264,7 +277,14 @@
 						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
 						this.$(go.Panel, "Vertical", 
 							this.$(go.Panel, "Auto",
-								this.$(go.Shape, "Rectangle", { name: "SELECTION", fill: "transparent", strokeWidth: 0, stroke: "#F09900" }),
+								this.$(go.Shape, "Rectangle", { 
+									name: "SELECTION", 
+									fill: "transparent", 
+									strokeWidth: 0, 
+									stroke: "#F09900" 
+								},
+								new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
+								),
 								this.$(go.Panel, "Horizontal", 
 									this.$(go.Picture, {
 											portId: "TO",
@@ -285,7 +305,8 @@
 											margin: 5,
 											// textValidation:onEditName
 										},
-										new go.Binding("text", "name"),//.makeTwoWay() //								
+										new go.Binding("text", "name"),//.makeTwoWay() //	
+										new go.Binding("stroke", "isHighlighted", function(h) { return h ? HIGHLIGHT_TEXT_COLOR : "#333333" }).ofObject()
 									),
 									// new go.Binding("editable","editable"),					
 									this.$("TreeExpanderButton", {
@@ -304,17 +325,17 @@
 							),
 							this.$(go.Panel, "Table", 
 								{ background: COMMENT_BGCOLOR},
-								new go.Binding("itemArray", "materialInfoList"),
+								new go.Binding("itemArray", "sumList"),//materialInfoList
 								{ 
 									margin: 4,
 									defaultAlignment: go.Spot.Left,
 									itemTemplate:
 										this.$(go.Panel, "TableRow",
-										new go.Binding("background", "back"),
+										// new go.Binding("background", "back"),
 										this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
-											{ column: 0, margin: 5 }),
+											{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 										this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
-											{ column: 1, margin: 5 })
+											{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR })
 										)  // end of itemTemplate
 								}
 							)
@@ -335,7 +356,14 @@
 						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
 						this.$(go.Panel, "Vertical", 
 							this.$(go.Panel, "Auto",
-								this.$(go.Shape, "Rectangle", { name: "SELECTION", fill: "transparent", strokeWidth: 0, stroke: "#F09900" }),
+								this.$(go.Shape, "Rectangle", { 
+									name: "SELECTION", 
+									fill: "transparent", 
+									strokeWidth: 0, 
+									stroke: "#F09900" 
+								},
+									new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
+								),
 								this.$(go.Panel, "Horizontal", 
 									this.$(go.Picture, {
 											portId: "TO",
@@ -357,7 +385,7 @@
 											// textValidation:onEditName
 										},
 										new go.Binding("text", "name"),//.makeTwoWay() //
-										
+										new go.Binding("stroke", "isHighlighted", function(h) { return h ? "#ffffff" : "#333333" }).ofObject()
 									),
 									// new go.Binding("editable","editable"),				
 									this.$("TreeExpanderButton", {
@@ -376,26 +404,26 @@
 							),
 							this.$(go.Panel, "Table", 
 								{ background: COMMENT_BGCOLOR},
-								new go.Binding("itemArray", "processInfoList"),
+								new go.Binding("itemArray", "sumList"),//processInfoList
 								{ 
 									margin: 4,
 									defaultAlignment: go.Spot.Left,
 									itemTemplate:
 										this.$(go.Panel, "TableRow",
-											new go.Binding("background", "back"),
+											// new go.Binding("background", "back"),
 											this.$(go.TextBlock, new go.Binding("text", "equipmentName"), // 设备
-												{ column: 0, margin: 5 }),
+												{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 											this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
-												{ column: 1, margin: 5 }),
+												{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 											this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
-												{ column: 2, margin: 5 })
+												{ column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR })
 										)  // end of itemTemplate
 								},
 
 								this.$(go.Panel, "TableRow",
 									{ isPanelMain: true },  // needed to keep this element when itemArray gets an Array
 									this.$(go.TextBlock, new go.Binding("text", "materialName"), // 物料名称
-										{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif"})//new go.Margin(2, 2, 0, 2)
+										{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif", stroke: COMMENT_TEXTCOLOR})//new go.Margin(2, 2, 0, 2)font: "bold 10pt sans-serif",
 								),
 							
 								this.$(go.RowColumnDefinition,
@@ -472,7 +500,7 @@
 						),
 						this.$(go.Panel, "Table", 
 							{ background: COMMENT_BGCOLOR},
-							new go.Binding("itemArray", "processInfoList"),
+							new go.Binding("itemArray", "sumList"),//processInfoList
 							{ 
 								margin: 4,
 								defaultAlignment: go.Spot.Left,
@@ -480,18 +508,18 @@
 									this.$(go.Panel, "TableRow",
 										new go.Binding("background", "back"),
 										this.$(go.TextBlock, new go.Binding("text", "equipmentName"), // 设备
-											{ column: 0, margin: 5 }),
+											{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 										this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
-											{ column: 1, margin: 5 }),
+											{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 										this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
-											{ column: 2, margin: 5 })
+											{ column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR })
 									)  // end of itemTemplate
 							},
 
 							this.$(go.Panel, "TableRow",
 								{ isPanelMain: true },  // needed to keep this element when itemArray gets an Array
 								this.$(go.TextBlock, new go.Binding("text", "materialName"), // 物料名称
-									{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif"})//new go.Margin(2, 2, 0, 2)
+									{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif", stroke: COMMENT_TEXTCOLOR})//new go.Margin(2, 2, 0, 2) 
 							),
 						
 							this.$(go.RowColumnDefinition,
@@ -571,6 +599,7 @@
 					this.restoreScreenClick();
 				}
 				
+				let aHighted = this.highted;
 				this.$store.commit({
 					type: "updateType",
 					key: "tree"
@@ -579,6 +608,14 @@
 					type: "updateKey",
 					key: node.data.key
 				});
+				
+				// 如果当前点击的不是高亮的值，则将高亮清空。
+				if(aHighted.length && !aHighted.includes(node.data.key)) {
+					this.$store.commit({
+						type: "updateHeighted",
+						data: []
+					});
+				}
 				
 				if(node.data.isMaterialNode) {   // node.data.type == "1"
 					// 根据物料节点查询仓储信息。        
@@ -857,33 +894,63 @@
 					o.visible = true;
 				})
 			},
-//			设置选中。
+			// 设置选中。
 			setSelection() {
 				if(!this.data.node.some(o => o.key == this.key)) {
 					return;
 				}
 			    this.tree.nodes.each(obj => {
 			    	// 取消选中样式。
-			    	obj.isSelected = false;
-					obj.background = null;
-			    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
+			    	if(obj.isSelected) {
+				    	obj.isSelected = false;
+						
+						if(obj.isHighlighted) {
+							obj.background = HIGHLIGHT_BG_COLOR;
+							obj.findObject("TB") && (obj.findObject("TB").stroke = HIGHLIGHT_TEXT_COLOR);
+						}else {
+							obj.background = null;
+					    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
+						}
+			    	}
 			    });
 				
 				let oData = this.treeData.node.filter(o => o.key == this.key)[0],
 					oNode = this.tree.findNodeForKey(oData.key);
-				
+
 				if(oNode) {				
 					oNode.isSelected = true;
-					oNode.background = "white";
-					oNode.findObject("TB") && (oNode.findObject("TB").stroke = "#333");
 				}
-
+				
 				if(oData.group) {
 					// 若节点在组合中。
 					if(!this.tree.findNodeForKey(oData.group).isSubGraphExpanded) {
 						this.tree.findNodeForKey(oData.group).expandSubGraph();
 					}
 				}
+			},
+			
+			// 设置高亮。
+			setHighted() {
+				let aHighted = this.highted
+				
+				this.tree.startTransaction("highlight");
+				
+				// 清空高亮。
+				this.tree.clearHighlighteds();
+				
+				// 是否需要高亮显示。
+				this.tree.nodes.each(obj => {
+			    	// 取消选中样式。
+			    	if(aHighted.includes(obj.data.key)) {
+						obj.isHighlighted = true;
+						obj.data.isHighlighted = true;
+					}else {
+						obj.isHighlighted = false;
+						obj.data.isHighlighted = false;
+					}
+			    });
+			    
+			    this.tree.commitTransaction("highlight");
 			},
 
 			/**
@@ -892,16 +959,20 @@
 			* @returns {void}
 			*/
 			onSvaeImgHandler(event) {
-				var oImage = this.tree.makeImage({
+				let oImage = this.tree.makeImage({
 					scale: 1,
 					maxSize: new go.Size(Infinity, Infinity),
-		//			  background: "rgb(248,248,240)"
+					// background: "rgb(248,248,240)"
 					}),
 					// 图片地址。
 					sImage = oImage.src;
 				
-				var w=window.open('about:blank','image from canvas');
-				w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
+				this.$refs.downloadImage.href = sImage;
+				this.$refs.downloadImage.download = "追溯主图.png";
+				this.$refs.downloadImage.click();
+
+				// var w=window.open('about:blank','image from canvas');
+				// w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
 			},	
 			/**
 			* 打印图片。
@@ -932,8 +1003,8 @@
 					}
 
 					// ie浏览器下打印必须要这行。			
-		//			w.document.close();
-		//			w.focus();
+					// w.document.close();
+					// w.focus();
 					
 					// 关闭窗口。
 					w.close();

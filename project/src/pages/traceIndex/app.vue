@@ -139,7 +139,7 @@
 			 *  恢复数据。
 			 */
 			treeDataInit() {
-				this.treeData = this.parseTreeData();
+				this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
 				// 重置路由。
 				this.$router.replace("/");
 
@@ -151,22 +151,6 @@
 			setPanelHeight() {
 			},
 
-			// // 判断调用接口是否成功。
-			// judgeLoaderHandler(param, fnSu, fnFail) {
-			// 	let bRight = param.data.errorCode;
-				
-			// 	// 判断是否调用成功。
-			// 	if(!bRight) {
-			// 		// 调用成功后的回调函数。
-			// 		fnSu && fnSu(param.data.data);
-			// 	}else {
-			// 		// 提示信息。
-			// 		console.warn(param.data.errorMsg.message);
-			// 		this.showMessage();
-			// 		// 失败后的回调函。
-			// 		fnFail && fnFail();
-			// 	}
-			// },	
 			showMessage() {
 				this.$alert('查无数据', '提示', {
 					type: 'warn'
@@ -185,7 +169,7 @@
 						data: oData		//fnP.parseTreeData(data)
 					});
 					// 格式化数据。
-					this.treeData = this.parseTreeData();
+					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
 					this.catalogData = this.parseCatalogData();
 				}							
 			},
@@ -210,174 +194,8 @@
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
 					"startPointDtos": this.params
 				}, this.requestSucess, this.requestFail, this.requestError)
-				// this.$ajax.post(this.url, {
-				// 	"startPointDtos": this.params
-				// }).then((res) => {
-				// 	this.fullscreenLoading = false;
-				// 	this.judgeLoaderHandler(res, (data) => {
-				// 		if(!data.length) {
-				// 			console.log('查无数据。');
-				// 			this.showMessage();
-				// 			// this.$message.warn('查无数据。');
-				// 		} else {
-				// 			this.$store.commit({
-				// 				type: "updateData",
-				// 				data: data		//fnP.parseTreeData(data)
-				// 			});
-				// 			// 格式化数据。
-				// 			this.treeData = this.parseTreeData();
-				// 			this.catalogData = this.parseCatalogData();
-				// 		}						
-				// 	})
-				// })
-				// .catch((err) => {
-				// 	console.log(err)
-				// 	this.fullscreenLoading = false;
-				// 	console.warn('查询出错！')
-				// 	this.showMessage();
-				// })
 			},
-			
-			/**
-			 * 设置右侧图表树结构数据。
-			 * @param {Array} aoData
-			 * @return {void}
-			 */
-			parseTreeData1() {
-				let aoData = this.rawData,
-					aoDiagramData = [],
-					aoDiagramLinkData = [],
-					oGroup = {};
-				
-				aoData.forEach(oData => {
-					if(oData.type != "1" && oData.subProcess && oData.subProcess.length) {
-						let oGroup = Object.assign({}, oData);
-						delete oGroup.subProcess;
-						oGroup.isGroup = true;
-						
-						aoDiagramData.push(oGroup);
-						aoDiagramLinkData.push({
-							from: oData.parent,
-							to: oData.key//oData.name
-						})
-						
-						oData.subProcess.forEach(o => {
-							o.group = oData.key;
-							o.type = oData.type;
-							aoDiagramData.push(o);
-							
-							if(o.parent) {
-								aoDiagramLinkData.push({
-									from: o.parent,
-									to: o.key //o.name
-								})
-							}
-						})
-					}else {
-						aoDiagramData.push(oData);
-						aoDiagramLinkData.push({
-							from: oData.parent,
-							to: oData.key//oData.name
-						})
-					}
-				})
-					
-				return {
-					node: aoDiagramData,
-					link: aoDiagramLinkData
-				};
-			},
-			/**
-			 * 设置右侧图表树结构数据。
-			 * @param {Array} aoData
-			 * @return {void}
-			 */
-			parseTreeData() {		
-				let aoData = fnP.parseTreeData(this.rawData),		//this.rawData,
-					aoDiagramData = [],
-					aoDiagramLinkData = [];
-				
-				aoData.forEach(oData => {	
-					// 树节点。		
-					if(oData.isMaterialNode) {
-						// 若为物料节点。
-						oData.category = "simple";
-					}else {
-						// 若为工序节点。
-						if(oData.isGroup) {
-							// 若为group
-							let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.processSeq < b.processSeq)[0]
-							if(oLastGroupItem) {
-								// 取最后一道工序的产出。
-								oData.processInfoList = oLastGroupItem.processInfoList
-							}
-						}
-						if(oData.processInfoList.length) {
-							// 有数据。
-							oData.materialName = oData.processInfoList[0].materialName;
-						}
-						oData.category = "simple";
-					}	
-					
-					aoDiagramData.push(oData);
-					let aoParents = oData.parents.split(",");
-					aoParents.forEach( sParent => {
-						aoDiagramLinkData.push({
-							from: sParent,
-							to: oData.key,
-							fromPort: "FROM",
-							toPort: "TO"
-						});
-					});
 
-					// // 注释节点。
-					// if(oData.isMaterialNode && oData.materialInfoList.length) {
-					// 	// 若为物料，且有数据。
-					// 	aoDiagramData.push({
-					// 		key: oData.key + "comment",
-					// 		items: oData.materialInfoList.map(o => {
-					// 			return {
-					// 				batch: o.batchNo || '-', 
-					// 				sum: o.sumQuantity
-					// 			}
-					// 		}),
-					// 		category: "materialComment"
-					// 	})
-					// 	aoDiagramLinkData.push({
-					// 		from: oData.key,
-					// 		to: oData.key + "comment",
-					// 		category: "Comment"
-					// 	});
-					// }else if(oData.processInfoList.length){
-					// 	// 若为工序，且有数据。
-					// 	aoDiagramData.push({
-					// 		key: oData.key + "comment",
-					// 		material: oData.processInfoList[0].materialName || '-',
-					// 		items: oData.processInfoList.map(o => {
-					// 			return {
-					// 				equipment: o.equipmentName || '-',
-					// 				batch: o.batchNo || '-', 
-					// 				sum: o.sumQuantity
-					// 			}
-					// 		}),
-					// 		category: "processComment"
-					// 	})
-					// 	aoDiagramLinkData.push({
-					// 		from: oData.key,
-					// 		to: oData.key + "comment",
-					// 		category: "Comment",
-					// 		fromPort: "TEXTBLOCK",
-					// 		toPort: "COMMENT"
-					// 	});
-					// }
-				})		
-				return {
-					node: aoDiagramData,
-					link: aoDiagramLinkData
-				}
-			},
-	
-		
 			/**
 			 * 获取左侧目录树数据。
 			 * @return {Array}
@@ -391,8 +209,15 @@
 
 					if(oData && oData.parents === "") {
 						oData.parent = "";
+						
+						let aKey = _getKeysOfSameName(oData)
+						// 修改数据。--- 修改名称，增加同层key值。
+						oData = Object.assign({}, oData, {
+							name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+							sublings: aKey
+						})
+						
 						aoCatalogData.push(oData);
-
 						aoCopyData.splice(i, 1);
 						_findChildrenData(aoCopyData, oData.key, oData.key)
 					}
@@ -415,16 +240,23 @@
 
 						if(oData && oData.parents.split(",").includes(sKey)) {
 							// 当前元素的子级。
-							oData.parent = sParentKey;
-							aoCatalogData.push(oData);
-							
-							aoCopyData.splice(i, 1);
-							
 							if(oData.isMaterialNode) {
+								oData.parent = "";
 								sNewKey = oData.key;
 							}else {
 								sNewKey = sParentKey;
+								oData.parent = sParentKey;
 							}
+							
+							let aKey = _getKeysOfSameName(oData)
+							// 修改数据。--- 修改名称，增加同层key值。
+							oData = Object.assign({}, oData, {
+								name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+								sublings: aKey
+							})
+							
+							aoCopyData.splice(i, 1);
+							aoCatalogData.push(oData);
 							
 							if(aoCopyData.length) {
 								_findChildrenData(aoCopyData, oData.key, sNewKey)
@@ -432,6 +264,53 @@
 						}
 					}
 				}
+			
+				
+				/**
+				 * 通过名称获取相同的名称的数据的key中。
+				 * @param {Object} oFilter
+				 * @return {Array}
+				 */
+				function _getKeysOfSameName(oFilter) {
+					let aKeys = [];
+					
+					for(let i = aoCopyData.length - 1; i >= 0; i--) {
+						let oData = aoCopyData[i];
+	
+						if(oData.name === oFilter.name && oData.key != oFilter.key) {
+							// 保存相同的数据。
+							aKeys.push(oData.key)
+							// 更改其他数据的parent值。-- 把相同的数据删掉后，以该数据为parent的值，将会找不到
+							_changeParentByKey(oData.key, oFilter.key);
+							// 删除其他数据。
+							aoCopyData.splice(i, 1);
+						}
+					}
+					
+					aKeys.push(oFilter.key)
+					
+					// 返回数据。
+					return aKeys
+				}
+				
+				/**
+				 * 修改parent为当前key值-> 保留下的key值。
+				 * @param {String} sKey
+				 * @param{String} sNewKey
+				 */
+				function _changeParentByKey(sKey, sNewKey) {
+					aoCopyData.filter( o => {
+						let aParent = o.parents.split(","),
+							nIndex = aParent.indexOf(sKey)
+							
+						if(nIndex > -1) {
+							// 修改parnets中key 为newkey
+							aParent[nIndex] = sNewKey
+							o.parents = aParent.join(",")
+						}
+					})
+				}
+			
 			},
 			// 收缩左侧树。
 			collapseTree() {

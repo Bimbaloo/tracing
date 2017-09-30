@@ -218,7 +218,19 @@
 			init() {
 				// 数据处理。
 				// 绘图。
+				
 				this.drawTree()
+				this.tree.addDiagramListener("LayoutCompleted", () => {
+					// 初始时判断 上下滚动箭头的显示状态
+			        for (var nit = this.tree.nodes; nit.next(); ) {
+			            var node = nit.value;
+			            var scroll = node.findObject("SCROLLER");
+			
+			            if(scroll) {
+			                scroll._updateScrollBar(scroll.findObject("TABLE"))
+			            }
+			        }
+		      	});
 			},
 			drawTree() {
 				let $ = this.$,
@@ -226,7 +238,7 @@
 					
 				this.tree =
 					$(go.Diagram, 'nodeLine', {
-						contentAlignment: go.Spot.LeftCenter,		// initialContentAlignment
+						contentAlignment: go.Spot.TopLeft,		// initialContentAlignment	LeftCenter
 						allowMove: false,
 			            allowZoom: false,
 			            allowCopy: false,
@@ -423,6 +435,14 @@
 			          portSpreading: go.Node.SpreadingNone
 			        },
 			        new go.Binding("location").makeTwoWay(),
+			        {
+		              selectionAdornmentTemplate:
+		                  $(go.Adornment, "Auto",
+		                      $(go.Shape, "RoundedRectangle",
+		                          { fill: null, stroke: null  }),
+		                      $(go.Placeholder)
+		                  )
+		          	},
 			        $(go.Panel, 'Horizontal',
 			            {
 			            	click: this.showProcessFilter		// 显示工序过滤弹窗。
@@ -461,7 +481,11 @@
 			              "TABLE.defaultRowSeparatorStrokeWidth": 0.5,
 			              "TABLE.defaultSeparatorPadding": new go.Margin(1, 3, 0, 3)
 			            }
-			          )
+			          ),
+			          	// 没有数据时不显示下面的边框
+			           new go.Binding("visible", '', function (a, b) {
+			              return a.data.items.length ? true: false
+			           }).ofObject()
 			        )
 			      );
 				
@@ -699,13 +723,13 @@
 					outProcessUid: oPrev.inProcessUid,
 					moldCode: "",
 					doCode: oPrev.inDoCode,
-					processCode: oPrev.inProcessCode,
-					materialCode: oNext.inMaterialCode,
+					processCode: oPrev.inProcessCode+":"+oPrev.inProcessName,
+					materialCode: oNext.inMaterialCode+":"+oNext.inMaterialName,
 					batchNo: oNext.inBatchNo,
 					barcode: oNext.inBarcode,
 					quantity: oPrev.inQuantity,
-					equipmentCode: oPrev.inEquipmentCode,
-					personCode: oPrev.inPersonCode,
+					equipmentCode: oPrev.inEquipmentCode+":"+oPrev.inEquipmentName,
+					personCode: oPrev.inPersonCode+":"+oPrev.inPersonName,
 					happenTime: oNext.inHappenTime,
 					shiftName: oPrev.inShiftName
 				}
@@ -1435,28 +1459,30 @@
     			let that = this,
     				aNew = [];
     			
-    			
     			aoData.forEach( o => {
     				// 连接或断开。    			
     				let oLine = o.line ? o.line: o,
     					oPrev = that.getNodeInfoById(oLine.fromPort),
-						oNext = that.getNodeInfoById(oLine.toPort);
+						oNext = that.getNodeInfoById(oLine.toPort),
+						aGroup = []
     			
     				// 加入上工序
-    				aNew.push({
+    				aGroup.push({
     					processName: oPrev.parentProcessName||oPrev.inProcessName,
-						equipmentName: oPrev["inEquipmentName"],
-						happenTime: oPrev["inHappenTime"],
-						quantity: oPrev["inQuantity"]
+						equipmentName: oPrev["outEquipmentName"],
+						happenTime: oPrev["outHappenTime"],
+						quantity: oPrev["outQuantity"]
     				})
     				
     				// 加入下工序
-    				aNew.push({
+    				aGroup.push({
     					processName: oNext.parentProcessName|| oNext.inProcessName,
-						equipmentName: oNext["outEquipmentName"],
-						happenTime: oNext["outHappenTime"],
-						quantity: oNext["outQuantity"]
+						equipmentName: oNext["inEquipmentName"],
+						happenTime: oNext["inHappenTime"],
+						quantity: oNext["inQuantity"]
     				})
+    				
+    				aNew.push(aGroup)
     			})
     			
     			// 返回数据。

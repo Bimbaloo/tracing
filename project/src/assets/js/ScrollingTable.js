@@ -41,7 +41,7 @@ go.GraphObject.defineBuilder("AutoRepeatButton", function(args) {
     }
   }
 
-  return $(go.Panel,
+  return $(go.Panel, 'Table',
            { actionDown: delayClicking, actionUp: endClicking });
 });
 
@@ -56,6 +56,7 @@ go.GraphObject.defineBuilder("AutoRepeatButton", function(args) {
 go.GraphObject.defineBuilder("ScrollingTable", function(args) {
   var $ = go.GraphObject.make;
   var tablename = go.GraphObject.takeBuilderArgument(args, "TABLE");
+  var timer = null;
  
   // an internal helper function for actually performing a scrolling operation
   function incrTableIndex(obj, i) {
@@ -91,8 +92,31 @@ go.GraphObject.defineBuilder("ScrollingTable", function(args) {
     if (!bar) return;
     var idx = table.topIndex;
     
-    if (up) up.opacity = (idx > 0) ? 1.0 : 0.0;
-    if (down) down.opacity = (idx < table.rowCount - 1) ? 1.0 : 0.0;
+    if(up) {
+        // 向上箭头是否隐藏。
+        if(idx > 0) {
+            if(!up.opacity) {
+                up.opacity = 0.6;
+            }
+        }else {
+            up.opacity = 0.0;
+        }
+    }
+
+    if(down) {
+        // 向下箭头是否隐藏。
+        if(idx < table.rowCount - 1) {
+            if(!down.opacity) {
+                down.opacity = 0.6;
+            }
+        }else {
+            down.opacity = 0.0;
+        }
+    }
+    
+    
+//  if (up) up.opacity = (idx > 0) ? 1.0 : 0.0;
+//  if (down) down.opacity = (idx < table.rowCount - 1) ? 1.0 : 0.0;
 
 //  var tabh = bar.actualBounds.height;
 //  var rowh = table.elt(idx).actualBounds.height;  //?? assume each row has same height?
@@ -101,6 +125,90 @@ go.GraphObject.defineBuilder("ScrollingTable", function(args) {
 //  var needed = idx > 0 || idx + numVisibleRows <= table.rowCount;
 //  bar.opacity = needed ? 1.0 : 0.0;
   }
+  
+  /**
+	 * 设置元素的hover事件。
+	 * @param obj
+	 * @param sShape {String} up | down
+	 * @param sHandleType {String} 'enter' | 'leave'
+	 */
+  function setHoverStyle(obj, sShape, sHandleType) {
+        var table = obj.panel.panel.panel.findObject(tablename);
+
+        var up = table.panel.elt(0);
+        var down = table.panel.elt(2);
+        var button = sShape === 'up' ? up : down;
+        var nOpacity = button.opacity;
+
+        if(button.opacity) {
+            if(sHandleType === 'enter') {
+                button.opacity = 1.0;
+            }else {
+                button.opacity = 0.6;
+            }
+        }
+  }
+  
+  /**
+	 * 设置元素的click样式。
+	 * @param obj
+	 * @param sShape {String} up | down
+	 * @param sHandleType {String} 'enter' | 'leave'
+	 */
+	function setClickFillStyle(obj, sShape, sHandleType) {
+	    var table = obj.panel.panel.panel.findObject(tablename);
+	
+	    var up = table.panel.elt(0);
+	    var down = table.panel.elt(2);
+	    var button = sShape === 'up' ? up : down;
+	
+	    var shape = button.findObject('arrowShape')
+	    if(shape) {
+	        if(sHandleType === 'enter') {
+	            shape.fill = '#ccc'
+	        }else {
+	            shape.fill = '#928f8f'
+	        }
+	
+	    }
+	}
+	
+	/**
+	 *清空运动定时器。
+	 * @param {void}
+	 * @return {void}
+	 */
+	function clearButtonMoveInterval() {
+	    if(timer) {
+	        clearInterval(timer);
+	        timer = null
+	    }
+	}
+
+	/**
+	 * 设置运动的定时器。
+	 * @param {Object} obj
+	 * @param {String} sType
+	 */
+	function setButtonMoveInterval(obj, sType) {
+		
+			if(sType === 'up') {
+	        incrTableIndex(obj, -1);
+	    }else {
+	        incrTableIndex(obj, +1);
+	    }
+		
+	    // 设置定时器。
+	    timer = setInterval(function () {
+	        // 循环操作。
+	        if(sType === 'up') {
+	            incrTableIndex(obj, -1);
+	        }else {
+	            incrTableIndex(obj, +1);
+	        }
+	    }, 100)
+	}
+	
 
   return $(go.Panel, "Table",
       {
@@ -113,13 +221,38 @@ go.GraphObject.defineBuilder("ScrollingTable", function(args) {
               {
                   name: "UP",
                   row: 0,
-                  alignment: go.Spot.Top,
-                  height: 16,
+                  alignment: go.Spot.TopCenter,
+                  stretch: go.GraphObject.Fill,
+                  height: 20,
                   opacity: 0,
-                  click: function(e, obj) { incrTableIndex(obj, -1); }
+                  background: 'transparent',
+                  isActionable: true,
+                  actionDown: function (e, obj) {
+                  		// 设置点击样式。
+                      setClickFillStyle(obj, 'up', 'enter')
+                      
+                      // 清空定时器。
+                      clearButtonMoveInterval();
+                      // 设置定时器。
+                      setButtonMoveInterval(obj, 'up')
+                  },
+                  actionUp: function (e, obj) {
+                  		// 设置点击后的样式。
+                      setClickFillStyle(obj, 'up', 'leave')
+                      
+                      // 清空定时器。
+                      clearButtonMoveInterval();
+                  },
+                  mouseHover: function (e, obj) {
+                      setHoverStyle(obj, 'up', 'enter')
+                  },
+                  mouseLeave: function (e, obj) {
+                      setHoverStyle(obj, 'up', 'leave')
+                  },
+//                click: function(e, obj) { incrTableIndex(obj, -1); }
               },
               $(go.Shape, "TriangleUp",
-                  {figure: "Chevron", margin: new go.Margin(1,0,0,0),  fill: "#928f8f", width: 12, height: 25, alignment: go.Spot.Center, stroke: null, angle: -90, stretch: go.GraphObject.Fill})),
+                  {name: 'arrowShape', figure: "Chevron", margin: new go.Margin(1,0,0,0),  fill: "#928f8f", width: 12, height: 25, alignment: go.Spot.Center, stroke: null, angle: -90, stretch: go.GraphObject.Fill})),
           // this actually holds the item elements
           $(go.Panel, "Table",
               {
@@ -133,12 +266,39 @@ go.GraphObject.defineBuilder("ScrollingTable", function(args) {
               {
                   name: "DOWN",
                   row: 2,
-                  alignment: go.Spot.Bottom,
-                  height: 16,
-                  click: function(e, obj) { incrTableIndex(obj, +1); }
+                  alignment: go.Spot.BottomCenter,
+                  stretch: go.GraphObject.Fill,
+                  height: 20,
+                  opacity: 0.6,
+                  background: 'transparent',
+                  isActionable: true,
+                  actionDown: function (e, obj) {
+                  		// 设置点击的样式。
+                    	setClickFillStyle(obj, 'down', 'enter')
+                    	
+                    	// 清空定时器。
+                      clearButtonMoveInterval();
+
+                      // 设置定时器。
+                      setButtonMoveInterval(obj, 'down')
+                  },
+                  actionUp: function (e, obj) {
+                  		// 设置点击 后的样式。
+                      setClickFillStyle(obj, 'down', 'leave')
+                      
+                      // 清空定时器。
+                      clearButtonMoveInterval();
+                  },
+                  mouseHover: function (e, obj) {
+                      setHoverStyle(obj, 'down', 'enter')
+                  },
+                  mouseLeave: function (e, obj) {
+                      setHoverStyle(obj, 'down', 'leave')
+                  },
+//                click: function(e, obj) { incrTableIndex(obj, +1); }
               },
-              $(go.Shape,
-                  {figure: "Chevron", fill: "#928f8f", width: 12, height: 25, alignment: go.Spot.Center, stroke: null, angle: 90, stretch: go.GraphObject.Fill}))
+          		$(go.Shape,
+              	{name: 'arrowShape', figure: "Chevron", fill: "#928f8f", width: 12, height: 25, stroke: null, angle: 90}))
       )
     );
     
