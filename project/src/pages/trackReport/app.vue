@@ -69,6 +69,7 @@
             <el-form :model="form">
                 <el-form-item label="报告人：" :label-width="formLabelWidth">
                     <el-input v-model="form.name" auto-complete="off" placeholder="请输入报告人"></el-input>
+					<el-input v-show="false"></el-input>
                 </el-form-item>
 				<el-form-item :label-width="formLabelWidth">
 					<el-checkbox v-model="form.printRemark">是否打印备注栏</el-checkbox>
