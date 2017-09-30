@@ -21,7 +21,12 @@
 				</span>
 			</div>
 			<div class="content-table condition-table" v-show="active.message">
-				<v-table :table-data="gridData" :loading="loading"></v-table> 
+				<div class='materialBox' v-for="equipment in equipmentTimes">
+					<div class='material'>{{equipment['name']}}：</div>
+					<div class='time' >
+						<span v-for='time in equipment["time"]'>{{time}}</span>
+					</div>
+				</div>
 			</div>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
 		</div>
@@ -44,7 +49,12 @@
 				<span>查询明细</span>
 			</div>
 			<div class="content-table condition-table">
-				<v-table :table-data="gridData" :loading="loading"></v-table> 
+				<div class='materialBox' v-for="equipment in equipmentTimes">
+					<div class='material'>{{equipment['name']}}：</div>
+					<div class='time' >
+						<span v-for='time in equipment["time"]'>{{time}}</span>
+					</div>
+				</div>
 			</div>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>
 			<h2 class="content-title" v-show="printRemark">备注</h2>
@@ -124,40 +134,6 @@
                         name: "加工时间"
                     }],
                     data: []
-					// 	{
-				    //   "barcode": "UN65457437520007057", 
-				    //   "batchNo": "20160331A", 
-				    //   "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				    //   "materialCode": "10000515", 
-				    //   "materialSpec": "", 
-				    //   "materialUnit": "kg", 
-				    //   "quantity": 16, 
-				    //   "happenTime": "2016-03-31 14:28:33", 
-				    //   "personName": "李瑞娇", 
-				    //   "equipmentName": "装配2.2线GP12", 
-				    //   "equipmentCode": "RLSB1", 
-				    //   "equipmentType": "", 
-				    //   "processName": "GP12", 
-				    //   "moldCode": "",
-				    //   "bucketNo": ""
-				    // },{
-				    //   "barcode": "UN65457437520007066", 
-				    //   "batchNo": "20160331A", 
-				    //   "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				    //   "materialCode": "10000515", 
-				    //   "materialSpec": "", 
-				    //   "materialUnit": "kg", 
-				    //   "quantity": 16, 
-				    //   "happenTime": "2016-03-31 14:28:33", 
-				    //   "personName": "李瑞娇", 
-				    //   "equipmentName": "装配2.2线GP12", 
-				    //   "equipmentCode": "RLSB1", 
-				    //   "equipmentType": "", 
-				    //   "processName": "GP12", 
-				    //   "moldCode": "",
-				    //   "bucketNo": ""
-					// }
-					
                 },
             
 				styleObject: {
@@ -171,6 +147,7 @@
 				filters: {},
 				filtersList: [],
 				//dialogState:false
+				equipmentTimes:[]
 			}
 		},
 		computed: {
@@ -258,26 +235,32 @@
 				}
 				
 			},
-// 			// 判断调用接口是否成功。
-// 			judgeLoaderHandler(param, fnSu, fnFail) {
-// 				let bRight = param.data.errorCode;
-				
-// 				// 判断是否调用成功。
-// 				if(!bRight) {
-// 					// 调用成功后的回调函数。
-// 					fnSu && fnSu(param.data.data);
-// 				}else {
-// 					// 提示信息。
-// //					this.error = "查无数据";
-// 					console.warn(param.data.errorMsg.message);
-// 					// 失败后的回调函。
-// 					fnFail && fnFail();
-// 				}
-// 			},	
 			// 起点请求成功。
 			requestStartPointsSucess(oData) {
+				//console.log(oData)
 				this.gridData.data = oData;
 				
+				let myData = JSON.parse(JSON.stringify(this.gridData.data))
+				let needArr = []
+				myData.forEach((el,i)=>{
+					let obj = {
+						"name":"",
+						"time":[]
+					}
+					obj["name"] = el["equipmentName"]
+					obj["time"].push(el["happenTime"])
+					needArr.push(obj)
+					for (let j = i+1 ; j < myData.length; j++){
+						if (el["equipmentName"] === myData[j]["equipmentName"]){
+							obj["time"].push(myData[j]["happenTime"])
+							myData.splice(j, 1)
+							j=j-1   
+						}
+					}
+				})
+				this.equipmentTimes = needArr
+
+
 				if(!oData.length) {
 					console.log('查无数据。');
 				}else {
@@ -302,9 +285,10 @@
 				console.warn(sErrorMessage);
 			},
 			// 请求错误。
-			requestError(er) {
+			requestError(error) {
               	// this.gridData.loading = false;
 				// this.error = "查无数据";
+				console.warn(error);
 				console.warn("查询出错。");
 			},
 			fetchStartPointsData () {
@@ -489,6 +473,33 @@
 		}
 		.condition-table {
 			margin-top: 0;
+			box-sizing: border-box;
+			border: 1px solid #42AF8F;
+			padding: 10px;
+			.materialBox {
+				display: flex;
+				box-sizing: border-box;
+				padding-left: 10px;
+				color: #666;
+				margin-bottom: 20px;
+				font-size: 14px;
+				&:last-child {
+					margin-bottom: 0;
+				}
+				.material {
+					line-height: 20px;
+				}
+				.time {
+					display: flex;
+					flex: 1;
+					flex-wrap: wrap;
+					&>span {
+						margin-left: 10px; 
+						line-height: 20px;
+					}
+				}
+			}
+			
 		}
 	}
 	// .clone {
