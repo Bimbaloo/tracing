@@ -12,7 +12,10 @@
                 <span>工艺参数</span>
             </h2>
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
-                <el-tabs  >
+                <div v-if="error" class="error">
+                    {{ empty }}
+                </div>
+                <el-tabs v-else>
                     <el-tab-pane :label="tableData.filename" v-for="(tableData,index) in tableDatas">
                         <div class="content-echarts" v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename">
                             <div class="charts" :id="`charts`+index"></div>
@@ -34,9 +37,7 @@
                         </div>
                     </el-tab-pane>
                 </el-tabs>
-                <div v-if="error" class="error">
-                    {{ empty }}
-                </div>
+                
             </div>
 
         </div>
