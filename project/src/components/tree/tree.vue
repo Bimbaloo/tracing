@@ -104,7 +104,9 @@
 						isShadowed: true
 					},
 					this.$(go.Panel, "Auto", {
-							defaultAlignment: go.Spot.Left
+							defaultAlignment: go.Spot.Left,
+							// 设置选中节点内边距，解决节点文字与图片的距离过近的问题。
+							padding: new go.Margin(0, 20, 0, 0)// b,l,t,r
 						},
 						this.$(go.Shape, {
 							fill: "#ffffff",
@@ -117,7 +119,7 @@
 								width: 20,
 								height: 20,
 								background: null,
-								margin: new go.Margin(0, 0, 0, 2),
+								margin: 2,
 								imageStretch: go.GraphObject.Uniform,
 							},
 							new go.Binding("source", "isMaterialNode", s => s ? material : process)
@@ -128,8 +130,7 @@
 					this.$(go.TextBlock, {
 							row: 1,
 							font: "14pt Helvetica, 微软雅黑, sans-serif",
-							stroke: "#333333",
-							margin: 5
+							stroke: "#333333"
 						},
 						new go.Binding("text", "name"),
 						new go.Binding("stroke", "isHighlighted", h => h ? HIGHLIGHT_TEXT_COLOR : "#333333")

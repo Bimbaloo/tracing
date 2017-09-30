@@ -4,8 +4,12 @@
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis">
             <div id="equipments" :style="{height: panelHeight + 'px'}"></div>
-            <div class="illustration" v-if="!loading" :style="{bottom: selectedEquipmentId?'40px':'16px'}">
-                <div v-for="state in states" :key="state.key"><i :class="['icon icon-16', `icon-${state.key}`]"></i>{{state.name}}</div>
+            <div class="illustration" 
+                :title="showState?'隐藏设备状态':'显示设备状态'"
+                v-if="!loading" 
+                :style="{bottom: selectedEquipmentId?'40px':'16px'}" 
+                @click="toggleStateHandle">
+                <div v-for="state in states" :key="state.key" :style="{color: showState?'#333':'#ccc'}" ><i :class="['icon icon-16', `icon-${state.key}`, showState?'':'unselected']"></i>{{state.name}}</div>
             </div>
             <!--维度按钮-->
             <div class="legend" v-if="!loading">
@@ -175,6 +179,8 @@
 		},
         data () {
             return {
+                // 是否展示设备状态。
+                showState: true,
                 // 设备。
                 equipments: [],
                 // 判断是否为遏制页面。
@@ -556,7 +562,9 @@
                             formatter: this.stateTooltipFormatter,
                             // 设置显示位置。
                             position: this.stateTooltipPosition,
-                            extraCssText: 'height:auto;'
+                            extraCssText: 'height:auto;',
+                            // 鼠标是否可进入悬浮框。
+                            enterable: false
                         }               
                     }]
                 };
@@ -733,6 +741,8 @@
                     this.onlyShowRelatedData = this.storageData.onlyShowRelatedData; 
                     // 显示的提示框。
                     this.markLine = this.storageData.markLine;
+                    // 是否显示设置状态。
+                    this.showState = this.storageData.showState;
                 }
             },
             // 保存数据到本地。
@@ -758,6 +768,8 @@
                 this.storageData.onlyShowRelatedData = this.onlyShowRelatedData;
                 // 显示的提示框。
                 this.storageData.markLine = this.markLine;
+                // 是否显示设置状态。
+                this.storageData.showState = this.showState;
 
                 sessionStorage.setItem("equipment_analysis_" + this.tag, JSON.stringify(this.storageData));
             },
@@ -795,6 +807,7 @@
                 this.markLine = [];
                 this.compareList = []; 
                 this.onlyShowRelatedData = true;
+                this.showState = true;
                 // 清空本地存储数据。
                 this.storageData = null;
                 sessionStorage.removeItem("equipment_analysis_" + this.tag);
@@ -1432,11 +1445,46 @@
                     }            
                 })	
             },
+            // 设备状态显示切换。
+            toggleStateHandle() {
+                this.showState = !this.showState;
+
+                if(this.showState) {
+                    this.showStateHandle();
+                }else {
+                    this.hideStateHandle();
+                }
+            },
+            // 显示状态。
+            showStateHandle() {         
+                this.chart.setOption({
+                    series: [{
+                        name: CHART_STATE_NAME,
+                        data: this.getStatusData(),
+                        tooltip: {
+                            trigger: 'item'
+                        }
+                    }]       
+                });
+            },
+            // 隐藏状态。
+            hideStateHandle() {
+                this.chart.setOption({
+                    series: [{
+                        name: CHART_STATE_NAME,
+                        data: this.getVisualStateData(),
+                        tooltip: {
+                            trigger: 'none'
+                        }
+
+                    }]
+                });
+            },
             // 设置图形数据。
             setChartData () {  
                                
                 // 设备状态。
-                this.option.series.filter(o => o.name=="状态")[0].data = this.getStatusData()
+                this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data = this.showState ? this.getStatusData(): this.getVisualStateData();
                 
                 // 获取各事件维度数据。
                 this.dimension.forEach(item => {
@@ -1482,6 +1530,7 @@
                 this.setSelectedTime();
                 // 设置提示框数据。
                 this.setTooltip();
+                
             },
             // 设置提示框。
             setTooltip() {
@@ -1811,6 +1860,27 @@
                     data: aoData
                 };
             },
+            // 设置无数据状态。
+            getVisualStateData() {
+                return this.equipments.map((item, index) => {
+                    return {
+                        name: '',
+                        value: [
+                            index,
+                            +new Date(this.datetime.start),
+                            +new Date(this.datetime.end),
+                            +new Date(this.datetime.end) - +new Date(this.datetime.start),
+                            this.datetime.start,
+                            this.datetime.end
+                        ],
+                        itemStyle: {
+                            normal: {
+                                color: '#dedede'
+                            }
+                        }
+                    };    
+                })
+            },
             // 获取设备状态。
             getStatusData () {
                 let aoData = [];
@@ -1837,6 +1907,7 @@
                                 }
                             }
                         });    
+                        return;
                     }else {
                         singleData.map(o => {
                             let oState = this.states.filter(state => state.key === o.type)[0];
@@ -2013,6 +2084,9 @@
             },
             // 状态提示。
             stateTooltipFormatter(params) {
+                // if(!params.name) {
+                //     return '';
+                // }
                 let time = params.value[3]/1000,    
                     hour = 0,
                     munite = 0,
@@ -2276,6 +2350,7 @@
                 position: absolute;
                 left: 0;
                 font-size: 12px;
+                cursor: pointer;
 
                 &>div {
                     padding: 5px 0;
