@@ -57,8 +57,8 @@
 		</div>
 		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" size="tiny">
             <el-form :model="form">
-                <el-form-item label="打印人：" :label-width="formLabelWidth">
-                    <el-input v-model="form.name" auto-complete="off"></el-input>
+                <el-form-item label="报告人：" :label-width="formLabelWidth">
+                    <el-input v-model="form.name" auto-complete="off" placeholder="请输入报告人"></el-input>
                 </el-form-item>
 				<el-form-item :label-width="formLabelWidth">
 					<el-checkbox v-model="form.printRemark">是否打印备注栏</el-checkbox>
@@ -378,7 +378,7 @@
 					this.printRemark = this.form.printRemark  //是否显示备注
 					/* 报告人报告时间部分 */
 					let reportTime = oRef.querySelector(".report-time")
-					let nickname = this.form.name
+					let nickname = this.form.name || (this.$store.state.loginModule.nickname !== null) ? this.$store.state.loginModule.nickname : ""
 					reportTime.innerHTML = `
 						<div class="tag report-time"  v-show="false" >
 							<span>报告人：${nickname}</span>
