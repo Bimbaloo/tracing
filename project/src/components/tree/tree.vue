@@ -23,8 +23,8 @@
 	// 注释背景颜色。
 	const COMMENT_BGCOLOR = "rgba(66,175,143,0.2)";//"rgba(44,52,60,0.7)";//
 	const COMMENT_TEXTCOLOR = "#333";
-	const HIGHLIGHT_BG_COLOR = "#FFF";//"#6DAB80";
-	const HIGHLIGHT_TEXT_COLOR = "#333";//"#FFF";
+	const HIGHLIGHT_BG_COLOR = "#f5efdc";//"#42af8f";//"#6DAB80";
+	const HIGHLIGHT_TEXT_COLOR = "#333";//"#333";
 	
 	export default {
 		props: {
@@ -109,17 +109,18 @@
 							padding: new go.Margin(0, 20, 0, 0)// b,l,t,r
 						},
 						this.$(go.Shape, {
-							fill: "#ffffff",
+							fill: HIGHLIGHT_BG_COLOR, //"#ffffff",
 							stroke: "#F09900",
 							strokeWidth: 1
 						},
-						new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "#ffffff")),
+//						new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "#ffffff")
+						),
 						this.$(go.Picture, {
 								position: new go.Point(0, 0),
-								width: 20,
-								height: 20,
+								width: 16,
+								height: 16,
 								background: null,
-								margin: 2,
+								margin: new go.Margin(0, 5, 0, 4),
 								imageStretch: go.GraphObject.Uniform,
 							},
 							new go.Binding("source", "isMaterialNode", s => s ? material : process)
@@ -130,10 +131,11 @@
 					this.$(go.TextBlock, {
 							row: 1,
 							font: "14pt Helvetica, 微软雅黑, sans-serif",
-							stroke: "#333333"
+							stroke: HIGHLIGHT_TEXT_COLOR,	//"#333333",
+							margin: 5
 						},
 						new go.Binding("text", "name"),
-						new go.Binding("stroke", "isHighlighted", h => h ? HIGHLIGHT_TEXT_COLOR : "#333333")
+//						new go.Binding("stroke", "isHighlighted", h => h ? HIGHLIGHT_TEXT_COLOR : "#333333")
 					)
 				)
 			},

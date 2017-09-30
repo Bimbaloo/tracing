@@ -7,6 +7,8 @@
 	import process from 'assets/img/process.png'
 	import {onDoubleClickNode} from 'assets/js/go-util'
 
+	const HIGHLIGHT_BG_COLOR = "#f5efdc";//"#fff";
+	
 	export default {
 		props: {
 			catalogData: Array,	//Object
@@ -201,7 +203,7 @@
 								padding: new go.Margin(0, 10, 0, 0)// b,l,t,r
 							},
 							$(go.Shape, {
-								fill: "rgb(255,255,255)",
+								fill: HIGHLIGHT_BG_COLOR,	//"rgb(255,255,255)",
 								stroke: "rgb(245,200,13)",
 								strokeWidth: 1
 							}),
@@ -247,15 +249,22 @@
 			// 设置选中节点样式。
 			setCatalogSelection() {
 				let oNode = this.catalog.findNodeForKey(this.key);
+				let oSublingNode = null
 				
 				this.catalog.nodes.each(o => {
+					// 当前节点的同名节点
+					if(o.data.sublings.includes(this.key)) {
+						oSublingNode = o;
+					}
 					o.isSelected = false;
 					o.background = null;
 					o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
 				})
 				
+				oNode = oNode ? oNode: oSublingNode
+				
 				if(oNode) {
-					oNode.background = "white";
+					oNode.background = HIGHLIGHT_BG_COLOR;	//"white";
 					oNode.isSelected = true;
 					oNode.findObject("TB").stroke = "#333";
 				}
