@@ -236,10 +236,14 @@
 					},{
 						prop: "type",
 						name: "类型",
-						width: 120,
+						width: 50,
 						formatter: function(sValue) {
 							return self.getTimeLineTypeInfo(sValue).text
 						}
+					},{
+						prop: "barcode",
+						name: "条码",
+						width: 210
 					},{
 						prop: "time",
 						name: "时间",
@@ -247,39 +251,35 @@
 					},{
 						prop: "location",
 						name: "地点",
-						width: 250
+						width: 160
 					},{
 						prop: "batchNo",
 						name: "批次",
-						width: 300
-					},{
-						prop: "barcode",
-						name: "条码",
-						width: 300
+						width: 160
 					},{
 						prop: "quantity",
 						name: "数量",
-						width: 120
+						width: 50
 					},{
 						prop: "shiftName",
 						name: "班次",
-						width: 180
+						width: 130
 					},{
 						prop: "personName",
 						name: "人员",
-						width: 120
+						width: 60
 					},{
 						prop: "moldCode",
 						name: "模号",
-						width: 120
+						width: 60
 					},{
 						prop: "vendorName",
 						name: "供应商/客户",
-						width: 120
+						width: 80
 					},{
 						prop: "checkResult",
 						name: "检验结果",
-						width: 120
+						width: 80
 					}],
 					bCreated: false,
 					loading: false,

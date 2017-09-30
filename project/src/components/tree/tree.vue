@@ -10,6 +10,7 @@
 		</div>
 		<div id="tree" style="height: 100%;"></div>
 		<!--div id="overview"></div-->
+		<a href="" ref="downloadImage" v-show="false"></a>
 	</div>
 </template>
 
@@ -22,18 +23,12 @@
 	// 注释背景颜色。
 	const COMMENT_BGCOLOR = "rgba(66,175,143,0.2)";//"rgba(44,52,60,0.7)";//
 	const COMMENT_TEXTCOLOR = "#333";
-
+	const HIGHLIGHT_BG_COLOR = "#FFF";//"#6DAB80";
+	const HIGHLIGHT_TEXT_COLOR = "#333";//"#FFF";
+	
 	export default {
 		props: {
-			treeData: Object,
-			// flexBasis:{      // 用于追溯页面上下拖动后视图大小更新
-			// 	type: Number,
-      		// 	required: false
-			// },
-			// resize: {		 // 用于追溯页面左右拖动后视图大小更新
-			// 	type: Number,
-      		// 	required: false
-			// }
+			treeData: Object
 		},
 		data() {
 			return {
@@ -59,13 +54,11 @@
 		    },
 		    key: function() {
 		    	if(this.type == "catalog") {
-//  				console.log(2)
 		    		this.$nextTick(function() {    		
 		    			this.setHighted()
 		    			this.setSelection();
 		    		})
 		    	}else {
-//		    		console.log(3)
 		    		this.setHighted()
 		    	}
 		    },
@@ -118,7 +111,7 @@
 							stroke: "#F09900",
 							strokeWidth: 1
 						},
-						new go.Binding("fill", "isHighlighted", h => h ? "#6DAB80" : "#ffffff")),
+						new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "#ffffff")),
 						this.$(go.Picture, {
 								position: new go.Point(0, 0),
 								width: 20,
@@ -139,7 +132,7 @@
 							margin: 5
 						},
 						new go.Binding("text", "name"),
-						new go.Binding("stroke", "isHighlighted", h => h ? "#ffffff" : "#333333")
+						new go.Binding("stroke", "isHighlighted", h => h ? HIGHLIGHT_TEXT_COLOR : "#333333")
 					)
 				)
 			},
@@ -162,8 +155,8 @@
 								strokeWidth: 0, 
 								stroke: "#F09900" 
 							},
-							new go.Binding("fill", "isHighlighted", function(h) { return h ? "#6DAB80" : "transparent" }).ofObject()
-//								new go.Binding("fill", "isHighlighted", h => h ? "#6DAB80" : "transparent")
+							new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
+								//new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "transparent")
 							),
 							this.$(go.Panel, "Horizontal", 
 								this.$(go.Picture, {
@@ -184,8 +177,8 @@
 										// textValidation:onEditName
 									},
 									new go.Binding("text", "name"),//.makeTwoWay() //
-									new go.Binding("stroke", "isHighlighted", function(h) { return h ? "#ffffff" : "#333333" }).ofObject()
-//									new go.Binding("stroke", "isHighlighted", h => h ? "#ffffff" : "#333333")
+									new go.Binding("stroke", "isHighlighted", function(h) { return h ? HIGHLIGHT_TEXT_COLOR : "#333333" }).ofObject()
+									//new go.Binding("stroke", "isHighlighted", h => h ? "#ffffff" : "#333333")
 								)
 							)
 						),					
@@ -290,7 +283,7 @@
 									strokeWidth: 0, 
 									stroke: "#F09900" 
 								},
-								new go.Binding("fill", "isHighlighted", function(h) { return h ? "#6DAB80" : "transparent" }).ofObject()
+								new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
 								),
 								this.$(go.Panel, "Horizontal", 
 									this.$(go.Picture, {
@@ -313,7 +306,7 @@
 											// textValidation:onEditName
 										},
 										new go.Binding("text", "name"),//.makeTwoWay() //	
-										new go.Binding("stroke", "isHighlighted", function(h) { return h ? "#ffffff" : "#333333" }).ofObject()
+										new go.Binding("stroke", "isHighlighted", function(h) { return h ? HIGHLIGHT_TEXT_COLOR : "#333333" }).ofObject()
 									),
 									// new go.Binding("editable","editable"),					
 									this.$("TreeExpanderButton", {
@@ -369,7 +362,7 @@
 									strokeWidth: 0, 
 									stroke: "#F09900" 
 								},
-									new go.Binding("fill", "isHighlighted", function(h) { return h ? "#6DAB80" : "transparent" }).ofObject()
+									new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
 								),
 								this.$(go.Panel, "Horizontal", 
 									this.$(go.Picture, {
@@ -901,7 +894,7 @@
 					o.visible = true;
 				})
 			},
-//			设置选中。
+			// 设置选中。
 			setSelection() {
 				if(!this.data.node.some(o => o.key == this.key)) {
 					return;
@@ -912,8 +905,8 @@
 				    	obj.isSelected = false;
 						
 						if(obj.isHighlighted) {
-							obj.background = "#6DAB80";
-							obj.findObject("TB") && (obj.findObject("TB").stroke = "#fff");
+							obj.background = HIGHLIGHT_BG_COLOR;
+							obj.findObject("TB") && (obj.findObject("TB").stroke = HIGHLIGHT_TEXT_COLOR);
 						}else {
 							obj.background = null;
 					    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
@@ -966,16 +959,20 @@
 			* @returns {void}
 			*/
 			onSvaeImgHandler(event) {
-				var oImage = this.tree.makeImage({
+				let oImage = this.tree.makeImage({
 					scale: 1,
 					maxSize: new go.Size(Infinity, Infinity),
-		//			  background: "rgb(248,248,240)"
+					// background: "rgb(248,248,240)"
 					}),
 					// 图片地址。
 					sImage = oImage.src;
 				
-				var w=window.open('about:blank','image from canvas');
-				w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
+				this.$refs.downloadImage.href = sImage;
+				this.$refs.downloadImage.download = "追溯主图.png";
+				this.$refs.downloadImage.click();
+
+				// var w=window.open('about:blank','image from canvas');
+				// w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
 			},	
 			/**
 			* 打印图片。
@@ -1006,8 +1003,8 @@
 					}
 
 					// ie浏览器下打印必须要这行。			
-		//			w.document.close();
-		//			w.focus();
+					// w.document.close();
+					// w.focus();
 					
 					// 关闭窗口。
 					w.close();

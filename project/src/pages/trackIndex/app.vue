@@ -173,7 +173,7 @@
 			 *  恢复数据。
 			 */
 			treeDataInit() {
-				this.treeData = this.parseTreeData();
+				this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData()this.parseTreeData();
 				// 重置路由。
 				this.$router.replace("/");
 
@@ -206,7 +206,7 @@
 						data: oData		//fnP.parseTreeData(data)
 					});
 					// 格式化数据。
-					this.treeData = this.parseTreeData();
+					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
 					this.tableData = this.parseTableData();
 					this.catalogData = this.parseCatalogData();
 				}	
@@ -240,107 +240,6 @@
 				
 				this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "post", oParam, this.requestSucess, this.requestFail, this.requestError)
 			},
-
-			/**
-			 * 设置右侧图表树结构数据。
-			 * @param {Array} aoData
-			 * @return {void}
-			 */
-			parseTreeData1() {
-				let aoData = this.rawData,
-					aoDiagramData = [],
-					aoDiagramLinkData = [],
-					oGroup = {};
-				
-				aoData.forEach(oData => {
-					if(oData.type != "1" && oData.subProcess && oData.subProcess.length) {
-						let oGroup = Object.assign({}, oData);
-						delete oGroup.subProcess;
-						oGroup.isGroup = true;
-						
-						aoDiagramData.push(oGroup);
-						aoDiagramLinkData.push({
-							from: oData.parent,
-							to: oData.key //oData.name	
-						})
-						
-						oData.subProcess.forEach(o => {
-							o.group = oData.key;
-							o.type = oData.type;
-							aoDiagramData.push(o);
-							
-							if(o.parent) {
-								aoDiagramLinkData.push({
-									from: o.parent,
-									to: o.key //o.name
-								})
-							}
-						})
-					}else {
-						aoDiagramData.push(oData);
-						aoDiagramLinkData.push({
-							from: oData.parent,
-							to: oData.key //oData.name
-						})
-					}
-				})
-					
-				return {
-					node: aoDiagramData,
-					link: aoDiagramLinkData
-				};
-			},			
-			/**
-			 * 设置右侧图表树结构数据。
-			 * @param {Array} aoData
-			 * @return {void}
-			 */
-			parseTreeData() {
-				
-				let aoData = fnP.parseTreeData(this.rawData),		//this.rawData,
-					aoDiagramData = [],
-					aoDiagramLinkData = [];
-					
-				aoData.forEach(oData => {
-					if(oData.isMaterialNode) {
-						// 若为物料节点。
-						oData.category = "simple";
-					}else {
-						// 若为工序节点。
-						if(oData.isGroup) {
-							// 若为group
-							let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.processSeq < b.processSeq)[0]
-							if(oLastGroupItem) {
-								// 取最后一道工序的产出。
-								oData.processInfoList = oLastGroupItem.processInfoList
-							}
-						}
-						if(oData.processInfoList.length) {
-							// 有数据。
-							oData.materialName = oData.processInfoList[0].materialName;
-						}
-						oData.category = "simple";
-					}	
-										
-					aoDiagramData.push(oData);					
-
-					// 物料或工序。 增加连接线。
-					let aoParents = oData.parents.split(",");
-					aoParents.forEach( sParent => {
-						aoDiagramLinkData.push({
-							from: sParent,
-							to: oData.key
-						});
-					})
-
-					
-				})
-					
-				return {
-					node: aoDiagramData,
-					link: aoDiagramLinkData
-				}
-			},	
 			parseTableData() {			
 				let aoData = this.rawData
 				let _rawData = []
