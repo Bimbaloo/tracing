@@ -197,7 +197,8 @@
 				this.catalog.nodeTemplate.selectionAdornmentTemplate =
 					$(go.Adornment, "Spot",
 						$(go.Panel, "Auto", {
-								defaultAlignment: go.Spot.Left
+								defaultAlignment: go.Spot.Left,
+								padding: new go.Margin(0, 10, 0, 0)// b,l,t,r
 							},
 							$(go.Shape, {
 								fill: "rgb(255,255,255)",

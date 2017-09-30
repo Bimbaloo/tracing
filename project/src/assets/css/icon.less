@@ -91,20 +91,32 @@
 	&.icon-run {
 		background-position: 0 -2 * @px16;
 	}
+	&.icon-run.unselected {
+		background-position: -@px16 -2 * @px16;
+	}
 
 	// 停机。
 	&.icon-stop {
 		background-position: 0 -3 * @px16;
+	}
+	&.icon-stop.unselected {
+		background-position: -@px16 -3 * @px16;
 	}
 
 	// 调试。
 	&.icon-debug {
 		background-position: 0 -4 * @px16;
 	}
+	&.icon-debug.unselected {
+		background-position: -@px16 -4 * @px16;
+	}
 
 	// 关机。
 	&.icon-close {
 		background-position: 0 -5 * @px16;
+	}
+	&.icon-close.unselected {
+		background-position: -@px16 -5 *@px16;
 	}
 }
 
