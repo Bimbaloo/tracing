@@ -1,54 +1,82 @@
 <template>
-	<div id="app" class="report-wrapper" ref="fastreport">
-		<div class="report-container">	
+	<div id="app" class="report-wrapper" >
+		<div class="report-container original" >	
 			<div class="page-icon">
 				<i class="icon icon-20 icon-download" title="下载" @click="downloadHandle('fastreport', $event)"></i>
-            	<i class="icon icon-20 icon-print" title="打印" @click="printHandle('fastreport', $event)"></i>
+            	<i class="icon icon-20 icon-print" title="打印" @click="beforePrint('fastreport', $event)"></i>
 			</div>
-			<div class="tag">
+			<!-- <div class="tag report-time"  v-show="false" >
 				<span>报告人：{{nickname}}</span>
 				<span>报告时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span>
-			</div>
+			</div> -->
 			<h1 class="title">快速报告</h1>
 			<h2 class="content-title">查询条件</h2>
-			<div class="condition" ref="condition">	
-				<div class='condition-messsage'>
-					<span v-for="(filter,index) in filtersList" :key="index">
-						{{filter[0]}} : {{filter[1]}}
-					</span> 
-				</div>	
-				<div class='result-messsage' v-if="!type">
-					<span style="cursor:pointer">结果集 : </span>
-					<span @click="dialogVisible('all')" label="all" style="cursor:pointer">共<i> {{result.whole}} </i>条,</span>
-					<span @click="dialogVisible('selected')" label="selected" style="cursor:pointer">选中<i> {{result.selected}} </i>条,</span>
-					<span @click="dialogVisible('filtered')" label="filtered" style="cursor:pointer">过滤<i> {{result.filter}} </i>条。</span>
-				</div>
-				
+			<div class='condition-messsage'>
+				<span v-for="(filter,index) in filtersList" :key="index">
+					{{filter[0]}} : {{filter[1]}}
+				</span>
+				<span class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
+				<span class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
 			</div>
-			<el-dialog v-if="!type" title="结果集" :visible.sync="dialogTableVisible" size="large">
-				<el-radio-group v-model="radio" @change="radioChange">
-				    <el-radio-button label="all" class="btn-radio">全部</el-radio-button>
-				    <el-radio-button label="selected" class="btn-radio">选中</el-radio-button>
-				    <el-radio-button label="filtered" class="btn-radio">过滤</el-radio-button>
-				</el-radio-group>				 				 
-	            <div v-if="error" class="error">
-	                {{ error }}
-	            </div>
-	            <div v-else class="content-table" >
-	                <v-table :table-data="showData" :loading="!dialogState" :heights="500" v-if="dialogState"></v-table>  <!-- 真正的显示内容的table -->
-					<v-table :table-data="gridData" :loading="!dialogState" :heights="500" v-else></v-table>              <!-- 为了在table组件未加载数据前撑开高度 -->
-	            </div>     
-			</el-dialog>
+			<div class='condition-list' @click="active.message = !active.message">
+				<span>查询明细
+					<i class="el-icon-d-arrow-right icon" v-show="!active.message"></i>
+				</span>
+			</div>
+
+			<div class="content-table condition-table" v-show="active.message">
+				<v-table :table-data="gridData" :loading="loading"></v-table> 
+			</div>
 			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
-			<h2 class="content-title">审核</h2>
-			<div class="condition-audit" >		
+			<h2 class="content-title condition-audit" v-show="false">备注</h2>
+			<div class="condition-audit" v-show="false" >		
 				<div class="tag">
 					<span>签名：</span>
 					<span>时间：</span>
 				</div>
 			</div>
 		</div>
-  	</div>
+		<div class='report-container clone' v-show="printReport" ref="fastreport">
+			<div class="tag report-time">
+				<span>报告人：{{nickname}}</span>
+				<span>报告时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span>
+			</div>
+			<h1 class="title">快速报告</h1>
+			<h2 class="content-title">查询条件</h2>
+			<div class='condition-messsage'>
+				<span v-for="(filter,index) in filtersList" :key="index">
+					{{filter[0]}} : {{filter[1]}}
+				</span>
+				<span class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
+				<span class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
+			</div>
+			<div class='condition-list'>
+				<span>查询明细</span>
+			</div>
+			<div class="content-table condition-table">
+				<v-table :table-data="gridData" :loading="loading"></v-table> 
+			</div>
+			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>
+			<h2 class="content-title condition-audit" v-show="false">备注</h2>
+			<div class="condition-audit" v-show="false" >		
+				<div class="tag">
+					<span>签名：</span>
+					<span>时间：</span>
+				</div>
+			</div>
+		</div>
+		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')">
+            <el-form :model="form">
+                <el-form-item label="打印人" :label-width="formLabelWidth">
+                    <el-input v-model="form.name" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogFormVisible = false,printReport = true">确 定</el-button>
+            </div>
+        </el-dialog>
+	  </div>
 </template>
 
 <script>
@@ -67,6 +95,18 @@
 		},
 		data() {
 			return {
+				dialogFormVisible: false,
+                form: {
+                    name: '',
+                },
+                formLabelWidth: '120px',
+
+				printRemark: false, // 是否打印备注栏
+				nickname: "",   	// 报告人
+				printReport: false, // 是否打印
+				active: {			// 条件列是否显示
+					message: false
+				},
 				dialogTableVisible: false,
 				radio: "all",
 				showData: {
@@ -83,51 +123,11 @@
                 selected: [],
                 gridData: {
                     columns: [{
-                        type: "index",
-                        name: "序号",
-                        width: "50"
-                    },{
-                        prop: "barcode",
-                        name: "条码"
-                    },{
-                        prop: "batchNo",
-                        name: "批次号"
-                    },{
-                        prop: "materialCode",
-                        name: "物料编码"
-                    },{
-                        prop: "materialName",
-                        name: "物料名称"
-                    },{
-                        prop: "materialSpec",
-                        name: "物料规格"
-                    },{
-                        prop: "materialUnit",
-                        name: "物料单位"
-                    },{
-                        prop: "quantity",
-                        name: "数量"
+                        prop: "equipmentName",
+                        name: "设备"
                     },{
                         prop: "happenTime",
                         name: "加工时间"
-                    },{
-                        prop: "personName",
-                        name: "操作人"
-                    },{
-                        prop: "equipmentName",
-                        name: "设备名称"
-                    },{
-                        prop: "equipmentCode",
-                        name: "设备编码"
-                    },{
-                        prop: "equipmentType",
-                        name: "设备类型"
-                    },{
-                        prop: "processName",
-                        name: "工序名称"
-                    },{
-                        prop: "moldCode",
-                        name: "模号"
                     }],
                     data: []
 					// 	{
@@ -176,13 +176,10 @@
 				},
 				filters: {},
 				filtersList: [],
-				dialogState:false
+				//dialogState:false
 			}
 		},
 		computed: {
-			nickname: function() {
-				return this.$store.state.loginModule.nickname;
-			},
 			query: function() {
 				let url = location.search; //获取url中"?"符后的字串 
 				let oRequest = {}; 
@@ -304,7 +301,7 @@
 					columns: this.gridData.columns,
 					data: this.gridData.data
 				}
-				this.dialogState = true	
+				//this.dialogState = true	
 			},
 			// 请求失败。
 			requestFail(sErrorMessage) {
@@ -325,38 +322,6 @@
 				}
 
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", fnP.parseQueryParam(this.filters), this.requestStartPointsSucess, this.requestFail, this.requestError)
-             	// this.$post(this.url, fnP.parseQueryParam(this.filters))
-             	// .then((res) => {
-	
-				// 	this.judgeLoaderHandler(res, (data) => {
-						
-				// 		this.gridData.data = data;
-						
-				// 		if(!data.length) {
-				// 			console.log('查无数据。');
-				// 		}else {
-				// 			this.gridData.data.forEach((o, index) => {
-				// 				if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
-				// 					// 标记为选中。
-				// 					o.tag = "selected";
-				// 				}else {
-				// 					o.tag = "filtered";
-				// 				}
-				// 			});
-				// 		}
-              
-                //         this.showData = {
-                //         	columns: this.gridData.columns,
-                //         	data: this.gridData.data
-                //         }
-				// 		this.dialogState = true						
-				// 	})
-				// })
-				// .catch((err) => {
-				// 	this.gridData.loading = false;
-				// 	// this.error = "查无数据";
-				// 	console.warn("查询出错。");
-				// })
 			},
 			// 获取名称成功。
 			requestNameSucess(oData) {
@@ -366,14 +331,6 @@
 			},
 			fetchDataName() {
 				this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, this.requestNameSucess, this.requestFail, this.requestError)
-				
-				// this.$ajax.get(TABLE_DATA_URL).then((res) => {
-				// 	this.judgeLoaderHandler(res, () => {
-				// 		// 获取对应的名称。
-				// 		this.dataName = res.data.data	
-				// 		this.setFilters()
-				// 	});
-				// });
 			},
 			setWidth() {
 				this.styleObject.minWidth = "1200px";
@@ -405,19 +362,58 @@
                     return;
                 }
                 window.Rt.utils.downloadHtml(html2canvas, oRef, "快速报告");     
-            },
+			},
+			//
+			beforePrint(){
+				this.dialogFormVisible = true
+			},
             // 页面打印。
             printHandle (refHtml, event) {
-				event.stopPropagation();
+				//event.stopPropagation();
+				if(!this.printReport){
+					return 0
+				}else{
+					this.printReport = true
 
-                let oRef = this.$refs[refHtml];
-                if(!oRef) {
-                    return;
-                }
-                
-                window.Rt.utils.printHtml(html2canvas,oRef);          
-            }
-		}
+					let original = document.querySelector(".original")
+					original.style.display = 'none'
+
+					let oRef = this.$refs[refHtml];
+					if(!oRef) {
+						return;
+					}
+
+					/* 报告人报告时间部分 */
+					let reportTime = oRef.querySelector(".report-time")
+					//reportTime.style.display = ""  //显示打印时间
+					let nickname = this.form.name
+					reportTime.innerHTML = `
+						<div class="tag report-time"  v-show="false" >
+							<span>报告人：${nickname}</span>
+							<span>报告时间：${new Date().Format("yyyy-MM-dd hh:mm:ss")}</span>
+						</div>
+					`
+					setTimeout(()=>{
+						window.Rt.utils.printHtml(html2canvas,oRef,{
+							height: this.outerHeight(oRef)
+						},true);
+					},500)
+					
+					setTimeout(function() {
+						original.style.display = ""
+						oRef.style.display = "none"
+					},1000)
+				}
+			},
+			//高度函数
+			outerHeight(el) {
+				var height = el.offsetHeight;
+				var style = getComputedStyle(el);
+
+				height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+				return height;
+				}
+			}
 	}
 </script>
 
@@ -442,7 +438,7 @@
 		
 		.page-icon {
 			position: absolute;
-			top: 78px;
+			top: 30px;
 			right: 20px;
 
 			.icon {
@@ -463,56 +459,56 @@
 		
 		&>.tag {
 			position: absolute;
-			top: 34px;
-			left: 50%;
-			margin-left: 80px;
-			
+			font-size: 14px;
+			top: 60px;
+			right: 20px;
 			span {
 				display: inline-block;
 				&+span {
 					margin-left: 30px;
-				}
-				
+				}	
 			}
 		}
 	}
-	.condition {
-		border: 2px solid #42AF8F;
-		padding: 10px 12px;
-		margin-bottom: 30px;
-		font-size: 14px;
+	.report-container {
 		.condition-messsage {
-			line-height: 25px;
+			box-sizing: border-box;
+			padding-left: 10px;
 			span {
+				font-size: 14px;
 				margin-right: 30px
 			}
-		}
-		.result-messsage {
-			line-height: 25px;
-			// span:nth-child(1) {
-			// 	margin-left: 10px
-			// }
-		}
-		span {
-			display: inline-block;
-			&+span:nth-child(1) {
-				margin-left: 60px;
+			
+			.default-message {
+				color: #999;
+				margin-right: 10px;
 			}
-			// &+span:nth-child(2) {
-			// 	margin-left: 60px;
-			// }
 		}
-		
-		.condition-line+.condition-line {
-			margin-top: 10px;
+		.condition-list {
+			box-sizing: border-box;
+			padding-left: 10px;
+			cursor: pointer;
+			span {
+				font-size: 14px;
+				line-height: 40px;
+				color: #42AF8F
+			}
+			.icon {
+				font-size: 12px;
+				margin-bottom: 3px;
+			}
 		}
-		
-		i {
-			color: #42AF8F;
-			font-style: normal;
-			font-weight: 600;
+		.condition-table {
+			margin-top: 0;
 		}
 	}
+	// .clone {
+	// 	position: absolute;
+	// 	left: 20px;
+	// 	right: 20px;
+	// 	top: 0;
+	// 	 bottom: 0;
+	// }
 	.condition-audit {
 		border: 2px solid #42AF8F;
 		padding: 20px 12px;

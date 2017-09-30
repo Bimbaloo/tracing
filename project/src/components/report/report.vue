@@ -4,7 +4,7 @@
 			{{ sErrorMessage }}
 		</div>
 		<div v-else ref="content">
-			<div ref="summary" :class="{ actived: active.summary }">
+			<div ref="summary" :class="[{ actived: active.summary },'report-tablebox']">
 				<h2 class="content-title" @click="active.summary=!active.summary">
 					<span class='table-title'>汇总信息
 						<i class="el-icon-d-arrow-right icon"></i>
@@ -23,7 +23,7 @@
 					</div>
 				</transition>
 			</div>
-			<div ref="inStocks" :class="{ actived: active.inStocks }">
+			<div ref="inStocks" :class="[{ actived: active.inStocks },'report-tablebox']">
 				<h2 class="content-title" @click="active.inStocks=!active.inStocks">
 					<span class='table-title'>在库明细
 						<i class="el-icon-d-arrow-right icon"></i>
@@ -39,7 +39,7 @@
 					</div>
 				</transition>
 			</div>
-			<div ref="inMakings" :class="{ actived: active.inMakings }">
+			<div ref="inMakings" :class="[{ actived: active.inMakings },'report-tablebox']">
 				<h2 class="content-title" @click="active.inMakings=!active.inMakings">
 					<span class='table-title'>在制明细
 						<i class="el-icon-d-arrow-right icon"></i>
@@ -68,7 +68,7 @@
 					</div>
 				</transition-group>
 			</div>
-			<div ref="outStocks" :class="{ actived: active.outStocks }">
+			<div ref="outStocks" :class="[{ actived: active.outStocks },'report-tablebox']">
 				<h2 class="content-title" @click="active.outStocks=!active.outStocks">
 					<span class='table-title'>出库明细
 						<i class="el-icon-d-arrow-right icon"></i>
@@ -114,7 +114,14 @@ export default {
 	},
 	props: {
 		type: String,
-		query: [Array, Object]
+		query: [Array, Object],
+		showTables: {
+			type: Array,
+			required: false,
+			default:function () {
+				return ["summary"]
+			}
+		},
 	},
 	data() {
 		return {
@@ -690,6 +697,10 @@ export default {
 			let oParam = {}
 
 			if (this.type == "trace") {
+				this.showTables.forEach((e)=>{
+					this.active[e] = true
+				})
+
 				// 若为快速报告。
 				let oQuery = this.query
 
