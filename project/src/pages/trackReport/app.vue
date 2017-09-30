@@ -362,7 +362,7 @@
 					this.printRemark = this.form.printRemark  //是否显示备注
 					/* 报告人报告时间部分 */
 					let reportTime = oRef.querySelector(".report-time")
-					let nickname = this.form.name || (this.$store.state.loginModule.nickname !== null) ? this.$store.state.loginModule.nickname : ""
+					let nickname = this.form.name || ((this.$store.state.loginModule.nickname !== null) ? this.$store.state.loginModule.nickname : "")
 					reportTime.innerHTML = `
 						<div class="tag report-time"  v-show="false" >
 							<span>报告人：${nickname}</span>
