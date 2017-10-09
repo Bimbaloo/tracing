@@ -1101,9 +1101,23 @@
 		overflow: hidden;
 	}
 	
+	.el-input__inner {
+		height: 30px;
+		border-radius: 0;
+	}
+
 	.el-button--text {
 		border: 1px solid #42af8f;
 		padding: 10px 15px;
+		border-radius: 0;
+	}
+	.el-button {
+		border-radius: 0;
+		width: 80px;
+		height: 30px;
+		padding: 0;
+		box-sizing: border-box;
+		font-size: 14px;
 	}
 	
 	.el-table .el-table__header thead tr th {

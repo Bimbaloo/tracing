@@ -489,14 +489,41 @@
           }
         }
       }
-
-
+      
     } 
 
-    .form-button {
-      margin-top: 80px;
-    }
+    // .form-button {
+    //   margin-top: 80px;
+    // }
   }
 </style>
 
 
+<style lang="less">
+ @media screen and (max-width: 1400px){
+   #app {
+     .search-tab {
+       &.el-tabs--border-card {
+         &>.el-tabs__content {
+          .el-tab-pane {
+              .panel-content {
+                  .panel-content-wrap {
+                      padding :0;
+                      .el-form {
+                          .form-conditions {
+                              max-height: 330px;
+                              overflow: auto;
+                              .el-form-item {
+                                  padding: 0 28px;
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+        }
+       }
+     }
+   }
+ }
+</style>
