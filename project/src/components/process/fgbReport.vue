@@ -456,6 +456,14 @@ export default {
         }
     }
 }
+.el-input {
+     width: 180px;
+ 
+ }
+.el-input__inner {
+    border-radius: 0;
+    height: 30px;
+}
 @media screen and (max-width: 1400px) {
     .el-table__expanded-cell{
         .table-form {
@@ -488,9 +496,7 @@ export default {
         }
     }
 }
- .el-input {
-     width: 180px
- }
+ 
  .el-form-input {
      display: inline-block;
      margin-left: 60px;
