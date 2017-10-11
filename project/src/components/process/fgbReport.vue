@@ -237,11 +237,11 @@ export default {
                 }
             })
             /* 测试数据 */
-            oQuery = {
-                "equipmentId": "69",
-                "startTime": "2017-08-28 19:00:00",
-                "endTime": "2017-08-28 20:00:00"
-            }
+            // oQuery = {
+            //     "equipmentId": "69",
+            //     "startTime": "2017-08-28 19:00:00",
+            //     "endTime": "2017-08-28 20:00:00"
+            // }
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
             // this.$get(url, oQuery)
