@@ -302,11 +302,13 @@ export default {
             this.tableData.height = this.adjustHeight()
         },
         fileDownload(row) {
-            //console.log(row)
-            const src = row["reportPath"]
+            //console.log(row["reportPath"])
+            const src = window.location.origin + `/` + row["reportPath"]
+            //console.log(src)
             const title = row["fileName"]
             //const src = "https://bimbaloo.github.io/www/ifms/images/MAC1.png"
             //const src = `https://bimbaloo.github.io/www/ifms/images/bg1.jpg`
+            //const src = `http://192.168.227.172:8080/download/quality_report/2016%E5%B9%B410%E6%9C%88/201610191211260005.png`
             const a = document.createElement('a');
             a.setAttribute('href', src);
             a.setAttribute('download', title);
