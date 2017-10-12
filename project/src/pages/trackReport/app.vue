@@ -68,7 +68,7 @@
 		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" size="tiny">
             <el-form :model="form">
                 <el-form-item label="报告人：" :label-width="formLabelWidth">
-                    <el-input v-model="form.name" auto-complete="off" placeholder="请输入报告人"></el-input>
+                    <el-input v-model="form.name" auto-complete="off" :placeholder="this.$store.state.loginModule.nickname"></el-input>
 					<el-input v-show="false"></el-input>
                 </el-form-item>
 				<el-form-item :label-width="formLabelWidth">
