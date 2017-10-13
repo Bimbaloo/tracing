@@ -309,7 +309,9 @@
     	max-height: 230px;	
     }
     .search-tab {
-    height: 650px;
+      max-height: 540px;
+      display: flex;
+      flex-direction: column;
 
     &.el-tabs--border-card {
       &>.el-tabs__header {
@@ -349,5 +351,23 @@
       }
     } 
   }
+  .el-tab-pane {
+    .panel {
+        .panel-content {
+            .panel-content-wrap {
+              padding: 0;
+                .el-form {
+                    .form-conditions {
+                        max-height: 350px;
+                        overflow: auto;
+                        .el-form-item {
+                          padding: 0 28px;
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
   }
 </style>

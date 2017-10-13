@@ -170,6 +170,7 @@
 					console.log("查无数据。");
 				}else {
 					oData.data = this.formatData(oData);
+					this.materialData.data = oData.data
 					this.styleObject.minWidth = "1200px";
 				}               	
             },
@@ -188,9 +189,9 @@
 				this.styleObject.minWidth = 0;  
             },
             fetchData () {
-				
-				let  oData = this.materialData;
-                oData.data = null;
+				let oData = {}
+				//let  oData = this.materialData;
+                oData.data = [];
                 this.loading = true;
 				
 				let sKey = this.$route.query && this.$route.query.key,
@@ -291,7 +292,7 @@
                 });
             },
             sortData(param1,param2, sType) {
-
+				
                 // 默认按照从小到大排序。
                 if(sType == "desc") {
                     // 从大到小时。

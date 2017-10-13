@@ -237,11 +237,11 @@ export default {
                 }
             })
             /* 测试数据 */
-            oQuery = {
-                "equipmentId": "69",
-                "startTime": "2017-08-28 19:00:00",
-                "endTime": "2017-08-28 20:00:00"
-            }
+            // oQuery = {
+            //     "equipmentId": "69",
+            //     "startTime": "2017-08-28 19:00:00",
+            //     "endTime": "2017-08-28 20:00:00"
+            // }
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
             // this.$get(url, oQuery)
@@ -456,6 +456,14 @@ export default {
         }
     }
 }
+.el-input {
+     width: 180px;
+ 
+ }
+.el-input__inner {
+    border-radius: 0;
+    height: 30px;
+}
 @media screen and (max-width: 1400px) {
     .el-table__expanded-cell{
         .table-form {
@@ -488,9 +496,7 @@ export default {
         }
     }
 }
- .el-input {
-     width: 180px
- }
+ 
  .el-form-input {
      display: inline-block;
      margin-left: 60px;

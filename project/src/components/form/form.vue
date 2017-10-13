@@ -1,10 +1,12 @@
 <template>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="labelWidth" @keyup.enter.native="submitForm('ruleForm')" >
-        <el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
-            <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
-			<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
-        </el-form-item>
-        <div  :class="['form-button', { 'form-button-last': active.radio === '4' && items.length > 10 }]">
+		<div class='form-conditions'>
+			<el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
+            	<component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
+				<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
+        	</el-form-item>
+		</div>
+        <div  class="form-button">
             <el-button class="btn" type="primary" @click="submitForm('ruleForm')">查询</el-button>
             <el-button v-show="showResetButton" class="btn" type="primary" @click="resetForm('ruleForm')">重置</el-button>
         </div>
@@ -342,10 +344,6 @@
     }
     .form-button {
         margin-top: 50px
-    }
-    .form-button-last {
-        margin-top: 30px;
-        margin-bottom: 30px;
     }
 	.el-form-item__content {
 		.el-input {

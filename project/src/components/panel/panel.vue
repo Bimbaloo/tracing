@@ -41,7 +41,7 @@
                 radio: "1",          
                 keys: {},
                 // 面板参数高度
-                sPanelHeight: "100%"
+                sPanelHeight: "auto"
             }
         },
         computed: {
