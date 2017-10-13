@@ -70,7 +70,7 @@
                         <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
                             <div class="tooltip-title" 
                             :style="{color: equipment.color}">
-                            {{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{compareData.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}}
+                            {{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{`${compareData.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
                             </div>
                             <ul class="event-list">
                                 <li v-for="(event,index) in equipment.event"
@@ -117,6 +117,8 @@
     const GRID_RIGHT = 220
     const GRID_TOP = 60
     const GRID_BOTTOM = 40
+    // y轴缩放距右侧的距离。
+    const Y_AXIS_ZOOM_RIGHT = 50
     // y轴标签换行的字符个数
     const Y_LABEL_LENGTH = 7
     // 标记线点的大小。
@@ -705,7 +707,7 @@
             resizeY: 'resizeChart'
         },
         methods: {
-			init() {    
+			init() {                  
                 this.getSessionStorage();     
                 // 初始化图形。              
 				this.setInitData();
@@ -777,12 +779,11 @@
             updateData() {
                 // 重置数据。
                 this.resetData();
-			
-                // 获取所有数据。
-                this.fetchAllData();
+			       
             },
             // 重置数据。
             resetData() {
+                this.sErrorMessage = "";
                 this.startIf = true;
 				this.endIf = true;
                 // 区域缩放是否激活。
@@ -794,8 +795,6 @@
                     this.equipments = []
                 }	
 
-                this.setChartHeight();
-                this.chart.clear();
                 // 选中的维度。
                 this.dimension.forEach(o => {
                     if(DEFAULT_SELECTED_DIMENSION.indexOf(o.key) > -1) {
@@ -812,6 +811,15 @@
                 this.storageData = null;
                 sessionStorage.removeItem("equipment_analysis_" + this.tag);
 
+                this.$nextTick(function() {
+                    this.chart.clear();
+                    this.chart = null;
+                    this.initChart()
+                    // this.setChartHeight();
+                    // this.chart.clear();
+                    // 获取所有数据。
+                    this.fetchAllData();
+                })
             },
 			// 初始化数据。
 			setInitData() {	
@@ -1379,6 +1387,14 @@
 					type: 0
                 }, this.requestSucess, this.requestFail, this.requestError)
 			},
+            // 过滤异常数据(组号为-1)。
+            filterAbnormalData(aoData) {
+                if(aoData) {
+                    return aoData.filter((out)=>(out.groupId !== -1));
+                }else {
+                    return []
+                }
+            },
             // 初始化图形数据。
             initChartData (aoData) {
                 // 更改顺序。
@@ -1403,34 +1419,34 @@
                         status: o.equipStatusList||[],
                         // 工单
                         work: {
-                            startWorkList: o.startWorkList||[],
-                            finishWorkList: o.finishWorkList||[]
+                            startWorkList: this.filterAbnormalData(o.startWorkList),
+                            finishWorkList: this.filterAbnormalData(o.finishWorkList)
                         },
                         // 投产投产
                         pool: {
-                            poolInList: o.poolInList||[],
-                            poolOutList: o.poolOutList||[]
+                            poolInList: this.filterAbnormalData(o.poolInList),
+                            poolOutList: this.filterAbnormalData(o.poolOutList)
                         },
                         // 质量
                         quality: {
-                            qcList: o.qcList||[],
-                            submitQcList: o.submitQcList||[]
+                            qcList: this.filterAbnormalData(o.qcList),
+                            submitQcList: this.filterAbnormalData(o.submitQcList)
                         },
                         // 事件
                         event: {
-                            startEquipWarningList: o.startEquipWarningList||[],
-                            endEquipWarningList: o.endEquipWarningList||[]
+                            startEquipWarningList: this.filterAbnormalData(o.startEquipWarningList),
+                            endEquipWarningList: this.filterAbnormalData(o.endEquipWarningList)
                         },
                         // 维护
                         repair: {
-                            spotCheckList: o.spotCheckList||[],
-                            startEquipRepairList: o.startEquipRepairList||[],
-                            endEquipRepairList: o.endEquipRepairList||[]
+                            spotCheckList: this.filterAbnormalData(o.spotCheckList),
+                            startEquipRepairList: this.filterAbnormalData(o.startEquipRepairList),
+                            endEquipRepairList: this.filterAbnormalData(o.endEquipRepairList)
                         },
                         // 工具
                         tool: {
-                            installToolList: o.installToolList||[],
-                            removeToolList: o.removeToolList||[]
+                            installToolList: this.filterAbnormalData(o.installToolList),
+                            removeToolList: this.filterAbnormalData(o.removeToolList)
                         }
                     }    
 
@@ -1517,7 +1533,7 @@
                         labelFormatter: function(index, value) {
                             return value.split("+")[0]
                         },
-                        right: 28,
+                        right: Y_AXIS_ZOOM_RIGHT,
                         // showDetail: false
                     },oAxis))
                 }
