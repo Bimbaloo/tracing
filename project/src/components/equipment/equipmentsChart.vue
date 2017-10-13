@@ -673,7 +673,7 @@
                             id: 'text',
                             cursor: "pointer",
                             style: {
-                                text: "相关投产",
+                                text: this.onlyShowRelatedData ? "相关投产":"全部投产",//D53A35,
                                 font: 'normal bold 16px 微软雅黑',
                                 fill: this.onlyShowRelatedData ? GREEN:"#333"//D53A35
                             },
@@ -1002,6 +1002,7 @@
             changePoolInAndOutVisibility () {
                 
                 let sColor = "#333",
+                    sText = "全部投产",
                     raletedData = $.extend(true, [], this.dimension.filter(o=> o.key === 'pool')[0].data),
                     oOption = {
                         series: []
@@ -1012,7 +1013,8 @@
 
                 if(this.onlyShowRelatedData) {
                     // 若只展示起点相关。
-                    sColor = GREEN
+                    sColor = GREEN;
+                    sText = "相关投产";
                     raletedData = raletedData.filter(arr => arr[5]);
                     raletedData = raletedData.map(arr => {
                         arr[2] = arr[5];
@@ -1029,7 +1031,8 @@
                 oOption.graphic = {
                     id: 'text',
                     style: {
-                        fill: sColor
+                        fill: sColor,
+                        text: sText
                     }
                 }
 
@@ -1633,7 +1636,7 @@
                         oResult.title = "投料";
                         oResult.tooltipData = [
                             {name: "条码", value: o.barcode},
-                            {name: "开始时间", value: o.happenTime},
+                            {name: "投入时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "工单号", value: o.doCode},
                             {name: "物料", value: o.materialName},
