@@ -11,16 +11,11 @@
 	        <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
 	      </el-tab-pane>
 	    </el-tabs>
-		   <span class="search-barcode" v-if="activeKey === 'stock'" @click="showDialog=true">条码查询</span>
     </div>
     <footer>
       <img class="version" :src="version"/>
       <span class="version-info">版本: {{ v }}</span>
     </footer>
-    <v-dialog 
-    	v-if="showDialog" 
-    	:dialog-visible="showDialog"
-    	@hideDialog="hideDialog"></v-dialog>
   </div>
 </template>
 
@@ -51,8 +46,7 @@
         labelWidth: "100px",
         handleSubmit: this._submitForm,
         sErrorMessage: "",
-        loading: false,
-        showDialog: false
+        loading: false
       }
     },
     computed: {
@@ -82,9 +76,6 @@
       });
     },
     methods: {
-    	hideDialog() {
-    		this.showDialog = false
-    	},
     	// 判断调用接口是否成功。
     	// judgeLoaderHandler(param,fnSu,fnFail) {
     	// 	let bRight = param.data.errorCode;
@@ -249,14 +240,6 @@
   	position: relative;
   	width: 1080px;
   	margin: 0 auto;
-  }
-  .search-barcode {
-  	position: absolute;
-  	bottom: 40px;
-  	right: 30px;
-  	cursor: pointer;
-  	color: #42af8f;
-  	text-decoration: underline;
   }
   .search-tab {
     /*width: 1080px;*/

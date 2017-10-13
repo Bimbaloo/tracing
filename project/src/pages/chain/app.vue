@@ -132,7 +132,7 @@
     	label: '产出可修复'
     }];
     
-    var sMultiValue = "all";
+    var sMultiValue = "全部"// "all";
 	
 	// 获取参数名称
 	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";

@@ -1,17 +1,41 @@
     
 <template>
-
-    <div class="tooltip-info" @mouseenter="showList=true" @mouseleave="showList=true">
-        <div v-if="back" class="back" @click="goBack">返回</div>
-        <div v-if="back" class="division">|</div>
-        <el-tooltip class="item" effect="light" content="Bottom Right" placement="bottom-end">
-            <ul slot="content" class="info-list">
-                <li @click="goToConfig" v-if="config">设置</li>
-                <li @click="logout" v-if="userId">退出</li>
-            </ul>     
-            <div class="user-name" :style="{cursor: nickname?'default':'pointer'}" @click="login">{{nickname || "登录"}}<i class="el-icon-arrow-down"></i></div>
-        </el-tooltip>
-    </div>
+	<div>
+	    <div class="tooltip-info" @mouseenter="showList=true" @mouseleave="showList=true">
+	        <div v-if="back" class="back" @click="goBack">返回</div>
+	        <div v-if="back" class="division">|</div>
+	        <el-tooltip v-if="tool" class="item" effect="light" content="Bottom Right" placement="bottom-end">
+	            <ul slot="content" class="info-list">
+	                <li @click="goSearchBarcode">条码查询</li>
+	                <li @click="goOutputRecord">产出记录</li>
+	            </ul>     
+	            <div class="user-name">小工具<i class="el-icon-arrow-down"></i></div>
+	        </el-tooltip>
+	        <div v-if="tool" class="division">|</div>
+	        <el-tooltip class="item" effect="light" content="Bottom Right" placement="bottom-end">
+	            <ul slot="content" class="info-list">
+	                <li @click="goToConfig" v-if="config">设置</li>
+	                <li @click="logout" v-if="userId">退出</li>
+	            </ul>     
+	            <div class="user-name" :style="{cursor: nickname?'default':'pointer'}" @click="login">{{nickname || "登录"}}<i class="el-icon-arrow-down"></i></div>
+	        </el-tooltip>
+	    </div>
+	    
+	    <!-- 条码查询 -->
+	    <v-dialog 
+    		v-if="showBarcodeDialog" 
+    		:dialog-visible="showBarcodeDialog"
+    		@hideDialog="hideBarcodeDialog">
+	    </v-dialog>
+	    
+	    <!-- 产出记录 -->
+	    <v-output 
+    		v-if="showOutputRecordDialog" 
+    		:dialog-visible="showOutputRecordDialog"
+    		@hideDialog="hideOutputRecordDialog">
+	    </v-output>
+	</div>
+    	
 </template>
 
 <script>
@@ -19,17 +43,31 @@
     const LOGIN_URL = HOST + "/api/v1/sso/get-login-info";
     // 退出。
     const LOGOUT_URL = HOST + "/api/v1/sso/logout";
+    
+    import dialog from "components/basic/dialogBarcode.vue"
+    import outputRecord from "components/basic/dialogOutputRecord.vue"
 
     export default {
+    	components: {
+    		"v-dialog": dialog,
+    		"v-output": outputRecord
+    	},
         props: {
             // 是否需要设置链接。
             config: Boolean,
             // 是否需要返回链接。
-            back: [Boolean, String]
+            back: [Boolean, String],
+            // 是否需要小工具链接。
+            tool: {
+            	type: Boolean,
+            	default: true
+            }
         },
         data () {
             return {
-                showList: true
+                showList: true,
+                showBarcodeDialog: false,
+                showOutputRecordDialog: false
             }
         },
         computed: {
@@ -79,6 +117,20 @@
             logout() {
                 this.$register.logout(this.$store, this.$ajax);
             },
+            // 条码查询。
+            goSearchBarcode() {
+            	this.showBarcodeDialog = true
+            },
+            hideBarcodeDialog() {
+            	this.showBarcodeDialog = false
+            },
+            // 产出记录。
+            goOutputRecord() {
+            	this.showOutputRecordDialog = true
+            },
+            hideOutputRecordDialog() {
+            	this.showOutputRecordDialog = false
+            }
         }
     }
 </script>
@@ -113,6 +165,10 @@
         }
         .division {
             padding: 0 10px;
+        }
+        
+        .user-name {
+        	cursor: pointer;
         }
     }
 

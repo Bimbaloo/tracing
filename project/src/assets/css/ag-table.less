@@ -1,5 +1,7 @@
 .ag-table {
     .ag-header {
+        background: #42af8f;
+        
         // 标题头部全选按钮居中
         .ag-header-select-all {
             width: 100%;
@@ -27,11 +29,28 @@
                 display: inline-block;
             }
         }
+        
+        // 表头操作按钮
+        .ag-header-cell-menu-button {
+            display: none;
+        }
     }
     
     .ag-body {
         background-color: #FFFFFF;
+        
+        .ag-body-viewport-wrapper {
+            height: 99.5%;
+        }
     }
+    
+    .ag-font-style {
+      cursor: default;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text; 
+      }
     
     // 表格内容全选居中
     .row-style {
@@ -45,6 +64,10 @@
     }
     .ag-cell {
         border-color: #e7f2ed;
+        // 省略号。。。 单元格的高度固定。。。
+//      white-space: normal;
+//      word-break: break-all;
+//      overflow: auto;
         
         &.ag-cell-focus {
             outline: none;

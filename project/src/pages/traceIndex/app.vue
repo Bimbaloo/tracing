@@ -1,6 +1,6 @@
 <template>
 	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
-		<v-header :config="false" :back="false"></v-header>
+		<v-header :config="true" :back="false" :tool="false"></v-header>
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
 		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
@@ -170,7 +170,7 @@
 					});
 					// 格式化数据。
 					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
-					this.catalogData = this.parseCatalogData();
+					this.catalogData = fnP.getCatalogData(this.rawData);
 				}							
 			},
 			// 请求失败。
@@ -195,7 +195,6 @@
 					"startPointDtos": this.params
 				}, this.requestSucess, this.requestFail, this.requestError)
 			},
-
 			/**
 			 * 获取左侧目录树数据。
 			 * @return {Array}
@@ -213,7 +212,7 @@
 						let aKey = _getKeysOfSameName(oData)
 						// 修改数据。--- 修改名称，增加同层key值。
 						oData = Object.assign({}, oData, {
-							name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+							name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
 							sublings: aKey
 						})
 						
@@ -251,7 +250,7 @@
 							let aKey = _getKeysOfSameName(oData)
 							// 修改数据。--- 修改名称，增加同层key值。
 							oData = Object.assign({}, oData, {
-								name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+								name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
 								sublings: aKey
 							})
 							

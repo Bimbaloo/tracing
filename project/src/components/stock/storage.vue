@@ -81,7 +81,7 @@
 //                      name: "条码类型"
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         width: "150",
                         class: "batch",
                         cellClick: this.batchClick
@@ -132,7 +132,7 @@
 
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         width: "150",
                         class: "batch",
                         cellClick: this.batchClick
@@ -180,7 +180,7 @@
                         name: "条码"
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         class: "batch"
                     }],
                     data: [{

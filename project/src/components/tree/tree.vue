@@ -54,16 +54,17 @@
 		    },
 		    key: function() {
 		    	if(this.type == "catalog") {
-		    		this.$nextTick(function() {    		
+		    		this.$nextTick(function() {
 		    			this.setHighted()
 		    			this.setSelection();
+		    			this.fitToCurrentKey()
 		    		})
 		    	}else {
 		    		this.setHighted()
 		    	}
 		    },
 		    root: function() {
-		    	this.redrawTree();
+//		    	this.redrawTree();
 			},
 			flexBasis: 'updateCanvas',
 			resize: 'updateCanvas'
@@ -854,8 +855,21 @@
 			},
 			// 布局完成后的事件处理，设置初始时节点在中间显示。
 			layoutCompletedHandle(e) {
-				if(this.treeData.node) {						
-					let oData = this.treeData.node.filter(o => o.parents == "")[0]
+//				if(this.treeData.node) {						
+//					let oData = this.treeData.node.filter(o => o.parents == "")[0]
+//					let node = this.tree.findNodeForKey(oData.key);
+//					if(node) {
+//						this.tree.centerRect(node.actualBounds);
+//					}
+//				}
+				this.fitToCurrentKey()
+			},
+			// 当选中时定位到当前。
+			fitToCurrentKey() {
+				if(this.treeData.node) {
+					// 如果存在显示的key值，则定位到显示的数据，否则定位到第一个数据。
+					
+					let oData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents == "")[0]
 					let node = this.tree.findNodeForKey(oData.key);
 					if(node) {
 						this.tree.centerRect(node.actualBounds);
@@ -880,7 +894,7 @@
 			 * @param {Object} oData
 			 * @return {void}
 			 */
-			redrawTree() {	
+			redrawTree1() {	
 				this.tree.nodes.each(o => {
 					if(!o.data.group) {				
 						o.visible = false
@@ -897,6 +911,32 @@
 					o.visible = true;
 				})
 			},
+			
+			/**
+			 * 展开右侧节点。
+			 * 
+			 */
+			redrawTree() {
+				this.tree.nodes.each(o => {
+					if(!o.data.group) {				
+						o.visible = false
+					}
+				});
+				
+				this.root.forEach( sKey => {
+					let oRoot = this.tree.findNodeForKey(sKey);
+					oRoot.visible = true;
+					
+					oRoot.findTreeChildrenNodes().each(o => {
+						o.visible = true;
+					})
+					oRoot.findTreeParts().each(o => {
+						o.visible = true;
+					})
+				})
+			},
+			
+			
 			// 设置选中。
 			setSelection() {
 				if(!this.data.node.some(o => o.key == this.key)) {

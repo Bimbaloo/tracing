@@ -12,6 +12,8 @@
 </template>
 <script>
 	import {AgGridVue} from "ag-grid-vue"
+//	import "ag-grid-enterprise/main"
+	
 	import "ag-grid/dist/styles/ag-grid.css"
 	import "ag-grid/dist/styles/theme-fresh.css"
 	import 'assets/css/ag-table.less'
@@ -44,7 +46,15 @@
 				    		suppressRowClickSelection: true,
 				    		// 取消自带loading效果
 				    		suppressLoadingOverlay: true,
-				    		overlayNoRowsTemplate: "暂无数据"
+				    		overlayNoRowsTemplate: "暂无数据",
+				    		// 右键显示菜单项。-- 使用企业版本后充值了复制事件。
+				    		getContextMenuItems: function(params) {
+				    			if (params.node == null) return null;
+				    			
+		    					var result = params.defaultItems.splice(0);
+				    			// ["copy", "copyWithHeaders", "paste", "separator", "toolPanel", "export"]
+				    			return ["copy", "copyWithHeaders", "paste"]
+				    		}
 			            }, this.tableData.gridOptions)
             }
         },
@@ -99,7 +109,7 @@
 		    	}
 				
 //		    	console.log(this.tableData.selected.length)
-		   }
+		  }
         }
     }
 </script>

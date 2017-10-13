@@ -8,7 +8,8 @@
 				
 				<el-form :model="search" :rules="rules" ref="ruleForm">
 					<el-form-item style="width: 75%; margin-right: 2%;" prop="barcode">
-						<el-input v-model="search.barcode" placeholder="请输入条码"></el-input>
+						<el-input v-model="search.barcode" placeholder="请输入条码" @keyup.enter.native="query('ruleForm')"></el-input>
+						<input id="hiddenText" type="text" style="display:none" />
 					</el-form-item>
 					<el-form-item>
 						<el-button class="btn" type="primary" @click="query('ruleForm')">查询</el-button>
@@ -21,11 +22,14 @@
 					<div class="item-title">条码信息</div>
 					<div class="item-content">
 						<ul class="item-list clear">
-							<li class="item-item"><label>查询码 : </label><span :title="data.barCode">{{ data.barCode }}</span></li>
-							<li class="item-item"><label>级码 : </label><span :title="data.barcodeTypeName">{{ data.barcodeTypeName }}</span></li>
-							<li class="item-item"><label>物料编码 : </label><span :title="data.materialCode">{{ data.materialCode }}</span></li>
-							<li class="item-item"><label>物料名称 : </label><span :title="data.materialName">{{ data.materialName }}</span></li>
-							<li class="item-item" style="width: 100%;"><label>父级码 : </label><span :title="data.packet">{{ data.packet }}</span></li>
+							<li class="item-item" :title="data.barcodeTypeName">条码类型 : {{ data.barcodeTypeName }}</li>
+							<li class="item-item" :title="data.happenTime">加工时间 : {{ data.happenTime }}</li>
+							<li class="item-item" :title="data.materialCode">物料编码 : {{ data.materialCode }}</li>
+							<li class="item-item" :title="data.materialName">物料名称 : {{ data.materialName }}</li>
+							<li class="item-item" :title="data.equipmentCode">设备编码 : {{ data.equipmentCode }}</li>
+							<li class="item-item" :title="data.equipmentName">设备名称 : {{ data.equipmentName }}</li>
+							<li class="item-item" :title="data.batchNo">批次 : {{ data.batchNo }}</li>
+							<li class="item-item" :title="data.packet">父级码 : {{ data.packet }}</li>
 						</ul>
 					</div>
 				</div>
@@ -78,11 +82,23 @@
 				},
 				data: {
 					barCode: '',
+					// 条码类型
 					barcodeTypeName: '',
+					// 物料编码
 					materialCode: '',
+					// 物料名称
 					materialName: '',
+					equipmentCode: '',
+					equipmentName: '',
+					// 加工时间
+					happenTime: '',
+					// 批次
+					batchNo: '',
+					// 父级码
 					packet: '',
+					// 数量
 					subBarcodeNum: '',
+					// 类型
 					subBarcodeTypeName: '',
 					subBarcodeList: []
 				},
@@ -125,28 +141,11 @@
 							this.loading = false;
 							this.error = "查询错误";
 						})
-						// this.$get(URL, this.search).then( (res) => {
-						// 	this.loading = false;
-							
-						// 	if(!res.data.errorCode) {
-						// 		this.data = res.data.data
-						// 	}else {
-						// 		this.error = res.data.errorMsg.message
-						// 	}
-							
-						// }).catch( (err) => {
-						// 	this.loading = false;
-						// 	this.error = "查询错误"
-						// })
 						
 					}else {
 						return false
 					}
 				})
-				
-				
-				
-				
 			},
 			handleClose() {
 				this.$emit('hideDialog')
@@ -158,9 +157,9 @@
 
 <style lang="less" scoped>
 	.dialog-wrap {
+		line-height: 20px;
 		
 		.dialog-content {
-			
 			.error {
 				margin-top: 20px;
 	    		border: 2px solid #42AF8F;
@@ -194,7 +193,11 @@
 								float: left;
 								line-height: 30px;
 								
-								span {
+								overflow: hidden;
+								text-overflow: ellipsis;
+								vertical-align: middle;
+								white-space: nowrap;
+								/*span {
 									display: inline-block;
 									width: calc(100% - 22px);
 									width: -webkit-calc(100% - 22px);
@@ -202,7 +205,7 @@
 									overflow: hidden;
 									text-overflow: ellipsis;
 									vertical-align: middle;
-								}
+								}*/
 							}
 						
 						}
