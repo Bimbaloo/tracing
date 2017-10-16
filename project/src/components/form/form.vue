@@ -16,7 +16,8 @@
 <script>
     import Input from 'components/basic/input.vue'
     import Select from 'components/basic/select.vue'
-    import DateTime from 'components/basic/dateTime.vue'
+	import DateTime from 'components/basic/dateTime.vue'
+	import { bus } from "assets/js/bus.js"
 
     export default {
         props: {
@@ -66,7 +67,16 @@
         	}
         },
         mounted () {
-        },
+		},
+		created() {
+			let _that = this
+            bus.$on('id-selected', function (obj) {
+				let datas = obj.keys
+				for(let i in datas){
+					_that.ruleForm[i] = datas[i]
+				}
+            })
+		},
         computed: {
             ruleForms: function() {
                 let oFormData = {};
