@@ -1,8 +1,9 @@
 <template>
     <header>
-        <img :src="logo"/>
-        <v-tooltip :config="config" :back="back"></v-tooltip>
+        <img :src="logo" @click="goSearch"/>
+        <v-tooltip :config="config" :back="back" :tool="tool"></v-tooltip>
     </header>
+    
 </template>
 <script>
 
@@ -17,14 +18,24 @@
             // 是否需要设置链接。
             config: Boolean,
             // 是否需要返回链接。
-            back: [Boolean, String]
+            back: [Boolean, String],
+            // 是否需要小工具链接。
+            tool: {
+            	required: false,
+            	type: Boolean,
+            	default: true
+            }
         },
         data () {
             return {
                 logo
             }
         },
-        methods: {}
+        methods: {
+        	goSearch() {
+        		window.open("search.html", "_self");
+        	}
+        }
     }
 </script>
 <style lang="less" scoped>
@@ -42,6 +53,7 @@
         img {
             // height: 48px;
             vertical-align: middle;
+            cursor: pointer;
         }
     }
 

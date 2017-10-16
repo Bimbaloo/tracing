@@ -15,7 +15,7 @@
                 {{ error }}
             </div-->
             <div class="content-table"> 
-            	<table class="raw-table" v-loading="loading" ref="rawTable">
+            	<!--<table class="raw-table" v-loading="loading" ref="rawTable">
             		<tr>
             			<th v-for="(column,index) in materialData.columns" :style="{width: column.width}" v-if="!column.hide" :key="index">
             				{{column.name}}
@@ -32,10 +32,35 @@
             				{{row[column.prop]}}
             			</td>
             		</tr>
-            	</table>
+            	</table>-->
+            	
 				<div v-if="error" class="error">
 					{{ error }}
 				</div>
+				<el-table
+					v-else
+    				border
+            		v-loading="loading"
+            		element-loading-text="拼命加载中"
+            		ref="rawTable"
+            		class="raw-table"
+            		@cell-click="cellClick"
+            		:data=materialData.data>
+			  		<el-table-column
+			  			align="center"
+			  			v-for="(column,index) in materialData.columns"
+				        :prop="column.prop"
+				        v-if="!column.hide"
+				        :label="column.name"
+				        :class-name="column.class"
+						:key="index">
+			  			<template scope="scope">
+			  				<div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
+			  					{{scope.row[column.prop]}}
+			  				</div>
+			  			</template>
+			  		</el-table-column>
+			  	</el-table>
                 <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
             </div>
 
@@ -80,7 +105,7 @@
                         merge: true,
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         class: "batch",
                         click: this.batchClick
                     },{
@@ -152,7 +177,10 @@
 					fnFail && fnFail();
 				}
 			},			
-
+			cellClick (row, column, cell, event) {
+                let oColumn = this.materialData.columns.filter(o => o.prop==column.property)[0];
+                oColumn.click && oColumn.click(row);                
+            },
             // 点击批次
             batchClick (row) {
             	if(row.batchNo) {
@@ -172,6 +200,30 @@
 					oData.data = this.formatData(oData);
 					this.materialData.data = oData.data
 					this.styleObject.minWidth = "1200px";
+					
+					this.$nextTick(function () {
+				      	var aMerge = document.querySelectorAll('.merges')
+				    	for(let i=0; i<aMerge.length; i++) {
+				        	let num = Number(aMerge[i].attributes['value'].nodeValue),
+				          	td = aMerge[i].parentNode.parentNode
+				          	
+				      		if(num) {
+				            	td.rowSpan = num
+				            }else {
+				            	td.style.display = "none"
+				            }
+				        }
+				    	
+				    	// 设置批次为空时，鼠标样式。
+				    	var aCell = document.querySelectorAll(".cell")
+				    	for(var i=0; i<aCell.length; i++) {
+				    		let oDiv = aCell[i].childNodes[0]
+				    		
+				    		if( oDiv && !oDiv.innerHTML) {
+				    			aCell[i].style.cursor="default"
+				    		}
+				    	}
+		 		 	})
 				}               	
             },
             // 请求失败。
@@ -316,7 +368,11 @@
     }  
 </script>
 
-<style lang="less">    
+<style lang="less">   
+	.el-table--enable-row-hover .el-table__body tr:hover>td {
+	  	background-color: transparent;
+	  	background-clip: padding-box;
+	} 
 	.material-stock  {	    	    	
     	.content-message {
     		margin-top: 20px;
@@ -350,12 +406,17 @@
     				height: 30px;
     			}
     			
-    			.batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            font-weight: 600;
-		        }    
+    			.el-table__body-wrapper {
+    				.batch {
+	    				.cell {
+			    	    	cursor: pointer;
+				            color: #f90;
+				            font-weight: 600;
+	    				}
+			        } 
+    			}   
     		}
+    		
     	}
     }
 </style>

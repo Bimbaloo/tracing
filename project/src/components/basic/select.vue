@@ -78,6 +78,17 @@
 	
     export default {
         props: ["formData", "placeholderData", "keyData", "listData"],
+        props: {
+        	formData: Object,
+        	placeHolderData: String,
+        	keyData: String,
+        	listData: Array,
+        	// 是否通过ajax调用。
+        	getByAjax: {
+        		required: false,
+        		default: true
+        	}
+        },
         data() {
             return {
                 form: this.formData,
@@ -93,7 +104,12 @@
                 loading: false
             }
         },
-        created() {},
+        created() {
+        	// 如果不是通过ajax获取数据。
+        	if(!this.getByAjax) {
+        		this.options = JSON.parse(JSON.stringify(this.listData || []));
+        	}
+        },
         methods: {
             handleChange(value) {
                 console.log(value);
@@ -108,7 +124,7 @@
             },
             // 下拉框点击事件。
             showSelect(bShow) {
-            	if(bShow) {
+            	if(bShow && this.getByAjax) {
             		// 先判断是否存在数据，不存在数据，则通过ajax请求。
             		this.loading = true;
             		
@@ -174,45 +190,13 @@
 			        	 	// 保存数据。
 			        	 	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
 						})
-			        	// this.$ajax.get(oAjax[sKey].url).then((res) => {
-			        		
-			        	// 	this.loading = false;
-			        		
-			        	// 	if(!res.data.errorCode) {
-			        	// 		// 成功。
-				        // 	 	this.list = res.data.data.map(o=>{
-				        // 	 		return {
-				        // 	 			label: o[oAjax[sKey].code + "Name"],
-				        // 	 			value: o[oAjax[sKey].code + "Code"] || o[oAjax[sKey].code + "Name"]
-				        // 	 		}
-				        // 	 	});
-			        	// 	}else {
-			        	// 		this.list = [];
-			        	// 	}
-			        		
-						// 	// 如果是物料，则获取部分数据。
-			        	// 	if(sKey === "materialCode") {
-			        	// 		// 物料只取其中一部分。并保存起来。当搜索时恢复
-			        	// 		this.options = this.list.filter((o,index)=>{
-			        	// 			return index<nLen;
-			        	// 		});
-			        	// 		this.oInit = this.options;
-			        	// 	}else {
-			        	// 		// 默认为所有、
-				        // 		this.options = this.list;
-			        	// 	}
-			        		
-			        	//  	oStorage[sKey] = this.list;
-			        	//  	// 保存数据。
-			        	//  	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
-			        	// });
 		        	}
             		
             	}
             },
             // 外部查询。
             remoteMethod(query) {
-            	if(this.key === "materialCode") {
+            	if(this.key === "materialCode" && this.getByAjax) {
             		// 物料数据，则通过搜索。
             		let sQuery = (query || "").trim();
             		

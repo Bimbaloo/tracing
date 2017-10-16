@@ -71,89 +71,6 @@ var parseData = function(aoGet){
 	
 	return aResult;
 };
-var aPrev1 = [{
-		"level": 0,
-		"type": 1,
-		"code": "99999999",
-		"name": "开始",
-		"parent": "",
-		"groupCode": null,
-		"groupName": null,
-		"processSeq": null,
-		"materialInfoList": [{
-			"barcode": "020600003",
-			"batchNo": "",
-			"quantity": 20000,
-			"iokey": "D201610110004_180_2016-10-11 14:48:11_0435_0"
-		}],
-		"processInfoList": null
-	},{
-		"level": 1,
-		"type": 1,
-		"code": "100",
-		"name": "物料",
-		"parent": "99999999",
-		"groupCode": null,
-		"groupName": null,
-		"processSeq": null,
-		"materialInfoList": [{
-			"barcode": "1",
-			"batchNo": "20160331A",
-			"quantity": 10
-		}],
-	},{
-		"level": 1,
-		"type": 2,
-		"code": "010",
-		"name": "工序21",
-		"parent": "99999999",
-		"groupCode": "001",
-		"groupName": "产线工序1",
-		"processSeq": "01",
-		"materialInfoList": null,
-		"processInfoList": [{
-			"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058",
-			"batchNo": "20160331A",
-			"quantity": 283,
-			"equipmentId": 180,
-			"equipmentName": "装配2.2线GP1",
-			"shiftDate": 1476288000000,
-			"shiftName": "早班",
-			"iokey": "D201610110004_180_2016-10-11 14:48:11_0435_0"
-		}]
-	},{
-		"level": 2,
-		"type": 2,
-		"code": "020",
-		"name": "工序22",
-		"parent": "010",
-		"groupCode": "001",
-		"groupName": "产线工序1",
-		"processSeq": "02",
-		"materialInfoList": null,
-		"processInfoList": [{
-			"materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058",
-			"batchNo": "20160331A",
-			"quantity": 283,
-			"equipmentId": 182,
-			"equipmentName": "装配2.2线GP2",
-			"shiftDate": 1476288000000,
-			"shiftName": "早班",
-			"iokey": "D201610120003_182_2016-10-14 03:59:35_7721_0"
-		}]
-	},{
-		"level": 3,
-		"type": 2,
-		"code": "110",
-		"name": "工序22",
-		"parent": "020",
-		"groupCode": null,
-		"groupName": null,
-		"processSeq": null,
-		"materialInfoList": null,
-		"processInfoList": null
-	}
-];
 
 // 转换树数据。
 var parseTreeData1 = function(aPrev) {
@@ -251,8 +168,6 @@ var parseTreeData1 = function(aPrev) {
 		}
 	})
 	
-	console.log(aNew)
-	
 	// 返回数据。
 	return aNew;
 	
@@ -277,7 +192,6 @@ var parseTreeData1 = function(aPrev) {
 		
 		// 返回子级数据。
 		return aSubGroup;
-		console.log(aSubGroup)
 		
 		/**
 		 * 获取元素的同组子级。
@@ -407,7 +321,6 @@ var parseTreeData = function(aTreeData) {
 		if(o.isGroup) {
 			let aChild = _getGroupChild(o.key);
 			if(aChild.length) {
-				console.log(aChild)
 				o.parents = aChild[0].parents;
 				aChild[0].parents = "";
 			}
@@ -606,16 +519,186 @@ var getTreeData = function(oRowData) {
 	}
 }
 
+// 获取追溯左侧导航数据。
+var getCatalogData = function(aoRowData) {	
+	let aoCatalogData = [],
+		aoCopyData = JSON.parse(JSON.stringify(aoRowData)),
+		aResult = []
+		
+	for(let i = aoCopyData.length - 1; i >= 0; i--) {
+		let oData = aoCopyData[i];
 
-// 物料，设备等下拉框数据改变，查询时参数处理。
-var parseQueryParam = function(oQuery, index) {
+		if(oData && oData.parents === "") {
+			oData.parent = "";
+			aoCatalogData.push(oData);
+
+			aoCopyData.splice(i, 1);
+			_findChildrenData(aoCopyData, oData.key, oData.key)
+		}
+	}
+	
+	// 物料的合并
+//	for(let i = aoCatalogData.length - 1; i >= 0; i--) {
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		let aKey = []
+		if(oData.isMaterialNode && !_isExist(oData)) {
+			// 物料-找同名
+			aKey = _getKeysOfSameName(oData).key
+			aResult.push(Object.assign({}, oData, {
+				name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
+				sublings: aKey
+			}))
+		}
+	}
+	
+	// 获取同名同物料下的工序。
+//	for(let i = aoCatalogData.length - 1; i >= 0; i--) {
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		if(!oData.isMaterialNode && !_isExist(oData)) {
+			// 工序-找同名
+			let oValue = _getKeysOfSameName(oData)
+			aResult.push(Object.assign({}, oData, {
+				name: (oValue.key.length-1) ? oData.name + "("+ oValue.key.length +")": oData.name,
+				sublings: oValue.key,
+				parent: oValue.parent
+			}))
+		}
+	}
+	
+	// 返回数据。
+	return aResult;
+	
+	/**
+	 * 递归查找子节点。
+	 * @param {Array} aoCopyData
+	 * @param {String} sKey
+	 * @param {String} sParentKey
+	 * @return {void}
+	 */
+	function _findChildrenData(aoCopyData, sKey, sParentKey) {
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i],
+				sNewKey = "";
+
+			if(oData && oData.parents.split(",").includes(sKey)) {
+				// 当前元素的子级。
+				if(oData.isMaterialNode) {
+					oData.parent = "";
+					sNewKey = oData.key;
+				}else {
+					sNewKey = sParentKey;
+					oData.parent = sParentKey;
+				}
+				
+				aoCopyData.splice(i, 1);
+				aoCatalogData.push(oData);
+				
+				if(aoCopyData.length) {
+					_findChildrenData(aoCopyData, oData.key, sNewKey)
+				}
+			}
+		}
+	}
+	
+	/**
+	 * 通过名称获取相同的名称的数据的key中。
+	 * @param {Object} oFilter
+	 * @return {Array}
+	 */
+	function _getKeysOfSameName(oFilter) {
+		let oResult = {
+			key: [],
+			parent: ""
+		};
+		
+//		for(let i = aoCatalogData.length - 1; i >= 0; i--) {
+		for(let i = 0; i < aoCatalogData.length; i++) {
+			let oData = aoCatalogData[i];
+
+			if(oFilter.isMaterialNode) {
+				// 物料-找同名
+				if(oData.name === oFilter.name) {
+					oResult.key.push({
+						key:oData.key,
+						parent: oData.parent
+					})
+				}
+			}else {
+				// 工序，找同parent
+				// 找到在aResulte中通存在的subling的值。
+				let oValue = _isSameLevel(oData, oFilter)
+				if(oData.name === oFilter.name && oValue.bSame) {
+					oResult.key.push({
+						key: oData.key,
+						parent: oData.parent
+					})
+					oResult.parent = oValue.parent
+				}
+			}
+		}
+		
+		// 返回数据。
+		return oResult
+	}
+	
+	/**
+	 * 判断元素是否存在已存在。
+	 * @param {Object} oData
+	 */
+	function _isExist(oData) {
+//		return aResult.some( o => o.sublings.includes(oData.key) )
+		return aResult.some( o => {
+			return o.sublings.some( o1 => o1.key == oData.key)
+		})
+	}
+	
+	/**
+	 * 判断工序是否是同一个合并后的父级。
+	 */
+	function _isSameLevel(oData, oValue) {
+		let oR = {
+			bSame: false,
+			parent: ''
+		}
+		
+		aResult.forEach( o => {
+//			if(!oR.bSame && o.sublings.includes(oData.parent) && o.sublings.includes(oValue.parent)) {
+//				oR.bSame = true
+//				oR.parent = o.key
+//			}
+			
+			if(!oR.bSame && o.sublings.some(o1 => o1.key == oData.parent) && o.sublings.some(o1 => o1.key == oValue.parent)) {
+				oR.bSame = true
+				oR.parent = o.key
+			}
+		})
+		
+		return oR
+	}
+}
+
+
+/**
+ * 物料，设备等下拉框数据改变，查询时参数处理。
+ * @param {Object} oQuery 需拆分的对象
+ * @param {Object} index 获取的字段
+ * @param {Object} bSplit	是否需要拆分，当参数不存在于判断的字段中
+ */
+var parseQueryParam = function(oQuery, index, bSplit) {
 	let oParam = Object.assign({}, oQuery);
 	
 	// 修改下拉框显示的值。
 	for(let sParam in oParam) {
 		// 下拉数据
-		if(['materialCode', 'equipmentCode', 'processCode', 'personCode'].includes(sParam)) {
-			oParam[sParam] = oParam[sParam].split(":")[index || 0];
+		if(['materialCode', 'equipmentCode', 'processCode', 'personCode', 'materialCodeList', 'equipmentCodeList', 'processCodeList'].includes(sParam) || bSplit) {
+			if(oParam[sParam] instanceof Array) {
+				// 数组处理。
+				oParam[sParam] = oParam[sParam].map( o => o.split(":")[index || 0])
+			}else {
+				oParam[sParam] = oParam[sParam].split(":")[index || 0];
+			}
 		}
 	}
 	
@@ -628,5 +711,6 @@ export default {
 	parseData,
 	parseTreeData,
 	parseQueryParam,
-	getTreeData
+	getTreeData,
+	getCatalogData
 }

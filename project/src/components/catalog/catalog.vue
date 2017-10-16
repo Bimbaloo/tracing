@@ -110,10 +110,19 @@
 									}
 								})
 								
-								let sRootKey = node.data.key;
-								if(node.data.parent &&　!node.isMaterialNode) {
-									sRootKey　= node.findTreeParentNode().data.key;				
-								}
+								let aRoot = [],
+									aSublings = []
+									
+								node.data.sublings.forEach( o => {
+									let sKey = node.data.isMaterialNode ? o.key : o.parent
+									
+									if(!aRoot.includes(sKey)) {
+										aRoot.push(sKey)
+									}
+									
+									aSublings.push(o.key)
+								})
+								
 								this.$store.commit({
 									type: "updateType",
 									key: "catalog"
@@ -122,18 +131,14 @@
 									type: "updateKey",
 									key: node.data.key
 								});
-								this.$store.commit({
-									type: "updateRoot",
-									key: ""
-								});
-								this.$store.commit({
-									type: "updateRoot",
-									key: sRootKey
-								});
+//								this.$store.commit({
+//									type: "updateRoot",
+//									key: aRoot
+//								});
 								// 更新高亮的数据。
 								this.$store.commit({
 									type: "updateHeighted",
-									data: node.data.sublings
+									data: aSublings	//node.data.sublings
 								})
 								
 								if(node.data.isMaterialNode) {		// node.data.type == "1"
@@ -146,7 +151,6 @@
 										}
 									})
 								}else {
-									// debugger
 									this.$router.replace({ 
 										path: "/process",
 										query: {
@@ -253,7 +257,8 @@
 				
 				this.catalog.nodes.each(o => {
 					// 当前节点的同名节点
-					if(o.data.sublings.includes(this.key)) {
+//					if(o.data.sublings.includes(this.key)) {
+					if(o.data.sublings.some(o1 => o1.key == this.key)) {
 						oSublingNode = o;
 					}
 					o.isSelected = false;

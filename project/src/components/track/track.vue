@@ -94,6 +94,7 @@
 //                  headerName: "工序编码",
 //                  width: 80
                 },{
+                	field: "processCode",
                 	headerName: "工序",
                 	width: 120,
                 	cellRenderer: function(params) {
@@ -118,6 +119,7 @@
 //                  field: "equipmentCode",
 //                  headerName: "设备编码"
                 },{
+                	field: "equipmentCode",
                 	headerName: "设备",
                 	width: 150,
                 	cellRenderer: function(params) {
@@ -125,7 +127,7 @@
 	                }
                 },{
                     field: "batchNo",
-                    headerName: "批次号",
+                    headerName: "批次",
                     width: 150
                 },{
                     field: "happenTime",

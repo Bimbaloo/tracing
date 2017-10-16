@@ -1,6 +1,6 @@
 <template>
 	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
-		<v-header></v-header>
+		<v-header :config="true" :back="false" :tool="false"></v-header>
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
 		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col class="router" ref="router"> -->
@@ -208,7 +208,7 @@
 					// 格式化数据。
 					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
 					this.tableData = this.parseTableData();
-					this.catalogData = this.parseCatalogData();
+					this.catalogData = fnP.getCatalogData(this.rawData) // this.parseCatalogData();
 				}	
 			},
 			// 请求失败。
@@ -274,7 +274,7 @@
 						let aKey = _getKeysOfSameName(oData)
 						// 修改数据。--- 修改名称，增加同层key值。
 						oData = Object.assign({}, oData, {
-							name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+							name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
 							sublings: aKey
 						})
 						
@@ -283,7 +283,7 @@
 						_findChildrenData(aoCopyData, oData.key, oData.key)
 					}
 				}
-
+				
 				// 返回数据。
 				return aoCatalogData;
 				
@@ -311,13 +311,13 @@
 							
 							let aKey = _getKeysOfSameName(oData)
 							// 修改数据。--- 修改名称，增加同层key值。
-							oData = Object.assign({}, oData, {
-								name: (aKey.length-1) ? oData.name + "("+ (aKey.length-1) +")": oData.name,
+							let oNewData = Object.assign({}, oData, {
+								name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
 								sublings: aKey
 							})
 							
 							aoCopyData.splice(i, 1);
-							aoCatalogData.push(oData);
+							aoCatalogData.push(oNewData);
 							
 							if(aoCopyData.length) {
 								_findChildrenData(aoCopyData, oData.key, sNewKey)

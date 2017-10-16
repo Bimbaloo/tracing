@@ -8,7 +8,6 @@
             <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
               <v-panel :active-tab="activeKey" :panel-height="panelHeight" :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
             </el-tab-pane>
-            <span class="search-barcode" v-if="activeKey === 'stock'" @click="showDialog=true">条码查询</span>
           </el-tabs>
         </div>
       </div>
@@ -26,11 +25,7 @@
           </div>
         </div>
       </div>
-    </div> 
-    <v-dialog 
-    	v-if="showDialog" 
-    	:dialog-visible="showDialog"
-    	@hideDialog="hideDialog"></v-dialog>
+    </div>
      <!-- <el-row :gutter="0" class="content">
           <el-col :xs="15" :sm="12" :md="9" :lg="5" :class="[{ collapsed: collapse }, 'nav']">      	
              <div class="flex-wraps">
@@ -92,8 +87,7 @@
         tip: true,
         handleSubmit: this._submitForm,
         sErrorMessage: "",
-        tag: "",
-        showDialog: false
+        tag: ""
       }
     },
     created() {
@@ -129,7 +123,7 @@
 
         this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
           // 请求成功。
-          this.categories = fnP.parseData(oResult).filter(o=>o.key!="restrain" && o.key!="link");
+          this.categories = fnP.parseData(oResult).filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume");
 
           this.categories.forEach(o => {
             if(oData && oData.tab == o.key) {
@@ -182,9 +176,6 @@
       requestError(err) {
         console.log(err);
       },
-    	hideDialog() {
-    		this.showDialog = false
-    	},
     	getSearchData () {
 				let oData = {
 							tab: "",
@@ -391,14 +382,6 @@
           top:0
          }
          
-         .search-barcode {
-         	position: absolute;
-			  	bottom: 40px;
-			  	right: 30px;
-			  	cursor: pointer;
-			  	color: #42af8f;
-			  	text-decoration: underline;
-         }
 			}
 			
       .router-container {

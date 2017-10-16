@@ -129,7 +129,7 @@ const store = new Vuex.Store({
   },
   state: {
     key: "",
-    root: "",
+    root: [],
     chrome: /chrome/i.test(navigator.userAgent),
     type: "",
     fullscreen: false,

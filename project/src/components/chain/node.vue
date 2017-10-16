@@ -20,7 +20,7 @@
 <script>
 	import Button from 'components/basic/button.vue'
 	import 'assets/js/ScrollingTable.js'
-	
+	import fnP from "assets/js/public.js"
 	
 	let sNormal= "#73b633";			// 正常节点		颜色+边框
 	let sBroke = "#db572d";			// 断链节点		颜色+边框
@@ -28,7 +28,7 @@
 	let sInCanDo = "#4287af";				// 投入可修复      边框
 	let sOutCanDo = "#6c42af";				// 产出可修复	边框
 	let sCanDo = "#adaf42";		  // 都可修复节点		边框
-	let sMultiValue = "all";
+	let sMultiValue = "全部"// "all";
 	
 	export default {
 		components: {
@@ -745,7 +745,8 @@
 					oProcess = {},
 					aSeriesData = [],
 					aDisaplayNode = [],			// 通过节点链类型显示的节点。
-					aFilterNodeType = this.filterData.nodeType,
+					// 改过multiSelect组件，则获取的数据会变化。
+					aFilterNodeType = fnP.parseQueryParam({nodeType: this.filterData.nodeType}, 0, true)["nodeType"], //this.filterData.nodeType,
 					aNowNode = [],
 					nIndex = 0;
 					
@@ -828,7 +829,8 @@
 							size: new go.Size(NaN, that.nodeHeight - 120),
 							height: that.nodeHeight - 150
 						},
-						aDisProcess = this.filterData.aFilterProcess;
+						// 改过multiSelect组件，则获取的数据会变化。
+						aDisProcess = fnP.parseQueryParam({process: this.filterData.aFilterProcess}, 0, true)["process"] //this.filterData.aFilterProcess;
 					
 					// 工序过滤。
 					if(aDisProcess.includes(sMultiValue) || aDisProcess.includes(sCode)) {
