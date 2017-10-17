@@ -9,7 +9,7 @@
                     <span>
                         <el-checkbox v-model="checked">全部数据</el-checkbox>
                     </span>
-                    <span style='margin-left:5px'>({{this.$route.query.shiftStartTime}}~~{{this.$route.query.shiftEndTime}})</span>
+                    <span style='margin-left:5px'>({{this.$route.query.shiftStartTime}}~{{this.$route.query.shiftEndTime}})</span>
                 </div>
             </div>
             <el-tabs element-loading-text="拼命加载中" class="search-tab" @tab-click="tabChange">
@@ -57,7 +57,7 @@
                                         <span>{{ props.row[column.prop] }}</span>
                                     </div>
                                     <div class="cell-content" v-else>
-                                        <span :class="[ bTrack ? '' : 'barcode']" :title="[bTrack ? '' : '批次追踪']" @click="barcodeClick(props.row)">{{ props.row[column.prop] }}</span>
+                                        <span :class="[ bTrack ? '' : 'barcode']" :title="[bTrack ? '' : '条码追踪']" @click="barcodeClick(props.row)">{{ props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -103,7 +103,7 @@
                                         <span>{{ props.row[column.prop] }}</span>
                                     </div>
                                     <div class="cell-content" v-else>
-                                        <span :class="[ bTrack ? '' : 'batchNo']" :title="[bTrack ? '' : '条码追踪']" @click="batchClick(props.row)">{{ props.row[column.prop] }}</span>
+                                        <span :class="[ bTrack ? '' : 'batchNo']" :title="[bTrack ? '' : '批次追踪']" @click="batchClick(props.row)">{{ props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
