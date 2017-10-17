@@ -1,7 +1,7 @@
 <!--出入库-->
 <template>
     <div class="router-content">
-        <div class="innner-content" :style="styleObject">
+        <div class="innner-content" >
             <div class="content-message tableData">
 				<span class='table-title'>
 					<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
@@ -25,7 +25,8 @@
             		element-loading-text="拼命加载中"
             		class="raw-table"
             		@cell-click="cellClick"
-            		:data=materialData.data>
+            		:data="materialData.data"
+					:height="tableHeight">
 			  		<el-table-column
 			  			align="center"
 			  			:resizable="true"
@@ -34,6 +35,7 @@
 				        v-if="!column.hide"
 				        :label="column.name"
 				        :class-name="column.class"
+						:width="column.width"
 						:key="index">
 			  			<template scope="scope">
 			  				<div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
@@ -90,6 +92,7 @@
                         prop: "batchNo",
                         name: "批次",
                         class: "batch",
+						width: 200,
                         click: this.batchClick
                     },{
                         prop: "quantity",
@@ -107,7 +110,8 @@
                         width: "60px"
                     },{
                         prop: "createTime",
-                        name: "处理时间"
+                        name: "处理时间",
+						width: 200
                     },{
                         prop: "personName",
                         name: "操作人",
@@ -123,13 +127,20 @@
 //                      }
                     }],
                     data: []
-                }
+                },
+				tableHeight: 200
             }
         },
         computed: {
 			rawData () {
 		    	return this.$store.state.rawData
-		   }
+			},
+		    resizeY: function() {
+            	return this.$store && this.$store.state.resizeY
+			},
+			fullscreen: function() {
+				return this.$store && this.$store.state.fullscreen
+			}
         },
         created () {
             // 组件创建完后获取数据，
@@ -138,10 +149,21 @@
         },
         mounted () {
 			this.fetchData();
+			this.tableHeight = this.setHeight()
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': 'fetchData'
+            '$route': function(){
+				this.fetchData()
+				this.tableHeight = this.setHeight()
+			},
+			"resizeY": function(){
+				this.tableHeight = this.setHeight()
+			},
+			/* 全屏大小时，重新设置table大小 */
+			"fullscreen": function(){
+				this.tableHeight = this.setHeight()
+			},
         },
         methods: {
 			// 判断调用接口是否成功。
@@ -393,7 +415,21 @@
                     return param1 > param2 ? 1:-1;
                 }
 
-            }
+            },
+			/* 获取元素实际高度(含margin) */
+			outerHeight(el) {
+				var height = el.offsetHeight;
+				var style = el.currentStyle || getComputedStyle(el);
+
+				height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+				return height;
+			},
+			// 设置table的高度
+			setHeight() {
+				let content = document.querySelector(".router-content")
+				let tableData = document.querySelector(".tableData")
+				return this.outerHeight(content) - this.outerHeight(tableData)-40	
+			}
         }
     }  
 </script>

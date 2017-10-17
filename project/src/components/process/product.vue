@@ -210,10 +210,6 @@ export default {
                     prop: "quantity",
                     width: "100"
                 }, {
-                    name: "质量",
-                    prop: "quality",
-                    width: "100"
-                }, {
                     name: "班次",
                     prop: "shiftName",
                     width: "200"
@@ -356,18 +352,11 @@ export default {
                     prop: "materialName",
                     width: ""
                 }, {
-                    name: "合格数",
-                    prop: "qualifiedNum",
+                    name: "数量",
+                    prop: "quantity",
                     width: "100"
-                }, {
-                    name: "报废数",
-                    prop: "scrapNum",
-                    width: "100"
-                }, {
-                    name: "不合格数",
-                    prop: "unqualifiedNum",
-                    width: "100"
-                }],
+                }
+                ],
                 height: 1,
                 data: []
             },
@@ -518,6 +507,11 @@ export default {
 
                 inDatas.push(...e.in)               // 获取投入数据
                 outDatas.push(e)                    // 获取产出数据
+                e.in.forEach(data=>{                // 投入记录的质量列为null时，显示为空
+                    if(data.quality === null){
+                        data.quality = ""
+                    }
+                })
                 uniteDatas.push(e)                  // 获取关联数据
                 uniteDatas.push(...e.in)
                 // 获取关联数据 -- 时间内
@@ -541,77 +535,16 @@ export default {
                 })
             })
 
-            // inDatas.forEach(el => {
-            //     /* 设置每条记录的合格数、报废数、不合格数 */
-            //     el.qualifiedNum = el.scrapNum = el.unqualifiedNum = 0
-            //     if (el.type === 1) {                                       // 合格数
-            //         el.qualifiedNum = el.quantity
-            //     } else if (el.type === 2) {                                // 报废数
-            //         el.scrapNum = el.quantity
-            //     } else {                                                 // 不合格数
-            //         el.unqualifiedNum = el.quantity
-            //     }
-            // })
 
             /* 所有投入汇总 */
             let inDatasCopy = JSON.parse(JSON.stringify(inDatas))
             inAllDatas = this.gatherDate(inAllDatas,inDatasCopy)
-            // inDatasCopy.forEach((el, i) => {                        // 投入汇总
-            //     inAllDatas.push({
-            //         batchNo: inDatasCopy[i]["batchNo"],             // 批次号
-            //         qualifiedNum: parseInt(inDatasCopy[i]["qualifiedNum"]),       // 合格数
-            //         scrapNum: parseInt(inDatasCopy[i]["scrapNum"]),               // 报废数
-            //         unqualifiedNum: parseInt(inDatasCopy[i]["unqualifiedNum"]), // 不合格数
-            //         materialName: inDatasCopy[i]["materialName"],   // 物料名称
-            //         materialCode: inDatasCopy[i]["materialCode"],   // 物料编码
-            //     })
-            //     for (let j = i + 1; j < inDatasCopy.length; j++) {
-            //         if (el["batchNo"] !== "" && el["batchNo"] === inDatasCopy[j]["batchNo"] && el["materialCode"] === inDatasCopy[j]["materialCode"]) {
-            //             inAllDatas[i].quantity = parseInt(inAllDatas[i]["quantity"]) + parseInt(inDatasCopy[j]["quantity"])  // 数量
-            //             inAllDatas[i].qualifiedNum = parseInt(inAllDatas[i]["qualifiedNum"]) + parseInt(inDatasCopy[j]["qualifiedNum"])        // 合格数
-            //             inAllDatas[i].scrapNum = parseInt(inAllDatas[i]["scrapNum"]) + parseInt(inDatasCopy[j]["scrapNum"])                    // 报废数
-            //             inAllDatas[i].unqualifiedNum = parseInt(inAllDatas[i]["unqualifiedNum"]) + parseInt(inDatasCopy[j]["unqualifiedNum"])  // 不合格数
-            //             inDatasCopy.splice(j, 1)
-            //             j = j - 1
-            //         }
-            //     }
-            // })
+
 
             /* 时间内投入汇总 */
             let inDatasCopyFilter = JSON.parse(JSON.stringify(inDatasFilter))
             inAllDatasFilter = this.gatherDate(inAllDatasFilter,inDatasCopyFilter)
-            // inDatasCopyFilter.forEach((el, i) => {                        // 投入汇总
-            //     inAllDatasFilter.push({
-            //         batchNo: inDatasCopyFilter[i]["batchNo"],             // 批次号
-            //         qualifiedNum: parseInt(inDatasCopyFilter[i]["qualifiedNum"]),       // 合格数
-            //         scrapNum: parseInt(inDatasCopyFilter[i]["scrapNum"]),               // 报废数
-            //         unqualifiedNum: parseInt(inDatasCopyFilter[i]["unqualifiedNum"]), // 不合格数
-            //         materialName: inDatasCopyFilter[i]["materialName"],   // 物料名称
-            //         materialCode: inDatasCopyFilter[i]["materialCode"],   // 物料编码
-            //     })
-            //     for (let j = i + 1; j < inDatasCopyFilter.length; j++) {
-            //         if (el["batchNo"] !== "" && el["batchNo"] === inDatasCopyFilter[j]["batchNo"] && el["materialCode"] === inDatasCopyFilter[j]["materialCode"]) {
-            //             inAllDatasFilter[i].qualifiedNum = parseInt(inAllDatasFilter[i]["qualifiedNum"]) + parseInt(inDatasCopyFilter[j]["qualifiedNum"])        // 合格数
-            //             inAllDatasFilter[i].scrapNum = parseInt(inAllDatasFilter[i]["scrapNum"]) + parseInt(inDatasCopyFilter[j]["scrapNum"])                    // 报废数
-            //             inAllDatasFilter[i].unqualifiedNum = parseInt(inAllDatasFilter[i]["unqualifiedNum"]) + parseInt(inDatasCopyFilter[j]["unqualifiedNum"])  // 不合格数
-            //             inDatasCopyFilter.splice(j, 1)
-            //             j = j - 1
-            //         }
-            //     }
-            // })
 
-
-            // outDatas.forEach(el => {
-            //     /* 设置每条记录的合格数、报废数、不合格数 */
-            //     el.qualifiedNum = el.scrapNum = el.unqualifiedNum = 0
-            //     if (el.type === 1) {                                       // 合格数
-            //         el.qualifiedNum = el.quantity
-            //     } else if (el.type === 2) {                                // 报废数
-            //         el.scrapNum = el.quantity
-            //     } else {                                                 // 不合格数
-            //         el.unqualifiedNum = el.quantity
-            //     }
-            // })
             /* 如果箱码列内容为空，取消该列 */
             if(outDatas.some((e)=> e.packetBarcode === '' || e.packetBarcode === null )){ 
                 this.outItems.columns = this.outItems.columns.filter(o => o.prop !== "packetBarcode");
@@ -619,50 +552,12 @@ export default {
             /* 所有产出汇总 */
             let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
             outAllDatas = this.gatherDate(outAllDatas,outDatasCopy)
-            // outDatasCopy.forEach((el, i) => {                             // 产出汇总
-            //     /* 根据批次合并，同批次合格数、报废数、不合格数分别汇总 */
-            //     outAllDatas.push({
-            //         batchNo: outDatasCopy[i]["batchNo"],              // 批次号
-            //         qualifiedNum: parseInt(outDatasCopy[i]["qualifiedNum"]),       // 合格数
-            //         scrapNum: parseInt(outDatasCopy[i]["scrapNum"]),               // 报废数
-            //         unqualifiedNum: parseInt(outDatasCopy[i]["unqualifiedNum"]), // 不合格数
-            //         materialName: outDatasCopy[i]["materialName"],   // 物料名称
-            //         materialCode: outDatasCopy[i]["materialCode"]    // 物料编码
-            //     })
-            //     for (let j = i + 1; j < outDatasCopy.length; j++) {
-            //         if (el["batchNo"] !== "" && el["batchNo"] === outDatasCopy[j]["batchNo"] && el["materialCode"] === outDatasCopy[j]["materialCode"]) {
-            //             outAllDatas[i].qualifiedNum = parseInt(outAllDatas[i]["qualifiedNum"]) + parseInt(outDatasCopy[j]["qualifiedNum"])        // 合格数
-            //             outAllDatas[i].scrapNum = parseInt(outAllDatas[i]["scrapNum"]) + parseInt(outDatasCopy[j]["scrapNum"])                    // 报废数
-            //             outAllDatas[i].unqualifiedNum = parseInt(outAllDatas[i]["unqualifiedNum"]) + parseInt(outDatasCopy[j]["unqualifiedNum"])  // 不合格数
-            //             outDatasCopy.splice(j, 1)
-            //             j = j - 1
-            //         }
-            //     }
-            // })
+
 
             /* 时间内产出汇总 */
             let outDatasCopyFilter = JSON.parse(JSON.stringify(outDatasFilter))
             outAllDatasFilter = this.gatherDate(outAllDatasFilter,outDatasCopyFilter)
-            // outDatasCopyFilter.forEach((el, i) => {                             // 产出汇总
-            //     /* 根据批次合并，同批次合格数、报废数、不合格数分别汇总 */
-            //     outAllDatasFilter.push({
-            //         batchNo: outDatasCopyFilter[i]["batchNo"],              // 批次号
-            //         qualifiedNum: parseInt(outDatasCopyFilter[i]["qualifiedNum"]),       // 合格数
-            //         scrapNum: parseInt(outDatasCopyFilter[i]["scrapNum"]),               // 报废数
-            //         unqualifiedNum: parseInt(outDatasCopyFilter[i]["unqualifiedNum"]), // 不合格数
-            //         materialName: outDatasCopyFilter[i]["materialName"],   // 物料名称
-            //         materialCode: outDatasCopyFilter[i]["materialCode"]    // 物料编码
-            //     })
-            //     for (let j = i + 1; j < outDatasCopyFilter.length; j++) {
-            //         if (el["batchNo"] !== "" && el["batchNo"] === outDatasCopyFilter[j]["batchNo"] && el["materialCode"] === outDatasCopyFilter[j]["materialCode"]) {
-            //             outAllDatasFilter[i].qualifiedNum = parseInt(outAllDatasFilter[i]["qualifiedNum"]) + parseInt(outDatasCopyFilter[j]["qualifiedNum"])        // 合格数
-            //             outAllDatasFilter[i].scrapNum = parseInt(outAllDatasFilter[i]["scrapNum"]) + parseInt(outDatasCopyFilter[j]["scrapNum"])                    // 报废数
-            //             outAllDatasFilter[i].unqualifiedNum = parseInt(outAllDatasFilter[i]["unqualifiedNum"]) + parseInt(outDatasCopyFilter[j]["unqualifiedNum"])  // 不合格数
-            //             outDatasCopyFilter.splice(j, 1)
-            //             j = j - 1
-            //         }
-            //     }
-            // })
+
 
 
 
@@ -757,13 +652,6 @@ export default {
                 // 批次追踪。
                 let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
                 oCondition = {
-                    // "keys": {
-                    //     equipmentId: this.$route.query["equipmentId"],
-                    //     equipmentName: this.$route.query["equipmentName"],
-                    //     batchNo: row.batchNo,
-                    //     materialCode: row.materialCode
-                    // },
-                    // "type": "batch"
                     selected: this.outItems.data.filter(o => o.batchNo === row.batchNo).map(o => {
                         return {
                             materialCode: o.materialCode,
@@ -790,12 +678,6 @@ export default {
                             barcode: row.barcode,
                             bucketNo: row.bucketNo
                         }]
-                        // "keys": {
-                        //     equipmentId: this.$route.query["equipmentId"],
-                        //     equipmentName: this.$route.query["equipmentName"],
-                        //     barcode: row.barcode
-                        // },
-                        // "type": "barcode"
                     }
 
                 sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
@@ -803,8 +685,6 @@ export default {
             }
         },
         materialClick(row) {
-            // console.log("物料编码")
-            // console.log(row)
             let oQuery = {
                 batchNo: row.batchNo,
                 materialCode: row.materialCode
@@ -822,20 +702,7 @@ export default {
             // 下载表格。
             window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
         },
-        // 表格导出。
-        // exportExcelHandle (sTable, sFileName, event) {
 
-        //     // 下载表格。
-        //     window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      
-        // },
-        // 表格打印。
-        // printHandle (refTable, event) {
-        //     let oTable = this.$refs[refTable];
-        //     if(!oTable) {
-        //         return;
-        //     }
-        //     window.Rt.utils.printHtml(html2canvas, oTable);              
-        // },
         // 表格打印。
         printHandle(refTable, event) {
             let oTable = this.$refs[refTable];
@@ -931,8 +798,6 @@ export default {
         },
         /* 点击产出 展开或收拢投入 */
         handleEdit(index, props) {
-            //debugger
-            //console.log(props)
             let elArr = []
             const num = props.row.in.length
             const trs = document.querySelectorAll(".el-table__body-wrapper")[0].querySelectorAll("tr")
@@ -981,6 +846,7 @@ export default {
             copyDate.forEach((el, i) => {                        // 投入汇总
                 needDate.push({
                     batchNo: copyDate[i]["batchNo"],             // 批次号
+                    quantity: parseInt(copyDate[i]["quantity"]),               // 数量
                     qualifiedNum: parseInt(copyDate[i]["qualifiedNum"]),       // 合格数
                     scrapNum: parseInt(copyDate[i]["scrapNum"]),               // 报废数
                     unqualifiedNum: parseInt(copyDate[i]["unqualifiedNum"]), // 不合格数

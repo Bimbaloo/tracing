@@ -149,6 +149,7 @@ export default {
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
+						width: "250",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -162,6 +163,7 @@ export default {
 					}, {
 						prop: "quantity",
 						name: "数量",
+						width: "100",
 						sortable: true,
 						sortMethod: function(a, b) {
 							return a - b > 0;
@@ -169,6 +171,7 @@ export default {
 					}, {
 						prop: "qualifiedNum",
 						name: "合格数",
+						width: "100",
 						sortable: true,
 						sortMethod: function(a, b) {
 							return a - b > 0;
@@ -176,6 +179,7 @@ export default {
 					}, {
 						prop: "unqualifiedNum",
 						name: "不合格数",
+						width: "100",
 						sortable: true,
 						sortMethod: function(a, b) {
 							return a - b > 0;
@@ -183,6 +187,7 @@ export default {
 					}, {
 						prop: "disabilityNum",
 						name: "报废数",
+						width: "100",
 						sortable: true,
 						sortMethod: function(a, b) {
 							return a - b > 0;
@@ -190,6 +195,7 @@ export default {
 					}, {
 						prop: "rate",
 						name: "合格率",
+						width: "100",
 						sortable: true,
 						formatter: function(row, column) {
 							return (row.rate * 100).toFixed(2) + "%"
@@ -214,6 +220,7 @@ export default {
 					}, {
 						prop: "batchNo",
 						name: "批次",
+						width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -227,6 +234,7 @@ export default {
 					}, {
 						prop: "quantity",
 						name: "数量",
+						width: "100",
 						sortable: true
 					}, {
 						prop: "stock",
@@ -299,6 +307,7 @@ export default {
 					}, {
 						prop: "batchNo",
 						name: "批次",
+						width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -312,6 +321,7 @@ export default {
 					}, {
 						prop: "quantity",
 						name: "数量",
+						width: "100",
 						sortable: true,
 						sortMethod: function(a, b) {
 							return a - b > 0;
@@ -375,6 +385,7 @@ export default {
 					}, {
 						prop: "batchNo",
 						name: "批次",
+						width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -388,6 +399,7 @@ export default {
 					}, {
 						prop: "quantity",
 						name: "数量",
+						width: "100",
 						sortable: true,
 						sortMethod: function(a, b) {
 							return a - b > 0;
@@ -448,6 +460,7 @@ export default {
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
+						width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -469,6 +482,7 @@ export default {
 					}, {
 						prop: "inNum",
 						name: "投入数量",
+						width: "100",
 						sortable: true,
 						sortMethod: function(a, b) {
 							return a - b > 0;
@@ -511,6 +525,7 @@ export default {
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
+						width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -635,7 +650,26 @@ export default {
 			for (let p in oData) {
 
 				oData[p].data = oResult[p];
+				
+
+				oData[p].data.sort(function (a, b) {
+					if (a.materialCode > b.materialCode) {
+						return 1;
+					}
+					if (a.materialCode < b.materialCode) {
+						return -1;
+					}
+					if (a.materialCode = b.materialCode){
+						if(a.batchNo > b.batchNo){
+						return 1
+						}
+					}
+					// a 必须等于 b
+					return 0;
+				});
+
 				oData[p].filteredData = oData[p].data;
+
 				if (oResult[p].length && !bSetWidth) {
 					bSetWidth = true;
 					// 设置最小宽度。
