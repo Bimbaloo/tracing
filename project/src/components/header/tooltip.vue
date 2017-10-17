@@ -12,13 +12,14 @@
 	            <div class="user-name">小工具<i class="el-icon-arrow-down"></i></div>
 	        </el-tooltip>
 	        <div v-if="tool" class="division">|</div>
-	        <el-tooltip class="item" effect="light" content="Bottom Right" placement="bottom-end">
+	        <el-tooltip v-if="config || userId" class="item" effect="light" content="Bottom Right" placement="bottom-end">
 	            <ul slot="content" class="info-list">
 	                <li @click="goToConfig" v-if="config">设置</li>
 	                <li @click="logout" v-if="userId">退出</li>
 	            </ul>     
 	            <div class="user-name" :style="{cursor: nickname?'default':'pointer'}" @click="login">{{nickname || "登录"}}<i class="el-icon-arrow-down"></i></div>
 	        </el-tooltip>
+	        <div v-else class="user-name" :style="{cursor: nickname?'default':'pointer'}" @click="login">{{nickname || "登录"}}</div>
 	    </div>
 	    
 	    <!-- 条码查询 -->
@@ -169,6 +170,7 @@
         
         .user-name {
         	cursor: pointer;
+        	display: inline-block;
         }
     }
 

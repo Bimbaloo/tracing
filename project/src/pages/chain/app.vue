@@ -641,7 +641,11 @@
 					
 					.el-select, .el-input {
 						display: inline-block;
+						width: 200px;
 					}
+				}
+				.form-conditions {
+					display: inline;
 				}
 				.form-button {
 					margin-top: 0;

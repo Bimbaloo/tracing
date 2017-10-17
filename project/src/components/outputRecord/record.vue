@@ -14,7 +14,7 @@
 			</el-form>
 			<div v-if="pageSize" class="line"></div>
 		</div>
-		<div class="output-content">
+		<div class="output-content" :style="{height: contentHeight+'px'}">
 			<!-- 详细信息 -->
 			<div v-if="pageSize" class="item-info" ref="outputTitle">
 				<div class="item-title">产出记录</div>
@@ -125,7 +125,7 @@
 					num: "100"
 				},
 				// 是否自动查询
-				bAutoSearch: false,
+//				bAutoSearch: !this.pageSize?true:false,	// 弹窗时默认查询。
 				outputData: {
 					url: HOST + "/api/v1/trace/out/latest-info",
 					loading: false,
@@ -179,7 +179,8 @@
 						width: 50
 					}],
 					data: []
-				}
+				},
+				contentHeight: 400
 			}
 		},
 		created() {
@@ -189,20 +190,24 @@
 			if(tag) {
 				let	oData = sessionStorage.getItem("outputDataSearchCondition-" + tag);
 				if(oData) {
-					this.bAutoSearch = true;
+//					this.bAutoSearch = true;
 					this.ruleForm = JSON.parse(oData)
 				}
 			}
 		},
 		mounted() {
-			this.outputData.height = this.adjustHeight()
-			
+			this.setHeight()
 			// 是否自动查询
-			this.bAutoSearch && this.submitForm('ruleForm')
+//			this.bAutoSearch && this.submitForm('ruleForm')
+			this.submitForm('ruleForm')
+			
+			window.onresize = () => {
+		        this.setHeight()
+		    }
 		},
 		watch: {
 			pageHeight: function() {
-				this.outputData.height = this.adjustHeight() - 40
+				this.setHeight()
 			}
 		},
 		computed: {
@@ -307,6 +312,10 @@
 			adjustHeight() {
 				return this.pageHeight - this.$refs.outputFilter.clientHeight - (this.pageSize ? this.$refs.outputTitle.clientHeight + 20:0) - 20
 			},
+			setHeight() {
+				this.outputData.height = this.adjustHeight() - 40
+				this.contentHeight = this.outputData.height + (this.pageSize ? this.$refs.outputTitle.clientHeight + 20:0)
+			},
 			getQueryParam() {
 				let oParam = fnP.parseQueryParam(this.ruleForm)
 				
@@ -347,25 +356,50 @@
 			},
 			// 打开新页面。
 			openNewPage() {
+				this.$emit("hideDialog")
 				// 保存数据。
 				let sTag = (+new Date()).toString().substr(-5);
 
           		sessionStorage.setItem('outputDataSearchCondition-' + sTag, JSON.stringify(this.ruleForm));
 				// 打开 页面。
-				window.open("outputRecord.html?tag="+sTag, "_self");
+				window.open("outputRecord.html?tag="+sTag, "_blank");
 			}
 		}
 	}
 	
 </script>
 
-<style lang="less" scoped>
+<style lang="less">
+	
+	.el-form-item {
+        margin-bottom: 19px;
+    }
+
+    .el-form-item__label {
+        padding: 8px 10px 8px 0;
+    }
+
+    .el-form-item__content {
+        line-height: 30px;
+        white-space: nowrap;
+    }
+
+    .el-input__inner {
+        height: 30px;
+        border-radius: 0;
+        border-color: #ddd;
+    }
+    .form-button {
+        margin-top: 50px
+    }
+	.el-form-item__content {
+		.el-input {
+			width: 100%
+		}
+	}
 	
 	.output-main {
-		.output-filter {
-			.el-form-item {
-				display: inline-block;
-			}
+		.output-filter {	
 			.line {
 				width: 100%;
 				height: 1px;
@@ -373,6 +407,8 @@
 			}
 		}
 		.output-content {
+			min-height: 300px;
+			
 			.item-info {
 				margin: 10px 0;
 				
@@ -387,7 +423,21 @@
 			.content-table {
 				margin: 0;
 			}
+			
+			.error {
+				border: 2px solid #42AF8F;
+			    padding: 20px 12px;
+			    margin-bottom: 30px;
+			    font-size: 14px;
+			    color: red;
+			}
 		}
 	}
 	
+</style>
+
+<style lang="less" scoped>
+	.el-form-item {
+		display: inline-block;
+	}
 </style>

@@ -232,22 +232,22 @@
 					columns: [{
 						prop: "materialName",
 						name: "",
-						width: 450
+						width: 550
 					},{
 						prop: "type",
 						name: "类型",
-						width: 50,
+						width: 80,
 						formatter: function(sValue) {
 							return self.getTimeLineTypeInfo(sValue).text
 						}
 					},{
 						prop: "barcode",
 						name: "条码",
-						width: 210
+						width: 240
 					},{
 						prop: "time",
 						name: "时间",
-						width: 150
+						width: 160
 					},{
 						prop: "location",
 						name: "地点",
@@ -259,7 +259,7 @@
 					},{
 						prop: "quantity",
 						name: "数量",
-						width: 50
+						width: 80
 					},{
 						prop: "shiftName",
 						name: "班次",
@@ -267,11 +267,11 @@
 					},{
 						prop: "personName",
 						name: "人员",
-						width: 60
+						width: 80
 					},{
 						prop: "moldCode",
 						name: "模号",
-						width: 60
+						width: 80
 					},{
 						prop: "vendorName",
 						name: "供应商/客户",

@@ -232,13 +232,15 @@
 				top: 15px;
 			}
 			.table {
-	    	    .batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            .cell {
-		                font-weight: 600;
-		            } 
-		        }         
+				.el-table__body-wrapper {
+		    	    .batch {
+		    	    	cursor: pointer;
+			            color: #f90;
+			            .cell {
+			                font-weight: 600;
+			            } 
+			        }         
+				}
 	    	   
 	    	}
 		}

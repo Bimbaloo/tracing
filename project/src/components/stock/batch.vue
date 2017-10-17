@@ -15,7 +15,7 @@
 				{{ outstockData.error }}
 			</div>
 			<div v-else class="content-table" ref="outstockTable">
-				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
+				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading" :resize="tdResize"></v-table>
 			</div>
 			<h2 class="content-title tableData">
 				<span class='table-title'>批次<span class="tag">{{batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;在库信息</span>
@@ -28,7 +28,7 @@
 				{{ instockData.error }}
 			</div>
 			<div v-else class="content-table" ref="instockTable">
-				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
+				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading" :resize="tdResize"></v-table>
 			</div>
 		</div>
 	</div>
@@ -54,6 +54,7 @@
 			return {
 				excel: true,
 				print: true,
+				tdResize: true,
 				btnShow: false,  //根据需要是否隐藏‘可疑品’按钮
 				styleError: {
                 	"max-height": "200px"

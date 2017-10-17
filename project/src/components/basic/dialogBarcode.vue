@@ -23,7 +23,7 @@
 					<div class="item-content">
 						<ul class="item-list clear">
 							<li class="item-item" :title="data.barcodeTypeName">条码类型 : {{ data.barcodeTypeName }}</li>
-							<li class="item-item" :title="data.happenTime">加工时间 : {{ data.happenTime }}</li>
+							<li class="item-item" :title="data.happenTime">加工时间 : {{ data.productDate }}</li>
 							<li class="item-item" :title="data.materialCode">物料编码 : {{ data.materialCode }}</li>
 							<li class="item-item" :title="data.materialName">物料名称 : {{ data.materialName }}</li>
 							<li class="item-item" :title="data.equipmentCode">设备编码 : {{ data.equipmentCode }}</li>
@@ -91,7 +91,7 @@
 					equipmentCode: '',
 					equipmentName: '',
 					// 加工时间
-					happenTime: '',
+					productDate: '',
 					// 批次
 					batchNo: '',
 					// 父级码
