@@ -205,7 +205,8 @@
     			// 工序过滤弹窗。
     			bFilter: false,
     			oFilter: {},
-    			processFilterData: {}
+				processFilterData: {},
+				myLocalStorage: []
 			}
 		},
 		computed: {
@@ -234,7 +235,14 @@
 			// 获取所需的查询参数。
       		this.tag = window.Rt.utils.getParam("tag", location.search);
           	let	oData = sessionStorage.getItem("searchConditions-" + this.tag),
-          		categories = [];
+				  categories = [];
+			// 用于保存查询记录	  
+			let history = localStorage.getItem("history")
+			if(history){
+				this.myLocalStorage = JSON.parse(history)
+			}else {
+				this.myLocalStorage = []
+			}	  
 
 			// 断链模块。
 		    if(oData) {
@@ -361,6 +369,8 @@
 			// 数据查询操作。
 			queryHandler(oParam) {
 				// 设置初始化显示的值。
+				oParam.tab = "link"
+				this.updateRecord(oParam)
 		    	this.initData();
 				this.fetchData(oParam);
 			},
@@ -545,7 +555,42 @@
 					type: "updateEdit",
 					key: false
 				});
-    		}
+			},
+			// 生产随机数函数
+			guid() {
+				function S4() {
+				return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+				}
+				return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+			},
+			// 保存查询记录
+			updateRecord(oConditions) {
+				let oData = oConditions
+				let isRepetition = true //默认不重复
+				// //debugger
+				isRepetition = this.myLocalStorage.some(el=>{
+					return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+				})
+				if(!isRepetition){
+						let obj = {
+						"id": this.guid(),
+						"dateTime": new Date().Format(),
+						oData
+					}
+					this.myLocalStorage.unshift(obj)
+					localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+				}else {
+					this.myLocalStorage.forEach((e,i)=>{
+						if(JSON.stringify(e.oData) === JSON.stringify(oConditions)){
+							let olddata = this.myLocalStorage.splice(i,1)[0]
+							olddata.id = this.guid()
+							olddata.dateTime = new Date().Format()
+							this.myLocalStorage.unshift(olddata)
+							localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+						}
+					})
+				}
+			}
 		}
 	}
 	

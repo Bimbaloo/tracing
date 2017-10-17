@@ -27,6 +27,7 @@
 </template>
 <script>
     import form from 'components/form/form.vue'
+    import { bus } from "assets/js/bus.js"
 
     export default {
         props: {
@@ -69,6 +70,10 @@
         },
         created () {
             // 设置选中的初始值。
+            let _that = this
+            bus.$on('id-selected', function (obj) {
+            _that.radio = obj.radio
+            })
             this.radio = this.category.active.radio;
             let initData = this.category.list.filter(o => o.key == this.radio)[0];    
             this.keys = this.getKeys(initData);
