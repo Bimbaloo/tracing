@@ -7,7 +7,7 @@
 					<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
 				</span>
 				<span class='table-handle'>
-					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', '仓储表', $event)"></i>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
 				</span>
 			</div>
@@ -76,6 +76,7 @@
                 error: "",
 				// sErrorMessage: "",
                 materialData: {
+					filename: "仓储表",
                     columns: [{
                         prop: "index",
                         name: "序号",
@@ -310,11 +311,11 @@
 				return aoData;
             },
 		   	// 表格导出。
-            exportExcelHandle (sTable, sFileName, event) {
-				
+            exportExcelHandle (sTable, oTableData, event) {
+				window.Rt.utils.exportMergeTable2Excel(XLSX, Blob, FileSaver, oTableData, this.$refs[sTable])
                 // 下载表格。
-                window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      
-            },
+                // window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      
+			},
             // 表格打印。
 	        printHandle(refTable, event) {
 	            let oTable = this.$refs[refTable];
