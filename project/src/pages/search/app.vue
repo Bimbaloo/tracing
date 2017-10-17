@@ -456,7 +456,6 @@ footer {
     transition: width .5s ease;
     width: 50px;
   }
-<<<<<<< HEAD
   .el-icon-arrow-left,
   .el-icon-arrow-right {
     position: absolute;
@@ -495,7 +494,10 @@ footer {
           font-size: 12px;
           line-height: 15px;
           cursor: pointer;
-=======
+        }
+      }
+    }
+  }
   .search-tab {
     /*width: 1080px;*/
     height: 750px;
@@ -518,7 +520,6 @@ footer {
           border-bottom: 4px solid transparent;
           color: #666;
 
->>>>>>> 578189290e4675f0a6e2d516533d2317f68f3ae2
           &:hover {
             color: #42af8f;
             .circle {
