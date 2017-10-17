@@ -509,7 +509,10 @@
         align-items: center;
         i {
             margin: 7.5px;
-        }
+		}
+		.icon {
+			cursor: pointer;
+		}
     }
 }
 </style>

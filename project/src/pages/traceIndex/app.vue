@@ -43,7 +43,7 @@
 				/* 左右拖动功能添加属性 */
 				_pageX:null,          //鼠标的横向位置
 				changeWidth:0,        //改变的宽度
-				LayoutLeftWidth: 325, //默认宽度
+				LayoutLeftWidth: 225, //默认宽度
 				draggingX: false,	  //左右拖动功能启动
 				// resizeUpdate:0,       //监听父集div大小改变更新左侧图形
 
