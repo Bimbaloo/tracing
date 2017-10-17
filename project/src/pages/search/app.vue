@@ -18,10 +18,10 @@
       <span class="version-info">版本: {{ v }}</span>
     </footer>
     <v-dialog v-if="showDialog" :dialog-visible="showDialog" @hideDialog="hideDialog"></v-dialog>
-    <div :class="['history-box',{ 'min-history-box': showHistory },{ 'max-history-box': !showHistory }]">
-      <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="!showHistory"></i>
-      <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="showHistory"></i>
-      <div class='history-panal' v-show="!showHistory">
+    <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]">
+      <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
+      <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
+      <div class='history-panal' v-show="showHistory">
         <h2>查询记录</h2>
         <ul class='history-content' v-for="ul in liData">
           <li class="ecorded-time">
@@ -90,8 +90,11 @@ export default {
         itemCode: "track",
         itemName: "追踪"
       }, {
-        itemCode: "restrain",
+        itemCode: "resume",
         itemName: "履历"
+      }, {
+        itemCode: "restrain",
+        itemName: "遏制"
       }, {
         itemCode: "link",
         itemName: "断链"
@@ -154,7 +157,7 @@ export default {
     },
     _submitForm(oConditions) {
       oConditions.tab = this.activeKey;
-
+      this.updateRecord(oConditions)
       let sTage = (+new Date()).toString().substr(-5);
 
       sessionStorage.setItem('searchConditions-' + sTage, JSON.stringify(oConditions));
@@ -220,6 +223,13 @@ export default {
       console.warn(error);
       console.warn("查询出错。");
     },
+    /* 生成随机数函数 */
+    guid() {
+      function S4() {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+      }
+      return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+    },
     // 点击历史记录后，填充
     findId(listId) {
       this.myLocalStorage.forEach(el=>{
@@ -229,6 +239,33 @@ export default {
           return 0
         }
       })
+    },
+    updateRecord(oConditions) {
+      let oData = oConditions
+      let isRepetition = true //默认不重复
+      //debugger
+      isRepetition = this.myLocalStorage.some(el=>{
+        return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+      })
+      if(!isRepetition){
+        let obj = {
+          "id": this.guid(),
+          "dateTime": new Date().Format(),
+          oData
+        }
+        this.myLocalStorage.unshift(obj)
+        localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+      }else {
+        this.myLocalStorage.forEach((e,i)=>{
+          if(JSON.stringify(e.oData) === JSON.stringify(oConditions)){
+            let olddata = this.myLocalStorage.splice(i,1)[0]
+            olddata.id = this.guid()
+            olddata.dateTime = new Date().Format()
+            this.myLocalStorage.unshift(olddata)
+            localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+          }
+        })
+      }
     }
   }
 }
@@ -412,7 +449,7 @@ footer {
   left: 0;
   top: 0;
   &.max-history-box {
-    transition: width .8s ease;
+    transition: width .5s ease;
     width: 400px;
   }
   &.min-history-box {
@@ -492,20 +529,13 @@ footer {
               flex-wrap: wrap;
               .detail-record {
                 margin-right: 10px;
+                word-break: break-all;
               }
             }
           }
         }
       }
     }
-  }
-  .max-history-box {
-    transition: width .8s ease;
-    width: 400px;
-  }
-  .min-history-box {
-    transition: width .5s ease;
-    width: 50px;
   }
 }
 

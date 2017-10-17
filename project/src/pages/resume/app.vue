@@ -292,7 +292,8 @@
 					barcode: [
 						{validator: validateBarcode, trigger: "change"}
 					]
-				}
+				},
+				myLocalStorage: []
 			}
 		},
 		// 计算属性。
@@ -310,6 +311,12 @@
 		},
 		created() {
 			this.$register.login(this.$restore);
+			let history = localStorage.getItem("history")
+			if(history){
+				this.myLocalStorage = JSON.parse(history)
+			}else {
+				this.myLocalStorage = []
+			}
 		},
 		// 创建时处理。mounted
 		mounted() {
@@ -392,6 +399,15 @@
 			submitForm(formName) {
 				this.$refs[formName].validate((valid) => {
 					if (valid) {
+						let obj = {
+							"keys": {
+								"barcode": this.ruleForm.barcode
+							},
+							"radio": "1",
+							"tab": "resume"
+						}
+						this.updateRecord(obj)
+
 						// 重置数据。----
 						this.initData();
 						
@@ -1081,6 +1097,41 @@
 	        	`;
 				
                 window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+			},
+			/* 生成随机数函数 */
+			guid() {
+				function S4() {
+				return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+				}
+				return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+			},
+			// 保存查询记录
+			updateRecord(oConditions) {
+				//debugger
+				let oData = oConditions
+				let isRepetition = true //默认不重复
+				isRepetition = this.myLocalStorage.some(el=>{
+				return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+				})
+				if(!isRepetition){
+				let obj = {
+					"id": this.guid(),
+					"dateTime": new Date().Format(),
+					oData
+				}
+				this.myLocalStorage.unshift(obj)
+				localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+				}else {
+				this.myLocalStorage.forEach((e,i)=>{
+					if(JSON.stringify(e.oData) === JSON.stringify(oConditions)){
+					let olddata = this.myLocalStorage.splice(i,1)[0]
+					olddata.id = this.guid()
+					olddata.dateTime = new Date().Format()
+					this.myLocalStorage.unshift(olddata)
+					localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+					}
+				})
+				}
 			}
 		}
 		

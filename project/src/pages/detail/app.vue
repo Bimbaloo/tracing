@@ -87,7 +87,8 @@
         tip: true,
         handleSubmit: this._submitForm,
         sErrorMessage: "",
-        tag: ""
+        tag: "",
+        myLocalStorage: []  //查询记录
       }
     },
     created() {
@@ -95,6 +96,13 @@
       this.$register.login(this.$store);
       // 获取数据。
       this.fetchData();
+      // 保存查询记录
+      let history = localStorage.getItem("history")
+      if(history){
+        this.myLocalStorage = JSON.parse(history)
+      }else {
+        this.myLocalStorage = []
+      }
       
     },
     mounted() {
@@ -252,6 +260,7 @@
           
           let sPath = '/' + this.activeKey;
           oConditions.tab = this.activeKey;
+          this.updateRecord(oConditions)
           // console.log(oConditions);
           sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions));
 
@@ -290,6 +299,41 @@
           this.changeWidth = e.pageX-this._pageX
         }
         
+      },
+      /* 生成随机数函数 */
+      guid() {
+        function S4() {
+          return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+      },
+      // 保存查询记录
+      updateRecord(oConditions) {
+        //debugger
+        let oData = oConditions
+        let isRepetition = true //默认不重复
+        isRepetition = this.myLocalStorage.some(el=>{
+          return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+        })
+        if(!isRepetition){
+          let obj = {
+            "id": this.guid(),
+            "dateTime": new Date().Format(),
+            oData
+          }
+          this.myLocalStorage.unshift(obj)
+          localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+        }else {
+          this.myLocalStorage.forEach((e,i)=>{
+            if(JSON.stringify(e.oData) === JSON.stringify(oConditions)){
+              let olddata = this.myLocalStorage.splice(i,1)[0]
+              olddata.id = this.guid()
+              olddata.dateTime = new Date().Format()
+              this.myLocalStorage.unshift(olddata)
+              localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+            }
+          })
+        }
       }
     },
     watch: {
