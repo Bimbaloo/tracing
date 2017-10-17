@@ -6,7 +6,7 @@
          </el-radio-group>
         </div>
         <div class="panel-content"
-        	:style="{height: sPanelHeight}">
+        	:style="{height: sPanelHeight+'px'}">
             <!--<v-form :tab="category.key" :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>-->
 	        <div class="panel-content-wrap" v-for="(item,index) in category.list" 
 	        		:class="[category.active.radio == item.key?'':'hide']" :key="index">
@@ -17,6 +17,7 @@
 	        			:label-width="labelWidth"
 	        			:handle-submit="handleSubmit"
 	        			:keys="keys"
+	        			:form-height="sPanelHeight"
 	        			:items="item.items" >
 	        		</v-form>
 	        	</div>
@@ -88,7 +89,7 @@
         	setPanelHeight() {
         		let oPanelTitle = this.$refs.panelTitle;
         		if(oPanelTitle) {
-	        		this.sPanelHeight = (this.panelHeight - oPanelTitle.clientHeight)+ "px"
+	        		this.sPanelHeight = (this.panelHeight - oPanelTitle.clientHeight)
         		}
         	},
             getKeys(oData) {
@@ -152,7 +153,7 @@
         // padding-right: 28px;
     }
     .panel-content {
-    	overflow: auto;
+    	/*overflow: auto;*/
     	
     	.panel-content-wrap {
     		padding:  0 28px;

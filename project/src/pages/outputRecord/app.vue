@@ -1,6 +1,6 @@
 <template>
 	<div id="app">
-		<v-header :config="true" :back="'search.html'" :tool="false"></v-header>
+		<v-header :config="false" :back="false" :tool="false"></v-header>
 		<div class="content" ref="content">
 			<v-output :page-size="true" :page-height="contentHeight"></v-output>
 		</div>

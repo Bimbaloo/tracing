@@ -456,6 +456,7 @@ footer {
     transition: width .5s ease;
     width: 50px;
   }
+<<<<<<< HEAD
   .el-icon-arrow-left,
   .el-icon-arrow-right {
     position: absolute;
@@ -494,6 +495,30 @@ footer {
           font-size: 12px;
           line-height: 15px;
           cursor: pointer;
+=======
+  .search-tab {
+    /*width: 1080px;*/
+    height: 750px;
+    /*margin: 0 auto;*/
+    border: none;
+    box-shadow: none;
+
+    &.el-tabs--border-card {
+      &>.el-tabs__header {
+        background-color: #d9dee4;
+
+        .el-tabs__item {
+          height: 42px;
+          line-height: 42px;     
+          /*width: 180px;*/
+          width: 270px;		// 216
+          text-align: center;
+          font-size: 16px;
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          color: #666;
+
+>>>>>>> 578189290e4675f0a6e2d516533d2317f68f3ae2
           &:hover {
             color: #42af8f;
             .circle {

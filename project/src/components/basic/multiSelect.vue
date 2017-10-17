@@ -303,10 +303,21 @@
 				width: 100%;
 				height: 100%;
 				overflow: hidden;
+				
+				.el-tag {
+					border-radius: 0;
+					height: 20px;
+					line-height: 20px;
+					margin: 5px 0 5px 6px;
+				}
 			}	    	
     	}	
     	.el-input {
-    		height: 36px;
+    		.el-input__inner {
+    			// 多选高度在内联元素中设置了为36px
+	    		height: 30px !important;
+    		}
+    			
     	}
     }
 </style>

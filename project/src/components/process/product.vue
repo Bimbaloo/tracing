@@ -187,28 +187,28 @@ export default {
                 columns: [{
                     name: "条码",
                     prop: "barcode",
-                    width: "",
+                    width: "200",
                     fixed: true,
                 }, {
                     name: "工单",
                     prop: "doCode",
-                    width: ""
+                    width: "200"
                 }, {
                     name: "批次",
                     prop: "batchNo",
-                    width: "",
+                    width: "200",
                 }, {
                     name: "物料编码",
                     prop: "materialCode",
-                    width: ""
+                    width: "200"
                 }, {
                     name: "物料名称",
                     prop: "materialName",
-                    width: ""
+                    width: "300"
                 }, {
                     name: "数量",
                     prop: "quantity",
-                    width: ""
+                    width: "100"
                 }, {
                     name: "质量",
                     prop: "quality",
@@ -216,11 +216,11 @@ export default {
                 }, {
                     name: "班次",
                     prop: "shiftName",
-                    width: ""
+                    width: "200"
                 }, {
                     name: "操作人",
                     prop: "personName",
-                    width: ""
+                    width: "120"
                 }, {
                     name: "投入时间",
                     prop: "happenTime",

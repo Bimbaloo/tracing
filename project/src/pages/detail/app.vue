@@ -538,7 +538,7 @@
                       padding :0;
                       .el-form {
                           .form-conditions {
-                              max-height: 330px;
+                              /*max-height: 330px;*/
                               overflow: auto;
                               .el-form-item {
                                   padding: 0 28px;

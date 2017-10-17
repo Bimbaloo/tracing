@@ -13,7 +13,7 @@
                 {{ outstockData.error }}
             </div>
             <div v-else class="content-table" ref="outstockTable">
-            	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>            
+            	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading" :resize="tdResize"></v-table>            
                 <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
             <h2 class="content-title tableData">
@@ -27,7 +27,7 @@
                 {{ instockData.error }}
             </div>
             <div v-else class="content-table" ref="instockTable">
-            	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
+            	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading" :resize="tdResize"></v-table>
             </div>
             <!-- 复制的内容 -->
             <!--<div v-show="false" ref="outstockTable">
@@ -66,6 +66,7 @@
                 },
                 excel: true,
                 print: true,
+                tdResize: true,
                 outstockData: {
                     url: HOST + "/api/v1/outstock",
                     loading: false,
@@ -268,7 +269,19 @@
                 this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", fnP.parseQueryParam(this.$route.query), (oResult) => {
 					// 请求成功。
 					oData.loading = false;			
-					oData.data = oResult;        
+					oData.data = oResult;
+					
+					// 设置批次的鼠标样式
+					this.$nextTick(function () {
+				    	// 设置批次为空时，鼠标样式。
+				    	var aBatch = document.querySelectorAll(".batch");
+				    	for(var i=0; i<aBatch.length; i++) {
+				    		let oCell = aBatch[i].querySelector(".cell")
+				    		if( oCell && !oCell.innerHTML) {
+				    			aBatch[i].style.cursor="default"
+				    		}
+				    	}
+		 		 	})
 				}, (sErrorMessage) => {
 					// 请求失败。
 					oData.loading = false;
@@ -398,24 +411,12 @@
             }
         }
     	.table {
-    	    .batch {
-    	    	cursor: pointer;
-	            color: #f90;
-	            
-	            .cell {
-	                font-weight: 600;
-	                height: 100%;
-	                line-height:40px; 
-	                 
-	                &:empty {
-	                	cursor: default;
-	                }
-	            } 
-	        }         
-            .clicked {
-                cursor: pointer;
-	            color: #f90;
-            }
+    		.el-table__body-wrapper {
+	            .clicked {
+	                cursor: pointer;
+		            color: #f90;
+	            }
+    		}
     	}
     	
     	.error {
