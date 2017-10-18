@@ -82,10 +82,17 @@
 		created() {
 			let _that = this
             bus.$on('id-selected', function (obj) {
-				let datas = obj.keys
-				for(let i in datas){
-					_that.ruleForm[i] = datas[i]
+				if(_that.tab === obj.tab){
+					let datas = obj.keys
+					for(let i in datas){
+						if(i === "startTime" || i === "endTime") {
+							bus.$emit('timeChange', obj)
+						}else{
+							_that.ruleForm[i] = datas[i]
+						}
+					}
 				}
+				
             })
 		},
         computed: {

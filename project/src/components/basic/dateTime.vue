@@ -11,6 +11,7 @@
 </template>
 
 <script>
+    import { bus } from "assets/js/bus.js"
     export default {
         props: {
         	formData: Object, 
@@ -32,6 +33,22 @@
                 key: this.keyData,
                 sTime: this.formData[this.keyData]
             }
+        },
+        created() {
+            let _that = this
+            //debugger
+            bus.$on('timeChange', function (obj){
+                //debugger
+                // console.log(_that.key)
+                // console.log(obj)
+                let datas = obj.keys
+                for(let i in datas){
+					if(i === _that.key) {
+                        _that.sTime = new Date(datas[i])
+                       // console.log(_that.sTime)
+					}
+				}
+            })
         },
         methods: {
         	// 输入处理

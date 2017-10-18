@@ -565,30 +565,44 @@
 			},
 			// 保存查询记录
 			updateRecord(oConditions) {
+				//debugger
+				delete(oConditions.keys._tag)
 				let oData = oConditions
 				let isRepetition = true //默认不重复
-				// //debugger
-				isRepetition = this.myLocalStorage.some(el=>{
-					return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+				let n //记录和第几个重复
+				this.myLocalStorage.forEach(data=>{
+				delete(data.oData.keys._tag)
+				})
+				isRepetition = this.myLocalStorage.some((el,j)=>{
+				if(JSON.stringify(el.oData) === JSON.stringify(oConditions)){
+					n = j
+				}
+				return JSON.stringify(el.oData) === JSON.stringify(oConditions)
 				})
 				if(!isRepetition){
-						let obj = {
-						"id": this.guid(),
-						"dateTime": new Date().Format(),
-						oData
-					}
-					this.myLocalStorage.unshift(obj)
-					localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+				let obj = {
+					"id": this.guid(),
+					"dateTime": new Date().Format(),
+					oData
+				}
+				delete(obj.oData.keys._tag)
+				this.myLocalStorage.unshift(obj)
+				this.myLocalStorage.forEach(data=>{
+					delete(data.oData.keys._tag)
+				})
+				localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
 				}else {
-					this.myLocalStorage.forEach((e,i)=>{
-						if(JSON.stringify(e.oData) === JSON.stringify(oConditions)){
-							let olddata = this.myLocalStorage.splice(i,1)[0]
-							olddata.id = this.guid()
-							olddata.dateTime = new Date().Format()
-							this.myLocalStorage.unshift(olddata)
-							localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
-						}
-					})
+				//debugger
+				let olddata = this.myLocalStorage.splice(n,1)[0]
+				olddata.id = this.guid()
+				let newTime = new Date().Format()
+				olddata.dateTime = newTime
+				delete(olddata.oData.keys._tag)
+				this.myLocalStorage.unshift(olddata)
+				this.myLocalStorage.forEach(data=>{
+					delete(data.oData.keys._tag)
+				})
+				localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
 				}
 			}
 		}

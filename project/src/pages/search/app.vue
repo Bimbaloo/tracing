@@ -1,11 +1,11 @@
 <template>
-  <div id="app">
+  <div id="app" v-loading="loading">
     <header>
       <img :src="logo" />
     </header>
     <v-tooltip :config="true" :back="false"></v-tooltip>
     <div class="search-tab-content">
-      <el-tabs v-loading="loading" element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab" @tab-click="handleClick">
+      <el-tabs  element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab" @tab-click="handleClick">
         <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
           <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
           <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
@@ -18,10 +18,10 @@
       <span class="version-info">版本: {{ v }}</span>
     </footer>
     <v-dialog v-if="showDialog" :dialog-visible="showDialog" @hideDialog="hideDialog"></v-dialog>
-    <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" :style="{zIndex: historyZindex}" @mouseover="historyZindex = 2" @mouseleave="historyZindex = 0">
+    <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" :style="{zIndex: historyZindex}" @mouseover="historyZindex = 2" @mouseleave="historyZindex = 0" >
       <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
-      <div class='history-panal' v-show="showHistory">
+      <div class='history-panal' v-show="showHistory" >
         <h2>查询记录</h2>
         <ul class='history-content' v-for="ul in liData">
           <li class="ecorded-time">
@@ -114,6 +114,9 @@ export default {
     let history = localStorage.getItem("history")
     if(history){
       this.myLocalStorage = JSON.parse(history)
+      this.myLocalStorage.forEach(data=>{
+          delete(data.oData.keys._tag)
+        })
     }else {
        this.myLocalStorage = []
     }
@@ -242,32 +245,46 @@ export default {
       })
     },
     updateRecord(oConditions) {
-      let oData = oConditions
-      let isRepetition = true //默认不重复
-      //debugger
-      isRepetition = this.myLocalStorage.some(el=>{
-        return JSON.stringify(el.oData) === JSON.stringify(oConditions)
-      })
-      if(!isRepetition){
-        let obj = {
-          "id": this.guid(),
-          "dateTime": new Date().Format(),
-          oData
-        }
-        this.myLocalStorage.unshift(obj)
-        localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
-      }else {
-        this.myLocalStorage.forEach((e,i)=>{
-          if(JSON.stringify(e.oData) === JSON.stringify(oConditions)){
-            let olddata = this.myLocalStorage.splice(i,1)[0]
-            olddata.id = this.guid()
-            olddata.dateTime = new Date().Format()
-            this.myLocalStorage.unshift(olddata)
-            localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
-          }
+        //debugger
+        delete(oConditions.keys._tag)
+        let oData = oConditions
+        let isRepetition = true //默认不重复
+        let n //记录和第几个重复
+        this.myLocalStorage.forEach(data=>{
+          delete(data.oData.keys._tag)
         })
+        isRepetition = this.myLocalStorage.some((el,j)=>{
+          if(JSON.stringify(el.oData) === JSON.stringify(oConditions)){
+            n = j
+          }
+          return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+        })
+        if(!isRepetition){
+          let obj = {
+            "id": this.guid(),
+            "dateTime": new Date().Format(),
+            oData
+          }
+          delete(obj.oData.keys._tag)
+          this.myLocalStorage.unshift(obj)
+          this.myLocalStorage.forEach(data=>{
+            delete(data.oData.keys._tag)
+          })
+          localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+        }else {
+          //debugger
+          let olddata = this.myLocalStorage.splice(n,1)[0]
+          olddata.id = this.guid()
+          let newTime = new Date().Format()
+          olddata.dateTime = newTime
+          delete(olddata.oData.keys._tag)
+          this.myLocalStorage.unshift(olddata)
+          this.myLocalStorage.forEach(data=>{
+            delete(data.oData.keys._tag)
+          })
+          localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+        }
       }
-    }
   }
 }
 </script>
