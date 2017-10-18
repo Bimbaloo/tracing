@@ -15,12 +15,22 @@
                 <div v-if="error" class="error">
                     {{ empty }}
                 </div>
-                <el-tabs v-else>
+                <el-tabs v-else v-loading="loading" element-loading-text="拼命加载中">
                     <el-tab-pane :label="tableData.filename" v-for="(tableData,index) in tableDatas">
-                        <div class="content-echarts" v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename">
+                        <el-switch
+                            v-model="tableData.value"
+                            on-color="#42af8f"
+                            off-color="#42af8f"
+                            on-text="图表"
+                            off-text="表格"
+                            on-value="表格"
+                            off-value="图形"
+                            v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename">
+                        </el-switch>
+                        <div class="content-echarts" v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename" v-show="tableData.value === '图形'">
                             <div class="charts" :id="`charts`+index"></div>
                         </div>
-                        <div class="content-tables">
+                        <div class="content-tables" v-show="tableData.value === '表格'">
                             <h2 class="content-title tableData">
                                 <span class='table-title'>
                                     <span>检验参数：{{tableData.varStdId}}</span>
@@ -32,7 +42,7 @@
                                 </span>
                             </h2>
                             <div class="content-table" ref="tableDataindex">
-                                <v-table :table-data="tableData" :max-height="400" :loading="loading" :resize="tdResize"></v-table>
+                                <v-table :table-data="tableData" :heights="tableHeight" :loading="loading" :resize="tdResize"></v-table>
                             </div>
                         </div>
                     </el-tab-pane>
@@ -92,7 +102,8 @@ export default {
             //  viewHeight:0
             routerContent: 0,
             flexbase: 200,
-            tableDatas: []
+            tableDatas: [],
+            tableHeight: 400
         }
 
     },
@@ -140,6 +151,7 @@ export default {
         this.addEvent(); //监听resize变化 触发 echarts.resize()
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
         this.flexbase = this.adjustHeight()
+        this.tableHeight = this.setTableHeight()
     },
 
     watch: {
@@ -147,9 +159,15 @@ export default {
         '$route': 'fetchData',
         resize: 'updateEcharts',
         /* 上下拖动时，重新设置flexBase大小变化 */
-        "resizeY": 'setFlexBase',
+        "resizeY": function(){
+            this.setFlexBase()
+            this.tableHeight = this.setTableHeight()
+        },
         /* 全屏大小时，重新设置flexBase大小 */
-        "fullscreen": 'setFlexBase'
+        "fullscreen": function(){
+            this.setFlexBase()
+            this.tableHeight = this.setTableHeight()
+        }
     },
     methods: {
         // 请求成功。
@@ -176,6 +194,16 @@ export default {
                 }
 
             })
+            tableDataArr.forEach(e=>{
+               let value =  optionArr.some(el=>{
+                    return el.series[0].name === e.filename
+                })
+                //debugger
+                if(!value) {
+                    e.value = "表格"
+                }
+            })
+
             this.options = optionArr         // 将处理后的 option 放入 options 中
             this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
             this.$nextTick(() => {
@@ -256,6 +284,15 @@ export default {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.flexbase = this.adjustHeight()
         },
+        setTableHeight(){
+            let tabs = document.querySelector(".el-tabs")
+            let tableHeight = this.viewHeight
+                              -88
+                              -48
+                              -66   // tabs-head的高
+                              -90   // table上面的标题
+            return tableHeight
+        },
         /* 处理每个tableData */
         setTableData(data, index) {
             let tableData = {
@@ -273,7 +310,8 @@ export default {
                     width: "",
                 }],
                 id: 0,
-                data: []
+                data: [],
+                value: "图形"
             }
             tableData.varStdId = data.varStdId
             tableData.unit = data.varUnit
@@ -641,6 +679,12 @@ export default {
         .el-tabs__content {
             overflow: auto;
         }
+    }
+}
+.el-switch__label {
+    span {
+        font-size: 12px;
+        top: 4.5px;
     }
 }
 </style>
