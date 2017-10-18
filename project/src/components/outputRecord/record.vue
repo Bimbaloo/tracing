@@ -202,7 +202,9 @@
 			this.submitForm('ruleForm')
 			
 			window.onresize = () => {
-		        this.setHeight()
+				if( this.$refs.outputFilter ) {
+			        this.setHeight()
+				}
 		    }
 		},
 		watch: {

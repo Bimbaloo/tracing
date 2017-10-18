@@ -11,7 +11,6 @@
           <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
         </el-tab-pane>
       </el-tabs>
-      <span class="search-barcode" v-if="activeKey === 'stock'" @click="showDialog=true">条码查询</span>
     </div>
     <footer>
       <img class="version" :src="version" />
@@ -52,7 +51,6 @@ import tooltip from 'components/header/tooltip.vue'
 import logo from 'assets/img/kssp-logo.png'
 import version from 'assets/img/version.png'
 import panel from 'components/panel/panel.vue'
-import dialog from 'components/basic/dialogBarcode.vue'
 import fnP from "assets/js/public.js"
 import { bus } from "assets/js/bus.js"
 
@@ -63,8 +61,7 @@ const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
 export default {
   components: {
     'v-panel': panel,
-    'v-tooltip': tooltip,
-    'v-dialog': dialog
+    'v-tooltip': tooltip
   },
   data() {
     return {
@@ -78,7 +75,6 @@ export default {
       handleSubmit: this._submitForm,
       sErrorMessage: "",
       loading: false,
-      showDialog: false,
       showHistory: true,
       dataName: [{
         itemCode: "stock",
@@ -130,7 +126,7 @@ export default {
     this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
       // 请求成功。
       this.loading = false;
-      this.categories = fnP.parseData(oData).filter(o => o.key != "restrain");
+      this.categories = fnP.parseData(oData).filter(o => o.key != "restrain" && o.key != "link");
       this.categories.forEach(o => {
         o.active = {
           radio: "1",
@@ -145,9 +141,7 @@ export default {
     });
   },
   methods: {
-    hideDialog() {
-      this.showDialog = false
-    },
+    hideDialog() {},
     // 显示提示信息。
     showMessage() {
       this.$message({
@@ -433,7 +427,7 @@ footer {
         height: 42px;
         line-height: 42px;
         /*width: 180px;*/
-        width: 216px; // 270
+        width: 270px; // 216
         text-align: center;
         font-size: 16px;
         border-top: 4px solid transparent;

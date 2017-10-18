@@ -21,18 +21,18 @@
                 inline-template
                 prop="itemName"
                 label="显示名称">
-                <!--<div>
-                	<el-input :value="row.itemName" :placeholder="row.itemName" @change="labelChangeHandler"></el-input>
-                </div>-->
-                <el-form :model="row" :rules="rules" ref="ruleForm">
+                <div>
+                	<el-input :disabled="true" :value="row.itemName" :placeholder="row.itemName" @change="labelChangeHandler"></el-input>
+                </div>
+                <!--<el-form :model="row" :rules="rules" ref="ruleForm">
                 	<el-form-item prop="itemName">
                 		<el-input :value="row.itemName" :placeholder="row.itemName" @change="labelChangeHandler"></el-input>
 					</el-form-item>
-                </el-form>
+                </el-form>-->
             </el-table-column>
         </el-table>
 
-        <el-button class="save-btn" type="primary" @click="saveClickHandler('ruleForm')">保存</el-button>
+        <el-button v-show="false" class="save-btn" type="primary" @click="saveClickHandler('ruleForm')">保存</el-button>
     </div>
 </template>
 
@@ -217,28 +217,29 @@
 <style lang="less">
 	.content-wraps {
 		padding: 20px;
+		
+	    .title{
+	        display: inline-block;
+	        margin: 0 0 20px;
+	    }
+	    .cell{
+	        text-align: center;
+	    }
+	    .el-table__header{
+	        th,.cell{
+	            background: #42af8f;
+	            color: #ffffff;
+	        }
+	    }
+	    .save-btn{
+	        margin-top: 20px;
+	    }
+	    .el-input__inner{
+	        text-align: center;
+	        border-radius: 0px;
+	    }
+	    /*.el-form-item {
+	    	margin: 20px 0;
+	    }*/
 	}
-    .title{
-        display: inline-block;
-        margin: 0 0 20px;
-    }
-    .cell{
-        text-align: center;
-    }
-    .el-table__header{
-        th,.cell{
-            background: #42af8f;
-            color: #ffffff;
-        }
-    }
-    .save-btn{
-        margin-top: 20px;
-    }
-    .el-input__inner{
-        text-align: center;
-        border-radius: 0px;
-    }
-    .el-form-item {
-    	margin: 20px 0;
-    }
 </style>
