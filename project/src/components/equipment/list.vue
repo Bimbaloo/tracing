@@ -87,6 +87,9 @@
 <script>
 	import DateTime from 'components/basic/dateTime.vue'
 	import EquipmentLine from 'components/equipment/equipmentLine.vue'
+	// import {host} from 'assets/js/configs.js'
+
+	// var HOST = window.HOST ? window.HOST: host
 
     export default {
 		props: {
@@ -643,7 +646,7 @@
 				let self = this;				
 				if(this.bList) {
 					// 若为设备列表页面。
-					this.$router.push({ 
+					this.$router.replace({ 
 						path: `/process/detail`, 
 						query: {
 							equipmentId: oData.equipmentId,

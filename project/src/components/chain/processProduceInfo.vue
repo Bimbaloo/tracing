@@ -22,7 +22,10 @@
 	import DateTime from "components/basic/dateTime.vue"
 	
 	export default {
-		props: ["popShow","popValue"],
+		props: {
+			popShow: Boolean,
+			popValue: Object
+		},
 		components: {
 			"v-input": Input,
     		"v-select": Select,
@@ -30,11 +33,27 @@
     		"v-button": Button
 		},
 		data() {
+			let validateTime = (rule, value, callback) => {
+				let sTime = value.trim(),
+        			nNow = +new Date();
+        		
+        		if(!sTime) {
+        			callback(new Error("请输入时间"))
+        		}else if(!window.Rt.utils.isDateTime(sTime)) {
+        			callback(new Error("请输入正确的时间格式"));
+        		}else if(+new Date(value) > nNow) {
+        			callback(new Error("时间不能超过当前时间"));
+        		}else {
+        			callback();
+        		}
+        	    
+			};
+			
 			return {
 				aList: [{
 					key: "materialCode",
 					type: "input",
-					label: "产出物料编码",
+					label: "产出物料",
 					disabled: true
 				},{
 					key: "batchNo",
@@ -45,6 +64,11 @@
 					key: "processCode",
 					type: "input",
 					label: "产出工序",
+					disabled: true
+				},{
+					key: "barcode",
+					type: "input",
+					label: "产出条码",
 					disabled: true
 				},{
 					key: "doCode",
@@ -72,11 +96,6 @@
 					label: "产出班次",
 					placeholder: "请选择班次"
 				},{
-					key: "barcode",
-					type: "input",
-					label: "产出条码",
-					placeholder: "请输入条码"
-				},{
 					key: "happenTime",
 					type: "dateTime",
 					label: "产出时间",
@@ -102,11 +121,8 @@
 					shiftName: [
 						{required: true, message: "请选择班次",trigger: "change"}
 					],
-					barcode: [
-						{required: true, message: "请选择条码",trigger: "change"}
-					],
 					happenTime: [
-						{required: true, message: "请选择时间",trigger: "change"}
+						{validator: validateTime, trigger: "change"}
 					]
 				}
 			}
@@ -118,7 +134,7 @@
 			}
 		},
 		watch: {
-			popValue: function() {
+			popShow: function() {
 				this.dialogVisible = this.popShow;
 				this.ruleForm = this.getForm()
 			}
@@ -156,7 +172,7 @@
 						
 						oNewValue[sParam] = oRuleForm[sKey]
 						
-						if(['equipmentCode', 'personCode'].includes(sKey)) {
+						if(['materialCode', 'processCode', 'equipmentCode', 'personCode'].includes(sKey)) {
 							oNewValue[sParam] = oNewValue[sParam].split(":")[0]
 						}
 						

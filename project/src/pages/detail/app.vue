@@ -1,6 +1,6 @@
 <template>
   <div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
-    <v-header></v-header>
+    <v-header :config="true" :back="'search.html'"></v-header>
      <div class="content">
       <div :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">
         <div class="flex-wraps">
@@ -25,7 +25,7 @@
           </div>
         </div>
       </div>
-    </div> 
+    </div>
      <!-- <el-row :gutter="0" class="content">
           <el-col :xs="15" :sm="12" :md="9" :lg="5" :class="[{ collapsed: collapse }, 'nav']">      	
              <div class="flex-wraps">
@@ -59,6 +59,7 @@
 <script>
   import header from "components/header/header.vue"
   import panel from "components/panel/panel.vue"
+  import dialog from 'components/basic/dialogBarcode.vue'
   import fnP from "assets/js/public.js"
   
 	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
@@ -66,7 +67,8 @@
   export default {
     components: {
       'v-header': header,
-      'v-panel': panel
+      'v-panel': panel,
+      'v-dialog': dialog
     },
     data() {
       return {
@@ -85,48 +87,25 @@
         tip: true,
         handleSubmit: this._submitForm,
         sErrorMessage: "",
-        tag: ""
-
+        tag: "",
+        myLocalStorage: []  //查询记录
       }
     },
     created() {
-
-      this.tag = location.search.split("=")[1];
-      let oData = sessionStorage.getItem("searchConditions-" + this.tag);
-      
-			// session 中获取
-      if(oData) {
-          oData = JSON.parse(oData);
-          this.activeKey = oData.tab;
-      }else if(window.location.hash.length > 2) {
-					// 清空了cookie后，url中有参数。则获取url中的参数。
-					oData = this.getSearchData();
-					this.activeKey = oData.tab;
+      // 登录判断。
+      this.$register.login(this.$store);
+      // 获取数据。
+      this.fetchData();
+      // 保存查询记录
+      let history = localStorage.getItem("history")
+      if(history){
+        this.myLocalStorage = JSON.parse(history)
+        this.myLocalStorage.forEach(data=>{
+          delete(data.oData.keys._tag)
+        })
+      }else {
+        this.myLocalStorage = []
       }
-      
-      this.$ajax.get(MODULE_ITEM_URL).then((res) => {
-      	this.judgeLoaderHandler(res,() => {
-	        this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
-	       //	console.log(this.categories)
-	       	this.categories.forEach(o => {
-	          if(oData && oData.tab == o.key) {
-	            o.active = oData;
-	          }else {
-	            o.active = {
-	              radio: "1",
-	              keys: {}
-	            }            
-	          }
-	        })
-      		
-      		this.$nextTick(() => {
-	          if(oData) {
-	            this._submitForm(oData);
-	          }            
-	        })
-      		
-      	});
-      });
       
     },
     mounted() {
@@ -139,6 +118,75 @@
       }
     },
     methods: {
+      fetchData() {
+        this.tag = location.search.split("=")[1];
+        let oData = sessionStorage.getItem("searchConditions-" + this.tag);
+        
+        // session 中获取
+        if(oData) {
+            oData = JSON.parse(oData);
+            this.activeKey = oData.tab;
+        }else if(window.location.hash.length > 2) {
+            // 清空了cookie后，url中有参数。则获取url中的参数。
+            oData = this.getSearchData();
+            this.activeKey = oData.tab;
+        }
+
+        this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
+          // 请求成功。
+          this.categories = fnP.parseData(oResult).filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume");
+
+          this.categories.forEach(o => {
+            if(oData && oData.tab == o.key) {
+              o.active = oData;
+            }else {
+              o.active = {
+                radio: "1",
+                keys: {}
+              }            
+            }
+          })
+          
+          this.$nextTick(() => {
+            if(oData) {
+              this._submitForm(oData);
+            }            
+          })
+        }, this.requestFail, this.requestError);
+      // this.$ajax.get(MODULE_ITEM_URL).then((res) => {
+      // 	this.judgeLoaderHandler(res,() => {
+	    //     this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
+	    //    //	console.log(this.categories)
+	    //    	this.categories.forEach(o => {
+	    //       if(oData && oData.tab == o.key) {
+	    //         o.active = oData;
+	    //       }else {
+	    //         o.active = {
+	    //           radio: "1",
+	    //           keys: {}
+	    //         }            
+	    //       }
+	    //     })
+      		
+      // 		this.$nextTick(() => {
+	    //       if(oData) {
+	    //         this._submitForm(oData);
+	    //       }            
+	    //     })
+      		
+      // 	});
+      // });        
+      },
+      // 请求失败。
+      requestFail(sErrorMessage) {
+        // 提示信息。
+        this.sErrorMessage = sErrorMessage;
+        this.showMessage();
+      },
+      // 请求错误。
+      requestError(err) {
+        console.log(err);
+      },
     	getSearchData () {
 				let oData = {
 							tab: "",
@@ -146,8 +194,8 @@
 							radio: "1"
 						},
 						aHref = location.href.split("?"),
-						aParams = aHref[1].split("&"),
-						aInfo = aHref[0].split("/");
+						aParams = aHref[2].split("&"),
+						aInfo = aHref[1].split("/");
 					
 					// 设置tab和radio
 					oData.tab = aInfo[aInfo.length-2];
@@ -162,22 +210,22 @@
 					// 返回参数。
 					return oData;
 			},
-    	// 判断调用接口是否成功。
-    	judgeLoaderHandler(param,fnSu,fnFail) {
-    		let bRight = param.data.errorCode;
+    	// // 判断调用接口是否成功。
+    	// judgeLoaderHandler(param,fnSu,fnFail) {
+    	// 	let bRight = param.data.errorCode;
         	
-        	// 判断是否调用成功。
-        	if(!bRight) {
-        		// 调用成功后的回调函数。
-        		fnSu && fnSu();
-        	}else {
-        		// 提示信息。
-        		this.sErrorMessage = param.data.errorMsg.message;
-        		this.showMessage();
-        		// 失败后的回调函。
-        		fnFail && fnFail();
-        	}
-    	},
+      //   	// 判断是否调用成功。
+      //   	if(!bRight) {
+      //   		// 调用成功后的回调函数。
+      //   		fnSu && fnSu();
+      //   	}else {
+      //   		// 提示信息。
+      //   		this.sErrorMessage = param.data.errorMsg.message;
+      //   		this.showMessage();
+      //   		// 失败后的回调函。
+      //   		fnFail && fnFail();
+      //   	}
+    	// },
     	// 显示提示信息。
 			showMessage() {
 				this.$message({
@@ -215,6 +263,7 @@
           
           let sPath = '/' + this.activeKey;
           oConditions.tab = this.activeKey;
+          this.updateRecord(oConditions)
           // console.log(oConditions);
           sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions));
 
@@ -224,7 +273,7 @@
 //        }
 				
 					// 修改下拉参数值。
-          this.$router.push({ path: sPath, query: this.getKeys(this.activeKey) })
+          this.$router.replace({ path: sPath, query: this.getKeys(this.activeKey) })
       },
       dragstar(e){   //鼠标按下，开始拖动
       //  console.log('开始')
@@ -253,6 +302,55 @@
           this.changeWidth = e.pageX-this._pageX
         }
         
+      },
+      /* 生成随机数函数 */
+      guid() {
+        function S4() {
+          return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+        }
+        return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+      },
+      // 保存查询记录
+      updateRecord(oConditions) {
+        //debugger
+        delete(oConditions.keys._tag)
+        let oData = oConditions
+        let isRepetition = true //默认不重复
+        let n //记录和第几个重复
+        this.myLocalStorage.forEach(data=>{
+          delete(data.oData.keys._tag)
+        })
+        isRepetition = this.myLocalStorage.some((el,j)=>{
+          if(JSON.stringify(el.oData) === JSON.stringify(oConditions)){
+            n = j
+          }
+          return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+        })
+        if(!isRepetition){
+          let obj = {
+            "id": this.guid(),
+            "dateTime": new Date().Format(),
+            oData
+          }
+          delete(obj.oData.keys._tag)
+          this.myLocalStorage.unshift(obj)
+          this.myLocalStorage.forEach(data=>{
+            delete(data.oData.keys._tag)
+          })
+          localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+        }else {
+          //debugger
+          let olddata = this.myLocalStorage.splice(n,1)[0]
+          olddata.id = this.guid()
+          let newTime = new Date().Format()
+          olddata.dateTime = newTime
+          delete(olddata.oData.keys._tag)
+          this.myLocalStorage.unshift(olddata)
+          this.myLocalStorage.forEach(data=>{
+            delete(data.oData.keys._tag)
+          })
+          localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+        }
       }
     },
     watch: {
@@ -344,6 +442,7 @@
           height:100%;
           top:0
          }
+         
 			}
 			
       .router-container {
@@ -434,14 +533,41 @@
           }
         }
       }
-
-
+      
     } 
 
-    .form-button {
-      margin-top: 80px;
-    }
+    // .form-button {
+    //   margin-top: 80px;
+    // }
   }
 </style>
 
 
+<style lang="less">
+ @media screen and (max-width: 1400px){
+   #app {
+     .search-tab {
+       &.el-tabs--border-card {
+         &>.el-tabs__content {
+          .el-tab-pane {
+              .panel-content {
+                  .panel-content-wrap {
+                      padding :0;
+                      .el-form {
+                          .form-conditions {
+                              /*max-height: 330px;*/
+                              overflow: auto;
+                              .el-form-item {
+                                  padding: 0 28px;
+                              }
+                          }
+                      }
+                  }
+              }
+          }
+        }
+       }
+     }
+   }
+ }
+</style>

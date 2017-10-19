@@ -1,59 +1,49 @@
 <template>
-	<el-dialog class="processDialog" :model="form" :title="form.name" :visible.sync="dialogVisible" :type="popType" :close-on-click-modal="false" :before-close="handleClose">
-		
-		<!-- 投入时间，产出时间  -->
-		<el-form label-position="left" label-width="100px" v-if="popType == 'inTime' || popType == 'outTime'">
-			<el-form-item label="开始时间">
-				<v-dateTime style="width: auto;" :form-data="form" key-data="startTime" placeholder-data="请输入开始时间"></v-dateTime>
-			</el-form-item>
-			<el-form-item label="结束时间">
-				<v-dateTime style="width: auto;" :form-data="form" key-data="endTime"  placeholderData="请输入结束时间"></v-dateTime>
-			</el-form-item>
-		</el-form>
-		
-		<!-- 数据完整性  -->
-		<el-form label-position="left" label-width="100px" v-if="popType == 'dataLine'">
-			<el-form-item>
-				<v-radio :form-data="form" key-data="value" :list-data="aRaidos" ></v-radio>
-			</el-form-item>
-		</el-form>
-		
-		<!-- 操作人，设备，工单 -->
-		<el-form label-position="left" label-width="100px" v-if=" (popType == 'person') || (popType == 'equipment') || (popType == 'doCode')">
-			<el-form-item :label="form.name">
-				<!--<v-select style="width:auto;" :form-data="form" key-data="selected" placeholderData="请选择" :list-data="parseSelectFormat(form.value)"></v-select>-->
-				<v-multiSelect style="width:80%;" :form-data="form" key-data="selected" placeholderData="请选择" :list-data="parseSelectFormat(form.value)"></v-multiSelect>
-			</el-form-item>
-		</el-form>
-		
+	<el-dialog class="processDialog" title="断链修复原因" :visible.sync="popShow" :close-on-click-modal="false" :before-close="handleClose">
 		<!-- 断链修复原因。 -->
-		<el-form label-position="left" label-width="100px" v-if="popType == 'recoveredDes' || popType == 'unRecoveredDes'">
+		<el-form class="process-form" label-position="left" label-width="100px">
 			<el-form-item label="修复的数据">
-				<ul class="pop-list">
-					<li v-for="item in popRecover">
-						<p v-for="value in item">
-							<span>{{ value.processName }}</span>
-							<span>{{ value.equipmentName }}</span>
-							<span>{{ value.happenTime }}</span>
-							<span>{{ value.quantity }}</span>
-						</p>
-					</li>
-				</ul>
+				<div class="pop-title" v-show="popData.link.length">
+					<span class="title-type">类型</span>
+					<span class="title-process">工序</span>
+					<span class="title-equipment">设备</span>
+					<span class="title-time">产出\投入时间</span>
+					<span class="title-quantity">数量</span>
+				</div>
+				<div class="pop-list">
+					<div class="list-item" v-for="value in popData.link">
+						<div v-for="(item, index) in value">
+							<span class="title-type">{{ index ? '→': '←' }}</span>
+							<span class="title-process">{{ item.processName }}</span>
+							<span class="title-equipment">{{ item.equipmentName }}</span>
+							<span class="title-time">{{ item.happenTime }}</span>
+							<span class="title-quantity">{{ item.quantity }}</span>
+						</div>
+					</div>
+				</div>
 			</el-form-item>
 			<el-form-item label="断开的数据">
-				<ul class="pop-list">
-					<li v-for="item in popDel">
-						<p v-for="value in item">
-							<span>{{ value.processName }}</span>
-							<span>{{ value.equipmentName }}</span>
-							<span>{{ value.happenTime }}</span>
-							<span>{{ value.quantity }}</span>
-						</p>
-					</li>
-				</ul>
+				<div class="pop-title" v-show="popData.cancel.length">
+					<span class="title-type">类型</span>
+					<span class="title-process">工序</span>
+					<span class="title-equipment">设备</span>
+					<span class="title-time">产出\投入时间</span>
+					<span class="title-quantity">数量</span>
+				</div>
+				<div class="pop-list">
+					<div class="list-item" v-for="value in popData.cancel">
+						<div v-for="(item, index) in value">
+							<span class="title-type">{{ index ? '→': '←' }}</span>
+							<span class="title-process">{{ item.processName }}</span>
+							<span class="title-equipment">{{ item.equipmentName }}</span>
+							<span class="title-time">{{ item.happenTime }}</span>
+							<span class="title-quantity">{{ item.quantity }}</span>
+						</div>
+					</div>
+				</div>
 			</el-form-item>
-			<el-form-item :label="form.name" prop="discription">
-				<el-input type="textarea" :rows="2" placeholder="请输入原因" v-model="form.discription"></el-input>
+			<el-form-item label="修复原因" >
+				<el-input type="textarea" :rows="2" placeholder="请输入原因" v-model="sdes"></el-input>
 			</el-form-item>
 		</el-form>
 		
@@ -65,100 +55,52 @@
 </template>
 
 <script>
-	import $ from "jquery"
-	import Input from "components/basic/input.vue"
-	import Select from "components/basic/select.vue"
-	import MultiSelect from "components/basic/multiSelect.vue"
 	import Button from "components/basic/button.vue"
-	import DateTime from "components/basic/dateTime.vue"
-	import Radio from "components/basic/radio.vue"
-
-	var aoRadioData = [{
-		label:"1",
-		text: "全部节点"
-	},{
-		label:"2",
-		text: "投产信息完整节点"
-	},{
-		label:"3",
-		text: "投产信息不完整节点"
-	}];
-
 
 	export default {
 		props: {
 			popShow: Boolean,
-			popType: String,
-			popValue: {
+			popData: {
 				type: Object,
-			},
-			popRecover: Array,
-			popDel: Array
+				default: {
+					cancel: [],
+					link: []
+				}
+			}
 		},
 		// 组件。
 		components: {
-			"v-input": Input,
-    		"v-select": Select,
-    		"v-multiSelect": MultiSelect,
-    		"v-button": Button,
-    		"v-dateTime": DateTime,
-    		"v-radio": Radio
+			"v-button": Button
 		},
 		data() {
 			return {
 				// 当前传入的值
-				type: this.popType,
-				oProcess: this.popValue,
-				dialogVisible: this.popShow,
-				aRaidos: aoRadioData
+				sdes: "",
+				aCancel: [],
+				aLink: []
 			}
 		},
-		created() {
-		},
+		created() {},
 		// 计算属性。
-		computed: {
-			form: function() {
-		 		var oForm = $.extend(true, {}, this.popValue[this.popType]);
-		 		return oForm;
-			}
-		},
+		computed: {},
 		watch: {
-			popType: function(sType) {
-				this.dialogVisible = this.popShow;
-				
-				if(sType) {
-					this.form = $.extend(true, {}, this.popValue[this.popType]);
-				}
+			popShow() {
+				this.sdes = "";
 			}
 		},
 		// 方法。
 		methods: {
-			// 下拉框中格式处理函数。
-			parseSelectFormat(aSelect) {
-				var aNewData = [];
-				
-				if(aSelect && aSelect.length) {
-					aSelect.forEach(function(sValue) {
-						aNewData.push({
-							label: sValue,
-							value: sValue
-						})
-					});
-				}
-				// 返回数据。
-				return aNewData;
-			},
 			// 弹窗筛选确定-- 重置筛选值。
 			setFilter() {
 				// 设置弹窗状态。
-				this.$emit("hidePop", this.form);
+				this.$emit("hideSavePop", this.sdes);
 			},
 			// 关闭按钮。
 			handleClose() {
-				this.$emit("hidePop");
+				this.$emit("hideSavePop");
 			},
 			closeModal() {
-				this.$emit("hidePop");
+				this.$emit("hideSavePop");
 			}
 		}
 		
@@ -169,11 +111,44 @@
 	
 	.processDialog {
 		.el-dialog {
-			max-width: 600px;
+			width: auto;
 		}
+		
+		.process-form {
+			max-height: 600px;
+			overflow: auto;
+		}
+		
+		.pop-list,
+		.pop-title {
+			span {
+				display: inline-block;
+				
+				&.title-type {
+					width: 30px;		
+				}
+				&.title-process {
+					width: 80px;
+				}
+				&.title-equipment {
+					width: 160px;
+				}
+				&.title-time {
+					width: 160px;
+				}
+				&.title-quantity {
+					width: 30px;
+				}
+			}
+		}
+		
+		.pop-title {
+			text-align: center
+		}
+		
 		.pop-list {
-			li {
-				list-style: circle;
+			.list-item {
+				border: 1px solid #42af8f;
 			}
 		}
 	}

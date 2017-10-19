@@ -4,7 +4,7 @@
 			<h1 class="title">遏制报告</h1>
 			<h2 class="content-title">查询条件</h2>
 			<div class="condition">
-				<div class="condition-line"><span>遏制人：</span><span>遏制时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span><span>遏制描述：{{params.description}}</span></div>
+				<div class="condition-line"><span>遏制人：{{nickname}}</span><span>遏制时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span><span>遏制描述：{{params.description}}</span></div>
 				<div class="condition-line"><span>物料编码：{{params.materialCode}}</span><span>批次：{{params.batchNo}}</span></div>
 			</div>
 			<v-report :hasData="setWidth" :noData="removeWidth"></v-report>
@@ -27,6 +27,9 @@
 			}
 		},
 		computed: {
+			nickname: function() {
+				return this.$store.state.loginModule.nickname;
+			},
 			params: function() {
 				let url = location.search; //获取url中"?"符后的字串 
 				let oRequest = {}; 
@@ -41,9 +44,7 @@
 			}
 		},
 		created() {
-			// 组件创建完后获取数据，
-			// 此时 data 已经被 observed 了
-//			 this.fetchData();
+			this.$register.login(this.$store);
 		},
 		methods: {
 			setWidth() {
@@ -72,6 +73,7 @@
 		border: 1px solid #ccc;
 		padding: 0 20px;
 		background-color: #fff;
+		box-sizing: border-box;
 		
 		.title {
 			height: 24px;

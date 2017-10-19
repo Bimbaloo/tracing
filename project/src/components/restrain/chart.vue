@@ -1,12 +1,12 @@
-<!--设备列表-->
+<!--遏制——设备分析-->
 <template>
     <div class="router-content" id="router-echart">
         <div class="innner-content">			
-			<v-equipment
-				:equipments="equipments"
-				:process="node.process"  
+			<v-equipment 
+				:equipments-code="equipments"
 				:datetime="datetime">
 			</v-equipment>
+			<!--div v-else class="empty">{{empty}}</div-->
 		</div>
 		
     </div>      
@@ -21,51 +21,61 @@
 		},
         data () {
             return {
-                // 点击的工序节点信息。
-                node: {},
-				equipments: [],
+				equipments: {},
 				datetime:{},
 				empty: "暂无数据。"
             }
         },
-        computed: {		
+        computed: {
+			bShowEq() {
+				return this.equipments.length && this.equipments.some(o=>o.shiftStartTime && o.shiftEndTime)
+			}			
         },
         created () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
-			this.setEquipmentList();
+			this.setData();
         },
-        mounted () {       
+        mounted () {
+            
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': 'setEquipmentList'
+            '$route': 'setData'
         },
         methods: {
 			/**
 			 * 设置设备列表。
 			 * @return {void}
 			 */
-			setEquipmentList () {
-				
-				this.equipments = [];
+			setData () {
+					
+				let oQuery = this.$route.query,
+					start = oQuery.shiftStartTime,
+					end = oQuery.shiftEndStartTime
 
-				let oQuery = this.$route.query || {},
-					equipmentId = oQuery.equipmentId,
-					start = oQuery.startTime,
-					end = oQuery.endTime;
+				if(oQuery.startTime && !oQuery.shiftStartTime) {
+					// 若只有开始时间，没有班次开始时间
+					start = oQuery.startTime
+				}
+				if(oQuery.endTime && !oQuery.shiftEndStartTime) {
+					// 若只有结束时间，没有班次结束时间
+					end = oQuery.endTime
+				}
 
-				this.equipments.push({
-					equipmentId: oequipmentId,
+				this.equipments = {
+					equipmentCode: oQuery.equipmentCode.split(":")[0],
 					shiftStartTime: start,
-					shiftEndTime:end
-				})
+					shiftEndTime: end
+				}
 
 				this.datetime = {
 					start: start,
 					initStart: start,
 					end: end,
-					initEnd: end
+					initEnd: end,
+					realStart: oQuery.startTime || start,
+					realEnd: oQuery.endTime || end
 				}
 			}
         }
@@ -73,8 +83,8 @@
 </script>
 
 <style lang="less"> 
-
 	#router-echart	{
 		overflow: hidden;
+		height: 100%;
 	}
 </style>

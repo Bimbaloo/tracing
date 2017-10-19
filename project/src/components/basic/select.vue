@@ -6,6 +6,7 @@
     	filterable 
     	clearable 
     	remote
+    	:default-first-option="true"
     	:remote-method="remoteMethod"
     	:loading="loading"
     	loading-text="加载中..."
@@ -28,6 +29,7 @@
     	style="width: 100%;" 
     	filterable 
     	clearable
+    	:default-first-option="true"
     	:loading="loading"
     	@visible-change ="showSelect"
     	@change="handleChange">
@@ -41,7 +43,10 @@
 </template>
 
 <script>
-	
+	// import {host} from 'assets/js/configs.js'
+
+	// var HOST = window.HOST ? window.HOST: host	
+
 	const oAjax = {
 		// 物料。
 		"materialCode": {
@@ -73,6 +78,17 @@
 	
     export default {
         props: ["formData", "placeholderData", "keyData", "listData"],
+        props: {
+        	formData: Object,
+        	placeHolderData: String,
+        	keyData: String,
+        	listData: Array,
+        	// 是否通过ajax调用。
+        	getByAjax: {
+        		required: false,
+        		default: true
+        	}
+        },
         data() {
             return {
                 form: this.formData,
@@ -88,7 +104,12 @@
                 loading: false
             }
         },
-        created() {},
+        created() {
+        	// 如果不是通过ajax获取数据。
+        	if(!this.getByAjax) {
+        		this.options = JSON.parse(JSON.stringify(this.listData || []));
+        	}
+        },
         methods: {
             handleChange(value) {
                 console.log(value);
@@ -103,7 +124,7 @@
             },
             // 下拉框点击事件。
             showSelect(bShow) {
-            	if(bShow) {
+            	if(bShow && this.getByAjax) {
             		// 先判断是否存在数据，不存在数据，则通过ajax请求。
             		this.loading = true;
             		
@@ -133,48 +154,51 @@
 		        		}
 		        		
 		        	}else {
-		        		// 通过请求获取数据。
-			        	this.$ajax.get(oAjax[sKey].url).then((res) => {
-			        		
-			        		this.loading = false;
-			        		
-			        		if(!res.data.errorCode) {
-			        			// 成功。
-				        	 	this.list = res.data.data.map(o=>{
-				        	 		return {
-				        	 			label: o[oAjax[sKey].code + "Name"],
-				        	 			value: o[oAjax[sKey].code + "Code"] || o[oAjax[sKey].code + "Name"]
-				        	 		}
-				        	 	});
-			        		}else {
-			        			this.list = [];
-			        		}
-			        		
-							// 如果是物料，则获取部分数据。
-			        		if(sKey === "materialCode") {
+						// 通过请求获取数据。
+						this.$register.sendRequest(this.$store, this.$ajax, oAjax[sKey].url, "get", null, (oData) => {
+							// 请求成功。
+							this.loading = false;
+							this.list = oData.map(o=>{
+								return {
+									label: o[oAjax[sKey].code + "Name"],
+									value: o[oAjax[sKey].code + "Code"] || o[oAjax[sKey].code + "Name"]
+								}
+							});
+
+							if(sKey === "materialCode") {
 			        			// 物料只取其中一部分。并保存起来。当搜索时恢复
 			        			this.options = this.list.filter((o,index)=>{
 			        				return index<nLen;
 			        			});
 			        			this.oInit = this.options;
 			        		}else {
-			        			// 默认为所有、
-				        		this.options = this.list;
-			        		}
-			        		
-			        	 	oStorage[sKey] = this.list;
+			        			// 默认为所有。
+								this.options = this.list;
+								
+							}
+							oStorage[sKey] = this.list;
 			        	 	// 保存数据。
 			        	 	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
-			        	});
+
+						}, (sErrorMessage) => {
+							// 请求失败。
+							this.loading = false;
+							this.list = [];
+							this.options = [];
+							this.oInit = [];
+							oStorage[sKey] = [];
+			        	 	// 保存数据。
+			        	 	sessionStorage.setItem(sSessionSelectStorageKey,JSON.stringify(oStorage));
+						})
 		        	}
             		
             	}
             },
             // 外部查询。
             remoteMethod(query) {
-            	if(this.key === "materialCode") {
+            	if(this.key === "materialCode" && this.getByAjax) {
             		// 物料数据，则通过搜索。
-            		let sQuery = query.trim();
+            		let sQuery = (query || "").trim();
             		
             		if(sQuery !== "") {
             			this.loading = true;

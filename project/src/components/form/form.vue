@@ -1,12 +1,14 @@
 <template>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="labelWidth" @keyup.enter.native="submitForm('ruleForm')" >
-        <el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
-            <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
-			<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
-        </el-form-item>
-        <div  :class="['form-button', { 'form-button-last': active.radio === '4' && items.length > 10 }]">
+		<div class='form-conditions' :style="{maxHeight: conditionHeight}">
+			<el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
+            	<component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
+				<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
+        	</el-form-item>
+		</div>
+        <div  class="form-button">
             <el-button class="btn" type="primary" @click="submitForm('ruleForm')">查询</el-button>
-            <el-button class="btn" type="primary" @click="resetForm('ruleForm')">重置</el-button>
+            <el-button v-show="showResetButton" class="btn" type="primary" @click="resetForm('ruleForm')">重置</el-button>
         </div>
     </el-form>
 </template>
@@ -14,7 +16,8 @@
 <script>
     import Input from 'components/basic/input.vue'
     import Select from 'components/basic/select.vue'
-    import DateTime from 'components/basic/dateTime.vue'
+	import DateTime from 'components/basic/dateTime.vue'
+	import { bus } from "assets/js/bus.js"
 
     export default {
         props: {
@@ -24,7 +27,14 @@
             items: Array,
             tab: String,
             subTab: String,
-            handleSubmit: Function          
+            handleSubmit: Function,
+            showResetButton: {
+            	required: false,
+            	default: true
+            },
+            formHeight: {
+            	required: false
+            }
         },
         components: {
             'v-input': Input,
@@ -42,7 +52,9 @@
             });
             
             return {
-            	ruleForm: oFormData
+            	ruleForm: oFormData,
+            	conditionHeight: 'auto',
+            	nBottomHeight: 10
             };
         },
         watch: {
@@ -57,10 +69,32 @@
         			});
         		},
         		deep: true
+        	},
+        	formHeight: function() {
+        		this.setHeight();
+        	},
+        	tab: function() {
+        		this.setHeight()
         	}
         },
         mounted () {
-        },
+		},
+		created() {
+			let _that = this
+            bus.$on('id-selected', function (obj) {
+				if(_that.tab === obj.tab){
+					let datas = obj.keys
+					for(let i in datas){
+						if(i === "startTime" || i === "endTime") {
+							bus.$emit('timeChange', obj)
+						}else{
+							_that.ruleForm[i] = datas[i]
+						}
+					}
+				}
+				
+            })
+		},
         computed: {
             ruleForms: function() {
                 let oFormData = {};
@@ -95,30 +129,47 @@
 	            	// 验证物料。
 	            	validateMaterialcode = (rule, value, callback) => {
 	            		if(!value) {
-	            			callback(new Error("请输入物料"));
+	            			callback(new Error("请选择物料"));
 	            		}else {
 	            			callback();
 	            		}
 	            	},
             		// 验证开始时间。
             	    validateStartTime = (rule, value, callback) => {
-	            		if(!value) {
-	            			callback(new Error("请输入开始时间"));
+	            		let sTime = value.trim(),
+	            			nNow = +new Date();
+	            		
+	            		if(!sTime) {
+	            			callback(new Error("请输入开始时间"))
+	            		}else if(!window.Rt.utils.isDateTime(sTime)) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(value) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
 	            		}else {
 	            			callback();
 	            		}
 	            	},
             		// 验证结束时间。
             		validateEndTime = (rule, value, callback) => {
-	            		let sStart = oForm.startTime;
-	            		if(!value) {
-	            			callback(new Error("请输入结束时间"));
-	            		}else if(sStart && sStart > value) {
+	            		let sStart = oForm.startTime,
+	            			sTime = value.trim(),
+	            			bIsFormat = window.Rt.utils.isDateTime(sTime),
+	            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
+            	    		nNow = +new Date();
+            	    		
+	            		if(!sTime) {
+	            			callback(new Error("请输入结束时间"))
+	            		}else if(!bIsFormat) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(sTime) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else if(sStart && bIsStartFormat && +new Date(sStart) > +new Date(sTime) ){
 	            			// 如果开始时间存在，而且开始时间大于结束时间。
 	            			callback(new Error("结束时间必须大于开始时间"));
 	            		}else {
 	            			callback();
 	            		}
+	            		
 	            	};
 	            	
 	            // 验证是否存在
@@ -145,14 +196,47 @@
 	            	}
 	            	
 	            },
-	            // 结束时间。
-	            validateTime = (rule, value, callback) => {
-	            	if(value && oForm.startTime && value < oForm.startTime) {
-	            		// 开始时间和结束时间都存在,且结束时间小。
-	            		callback(new Error("结束时间要大于开始时间"));
-	            	}else {
+	            validateStart = (rule, value, callback) => {
+	            	let sTime = value.trim(),
+	            		bIsFormat = window.Rt.utils.isDateTime(sTime),
+        	    		nNow = +new Date();
+        	    	
+        	    	if(sTime) {
+	            		if(!bIsFormat) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(value) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else {
+	            			callback();
+	            		}
+        	    	}else {
 	            		callback();
 	            	}
+	            },
+	            // 结束时间。
+	            validateTime = (rule, value, callback) => {
+	            	let sStart = oForm.startTime,
+	            		sTime = value.trim(),
+            			bIsFormat = window.Rt.utils.isDateTime(sTime),
+            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
+        	    		nNow = +new Date();
+					
+        	    	if(sTime) {
+						// 存在时间。
+	        	    	if(!bIsFormat) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(sTime) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else if(bIsStartFormat && +new Date(sStart) > +new Date(sTime)) {
+	            			// 如果开始时间存在，而且开始时间大于结束时间。
+	            			callback(new Error("结束时间必须大于开始时间"));
+	            		}else {
+	            			callback();
+	            		}
+        	    	}else {
+        	    		callback();
+        	    	}
+	            		
 	            };
             	
             	// 所有规则。
@@ -173,6 +257,7 @@
             			"materialCode": [{validator: validateParam, trigger: "change"}],
             			"equipmentCode": [{validator: validateParam, trigger: "change"}],
             			"doCode": [{validator: validateParam, trigger: "change"}],
+            			"startTime": [{validator: validateStart, trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateTime, trigger: "change"}]
             		},
@@ -182,12 +267,21 @@
             			"materialCode": [{validator: validateParam,trigger: "change"}],
             			"equipmentCode": [{validator: validateParam,trigger: "change"}],
             			"doCode": [{validator: validateParam,trigger: "change"}],
+            			"startTime": [{validator: validateStart, trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateTime, trigger: "change"}]
             		},
             		// 履历。
             		"resume": {
             			"barcode": [{validator: validateBarcode, trigger: "change"}]
+            		},
+            		// 断链
+            		"link": {
+            			"batchNo": [{validator: validateBatch,trigger: "change"}],
+	                	"materialCode": [{validator: validateMaterialcode,trigger: "change"}],
+	                	"startTime": [{validator: validateStart, trigger: "change"}],
+            			// 结束时间。
+            			"endTime": [{validator: validateTime, trigger: "change"}]
             		}
                 };
                 
@@ -204,6 +298,18 @@
             }
         },
         methods: {
+        	setHeight() {
+        		if(this.formHeight && Number(this.formHeight)) {
+	        		this.conditionHeight = this.formHeight - this.nBottomHeight + 'px'
+        		}
+        	},
+        	outerHeight(el) {
+	            var height = el.offsetHeight;
+	            var style = el.currentStyle || getComputedStyle(el);
+	
+	            height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+	            return height;
+	        },
             getNameByKey(sKey) {
             	let aItem = this.items.filter(o => o.key === sKey);
             	
@@ -278,10 +384,6 @@
     }
     .form-button {
         margin-top: 50px
-    }
-    .form-button-last {
-        margin-top: 30px;
-        margin-bottom: 30px;
     }
 	.el-form-item__content {
 		.el-input {

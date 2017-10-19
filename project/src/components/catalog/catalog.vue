@@ -7,6 +7,8 @@
 	import process from 'assets/img/process.png'
 	import {onDoubleClickNode} from 'assets/js/go-util'
 
+	const HIGHLIGHT_BG_COLOR = "#f5efdc";//"#fff";
+	
 	export default {
 		props: {
 			catalogData: Array,	//Object
@@ -87,6 +89,11 @@
 							setsChildPortSpot: false
 						}),
 						click: (e) => {
+							// 更新高亮的数据。
+							this.$store.commit({
+								type: "updateHeighted",
+								data: []
+							})
 							this.$emit("init");
 						}
 					});
@@ -103,10 +110,19 @@
 									}
 								})
 								
-								let sRootKey = node.data.key;
-								if(node.data.parent &&　!node.isMaterialNode) {
-									sRootKey　= node.findTreeParentNode().data.key;				
-								}
+								let aRoot = [],
+									aSublings = []
+									
+								node.data.sublings.forEach( o => {
+									let sKey = node.data.isMaterialNode ? o.key : o.parent
+									
+									if(!aRoot.includes(sKey)) {
+										aRoot.push(sKey)
+									}
+									
+									aSublings.push(o.key)
+								})
+								
 								this.$store.commit({
 									type: "updateType",
 									key: "catalog"
@@ -115,14 +131,19 @@
 									type: "updateKey",
 									key: node.data.key
 								});
+//								this.$store.commit({
+//									type: "updateRoot",
+//									key: aRoot
+//								});
+								// 更新高亮的数据。
 								this.$store.commit({
-									type: "updateRoot",
-									key: sRootKey
-								});
+									type: "updateHeighted",
+									data: aSublings	//node.data.sublings
+								})
 								
 								if(node.data.isMaterialNode) {		// node.data.type == "1"
 									// 根据物料节点查询仓储信息。        
-									this.$router.push({ 
+									this.$router.replace({ 
 										path: "/stock", 
 										query: {
 											"key": node.data.key,
@@ -130,8 +151,7 @@
 										}
 									})
 								}else {
-									// debugger
-									this.$router.push({ 
+									this.$router.replace({ 
 										path: "/process",
 										query: {
 											"key": node.data.key,
@@ -183,10 +203,11 @@
 				this.catalog.nodeTemplate.selectionAdornmentTemplate =
 					$(go.Adornment, "Spot",
 						$(go.Panel, "Auto", {
-								defaultAlignment: go.Spot.Left
+								defaultAlignment: go.Spot.Left,
+								padding: new go.Margin(0, 10, 0, 0)// b,l,t,r
 							},
 							$(go.Shape, {
-								fill: "rgb(255,255,255)",
+								fill: HIGHLIGHT_BG_COLOR,	//"rgb(255,255,255)",
 								stroke: "rgb(245,200,13)",
 								strokeWidth: 1
 							}),
@@ -232,15 +253,23 @@
 			// 设置选中节点样式。
 			setCatalogSelection() {
 				let oNode = this.catalog.findNodeForKey(this.key);
+				let oSublingNode = null
 				
 				this.catalog.nodes.each(o => {
+					// 当前节点的同名节点
+//					if(o.data.sublings.includes(this.key)) {
+					if(o.data.sublings.some(o1 => o1.key == this.key)) {
+						oSublingNode = o;
+					}
 					o.isSelected = false;
 					o.background = null;
 					o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
 				})
 				
+				oNode = oNode ? oNode: oSublingNode
+				
 				if(oNode) {
-					oNode.background = "white";
+					oNode.background = HIGHLIGHT_BG_COLOR;	//"white";
 					oNode.isSelected = true;
 					oNode.findObject("TB").stroke = "#333";
 				}

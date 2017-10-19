@@ -5,39 +5,42 @@
                 <div class='condition-messsage'>
                     <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
-                    </span> 
+                    </span>
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	质检记录
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('qtTable', $event)"></i>
+                <span class='table-title'>质检记录</span>
+                <span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('qtTable', $event)"></i>
+                </span>
             </h2>
-			<div class="content-table" ref="qtTable">
+            <div class="content-table" ref="qtTable">
                 <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
-			</div>
-		
-					
+            </div>
+
         </div>
-    </div>  
+    </div>
 </template>
 
 <script>
-	import XLSX from 'xlsx'
-    import Blob from 'blob'
-    import FileSaver from 'file-saver'
-    import html2canvas from 'html2canvas'
-    import table from "components/basic/table.vue"
-    import rasterizeHTML from 'rasterizehtml'
-	
+import XLSX from 'xlsx'
+import Blob from 'blob'
+import FileSaver from 'file-saver'
+import html2canvas from 'html2canvas'
+import table from "components/basic/table.vue"
+import rasterizeHTML from 'rasterizehtml'
+// import {host} from 'assets/js/configs.js'
+
+// var HOST = window.HOST ? window.HOST: host	
 const url = HOST + `/api/v1/quality/inspect/by-equipment-time`;
 //const url = `http://rap.taobao.org/mockjsdata/24404/quality/inspect/by-equipment-time?`
-//const url = `static/sb.json`
+//const url = `static/a.json`
 
 export default {
     components: {
-		'v-table': table
-	},
+        'v-table': table
+    },
     data() {
         return {
             excel: true,
@@ -51,81 +54,79 @@ export default {
 
             loading: false,
             tdResize: true, // 是否允许拖动table大小
-            condition:{},   // 查询条件    
-            dataName:[      // 条件对应中文名
+            condition: {},   // 查询条件    
+            dataName: [      // 条件对应中文名
                 {
-                    itemCode:"equipmentName",
-                    itemName:"设备"
-                },{
-                    itemCode:"startTime",
-                    itemName:"开始时间"
-                },{
-                    itemCode:"endTime",
-                    itemName:"结束时间"
+                    itemCode: "equipmentName",
+                    itemName: "设备"
+                }, {
+                    itemCode: "startTime",
+                    itemName: "开始时间"
+                }, {
+                    itemCode: "endTime",
+                    itemName: "结束时间"
                 },
             ],
             condition: {},
-            /* 投入 */
+            /* 质检显示数据*/
             tableData: {
                 filename: "质检记录",
                 columns: [{
-                    name: "三检类型",
-                    prop: "barcode",
-                    width: "200",
-                }, {
-                    name: "设备编码",
-                    prop: "eqipmentCode",
-                    width: "200"
-                }, {
+                    name: "质检类型",
+                    prop: "methodName",
+                    width: "80",
+                },
+                // {
+                //     name: "设备编码",
+                //     prop: "equipmentCode",
+                //     width: ""
+                // }, 
+                {
                     name: "设备名称",
-                    prop: "eqipmentName",
-                    width: "200"
+                    prop: "equipmentName",
+                    width: ""
                 }, {
                     name: "上报时间",
                     prop: "reportTime",
-                    width: "200",
+                    width: "180",
                 }, {
                     name: "检验时间",
                     prop: "commitTime",
-                    width: "200",
+                    width: "180",
                 }, {
-                    name: "审核时间",
-                    prop: "inspectedTime",
+                    name: "质检人",
+                    prop: "operatorName",
                     width: "120"
                 }, {
-                    name: "人员姓名",
-                    prop: "operatorName",
-                    width: "300"
-                }, {
-                    name: "员工号",
-                    prop: "operatorCard",
-                    width: "200"
-                },{
                     name: "审核时间",
                     prop: "inspectedTime",
+                    width: "180"
+                }, {
+                    name: "审核人",
+                    prop: "inspectorName",
                     width: "120"
                 }, {
                     name: "检验结果",
-                    prop: "operatorCard",
-                    width: "120"
+                    prop: "isPassName",
+                    width: ""
                 }
-                // ,{
-                //     name: "检验项目",
-                //     prop: "happenTime",
-                //     width: "500",
-                //     lists: [
-                //         {
-                //             itemName: "项目1",
-                //             value: "value0",
-                //            // width: "200"
-                //         },
-                //         {
-                //             itemName: "项目2",
-                //             value: "value1",
-                //            // width: "300"
-                //         }]
-                // }
-                
+                    // ,{
+                    //     name: "检验项目",
+                    //     prop: "happenTime",
+                    //     width: "500",
+                    //     lists: [
+                    //         {
+                    //             itemName: "项目1",
+                    //             prop: "value0",
+                    //            // width: "200"
+                    //         },
+                    //         {
+                    //             itemName: "项目2",
+                    //             prop: "value1",
+                    //            // width: "300"
+                    //         }]
+                    // }
+
                 ],
                 height: 1,
                 data: [],
@@ -137,84 +138,108 @@ export default {
 
     },
     created() {
-        
+
 
         this.fetchData();
-       
-    },
-    computed:{
 
-        viewHeight: function(){
+    },
+    computed: {
+
+        viewHeight: function() {
             return this.routerContent
         },
-        resizeY: function(){
-            return this.$store.state.resizeY
+        resizeY: function() {
+            return this.$store && this.$store.state.resizeY
         },
-        fullscreen: function(){
-            return this.$store.state.fullscreen
+        fullscreen: function() {
+            return this.$store && this.$store.state.fullscreen
         },
         /* 查询条件转数组中文 */
         filters: function() {
-			let filters = this.condition
-			for(let i in filters){
-				if(filters[i] === '' || i === '_tag'){
-					delete filters[i]
-				}
-			}
-			/* 为了将获取到的 barcode等转换为对应的中文 */
-			let b = Object.entries(filters),
-				a = this.dataName;
+            let filters = this.condition
+            for (let i in filters) {
+                if (filters[i] === '' || i === '_tag') {
+                    delete filters[i]
+                }
+            }
+            /* 为了将获取到的 barcode等转换为对应的中文 */
+            let b = Object.entries(filters),
+                a = this.dataName;
 
-			b.forEach(o =>
-                a.forEach(function (x) {
-                    if(o[0] === x.itemCode){
+            b.forEach(o =>
+                a.forEach(function(x) {
+                    if (o[0] === x.itemCode) {
                         o[0] = x.itemName
                     }
                 })
-           )
-		    return b
-			/* 为了将获取到的 barcode等转换为对应的中文 */
-		}
+            )
+            return b
+            /* 为了将获取到的 barcode等转换为对应的中文 */
+        }
     },
-    mounted(){
+    mounted() {
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
-        this.tableData.height  = this.adjustHeight()
-       
+        this.tableData.height = this.adjustHeight()
+
     },
-    updated(){
-        
+    updated() {
+
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
         '$route': 'fetchData',
         /* 上下拖动时，重新设置table大小变化 */
-        "resizeY":'setTbaleHeight',
-         /* 全屏大小时，重新设置table大小 */
+        "resizeY": 'setTbaleHeight',
+        /* 全屏大小时，重新设置table大小 */
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
-       // 判断调用接口是否成功。
-        judgeLoaderHandler(param, fnSu, fnFail) {
-            let bRight = param.data.errorCode;
+        // 请求成功。
+        requestSucess(oData) {
+            this.loading = false;
             
-            // 判断是否调用成功。
-            if(!bRight) {
-            	// 调用成功后的回调函数。
-                fnSu && fnSu();
-            }else {
-                 // 提示信息。
-                console.log(param.data.errorMsg.message)
-                // 失败后的回调函。
-                fnFail && fnFail();
-            }
-        },	
-        // 显示提示信息。
-        showMessage() {
-            this.$message({
-                message: this.sErrorMessage,
-                duration: 3000
-            });
-        },		              
+            let odata = oData,  //获取到的data
+
+                obj = {
+                    name: "检验项目",
+                    width: "500",
+                    lists: []
+                };
+
+            odata.forEach((el) => {  /* 处理columns和data */
+                let items = el.items,
+                    tdata = []              //储存items里面的data
+                items.forEach((item) => {
+                    if (obj.lists.every((list) => {
+                        return list.itemName !== item.itemName
+                    })
+                    ) {
+                        obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
+                            itemName: `${item.itemName}`,
+                            prop: encodeURI(`${item.itemName}`)
+                        })
+                    }
+                    tdata[encodeURI(`${item.itemName}`)] = item.value
+
+                })
+                let objData = Object.assign(el, tdata);   // 合并获取正在的data
+                this.tableData.data.push(objData)
+            })
+
+            this.tableData.columns.push(obj)               
+        },
+        // 请求失败。
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage);
+        },
+        // 请求错误。
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
+        },     
         // 获取数据。
         fetchData() {
 
@@ -228,66 +253,43 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-            this.$get(url, oQuery)
-                .then((res) => {
-                    console.log(res)
-                    this.loading = false;
-                    this.judgeLoaderHandler(res, () => {
-                        let odata = res.data.data,  //获取到的data
-
-                            obj = {
-                                name: "检验项目",
-                                width: "500",
-                                lists: []
-                            };
-
-                        odata.forEach((el) => {  /* 处理columns和data */
-                            let items = el.items,
-                                tdata = []              //储存items里面的data
-                            items.forEach((item) => {
-                                if (obj.lists.every((list) => {
-                                        return list.itemName !== item.itemName
-                                    })
-                                ) {
-                                    obj.lists.push({                        //将获取到的检验项目的名称的 'encodeURI'编码作为该名称的 value值
-                                        itemName: `${item.itemName}`,
-                                        prop: encodeURI(`${item.itemName}`)
-                                    })
-                                }
-                                tdata[encodeURI(`${item.itemName}`)] = item.value
-
-                            })
-                            let objData = Object.assign(el, tdata);   // 合并获取正在的data
-                            this.tableData.data.push(objData)
-                        })
-
-                        this.tableData.columns.push(obj)
-
-
-                    });
-                })
-                .catch((err) => {
-                    this.loading = false;
-                    this.styleObject.minWidth = 0;
-                    console.log("数据库查询出错。")
-                })
+            // oQuery = {
+            //     "equipmentId": "208",
+            //     "startTime": "2017-05-03 08:19:30", //开始时间 格式：yyyy-MM-dd hh:mm:ss
+            //     "endTime": "2017-05-03 08:19:30" //结束时间 格式：yyyy-MM-dd hh:mm:ss
+            // }
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
         },
         // 表格导出。
-        exportExcelHandle (oData, event) {
-            if(!oData) {
+        exportExcelHandle(oData, event) {
+            if (!oData) {
                 return;
             }
+            /* 将传入的json格式转化 */
+            let copyData = this.cloneObj(oData)
+            copyData.columns.forEach((column,index) => {
+                if (column.lists && column.lists.length !== 0) {
+                    column.lists.forEach(function(el) {
+                        copyData.columns.push({
+                            name: `${el.itemName}`,
+                            prop: `${el.prop}`,
+                            width: `${el.width}`
+                        })
+                    })
+                    copyData.columns.splice(index, 1)
+                }
+            })
             // 下载表格。
-            window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);      
+            window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, copyData);
         },
         // 表格打印。
-        printHandle (refTable, event) {
+        printHandle(refTable, event) {
             let oTable = this.$refs[refTable];
-            
-            if(!oTable) {
+
+            if (!oTable) {
                 return;
             }
-            
+
             let sHtml = `
                 <div class="table el-table">
                     <div class="el-table__header-wrapper">
@@ -313,11 +315,15 @@ export default {
                         .el-table__body-wrapper tr:nth-child(odd) {
                             background-color: #fff;
                         }
+                        .el-table__body-wrapper td {
+                        	white-space: normal;
+    						word-break: break-all;
+                        }
                         .el-table__body-wrapper .cell {
                             min-height: 30px;
                             line-height: 30px;
                             // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-//	        					border: 1px solid #e4efec;
+                            //	border: 1px solid #e4efec;
                             box-sizing: border-box;
                         }
                         .el-table__empty-block {
@@ -326,7 +332,7 @@ export default {
                     </style>
                 </div>
             `;
-            
+
             window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
         },
         // 获取高度。
@@ -334,14 +340,14 @@ export default {
 
             let ntable = 0;
             ntable = Math.floor(
-                        this.viewHeight
-                        -this.outerHeight(document.querySelector(".condition"))
-                        -this.outerHeight(document.querySelector(".tableData"))
-                    );
+                this.viewHeight
+                - this.outerHeight(document.querySelector(".condition"))
+                - this.outerHeight(document.querySelector(".tableData"))
+            );
             return ntable;
         },
         /* 获取元素实际高度(含margin) */
-         outerHeight(el) {
+        outerHeight(el) {
             var height = el.offsetHeight;
             var style = el.currentStyle || getComputedStyle(el);
 
@@ -349,18 +355,34 @@ export default {
             return height;
         },
         /* 设置table实际高度 */
-        setTbaleHeight(){
+        setTbaleHeight() {
             this.routerContent = document.querySelector(".router-content").offsetHeight
             this.tableData.height = this.adjustHeight()
         },
         /* 设置title */
-        setTitle(el,title){
+        setTitle(el, title) {
             let elTds = document.querySelectorAll(el)
-            elTds.forEach((el,index)=>{
-                if(elTds[index].tagName.toLocaleLowerCase() === 'td'){
-                        el.setAttribute('title', title);
+            elTds.forEach((el, index) => {
+                if (elTds[index].tagName.toLocaleLowerCase() === 'td') {
+                    el.setAttribute('title', title);
                 }
             })
+        },
+        /* 数组与对象深拷贝 */
+        cloneObj(obj) {
+            var str, newobj = obj.constructor === Array ? [] : {};
+            if (typeof obj !== 'object') {
+                return;
+            } else if (window.JSON) {
+                str = JSON.stringify(obj), //系列化对象
+                    newobj = JSON.parse(str); //还原
+            } else {
+                for (var i in obj) {
+                    newobj[i] = typeof obj[i] === 'object' ?
+                        this.cloneObj(obj[i]) : obj[i];
+                }
+            }
+            return newobj;
         }
     }
 }
@@ -387,31 +409,30 @@ export default {
         right: auto;
     }
 }
+</style>
 
-.table {
-    .batch,
-    .barcode,
-    .material {
-        cursor: pointer;
-        color: #f90;
-
-        .cell {
-            font-weight: 600;
-
-            &:empty {
-                cursor: default;
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        i {
+            margin: 7.5px;
+            &:hover {
+                cursor: pointer
             }
         }
     }
-    .clicked {
-        cursor: pointer;
-        color: #f90;
+    .table-table {
+        i {
+            margin: 5px;
+        }
     }
 }
-
 </style>
-
-
 
 
 

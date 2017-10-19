@@ -3,15 +3,17 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in tableData.filters">
+                    <span v-for="filter in filters">
                         {{filter[0]}} : {{filter[1]}}
                     </span> 
                 </div>
             </div>
             <h2 class="content-title tableData">
-            	送检
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('toolTable', $event)"></i>
+                <span class='table-title'>工具记录</span>
+                <span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('toolTable', $event)"></i>
+                </span>
             </h2>
 			<div class="content-table" ref="toolTable">
                 <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
@@ -29,8 +31,14 @@
     import html2canvas from 'html2canvas'
     import table from "components/basic/table.vue"
     import rasterizeHTML from 'rasterizehtml'
+    // import {host} from 'assets/js/configs.js'
 	
-const url = HOST + "/api/v1/trace/inout/by-equipment";
+    // var HOST = window.HOST ? window.HOST: host
+
+    const url = HOST + "/api/v1/tool/by-equipment-time";
+    //const url = "http://192.168.20.102:8088" + "/api/v1/tool/by-equipment-time";
+
+
 
 export default {
     components: {
@@ -49,64 +57,65 @@ export default {
          
             loading: false,
             tdResize: true, //是否允许拖动table大小
+            condition:{},   // 查询条件    
+            dataName:[      // 条件对应中文名
+                {
+                    itemCode:"equipmentName",
+                    itemName:"设备"
+                },{
+                    itemCode:"startTime",
+                    itemName:"开始时间"
+                },{
+                    itemCode:"endTime",
+                    itemName:"结束时间"
+                },
+            ],
             /* 投入 */
             tableData: {
+                filename: '工具记录',
                 columns: [{
-                    name: "序号",
-                    type:"index",
-                    width: "50"
-                }, {
-                    name: "工具位子",
-                    prop: "barcode",
-                    width: "200",
-                }, {
                     name: "工具编码",
-                    prop: "",
-                    width: "200"
+                    prop: "toolCode",
+                    width: ""
                 }, {
                     name: "工具类型",
-                    prop: "doCode",
-                    width: "200"
+                    prop: "toolTypeName",
+                    width: ""
                 }, {
                     name: "工具名称",
-                    prop: "batchNo",
-                    width: "200",
+                    prop: "toolName",
+                    width: "",
                 }, {
                     name: "规格",
-                    prop: "materialCode",
-                    width: "200",
+                    prop: "toolSpec",
+                    width: "",
                 }, {
-                    name: "工具使用时间",
-                    prop: "quantity",
-                    width: "120"
+                    name: "操作类型",
+                    prop: "operateType",
+                    width: ""
                 }, {
-                    name: "操作人(开始使用)",
-                    prop: "materialName",
-                    width: "300"
+                    name: "工具位置",
+                    prop: "toolPosition",
+                    width: "",
                 }, {
-                    name: "工具结束使用时间",
-                    prop: "shiftName",
-                    width: "200"
+                    name: "操作时间",
+                    prop: "operateTime",
+                    width: ""
                 }, {
-                    name: "操作人(结束时间)",
-                    prop: "personName",
-                    width: "120"
+                    name: "操作人",
+                    prop: "operatorName",
+                    width: ""
                 }, {
                     name: "额定寿命",
-                    prop: "happenTime",
-                    width: "300"
-                }, {
-                    name: "起始寿命",
-                    prop: "happenTime",
-                    width: "300"
-                }, {
-                    name: "结束寿命",
-                    prop: "happenTime",
-                    width: "300"
+                    prop: "toolRatedLife",
+                    width: ""
+                },  {
+                    name: "剩余寿命",
+                    prop: "life",
+                    width: ""
                 }],
                 height: 1,
-                data: [],
-                filters:[["条码","xxxx"],["开始时间","xxxx-xx-xx xx:xx:xx"],["结束时间","xxxx-xx-xx xx:xx:xx"]]
+                data: []
             },
            
           routerContent:0
@@ -115,7 +124,6 @@ export default {
 
     },
     created() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
 
         this.fetchData();
        
@@ -126,14 +134,37 @@ export default {
             return this.routerContent
         },
         resizeY: function(){
-            return this.$store.state.resizeY
+            return this.$store && this.$store.state.resizeY
         },
         fullscreen: function(){
-            return this.$store.state.fullscreen
-        }
+            return this.$store && this.$store.state.fullscreen
+        },
+        /* 查询条件转数组中文 */
+        filters: function() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		}
     },
     mounted(){
-       this.tableData.height  = this.adjustHeight()
+        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.tableData.height  = this.adjustHeight()
        
     },
     updated(){
@@ -149,46 +180,73 @@ export default {
     },
     methods: {
         // 判断调用接口是否成功。
-        judgeLoaderHandler(param, fnSu, fnFail) {
-            let bRight = param.data.errorCode;
+        // judgeLoaderHandler(param, fnSu, fnFail) {
+        //     let bRight = param.data.errorCode;
             
-            // 判断是否调用成功。
-            if(!bRight) {
-                // 调用成功后的回调函数。
-                fnSu && fnSu();
-            }else {
-                // 提示信息。
-                console.log(param.data.errorMsg.message)
-                // 失败后的回调函。
-                fnFail && fnFail();
-            }
-        },	
+        //     // 判断是否调用成功。
+        //     if(!bRight) {
+        //         // 调用成功后的回调函数。
+        //         fnSu && fnSu();
+        //     }else {
+        //         // 提示信息。
+        //         console.log(param.data.errorMsg.message)
+        //         // 失败后的回调函。
+        //         fnFail && fnFail();
+        //     }
+        // },	
         // 显示提示信息。
-        showMessage() {
-            this.$message({
-                message: this.sErrorMessage,
-                duration: 3000
-            });
-        },		       
-        // 获取数据。
-        fetchData() {    
+        // showMessage() {
+        //     this.$message({
+        //         message: this.sErrorMessage,
+        //         duration: 3000
+        //     });
+        // },	
+        // 请求成功。
+        requestSucess(oData) {
+            this.loading = false;
             
+            this.tableData.data = oData;        
+        },
+        // 请求失败。
+        requestFail(sErrorMessage) {
+            this.loading = false;
+            // 提示信息。
+            console.log(sErrorMessage);
+        },
+        // 请求错误。
+        requestError(err) {
+            this.loading = false;
+            this.styleObject.minWidth = 0;
+            console.log("数据库查询出错。")
+        },  	       
+        // 获取数据。
+        fetchData() {          
             this.loading = true;
-            let oQuery = this.$route.query;
+            let oQuery = {}
+            Object.keys(this.$route.query).forEach((el)=>{
+                if(el === "equipmentId" || el === "startTime" || el === "endTime"){
+                    oQuery[el] = this.$route.query[el]
+                }
+                if(el === "equipmentName" || el === "startTime" || el === "endTime"){
+                    this.condition[el] = this.$route.query[el]
+                }
+            })
 
-            this.$post(url, oQuery)
-            .then((res) => {
-                this.loading = false;
+            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+
+            // this.$get(url, oQuery)
+            // .then((res) => {
+            //     this.loading = false;
              
-                this.judgeLoaderHandler(res,() => {
-                    this.tableData.data = res.data.data.in
-                });				 
-            })
-            .catch((err) => {
-                this.loading = false;
-                this.styleObject.minWidth = 0;   
-                console.log("数据库查询出错。")
-            })
+            //     this.judgeLoaderHandler(res,() => {
+            //         this.tableData.data = res.data.data
+            //     });				 
+            // })
+            // .catch((err) => {
+            //     this.loading = false;
+            //     this.styleObject.minWidth = 0;   
+            //     console.log("数据库查询出错。")
+            // })
         },
         // 表格导出。
         exportExcelHandle (oData, event) {
@@ -230,6 +288,10 @@ export default {
                         }
                         .el-table__body-wrapper tr:nth-child(odd) {
                             background-color: #fff;
+                        }
+                        .el-table__body-wrapper td {
+                        	white-space: normal;
+    						word-break: break-all;
                         }
                         .el-table__body-wrapper .cell {
                             min-height: 30px;
@@ -306,29 +368,30 @@ export default {
     }
 }
 
-.table {
-    .batch,
-    .barcode,
-    .material {
-        cursor: pointer;
-        color: #f90;
+</style>
 
-        .cell {
-            font-weight: 600;
-
-            &:empty {
-                cursor: default;
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        i {
+            margin: 7.5px;
+            &:hover {
+                cursor: pointer
             }
         }
     }
-    .clicked {
-        cursor: pointer;
-        color: #f90;
+    .table-table {
+        i {
+            margin: 5px;
+        }
     }
 }
-
 </style>
-
 
 
 

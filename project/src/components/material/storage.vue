@@ -1,31 +1,49 @@
 <!--出入库-->
 <template>
     <div class="router-content">
-        <div class="innner-content" :style="styleObject">
-            <div class="content-message">
-            	<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
-				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', '仓储表', $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
-            </div>
+        <div class="innner-content" >
+            <div class="content-message tableData">
+				<span class='table-title'>
+					<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+				</span>
+				<span class='table-handle'>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
+				</span>
+			</div>
             <!--div v-if="error" class="error">
                 {{ error }}
             </div-->
-            <div class="content-table"> 
-            	<table class="raw-table" v-loading="loading" ref="rawTable">
-            		<tr>
-            			<th v-for="column in materialData.columns" :style="{width: column.width}" v-if="!column.hide">
-            				{{column.name}}
-            			</th>
-            		</tr>
-            		<tr v-for="row in materialData.data">
-            			<td v-for="column in materialData.columns" :style="{cursor: column.click && !row[column.prop]?'default':'cursor'}" :class="column.class" @click="column.click && column.click(row)" v-if="!(column.hide||(column.merge && row.hide))" :rowspan="`${column.merge ? row.rowspan : ''}`">
-            				{{row[column.prop]}}
-            			</td>
-            		</tr>
-            	</table>
+            <div class="content-table" ref="rawTable"> 
 				<div v-if="error" class="error">
 					{{ error }}
 				</div>
+				<el-table
+					v-else
+    				border
+            		v-loading="loading"
+            		element-loading-text="拼命加载中"
+            		class="raw-table"
+            		@cell-click="cellClick"
+            		:data="materialData.data"
+					:height="tableHeight">
+			  		<el-table-column
+			  			align="center"
+			  			:resizable="true"
+			  			v-for="(column,index) in materialData.columns"
+				        :prop="column.prop"
+				        v-if="!column.hide"
+				        :label="column.name"
+				        :class-name="column.class"
+						:width="column.width"
+						:key="index">
+			  			<template scope="scope">
+			  				<div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
+			  					{{scope.row[column.prop]}}
+			  				</div>
+			  			</template>
+			  		</el-table-column>
+			  	</el-table>
                 <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
             </div>
 
@@ -39,7 +57,8 @@
     import Blob from 'blob'
     import FileSaver from 'file-saver'
 	import html2canvas from 'html2canvas'
-	
+	import rasterizeHTML from 'rasterizehtml'
+
     export default {
         // components: {
         //     'v-table': table
@@ -59,6 +78,7 @@
                 error: "",
 				// sErrorMessage: "",
                 materialData: {
+					filename: "仓储表",
                     columns: [{
                         prop: "index",
                         name: "序号",
@@ -70,8 +90,9 @@
                         merge: true,
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         class: "batch",
+						width: 200,
                         click: this.batchClick
                     },{
                         prop: "quantity",
@@ -89,7 +110,8 @@
                         width: "60px"
                     },{
                         prop: "createTime",
-                        name: "处理时间"
+                        name: "处理时间",
+						width: 200
                     },{
                         prop: "personName",
                         name: "操作人",
@@ -105,13 +127,20 @@
 //                      }
                     }],
                     data: []
-                }
+                },
+				tableHeight: 200
             }
         },
         computed: {
 			rawData () {
 		    	return this.$store.state.rawData
-		   }
+			},
+		    resizeY: function() {
+            	return this.$store && this.$store.state.resizeY
+			},
+			fullscreen: function() {
+				return this.$store && this.$store.state.fullscreen
+			}
         },
         created () {
             // 组件创建完后获取数据，
@@ -120,10 +149,21 @@
         },
         mounted () {
 			this.fetchData();
+			this.tableHeight = this.setHeight()
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': 'fetchData'
+            '$route': function(){
+				this.fetchData()
+				this.tableHeight = this.setHeight()
+			},
+			"resizeY": function(){
+				this.tableHeight = this.setHeight()
+			},
+			/* 全屏大小时，重新设置table大小 */
+			"fullscreen": function(){
+				this.tableHeight = this.setHeight()
+			},
         },
         methods: {
 			// 判断调用接口是否成功。
@@ -142,18 +182,74 @@
 					fnFail && fnFail();
 				}
 			},			
-
+			cellClick (row, column, cell, event) {
+                let oColumn = this.materialData.columns.filter(o => o.prop==column.property)[0];
+                oColumn.click && oColumn.click(row);                
+            },
             // 点击批次
             batchClick (row) {
             	if(row.batchNo) {
             		// 批次存在可点击
-	                this.$router.push({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+	                this.$router.replace({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
             	}
+			},
+			// 请求成功。
+            requestSucess(oData) {
+                this.loading = false;
+				this.error = "";
+				
+				if(!oData.length) {
+					this.error = "查无数据。"
+					console.log("查无数据。");
+				}else {
+					oData.data = this.formatData(oData);
+					this.materialData.data = oData.data
+					this.styleObject.minWidth = "1200px";
+					
+					this.$nextTick(function () {
+				      	var aMerge = document.querySelectorAll('.merges')
+				    	for(let i=0; i<aMerge.length; i++) {
+				        	let num = Number(aMerge[i].attributes['value'].nodeValue),
+				          	td = aMerge[i].parentNode.parentNode
+				          	
+				      		if(num) {
+				            	td.rowSpan = num
+				            }else {
+//				            	td.style.display = "none"
+								td.remove()
+				            }
+				        }
+				    	
+				    	// 设置批次为空时，鼠标样式。
+				    	var aCell = document.querySelectorAll(".cell")
+				    	for(var i=0; i<aCell.length; i++) {
+				    		let oDiv = aCell[i].childNodes[0]
+				    		
+				    		if( oDiv && !oDiv.innerHTML) {
+				    			aCell[i].style.cursor="default"
+				    		}
+				    	}
+		 		 	})
+				}               	
+            },
+            // 请求失败。
+            requestFail(sErrorMessage) {
+                this.loading = false;
+			
+				// 提示信息。
+				this.error = "查无数据";
+				console.warn(param.data.errorMsg.message);
+            },
+            // 请求错误。
+            requestError(err) {
+				this.loading = false;
+				this.error = "查无数据。"
+				this.styleObject.minWidth = 0;  
             },
             fetchData () {
-				
-				let  oData = this.materialData;
-                oData.data = null;
+				let oData = {}
+				//let  oData = this.materialData;
+                oData.data = [];
                 this.loading = true;
 				
 				let sKey = this.$route.query && this.$route.query.key,
@@ -166,64 +262,36 @@
 					materialInfoList: oNode.materialInfoList || []
 				}
 
-			    // setTimeout(() => {
-				// 	this.loading = false;
-				// 	let aoTest = [{
-				//       "materialCode": "10000515", 
-				//       "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				//       "barcode": "UN65457437520007057", 
-				//       "warehouse": "成品仓库", 
-				//       "reservoir": "CPK0001", 
-				//       "opType": "出库", 
-				//       "batchNo": "20160331B", 
-				//       "quantity": 16, 
-				//       "createTime": "2016-03-31 16:32:44", 
-				//       "personName": "周宇庭", 
-				//       "vendorName": "上海通用"
-				//     }, {
-				//       "materialCode": "10000515", 
-				//       "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				//       "barcode": "UN65457437520007057", 
-				//       "warehouse": "成品仓库", 
-				//       "reservoir": "CPK0001", 
-				//       "opType": "入库", 
-				//       "batchNo": "20160331A", 
-				//       "quantity": 16, 
-				//       "createTime": "2016-03-31 16:32:44", 
-				//       "personName": "周宇庭", 
-				//       "vendorName": "上海通用"
-				//     }]
-
-				// 	oData.data = this.formatData(aoTest);
-			    // }, 1000)
-
-				this.$post(this.url, {
+				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
 					code: this.node.code,
 					materialInfoList: this.node.materialInfoList
-				})
-				.then((res) => {
-					this.loading = false;
-					this.error = "";
-					this.judgeLoaderHandler(res, (data) => {
-//						debugger
-						// 保存数据。
-						if(!data.length) {
-							this.error = "查无数据。"
-							console.log("查无数据。");
-						}else {
-							oData.data = this.formatData(data);
-							this.styleObject.minWidth = "1200px";
-						}
+				}, this.requestSucess, this.requestFail, this.requestError)
+				// this.$post(this.url, {
+				// 	code: this.node.code,
+				// 	materialInfoList: this.node.materialInfoList
+				// })
+				// .then((res) => {
+				// 	this.loading = false;
+				// 	this.error = "";
+				// 	this.judgeLoaderHandler(res, (data) => {
+				// 		// 保存数据。
+				// 		if(!data.length) {
+				// 			this.error = "查无数据。"
+				// 			console.log("查无数据。");
+				// 		}else {
+				// 			oData.data = this.formatData(data);
+				// 			this.styleObject.minWidth = "1200px";
+				// 		}
 						
-					});				 
-				})
-				.catch((err) => {
-					this.loading = false;
-					this.error = "查无数据。"
-					// this.sErrorMessage = "查询出错。"
-					// this.showMessage();
-					this.styleObject.minWidth = 0;          
-				})
+				// 	});				 
+				// })
+				// .catch((err) => {
+				// 	this.loading = false;
+				// 	this.error = "查无数据。"
+				// 	// this.sErrorMessage = "查询出错。"
+				// 	// this.showMessage();
+				// 	this.styleObject.minWidth = 0;          
+				// })
            },
            /**
             * 格式化数据。
@@ -265,24 +333,70 @@
 				return aoData;
             },
 		   	// 表格导出。
-            exportExcelHandle (sTable, sFileName, event) {
-
+            exportExcelHandle (sTable, oTableData, event) {
+				window.Rt.utils.exportMergeTable2Excel(XLSX, Blob, FileSaver, oTableData, this.$refs[sTable])
                 // 下载表格。
-                window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      
-            },
+                // window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      
+			},
             // 表格打印。
-            printHandle (refTable, event) {
-
-                let oTable = this.$refs[refTable];
-                if(!oTable) {
-                    return;
-                }
-                window.Rt.utils.printHtml(html2canvas, oTable,{
-                	height: oTable.clientHeight * 1.5
-                });
-            },
+	        printHandle(refTable, event) {
+	            let oTable = this.$refs[refTable];
+	
+	            if (!oTable) {
+	                return;
+	            }
+	
+	            let sHtml = `
+	                <div class="table el-table">
+	                    <div class="el-table__header-wrapper">
+	                        ${oTable.querySelector(".el-table__header-wrapper").innerHTML}
+	                    </div>
+	                    <div class="el-table__body-wrapper">
+	                        ${oTable.querySelector(".el-table__body-wrapper").innerHTML}
+	                    </div>
+	                    <style>
+	                        .el-table td.is-center, .el-table th.is-center {
+	                            text-align: center;
+	                        }
+	                        .table thead th {
+	                            height: 36px;
+	                            background-color: #42af8f;
+	                        }
+	                        .table thead th .cell {
+	                            color: #fff;
+	                        }
+//		                    .el-table__body-wrapper tr:nth-child(even) {
+//		                        background-color: #fafafa;
+//		                    }
+//		                    .el-table__body-wrapper tr:nth-child(odd) {
+//		                        background-color: #fff;
+//		                    }
+	                        .el-table__body-wrapper td {
+	                        	white-space: normal;
+	    						word-break: break-all;
+	                        }
+	                        .el-table__body-wrapper .cell {
+	                            min-height: 30px;
+	                            line-height: 30px;
+	                            // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+	                            //	border: 1px solid #e4efec;
+	                            box-sizing: border-box;
+	                        }
+	                        .el-table__body-wrapper .batch .cell > div {
+	                            color: #f90;
+	                        	font-weight: 600
+	                        }
+	                        .el-table__empty-block {
+	                            text-align: center;	
+	                        }
+	                    </style>
+	                </div>
+	            `;
+	
+	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+	        },
             sortData(param1,param2, sType) {
-
+				
                 // 默认按照从小到大排序。
                 if(sType == "desc") {
                     // 从大到小时。
@@ -301,12 +415,30 @@
                     return param1 > param2 ? 1:-1;
                 }
 
-            }
+            },
+			/* 获取元素实际高度(含margin) */
+			outerHeight(el) {
+				var height = el.offsetHeight;
+				var style = el.currentStyle || getComputedStyle(el);
+
+				height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+				return height;
+			},
+			// 设置table的高度
+			setHeight() {
+				let content = document.querySelector(".router-content")
+				let tableData = document.querySelector(".tableData")
+				return this.outerHeight(content) - this.outerHeight(tableData)-40	
+			}
         }
     }  
 </script>
 
-<style lang="less">    
+<style lang="less">   
+	.el-table--enable-row-hover .el-table__body tr:hover>td {
+	  	background-color: transparent;
+	  	background-clip: padding-box;
+	} 
 	.material-stock  {	    	    	
     	.content-message {
     		margin-top: 20px;
@@ -334,18 +466,53 @@
     				background-color: #42AF8F;
     				color: #fff;
     				font-weight: bold;
+    				
+    				&>div {
+    					font-weight: 600;
+    				}
     			}
     			
     			td {
     				height: 30px;
     			}
     			
-    			.batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            font-weight: 600;
-		        }    
+    			.el-table__body-wrapper {
+    				.batch {
+	    				.cell {
+			    	    	cursor: pointer;
+				            color: #f90;
+				            
+				            &>div {
+					            font-weight: 600;
+				            }
+	    				}
+			        } 
+    			}   
     		}
+    		
     	}
     }
+</style>
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+	justify-content: space-between;
+	margin-top: 0;
+    margin-bottom: -20px;
+	.table-title {
+		display: flex;
+        align-items: center;
+	}
+    .table-handle {
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        i {
+            margin: 7.5px;
+		}
+		.icon {
+			cursor: pointer;
+		}
+    }
+}
 </style>

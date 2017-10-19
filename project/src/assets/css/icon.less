@@ -14,6 +14,121 @@
 }
 
 /*
+ * 12x12 图标。
+ */
+ .icon.icon-12 {
+	width: @px12;
+	height: @px12;
+	background-image: url(../img/icon-12.png);
+
+    // 删除。
+	&.icon-delete {
+		background-position: 0 0;
+	}
+	&.icon-delete:hover {
+		background-position: -@px12 0;
+	}
+
+	// 翻转。
+	&.icon-reverse {
+		background-position: 0 -@px12;
+	}
+	&.icon-reverse:hover {
+		background-position: -@px12 -@px12;
+	}
+}
+
+/*
+ * 14x14 图标。
+ */
+ .icon.icon-14 {
+	width: @px14;
+	height: @px14;
+	background-image: url(../img/icon-14.png);
+
+    // 关闭。
+	&.icon-close {
+		background-position: 0 -@px14;
+	}
+	&.icon-close:hover {
+		background-position: -@px14 -@px14;
+	}
+
+	// 翻转。
+	&.icon-reverse {
+		background-position: 0 0;
+	}
+	&.icon-reverse:hover {
+		background-position: -@px14 0;
+	}
+}
+
+/*
+ * 16x16 图标。
+ */
+ .icon.icon-16 {
+	width: @px16;
+	height: @px16;
+	background-image: url(../img/icon-16.png);
+
+    // 隐藏。
+	&.icon-hide {
+		background-position: 0 0;
+	}
+	&.icon-hide:hover {
+		background-position: -@px16 0;
+	}
+
+    // 显示。
+	&.icon-show {
+		background-position: 0 -@px16;
+	}
+	&.icon-show:hover {
+		background-position: -@px16 -@px16;
+	}
+
+	// 加工。
+	&.icon-run {
+		background-position: 0 -2 * @px16;
+	}
+	&.icon-run.unselected {
+		background-position: -@px16 -2 * @px16;
+	}
+
+	// 停机。
+	&.icon-stop {
+		background-position: 0 -3 * @px16;
+	}
+	&.icon-stop.unselected {
+		background-position: -@px16 -3 * @px16;
+	}
+
+	// 调试。
+	&.icon-debug {
+		background-position: 0 -4 * @px16;
+	}
+	&.icon-debug.unselected {
+		background-position: -@px16 -4 * @px16;
+	}
+
+	// 关机。
+	&.icon-close {
+		background-position: 0 -5 * @px16;
+	}
+	&.icon-close.unselected {
+		background-position: -@px16 -5 *@px16;
+	}
+	
+	// 新窗口打开。
+	&.icon-openNew {
+	    background-position: 0 -6 * @px16;
+	}
+	&.icon-openNew:hover {
+	   background-position: -@px16 -6 *@px16; 
+	}
+}
+
+/*
  * 20x20 图标。
  */
 .icon.icon-20 {
@@ -224,31 +339,5 @@
 	}
 	&.icon-config:hover {
 		background-position: -@px24 -@px24;
-	}
-}
-
-
-/*
- * 16x16 图标。
- */
-.icon.icon-16 {
-	width: @px16;
-	height: @px16;
-	background-image: url(../img/icon-16.png);
-
-    // 隐藏。
-	&.icon-hide {
-		background-position: 0 0;
-	}
-	&.icon-hide:hover {
-		background-position: -@px16 0;
-	}
-
-    // 显示。
-	&.icon-show {
-		background-position: 0 -@px16;
-	}
-	&.icon-show:hover {
-		background-position: -@px16 -@px16;
 	}
 }

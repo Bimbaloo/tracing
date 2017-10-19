@@ -1,4 +1,4 @@
-(function(window, document, undefined){
+(function (window, document) {
 	// 函数扩展
 	// 日期函数
 	Date.prototype.Format = function(fmt){ 
@@ -99,9 +99,61 @@
 		 * # }
 		 * @return {void}
 		 */
-		exportJson2Excel: function(XLSX, Blob, FileSaver, oTableData) {
-			let oData = Object.assign({}, oTableData);
+		exportJson2Excel: function(XLSX, Blob, FileSaver, oTableData) {	
+			let aoTableJson = this.parseTableData(oTableData);
+
+			if (!aoTableJson.length) {
+				return;
+			}
+			// 创建表格。
+			let wb = {
+					SheetNames: ["Sheet1"],
+					Sheets: {
+						// 创建sheet
+						Sheet1: XLSX.utils.json_to_sheet(aoTableJson)
+					}
+			}
+		
+			let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 	
+			let sFileName = oData.filename || "table";
+	
+			// 下载表格。
+			FileSaver.saveAs(new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' }), sFileName + ".xlsx");            	
+		},
+
+		exportMergeTable2Excel: function (XLSX, Blob, FileSaver, oTableData, oElement) { 
+			let aoTableJson = this.parseTableData(oTableData);
+			
+			if (!aoTableJson.length) {
+				return;
+			}
+			// 创建表格。
+			let jsonSheet = XLSX.utils.json_to_sheet(aoTableJson),
+				wb = XLSX.utils.table_to_book(oElement),
+				sheet = wb.Sheets[wb.SheetNames[0]];
+			
+			for(let p in sheet)	{
+				if(jsonSheet[p] && sheet[p]) {
+					sheet[p] = jsonSheet[p]
+				}			
+			}
+
+			let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
+			
+			let sFileName = oTableData.filename || "table";
+	
+			// 下载表格。
+			FileSaver.saveAs(new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' }), sFileName + ".xlsx");            	
+			
+		},
+		/**
+		 * @param{Object} oTableData
+		 * @return{Array}
+		 */
+		parseTableData: function(oTableData) {
+			let oData = Object.assign({}, oTableData);
+			
 			let aoTableJson = [];
 	
 			if(oData instanceof Array ) {
@@ -137,40 +189,20 @@
 	
 				aoTableJson.push(oNewData);			
 			}
-	
-			if (!aoTableJson.length) {
-				return;
-			}
-	
-			// 创建表格。
-			let wb = {
-					SheetNames: ["Sheet1"],
-					Sheets: {
-						// 创建sheet
-						Sheet1: XLSX.utils.json_to_sheet(aoTableJson)
-					}
-			}
-	
-			let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
-	
-			let sFileName = oData.filename || "table";
-	
-			// 下载表格。
-			FileSaver.saveAs(new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' }), sFileName + ".xlsx");            	
-		},
 
-		
+			return aoTableJson;
+		},
 		/**
 		 * 导出Table为excel。依赖xlsx、blob、file-saver。
 		 * @param {Element} oElement table节点
 		 * @param {String} sFileName 文件名
 		 * @return {void}
 		 */
-		exportTable2Excel: function(XLSX, Blob, FileSaver, oElement, sFileName, oFormat) {
+		exportTable2Excel: function (XLSX, Blob, FileSaver, oElement, sFileName, oFormat) {
 			// 根据table节点生产表。
 			let wb = XLSX.utils.table_to_book(oElement),
 				sheet = wb.Sheets[wb.SheetNames[0]];
-			
+
 			if(oFormat.date) {
 				for(let p in sheet) {
 					if(sheet[p].t == "n" && sheet[p].z == "m/d/yy") {
@@ -485,10 +517,96 @@
 		 */
 		hasParam: function(sName, sHref) {
 			return this.getParams(sUrl)[sName] != null;
-		}
-	}
+		},
+		
+		/**
+		 * 判断是否为正确的时间格式.
+		 * @param {String} sTime
+		 * @return {Boolean}
+		 */
+		isDateTime: function(sTime) {
+			var sReg = /^(\d+)-(\d{1,2})-(\d{1,2}) (\d{1,2}):(\d{1,2}):(\d{1,2})$/,
+				sRs = (sTime || "").match(sReg)
+			
+			// 返回判断是否为正确的格式结果.
+			if(sRs == null) {
+				return false
+			}else {
+				return true
+			}
+		},
+		
+		/**
+		 * 判断是否为正确的日期格式.
+		 * @param {String} sDate
+		 * @return {Boolean}
+		 */
+		isDate: function(sDate) {
+			var sReg = /^(\d+)-(\d{1,2})-(\d{1,2})$/,
+				sRs = (sDate || "").match(sReg)
+		
+			// 返回判断是否为正确的格式结果.
+			if(sRs == null) {
+				return false
+			}else {
+				return true
+			}
+		},
 
-	
+		/**
+		 * Get the value of a cookie with the given name.
+		 *
+		 * @example Rt.utils.cookie('the_cookie');
+		 * @desc Get the value of a cookie.
+		 *
+		 * @param String name The name of the cookie.
+		 * @return The value of the cookie.
+		 * @type String
+		 *
+		 * @name Rt.utils.cookie
+		 * @cat Plugins/Cookie
+		 * @author Klaus Hartl/klaus.hartl@stilbuero.de
+		 */
+		cookie: function(name, value, options) {
+			if (typeof value != 'undefined') { // name and value given, set cookie
+				options = options || {};
+				if (value === null) {
+					value = '';
+					options.expires = -1;
+				}
+				var expires = '';
+				if (options.expires && (typeof options.expires == 'number' || options.expires.toUTCString)) {
+					var date;
+					if (typeof options.expires == 'number') {
+						date = new Date();
+						date.setTime(date.getTime() + (options.expires * 24 * 60 * 60 * 1000));
+					} else {
+						date = options.expires;
+					}
+					expires = '; expires=' + date.toUTCString(); // use expires attribute, max-age is not supported by IE
+				}
+				var path = options.path ? '; path=' + options.path : '';
+				var domain = options.domain ? '; domain=' + options.domain : '';
+				var secure = options.secure ? '; secure' : '';
+				document.cookie = [name, '=', encodeURIComponent(value), expires, path, domain, secure].join('');
+			} else { // only name given, get cookie
+				var cookieValue = null;
+				if (document.cookie && document.cookie != '') {
+					var cookies = document.cookie.split(';');
+					for (var i = 0; i < cookies.length; i++) {
+						var cookie = cookies[i].trim();
+						// Does this cookie string begin with the name we want?
+						if (cookie.substring(0, name.length + 1) == (name + '=')) {
+							cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+							break;
+						}
+					}
+				}
+				return cookieValue;
+			}
+		}
+
+	}
 
 	window.Rt = {};
 	

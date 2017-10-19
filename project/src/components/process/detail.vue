@@ -13,7 +13,7 @@
 							<el-checkbox-button :label="obj.type">{{obj.name}}</el-checkbox-button>
 							<div class="link-line" v-show="obj.show"></div>
 							<div class="list-btn-wrap" v-show="obj.show">
-								<span v-for="item in obj.list" @click="listButtonClick(item)" :class="{fgb: item.name=='FGB'}">{{item.name}}</span>
+								<span v-for="(item,index) in obj.list" :key="index" @click="listButtonClick(item)" :class="{fgb: item.name=='FGB'}">{{item.name}}</span>
 							</div>
 						</div>						
 					</el-checkbox-group>
@@ -36,8 +36,10 @@
 
 <script>
 	import equipment from "components/equipment/list"
+	// import {host} from 'assets/js/configs.js'
 
-	const sFineReportUrl = FINE_REPORT_HOST + "/WebReport/ReportServer?reportlet=";
+	// var HOST = window.HOST ? window.HOST: host
+	// const sFineReportUrl = HOST + "/WebReport/ReportServer?reportlet=";
 
     export default {
 		components: {
@@ -71,15 +73,15 @@
 					show: false,
                     list: [{
 						name: "质检",
-						cpt: "/QTReport.cpt",
+						// cpt: "/QTReport.cpt",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "送检",
-						cpt: "/QCReport.cpt",
+						// cpt: "/QCReport.cpt",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     },{
 						name: "FGB",
-						cpt: "/FGBReport.cpt&__bypagesize__=false",
+						// cpt: "/FGBReport.cpt&__bypagesize__=false",
 						parameter: ["equipmentId", "startTime", "endTime", "processCode"]  
                     }]
 				}, {
@@ -185,20 +187,20 @@
 				if(oData.router) {				
 					let oQuery = this.getParamter(oData.query);
 					
-					this.$router.push({path: oData.router, query: oQuery});
+					this.$router.replace({path: oData.router, query: oQuery});
 				}
 
-				if(oData.cpt) {
-					let oParam = this.getParamter(oData.parameter),
-						sPath = sFineReportUrl + oData.cpt;
+				// if(oData.cpt) {
+				// 	let oParam = this.getParamter(oData.parameter),
+				// 		sPath = sFineReportUrl + oData.cpt;
 
-					oData.parameter.forEach(p => {
-						if(oParam[p]) {
-							sPath += "&" + p + "=" + oParam[p]
-						}						
-					});
-					window.open(sPath , "_blank");
-				}
+				// 	oData.parameter.forEach(p => {
+				// 		if(oParam[p]) {
+				// 			sPath += "&" + p + "=" + oParam[p]
+				// 		}						
+				// 	});
+				// 	window.open(sPath , "_blank");
+				// }
 			},
 			/**
 			 * @param {Array}

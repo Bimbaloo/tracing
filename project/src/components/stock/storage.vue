@@ -2,28 +2,32 @@
 <template>
     <div class="router-content">
         <div class="innner-content">
-            <h2 class="content-title">
-               	 出库信息
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>
+            <h2 class="content-title tableData">
+                <span class='table-title'>出库信息</span>
+               	<span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>
+                </span>
             </h2>
             <div v-if="outstockData.error" class="error" :style="styleError">
                 {{ outstockData.error }}
             </div>
             <div v-else class="content-table" ref="outstockTable">
-            	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>            
+            	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading" :resize="tdResize"></v-table>            
                 <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
-            <h2 class="content-title">
-               	 入库信息
-                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+            <h2 class="content-title tableData">
+                <span class='table-title'>入库信息</span>
+                <span class='table-handle'>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+                </span>
             </h2>
             <div v-if="instockData.error" class="error" :style="styleError">
                 {{ instockData.error }}
             </div>
             <div v-else class="content-table" ref="instockTable">
-            	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
+            	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading" :resize="tdResize"></v-table>
             </div>
             <!-- 复制的内容 -->
             <!--<div v-show="false" ref="outstockTable">
@@ -45,7 +49,10 @@
     import FileSaver from 'file-saver'
 	import rasterizeHTML from 'rasterizehtml'
 	import fnP from "assets/js/public.js"
-	
+	// import {host} from 'assets/js/configs.js'
+
+    // var HOST = window.HOST ? window.HOST: host
+    	
     export default {
         components: {
             'v-table': table,
@@ -59,6 +66,7 @@
                 },
                 excel: true,
                 print: true,
+                tdResize: true,
                 outstockData: {
                     url: HOST + "/api/v1/outstock",
                     loading: false,
@@ -74,7 +82,7 @@
 //                      name: "条码类型"
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         width: "150",
                         class: "batch",
                         cellClick: this.batchClick
@@ -125,7 +133,7 @@
 
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         width: "150",
                         class: "batch",
                         cellClick: this.batchClick
@@ -173,7 +181,7 @@
                         name: "条码"
                     },{
                         prop: "batchNo",
-                        name: "批次号",
+                        name: "批次",
                         class: "batch"
                     }],
                     data: [{
@@ -184,7 +192,7 @@
                 }
             }
         },
-        created () {
+        mounted () {
             // 组件创建完后获取数据，
             // 此时 data 已经被 observed 了
             this.fetchPage();
@@ -208,7 +216,7 @@
             batchClick (row) {
             	// 如果批次数据存在，则可点击。
             	if(row.batchNo) {
-	                this.$router.push({ path: `/stock/${this.key}/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+	                this.$router.replace({ path: `/stock/${this.key}/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
             	}
             },
             // 获取高度。
@@ -233,6 +241,7 @@
             fetchData (oData) {
                 oData.error = null;
                 oData.data = [];
+                oData.height = this.adjustHeight();
                 oData.loading = true;
 
                 let sPath = oData.url;
@@ -257,26 +266,58 @@
                     default: break;
                 }
                 
-                this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
-                .then((res) => {
-                    oData.loading = false;
-                    oData.height = this.adjustHeight();
-                    if(!res.data.errorCode) {
-                        oData.data = res.data.data;
-                    }else {
-                    	this.styleError.maxHeight = this.adjustHeight()-50+"px";
-//                  	oData.error = res.data.errorMsg.message;
-                    	console.log(res.data.errorMsg.message)
-                    }
-                })
-                .catch((err) => {
-                    oData.loading = false;
-//                  oData.error = "查询出错。"
-                    console.log("接口查询出错。");
-                    if(this.outstockData.error && this.instockData.error) {
-                        this.styleError.maxHeight = this.adjustHeight()-50+"px"
-                    }           
-                })
+                this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", fnP.parseQueryParam(this.$route.query), (oResult) => {
+					// 请求成功。
+					oData.loading = false;			
+					oData.data = oResult;
+					
+					// 设置批次的鼠标样式
+					this.$nextTick(function () {
+				    	// 设置批次为空时，鼠标样式。
+				    	var aBatch = document.querySelectorAll(".batch");
+				    	for(var i=0; i<aBatch.length; i++) {
+				    		let oCell = aBatch[i].querySelector(".cell")
+				    		if( oCell && !oCell.innerHTML) {
+				    			aBatch[i].style.cursor="default"
+				    		}
+				    	}
+		 		 	})
+				}, (sErrorMessage) => {
+					// 请求失败。
+					oData.loading = false;
+					this.styleError.maxHeight = this.adjustHeight()-50+"px";
+					// 提示信息。
+					console.log(sErrorMessage);
+				}, (err) => {
+					// 请求错误。
+					oData.loading = false;
+					console.log("接口查询出错。");
+
+					if(this.outstockData.error && this.instockData.error) {
+						this.styleError.maxHeight = this.adjustHeight()-50+"px"
+					}
+				})
+
+                // this.$ajax.post(sPath, fnP.parseQueryParam(this.$route.query))
+                // .then((res) => {
+                //     oData.loading = false;
+                // //   oData.height = this.adjustHeight();
+                //     if(!res.data.errorCode) {
+                //         oData.data = res.data.data;
+                //     }else {
+                //     	this.styleError.maxHeight = this.adjustHeight()-50+"px";
+                //   	// oData.error = res.data.errorMsg.message;
+                //     	console.log(res.data.errorMsg.message)
+                //     }
+                // })
+                // .catch((err) => {
+                //     oData.loading = false;
+                // //   oData.error = "查询出错。"
+                //     console.log("接口查询出错。");
+                //     if(this.outstockData.error && this.instockData.error) {
+                //         this.styleError.maxHeight = this.adjustHeight()-50+"px"
+                //     }           
+                // })
             },
             visibleChange () {
 //              debugger
@@ -323,10 +364,14 @@
 	        				.el-table__body-wrapper tr:nth-child(odd) {
 	        				 	background-color: #fff;
 	        				}
+	        				.el-table__body-wrapper td {
+	                        	white-space: normal;
+	    						word-break: break-all;
+	                        }
 	        				.el-table__body-wrapper .cell {
 	        					min-height: 30px;
 	        					line-height: 30px;
-//	        					border: 1px solid #e4efec;
+                            //  border: 1px solid #e4efec;
 	        				}
 	        				.batch {
 	        					color: #f90;
@@ -366,22 +411,12 @@
             }
         }
     	.table {
-    	    .batch {
-    	    	cursor: pointer;
-	            color: #f90;
-	            
-	            .cell {
-	                font-weight: 600;
-	                
-	                &:empty {
-	                	cursor: default;
-	                }
-	            } 
-	        }         
-            .clicked {
-                cursor: pointer;
-	            color: #f90;
-            }
+    		.el-table__body-wrapper {
+	            .clicked {
+	                cursor: pointer;
+		            color: #f90;
+	            }
+    		}
     	}
     	
     	.error {
@@ -395,3 +430,23 @@
 
     }
 </style>
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        i {
+            margin: 7.5px;
+        }
+    }
+    .table-table {
+        i {
+            margin: 5px;
+        }
+    }
+}
+</style>
+
