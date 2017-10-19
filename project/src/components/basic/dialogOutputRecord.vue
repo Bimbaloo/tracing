@@ -43,6 +43,10 @@
 	.dialog-wrap {
 		line-height: 20px;
 		
+		.el-dialog--large {
+			width: 95%;
+		}
+		
 		.el-dialog__body {
 			padding-bottom: 20px;
 		}
