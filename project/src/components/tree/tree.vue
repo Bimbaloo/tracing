@@ -1,13 +1,16 @@
 <template>
 	<div class="diagram" ref="diagram">
 		<div class="icons">
+			<i class="icon icon-20 icon-hide" v-if="!tipsShow" @click="showTips"  title="显示详情"></i>
+            <i class="icon icon-20 icon-show" v-else @click="hideTips"  title="隐藏详情"></i>
 			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
 			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
 			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
 		</div>
 		<div id="tree" style="height: 100%;"></div>
-		<div id="overview"></div>
+		<!--div id="overview"></div-->
+		<a href="" ref="downloadImage" v-show="false"></a>
 	</div>
 </template>
 
@@ -15,47 +18,53 @@
 	import material from 'assets/img/material.png'
 	import process from 'assets/img/process.png'
 	import {onNodeSelectionChange, onClickNode, onContextClickNode, onDoubleClickNode, tooltipTextConverter, zoomDiagram} from 'assets/js/go-util'
+	// import BalloonLink from 'assets/js/BalloonLink.js'
+
+	// 注释背景颜色。
+	const COMMENT_BGCOLOR = "rgba(66,175,143,0.2)";//"rgba(44,52,60,0.7)";//
+	const COMMENT_TEXTCOLOR = "#333";
+	const HIGHLIGHT_BG_COLOR = "#f5efdc";//"#42af8f";//"#6DAB80";
+	const HIGHLIGHT_TEXT_COLOR = "#333";//"#333";
 	
 	export default {
 		props: {
-			treeData: Object,
-			// flexBasis:{      // 用于追溯页面上下拖动后视图大小更新
-			// 	type: Number,
-      		// 	required: false
-			// },
-			// resize: {		 // 用于追溯页面左右拖动后视图大小更新
-			// 	type: Number,
-      		// 	required: false
-			// }
+			treeData: Object
 		},
 		data() {
 			return {
+				// 默认隐藏详细。
+				tipsShow: false,
 				tree: null,
 				overview: null,
-				flag: true
+				flag: true,
 			}
 		},
 		watch: {
-		    // 如果 发生改变，这个函数就会运行
-//		    treeData: function() {
-//		    	this.data = Object.assign({}, this.treeData);
-//		    },
 		    data: function () {	
-		    	if(this.tree) {		  
-  		
-		    		this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    		
+		    	if(this.tree) {	
+					if(this.tipsShow) {
+						// 若需要显示详情。
+						this.data.node.forEach(o => o.isMaterialNode ? (o.category = 'material'):(o.category = 'process'))
+					}
+					
+					this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    	
+					this.tree.model.linkFromPortIdProperty = "fromPort";
+					this.tree.model.linkToPortIdProperty = "toPort";
 		    	}				
 		    },
 		    key: function() {
 		    	if(this.type == "catalog") {
-
-		    		this.$nextTick(function() {    		
+		    		this.$nextTick(function() {
+		    			this.setHighted()
 		    			this.setSelection();
+		    			this.fitToCurrentKey()
 		    		})
+		    	}else {
+		    		this.setHighted()
 		    	}
 		    },
 		    root: function() {
-		    	this.redrawTree();
+//		    	this.redrawTree();
 			},
 			flexBasis: 'updateCanvas',
 			resize: 'updateCanvas'
@@ -85,15 +94,492 @@
 		    // 树的数据全屏。
 		   	treeFullscreen () {
 		   		return this.$store.state.treeFullscreen
-		   	}
+			},
+			// 高亮的数据。
+			highted() {
+				return this.$store.state.highted
+			},
+			// 选中样式。
+			selectionAdornmentTemplate () {
+				return this.$(go.Adornment, "Spot", {
+						isShadowed: true
+					},
+					this.$(go.Panel, "Auto", {
+							defaultAlignment: go.Spot.Left,
+							// 设置选中节点内边距，解决节点文字与图片的距离过近的问题。
+							padding: new go.Margin(0, 20, 0, 0)// b,l,t,r
+						},
+						this.$(go.Shape, {
+							fill: HIGHLIGHT_BG_COLOR, //"#ffffff",
+							stroke: "#F09900",
+							strokeWidth: 1
+						},
+//						new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "#ffffff")
+						),
+						this.$(go.Picture, {
+								position: new go.Point(0, 0),
+								width: 16,
+								height: 16,
+								background: null,
+								margin: new go.Margin(0, 5, 0, 4),
+								imageStretch: go.GraphObject.Uniform,
+							},
+							new go.Binding("source", "isMaterialNode", s => s ? material : process)
+						),
+						this.$(go.Placeholder) // this represents the selected Node
+					),
+
+					this.$(go.TextBlock, {
+							row: 1,
+							font: "14pt Helvetica, 微软雅黑, sans-serif",
+							stroke: HIGHLIGHT_TEXT_COLOR,	//"#333333",
+							margin: 5
+						},
+						new go.Binding("text", "name"),
+//						new go.Binding("stroke", "isHighlighted", h => h ? HIGHLIGHT_TEXT_COLOR : "#333333")
+					)
+				)
+			},
+			// 简单节点样式。
+			simpleNodeTemplate() {
+				return	this.$(go.Node, "Horizontal", 
+						{ selectionObjectName: "SELECTION" },  // added this property!
+						{
+							selectionChanged: onNodeSelectionChange,//this.nodeSelectionChangeHandle,
+							click: this.treeNodeClickHandle,
+							doubleClick: onDoubleClickNode,
+							contextClick: onContextClickNode,
+							alignment: go.Spot.Center
+						}, // this event handler is defined below
+						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
+						this.$(go.Panel, "Auto", 
+							this.$(go.Shape, "Rectangle", { 
+								name: "SELECTION", 
+								fill: "transparent", 
+								strokeWidth: 0, 
+								stroke: "#F09900" 
+							},
+							new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
+								//new go.Binding("fill", "isHighlighted", h => h ? HIGHLIGHT_BG_COLOR : "transparent")
+							),
+							this.$(go.Panel, "Horizontal", 
+								this.$(go.Picture, {
+										width: 20,
+										height: 20,
+										background: null,
+										margin: new go.Margin(0, 0, 0, 4),
+										imageStretch: go.GraphObject.Uniform,
+									},
+									new go.Binding("source", "isMaterialNode", s => s ? material : process)
+								),
+								this.$(go.TextBlock, {
+										name: "TB",
+										row: 1,
+										font: "14pt Helvetica, 微软雅黑, sans-serif",
+										stroke: "#333333",
+										margin: 5,
+										// textValidation:onEditName
+									},
+									new go.Binding("text", "name"),//.makeTwoWay() //
+									new go.Binding("stroke", "isHighlighted", function(h) { return h ? HIGHLIGHT_TEXT_COLOR : "#333333" }).ofObject()
+									//new go.Binding("stroke", "isHighlighted", h => h ? "#ffffff" : "#333333")
+								)
+							)
+						),					
+						this.$("TreeExpanderButton", {
+							width: 12,
+							height: 12,
+							cursor: "pointer",
+							"ButtonBorder.fill": "#ccc",
+							"ButtonBorder.stroke": null,
+							"_buttonFillOver": "#b8b8b8",
+							"_buttonStrokeOver": null,
+							click: this.treeExpanderButtonClickHandle
+						}),
+						{selectionAdornmentTemplate: this.selectionAdornmentTemplate}
+					);
+			},
+			simpleGroupTemplate() {
+				return this.$(go.Group, "Horizontal", 
+						{ selectionObjectName: "SELECTION" },  // added this property!
+						{ // define the group's internal layout
+							selectionAdorned: false,
+							selectionChanged: onNodeSelectionChange,
+							layout: this.$(go.TreeLayout, {layerSpacing: 20, nodeSpacing: 10}),
+							// the group begins unexpanded;
+							// upon expansion, a Diagram Listener will generate contents for the group
+							isSubGraphExpanded: false,
+							// when a group is expanded, if it contains no parts, generate a subGraph inside of it
+							// subGraphExpandedChanged: (group) => {
+							// 	if(group.memberParts.count === 0) {
+							// 	}
+							// },
+							click: this.groupNodeClickHandle,
+							cursor: "pointer",
+						},
+						this.$(go.Panel, "Auto", 
+							this.$(go.Shape, "Rectangle", {
+								name: "SELECTION",
+								fill: null,
+								stroke: "gray",
+								strokeWidth: 2
+							}),
+							this.$(go.Panel, "Vertical", {
+									defaultAlignment: go.Spot.Left,
+									margin: 4
+								},
+								this.$(go.Panel, "Horizontal", {
+										defaultAlignment: go.Spot.Top
+									},
+									// the SubGraphExpanderButton is a panel that functions as a button to expand or collapse the subGraph
+									this.$("SubGraphExpanderButton", {
+										name: "processExpanderButton",
+										width: 0,
+										height: 0,
+										cursor: "pointer",
+										"ButtonBorder.fill": null, //"#fcbb3a",
+										"ButtonBorder.stroke": null,
+										"_buttonFillOver": null, //"#f9a216",
+										"_buttonStrokeOver": null
+									}),
+									this.$(go.TextBlock, {
+											font: "bold 12pt Helvetica, 微软雅黑, sans-serif",
+											margin: 4,
+											stroke: "#169bd5"
+										},
+										new go.Binding("text", "name"))	// key
+								),
+								// create a placeholder to represent the area where the contents of the group are
+								this.$(go.Placeholder, {
+									padding: new go.Margin(0, 10)
+								})
+							), // end Vertical Panel
+						),
+						this.$("TreeExpanderButton", {
+							width: 12,
+							height: 12,
+							cursor: "pointer",
+							"ButtonBorder.fill": "#ccc",
+							"ButtonBorder.stroke": null,
+							"_buttonFillOver": "#b8b8b8",
+							"_buttonStrokeOver": null,
+							click: this.treeExpanderButtonClickHandle
+						})
+						
+					); // end Group								
+			
+			},
+			materialNodeTemplate() {
+				return this.$(go.Node, "Horizontal", 
+						{ selectionObjectName: "SELECTION" },  // added this property!
+						{	selectionChanged: onNodeSelectionChange,
+							click: this.treeNodeClickHandle,
+							doubleClick: onDoubleClickNode,
+							contextClick: onContextClickNode,
+							// alignment: go.Spot.Top
+						}, 
+						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
+						this.$(go.Panel, "Vertical", 
+							this.$(go.Panel, "Auto",
+								this.$(go.Shape, "Rectangle", { 
+									name: "SELECTION", 
+									fill: "transparent", 
+									strokeWidth: 0, 
+									stroke: "#F09900" 
+								},
+								new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
+								),
+								this.$(go.Panel, "Horizontal", 
+									this.$(go.Picture, {
+											portId: "TO",
+											toSpot: go.Spot.Left,
+											width: 20,
+											height: 20,
+											background: null,
+											margin: new go.Margin(0, 0, 0, 4),
+											imageStretch: go.GraphObject.Uniform,
+										},
+										new go.Binding("source", "isMaterialNode", s => s ? material : process)
+									),
+									this.$(go.TextBlock, {
+											name: "TB",
+											row: 1,
+											font: "14pt Helvetica, 微软雅黑, sans-serif",
+											stroke: "#333333",
+											margin: 5,
+											// textValidation:onEditName
+										},
+										new go.Binding("text", "name"),//.makeTwoWay() //	
+										new go.Binding("stroke", "isHighlighted", function(h) { return h ? HIGHLIGHT_TEXT_COLOR : "#333333" }).ofObject()
+									),
+									// new go.Binding("editable","editable"),					
+									this.$("TreeExpanderButton", {
+										portId: "FROM",
+										fromSpot: go.Spot.Right,
+										width: 12,
+										height: 12,
+										cursor: "pointer",
+										"ButtonBorder.fill": "#ccc",
+										"ButtonBorder.stroke": null,
+										"_buttonFillOver": "#b8b8b8",
+										"_buttonStrokeOver": null,
+										click: this.treeExpanderButtonClickHandle
+									})
+								),
+							),
+							this.$(go.Panel, "Table", 
+								{ background: COMMENT_BGCOLOR},
+								new go.Binding("itemArray", "sumList"),//materialInfoList
+								{ 
+									margin: 4,
+									defaultAlignment: go.Spot.Left,
+									itemTemplate:
+										this.$(go.Panel, "TableRow",
+										// new go.Binding("background", "back"),
+										this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
+											{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+										this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
+											{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR })
+										)  // end of itemTemplate
+								}
+							)
+						),
+						{selectionAdornmentTemplate: this.selectionAdornmentTemplate}
+					)	
+			},
+			processNodeTemplate() {
+				return this.$(go.Node, "Horizontal", 
+						{ selectionObjectName: "SELECTION" },  // added this property!
+						{
+							selectionChanged: onNodeSelectionChange,
+							click: this.treeNodeClickHandle,
+							doubleClick: onDoubleClickNode,
+							contextClick: onContextClickNode,
+							// alignment: go.Spot.Top
+						},
+						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
+						this.$(go.Panel, "Vertical", 
+							this.$(go.Panel, "Auto",
+								this.$(go.Shape, "Rectangle", { 
+									name: "SELECTION", 
+									fill: "transparent", 
+									strokeWidth: 0, 
+									stroke: "#F09900" 
+								},
+									new go.Binding("fill", "isHighlighted", function(h) { return h ? HIGHLIGHT_BG_COLOR : "transparent" }).ofObject()
+								),
+								this.$(go.Panel, "Horizontal", 
+									this.$(go.Picture, {
+											portId: "TO",
+											toSpot: go.Spot.Left,
+											width: 20,
+											height: 20,
+											background: null,
+											margin: new go.Margin(0, 0, 0, 4),
+											imageStretch: go.GraphObject.Uniform,
+										},
+										new go.Binding("source", "isMaterialNode", s => s ? material : process)
+									),
+									this.$(go.TextBlock, {
+											name: "TB",
+											row: 1,
+											font: "14pt Helvetica, 微软雅黑, sans-serif",
+											stroke: "#333333",
+											margin: 5,
+											// textValidation:onEditName
+										},
+										new go.Binding("text", "name"),//.makeTwoWay() //
+										new go.Binding("stroke", "isHighlighted", function(h) { return h ? "#ffffff" : "#333333" }).ofObject()
+									),
+									// new go.Binding("editable","editable"),				
+									this.$("TreeExpanderButton", {
+										portId: "FROM",
+										fromSpot: go.Spot.Right,
+										width: 12,
+										height: 12,
+										cursor: "pointer",
+										"ButtonBorder.fill": "#ccc",
+										"ButtonBorder.stroke": null,
+										"_buttonFillOver": "#b8b8b8",
+										"_buttonStrokeOver": null,
+										click: this.treeExpanderButtonClickHandle
+									})
+								),
+							),
+							this.$(go.Panel, "Table", 
+								{ background: COMMENT_BGCOLOR},
+								new go.Binding("itemArray", "sumList"),//processInfoList
+								{ 
+									margin: 4,
+									defaultAlignment: go.Spot.Left,
+									itemTemplate:
+										this.$(go.Panel, "TableRow",
+											// new go.Binding("background", "back"),
+											this.$(go.TextBlock, new go.Binding("text", "equipmentName"), // 设备
+												{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+											this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
+												{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+											this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
+												{ column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR })
+										)  // end of itemTemplate
+								},
+
+								this.$(go.Panel, "TableRow",
+									{ isPanelMain: true },  // needed to keep this element when itemArray gets an Array
+									this.$(go.TextBlock, new go.Binding("text", "materialName"), // 物料名称
+										{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif", stroke: COMMENT_TEXTCOLOR})//new go.Margin(2, 2, 0, 2)font: "bold 10pt sans-serif",
+								),
+							
+								this.$(go.RowColumnDefinition,
+									{ row: 1, separatorStroke: "white" })
+							)
+						),
+						{selectionAdornmentTemplate: this.selectionAdornmentTemplate}
+					)
+			},
+			processGroupTemplate() {
+				return this.$(go.Group, "Vertical", { // define the group's internal layout
+							selectionAdorned: false,
+							layout: this.$(go.TreeLayout, {layerSpacing: 20, nodeSpacing: 10}),
+							// the group begins unexpanded;
+							// upon expansion, a Diagram Listener will generate contents for the group
+							isSubGraphExpanded: false,
+							click: this.groupNodeClickHandle,
+							cursor: "pointer",
+							selectionAdorned: false,
+						},
+						this.$(go.Panel, "Horizontal",
+							this.$(go.Panel, "Auto", 
+								this.$(go.Shape, "Rectangle", {
+									fill: null,
+									stroke: "gray",
+									strokeWidth: 2,
+									portId: 'TO',
+									
+									toSpot: go.Spot.Left
+								}),
+								this.$(go.Panel, "Vertical", {
+										defaultAlignment: go.Spot.Left,
+										margin: 4
+									},
+									this.$(go.Panel, "Horizontal", {
+											defaultAlignment: go.Spot.Top
+										},
+										// the SubGraphExpanderButton is a panel that functions as a button to expand or collapse the subGraph
+										this.$("SubGraphExpanderButton", {
+											name: "processExpanderButton",
+											width: 0,
+											height: 0,
+											cursor: "pointer",
+											"ButtonBorder.fill": null, //"#fcbb3a",
+											"ButtonBorder.stroke": null,
+											"_buttonFillOver": null, //"#f9a216",
+											"_buttonStrokeOver": null
+										}),
+										this.$(go.TextBlock, {
+												font: "bold 12pt Helvetica, 微软雅黑, sans-serif",
+												margin: 4,
+												stroke: "#169bd5"
+											},
+											new go.Binding("text", "name"))	// key
+									),
+									// create a placeholder to represent the area where the contents of the group are
+									this.$(go.Placeholder, {
+										padding: new go.Margin(0, 10)
+									})
+								)
+							),
+							this.$("TreeExpanderButton", {
+								width: 12,
+								height: 12,
+								cursor: "pointer",
+								fromSpot: go.Spot.Right,
+								portId: "FROM",
+								"ButtonBorder.fill": "#ccc",
+								"ButtonBorder.stroke": null,
+								"_buttonFillOver": "#b8b8b8",
+								"_buttonStrokeOver": null,
+								click: this.treeExpanderButtonClickHandle
+							})
+						),
+						this.$(go.Panel, "Table", 
+							{ background: COMMENT_BGCOLOR},
+							new go.Binding("itemArray", "sumList"),//processInfoList
+							{ 
+								margin: 4,
+								defaultAlignment: go.Spot.Left,
+								itemTemplate:
+									this.$(go.Panel, "TableRow",
+										new go.Binding("background", "back"),
+										this.$(go.TextBlock, new go.Binding("text", "equipmentName"), // 设备
+											{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+										this.$(go.TextBlock, new go.Binding("text", "batchNo"), // 批次
+											{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+										this.$(go.TextBlock, new go.Binding("text", "sumQuantity"),	// 数量
+											{ column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR })
+									)  // end of itemTemplate
+							},
+
+							this.$(go.Panel, "TableRow",
+								{ isPanelMain: true },  // needed to keep this element when itemArray gets an Array
+								this.$(go.TextBlock, new go.Binding("text", "materialName"), // 物料名称
+									{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif", stroke: COMMENT_TEXTCOLOR})//new go.Margin(2, 2, 0, 2) 
+							),
+						
+							this.$(go.RowColumnDefinition,
+								{ row: 1, separatorStroke: "white" })
+						)
+
+					) 	
+			},
+			linkTemplate() {
+				return this.$(go.Link, // the whole link panel
+						new go.Binding("points").makeTwoWay(), {
+							curve: go.Link.Bezier,
+							toShortLength: 0,
+							selectable: false,
+							corner: 0
+							// adjusting: go.Link.Stretch,
+						},
+							// new go.Binding("curviness", "curviness"),
+						this.$(go.Shape, // the link shape
+							{
+								stroke: "#999",
+								strokeWidth: 3
+							})
+					);
+			}
+
 		},
 		created() {
 		},		
 		mounted() {
 			this.drawTree();
-			this.createOverview();
+			// this.createOverview();
 		},
 		methods: {
+			showTips() {
+				this.tipsShow = !this.tipsShow;
+				this.tree.nodes.each(node=> {
+					let bVisible = node.visible,	
+						cat = node.data.isMaterialNode ? "material": "process";
+
+					if(!(node.data.isGroup && node.isSubGraphExpanded)) {
+						// 如果不为组且展开。
+						this.tree.model.setCategoryForNodeData(node.data, cat);
+						node.visible = 	bVisible
+					}
+															
+				})
+			},
+			hideTips() {
+				this.tipsShow = !this.tipsShow;
+				this.tree.nodes.each(node=> {
+					let bVisible = node.visible				
+					this.tree.model.setCategoryForNodeData(node.data, "simple");
+					node.visible = 	bVisible								
+				})
+			},
 			fullScreenClick() {
                 // 详情全屏按钮点击事件。
 				this.$store.commit({
@@ -110,19 +596,234 @@
 				});
 				this.recoverSize() 
 				this.updateCanvas()
-            },
-			/**
-			 * 设置gojs图形。
-			 * @param {Object} oData
-			 * @param {String} sId
-			 * @return {Object}
-			 */
-			drawTree() {
-				let $ = this.$;
+			},
+			// 树节点点击事件。
+			treeNodeClickHandle(e, node) {
+				if(this.treeFullscreen) {
+					this.restoreScreenClick();
+				}
+				
+				let aHighted = this.highted;
+				this.$store.commit({
+					type: "updateType",
+					key: "tree"
+				});
+				this.$store.commit({
+					type: "updateKey",
+					key: node.data.key
+				});
+				
+				// 如果当前点击的不是高亮的值，则将高亮清空。
+				if(aHighted.length && !aHighted.includes(node.data.key)) {
+					this.$store.commit({
+						type: "updateHeighted",
+						data: []
+					});
+				}
+				
+				if(node.data.isMaterialNode) {   // node.data.type == "1"
+					// 根据物料节点查询仓储信息。        
+					this.$router.replace({ 
+						path: "/stock", 
+						query: {
+							"key": node.data.key,
+							"_tag":  new Date().getTime().toString().substr(-5)
+						}
+					})
+				}else {
+					
+					this.$router.replace({ 
+						path: "/process",
+						query: {
+							"key": node.data.key,
+							"_tag":  new Date().getTime().toString().substr(-5)
+						}										
+					})
+				}
+			},
+			// nodeSelectionChangeHandle(node) {				
+			// 	let oSelect = node.findObject("SELECTION");
+			// 	if (oSelect !== null) {
+			// 		if (node.isSelected) {
+			// 			oSelect.fill = "#fff";
+			// 			oSelect.strokeWidth = 2;
+			// 		}else {
+			// 			oSelect.fill = "transparent";
+			// 			oSelect.strokeWidth = 0;
+			// 		}
+			// 	}
+			// },
+			// 展开/收起按钮点击事件。
+			treeExpanderButtonClickHandle(e, button) {
+				let node = button.part;
 
+				if(node instanceof go.Adornment) {
+					node = node.adornedPart;
+				}
+
+				if(!(node instanceof go.Node)) {
+					return;
+				}
+
+				let diagram = node.diagram;
+
+				if(diagram === null) {
+					return;
+				}
+
+				let cmd = diagram.commandHandler;
+
+				if(node.isTreeExpanded) {
+					if(!cmd.canCollapseTree(node)) {
+						return;
+					}
+				} else {
+					if(!cmd.canExpandTree(node)) {
+						return;
+					}
+				}
+				e.handled = true;
+				
+				let sGroup = node.data.group;
+				if(node.isTreeExpanded) {
+					cmd.collapseTree(node);
+				} else {
+					cmd.expandTree(node);
+				}
+			},
+			// 组节点点击事件。
+			groupNodeClickHandle(e, node) {
+	
+				let bSubGraphExpanded = node.isSubGraphExpanded;
+
+				if(this.tipsShow && !bSubGraphExpanded) {
+					// 组未展开，隐藏详情。
+					this.tree.model.setCategoryForNodeData(node.data, "simple");
+				}
+
+				node.findObject("processExpanderButton").click(e, node.findObject("processExpanderButton"));
+
+				if(this.tipsShow && bSubGraphExpanded) {
+					// 组展开，且展示详情。
+					this.tree.model.setCategoryForNodeData(node.data, "process");
+					
+				}
+				
+			},
+			// 设置树节点、连线、组样式。
+			setTreeTemplate() {
+				// Define a simple node template consisting of text followed by an expand/collapse button
+				// this.tree.nodeTemplate = this.simpleNodeTemplate;
+
+				// 连线样式。
+				this.tree.linkTemplate = this.linkTemplate;
+				
+				// 节点样式组。
+				var templmap = new go.Map("string", go.Node);
+				templmap.add("simple", this.simpleNodeTemplate);
+				templmap.add("material", this.materialNodeTemplate);
+				templmap.add("process", this.processNodeTemplate);
+				this.tree.nodeTemplateMap = templmap;
+
+				// 群组样式组。
+				var groupTemplmap = new go.Map("string", go.Group);
+				groupTemplmap.add("simple", this.simpleGroupTemplate);
+				groupTemplmap.add("process", this.processGroupTemplate);
+				this.tree.groupTemplateMap = groupTemplmap;
+			},
+
+			// 设置提示框样式。
+			setCommentTemplate() {
+				// 物料节点注释样式。					
+				this.tree.nodeTemplateMap.add("materialComment",
+					// this.$(go.Node,  // this needs to act as a rectangular shape for BalloonLink,
+					// { background: "transparent" },  // which can be accomplished by setting the background.
+					// this.$(go.TextBlock,
+					// 	{ stroke: "brown", margin: 3 },
+					// 	new go.Binding("text"))
+					// )
+					this.$(go.Node, "Auto",
+						// new go.Binding("location", "loc", go.Point.parse),//.makeTwoWay(go.Point.stringify), //
+						this.$(go.Shape, { fill: COMMENT_BGCOLOR, stroke: "lightgray", strokeWidth: 1 }),
+						this.$(go.Panel, "Table",
+							new go.Binding("itemArray", "items"),
+							{ margin: 4,
+							defaultAlignment: go.Spot.Left,
+							itemTemplate:
+								this.$(go.Panel, "TableRow",
+								new go.Binding("background", "back"),
+								this.$(go.TextBlock, new go.Binding("text", "batch"), // 批次
+									{ column: 0, margin: 5 }),
+								this.$(go.TextBlock, new go.Binding("text", "sum"),	// 数量
+									{ column: 1, margin: 5 })
+								)  // end of itemTemplate
+							})
+						)	
+				);
+
+				// 工序节点注释样式。
+				this.tree.nodeTemplateMap.add("processComment",
+					this.$(go.Node, "Auto",
+						this.$(go.Shape, { fill: COMMENT_BGCOLOR, stroke: "lightgray", strokeWidth: 1 }),
+						this.$(go.Panel, "Table",
+							new go.Binding("itemArray", "items"),
+							{ 
+								margin: 4,
+								defaultAlignment: go.Spot.Left,
+								itemTemplate:
+									this.$(go.Panel, "TableRow",
+										new go.Binding("background", "back"),
+										this.$(go.TextBlock, new go.Binding("text", "equipment"), // 设备
+											{ column: 0, margin: 5 }),
+										this.$(go.TextBlock, new go.Binding("text", "batch"), // 批次
+											{ column: 1, margin: 5 }),
+										this.$(go.TextBlock, new go.Binding("text", "sum"),	// 数量
+											{ column: 2, margin: 5 })
+									)  // end of itemTemplate
+							},
+							this.$(go.Panel, "TableRow",
+								{ isPanelMain: true },  // needed to keep this element when itemArray gets an Array
+								this.$(go.TextBlock, new go.Binding("text", "material"), // 物料名称
+									{ row: 0, column: 0, columnSpan: 3, margin: 5, font: "bold 10pt sans-serif"})//new go.Margin(2, 2, 0, 2)
+								),
+							// this.$(go.RowColumnDefinition,
+							// 	{ row: 0, background: "lightgray" }),
+							this.$(go.RowColumnDefinition,
+								{ row: 1, separatorStroke: "white" })
+							)
+						)
+				);		
+				
+				this.tree.linkTemplateMap.add("Comment",
+					// if the BalloonLink class has been loaded from the Extensions directory, use it
+					// this.$((typeof BalloonLink === "function" ? BalloonLink : go.Link),
+					// this.$(go.Shape,  // the Shape.geometry will be computed to surround the comment node and
+					// 	// point all the way to the commented node
+					// 	{ stroke: "lightgray", strokeWidth: 1, fill: COMMENT_BGCOLOR }))
+					this.$(go.Link,
+					{ routing: go.Link.AvoidsNodes,
+						corner: 10 },                  // rounded corners
+					this.$(go.Shape, { stroke: COMMENT_BGCOLOR }),
+					this.$(go.Shape, { stroke: COMMENT_BGCOLOR, toArrow: "Standard", fill: COMMENT_BGCOLOR })
+					)
+					// this.$(go.Link,
+					// { curve: go.Link.Bezier},
+					// this.$(go.Shape, { stroke: COMMENT_BGCOLOR, strokeWidth: 2 }),
+					// this.$(go.Shape, { stroke: COMMENT_BGCOLOR, toArrow: "Standard", fill: COMMENT_BGCOLOR })
+					// )
+				)
+			},
+			// 画布双击事件。
+			diagramDblClickHandle(e, node) {
+				zoomDiagram(this.tree, this.flag);
+				this.flag = !this.flag;
+			},
+			// 画布初始化。
+			initDiagram() {
 				this.tree =
-					$(go.Diagram, 'tree', {
+					this.$(go.Diagram, 'tree', {
 						// define the layout for the diagram
+						// initialContentAlignment: go.Spot.Center,
 						contentAlignment: go.Spot.LeftCenter,
 						allowMove: false,
 						allowZoom: true,
@@ -131,287 +832,50 @@
 						allowHorizontalScroll: true,
 						hasHorizontalScrollbar: this.chrome,
 						hasVerticalScrollbar: this.chrome,
-						allowVerticalScroll: true,
-						
-			//          initialAutoScale:go.Diagram.Uniform,
-			//			layout: $(go.TreeLayout, {
-			//				nodeSpacing: 20,
-			//				layerSpacing: 33
-			//			}),
-				        layout: $(go.LayeredDigraphLayout, {layerSpacing: 33, columnSpacing: 25}),
-						doubleClick: (e, node) => {
-							zoomDiagram(this.tree, this.flag);
-							this.flag = !this.flag;
-						}							
-					});
-
-				let tooltipTemplate =
-					$(go.Adornment, "Auto", {
-							isShadowed: true
-						},
-						$(go.Shape, "Rectangle", {
-							fill: "white",
-							stroke: "#dedede"
-						}),
-						$(go.TextBlock, {
-								font: "14pt Helvetica, 微软雅黑, sans-serif",
-								stroke: "#333333",
-								wrap: go.TextBlock.WrapFit,
-								desiredSize: new go.Size(1000, NaN),
-								alignment: go.Spot.Center,
-								margin: 4
-							},
-							new go.Binding("text", "", tooltipTextConverter))
-					);
-
-				// Define a simple node template consisting of text followed by an expand/collapse button
-				this.tree.nodeTemplate =
-					$(go.Node, "Horizontal", {
-							selectionChanged: onNodeSelectionChange,
-							click: (e, node) => {
-//								onClickNode(e, node, this.tree, this.catalog)
-								if(this.treeFullscreen) {
-									this.restoreScreenClick();
-								}
-								
-								this.$store.commit({
-									type: "updateType",
-									key: "tree"
-								});
-								this.$store.commit({
-									type: "updateKey",
-									key: node.data.key
-								});
-								
-								if(node.data.isMaterialNode) {   // node.data.type == "1"
-									// 根据物料节点查询仓储信息。        
-									this.$router.push({ 
-										path: "/stock", 
-										query: {
-											"key": node.data.key,
-											"_tag":  new Date().getTime().toString().substr(-5)
-										}
-									})
-								}else {
-									
-									this.$router.push({ 
-										path: "/process",
-										query: {
-											"key": node.data.key,
-											"_tag":  new Date().getTime().toString().substr(-5)
-										}										
-									})
-								}
-							},
-							doubleClick: onDoubleClickNode,
-							contextClick: onContextClickNode,
-							alignment: go.Spot.Center,
-							toolTip: tooltipTemplate,
-						}, // this event handler is defined below
-						new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify), //
-						$(go.Panel, "Table", {
-								width: 24,
-								defaultAlignment: go.Spot.Center
-							},
-							$(go.RowColumnDefinition, {
-								row: 0,
-								height: 20
-							}),
-							$(go.Picture, {
-									width: 20,
-									height: 20,
-									background: null,
-									margin: new go.Margin(0, 0, 0, 4),
-									imageStretch: go.GraphObject.Uniform,
-								},
-								new go.Binding("source", "isMaterialNode", s => s ? material : process)
-							)
-						),
-						$(go.TextBlock, {
-								name: "TB",
-								row: 1,
-								font: "14pt Helvetica, 微软雅黑, sans-serif",
-								stroke: "#333333",
-								margin: 5,
-								//	                  	textValidation:onEditName
-							},
-							new go.Binding("text", "name").makeTwoWay() //
-						),
-						//	              new go.Binding("editable","editable"),
-						$("TreeExpanderButton", {
-							width: 12,
-							height: 12,
-							cursor: "pointer",
-							"ButtonBorder.fill": "#ccc",
-							"ButtonBorder.stroke": null,
-							"_buttonFillOver": "#b8b8b8",
-							"_buttonStrokeOver": null,
-							click: (e, button) => {
-								let node = button.part;
-								if(node instanceof go.Adornment) node = node.adornedPart;
-								if(!(node instanceof go.Node)) return;
-								let diagram = node.diagram;
-								if(diagram === null) return;
-								let cmd = diagram.commandHandler;
-								if(node.isTreeExpanded) {
-									if(!cmd.canCollapseTree(node)) return;
-								} else {
-									if(!cmd.canExpandTree(node)) return;
-								}
-								e.handled = true;
-								
-								let sGroup = node.data.group;
-								if(node.isTreeExpanded) {
-									cmd.collapseTree(node);
-								} else {
-									cmd.expandTree(node);
-								}
-							}
-						})
-					);
-				
-				// 设置选中样式。
-				this.tree.nodeTemplate.selectionAdornmentTemplate =
-					$(go.Adornment, "Spot", {
-							isShadowed: true
-						},
-						$(go.Panel, "Auto", {
-								defaultAlignment: go.Spot.Left
-							},
-							$(go.Shape, {
-								fill: "#ffffff",
-								stroke: "#F09900",
-								strokeWidth: 1
-							}),
-
-							$(go.Picture, {
-									position: new go.Point(0, 0),
-									width: 20,
-									height: 20,
-									background: null,
-									margin: new go.Margin(0, 0, 0, 2),
-									imageStretch: go.GraphObject.Uniform,
-								},
-								new go.Binding("source", "isMaterialNode", s => s ? material : process)
-							),
-							$(go.Placeholder) // this represents the selected Node
-						),
-
-						$(go.TextBlock, {
-								row: 1,
-								font: "14pt Helvetica, 微软雅黑, sans-serif",
-								stroke: "#333333",
-								margin: 5
-							},
-							new go.Binding("text", "name")
-						)
-					); // end Adornment
-
-				this.tree.linkTemplate =
-					$(go.Link, // the whole link panel
-						new go.Binding("points").makeTwoWay(), {
-							curve: go.Link.Bezier,
-							toShortLength: 0,
-							selectable: false,
-							corner: 0
-				//	        adjusting: go.Link.Stretch,
-						},
-				//      new go.Binding("curviness", "curviness"),
-						$(go.Shape, // the link shape
-							{
-								stroke: "#999",
-								strokeWidth: 3
-							})
-					);
-					
-					// define the group template
-				this.tree.groupTemplate =
-					$(go.Group, "Auto", { // define the group's internal layout
-							layout: $(go.TreeLayout, {layerSpacing: 20, nodeSpacing: 10}),
-							// the group begins unexpanded;
-							// upon expansion, a Diagram Listener will generate contents for the group
-							isSubGraphExpanded: false,
-							// when a group is expanded, if it contains no parts, generate a subGraph inside of it
-							subGraphExpandedChanged: (group) => {
-								if(group.memberParts.count === 0) {
-		//							randomGroup(group.data.key);
-								}
-							},
-
-							click: (e, node) => {
-								node.findObject("processExpanderButton").click(e, node.findObject("processExpanderButton"));
-							},
-							cursor: "pointer",
-						},
-						$(go.Shape, "Rectangle", {
-							fill: null,
-							stroke: "gray",
-							strokeWidth: 2
-						}),
-						$(go.Panel, "Vertical", {
-								defaultAlignment: go.Spot.Left,
-								margin: 4
-							},
-							$(go.Panel, "Horizontal", {
-									defaultAlignment: go.Spot.Top
-								},
-								// the SubGraphExpanderButton is a panel that functions as a button to expand or collapse the subGraph
-								$("SubGraphExpanderButton", {
-									name: "processExpanderButton",
-									width: 0,
-									height: 0,
-									cursor: "pointer",
-									"ButtonBorder.fill": null, //"#fcbb3a",
-									"ButtonBorder.stroke": null,
-									"_buttonFillOver": null, //"#f9a216",
-									"_buttonStrokeOver": null
-								}),
-								$(go.TextBlock, {
-										font: "bold 12pt Helvetica, 微软雅黑, sans-serif",
-										margin: 4,
-										stroke: "#169bd5"
-									},
-									new go.Binding("text", "name"))	// key
-							),
-							// create a placeholder to represent the area where the contents of the group are
-							$(go.Placeholder, {
-								padding: new go.Margin(0, 10)
-							})
-						) // end Vertical Panel
-					); // end Group
-					
-					
-					this.tree.nodeTemplateMap.add("Comment",
-				      $(go.Node,  // this needs to act as a rectangular shape for BalloonLink,
-				        { background: "transparent" },  // which can be accomplished by setting the background.
-				        $(go.TextBlock,
-				          { stroke: "brown", margin: 3 },
-				          new go.Binding("text"))
-				      ));
-				
-				    this.tree.linkTemplateMap.add("Comment",
-				      // if the BalloonLink class has been loaded from the Extensions directory, use it
-				      $((typeof BalloonLink === "function" ? BalloonLink : go.Link),
-				        $(go.Shape,  // the Shape.geometry will be computed to surround the comment node and
-				                     // point all the way to the commented node
-				          { stroke: "brown", strokeWidth: 1, fill: "lightyellow" })
-				      ));
-				      
-				      // 设置初始时节点在中间显示。
-				    let self = this;
-				    this.tree.addDiagramListener("LayoutCompleted", function(e){
-				    	
-				    	if(self.treeData.node) {
-				    		
-					    	let oData = self.treeData.node.filter(o => o.parents == "")[0]
-						  	let node = self.tree.findNodeForKey(oData.key);
-						  	if(node) {
-								self.tree.centerRect(node.actualBounds);
-						  	}
-				    	}
+						allowVerticalScroll: true,					
+				        layout: this.$(go.LayeredDigraphLayout, {layerSpacing: 33, columnSpacing: 25}),
+						doubleClick: this.diagramDblClickHandle						
 					});
 			},
-
+			/**
+			 * 设置gojs图形。
+			 * @param {Object} oData
+			 * @param {String} sId
+			 * @return {Object}
+			 */
+			drawTree() {
+				// 画布初始化。
+				this.initDiagram();
+				// 设置主节点样式。
+				this.setTreeTemplate();
+				// 设置提示框样式。
+				// this.setCommentTemplate();	
+				// 布局完成后的事件处理，设置初始时节点在中间显示。
+				this.tree.addDiagramListener("LayoutCompleted", this.layoutCompletedHandle);
+			},
+			// 布局完成后的事件处理，设置初始时节点在中间显示。
+			layoutCompletedHandle(e) {
+//				if(this.treeData.node) {						
+//					let oData = this.treeData.node.filter(o => o.parents == "")[0]
+//					let node = this.tree.findNodeForKey(oData.key);
+//					if(node) {
+//						this.tree.centerRect(node.actualBounds);
+//					}
+//				}
+				this.fitToCurrentKey()
+			},
+			// 当选中时定位到当前。
+			fitToCurrentKey() {
+				if(this.treeData.node) {
+					// 如果存在显示的key值，则定位到显示的数据，否则定位到第一个数据。
+					
+					let oData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents == "")[0]
+					let node = this.tree.findNodeForKey(oData.key);
+					if(node) {
+						this.tree.centerRect(node.actualBounds);
+					}
+				}
+			},
 			/**
 			 * 创建缩略图。
 			 * @param {Object} oDiagram
@@ -420,7 +884,8 @@
 			 */
 			createOverview() {
 				this.overview = this.$(go.Overview, 'overview', {
-					observed: this.tree
+					observed: this.tree,
+					contentAlignment: go.Spot.Center
 				});
 			},
 			
@@ -429,7 +894,7 @@
 			 * @param {Object} oData
 			 * @return {void}
 			 */
-			redrawTree() {	
+			redrawTree1() {	
 				this.tree.nodes.each(o => {
 					if(!o.data.group) {				
 						o.visible = false
@@ -446,33 +911,89 @@
 					o.visible = true;
 				})
 			},
-//			设置选中。
+			
+			/**
+			 * 展开右侧节点。
+			 * 
+			 */
+			redrawTree() {
+				this.tree.nodes.each(o => {
+					if(!o.data.group) {				
+						o.visible = false
+					}
+				});
+				
+				this.root.forEach( sKey => {
+					let oRoot = this.tree.findNodeForKey(sKey);
+					oRoot.visible = true;
+					
+					oRoot.findTreeChildrenNodes().each(o => {
+						o.visible = true;
+					})
+					oRoot.findTreeParts().each(o => {
+						o.visible = true;
+					})
+				})
+			},
+			
+			
+			// 设置选中。
 			setSelection() {
 				if(!this.data.node.some(o => o.key == this.key)) {
 					return;
 				}
 			    this.tree.nodes.each(obj => {
 			    	// 取消选中样式。
-			    	obj.isSelected = false;
-					obj.background = null;
-			    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
+			    	if(obj.isSelected) {
+				    	obj.isSelected = false;
+						
+						if(obj.isHighlighted) {
+							obj.background = HIGHLIGHT_BG_COLOR;
+							obj.findObject("TB") && (obj.findObject("TB").stroke = HIGHLIGHT_TEXT_COLOR);
+						}else {
+							obj.background = null;
+					    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
+						}
+			    	}
 			    });
 				
 				let oData = this.treeData.node.filter(o => o.key == this.key)[0],
 					oNode = this.tree.findNodeForKey(oData.key);
-				
+
 				if(oNode) {				
 					oNode.isSelected = true;
-					oNode.background = "white";
-					oNode.findObject("TB") && (oNode.findObject("TB").stroke = "#333");
 				}
-
+				
 				if(oData.group) {
 					// 若节点在组合中。
 					if(!this.tree.findNodeForKey(oData.group).isSubGraphExpanded) {
 						this.tree.findNodeForKey(oData.group).expandSubGraph();
 					}
 				}
+			},
+			
+			// 设置高亮。
+			setHighted() {
+				let aHighted = this.highted
+				
+				this.tree.startTransaction("highlight");
+				
+				// 清空高亮。
+				this.tree.clearHighlighteds();
+				
+				// 是否需要高亮显示。
+				this.tree.nodes.each(obj => {
+			    	// 取消选中样式。
+			    	if(aHighted.includes(obj.data.key)) {
+						obj.isHighlighted = true;
+						obj.data.isHighlighted = true;
+					}else {
+						obj.isHighlighted = false;
+						obj.data.isHighlighted = false;
+					}
+			    });
+			    
+			    this.tree.commitTransaction("highlight");
 			},
 
 			/**
@@ -481,16 +1002,20 @@
 			* @returns {void}
 			*/
 			onSvaeImgHandler(event) {
-				var oImage = this.tree.makeImage({
+				let oImage = this.tree.makeImage({
 					scale: 1,
 					maxSize: new go.Size(Infinity, Infinity),
-		//			  background: "rgb(248,248,240)"
+					// background: "rgb(248,248,240)"
 					}),
 					// 图片地址。
 					sImage = oImage.src;
 				
-				var w=window.open('about:blank','image from canvas');
-				w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
+				this.$refs.downloadImage.href = sImage;
+				this.$refs.downloadImage.download = "追溯主图.png";
+				this.$refs.downloadImage.click();
+
+				// var w=window.open('about:blank','image from canvas');
+				// w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
 			},	
 			/**
 			* 打印图片。
@@ -521,8 +1046,8 @@
 					}
 
 					// ie浏览器下打印必须要这行。			
-		//			w.document.close();
-		//			w.focus();
+					// w.document.close();
+					// w.focus();
 					
 					// 关闭窗口。
 					w.close();
@@ -544,6 +1069,7 @@
 	.diagram {
 		display: flex;
 		flex-direction: column;
+		position: relative;
 	}
 	.icons {
 		position: relative;
@@ -551,6 +1077,8 @@
 		text-align: right;
 		padding-right:20px;
 		
+		.icon-show,
+		.icon-hide,
 		.icon-exportImg,
 		.icon-print,
 		.icon-fullScreen,
@@ -579,4 +1107,17 @@
 		}
 	}
 	
+	#overview {
+		width: 200px; 
+		height: 100px; 
+		position: absolute; 
+		left: 0; 
+		top: 0; 
+		border:1px solid #ccc;
+		
+		canvas {
+			outline:none;
+		}
+		
+	}
 </style>

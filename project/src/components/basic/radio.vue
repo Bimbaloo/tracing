@@ -1,6 +1,6 @@
 <template>
 	<el-radio-group v-model="form[key]">
-		<el-radio v-for="item in radios" :label="item.label">{{item.text}}</el-radio>
+		<el-radio v-for="(item,index) in radios" :label="item.label" :key="index">{{item.text}}</el-radio>
 	</el-radio-group>
 </template>
 

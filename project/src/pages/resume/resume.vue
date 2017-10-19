@@ -205,7 +205,9 @@
 	import Button from "components/basic/button.vue"
 	import TimeNode from "components/resume/time-node.vue"
 	import html2canvas from 'html2canvas'
-	
+	// import {host} from 'assets/js/configs.js'
+
+	// var HOST = window.HOST ? window.HOST: host	
 	var bFull = window.location.hash.indexOf("full")>-1?true:false;
 	
 	export default {

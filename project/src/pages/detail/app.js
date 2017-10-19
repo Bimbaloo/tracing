@@ -1,4 +1,5 @@
 import Vue from 'vue'
+import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 
 import ElementUI from 'element-ui'
@@ -7,17 +8,17 @@ import App from './app.vue'
 import axios from 'axios'
 import 'babel-polyfill'
 
+import 'assets/css/icon.less'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
-//import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'
 
 Vue.use(VueRouter)
 Vue.use(ElementUI)
 
+
 Vue.prototype.$ajax = axios;
 Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
-
 Vue.prototype.$post = axios.post;
 
 // import Stock from 'components/stock/stock.vue'
@@ -54,8 +55,22 @@ const router = new VueRouter({
   routes // （缩写）相当于 routes: routes
 })
 
+Vue.use(Vuex)
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import {loginModule} from 'assets/js/loginStore.js'
+
+Vue.prototype.$register = loginFn;
+
+const store = new Vuex.Store({
+  modules: {
+    loginModule
+  }
+})
+
 new Vue({
   el: '#app',
   router,
+  store,
   render: h => h(App)
 })

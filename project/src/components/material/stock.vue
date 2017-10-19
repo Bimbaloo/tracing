@@ -5,10 +5,14 @@
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
         </div>
+        <div class="path-btn">
+        	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
+            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
+        </div>
         <div class="router-path">
             <span class="path-item" @click="checkStock">仓储信息</span>
             <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
-            <span class="path-item" v-if="restrainIf">>遏制</span>
+            <span class="path-item" v-if="restrainIf">>可疑品</span>
         </div> 
         <router-view></router-view>  
         <!--el-breadcrumb separator="/" class="router-path">
@@ -28,7 +32,10 @@
                 batch: {},
                 restrain: {},
                 batchIf: false,
-                restrainIf: false    
+                restrainIf: false,
+                btnShowRestrain: false,		// 临时屏蔽遏制
+                description: "",
+				url: "/trace/v1/materialbatchsuppress"
             }
         },
         computed: {
@@ -48,7 +55,7 @@
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock`, query: this.material})
+                this.$router.replace({ path: `/stock`, query: this.material})
             },
             // 同批出入库
             checkBatch(event) {
@@ -56,8 +63,96 @@
                     // 若为最后一个节点，则不可点击。
                     return false;
                 }
-                this.$router.push({ path: `/stock/batch`, query: this.batch})
+                this.$router.replace({ path: `/stock/batch`, query: this.batch})
             },
+            // 可疑品
+            showSuspiciousList() {
+				let sKey = this.$route.params.key,
+					sPath = "";	
+				if(sKey != undefined && sKey !== "") {
+					sPath = `/stock/${sKey}/restrain`;			
+				}else {
+					sPath = "/stock/restrain"
+				}		
+				this.$router.replace({ path: sPath, query: this.$route.query})
+			},
+			// 遏制
+			showRestrain() {
+		        const h = this.$createElement;
+		        let bSucess = false;
+		        let self = this;
+		        this.$msgbox({
+		          title: "提示",
+		          message: h("el-input", {
+		          	  	attrs: {
+		          	  		type: "textarea",
+		          			rows: 4,
+		          			placeholder: "请输入遏制描述信息"
+					  	},
+					  	class: {
+						    message: true
+						},
+						domProps: {
+					      	value: self.description
+					    },
+					    on: {
+						    blur: function (event) {
+						        self.description = event.target.value
+						    }
+					    }
+		          }),
+		          showCancelButton: true,
+		          confirmButtonText: '确定',
+		          cancelButtonText: '取消',
+		          beforeClose: (action, instance, done) => {   
+		
+		            if (action === 'confirm') {
+		              	instance.confirmButtonLoading = true;
+		              	instance.confirmButtonText = '执行中...';
+		     		
+		     			let oConditions = Object.assign({description: self.description}, this.$route.query);
+		     			
+//		              	this.$post(this.url, oConditions)
+//		        		.then((res) => { 		        			
+		        			done();
+		        			instance.confirmButtonLoading = false;
+//		        			if(!res.errorCode) {			
+		        				bSucess = true;
+		        				// 隐藏遏制按钮。
+		        				self.restrainIf = false;
+		        				let sSerializion = "";
+		        				for(let p in oConditions) {
+		        					sSerializion += `&${p}=${oConditions[p]}`;
+		        				}
+		        				sSerializion = sSerializion.substring(1);
+		        				// 遏制成功，打开到遏制报告。
+		        				window.open("/restrain/report.html?" +　sSerializion);
+		        				
+//		        			}
+//		        		})
+//		        		.catch((err) => {        
+//		        			done();
+//		        			instance.confirmButtonLoading = false;
+//		        		});
+		
+		            } else {            
+		              	done();
+		//            	instance.$slots.default[0].elm.children[0].value = "";
+		            }
+		            
+		          }
+		        }).then(action => {
+		        	if(action == 'confirm') {
+		        		if(bSucess) {
+		        			this.$message.success('提交成功！');
+		        		}else {
+		        			this.$message.error('提交失败！');
+		        		}
+		        	}
+		//      	self.description = "";
+		        })
+    
+			},
             setRouteQuery() {
                 let aHref = location.href.split("?")[0].split("/"),
                     sType = aHref[aHref.length-1];
@@ -144,7 +239,13 @@
             right: 10px;
             z-index: 10;
         }
-
+        
+		.path-btn {
+        	position: absolute;
+            top: 10px;
+            right: 50px;
+            z-index: 10;
+        }
 		.router-path {
 			flex: 0 50px;
 			height: 50px;

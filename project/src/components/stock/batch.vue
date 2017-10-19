@@ -1,37 +1,35 @@
 <!--同批出入库-->
 <template>
 	<div class="router-content">
-		<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>
+		<!--<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>-->
 		<div class="innner-content">
-			<h2 class="content-title">
-				<span class="tag">{{batch}}</span>出库信息
-				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
+			<h2 class="content-title tableData">
+				
+				<span class='table-title'>批次<span class="tag">{{batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;出库信息</span>
+				<span class='table-handle'>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
+				</span>
 			</h2>
 			<div v-if="outstockData.error" class="error" :style="styleError">
 				{{ outstockData.error }}
 			</div>
 			<div v-else class="content-table" ref="outstockTable">
-				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading"></v-table>
+				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading" :resize="tdResize"></v-table>
 			</div>
-			<h2 class="content-title">
-				<span class="tag">{{batch}}</span>在库信息
-				<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
-                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+			<h2 class="content-title tableData">
+				<span class='table-title'>批次<span class="tag">{{batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;在库信息</span>
+				<span class='table-handle'>
+					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
+                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+				</span>
 			</h2>
 			<div v-if="instockData.error" class="error" :style="styleError">
 				{{ instockData.error }}
 			</div>
 			<div v-else class="content-table" ref="instockTable">
-				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading"></v-table>
+				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading" :resize="tdResize"></v-table>
 			</div>
-			<!-- 复制的内容 -->
-            <!--<div v-show="false" ref="outstockTable">
-            	<v-table :b-fixed="false" :table-data="outstockData" :loading="outstockData.loading"></v-table>
-            </div>
-            <div v-show="false" ref="instockTable">
-            	<v-table :b-fixed="false" :table-data="instockData" :loading="instockData.loading"></v-table>
-            </div>-->
 		</div>
 	</div>
 
@@ -44,7 +42,10 @@
     import Blob from 'blob'
     import FileSaver from 'file-saver'
 	import rasterizeHTML from 'rasterizehtml'
-	
+	// import {host} from 'assets/js/configs.js'
+
+	// var HOST = window.HOST ? window.HOST: host
+
 	export default {
 		components: {
 			'v-table': table
@@ -53,11 +54,13 @@
 			return {
 				excel: true,
 				print: true,
+				tdResize: true,
 				btnShow: false,  //根据需要是否隐藏‘可疑品’按钮
 				styleError: {
                 	"max-height": "200px"
                 },
 				batch: this.$route.query.batchNo,
+				materialCode: this.$route.query.materialCode,
 				outstockData: {
 					url: HOST + "/api/v1/outstock/bybatch",
 					loading: false,
@@ -73,7 +76,7 @@
 //						name: "条码类型"
 					}, {
 						prop: "batchNo",
-						name: "批次号",
+						name: "批次",
 						width: "150"
 					}, {
 						prop: "materialCode",
@@ -122,7 +125,7 @@
 //						name: "条码类型"
 					}, {
 						prop: "batchNo",
-						name: "批次号",
+						name: "批次",
 						width: "150"
 					}, {
 						prop: "materialCode",
@@ -161,7 +164,7 @@
 				},
 			}
 		},
-		created() {
+		mounted() {
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
 			this.fetchPage();
@@ -193,48 +196,69 @@
             						- (jTable.outerHeight(true) - jTable.height()))/2);
             	
             	return nHeight;
-            },
+			},			
             // 获取参数。
 			fetchData(oData) {
 				oData.error = null;
 				oData.data = [];
+				oData.height = this.adjustHeight();
 				oData.loading = true;
 
 				let sPath = oData.url;
 
-				this.$ajax.post(sPath, this.$route.query)
-					.then((res) => {
-						oData.loading = false;
-						oData.height = this.adjustHeight();
+				this.$register.sendRequest(this.$store, this.$ajax, sPath, "post", this.$route.query, (oResult) => {
+					// 请求成功。
+					oData.loading = false;			
+					oData.data = oResult;        
+				}, (sErrorMessage) => {
+					// 请求失败。
+					oData.loading = false;
+					this.styleError.maxHeight = this.adjustHeight()-50+"px";
+					// 提示信息。
+					console.log(sErrorMessage);
+				}, (err) => {
+					// 请求错误。
+					oData.loading = false;
+					console.log("接口查询出错。");
+
+					if(this.outstockData.error && this.instockData.error) {
+						this.styleError.maxHeight = this.adjustHeight()-50+"px"
+					}
+				})
+
+				// this.$ajax.post(sPath, this.$route.query)
+				// 	.then((res) => {
+				// 		oData.loading = false;
+				// 		// oData.height = this.adjustHeight();
 						
-						if(!res.data.errorCode) {
-							oData.data = res.data.data;
-						}else {
-							this.styleError.maxHeight = this.adjustHeight()-50+"px";
-//							oData.error = res.data.errorMsg.message;
-							console.log(res.data.errorMsg.message);
-						}
-					})
-					.catch((err) => {
-						oData.loading = false;
-//						oData.error = "查询出错。"
-						console.log("接口查询出错。");
-						if(this.outstockData.error && this.instockData.error) {
-							this.styleError.maxHeight = this.adjustHeight()-50+"px"
-						}
-					})
+				// 		if(!res.data.errorCode) {
+				// 			oData.data = res.data.data;
+				// 		}else {
+				// 			this.styleError.maxHeight = this.adjustHeight()-50+"px";
+				// 			// oData.error = res.data.errorMsg.message;
+				// 			console.log(res.data.errorMsg.message);
+				// 		}
+				// 	})
+				// 	.catch((err) => {
+				// 		oData.loading = false;
+				// 		// oData.error = "查询出错。"
+				// 		console.log("接口查询出错。");
+				// 		if(this.outstockData.error && this.instockData.error) {
+				// 			this.styleError.maxHeight = this.adjustHeight()-50+"px"
+				// 		}
+				// 	})
 			},
 			// 可疑品列表。
 			showSuspiciousList() {
 				if(!this.btnShow){
 					let sKey = this.$route.params.key,
-					sPath = "";				
+					sPath = "";		
 					if(sKey != undefined && sKey !== "") {
 						sPath = `/stock/${sKey}/restrain`;			
 					}else {
 						sPath = "/stock/restrain"
 					}		
-					this.$router.push({ path: sPath, query: this.$route.query})
+					this.$router.replace({ path: sPath, query: this.$route.query})
 				}else{
 					console.log("该功能将在后续开发，敬请期待...")
 				}
@@ -281,11 +305,15 @@
 	        				.el-table__body-wrapper tr:nth-child(odd) {
 	        				 	background-color: #fff;
 	        				}
+	        				.el-table__body-wrapper td {
+	                        	white-space: normal;
+	    						word-break: break-all;
+	                        }
 	        				.el-table__body-wrapper .cell {
 	        					min-height: 30px;
 	        					line-height: 30px;
 	        					// 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-//	        					border: 1px solid #e4efec;
+								//  border: 1px solid #e4efec;
 	        					box-sizing: border-box;
 	        				}
 	        				.el-table__empty-block {
@@ -339,4 +367,29 @@
 		    overflow: auto;
     	}
 	}
+</style>
+<style lang="less" scoped>
+.tableData {
+    display: flex;
+    justify-content: space-between;
+    .table-handle {
+        margin-right: 5px;
+        display: flex;
+        align-items: center;
+        i {
+            margin: 7.5px;
+        }
+    }
+    .table-table {
+        i {
+            margin: 5px;
+        }
+    }
+}
+.router-content {
+	.btn-restrain {
+		right: 100px;
+	}
+}
+
 </style>

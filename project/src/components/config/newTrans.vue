@@ -1,5 +1,5 @@
 <template>
-	<el-dialog title="条件组合" :visible.sync="dialogVisable" :close-on-click-modal="false" :before-close="closeModal">
+	<el-dialog class="transfer-dialog" title="条件组合" :visible.sync="dialogVisable" :close-on-click-modal="false" :before-close="closeModal">
         <el-form label-position="left" label-width="60px" :model="ruleForm" :rules="rules" ref="ruleForm">
         	<el-form-item label="名称" prop="name">
 			    <el-input v-model="title" placeholder="请输入条件组合名称"></el-input>
@@ -118,9 +118,15 @@
 			}
 		},
 		computed: {
-			dialogVisable: function() {
-				let bVisable = this.dialogShow;
-				return bVisable;
+			dialogVisable: {
+				get: function() {
+					let bVisable = this.dialogShow;
+					return bVisable;
+				},
+				set: function(e){
+					let bVisable = e;
+					return bVisable;
+				}
 			},
 			ruleForm: function() {
 				return {
@@ -166,20 +172,23 @@
 
 <style lang="less">
 	
-	.el-dialog{
-        width: 860px;
-        .el-form {
-        	margin: 0 30px;
+	.transfer-dialog {
+        .el-dialog {
+        	width: 860px;
+        	
+	        .el-form {
+	        	margin: 0 30px;
+	        }
+	        .el-transfer{
+	            margin-left: 0;/*30px;*/
+	        }
+	        .el-transfer-panel{
+	            width: 320px;
+	        }
+		    .el-dialog__header,.dialog-footer{
+		        text-align: center;
+		    }
         }
-        .el-transfer{
-            margin-left: 0;/*30px;*/
-        }
-        .el-transfer-panel{
-            width: 320px;
-        }
-    }
-    .el-dialog__header,.dialog-footer{
-        text-align: center;
     }
 	
 </style>

@@ -1,14 +1,17 @@
 <template>
     <el-date-picker
-      v-model="form[key]" 
+      v-model="sTime" 
       :type="dateType"
       :placeholder="hint" 
+      :disabled="disabled"
       style="width: 100%;"
-      @change="dateChange">
+      @change.native = "dateChange"
+      @change = "dateClick">
     </el-date-picker>
 </template>
 
 <script>
+    import { bus } from "assets/js/bus.js"
     export default {
         props: {
         	formData: Object, 
@@ -17,18 +20,50 @@
         	dateType: {
         		required: false,
         		default: "datetime"
+        	},
+        	disabled: {
+        		required: false,
+        		default: false
         	}
         },
         data() {
             return {
                 form: this.formData,
                 hint: this.placeholderData || '',
-                key: this.keyData
+                key: this.keyData,
+                sTime: this.formData[this.keyData]
             }
         },
+        created() {
+            let _that = this
+            //debugger
+            bus.$on('timeChange', function (obj){
+                //debugger
+                // console.log(_that.key)
+                // console.log(obj)
+                let datas = obj.keys
+                for(let i in datas){
+					if(i === _that.key) {
+                        _that.sTime = new Date(datas[i])
+                       // console.log(_that.sTime)
+					}
+				}
+            })
+        },
         methods: {
-        	dateChange(sVal) {
-        		this.form[this.key] = sVal;
+        	// 输入处理
+        	dateChange(event) {
+        		let sVal = event.target.value
+        		this.formData[this.keyData] = sVal;
+        	},
+        	// 选中确定处理
+        	dateClick(value) {
+        		if(value != undefined) {
+        			this.formData[this.keyData] = value;
+        		}else {
+        			// 点击插件自动清空，返回是undefined 
+        			this.formData[this.keyData] = '';
+        		}
         	}
         }
     }

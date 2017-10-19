@@ -32,14 +32,15 @@ const config = {
   output: {
     path: resolve(__dirname, './dist'),
     filename: 'assets/js/[name].js',
-    publicPath: '/'
+//  publicPath: '/'
   },
   resolve: {
     extensions: ['.js', '.vue'],
     alias: {
       assets: join(__dirname, '/src/assets'),
       components: join(__dirname, '/src/components'),
-      root: join(__dirname, 'node_modules')
+      root: join(__dirname, 'node_modules'),
+      vue: 'vue/dist/vue.js'
     }
   },
   module: {
@@ -99,7 +100,7 @@ const config = {
         use: [{
           loader: 'url-loader',
           options: {
-            limit: 10000,
+            limit: 1000000,
             name: 'assets/img/[name].[hash:7].[ext]'
           }
         }]
@@ -107,6 +108,10 @@ const config = {
     ]
   },
   plugins: [
+    // new webpack.DefinePlugin({
+    //   'DEV_HOST': JSON.stringify("http://192.168.227.172:8088"), //http://192.168.20.187:8080
+    //   'PRO_HOST': JSON.stringify("http://192.168.227.170:8087")
+    // }),
     new webpack.optimize.ModuleConcatenationPlugin(),
     new CommonsChunkPlugin({
       name: 'vendors',
@@ -119,18 +124,19 @@ const config = {
   ],
   devServer: {
     host: '127.0.0.1',
-    port: 8080,
+    port: 8010,
     historyApiFallback: false,
     noInfo: true,
     proxy: {
       '/api': {
-        target: 'http://127.0.0.1:8080',
+        target: 'http://127.0.0.1:8010',
         changeOrigin: true,
         pathRewrite: { '^/api': '' }
       }
     },
     open: true,
-    openPage: 'search.html'
+    openPage: 'search.html',
+    compress: true //开启gzip压缩
   },
   devtool: '#eval-source-map'
 }

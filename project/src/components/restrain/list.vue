@@ -10,13 +10,12 @@
 </template>
 
 
-
-
-
-
 <script>
 
 	import table from "components/basic/table.vue"
+	// import {host} from 'assets/js/configs.js'
+
+	// var HOST = window.HOST ? window.HOST: host
 	//	const URL = HOST + "/api/v1/suppress/list";   // 正式
 	//const URL = "http://rapapi.org/mockjsdata/21533/list?";   // 测试获取遏制列表数据
 	const URL = "../static/restrain.json";   // 测试获取遏制列表数据
@@ -124,34 +123,53 @@
 					console.log(this.restrainList)
 				}
 			},
+			// 请求成功。
+			requestSucess(oData) {
+				this.loading = false;
+				
+				this.tableData.data = oData;        
+			},
+			// 请求失败。
+			requestFail(sErrorMessage) {
+				this.loading = false;
+				// 提示信息。
+				console.log(sErrorMessage);
+			},
+			// 请求错误。
+			requestError(err) {
+				this.loading = false;
+			//	this.styleObject.minWidth = 0;
+				console.log("数据库查询出错。")
+			},  		
 
 		// 调用接口查询
 			getListhData(oCondition){
-				//debugger
-				this.$ajax.get(URL,oCondition).then((res) => {
-					this.judgeLoaderHandler(res,() => {
-					//	debugger
-						this.tableDate.data = res.data.data
-					});
-				})
+            	this.$register.sendRequest(this.$store, this.$ajax, URL, "get", oCondition, this.requestSucess, this.requestFail, this.requestError)
+				
+				// this.$ajax.get(URL,oCondition).then((res) => {
+				// 	this.judgeLoaderHandler(res,() => {
+				// 	//	debugger
+				// 		this.tableDate.data = res.data.data
+				// 	});
+				// })
 			},
 
 		// 判断调用接口是否成功。
-			judgeLoaderHandler(param,fnSu,fnFail) {
-				let bRight = param.data.errorCode;
+			// judgeLoaderHandler(param,fnSu,fnFail) {
+			// 	let bRight = param.data.errorCode;
 						
-				// 判断是否调用成功。
-				if(!bRight) {
-					// 调用成功后的回调函数。
-					fnSu && fnSu();
-				}else {
-					// 提示信息。
-					this.sErrorMessage = param.data.errorMsg.message;
-					this.showMessage();
-					// 失败后的回调函。
-					fnFail && fnFail();
-				}
-			},
+			// 	// 判断是否调用成功。
+			// 	if(!bRight) {
+			// 		// 调用成功后的回调函数。
+			// 		fnSu && fnSu();
+			// 	}else {
+			// 		// 提示信息。
+			// 		this.sErrorMessage = param.data.errorMsg.message;
+			// 		this.showMessage();
+			// 		// 失败后的回调函。
+			// 		fnFail && fnFail();
+			// 	}
+			// },
 			//查看详情
 			viewDetails(index){
 				console.log(index)
@@ -209,11 +227,6 @@
 		}
 	}
 </script>
-
-
-
-
-
 
 <style scoped lang="less">
 

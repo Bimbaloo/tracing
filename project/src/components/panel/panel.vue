@@ -6,10 +6,10 @@
          </el-radio-group>
         </div>
         <div class="panel-content"
-        	:style="{height: sPanelHeight}">
+        	:style="{height: sPanelHeight+'px'}">
             <!--<v-form :tab="category.key" :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>-->
-	        <div class="panel-content-wrap" v-for="item in category.list" 
-	        		:class="[category.active.radio == item.key?'':'hide']">
+	        <div class="panel-content-wrap" v-for="(item,index) in category.list" 
+	        		:class="[category.active.radio == item.key?'':'hide']" :key="index">
 	        		<v-form 
 	        			:tab="category.key"
 	        			:sub-tab="item.key"
@@ -17,15 +17,18 @@
 	        			:label-width="labelWidth"
 	        			:handle-submit="handleSubmit"
 	        			:keys="keys"
+	        			:form-height="sPanelHeight"
 	        			:items="item.items" >
 	        		</v-form>
 	        	</div>
         </div>
+        
     </div>
     
 </template>
 <script>
     import form from 'components/form/form.vue'
+    import { bus } from "assets/js/bus.js"
 
     export default {
         props: {
@@ -40,7 +43,7 @@
                 radio: "1",          
                 keys: {},
                 // 面板参数高度
-                sPanelHeight: "100%"
+                sPanelHeight: "auto"
             }
         },
         computed: {
@@ -68,6 +71,10 @@
         },
         created () {
             // 设置选中的初始值。
+            let _that = this
+            bus.$on('id-selected', function (obj) {
+            _that.radio = obj.radio
+            })
             this.radio = this.category.active.radio;
             let initData = this.category.list.filter(o => o.key == this.radio)[0];    
             this.keys = this.getKeys(initData);
@@ -82,7 +89,7 @@
         	setPanelHeight() {
         		let oPanelTitle = this.$refs.panelTitle;
         		if(oPanelTitle) {
-	        		this.sPanelHeight = (this.panelHeight - oPanelTitle.clientHeight)+ "px"
+	        		this.sPanelHeight = (this.panelHeight - oPanelTitle.clientHeight)
         		}
         	},
             getKeys(oData) {
@@ -146,7 +153,7 @@
         // padding-right: 28px;
     }
     .panel-content {
-    	overflow: auto;
+    	/*overflow: auto;*/
     	
     	.panel-content-wrap {
     		padding:  0 28px;

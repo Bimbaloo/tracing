@@ -1,54 +1,86 @@
 <template>
-	<div id="app" class="report-wrapper" ref="fastreport">
-		<div class="report-container">	
+	<div id="app" class="report-wrapper" >
+		<!-- 显示节点 -->
+		<div class="report-container original" v-show="!printReport">	
 			<div class="page-icon">
 				<i class="icon icon-20 icon-download" title="下载" @click="downloadHandle('fastreport', $event)"></i>
-            	<i class="icon icon-20 icon-print" title="打印" @click="printHandle('fastreport', $event)"></i>
+            	<i class="icon icon-20 icon-print" title="打印" @click="beforePrint('fastreport', $event)"></i>
 			</div>
-			<div class="tag">
-				<span>报告人：admin</span>
+			<h1 class="title">快速报告</h1>
+			<h2 class="content-title">查询条件</h2>
+			<div class='condition-messsage'>
+				<span v-for="(filter,index) in filtersList" :key="index">
+					{{filter[0]}} : {{filter[1]}}
+				</span>
+				<span v-show="!this.filters.materialCode && gridData.data[0]" class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
+				<span v-show="!this.filters.processName && gridData.data[0]" class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
+			</div>
+			<div class='condition-list' @click="active.message = !active.message">
+				<span>查询明细
+					<i class="el-icon-d-arrow-right icon" v-show="!active.message"></i>
+				</span>
+			</div>
+			<div class="content-table condition-table" v-show="active.message">
+				<div class='materialBox' v-for="equipment in equipmentTimes">
+					<div class='material'>{{equipment['name']}}：</div>
+					<div class='time' >
+						<span v-for='time in equipment["time"]'>{{time}}</span>
+					</div>
+				</div>
+			</div>
+			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
+		</div>
+		<!-- 打印节点 -->
+		<div class='report-container clone' v-show="printReport" ref="fastreport">
+			<div class="tag report-time">
+				<span>报告人：{{nickname}}</span>
 				<span>报告时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span>
 			</div>
 			<h1 class="title">快速报告</h1>
 			<h2 class="content-title">查询条件</h2>
-			<div class="condition" ref="condition">	
-				<div class='condition-messsage'>
-					<span v-for="filter in _filters">
-						{{filter[0]}} : {{filter[1]}}
-					</span> 
-				</div>	
-				<div class='result-messsage'>
-					<span style="cursor:pointer">结果集:</span>
-					<span @click="dialogVisible('all')" label="all" style="cursor:pointer">共<i> {{result.whole}} </i>条,</span>
-					<span @click="dialogVisible('selected')" label="selected" style="cursor:pointer">选中<i> {{result.selected}} </i>条,</span>
-					<span @click="dialogVisible('filtered')" label="filtered" style="cursor:pointer">过滤<i> {{result.filter}} </i>条。</span>
-				</div>
-				
+			<div class='condition-messsage'>
+				<span v-for="(filter,index) in filtersList" :key="index">
+					{{filter[0]}} : {{filter[1]}}
+				</span>
+				<span v-show="!this.filters.materialCode" class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
+				<span v-show="!this.filters.processName " class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
 			</div>
-			<el-dialog title="结果集" :visible.sync="dialogTableVisible" size="large">
-				<el-radio-group v-model="radio" @change="radioChange">
-				    <el-radio-button label="all" class="btn-radio">全部</el-radio-button>
-				    <el-radio-button label="selected" class="btn-radio">选中</el-radio-button>
-				    <el-radio-button label="filtered" class="btn-radio">过滤</el-radio-button>
-				</el-radio-group>				 				 
-	            <div v-if="error" class="error">
-	                {{ error }}
-	            </div>
-	            <div v-else class="content-table" >
-	                <v-table :table-data="showData" :loading="!dialogState" :heights="500" v-if="dialogState"></v-table>  <!-- 真正的显示内容的table -->
-					<v-table :table-data="gridData" :loading="!dialogState" :heights="500" v-else></v-table>              <!-- 为了在table组件未加载数据前撑开高度 -->
-	            </div>     
-			</el-dialog>
-			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
-			<h2 class="content-title">审核</h2>
-			<div class="condition-audit" >		
+			<div class='condition-list'>
+				<span>查询明细</span>
+			</div>
+			<div class="content-table condition-table">
+				<div class='materialBox' v-for="equipment in equipmentTimes">
+					<div class='material'>{{equipment['name']}}：</div>
+					<div class='time' >
+						<span v-for='time in equipment["time"]'>{{time}}</span>
+					</div>
+				</div>
+			</div>
+			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>
+			<h2 class="content-title" v-show="printRemark">备注</h2>
+			<div class="condition-audit" v-show="printRemark" >		
 				<div class="tag">
 					<span>签名：</span>
 					<span>时间：</span>
 				</div>
 			</div>
 		</div>
-  	</div>
+		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" size="tiny">
+            <el-form :model="form">
+                <el-form-item label="报告人：" :label-width="formLabelWidth">
+                    <el-input v-model="form.name" auto-complete="off" :placeholder="this.$store.state.loginModule.nickname"></el-input>
+					<el-input v-show="false"></el-input>
+                </el-form-item>
+				<el-form-item :label-width="formLabelWidth">
+					<el-checkbox v-model="form.printRemark">是否打印备注栏</el-checkbox>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="dialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="dialogFormVisible = false,printReport = true">确 定</el-button>
+            </div>
+        </el-dialog>
+	  </div>
 </template>
 
 <script>
@@ -56,7 +88,7 @@
 	import table from "components/basic/table.vue"
 	import html2canvas from 'html2canvas'
 	import fnP from "assets/js/public.js"
-	
+
 	// 数据名称接口。
     const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
 
@@ -67,6 +99,19 @@
 		},
 		data() {
 			return {
+				dialogFormVisible: false,
+                form: {
+					name: '',
+					printRemark: true
+                },
+                formLabelWidth: '120px',
+
+				printRemark: false, // 是否打印备注栏
+				nickname: "",   	// 报告人
+				printReport: false, // 是否打印
+				active: {			// 条件列是否显示
+					message: false
+				},
 				dialogTableVisible: false,
 				radio: "all",
 				showData: {
@@ -77,89 +122,19 @@
 				url: HOST + "/api/v1/trace/down/start-points",
 				dataName:[],
 				loading: false,
-                error: "",
+				error: "",
+				// 快速报告查询类型。若为溯源页面跳转而来，该类型不为空。
+				type: "",
                 selected: [],
                 gridData: {
                     columns: [{
-                        type: "index",
-                        name: "序号",
-                        width: "50"
-                    },{
-                        prop: "barcode",
-                        name: "条码"
-                    },{
-                        prop: "batchNo",
-                        name: "批次号"
-                    },{
-                        prop: "materialCode",
-                        name: "物料编码"
-                    },{
-                        prop: "materialName",
-                        name: "物料名称"
-                    },{
-                        prop: "materialSpec",
-                        name: "物料规格"
-                    },{
-                        prop: "materialUnit",
-                        name: "物料单位"
-                    },{
-                        prop: "quantity",
-                        name: "数量"
+                        prop: "equipmentName",
+                        name: "设备"
                     },{
                         prop: "happenTime",
                         name: "加工时间"
-                    },{
-                        prop: "personName",
-                        name: "操作人"
-                    },{
-                        prop: "equipmentName",
-                        name: "设备名称"
-                    },{
-                        prop: "equipmentCode",
-                        name: "设备编码"
-                    },{
-                        prop: "equipmentType",
-                        name: "设备类型"
-                    },{
-                        prop: "processName",
-                        name: "工序名称"
-                    },{
-                        prop: "moldCode",
-                        name: "模号"
                     }],
-                    data: [{
-				      "barcode": "UN65457437520007057", 
-				      "batchNo": "20160331A", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "materialCode": "10000515", 
-				      "materialSpec": "", 
-				      "materialUnit": "kg", 
-				      "quantity": 16, 
-				      "happenTime": "2016-03-31 14:28:33", 
-				      "personName": "李瑞娇", 
-				      "equipmentName": "装配2.2线GP12", 
-				      "equipmentCode": "RLSB1", 
-				      "equipmentType": "", 
-				      "processName": "GP12", 
-				      "moldCode": "",
-				      "bucketNo": ""
-				    },{
-				      "barcode": "UN65457437520007066", 
-				      "batchNo": "20160331A", 
-				      "materialName": "ZC/SGE LFV 活塞总成/环销卡簧连杆/新型线/12667058", 
-				      "materialCode": "10000515", 
-				      "materialSpec": "", 
-				      "materialUnit": "kg", 
-				      "quantity": 16, 
-				      "happenTime": "2016-03-31 14:28:33", 
-				      "personName": "李瑞娇", 
-				      "equipmentName": "装配2.2线GP12", 
-				      "equipmentCode": "RLSB1", 
-				      "equipmentType": "", 
-				      "processName": "GP12", 
-				      "moldCode": "",
-				      "bucketNo": ""
-				    }]
+                    data: []
                 },
             
 				styleObject: {
@@ -171,7 +146,9 @@
 					filter: 0
 				},
 				filters: {},
-				dialogState:false
+				filtersList: [],
+				//dialogState:false
+				equipmentTimes:[]
 			}
 		},
 		computed: {
@@ -186,112 +163,153 @@
 					} 
 				} 
 				return oRequest; 
-			},
-			_filters: function() {
-				let _filters = this.filters
-				for(let i in _filters){
-					if(_filters[i] === '' || i === '_tag'){
-						delete _filters[i]
-					}
-				}
-				/* 为了将获取到的 barcode等转换为对应的中文 */
-				let b = Object.entries(_filters),
-					a = this.dataName;
-
-				b.forEach(o =>
-                    a.forEach(function (x) {
-                        if(o[0] === x.itemCode){
-                            o[0] = x.itemName
-                        }
-                    })
-                )
-				return b
-				/* 为了将获取到的 barcode等转换为对应的中文 */
 			}
 		},
 		created() {
+			// 登录验证。
+			this.$register.login(this.$store);
+
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
 			let oConditions = sessionStorage.getItem("fastReport_" + this.query.tag);
 			
 			if(oConditions) {
-				oConditions = JSON.parse(oConditions);			
-				this.result.selected = (oConditions.selected && oConditions.selected.length) || 0;
-				this.result.whole = oConditions.length || 0;
-				this.result.filter = this.result.whole - this.result.selected;
+				oConditions = JSON.parse(oConditions);	
 				
-				this.filters = oConditions.filters || [];
-				this.selected = oConditions.selected || [];
+				if(!oConditions.type) {
+					// 通过起点集查询。
+					this.result.selected = (oConditions.selected && oConditions.selected.length) || 0;
+					this.result.whole = oConditions.length || 0;
+					this.result.filter = this.result.whole - this.result.selected;
+					
+					this.filters = oConditions.filters || [];
+					this.selected = oConditions.selected || [];
+				}else {
+					// 溯源页面跳转。
+					this.type = oConditions.type
+					this.filters = Object.assign({}, oConditions.keys)
+					this.selected = oConditions
+				}
+
 			}
 
 			this.fetchDataName()  //获取名称
 		},
 		mounted() {
-			this.fetchData();
+			this.fetchStartPointsData();
 		},
 		methods: {
-			// 判断调用接口是否成功。
-			judgeLoaderHandler(param, fnSu, fnFail) {
-				let bRight = param.data.errorCode;
+			setFilters () {
 				
-				// 判断是否调用成功。
-				if(!bRight) {
-					// 调用成功后的回调函数。
-					fnSu && fnSu(param.data.data);
-				}else {
-					// 提示信息。
-//					this.error = "查无数据";
-					console.warn(param.data.errorMsg.message);
-					// 失败后的回调函。
-					fnFail && fnFail();
+				let oFilters = this.filters,
+					aoFilters = []
+				
+				for(let param in oFilters){
+					if(oFilters[param] === '' || param === '_tag'){
+						delete oFilters[param]
+					}else {
+						/* 为了将获取到的 barcode等转换为对应的中文 */
+						let aValue = this.setSpecialItem(param, oFilters[param])
+						aValue && aoFilters.push(aValue)				
+					}
 				}
-			},	
-			fetchData () {
+				this.filtersList = aoFilters 
+			},
+			// 获取对应的中文。
+			setSpecialItem (param, sValue) {
+				
+				if(param === "equipmentName") {
+					// 设备名称。
+					param = "equipmentCode"
+				}
+
+				let oItem = this.dataName.filter(o => o.itemCode === param)[0]
+
+				if(oItem) {
+					if(typeof sValue === "string") {
+						let oParam = {};
+						oParam[param] = sValue;
+						sValue = fnP.parseQueryParam(oParam, 1)[param]
+					}
+
+					return [oItem.itemName, sValue]
+				}
+				
+			},
+			// 起点请求成功。
+			requestStartPointsSucess(oData) {
+				//console.log(oData)
+				this.gridData.data = oData;
+				
+				let myData = JSON.parse(JSON.stringify(this.gridData.data))
+				let needArr = []
+				myData.forEach((el,i)=>{
+					let obj = {
+						"name":"",
+						"time":[]
+					}
+					obj["name"] = el["equipmentName"]
+					obj["time"].push(el["happenTime"])
+					needArr.push(obj)
+					for (let j = i+1 ; j < myData.length; j++){
+						if (el["equipmentName"] === myData[j]["equipmentName"]){
+							obj["time"].push(myData[j]["happenTime"])
+							myData.splice(j, 1)
+							j=j-1   
+						}
+					}
+				})
+				this.equipmentTimes = needArr
+
+
+				if(!oData.length) {
+					console.log('查无数据。');
+				}else {
+					this.gridData.data.forEach((o, index) => {
+						if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
+							// 标记为选中。
+							o.tag = "selected";
+						}else {
+							o.tag = "filtered";
+						}
+					});
+				}
+		
+				this.showData = {
+					columns: this.gridData.columns,
+					data: this.gridData.data
+				}
+				//this.dialogState = true	
+			},
+			// 请求失败。
+			requestFail(sErrorMessage) {
+				console.warn(sErrorMessage);
+			},
+			// 请求错误。
+			requestError(error) {
+              	// this.gridData.loading = false;
+				// this.error = "查无数据";
+				console.warn(error);
+				console.warn("查询出错。");
+			},
+			fetchStartPointsData () {
 				this.error = "";
 				this.gridData.data = [];
-				// url:api/v1/trace/down/start-points
-             	this.$post(this.url, fnP.parseQueryParam(this.filters))
-             	.then((res) => {
-					//debugger
-					this.judgeLoaderHandler(res, (data) => {
-						
-						this.gridData.data = data;
-						
-						if(!data.length) {
-							console.log('查无数据。');
-						}else {
-							this.gridData.data.forEach((o, index) => {
-								if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
-									// 标记为选中。
-									o.tag = "selected";
-								}else {
-									o.tag = "filtered";
-								}
-							});
-						}
-              
-                        this.showData = {
-                        	columns: this.gridData.columns,
-                        	data: this.gridData.data
-                        }
-						this.dialogState = true						
-					})
-             })
-             .catch((err) => {
-                this.gridData.loading = false;
-//				this.error = "查无数据";
-				console.warn("查询出错。");
-             })
+				
+				if(this.type) {
+					return;
+				}
+
+				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", fnP.parseQueryParam(this.filters), this.requestStartPointsSucess, this.requestFail, this.requestError)
+			},
+			// 获取名称成功。
+			requestNameSucess(oData) {
+				// 获取对应的名称。
+				this.dataName = oData	
+				this.setFilters()
 			},
 			fetchDataName() {
-				this.$ajax.get(TABLE_DATA_URL).then((res) => {
-					this.judgeLoaderHandler(res, () => {
-						// 获取对应的名称。
-						//debugger
-
-						this.dataName = res.data.data	
-					});
-				});
+				this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, this.requestNameSucess, this.requestFail, this.requestError)
 			},
 			setWidth() {
 				this.styleObject.minWidth = "1200px";
@@ -323,19 +341,53 @@
                     return;
                 }
                 window.Rt.utils.downloadHtml(html2canvas, oRef, "快速报告");     
-            },
+			},
+			//
+			beforePrint(){
+				this.dialogFormVisible = true
+			},
             // 页面打印。
             printHandle (refHtml, event) {
-				event.stopPropagation();
+				//event.stopPropagation();
+				if(!this.printReport){
+					return 0
+				}else{
+					let oRef = this.$refs[refHtml];
+					if(!oRef) {
+						return;
+					}
+					let icons = oRef.querySelectorAll(".icon")
+					icons.forEach(e=>{
+						e.style.display = "none"
+					})
+					this.printRemark = this.form.printRemark  //是否显示备注
+					/* 报告人报告时间部分 */
+					let reportTime = oRef.querySelector(".report-time")
+					let nickname = this.form.name || ((this.$store.state.loginModule.nickname !== null) ? this.$store.state.loginModule.nickname : "")
+					reportTime.innerHTML = `
+						<div class="tag report-time"  v-show="false" >
+							<span>报告人：${nickname}</span>
+							<span>报告时间：${new Date().Format("yyyy-MM-dd hh:mm:ss")}</span>
+						</div>
+					`
+					setTimeout(()=>{
+						window.Rt.utils.printHtml(html2canvas,oRef,{
+							height: this.outerHeight(oRef)
+						},false);
+						this.printReport = false
+					},1000)
+					
+				}
+			},
+			//高度函数
+			outerHeight(el) {
+				var height = el.offsetHeight;
+				var style = getComputedStyle(el);
 
-                let oRef = this.$refs[refHtml];
-                if(!oRef) {
-                    return;
-                }
-                
-                window.Rt.utils.printHtml(html2canvas,oRef);          
-            }
-		}
+				height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+				return height;
+				}
+			}
 	}
 </script>
 
@@ -356,10 +408,11 @@
 		padding: 0 20px;
 		background-color: #fff;
 		position: relative;
+		box-sizing: border-box;
 		
 		.page-icon {
 			position: absolute;
-			top: 78px;
+			top: 30px;
 			right: 20px;
 
 			.icon {
@@ -380,56 +433,83 @@
 		
 		&>.tag {
 			position: absolute;
-			top: 34px;
-			left: 50%;
-			margin-left: 80px;
-			
+			font-size: 14px;
+			top: 60px;
+			right: 20px;
 			span {
 				display: inline-block;
 				&+span {
 					margin-left: 30px;
-				}
-				
+				}	
 			}
 		}
 	}
-	.condition {
-		border: 2px solid #42AF8F;
-		padding: 10px 12px;
-		margin-bottom: 30px;
-		font-size: 14px;
+	.report-container {
 		.condition-messsage {
-			line-height: 25px;
+			box-sizing: border-box;
+			padding-left: 10px;
 			span {
-				margin-left: 10px
+				font-size: 14px;
+				margin-right: 30px
+			}
+			
+			.default-message {
+				color: #999;
+				margin-right: 10px;
 			}
 		}
-		.result-messsage {
-			line-height: 25px;
-			span:nth-child(1) {
-				margin-left: 10px
+		.condition-list {
+			box-sizing: border-box;
+			padding-left: 10px;
+			cursor: pointer;
+			span {
+				font-size: 14px;
+				line-height: 40px;
+				color: #42AF8F
+			}
+			.icon {
+				font-size: 12px;
+				margin-bottom: 3px;
 			}
 		}
-		span {
-			display: inline-block;
-			&+span:nth-child(1) {
-				margin-left: 60px;
+		.condition-table {
+			margin-top: 0;
+			box-sizing: border-box;
+			border: 1px solid #42AF8F;
+			padding: 10px;
+			.materialBox {
+				display: flex;
+				box-sizing: border-box;
+				padding-left: 10px;
+				color: #666;
+				margin-bottom: 20px;
+				font-size: 14px;
+				&:last-child {
+					margin-bottom: 0;
+				}
+				.material {
+					line-height: 20px;
+				}
+				.time {
+					display: flex;
+					flex: 1;
+					flex-wrap: wrap;
+					&>span {
+						margin-left: 10px; 
+						line-height: 20px;
+					}
+				}
 			}
-			// &+span:nth-child(2) {
-			// 	margin-left: 60px;
-			// }
-		}
-		
-		.condition-line+.condition-line {
-			margin-top: 10px;
-		}
-		
-		i {
-			color: #42AF8F;
-			font-style: normal;
-			font-weight: 600;
+			
 		}
 	}
+	// .clone {
+	// 	position: absolute;
+	// 	left: 20px;
+	// 	right: 20px;
+	// 	top: 0;
+	// 	 bottom: 0;
+	// }
 	.condition-audit {
 		border: 2px solid #42AF8F;
 		padding: 20px 12px;
@@ -464,5 +544,29 @@
 	}
 	.el-loading-mask {
 		z-index: 1000 ;
+	}
+	.el-dialog--tiny {
+		max-width: 420px;
+	}
+	.el-dialog__body {
+		.el-form-item {
+			margin-bottom: 0; 
+		}
+		.el-input {
+			.el-input__inner{
+				height: 30px;
+				border-radius: 0;
+				width: 200px;
+				border-color: #ddd;
+			}
+		}
+	}
+	.el-dialog__footer {
+		text-align: center;
+		.dialog-footer {
+			.el-button {
+				border-radius: 0
+			}
+		}
 	}
 </style>

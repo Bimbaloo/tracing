@@ -1,0 +1,126 @@
+.ag-table {
+    .ag-header {
+        background: #42af8f;
+        
+        // 标题头部全选按钮居中
+        .ag-header-select-all {
+            width: 100%;
+            margin-left: -2px;
+            // 垂直居中对齐
+            margin-top: 8px;
+        }
+        
+        .ag-header-row {
+            background-color: #42AF8F;
+            color: #FFFFFF;
+            line-height: 30px;
+        }
+    }
+    .ag-header-cell {
+        text-align: center;
+        border-right-color: #e7f2ed;
+        
+       .ag-header-cell-label {
+            text-align: center;
+            display: block;
+            
+            & > span {
+                float: none;
+                display: inline-block;
+                font-weight: 600;
+            }
+        }
+        
+        // 表头操作按钮
+        .ag-header-cell-menu-button {
+            display: none;
+        }
+    }
+    
+    .ag-body {
+        background-color: #FFFFFF;
+        
+        .ag-body-viewport-wrapper {
+            height: 99.5%;
+        }
+    }
+    
+    .ag-font-style {
+      cursor: default;
+      -webkit-user-select: text;
+      -moz-user-select: text;
+      -ms-user-select: text;
+      user-select: text; 
+      }
+    
+    // 表格内容全选居中
+    .row-style {
+        text-align: center;
+        line-height: 38px;
+    }
+    
+    // border
+    .ag-root {
+        border-color: #e7f2ed;
+    }
+    .ag-cell {
+        border-color: #e7f2ed;
+        color: rgb(31, 61, 55);
+        // 省略号。。。 单元格的高度固定。。。
+//      white-space: normal;
+//      word-break: break-all;
+//      overflow: auto;
+        
+        &.ag-cell-focus {
+            outline: none;
+        }
+    }
+    .ag-ltr {
+        .ag-cell-no-focus {
+            border-style: solid;        
+            border-color: #e7f2ed;
+        }
+    } 
+    
+    .ag-row-selected.ag-row-even {
+        // 取消行选中样式
+        background-color: #FFFFFF;
+    }
+    .ag-row-selected.ag-row-odd {
+        // 取消行选中样式
+        background-color: #f6f6f6;
+    }
+    .ag-icon-checkbox-checked-readonly,
+    .ag-icon-checkbox-checked {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background: transparent url(../img/icon-16-checkbox.png) -16px 0 no-repeat;
+    }
+    
+    // 有选中未全选的样式。
+    .ag-icon-checkbox-indeterminate,
+    .ag-icon-checkbox-indeterminate-readonly {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background: transparent url(../img/icon-16-checkbox.png) 0 0 no-repeat;
+    }
+    .ag-icon-checkbox-unchecked-readonly,
+    .ag-icon-checkbox-unchecked{
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background: transparent url(../img/icon-16-checkbox.png) 0 0 no-repeat;
+    }
+ 
+    .ag-icon-checkbox-checked:empty {
+        background: #42AF8F url(../img/icon-16-checkbox.png) -16px 0 no-repeat;
+    }
+    @media all and (-ms-high-contrast: none), (-ms-high-contrast: active) {
+        .ag-icon-checkbox-checked:empty {
+            background: #42AF8F url(../img/icon-16-checkbox.png) -16px 0 no-repeat;
+        } 
+    } 
+    
+}
