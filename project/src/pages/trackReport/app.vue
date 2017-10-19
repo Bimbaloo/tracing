@@ -163,7 +163,6 @@
 				}
 
 			}
-
 			this.fetchDataName()  //获取名称
 		},
 		mounted() {
@@ -468,9 +467,10 @@
 	                    	.report-container .report .content-table.inner {
 							  display: block !important;
 							}
-//	                    	.report-container .readmine {
-//	                    		display:　block;
-//	                    	}
+	                    	.report-container .report .error {
+	                    		height: 60px;
+							    text-align: center;
+	                    	}
 	                    	.report-container .readmine .condition-audit {
 	                    		border: 2px solid #42AF8F;
 								padding: 20px 12px;
@@ -536,7 +536,9 @@
 	                </div>
 	            `;
 	
-	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml, {
+	            	width: document.body.clientWidth
+	            });
 	            this.printReport = false
 			},
 			//高度函数

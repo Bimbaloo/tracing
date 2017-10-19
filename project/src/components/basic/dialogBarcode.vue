@@ -1,5 +1,5 @@
 <template>
-	<el-dialog size="small" class="dialog-wrap" title="条码查询" :visible.sync="dialogVisible" :close-on-click-modal="false" :before-close="handleClose">
+	<el-dialog size="small" class="dialog-barcode-wrap" title="条码查询" :visible.sync="dialogVisible" :close-on-click-modal="false" :before-close="handleClose">
 
 		<div class="dialog-content">
 			<div class="dialog-filter">
@@ -155,9 +155,13 @@
 	
 </script>
 
-<style lang="less" scoped>
-	.dialog-wrap {
+<style lang="less">
+	.dialog-barcode-wrap {
 		line-height: 20px;
+		
+		.el-dialog--small {
+			min-width: 500px;
+		}
 		
 		.dialog-content {
 			.error {
@@ -197,15 +201,6 @@
 								text-overflow: ellipsis;
 								vertical-align: middle;
 								white-space: nowrap;
-								/*span {
-									display: inline-block;
-									width: calc(100% - 22px);
-									width: -webkit-calc(100% - 22px);
-									width: -moz-calc(100% - 22px);
-									overflow: hidden;
-									text-overflow: ellipsis;
-									vertical-align: middle;
-								}*/
 							}
 						
 						}
