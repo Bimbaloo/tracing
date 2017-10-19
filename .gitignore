@@ -8,3 +8,6 @@ npm-debug.log
 npm-debug.log
 project/src/assets/js/configs.js
 .gitignore
+.cache-loader
+.static
+.project
