@@ -107,6 +107,7 @@ import XLSX from 'xlsx'
 import Blob from 'blob'
 import FileSaver from 'file-saver'
 import html2canvas from 'html2canvas'
+import rasterizeHTML from 'rasterizehtml'
 
 export default {
 	components: {
@@ -881,7 +882,57 @@ export default {
 			if (!oTable) {
 				return;
 			}
-			window.Rt.utils.printHtml(html2canvas, oTable);
+			
+			
+			let sHtml = `
+	                <div class="table el-table">
+	                    <div class="el-table__header-wrapper">
+	                        ${oTable.querySelector(".el-table__header-wrapper").innerHTML}
+	                    </div>
+	                    <div class="el-table__body-wrapper">
+	                        ${oTable.querySelector(".el-table__body-wrapper").innerHTML}
+	                    </div>
+	                    <style>
+	                        .el-table td.is-center, .el-table th.is-center {
+	                            text-align: center;
+	                        }
+	                        .table thead th {
+	                            height: 36px;
+	                            background-color: #42af8f;
+	                        }
+	                        .table thead th .cell {
+	                            color: #fff;
+	                        }
+		                    .el-table__body-wrapper tr:nth-child(even) {
+		                        background-color: #fafafa;
+		                    }
+		                    .el-table__body-wrapper tr:nth-child(odd) {
+		                        background-color: #fff;
+		                    }
+	                        .el-table__body-wrapper td {
+	                        	white-space: normal;
+	    						word-break: break-all;
+	                        }
+	                        .el-table__body-wrapper .cell {
+	                            min-height: 30px;
+	                            line-height: 30px;
+	                            // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+	                            //	border: 1px solid #e4efec;
+	                            box-sizing: border-box;
+	                        }
+	                        .el-table__body-wrapper .batch .cell > div {
+	                            color: #f90;
+	                        	font-weight: 600
+	                        }
+	                        .el-table__empty-block {
+	                            text-align: center;	
+	                        }
+	                    </style>
+	                </div>
+	            `;
+	
+	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+//			window.Rt.utils.printHtml(html2canvas, oTable);
 		}
 	}
 }
