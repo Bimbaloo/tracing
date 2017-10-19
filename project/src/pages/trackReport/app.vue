@@ -214,7 +214,11 @@
 				
 				let myData = JSON.parse(JSON.stringify(this.gridData.data))
 				let needArr = []
-				myData.forEach((el,i)=>{
+				let selectedArr = []
+				this.selected.forEach((o, index) => {
+					selectedArr.push(myData.find(e=> o.bucketNo === e.bucketNo))
+				})
+				selectedArr.forEach((el,i)=>{
 					let obj = {
 						"name":"",
 						"time":[]
@@ -222,10 +226,10 @@
 					obj["name"] = el["equipmentName"]
 					obj["time"].push(el["happenTime"])
 					needArr.push(obj)
-					for (let j = i+1 ; j < myData.length; j++){
-						if (el["equipmentName"] === myData[j]["equipmentName"]){
-							obj["time"].push(myData[j]["happenTime"])
-							myData.splice(j, 1)
+					for (let j = i+1 ; j < selectedArr.length; j++){
+						if (el["equipmentName"] === selectedArr[j]["equipmentName"]){
+							obj["time"].push(selectedArr[j]["happenTime"])
+							selectedArr.splice(j, 1)
 							j=j-1   
 						}
 					}
@@ -626,7 +630,7 @@
 				box-sizing: border-box;
 				padding-left: 10px;
 				color: #666;
-				margin-bottom: 20px;
+				margin-bottom: 5px;
 				font-size: 14px;
 				&:last-child {
 					margin-bottom: 0;
