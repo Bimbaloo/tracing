@@ -2,7 +2,7 @@
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="labelWidth" @keyup.enter.native="submitForm('ruleForm')" >
 		<div class='form-conditions' :style="{maxHeight: conditionHeight}">
 			<el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
-            	<component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key"></component> 
+            	<component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key" :tab="tab" :sub-tab="subTab"></component> 
 				<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
         	</el-form-item>
 		</div>
@@ -82,7 +82,7 @@
 		created() {
 			let _that = this
             bus.$on('id-selected', function (obj) {
-				if(_that.tab === obj.tab){
+				if(_that.tab === obj.tab && _that.subTab === obj.radio){
 					let datas = obj.keys
 					for(let i in datas){
 						if(i === "startTime" || i === "endTime") {

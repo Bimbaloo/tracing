@@ -16,7 +16,6 @@
       <img class="version" :src="version" />
       <span class="version-info">版本: {{ v }}</span>
     </footer>
-    <v-dialog v-if="showDialog" :dialog-visible="showDialog" @hideDialog="hideDialog"></v-dialog>
     <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" :style="{zIndex: historyZindex}" @mouseover="historyZindex = 2" @mouseleave="historyZindex = 0" >
       <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>

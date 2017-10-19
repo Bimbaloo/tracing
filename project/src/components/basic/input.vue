@@ -5,6 +5,24 @@
 <script>
     export default {
         props: ['formData', 'placeholderData', 'keyData','disabledData'],
+        props: {
+        	formData: Object,
+        	placeHolderData: String,
+        	keyData: String,
+        	listData: Array,
+        	disabledData: {
+        		required: false,
+        		default: false
+        	},
+			tab: {
+                required: false,
+        		default: null
+            },
+            subTab: {
+                required: false,
+        		default: null
+            }
+        },
         data() {
             return {
                 hint: this.placeholderData,

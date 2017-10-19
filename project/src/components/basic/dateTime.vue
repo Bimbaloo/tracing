@@ -24,7 +24,15 @@
         	disabled: {
         		required: false,
         		default: false
-        	}
+        	},
+            tab: {
+                required: false,
+        		default: null
+            },
+            subTab: {
+                required: false,
+        		default: null
+            }
         },
         data() {
             return {
@@ -39,15 +47,17 @@
             //debugger
             bus.$on('timeChange', function (obj){
                 //debugger
-                // console.log(_that.key)
-                // console.log(obj)
-                let datas = obj.keys
-                for(let i in datas){
-					if(i === _that.key) {
-                        _that.sTime = new Date(datas[i])
-                       // console.log(_that.sTime)
-					}
-				}
+                 //console.log(_that.tab)
+                if(_that.tab === obj.tab && _that.subTab === obj.radio){
+                    let datas = obj.keys
+                    for(let i in datas){
+                        if(i === _that.key) {
+                            _that.sTime = new Date(datas[i])
+                        // console.log(_that.sTime)
+                        }
+                    }
+                }
+                
             })
         },
         methods: {

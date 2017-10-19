@@ -87,7 +87,15 @@
         	getByAjax: {
         		required: false,
         		default: true
-        	}
+        	},
+			tab: {
+                required: false,
+        		default: null
+            },
+            subTab: {
+                required: false,
+        		default: null
+            }
         },
         data() {
             return {

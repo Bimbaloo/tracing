@@ -73,7 +73,9 @@
             // 设置选中的初始值。
             let _that = this
             bus.$on('id-selected', function (obj) {
-            _that.radio = obj.radio
+                if(_that.category.key === obj.tab){
+                     _that.radio = obj.radio
+                }
             })
             this.radio = this.category.active.radio;
             let initData = this.category.list.filter(o => o.key == this.radio)[0];    
