@@ -155,11 +155,12 @@ export default {
 					}, {
 						prop: "materialCode",
 						name: "物料编码",
+						width: '200',
 						sortable: true
 					}, {
 						prop: "materialName",
 						name: "物料名称",
-						width: "300",
+//						width: "300",
 						sortable: true
 					}, {
 						prop: "quantity",
