@@ -11,7 +11,8 @@
 				<span>设备名称：{{$route.query.equipmentName}}</span><span>开始时间：{{$route.query.startTime}}</span><span>结束时间：{{$route.query.endTime}}</span>
 			</div>
 			<h2 class="title">可疑品列表</h2>
-			<v-report :hasData="setWidth" :noData="removeWidth" ></v-report>
+			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
+			<v-report v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report>
 		</div>
 	</div>
 
@@ -46,7 +47,7 @@
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
-			// '$route': 'fetchData'
+//			 '$route': 'fetchData'
 		},
 		methods: {	
 

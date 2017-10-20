@@ -29,7 +29,8 @@
                 node: {},
 				equipments: [],
 				datetime:{},
-				empty: "暂无数据。"
+				empty: "暂无数据。",
+				tag: this.$route.query._tag
             }
         },
         computed: {
@@ -54,9 +55,14 @@
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': function() {
-				this.setEquipmentList();
-				this.setDateTime();			
+            '$route': function(to, from) {
+            	// 如果从tree上直接点击，需要更新数据. tag不同
+            	// 从其他页面中进入。from.meta.title不一样
+            	if(to.meta.title == 'chart' && (from.meta.title == 'chart' || (to.query._tag != undefined && this.tag != to.query._tag) )) {
+					this.tag = to.query._tag;
+					this.setEquipmentList();
+					this.setDateTime();
+            	}
 			}
         },
         methods: {
