@@ -22,6 +22,7 @@
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
       <div class='history-title' v-show="showHistory" >
         <h2>查询记录</h2>
+        <h3 class="clear-history" @click="clearHistory">清空查询记录</h3>
       </div>
       <div class='history-panal' v-show="showHistory" >
         <ul class='history-content' v-for="ul in liData">
@@ -285,6 +286,11 @@ export default {
           })
           localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
         }
+      },
+      // 清空历史记录
+      clearHistory(){
+        localStorage.removeItem("history")
+        this.myLocalStorage = []
       }
   }
 }
@@ -492,7 +498,17 @@ footer {
     &>h2 {
       color: #fff;
       text-align: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
+    }
+    &>h3 {
+      font-size: 14px;
+      color: #fff;
+      text-align: right;
+      margin-right: 20px;
+      &:hover {
+        cursor: pointer;
+        color: #42af8f
+      }
     }
   }
   .history-panal {
