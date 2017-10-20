@@ -12,7 +12,9 @@
             	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
             </div>
         </div> 
-        <router-view></router-view>  
+        <keep-alive>
+		    <router-view></router-view>
+        </keep-alive>
     </div>
 </template>
 

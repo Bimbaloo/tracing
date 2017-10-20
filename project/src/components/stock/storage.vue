@@ -61,6 +61,7 @@
         data () {
             return {
                 key: this.$route.params.key,
+                tag: this.$route.query._tag,
                 styleError: {
                 	"max-height": "200px"
                 },
@@ -199,9 +200,19 @@
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': function() {
+            '$route': function(to, from) {
             	this.key = this.$route.params.key;
-              	this.fetchPage();
+            	
+            	// 不是从后面同批入库及遏制中进入的都要重新获取数据
+            	let toTitle = to.meta.title,
+            		fromTitle = from.meta.title;
+            		
+            	// 从查询按钮进入查询时的处理。
+            	// 查出库: 从可疑品(restrain)或同批次入库(batch)中进入，则不会重新请求 
+            	if( toTitle == 'storage' && (fromTitle == 'storage' || (to.query._tag != undefined && this.tag != to.query._tag) )) {
+		            this.tag = to.query._tag;
+		            this.fetchPage();
+            	}
             }
         },
         methods: {

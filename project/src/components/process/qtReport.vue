@@ -187,7 +187,12 @@ export default {
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': 'fetchData',
+        '$route': function(to, from) {
+        	// 当是质检时，更新数据
+        	if(to.meta.title == 'qtReport') {
+        		this.fetchData();
+        	}
+        },
         /* 上下拖动时，重新设置table大小变化 */
         "resizeY": 'setTbaleHeight',
         /* 全屏大小时，重新设置table大小 */
@@ -197,6 +202,7 @@ export default {
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
+            this.tableData.data = [];
             
             let odata = oData,  //获取到的data
 
@@ -225,8 +231,11 @@ export default {
                 let objData = Object.assign(el, tdata);   // 合并获取正在的data
                 this.tableData.data.push(objData)
             })
-
-            this.tableData.columns.push(obj)               
+			
+			// 判断是否需要添加column。
+			if(!this.tableData.columns.some( o => o.name == obj.name)) {
+	            this.tableData.columns.push(obj)               
+			}
         },
         // 请求失败。
         requestFail(sErrorMessage) {

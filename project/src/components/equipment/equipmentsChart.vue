@@ -181,6 +181,7 @@
 		},
         data () {
             return {
+            	treeTag: this.$route.query._tag,
                 // 是否展示设备状态。
                 showState: true,
                 // 设备。
@@ -700,7 +701,15 @@
         },
         watch: {
 			// 为了每次点击都会查询。
-			'$route': 'updateData',
+			'$route': function(to, from) {
+				// 如果从tree上直接点击，需要更新数据. tag不同
+            	// 从其他页面中进入。from.meta.title不一样
+				if(to.meta.title == 'chart' && (from.meta.title == 'chart' || (to.query._tag != undefined && this.treeTag != to.query._tag))) {
+					this.treeTag = to.query._tag;
+					this.updateData()
+				}
+				this.resizeChart()
+			},
             fullscreen: 'resizeChart',
             treeFullscreen: 'resizeChart',
             resize: 'resizeChart',
