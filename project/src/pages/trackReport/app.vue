@@ -12,8 +12,8 @@
 				<span v-for="(filter,index) in filtersList" :key="index">
 					{{filter[0]}} : {{filter[1]}}
 				</span>
-				<span v-show="!this.filters.materialCode && gridData.data[0]" class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
-				<span v-show="!this.filters.processName && gridData.data[0]" class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
+				<span v-show="!this.filters.materialCode && selectedArrs[0]" class="default-message" >物料：{{selectedArrs[0] ? selectedArrs[0]["materialCode"] : ""}}</span>
+				<span v-show="!this.filters.processName && selectedArrs[0]" class="default-message" >工序：{{selectedArrs[0] ? selectedArrs[0]["processName"] : ""}}</span> 
 			</div>
 			<div class='condition-list' @click="active.message = !active.message">
 				<span>查询明细
@@ -116,7 +116,8 @@
 				filters: {},
 				filtersList: [],
 				//dialogState:false
-				equipmentTimes:[]
+				equipmentTimes:[],
+				selectedArrs: []
 			}
 		},
 		computed: {
@@ -217,6 +218,7 @@
 				this.selected.forEach((o, index) => {
 					selectedArr.push(myData.find(e=> o.bucketNo === e.bucketNo))
 				})
+				this.selectedArrs = JSON.parse(JSON.stringify(selectedArr))
 				selectedArr.forEach((el,i)=>{
 					let obj = {
 						"name":"",
