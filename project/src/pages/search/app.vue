@@ -20,7 +20,9 @@
     <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" :style="{zIndex: historyZindex}" @mouseover="historyZindex = 2" @mouseleave="historyZindex = 0" >
       <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
-      <div class='history-title'><h2>查询记录</h2></div>
+      <div class='history-title' v-show="showHistory" >
+        <h2>查询记录</h2>
+      </div>
       <div class='history-panal' v-show="showHistory" >
         <ul class='history-content' v-for="ul in liData">
           <li class="ecorded-time">
@@ -35,7 +37,7 @@
               <li class="ecorded-module">{{data.oData.tab}}</li>
               <li class='records'>
                 <ul class="detail-record-box">
-                  <li class="detail-record" v-for="li in data.oData.keys">{{li[0]}}:{{li[1]}}</li>
+                  <li class="detail-record" v-for="li in data.oData.keys" v-if="li[1]">{{li[0]}}:{{li[1]}}</li>
                 </ul>
               </li>
             </ul>
