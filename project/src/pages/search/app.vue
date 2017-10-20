@@ -20,8 +20,8 @@
     <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" :style="{zIndex: historyZindex}" @mouseover="historyZindex = 2" @mouseleave="historyZindex = 0" >
       <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
+      <div class='history-title'><h2>查询记录</h2></div>
       <div class='history-panal' v-show="showHistory" >
-        <h2>查询记录</h2>
         <ul class='history-content' v-for="ul in liData">
           <li class="ecorded-time">
             <h3>{{ul.date}}</h3>
@@ -164,7 +164,12 @@ export default {
     },
     switchData(oldData) {
       let newData = []
-      let oData = JSON.parse(JSON.stringify(oldData))
+      let oData = []
+      if(oldData.length>50){
+        oData = oldData.slice(0,50)
+      }else{
+        oData = JSON.parse(JSON.stringify(oldData))
+      }
       oData.forEach((el, i) => {
         let a = {
           "date": "",
@@ -461,6 +466,8 @@ footer {
   height: 100%;
   left: 0;
   top: 0;
+  display: flex;
+  flex-direction: column;
   &.max-history-box {
     transition: width .5s ease;
     width: 400px;
@@ -477,16 +484,21 @@ footer {
     color: #fff;
     cursor: pointer;
   }
-  .history-panal {
+  .history-title {
     box-sizing: border-box;
     margin-top: 50px;
-    padding-left: 15px;
-    padding-right: 15px;
     &>h2 {
       color: #fff;
       text-align: center;
       margin-bottom: 20px;
     }
+  }
+  .history-panal {
+    box-sizing: border-box;
+    padding-left: 15px;
+    padding-right: 15px;
+    flex: 1;
+    overflow: auto;
     .history-content {
       margin-bottom: 30px;
       >li {
