@@ -26,12 +26,17 @@
                         <el-table class="table-main" :data="checked?uniteItems.data:uniteItems.dataFilter" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
-                                    <div :class="['cell-content',{ltext: column.prop === 'barcode'}]" v-if="column.prop === 'barcode'" :style="{paddingLeft: !!props.row.in ? 15 : 50 +'px'}">
+                                    <div 
+                                    :class="['cell-content',{ltext: column.prop === 'barcode'}]" 
+                                    v-if="column.prop === 'barcode'" 
+                                    :style="{paddingLeft: !!props.row.in ? 15 : 50 +'px'}">
                                         <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
                                         <span>{{ props.row[column.prop]}}</span>
+                                        <i v-if="showCamera" class="icon icon-12 icon-camera" title="视频监控"></i>
                                     </div>
                                     <div class="cell-content" v-else>
                                         <span>{{ props.row[column.prop] }}</span>
+                                        <i v-if="showCamera"></i>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -156,6 +161,8 @@ export default {
     },
     data() {
         return {
+            // 是否开启视频监控。
+            showCamera: !!CAMERA,
             checked: false, //是否显示全部数据
             excel: true,
             print: true,

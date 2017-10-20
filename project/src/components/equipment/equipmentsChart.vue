@@ -76,7 +76,12 @@
                                 <li v-for="(event,index) in equipment.event"
                                 :key="index" 
                                 v-if="compareData.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
-                                    <div :style="{color: equipment.color}">{{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;<span v-if="event.group">事件组：{{event.group}}</span><i v-if="!!event.related" class="icon icon-arrow-tag"></i></div>
+                                    <div :style="{color: equipment.color}">
+                                        {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
+                                        <span v-if="event.group">事件组：{{event.group}}</span>
+                                        <i v-if="!!event.related" class="icon icon-12 icon-pin"></i>
+                                        <i v-if="showCamera && compareData.dimension==='pool'" class="icon icon-12 icon-camera" title="监控视频"></i>
+                                    </div>
                                     <ul class="content-list">
                                         <li v-for="(content,index) in event.content" :key="index">
                                             {{content.name}}:&nbsp;&nbsp;{{parseData(content.value)}}
@@ -181,6 +186,8 @@
 		},
         data () {
             return {
+                // 是否开启视频监控。
+                showCamera: !!CAMERA,
                 // 是否展示设备状态。
                 showState: true,
                 // 设备。
@@ -2060,7 +2067,7 @@
 
                             if(o.related) {
                                 // 若为起点相关。
-                                sTag = `<i class="icon icon-arrow-tag"></i>`;
+                                sTag = `<i class="icon icon-12 icon-pin"></i>`;
                             }
                             if(sGroup) {
                                 sList += `<div style="color:${param.color}">${++nIndex}.${o.title}&nbsp;&nbsp;事件组：${sGroup}${sTag}</div>`;
@@ -2652,11 +2659,13 @@
     	}
     }
 
-    .icon-arrow-tag {
-        margin: -2px 5px 0 5px;
-        width: 12px;
-        height: 12px;
-        background: url(../../assets/img/icon-pin.png);
-        background-size: 12px 12px;
+    .icon-12{
+        &.icon-pin {
+             margin-left: 5px;
+        }
+
+        &.icon-camera {
+            cursor: pointer;
+        }
     }
 </style>

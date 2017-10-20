@@ -16,10 +16,9 @@ import 'assets/js/global.js'
 Vue.use(VueRouter)
 Vue.use(ElementUI)
 
-
-Vue.prototype.$ajax = axios;
-Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
-Vue.prototype.$post = axios.post;
+Vue.prototype.$ajax = axios
+Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, { params: oParams })
+Vue.prototype.$post = axios.post
 
 // import Stock from 'components/stock/stock.vue'
 // import Trace from 'components/trace/trace.vue'

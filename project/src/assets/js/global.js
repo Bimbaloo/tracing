@@ -86,7 +86,7 @@
 		
 		/**
 		 * 导出Json为excel。依赖xlsx、blob、file-saver。
-		 * @param {Array || Object} oData
+		 * @param {Array || Object} oTableData
 		 * # type 1 
 		 * # [{add: "ann", age: 1}]
 		 * # type 2
@@ -116,12 +116,27 @@
 		
 			let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 	
-			let sFileName = oData.filename || "table";
+			let sFileName = (oTableData && oTableData.filename) || "table";
 	
 			// 下载表格。
 			FileSaver.saveAs(new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' }), sFileName + ".xlsx");            	
 		},
 
+		/**
+		 * 导出带合并单元格的表格为excel。依赖xlsx、blob、file-saver。
+		 * @param {Array || Object} oTableData
+		 * # type 1 
+		 * # [{add: "ann", age: 1}]
+		 * # type 2
+		 * # {data: [{add: "ann", age: 1}]}
+		 * # type 3
+		 * # {
+		 * #	columns: [{name: "地址", prop: "add"},{name: "年龄", prop: "age"}],
+		 * #	data: [{add: "ann", age: 1}, {add: "bbb", age: 2}]
+		 * #	filename: "下载"
+		 * # }
+		 * @return {void}
+		 */
 		exportMergeTable2Excel: function (XLSX, Blob, FileSaver, oTableData, oElement) { 
 			let aoTableJson = this.parseTableData(oTableData);
 			
@@ -141,13 +156,14 @@
 
 			let wbout = XLSX.write(wb, { bookType: 'xlsx', type: 'binary' });
 			
-			let sFileName = oTableData.filename || "table";
+			let sFileName = (oTableData && oTableData.filename) || "table";
 	
 			// 下载表格。
 			FileSaver.saveAs(new Blob([this.s2ab(wbout)], { type: 'application/octet-stream' }), sFileName + ".xlsx");            	
 			
 		},
 		/**
+		 * 数据转换。
 		 * @param{Object} oTableData
 		 * @return{Array}
 		 */
@@ -156,7 +172,7 @@
 			
 			let aoTableJson = [];
 	
-			if(oData instanceof Array ) {
+			if(oTableData instanceof Array ) {
 				// 若为数组。
 				aoTableJson = oData;
 			}else if(!oData.columns || !oData.columns.length) {

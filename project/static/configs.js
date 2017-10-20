@@ -8,3 +8,6 @@ var HOST =
 // var FINE_REPORT_HOST = "http://192.168.20.181:8088";
 // var MI_HOST = "http://report.zjrealtech.com:801";
 var VERSION = "1.0.0-RC2";
+
+// 是否开启视频监控功能。
+var CAMERA = 1;
