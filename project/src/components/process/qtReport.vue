@@ -236,6 +236,8 @@ export default {
 			if(!this.tableData.columns.some( o => o.name == obj.name)) {
 	            this.tableData.columns.push(obj)               
 			}
+			
+			this.setTbaleHeight()
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -365,8 +367,10 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.tableData.height = this.adjustHeight()
+        	if(this.$route.meta.title == 'qtReport') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.tableData.height = this.adjustHeight()
+        	}
         },
         /* 设置title */
         setTitle(el, title) {
