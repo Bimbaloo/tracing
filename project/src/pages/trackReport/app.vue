@@ -18,13 +18,15 @@
 			<div class='condition-list' @click="active.message = !active.message">
 				<span>查询明细
 					<i class="el-icon-d-arrow-right icon" v-show="!active.message"></i>
+					<span v-show="active.message">--追踪结果集选中行信息</span>
+					<span v-show="active.message" style="color:#999;margin-left:10px">设备名称：（条码，加工时间）</span>
 				</span>
 			</div>
 			<div class="content-table condition-table" v-show="active.message">
 				<div class='materialBox' v-for="equipment in equipmentTimes">
 					<div class='material'>{{equipment['name']}}：</div>
 					<div class='time' >
-						<span v-for='time in equipment["time"]'>{{time}}</span>
+						<span v-for='(time,i) in equipment["time"]'>（{{equipment["barcode"][i]}}，{{time}}）</span>
 					</div>
 				</div>
 			</div>
@@ -222,14 +224,17 @@
 				selectedArr.forEach((el,i)=>{
 					let obj = {
 						"name":"",
-						"time":[]
+						"time":[],
+						"barcode":[],
 					}
 					obj["name"] = el["equipmentName"]
 					obj["time"].push(el["happenTime"])
+					obj["barcode"].push(el["barcode"])
 					needArr.push(obj)
 					for (let j = i+1 ; j < selectedArr.length; j++){
 						if (el["equipmentName"] === selectedArr[j]["equipmentName"]){
 							obj["time"].push(selectedArr[j]["happenTime"])
+							obj["barcode"].push(selectedArr[j]["barcode"])
 							selectedArr.splice(j, 1)
 							j=j-1   
 						}
