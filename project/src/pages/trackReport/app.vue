@@ -163,7 +163,6 @@
 				}
 
 			}
-
 			this.fetchDataName()  //获取名称
 		},
 		mounted() {
@@ -214,7 +213,11 @@
 				
 				let myData = JSON.parse(JSON.stringify(this.gridData.data))
 				let needArr = []
-				myData.forEach((el,i)=>{
+				let selectedArr = []
+				this.selected.forEach((o, index) => {
+					selectedArr.push(myData.find(e=> o.bucketNo === e.bucketNo))
+				})
+				selectedArr.forEach((el,i)=>{
 					let obj = {
 						"name":"",
 						"time":[]
@@ -222,10 +225,10 @@
 					obj["name"] = el["equipmentName"]
 					obj["time"].push(el["happenTime"])
 					needArr.push(obj)
-					for (let j = i+1 ; j < myData.length; j++){
-						if (el["equipmentName"] === myData[j]["equipmentName"]){
-							obj["time"].push(myData[j]["happenTime"])
-							myData.splice(j, 1)
+					for (let j = i+1 ; j < selectedArr.length; j++){
+						if (el["equipmentName"] === selectedArr[j]["equipmentName"]){
+							obj["time"].push(selectedArr[j]["happenTime"])
+							selectedArr.splice(j, 1)
 							j=j-1   
 						}
 					}
@@ -464,9 +467,10 @@
 	                    	.report-container .report .content-table.inner {
 							  display: block !important;
 							}
-//	                    	.report-container .readmine {
-//	                    		display:　block;
-//	                    	}
+	                    	.report-container .report .error {
+	                    		height: 60px;
+							    text-align: center;
+	                    	}
 	                    	.report-container .readmine .condition-audit {
 	                    		border: 2px solid #42AF8F;
 								padding: 20px 12px;
@@ -532,7 +536,9 @@
 	                </div>
 	            `;
 	
-	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml, {
+	            	width: document.body.clientWidth
+	            });
 	            this.printReport = false
 			},
 			//高度函数
@@ -626,7 +632,7 @@
 				box-sizing: border-box;
 				padding-left: 10px;
 				color: #666;
-				margin-bottom: 20px;
+				margin-bottom: 5px;
 				font-size: 14px;
 				&:last-child {
 					margin-bottom: 0;
