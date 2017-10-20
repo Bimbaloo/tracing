@@ -165,13 +165,17 @@ export default {
         resize: 'updateEcharts',
         /* 上下拖动时，重新设置flexBase大小变化 */
         "resizeY": function(){
-            this.setFlexBase()
-            this.tableHeight = this.setTableHeight()
+        	if(this.$route.meta.title == 'parameter') {
+	            this.setFlexBase()
+	            this.tableHeight = this.setTableHeight()
+        	}
         },
         /* 全屏大小时，重新设置flexBase大小 */
         "fullscreen": function(){
-            this.setFlexBase()
-            this.tableHeight = this.setTableHeight()
+            if(this.$route.meta.title == 'parameter') {
+	            this.setFlexBase()
+	            this.tableHeight = this.setTableHeight()
+        	}
         }
     },
     methods: {

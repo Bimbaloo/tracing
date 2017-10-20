@@ -215,6 +215,7 @@ export default {
         requestSucess(oData) {
             this.loading = false;
             this.tableData.data = oData;
+            this.setTbaleHeight()
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -345,8 +346,10 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.tableData.height = this.adjustHeight()
+        	if(this.$route.meta.title == 'fgbReport') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.tableData.height = this.adjustHeight()
+        	}
         },
         /* 根据新获取的检验值，找到对应的中文 */
         setName(val) {

@@ -580,6 +580,8 @@ export default {
             this.outAllItems.dataFilter = outAllDatasFilter             // 产出汇总--时间内
             this.inAllItems.data = inAllDatas                           // 投入汇总
             this.inAllItems.dataFilter = inAllDatasFilter               // 投入汇总--时间内
+        	
+        	this.setTbaleHeight()
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -787,10 +789,12 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-            this.uniteItems.height = 2 * this.adjustHeight() + 70
-           // console.log(this.adjustHeight())
+        	if(this.$route.meta.title == 'product') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
+	            this.uniteItems.height = 2 * this.adjustHeight() + 70
+	           // console.log(this.adjustHeight())
+        	}
         },
         /* 设置title */
         setTitle(el, title) {

@@ -215,6 +215,7 @@ export default {
         requestSucess(oData) {
             this.loading = false;
             this.tableData.data = oData;
+            this.setTbaleHeight()
         },
         requestFail(sErrorMessage) {
             this.loading = false;
@@ -338,8 +339,10 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.tableData.height = this.adjustHeight()
+        	if(this.$route.meta.title == 'event') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.tableData.height = this.adjustHeight()
+        	}
         }
     }
 }

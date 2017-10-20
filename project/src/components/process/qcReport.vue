@@ -191,7 +191,8 @@ export default {
                  }else{
                       el["handle"] = ""
                  }
-            })                     
+            }) 
+            this.setTbaleHeight()
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -303,8 +304,10 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.tableData.height = this.adjustHeight()
+        	if(this.$route.meta.title == 'qcReport') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.tableData.height = this.adjustHeight()
+        	}
         },
         fileDownload(row) {
             if(!!row["reportPath"]){ //下载路径不存在或为空时屏蔽下载功能
