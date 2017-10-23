@@ -38,7 +38,7 @@
               <li class="ecorded-module">{{data.oData.tab}}</li>
               <li class='records'>
                 <ul class="detail-record-box">
-                  <li class="detail-record" v-for="li in data.oData.keys" v-if="li[1]">{{li[0]}}:{{li[1]}}</li>
+                  <li class="detail-record" v-for="li in data.oData.keys" v-if="li[1]">{{li[0]}}：{{li[1]}}</li>
                 </ul>
               </li>
             </ul>
