@@ -503,7 +503,8 @@
 								display: block !important;
 								font-size: 14px
 	                    	}
-							.el-table {
+							.el-table .resize-triggers {
+								display: none;
 							}
 	                        .el-table td.is-center, .el-table th.is-center {
 	                            text-align: center;
