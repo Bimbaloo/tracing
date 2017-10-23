@@ -123,9 +123,13 @@ const config = {
     extractCSS
   ],
   devServer: {
-    host: '127.0.0.1',
+    host: "0.0.0.0",
     port: 8010,
-    historyApiFallback: false,
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/$/, to: '/search.html' },
+      ]
+    },
     noInfo: true,
     proxy: {
       '/api': {
