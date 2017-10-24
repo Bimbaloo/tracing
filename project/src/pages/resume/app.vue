@@ -9,9 +9,10 @@
 			<div class="resume-content-wrap" :class="{full:bFullScreen}">
 				<div class="clone"></div>
 				<div class="resume-content">
-					<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="80px">
+					<el-form v-show="!bFullScreen" class="filters" :model="ruleForm" :rules="rules" ref="ruleForm" label-position="left" label-width="80px" @keyup.enter.native="submitForm('ruleForm')">
 						<el-form-item class="filters-code" label="成品条码:" prop="barcode">
 							<v-input placeholder-data="请输入条码或扫码" key-data="barcode" :form-data="ruleForm"></v-input>
+							<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
 						</el-form-item>
 						<el-form-item>
 							<v-button text-data="查询" @query="submitForm('ruleForm')"></v-button>
