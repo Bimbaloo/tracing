@@ -238,7 +238,7 @@
 			
 				// 提示信息。
 				this.error = "查无数据";
-				console.warn(param.data.errorMsg.message);
+				console.warn(sErrorMessage);
             },
             // 请求错误。
             requestError(err) {

@@ -7,4 +7,5 @@ var HOST =
 //"http://192.168.20.102:8088"; 
 // var FINE_REPORT_HOST = "http://192.168.20.181:8088";
 // var MI_HOST = "http://report.zjrealtech.com:801";
+
 var VERSION = "1.0.0-RC2";

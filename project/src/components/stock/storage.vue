@@ -77,9 +77,9 @@
                         prop: "barcode",
                         name: "条码",
                         fixed: true
-//                  },{
-//                      prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
-//                      name: "条码类型"
+                 //},{
+                     //prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
+                     //name: "条码类型"
                     },{
                         prop: "batchNo",
                         name: "批次",
@@ -127,9 +127,9 @@
                         prop: "barcode",
                         name: "条码",
                         fixed: true
-//                  },{
-//                      prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
-//                      name: "条码类型"
+                 //},{
+                     //prop: "barcodeTypeName",//1-单件条码 2-箱条码 3-流转框条码 999-其他
+                     //name: "条码类型"
 
                     },{
                         prop: "batchNo",
