@@ -6,11 +6,11 @@ import 'element-ui/lib/theme-green/index.css'
 
 import App from './app.vue'
 import axios from 'axios'
-import echarts  from 'echarts'
+import echarts from 'echarts'
 import Vuex from 'vuex'
 import 'babel-polyfill'
 
-//import 'assets/js/html2canvas.js'
+// import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'

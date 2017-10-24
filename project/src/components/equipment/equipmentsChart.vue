@@ -1,6 +1,16 @@
 <!--设备-->
 <template>
     <div class="content-list" v-loading="loading" element-loading-text="拼命加载中">
+	    <!-- 设备监控 -->
+	    <v-dialog 
+    		v-if="showCamera" 
+    		:dialog-visible="videoForm.visible"
+            :equipment-id="videoForm.equipmentId" 
+            :equipment-name="videoForm.equipmentName" 
+            :time="videoForm.time" 
+            :type="videoForm.type"
+    		@hideDialog="hideVideoDialog">
+	    </v-dialog>        
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis">
             <div id="equipments" :style="{height: panelHeight + 'px'}"></div>
@@ -80,7 +90,11 @@
                                         {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
                                         <span v-if="event.group">事件组：{{event.group}}</span>
                                         <i v-if="!!event.related" class="icon icon-12 icon-pin"></i>
-                                        <i v-if="showCamera && compareData.dimension==='pool'" class="icon icon-12 icon-camera" title="监控视频"></i>
+                                        <i 
+                                        @click="showVideoDialog(equipment.id, equipment.name, compareData.time, event.title)"
+                                        v-if="showCamera && compareData.dimension==='pool'" 
+                                        class="icon icon-12 icon-camera" 
+                                        title="监控视频"></i>
                                     </div>
                                     <ul class="content-list">
                                         <li v-for="(content,index) in event.content" :key="index">
@@ -102,9 +116,12 @@
 
 <script>
     import pin from 'assets/img/icon-pin.png'
+    import VideoDialog from 'components/monitor/dialog.vue'
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
 
+    // 是否开启视频监控。
+    const CAMERA = 0;
     // 设备状态。
     const CHART_STATE_NAME = "状态"
     // 图形下margin。
@@ -150,7 +167,7 @@
         filterMode: 'weakFilter',
         // show: true,
         // 展示图像缩略轴。
-        showDataShadow: true,
+        showDataShadow: false,
         // top: 400,
         // borderColor: 'transparent',
         // backgroundColor: '#e2e2e2',
@@ -161,8 +178,7 @@
             shadowOffsetX: 1,
             shadowOffsetY: 2,
             shadowColor: '#fff'
-        },
-        showDataShadow: false
+        }
     };
 
     export default {
@@ -182,10 +198,17 @@
             }
 		},
 		components: {
-			'v-datetime': DateTime
+            'v-datetime': DateTime,
+            "v-dialog": VideoDialog
 		},
         data () {
             return {
+                videoForm: {
+                    visible: false,
+                    equipmentId: '',
+                    equipmentName: '',
+                    time: ''
+                },
                 // 是否开启视频监控。
                 showCamera: !!CAMERA,
                 // 是否展示设备状态。
@@ -722,7 +745,21 @@
                 this.fetchAllData();
 				// 添加事件监听。
                 this.addEvent();
-			},
+            },
+            // 隐藏监控视频。
+            hideVideoDialog() {
+                this.videoForm.visible = false;
+            },
+            // 打开监控视频。
+            showVideoDialog(id, name, time, type) {
+                this.videoForm = {
+                    visible: true,
+                    equipmentId: id,
+                    equipmentName: name,
+                    time: time,
+                    type: type==="投料" ? "1":"2"
+                };
+            },
             // 获取存储的数据。
             getSessionStorage() {
                 if(!("startTime" in this.$route.query)) {
@@ -897,7 +934,9 @@
                             oData = {};
 
                         if(oCurrent) {
-                            oData.name = this.categories[oCurrent[1]].value.split("+")[0]; // 设备名称。
+                            let aoEquipmentInfo = this.categories[oCurrent[1]].value.split("+");
+                            oData.id = aoEquipmentInfo[1]; // 设备id。
+                            oData.name = aoEquipmentInfo[0]; // 设备名称。
                             oData.color = obj.color; // 维度颜色。
                             oData.series = obj.name; // 维度名称。
                             oData.quantity = oCurrent[3].length; // 事件数量。
@@ -928,9 +967,11 @@
                 }else {
                     aoCurrentList = this.axisTooltipData.map(param => {
                         let aoValue = param.value,
-                            oData = {};
+                            oData = {},
+                            aoEquipmentInfo = param.name.split("+");
 
-                        oData.name = param.name.split("+")[0];
+                        oData.id = aoEquipmentInfo[1];
+                        oData.name = aoEquipmentInfo[0];
                         oData.color = param.color;
                         oData.series = param.seriesName;
                         oData.quantity = aoValue[2];
@@ -2667,5 +2708,9 @@
         &.icon-camera {
             cursor: pointer;
         }
+    }
+
+    .el-dialog__body {
+        padding: 0;
     }
 </style>

@@ -6,6 +6,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-green/index.css'
 import App from './app.vue'
 import axios from 'axios'
+// import jquery from 'jquery'
 import 'babel-polyfill'
 
 import 'assets/js/global.js'
@@ -14,6 +15,7 @@ import 'assets/css/common.less'
 import 'assets/css/icon.less'
 
 Vue.prototype.$ajax = axios
+// Vue.prototype.$jquery = jquery
 
 Vue.use(ElementUI)
 

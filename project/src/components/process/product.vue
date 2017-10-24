@@ -1,5 +1,15 @@
 <template>
     <div class="router-content">
+        <!-- 设备监控 -->
+	    <v-dialog 
+    		v-if="showCamera" 
+    		:dialog-visible="videoForm.visible"
+            :equipment-id="videoForm.equipmentId" 
+            :equipment-name="videoForm.equipmentName" 
+            :time="videoForm.time" 
+            :type="videoForm.type"
+    		@hideDialog="hideVideoDialog">
+	    </v-dialog>     
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
@@ -32,11 +42,14 @@
                                     :style="{paddingLeft: !!props.row.in ? 15 : 50 +'px'}">
                                         <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
                                         <span>{{ props.row[column.prop]}}</span>
-                                        <i v-if="showCamera" class="icon icon-12 icon-camera" title="视频监控"></i>
+                                        <i 
+                                        v-if="showCamera" 
+                                        class="icon icon-12 icon-camera" 
+                                        title="视频监控"
+                                        @click="showVideoDialog(props.row)"></i>
                                     </div>
                                     <div class="cell-content" v-else>
                                         <span>{{ props.row[column.prop] }}</span>
-                                        <i v-if="showCamera"></i>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -149,20 +162,29 @@ import FileSaver from 'file-saver'
 import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
+import VideoDialog from 'components/monitor/dialog.vue'
 
-
+// 是否开启视频监控。
+const CAMERA = 0;
 const url = HOST + "/api/v1/trace/inout/by-trace";
 //const url = "http://rapapi.org/mockjsdata/21533/qqq?"
 //const url = `static/produce.json`
 
 export default {
     components: {
-        'v-table': table
+        'v-table': table,
+        "v-dialog": VideoDialog
     },
     data() {
         return {
             // 是否开启视频监控。
             showCamera: !!CAMERA,
+            videoForm: {
+                visible: false,
+                equipmentId: '',
+                equipmentName: '',
+                time: ''
+            },
             checked: false, //是否显示全部数据
             excel: true,
             print: true,
@@ -464,6 +486,20 @@ export default {
                // this.outItems.columns[0].class = ''
                // this.outItems.columns[0].cellClick = ''
             }
+        },
+        // 隐藏监控视频。
+        hideVideoDialog() {
+            this.videoForm.visible = false;
+        },
+        // 打开监控视频。
+        showVideoDialog(row) {
+            this.videoForm = {
+                visible: true,
+                equipmentId: row.equipmentId,
+                equipmentName: row.equipmentName,
+                time: row.happenTime,
+                type: row.productionType==="产出" ? "2":"1"
+            };
         },
         // 请求成功。
         requestSucess(oData) {
