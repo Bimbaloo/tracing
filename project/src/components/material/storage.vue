@@ -68,6 +68,7 @@
 				excel: true,
 				print: true,
                 key: this.$route.params.key,
+                tag: this.$route.query._tag,
                 styleObject: {
                     "min-width": "1000px"
                 },
@@ -153,9 +154,17 @@
         },
         watch: {
             // 如果路由有变化，会再次执行该方法
-            '$route': function(){
-				this.fetchData()
-				this.tableHeight = this.setHeight()
+            '$route': function(to, from){
+            	let toTitle = to.meta.title,
+            		fromTitle = from.meta.title;
+            		
+            	// 如果从tree上直接点击，需要更新数据. tag不同
+            	// 仓储信息: 从可疑品(restrain)或同批次入库(batch)中进入，则不会重新请求 .tag是一样的
+            	if( toTitle == 'storage' && (fromTitle == 'storage' || (to.query._tag != undefined && this.tag != to.query._tag)) ) {
+					this.tag = to.query._tag;
+					this.fetchData()
+					this.tableHeight = this.setHeight()
+            	}
 			},
 			"resizeY": function(){
 				this.tableHeight = this.setHeight()

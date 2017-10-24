@@ -172,7 +172,12 @@ export default {
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': 'fetchData',
+        '$route': function(to, from) {
+        	// 当是质检时，更新数据
+        	if(to.meta.title == 'tool') {
+        		this.fetchData();
+        	}
+        },
         /* 上下拖动时，重新设置table大小变化 */
         "resizeY":'setTbaleHeight',
          /* 全屏大小时，重新设置table大小 */
@@ -205,7 +210,9 @@ export default {
         requestSucess(oData) {
             this.loading = false;
             
-            this.tableData.data = oData;        
+            this.tableData.data = oData;     
+            
+            this.setTbaleHeight()
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -330,8 +337,10 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight(){
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.tableData.height = this.adjustHeight()
+        	if(this.$route.meta.title == 'tool') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.tableData.height = this.adjustHeight()
+        	}
         },
         /* 设置title */
         setTitle(el,title){

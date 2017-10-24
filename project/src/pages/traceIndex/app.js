@@ -55,53 +55,98 @@ const routes = [{
     component: Stock,
     children: [{
       path: '',
-      component: Storage
+      component: Storage,
+      meta: {
+      	title: 'storage'
+      }
     },{
       path: 'batch',
-      component: Batch
+      component: Batch,
+      meta: {
+      	title: 'batch'
+      }
     },{
       path: 'restrain',
-      component: Suspicious
+      component: Suspicious,
+      meta: {
+      	title: 'restrain'
+      }
     }]
   },{ 
     path: '/process', 
     component: Process,
     children: [{
       path: '',
-      component: Chart//List
+      component: Chart,//List
+      meta: {
+      	title: 'chart'
+      }
     },{
       path: 'detail',
-      component: Detail
+      component: Detail,
+      meta: {
+      	title: 'detail'
+      }
     },{
       path: 'product',
-      component: Product
+      component: Product,
+      meta: {
+      	title: 'product'
+      }
     },{//质检
       path: 'qtReport',
-      component: QtReport
+      component: QtReport,
+      meta: {
+      	title: 'qtReport'
+      }
     },{//送检
       path: 'qcReport',
-      component: QcReport
+      component: QcReport,
+      meta: {
+      	title: 'qcReport'
+      }
     },{//fgb
       path: 'fgbReport',
-      component: FgbReport
+      component: FgbReport,
+      meta: {
+      	title:'fgbReport'
+      }
     },{//工具
       path: 'tool',
-      component: Tool
+      component: Tool,
+      meta: {
+      	title: 'tool'
+      }
     },{//事件
       path: 'event',
-      component: Event
+      component: Event,
+      meta: {
+      	title: 'event'
+      }
     },{//维修记录
       path: 'repair',
-      component: Repair
+      component: Repair,
+      meta:{
+      	title: 'repair'
+      }
     },{//点检记录
       path: 'spotReport',
-      component: SpotReport
+      component: SpotReport,
+      meta: {
+      	title: 'spotReport'
+      }
     },{//工艺参数
       path: 'parameter',
-      component: Parameter
+      component: Parameter,
+      meta: {
+      	title: 'parameter'
+      }
     },{//遏制
       path: 'restrain',
-      component: Suspicious
+      component: Suspicious,
+      meta: {
+      	title: 'restrain'
+      }
     }]
   },
   { path: '/trace', component: Trace },

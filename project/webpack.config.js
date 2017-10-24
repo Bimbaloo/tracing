@@ -123,9 +123,13 @@ const config = {
     extractCSS
   ],
   devServer: {
-    host: '127.0.0.1',
+    host: "0.0.0.0", // 为了使项目可以ip访问  https://doc.webpack-china.org/configuration/dev-server/#devserver-host
     port: 8010,
-    historyApiFallback: false,
+    historyApiFallback: {
+      rewrites: [
+        { from: /^\/$/, to: '/search.html' },
+      ]
+    },
     noInfo: true,
     proxy: {
       '/api': {
@@ -134,8 +138,9 @@ const config = {
         pathRewrite: { '^/api': '' }
       }
     },
+    useLocalIp: true, // host修改后，会自动打开0.0.0.0:8010/search.html，这个属性使用本地ip作为页面ip https://doc.webpack-china.org/configuration/dev-server/#devserver-uselocalip
     open: true,
-    openPage: 'search.html',
+    openPage: 'search.html', // 希望自动打开 http://127.0.0.1:8010/search.html
     compress: true //开启gzip压缩
   },
   devtool: '#eval-source-map'

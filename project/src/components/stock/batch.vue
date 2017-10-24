@@ -171,7 +171,16 @@
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
-			'$route': 'fetchPage',
+			'$route': function(to, from) {
+            	let toTitle = to.meta.title,
+            		fromTitle = from.meta.title;
+            		
+				// 当从可疑品(restrain)点击进入不会重新查询。
+            	if(toTitle == 'batch' && fromTitle == 'storage') {
+            		// 同批次出入库
+		            this.fetchPage();
+            	}
+			},
 			// 在物料仓储时，放大处理。
 			'$store.state.fullscreen': function() {
 				// 修改页面的内容的高度。

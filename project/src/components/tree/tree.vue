@@ -3,7 +3,7 @@
 		<div class="icons">
 			<i class="icon icon-20 icon-hide" v-if="!tipsShow" @click="showTips"  title="显示详情"></i>
             <i class="icon icon-20 icon-show" v-else @click="hideTips"  title="隐藏详情"></i>
-			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
+			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler1" title="生成图片"></i>
 			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
 			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
@@ -1009,14 +1009,60 @@
 					}),
 					// 图片地址。
 					sImage = oImage.src;
-				
+					
+				// 当数据量过大时，下载失败
 				this.$refs.downloadImage.href = sImage;
 				this.$refs.downloadImage.download = "追溯主图.png";
 				this.$refs.downloadImage.click();
 
-				// var w=window.open('about:blank','image from canvas');
-				// w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
+//				 var w=window.open('about:blank','image from canvas');
+//				 w.document.write("<img src='"+sImage+"' alt='from canvas'/>");	
 			},	
+			/**
+			 * 生成图片。
+			 * @param {Object} event
+			 * @return {void}
+			 */
+			onSvaeImgHandler1(event) {
+				let oImage = this.tree.makeImage({
+					scale: 1,
+					maxSize: new go.Size(Infinity, Infinity),
+					// background: "rgb(248,248,240)"
+					}),
+					// 图片地址。
+					sImage = oImage.src,
+	            	aLink = this.$refs.downloadImage;
+					
+				// 下载图片
+				downloadFile("追溯主图.png", sImage);
+					
+				// 数据转换。
+				function base64Img2Blob(code){
+	                let parts = code.split(';base64,');
+	                let contentType = parts[0].split(':')[1];
+	                let raw = window.atob(parts[1]);
+	                let rawLength = raw.length;
+	
+	                let uInt8Array = new Uint8Array(rawLength);
+	
+	                for (let i = 0; i < rawLength; ++i) {
+	                  uInt8Array[i] = raw.charCodeAt(i);
+	                }
+	
+	                return new Blob([uInt8Array], {type: contentType}); 
+	            }
+				// 下载图片。
+	            function downloadFile(fileName, content){
+	                let blob = base64Img2Blob(content); //new Blob([content]);
+	                let evt = document.createEvent("HTMLEvents");
+	                
+	                evt.initEvent("click", false, false);//initEvent 不加后两个参数在FF下会报错
+	                aLink.download = fileName;
+	                aLink.href = URL.createObjectURL(blob);
+	         		aLink.click()
+	                aLink.dispatchEvent(evt);
+	            }
+			},
 			/**
 			* 打印图片。
 			* @param {Object} event

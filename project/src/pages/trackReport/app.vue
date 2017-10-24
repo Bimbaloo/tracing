@@ -12,19 +12,21 @@
 				<span v-for="(filter,index) in filtersList" :key="index">
 					{{filter[0]}} : {{filter[1]}}
 				</span>
-				<span v-show="!this.filters.materialCode && gridData.data[0]" class="default-message" >物料：{{gridData.data[0] ? gridData.data[0]["materialCode"] : ""}}</span>
-				<span v-show="!this.filters.processName && gridData.data[0]" class="default-message" >工序：{{gridData.data[0] ? gridData.data[0]["processName"] : ""}}</span> 
+				<span v-show="!this.filters.materialCode && selectedArrs[0]" class="default-message" >物料：{{selectedArrs[0] ? selectedArrs[0]["materialCode"] : ""}}</span>
+				<span v-show="!this.filters.processName && selectedArrs[0]" class="default-message" >工序：{{selectedArrs[0] ? selectedArrs[0]["processName"] : ""}}</span> 
 			</div>
 			<div class='condition-list' @click="active.message = !active.message">
 				<span>查询明细
 					<i class="el-icon-d-arrow-right icon" v-show="!active.message"></i>
+					<span v-show="active.message">--追踪结果集选中行信息</span>
+					<span v-show="active.message" style="color:#999;margin-left:10px">设备名称：（条码，加工时间）</span>
 				</span>
 			</div>
 			<div class="content-table condition-table" v-show="active.message">
 				<div class='materialBox' v-for="equipment in equipmentTimes">
 					<div class='material'>{{equipment['name']}}：</div>
 					<div class='time' >
-						<span v-for='time in equipment["time"]'>{{time}}</span>
+						<span v-for='(time,i) in equipment["time"]'>（{{equipment["barcode"][i]}}，{{time}}）</span>
 					</div>
 				</div>
 			</div>
@@ -116,7 +118,8 @@
 				filters: {},
 				filtersList: [],
 				//dialogState:false
-				equipmentTimes:[]
+				equipmentTimes:[],
+				selectedArrs: []
 			}
 		},
 		computed: {
@@ -217,17 +220,21 @@
 				this.selected.forEach((o, index) => {
 					selectedArr.push(myData.find(e=> o.bucketNo === e.bucketNo))
 				})
+				this.selectedArrs = JSON.parse(JSON.stringify(selectedArr))
 				selectedArr.forEach((el,i)=>{
 					let obj = {
 						"name":"",
-						"time":[]
+						"time":[],
+						"barcode":[],
 					}
 					obj["name"] = el["equipmentName"]
 					obj["time"].push(el["happenTime"])
+					obj["barcode"].push(el["barcode"])
 					needArr.push(obj)
 					for (let j = i+1 ; j < selectedArr.length; j++){
 						if (el["equipmentName"] === selectedArr[j]["equipmentName"]){
 							obj["time"].push(selectedArr[j]["happenTime"])
+							obj["barcode"].push(selectedArr[j]["barcode"])
 							selectedArr.splice(j, 1)
 							j=j-1   
 						}
@@ -496,7 +503,8 @@
 								display: block !important;
 								font-size: 14px
 	                    	}
-							.el-table {
+							.el-table .resize-triggers {
+								display: none;
 							}
 	                        .el-table td.is-center, .el-table th.is-center {
 	                            text-align: center;

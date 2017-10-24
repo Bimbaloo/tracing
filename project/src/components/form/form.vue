@@ -85,6 +85,7 @@
 				if(_that.tab === obj.tab && _that.subTab === obj.radio){
 					let datas = obj.keys
 					for(let i in datas){
+						_that.ruleForm[i] = datas[i]
 						if(i === "startTime" || i === "endTime") {
 							bus.$emit('timeChange', obj)
 						}else{
@@ -138,7 +139,7 @@
             	    validateStartTime = (rule, value, callback) => {
 	            		let sTime = value.trim(),
 	            			nNow = +new Date();
-	            		
+	            		console.log(sTime)
 	            		if(!sTime) {
 	            			callback(new Error("请输入开始时间"))
 	            		}else if(!window.Rt.utils.isDateTime(sTime)) {

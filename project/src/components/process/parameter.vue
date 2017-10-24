@@ -156,17 +156,26 @@ export default {
 
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': 'fetchData',
+        '$route': function(to, from) {
+        	// 当是质检时，更新数据
+        	if(to.meta.title == 'parameter') {
+        		this.fetchData();
+        	}
+        },
         resize: 'updateEcharts',
         /* 上下拖动时，重新设置flexBase大小变化 */
         "resizeY": function(){
-            this.setFlexBase()
-            this.tableHeight = this.setTableHeight()
+        	if(this.$route.meta.title == 'parameter') {
+	            this.setFlexBase()
+	            this.tableHeight = this.setTableHeight()
+        	}
         },
         /* 全屏大小时，重新设置flexBase大小 */
         "fullscreen": function(){
-            this.setFlexBase()
-            this.tableHeight = this.setTableHeight()
+            if(this.$route.meta.title == 'parameter') {
+	            this.setFlexBase()
+	            this.tableHeight = this.setTableHeight()
+        	}
         }
     },
     methods: {

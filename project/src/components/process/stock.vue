@@ -15,11 +15,10 @@
                 :key="index" 
                 :to="{path: oRoute.path, query: oRoute.query}" 
                 replace><span v-if="index">></span>{{oRoute.name}}</router-link>
-        </div> 
-        <router-view></router-view>  
-        <!--el-breadcrumb separator="/" class="router-path">
-        <el-breadcrumb-item :to="{ path: activeKey, query: activeKeys }" class="path-item" ref="pathItem">{{activeName}}</el-breadcrumb-item>
-        </el-breadcrumb-->
+        </div>
+        <keep-alive>
+	        <router-view></router-view>  
+        </keep-alive>
     </div>
 </template>
 

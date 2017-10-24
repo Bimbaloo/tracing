@@ -36,13 +36,22 @@ const routes = [{
     component: Stock,
     children: [{
       path: '',
-      component: Storage
+      component: Storage,
+      meta: {
+      	title: 'storage'
+      }
     },{
       path: 'batch',
-      component: Batch
+      component: Batch,
+      meta: {
+      	title: 'batch'
+      }
     },{
       path: 'restrain',
-      component: Suspicious
+      component: Suspicious,
+      meta: {
+      	title: 'restrain'
+      }
     }]
   },
   { path: '/trace/:key', component: Trace },

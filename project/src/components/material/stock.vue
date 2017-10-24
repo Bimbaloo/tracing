@@ -14,15 +14,15 @@
             <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
             <span class="path-item" v-if="restrainIf">>可疑品</span>
         </div> 
-        <router-view></router-view>  
-        <!--el-breadcrumb separator="/" class="router-path">
-        <el-breadcrumb-item :to="{ path: activeKey, query: activeKeys }" class="path-item" ref="pathItem">{{activeName}}</el-breadcrumb-item>
-        </el-breadcrumb-->
+        <keep-alive>
+	        <router-view></router-view>  
+        </keep-alive>
     </div>
 </template>
 
 <script>
-
+	import fnP from "assets/js/public.js"
+	
     export default {
         data () {
             return { 
@@ -154,15 +154,26 @@
     
 			},
             setRouteQuery() {
-                let aHref = location.href.split("?")[0].split("/"),
-                    sType = aHref[aHref.length-1];
+//              let aHref = location.href.split("?")[0].split("/"),
+//                  sType = aHref[aHref.length-1];
+//
+//              if(sType == "batch") {
+//                  this.batch = this.$route.query;
+//              }else if(sType == "restrain") {
+//                  this.restrain = this.$route.query;
+//              }else {
+//                  this.material = this.$route.query;
+//              }
+                let aHref = this.$route.path.split("/"),
+                    sType = aHref[aHref.length-1],
+                    oQuery = fnP.parseQueryParam(this.$route.query);
 
                 if(sType == "batch") {
-                    this.batch = this.$route.query;
+                    this.batch = oQuery;
                 }else if(sType == "restrain") {
-                    this.restrain = this.$route.query;
+                    this.restrain = oQuery;
                 }else {
-                    this.material = this.$route.query;
+                    this.material = oQuery;
                 }
             },
             setPathVisible(to) {

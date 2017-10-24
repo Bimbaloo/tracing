@@ -169,7 +169,12 @@ export default {
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': 'fetchData',
+        '$route': function(to, from) {
+        	// 当是质检时，更新数据
+        	if(to.meta.title == 'qcReport') {
+        		this.fetchData();
+        	}
+        },
         /* 上下拖动时，重新设置table大小变化 */
         "resizeY": 'setTbaleHeight',
         /* 全屏大小时，重新设置table大小 */
@@ -186,7 +191,8 @@ export default {
                  }else{
                       el["handle"] = ""
                  }
-            })                     
+            }) 
+            this.setTbaleHeight()
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -298,8 +304,10 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.tableData.height = this.adjustHeight()
+        	if(this.$route.meta.title == 'qcReport') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.tableData.height = this.adjustHeight()
+        	}
         },
         fileDownload(row) {
             if(!!row["reportPath"]){ //下载路径不存在或为空时屏蔽下载功能

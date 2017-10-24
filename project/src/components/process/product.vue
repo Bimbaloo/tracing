@@ -473,7 +473,12 @@ export default {
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': 'fetchData',
+        '$route': function(to, from) {
+        	// 当是质检时，更新数据
+        	if(to.meta.title == 'product') {
+        		this.fetchData();
+        	}
+        },
         /* 上下拖动时，重新设置table大小变化 */
         "resizeY": 'setTbaleHeight',
         /* 全屏大小时，重新设置table大小 */
@@ -618,6 +623,8 @@ export default {
             this.outAllItems.dataFilter = outAllDatasFilter             // 产出汇总--时间内
             this.inAllItems.data = inAllDatas                           // 投入汇总
             this.inAllItems.dataFilter = inAllDatasFilter               // 投入汇总--时间内
+        	
+        	this.setTbaleHeight()
         },
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -825,10 +832,12 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
-            this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-            this.uniteItems.height = 2 * this.adjustHeight() + 70
-           // console.log(this.adjustHeight())
+        	if(this.$route.meta.title == 'product') {
+	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
+	            this.uniteItems.height = 2 * this.adjustHeight() + 70
+	           // console.log(this.adjustHeight())
+        	}
         },
         /* 设置title */
         setTitle(el, title) {
