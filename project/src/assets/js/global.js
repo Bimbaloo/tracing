@@ -269,7 +269,7 @@
 					var sImg = canvas.toDataURL("image/png");
 						
 					// 打印
-					var w = window.open("about:blank","image from cancas");
+					var w = window.open("","image from cancas");
 					w.document.write("<img src='"+sImg+"' alt='from canvas'>")
 				
 					setTimeout(function() {
@@ -297,7 +297,7 @@
 			let canvas = document.createElement("canvas");
 			
 			rasterizeHTML.drawHTML(sHtml, canvas, option || {}).then(function(res) {
-				var w = window.open("about:blank","image from cancas");
+				var w = window.open("","image from cancas");
 				
 				w.document.body.appendChild(res.image);
 				
