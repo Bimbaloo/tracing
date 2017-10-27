@@ -8,7 +8,7 @@
 			</div>
 			<h1 class="title">快速报告</h1>
 			<h2 class="content-title">查询条件</h2>
-			<div class='condition-messsage'>
+			<div class='condition-message'>
 				<span v-for="(filter,index) in filtersList" :key="index">
 					{{filter[0]}} : {{filter[1]}}
 				</span>
@@ -417,15 +417,15 @@
 	                    	.report-container >.tag span + span {
 	                    		margin-left: 30px
 	                    	}
-	                    	.report-container .condition-messsage {
+	                    	.report-container .condition-message {
 	                    		box-sizing: border-box;
 								padding-left: 10px;
 	                    	}
-	                    	.report-container .condition-messsage span {
+	                    	.report-container .condition-message span {
 	                    		font-size: 14px;
 								margin-right: 30px
 	                    	}
-	                    	.report-container .condition-messsage .default-message {
+	                    	.report-container .condition-message .default-message {
 	                    		color: #999;
 								margin-right: 10px;
 	                    	}
@@ -603,7 +603,7 @@
 		
 	}
 	.report-container {
-		.condition-messsage {
+		.condition-message {
 			box-sizing: border-box;
 			padding-left: 10px;
 			span {
