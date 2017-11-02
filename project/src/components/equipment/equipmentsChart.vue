@@ -77,35 +77,36 @@
                         <div class="tooltip-time">{{compareData.time}}</div>
                         <i class="btn-close icon icon-14 icon-close" title="关闭" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
                         <i class="btn-reverse icon icon-14 icon-reverse" title="翻转" @click="reversePanelClickHandle(compareData)" ></i>
-                        <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
-                            <div class="tooltip-title" 
-                            :style="{color: equipment.color}">
-                            {{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{`${compareData.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
+                        <div class="list-wrapper" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">                        
+                            <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" >
+                                <div class="tooltip-title" 
+                                :style="{color: equipment.color}">
+                                {{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{`${compareData.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
+                                </div>
+                                <ul class="event-list">
+                                    <li v-for="(event,index) in equipment.event"
+                                    :key="index" 
+                                    v-if="compareData.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
+                                        <div :style="{color: equipment.color}">
+                                            {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
+                                            <span v-if="event.group">事件组：{{event.group}}</span>
+                                            <i v-if="!!event.related" class="icon icon-12 icon-pin"></i>
+                                            <i 
+                                            @click="showVideoDialog(equipment.id, equipment.name, compareData.time, event.title)"
+                                            v-if="showCamera && compareData.dimension==='pool'" 
+                                            class="icon icon-12 icon-camera" 
+                                            title="监控视频"></i>
+                                        </div>
+                                        <ul class="content-list">
+                                            <li v-for="(content,index) in event.content" :key="index">
+                                                {{content.name}}:&nbsp;&nbsp;{{parseData(content.value)}}
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                
                             </div>
-                            <ul class="event-list">
-                                <li v-for="(event,index) in equipment.event"
-                                :key="index" 
-                                v-if="compareData.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
-                                    <div :style="{color: equipment.color}">
-                                        {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
-                                        <span v-if="event.group">事件组：{{event.group}}</span>
-                                        <i v-if="!!event.related" class="icon icon-12 icon-pin"></i>
-                                        <i 
-                                        @click="showVideoDialog(equipment.id, equipment.name, compareData.time, event.title)"
-                                        v-if="showCamera && compareData.dimension==='pool'" 
-                                        class="icon icon-12 icon-camera" 
-                                        title="监控视频"></i>
-                                    </div>
-                                    <ul class="content-list">
-                                        <li v-for="(content,index) in event.content" :key="index">
-                                            {{content.name}}:&nbsp;&nbsp;{{parseData(content.value)}}
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            
                         </div>
-                        
                     </div>
                     <div class="line" :style="{left:compareData.left*100+'%', top: panelTop+'px', height: chartHeight-3 + 'px', zIndex: compareData.zIndex}"></div>
                 </div>
@@ -2635,11 +2636,13 @@
                     cursor: pointer;
                 }
 
-                .tooltip-list {
+                .list-wrapper {
                     padding: 10px;
                     overflow-y: auto;
                     position: relative;
-                    // border: 1px solid #D53A35;
+                }
+                .tooltip-list + .tooltip-list{
+                    margin-top: 5px;
                 }
 
                 .content-list {
