@@ -11,7 +11,7 @@
 					</span>
 					<span class='table-handle'>
 						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.summary, $event)"></i>
-						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('summaryTable', $event)"></i>
+						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('summaryTable', $event, '汇总信息')"></i>
 					</span>
 				</h2>
 				<!--<div class="content-table">
@@ -30,7 +30,7 @@
 					</span>
 					<span class='table-handle'>
 						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.inStocks, $event)"></i>
-						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inStocksTable', $event)"></i>
+						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inStocksTable', $event, '在库明细')"></i>
 					</span>
 				</h2>
 				<transition name="el-zoom-in-top">
@@ -50,7 +50,7 @@
 						<span class='table-title'>加工中</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.inMaking, $event)"></i>
-							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inMakingTable', $event)"></i>
+							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inMakingTable', $event, '在制明细-加工中')"></i>
 						</span>
 					</h2>
 					<div class="content-table second-table" ref="inMakingTable" key="2">
@@ -60,7 +60,7 @@
 						<span class='table-title'>滞留中</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.remain, $event)"></i>
-							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('remainTable', $event)"></i>
+							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('remainTable', $event, '在制明细-滞留中')"></i>
 						</span>
 					</h2>
 					<div class="content-table second-table" ref="remainTable" key="4">
@@ -79,7 +79,7 @@
 						<span class='table-title'>滞留中</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.outStocks, $event)"></i>
-							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outStocksTable', $event)"></i>
+							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outStocksTable', $event, '出库明细-滞留中')"></i>
 						</span>
 					</h2>
 					<div class="content-table inner second-table" key="6" ref="outStocksTable">
@@ -89,7 +89,7 @@
 						<span class='table-title'>已发货</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.delivered, $event)"></i>
-							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('deliveredTable', $event)"></i>
+							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('deliveredTable', $event, '出库明细-已发货')"></i>
 						</span>
 					</h2>
 					<div class="content-table inner second-table" key="8" ref="deliveredTable">
@@ -506,7 +506,7 @@ export default {
 					}, {
 						prop: "inTime",
 						name: "投入时间",
-						width: "150",
+						width: "180",
 						sortable: true
 					}],
 					data: [{
@@ -577,12 +577,12 @@ export default {
 					}, {
 						prop: "outTimeFirst",
 						name: "最早产出时间",
-						width: "150",
+						width: "180",
 						sortable: true
 					}, {
 						prop: "outTimeLast",
 						name: "最晚产出时间",
-						width: "150",
+						width: "180",
 						sortable: true
 					}],
 					data: []
@@ -876,7 +876,7 @@ export default {
 			window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
 		},
 		// 表格打印。
-		printHandle(refTable, event) {
+		printHandle(refTable, event, sTitle) {
 			event.stopPropagation();
 
 			let oTable = this.$refs[refTable];
@@ -884,8 +884,12 @@ export default {
 				return;
 			}
 			
-			
 			let sHtml = `
+					<h2 class="content-title">查询条件</h2>
+					<div class="condition-message">${oTable.offsetParent.querySelector('.condition-message').innerHTML}</div>
+					<div class="condition-list">${oTable.offsetParent.querySelector('.condition-list').innerHTML}</div>
+					<div class="content-table condition-table">${oTable.offsetParent.querySelector('.condition-table').innerHTML}</div>
+					<h2 class="content-title"><span class="table-title">${sTitle}</span></h2>
 	                <div class="table el-table">
 	                    <div class="el-table__header-wrapper">
 	                        ${oTable.querySelector(".el-table__header-wrapper").innerHTML}
@@ -893,43 +897,105 @@ export default {
 	                    <div class="el-table__body-wrapper">
 	                        ${oTable.querySelector(".el-table__body-wrapper").innerHTML}
 	                    </div>
-	                    <style>
-	                        .el-table td.is-center, .el-table th.is-center {
-	                            text-align: center;
-	                        }
-	                        .table thead th {
-	                            height: 36px;
-	                            background-color: #42af8f;
-	                        }
-	                        .table thead th .cell {
-	                            color: #fff;
-	                        }
-		                    .el-table__body-wrapper tr:nth-child(even) {
-		                        background-color: #fafafa;
-		                    }
-		                    .el-table__body-wrapper tr:nth-child(odd) {
-		                        background-color: #fff;
-		                    }
-	                        .el-table__body-wrapper td {
-	                        	white-space: normal;
-	    						word-break: break-all;
-	                        }
-	                        .el-table__body-wrapper .cell {
-	                            min-height: 30px;
-	                            line-height: 30px;
-	                            // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-	                            //	border: 1px solid #e4efec;
-	                            box-sizing: border-box;
-	                        }
-	                        .el-table__body-wrapper .batch .cell > div {
-	                            color: #f90;
-	                        	font-weight: 600
-	                        }
-	                        .el-table__empty-block {
-	                            text-align: center;	
-	                        }
-	                    </style>
 	                </div>
+	                <style>
+	                	.content-title {
+                    		font-size: 16px;
+                    		height: 16px;
+							line-height: 16px;
+							text-indent: 10px;
+                    		border-left: 4px solid #42af8f;
+                    	}
+                    	.content-title .table-title {
+                    		font-size: 16px;
+                    		color: #42AF8F;
+                    	}
+                    	.condition-message {
+                    		box-sizing: border-box;
+							padding-left: 10px;
+                    	}
+                    	.condition-message span {
+                    		font-size: 14px;
+							margin-right: 30px
+                    	}
+                    	.condition-message .default-message {
+                    		color: #999;
+							margin-right: 10px;
+                    	}
+                    	.condition-list {
+                    		box-sizing: border-box;
+							padding-left: 10px;
+                    	}
+                    	.condition-list span {
+                    		font-size: 14px;
+							line-height: 40px;
+							color: #42AF8F;
+                    	}
+                    	.condition-list icon {
+                    		display: none;
+                    	}
+                    	.condition-table {
+                    		margin-top: 0;
+							box-sizing: border-box;
+							border: 1px solid #42AF8F;
+							padding: 10px;
+                    	}
+                    	.condition-table .materialBox {
+                    		display: flex;
+							box-sizing: border-box;
+							padding-left: 10px;
+							color: #666;
+							margin-bottom: 20px;
+							font-size: 14px;
+                    	}
+                    	.condition-table .materialBox .material {
+							line-height: 20px;
+						}
+                    	.condition-table .materialBox .time {
+                    		display: flex;
+							flex: 1;
+							flex-wrap: wrap;
+							height: auto;
+                    	}
+                    	.condition-table .materialBox .time > span {
+                    		margin-left: 10px; 
+							line-height: 20px;
+                    	}
+                        .el-table td.is-center, .el-table th.is-center {
+                            text-align: center;
+                        }
+                        .table thead th {
+                            height: 36px;
+                            background-color: #42af8f;
+                        }
+                        .table thead th .cell {
+                            color: #fff;
+                        }
+	                    .el-table__body-wrapper tr:nth-child(even) {
+	                        background-color: #fafafa;
+	                    }
+	                    .el-table__body-wrapper tr:nth-child(odd) {
+	                        background-color: #fff;
+	                    }
+                        .el-table__body-wrapper td {
+                        	white-space: normal;
+    						word-break: break-all;
+                        }
+                        .el-table__body-wrapper .cell {
+                            min-height: 30px;
+                            line-height: 30px;
+                            // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+                            //	border: 1px solid #e4efec;
+                            box-sizing: border-box;
+                        }
+                        .el-table__body-wrapper .batch .cell > div {
+                            color: #f90;
+                        	font-weight: 600
+                        }
+                        .el-table__empty-block {
+                            text-align: center;	
+                        }
+                    </style>
 	            `;
 	
 	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
