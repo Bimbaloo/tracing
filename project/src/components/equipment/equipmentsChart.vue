@@ -371,7 +371,6 @@
                         name: "工具记录",
                         router: "/process/tool",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
-
                     }]
                 }, {
                     show: true,

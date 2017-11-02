@@ -8,6 +8,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin')
 const ExtractTextPlugin = require('extract-text-webpack-plugin')
 const CommonsChunkPlugin = require('webpack/lib/optimize/CommonsChunkPlugin')
 const OptimizeCSSPlugin = require('optimize-css-assets-webpack-plugin')
+const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const extractCSS = new ExtractTextPlugin({
   filename: 'assets/css/[name].css',
@@ -120,7 +121,14 @@ const config = {
       minChunks: chunks.length
     }),
     extractLESS,
-    extractCSS
+    extractCSS,
+    new CopyWebpackPlugin([
+      {
+          from: 'src/static',
+          to: 'static'/*,
+          ignore: ['.*']*/
+      }
+    ])
   ],
   devServer: {
     host: '127.0.0.1', // 0.0.0.0 为了使项目可以ip访问  https://doc.webpack-china.org/configuration/dev-server/#devserver-host
