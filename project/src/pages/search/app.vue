@@ -108,7 +108,7 @@ export default {
     }
   },
   created() {
-    this.fetchDataName()  //获取名称
+    
     //debugger
     let history = localStorage.getItem("history")
     if(history){
@@ -128,6 +128,7 @@ export default {
     // 请求判断。   
     this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
       // 请求成功。
+      
       this.loading = false;
       this.categories = fnP.parseData(oData).filter(o => o.key != "restrain" && o.key != "link");
       this.categories.forEach(o => {
@@ -142,6 +143,7 @@ export default {
       this.sErrorMessage = sErrorMessage;
       this.showMessage();
     });
+    //this.fetchDataName()  //获取名称
   },
   methods: {
     hideDialog() {},
