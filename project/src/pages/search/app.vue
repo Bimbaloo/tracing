@@ -143,7 +143,7 @@ export default {
       this.sErrorMessage = sErrorMessage;
       this.showMessage();
     });
-    //this.fetchDataName()  //获取名称
+    this.fetchDataName()  //获取名称
   },
   methods: {
     hideDialog() {},
