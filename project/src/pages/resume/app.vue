@@ -107,7 +107,7 @@
 											</div>
 											<div class="sub-info" :class="getTimeLineTypeInfo(item.type).color">
 												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
-													<div class="item-type">{{getTimeLineTypeInfo(item.type).text}} :</div>
+													<div class="item-type">{{ item.type }} :</div>
 													<div class="item-info">
 														<span class="tips">{{ item.personName || "-" }}</span> 
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span>
@@ -119,25 +119,25 @@
 													</div>
 												</div>
 												<div class="sub-item" v-else-if="getTimeLineTypeInfo(item.type).type==2">
-													<div class="item-type">{{ item.processName+getTimeLineTypeInfo(item.type).text }} :</div>
+													<div class="item-type">{{ item.processName + item.type }} :</div>
 													<div class="item-info">
 														<span class="tips">{{ item.personName || "-" }}</span> 在
 														<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
 														的 <span class="tips">{{ item.materialName || "-" }}</span> 物料
-														{{ getTimeLineTypeInfo(item.type).text }}
+														{{ item.type }}
 													</div>
 												</div>
 												<div class="sub-item" v-else>
-													<div class="item-type">{{ getTimeLineTypeInfo(item.type).text }} :</div>
+													<div class="item-type">{{ item.type }} :</div>
 													<div class="item-info">
 														<span class="tips">{{ item.personName || "-" }}</span> 
 														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
 														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
 														，在<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上产出的
 														<span class="tips">{{ item.materialName || "-" }}</span> 物料
-														{{ getTimeLineTypeInfo(item.type).text }}，共计
+														{{ item.type }}，共计
 														<span class="tips">{{ item.quantity || "-" }}</span> 件，结果为
 														<span class="tips">{{ item.checkResult || "-" }}</span>
 													</div>
@@ -237,10 +237,7 @@
 					},{
 						prop: "type",
 						name: "类型",
-						width: 80,
-						formatter: function(sValue) {
-							return self.getTimeLineTypeInfo(sValue).text
-						}
+						width: 80
 					},{
 						prop: "barcode",
 						name: "条码",
@@ -444,13 +441,13 @@
 				this.oTab.loading = false;
 				// 显示标题。
 				this.bShowTitle = true;
-				this.oTitle.materialName = oData.materialName;
-				this.oTitle.batchNo = oData.batchNo;
+				this.oTitle.materialName = oData.productMaterialName;
+				this.oTitle.batchNo = oData.productBatchNo;
 				
 				// 数据修改。
 				this.aoTable = oData.bomResumes;
 				this.aParsedData = this.parseTableData();
-				this.aoTimeLineData = oData.timeLineResumes;
+				this.aoTimeLineData = this.parseTimeLineData(oData.timeLineDateResumes);
 				
 				if(this.bCarousel) {
 					this.$nextTick(function() {
@@ -506,13 +503,28 @@
 				}				
 			},
 			/**
+			 * 时间轴数据处理。
+			 * @param {Array} aoData
+			 * @return {Array}
+			 */
+			parseTimeLineData(aoData) {
+				// 按照日期排序。
+				let aoNewData = aoData.sort( (oA, oB) => +new Date(oA.date) - +new Date(oB.date) < 0? 1:-1 )
+				
+				// 按时间排序。
+				aoNewData.forEach( o => o.resumes = o.resumes.sort( ( oA, oB ) => +new Date(oA.time) - +new Date(oB.time) < 0? 1:-1 ) )
+				
+				// 返回数据。
+				return aoNewData
+			},
+			/**
 			 * 表格数据处理函数。
 			 */
 			parseTableData() {
 				var	_that = this,
 				    aoNew = [];
 				    
-				_getData(null, 0);
+				_getData(-1, 0);
 				
 				return aoNew;
 				/**
@@ -564,7 +576,8 @@
 				})
 				
 				// 排序处理。
-				aResult = this.setDataOrder(aResult);
+				aResult = aResult.sort( (oA, oB) => +new Date( oA.data ? oA.data.time || 0 : 0 ) - +new Date( oB.data ? oB.data.time || 0 : 0) < 0? 1:-1 )
+//				aResult = this.setDataOrder(aResult);
 				
 				// 返回数据。
 				return aResult;
@@ -880,54 +893,61 @@
 				var oReturn = {};
 				
 				switch(sType) {
-					// 出库。
-					case "1":
+					// 出库。1
+					case "出库":
 						oReturn = {
 							color: "yellow",
 							text: "出库",
 							type: "1"
 						};
 						break;
-					// 入库。
-					case "2":
+					// 入库。2
+					case "入库":
 						oReturn = {
 							color: "yellow",
 							text: "入库",
 							type: "1"
 						};
 						break;
-					// 投入。
-					case　"3":
+					// 投入。3
+					case　"投入":
 						oReturn = {
 							color: "green",
 							text: "投入",
 							type: "2"
 						};
 						break;
-					// 产出。
-					case "4":
+					// 产出。4
+					case "产出":
 						oReturn = {
 							color: "green",
 							text: "产出",
 							type: "2"
 						};
 						break;
-					// 送检。
-					case "5":
+					// 送检。5
+					case "送检":
 						oReturn = {
 							color: "red",
 							text: "送检",
 							type: "3"
 						};
 						break;
-					// 质检。
-					case "6":
+					// 质检。6
+					case "质检":
 						oReturn = {
 							color: "red",
 							text: "质检",
 							type: "3"
 						};
 						break;
+					// 其他类型，按照出入库进行
+					default: 
+						oReturn = {
+							color: "yellow",
+							text: sType,
+							type: "1"
+						}
 				}
 				
 				// 返回数据。
@@ -1022,9 +1042,7 @@
 							materialName: o.name
 						}
 					}else {
-						return Object.assign({}, o.data, {
-							type: this.getTimeLineTypeInfo(o.data.type).text
-						})
+						return o.data
 					}
 				})
 				

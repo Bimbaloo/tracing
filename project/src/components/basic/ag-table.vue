@@ -54,7 +54,8 @@
 		    					var result = params.defaultItems.splice(0);
 				    			// ["copy", "copyWithHeaders", "paste", "separator", "toolPanel", "export"]
 				    			return ["copy", "copyWithHeaders", "paste"]
-				    		}
+				    		},
+//				    		onGridReady: this.onGridReady,
 			            }, this.tableData.gridOptions)
             }
         },
@@ -70,6 +71,12 @@
         	this.tableData.selected = []
         },
         methods: {
+        	onGridReady() {
+        		// get columns to fit the grid width
+				this.option.api.sizeColumnsToFit();
+				// get columns to fit content
+//				this.option.columnApi.autoSizeAllColumns()
+        	},
         	selectionChanged() {
 		    	let aSelected = this.option.api.getSelectedRows(),
 		    		that = this;
