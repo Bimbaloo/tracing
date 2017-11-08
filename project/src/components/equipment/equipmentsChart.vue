@@ -71,39 +71,50 @@
             <div class="tooltip-wrapper" :style="{width: chartWidth+'px', margin: grid[0] + 'px ' + grid[1] + 'px ' + grid[2] + 'px ' + grid[3] + 'px'}">
                 <div v-for="compareData in compareList" 
                     :key="compareData.millisecond"              
-                    @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)" 
-                    v-show="dimension.filter(o => o.key === compareData.dimension)[0].show && (compareData.dimension==='pool'?(!onlyShowRelatedData || (compareData.related && onlyShowRelatedData)):true)">                    
-                    <div :class="['tooltip-panel', compareData.reverse ? 'left':'right']" :style="{left:compareData.position*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
+                    @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)"
+                    v-if="compareData.list.some(item=>dimension.filter(o => o.key === item.dimension)[0].show)">
+                    <!--v-show="dimension.filter(o => o.key === compareData.dimension)[0].show && (compareData.dimension==='pool'?(!onlyShowRelatedData || (compareData.related && onlyShowRelatedData)):true)"-->                    
+                    <div 
+                    :class="['tooltip-panel', compareData.reverse ? 'left':'right']" 
+                    :style="{left:compareData.position*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
                         <div class="tooltip-time">{{compareData.time}}</div>
                         <i class="btn-close icon icon-14 icon-close" title="关闭" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
                         <i class="btn-reverse icon icon-14 icon-reverse" title="翻转" @click="reversePanelClickHandle(compareData)" ></i>
-                        <div class="tooltip-list" v-for="(equipment,index) in compareData.list" :key="index" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
-                            <div class="tooltip-title" 
-                            :style="{color: equipment.color}">
-                            {{equipment.name}}&nbsp;&nbsp;{{equipment.series}}&nbsp;&nbsp;{{`${compareData.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
+                        <div class="list-wrapper" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
+                            <div 
+                            class="tooltip-list" 
+                            v-for="(equipment,index) in compareData.list" 
+                            :key="index"
+                            v-if="dimension.filter(o => o.key === equipment.dimension)[0].show">
+                                <div class="tooltip-title" 
+                                :style="{color: equipment.color}">
+                                {{equipment.name}}&nbsp;&nbsp;
+                                {{equipment.series}}&nbsp;&nbsp;
+                                {{`${equipment.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
+                                </div>
+                                <ul class="event-list">
+                                    <li v-for="(event,index) in equipment.event"
+                                    :key="index" 
+                                    v-if="equipment.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
+                                        <div :style="{color: equipment.color}">
+                                            {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
+                                            <span v-if="event.group">事件组：{{event.group}}</span>
+                                            <i v-if="!!event.related" class="icon icon-12 icon-pin"></i>
+                                            <i 
+                                            @click="showVideoDialog(equipment.id, equipment.name, compareData.time, event.title)"
+                                            v-if="showCamera && equipment.dimension==='pool'" 
+                                            class="icon icon-12 icon-camera" 
+                                            title="监控视频"></i>
+                                        </div>
+                                        <ul class="content-list">
+                                            <li v-for="(content,index) in event.content" :key="index">
+                                                {{content.name}}:&nbsp;&nbsp;{{parseData(content.value)}}
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                                
                             </div>
-                            <ul class="event-list">
-                                <li v-for="(event,index) in equipment.event"
-                                :key="index" 
-                                v-if="compareData.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
-                                    <div :style="{color: equipment.color}">
-                                        {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
-                                        <span v-if="event.group">事件组：{{event.group}}</span>
-                                        <i v-if="!!event.related" class="icon icon-12 icon-pin"></i>
-                                        <i 
-                                        @click="showVideoDialog(equipment.id, equipment.name, compareData.time, event.title)"
-                                        v-if="showCamera && compareData.dimension==='pool'" 
-                                        class="icon icon-12 icon-camera" 
-                                        title="监控视频"></i>
-                                    </div>
-                                    <ul class="content-list">
-                                        <li v-for="(content,index) in event.content" :key="index">
-                                            {{content.name}}:&nbsp;&nbsp;{{parseData(content.value)}}
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                            
                         </div>
                         
                     </div>
@@ -844,8 +855,10 @@
 
                 if(!this.bRestrain) {
                     this.equipments = this.equipmentsId
+                    this.onlyShowRelatedData = true;
                 }else {
                     this.equipments = []
+                    this.onlyShowRelatedData = false;
                 }	
 
                 // 选中的维度。
@@ -858,7 +871,7 @@
                 })
                 this.markLine = [];
                 this.compareList = []; 
-                this.onlyShowRelatedData = true;
+                
                 this.showState = true;
                 // 清空本地存储数据。
                 this.storageData = null;
@@ -880,6 +893,7 @@
                     this.equipments = this.equipmentsId
                 }else {
                     this.equipments = []
+                    this.onlyShowRelatedData = false;
                 }			
                 
                 this.initChart();
@@ -949,6 +963,7 @@
                             oData.color = obj.color; // 维度颜色。
                             oData.series = obj.name; // 维度名称。
                             oData.quantity = oCurrent[3].length; // 事件数量。
+                            oData.dimension = oCurrent[4]; // 事件维度。
                             oData.relatedQuantity = oCurrent[5]; // 起点相关数量。 
                             oData.event = [];
 
@@ -962,13 +977,14 @@
                                     // 起点相关标记。
                                     index: index+1,
                                     relatedIndex: relatedIndex,
-                                    related: o.related,
+                                    related: !!o.related,
                                     group: o.groupId == null?'':o.groupId,
                                     title: o.title,
                                     content: o.tooltipData
                                 })
                             });
 
+                            oData.related = !!relatedIndex;
                             aoCurrentList.push(oData);
                         }
 
@@ -984,6 +1000,7 @@
                         oData.color = param.color;
                         oData.series = param.seriesName;
                         oData.quantity = aoValue[2];
+                        oData.dimension = param.data[4];
                         // 起点相关数量。
                         oData.relatedQuantity = aoValue[5];
                         oData.event = [];
@@ -1004,6 +1021,8 @@
                                 content: o.tooltipData
                             })
                         })
+
+                        oData.related = !!relatedIndex;
                         return oData;
                     })                    
                 }
@@ -1044,8 +1063,8 @@
 
                 return {
                     reverse: false,
-                    related: bRelated,
-                    dimension: sDimension,
+                    // related: bRelated,
+                    // dimension: sDimension,
                     zIndex: zIndex || TOOLTIP_Z_INDEX,
                     millisecond: nTime,
                     position: nRealLeft,
@@ -1100,7 +1119,7 @@
                 if(!this.markLine.filter(o => o.xAxis===value[0]).length) {
                     let bRelated = !!value[5]
                     // 若无该标记线，添加标记线，并标记是否与起点相关。
-                    this.markLine.push({ xAxis: value[0], related: bRelated, dimension: value[4]});
+                    this.markLine.push({ xAxis: value[0]});//, related: bRelated, dimension: value[4]}
 
                     this.compareList = this.compareList.map(o => {
                         o.zIndex = TOOLTIP_Z_INDEX
@@ -1108,7 +1127,7 @@
                     })
                     // 添加对比数据。
                     this.compareList.push(this.transformTooltipDataToCompareData(value[0], bRelated, value[4], TOOLTIP_Z_INDEX+1));
-                   
+                    
                 }
             },
             // 标记线点击事件。
@@ -1170,7 +1189,7 @@
                     bRelated = !!aData[5];
 
                 // 添加标记线。
-                this.markLine.push({ xAxis: nTime, related: bRelated, dimension: value[4]});
+                this.markLine.push({ xAxis: nTime});//, related: bRelated, dimension: value[4]});
 
                 this.compareList = this.compareList.map(o => {
                     o.zIndex = TOOLTIP_Z_INDEX
@@ -2636,11 +2655,13 @@
                     cursor: pointer;
                 }
 
-                .tooltip-list {
+                .list-wrapper {
                     padding: 10px;
                     overflow-y: auto;
                     position: relative;
-                    // border: 1px solid #D53A35;
+                }
+                .tooltip-list + .tooltip-list {
+                    margin-top: 5px; 
                 }
 
                 .content-list {
@@ -2712,10 +2733,13 @@
     .icon-12{
         &.icon-pin {
              margin-left: 5px;
+             margin-top: -3px;
         }
 
         &.icon-camera {
             cursor: pointer;
+            margin-left: 5px;
+            margin-top: -3px;
         }
     }
 
