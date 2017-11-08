@@ -949,65 +949,26 @@
             // 获取当前数据列表。
             getCurrentDataList(nTime) {
                 let aoCurrentList = [];
-                                
-                if((!this.axisTooltipData.length) || (nTime !== this.axisTooltipData[0].value[0])) {
-                    // 若点击的数据点与移动轴不一致。
-                    this.dimension.forEach(obj => {             
-                        let oCurrent = obj.data.filter(o => o[0] === nTime)[0],
-                            oData = {};
+                
+                // 若点击的数据点与移动轴不一致。
+                this.dimension.forEach(obj => {             
+                    let oCurrent = obj.data.filter(o => o[0] === nTime)[0],
+                        oData = {};
 
-                        if(oCurrent) {
-                            let aoEquipmentInfo = this.categories[oCurrent[1]].value.split("+");
-                            oData.id = aoEquipmentInfo[1]; // 设备id。
-                            oData.name = aoEquipmentInfo[0]; // 设备名称。
-                            oData.color = obj.color; // 维度颜色。
-                            oData.series = obj.name; // 维度名称。
-                            oData.quantity = oCurrent[3].length; // 事件数量。
-                            oData.dimension = oCurrent[4]; // 事件维度。
-                            oData.relatedQuantity = oCurrent[5]; // 起点相关数量。 
-                            oData.event = [];
-
-                            let relatedIndex = 0;
-                            // 事件列表
-                            oCurrent[3].forEach((o,index) => {
-                                if(o.related) {
-                                    relatedIndex++;
-                                }
-                                oData.event.push({
-                                    // 起点相关标记。
-                                    index: index+1,
-                                    relatedIndex: relatedIndex,
-                                    related: !!o.related,
-                                    group: o.groupId == null?'':o.groupId,
-                                    title: o.title,
-                                    content: o.tooltipData
-                                })
-                            });
-
-                            oData.related = !!relatedIndex;
-                            aoCurrentList.push(oData);
-                        }
-
-                    });                    
-                }else {
-                    aoCurrentList = this.axisTooltipData.map(param => {
-                        let aoValue = param.value,
-                            oData = {},
-                            aoEquipmentInfo = param.name.split("+");
-
-                        oData.id = aoEquipmentInfo[1];
-                        oData.name = aoEquipmentInfo[0];
-                        oData.color = param.color;
-                        oData.series = param.seriesName;
-                        oData.quantity = aoValue[2];
-                        oData.dimension = param.data[4];
-                        // 起点相关数量。
-                        oData.relatedQuantity = aoValue[5];
+                    if(oCurrent) {
+                        let aoEquipmentInfo = this.categories[oCurrent[1]].value.split("+");
+                        oData.id = aoEquipmentInfo[1]; // 设备id。
+                        oData.name = aoEquipmentInfo[0]; // 设备名称。
+                        oData.color = obj.color; // 维度颜色。
+                        oData.series = obj.name; // 维度名称。
+                        oData.quantity = oCurrent[3].length; // 事件数量。
+                        oData.dimension = oCurrent[4]; // 事件维度。
+                        oData.relatedQuantity = oCurrent[5]; // 起点相关数量。 
                         oData.event = [];
 
                         let relatedIndex = 0;
                         // 事件列表
-                        aoValue[3].forEach((o,index) => {
+                        oCurrent[3].forEach((o,index) => {
                             if(o.related) {
                                 relatedIndex++;
                             }
@@ -1015,17 +976,18 @@
                                 // 起点相关标记。
                                 index: index+1,
                                 relatedIndex: relatedIndex,
-                                related: o.related,
+                                related: !!o.related,
                                 group: o.groupId == null?'':o.groupId,
                                 title: o.title,
                                 content: o.tooltipData
                             })
-                        })
+                        });
 
                         oData.related = !!relatedIndex;
-                        return oData;
-                    })                    
-                }
+                        aoCurrentList.push(oData);
+                    }
+
+                });                    
 
                 return aoCurrentList;
             },      
