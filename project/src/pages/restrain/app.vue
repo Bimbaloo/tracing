@@ -9,12 +9,12 @@
 							<div class='radio'>
 								<el-radio :label="radio.key" v-for="(radio,index) in radioList" :key="index">{{radio.groupName}}</el-radio>
 							</div>
-							<el-form :inline="true" ref="materialForm" :model="materialForm"  :class="[ 'demo-form-inline','form-inline']" :rules="rules">
-								 <el-form-item v-for="(item,index) in groupItems" :label="item.itemName" v-show="item.key === radioNumber" :key="item.itemCode+index" :prop="item.itemCode">
-									 <component :is="`v-${item.type}`" :form-data="materialForm" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
+							<el-form :inline="true" :ref="`materialForm${index}`" :model="materialForm[index]"  :class="[ 'demo-form-inline','form-inline']" v-for="(form,index) in radioList" v-show="form.key == radioNumber" :rules="materialFormRules[index]">
+								 <el-form-item v-for="(item,num) in groupItems" :label="item.itemName" v-if="item.key === radioNumber" :key="item.itemCode+num" :prop="item.itemCode">
+									 <component :is="`v-${item.type}`" :form-data="materialForm[index]" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
-									<el-button type="primary" class='btn' @click="submitForm('materialForm')">查询</el-button>
+									<el-button type="primary" class='btn' @click="submitForm(`materialForm${index}`)">查询</el-button>
 								</el-form-item>
 							</el-form>
 						</el-radio-group>
@@ -52,6 +52,7 @@
 
 	//const URL_JOIN = HOST + "";//"http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
 	const URL_JOIN = "../static/2.json"    // 测试获取刚进来的数据
+	//const URL_JOIN = HOST + "/api/v1/customized/modules";
 	export default {
 		// 页面组件。
 		components: {
@@ -62,73 +63,96 @@
 		},
 		// 页面数据。
 		data() {
+			// 验证开始时间。
+			const validateStartTime = (rule, value, callback) => {
+					if(!value) {
+	            		callback(new Error("请输入开始时间"));
+	            	}else if(value && value > new Date().Format()){
+						// 如果开始时间存在，而且开始时间大于结束时间。
+						callback(new Error("开始时间不能大于当前时间"));
+					}else {
+	            		callback();
+	            	}
+				}
+			// 验证结束时间。
+			const validateEndTime = (rule, value, callback) => {
+				let sStart = this.formDatas.startTime;
+				if(!value) {
+					callback(new Error("请输入结束时间"));
+				}else if(sStart && sStart > value) {
+					// 如果开始时间存在，而且开始时间大于结束时间。
+					callback(new Error("结束时间必须大于开始时间"));
+				}else {
+					callback();
+				}
+			};
 			return {
 				radioList:[
 					{
-						key:'0',
+						key:'1',
 						groupName:'物料'
 					},
 					{
-						key:'1',
-						groupName:'设备',
+						key:'2',
+						groupName:'设备'
 					}
 				],
 				groupItems: [
                         {
-							key:'1',
+							key:'2',
                          	itemCode: "equipmentCode",
 							itemName: "设备",
 							type: "select",
 							placeholder:"请选择设备"
                         },
                         {
-							key:'1',
+							key:'2',
                          	itemCode: "startTime",
 							itemName: "开始时间",
 							type: "datetime",
 							placeholder:"请选择开始时间"
                         },
                         {
-							key:'1',
+							key:'2',
                          	itemCode: "endTime",
 							itemName: "结束时间",
 							type: "datetime",
 							placeholder:"请选择结束时间"
 						},
 						{
-							key:'0',
+							key:'1',
                          	itemCode: "materialCode",
 							itemName: "物料",
 							type: "select",
 							placeholder:"请选择物料"
                         },
                         {
-							key:'0',
+							key:'1',
                          	itemCode: "batchNo",
 							itemName: "批次",
 							type: "input",
 							placeholder:"请输入批次"
                         }
 				],
-
-				materialForm:{
+				materialForm:[{
 					equipmentCode:'',   //设备
+					batchNo: ''			//批次号
+				},{
 					startTime:'',		//开始时间
 					endTime:'',			//结束时间
 					materialCode:'',	//物料编号
-					batchNo: ''			//批次号
-				},
+				}],
 				activeName: 'first',
-				radioNumber: '0',
+				radioNumber: '1',
 				equipmentRules: {
 					personCode: [
 						{ required: true, message: '请选择人员', trigger: 'change' }
 					],
 					startTime: [
-						{ required: true, message: '请选择开始日期', trigger: 'change' }
+						{ validator: validateStartTime , required: true, trigger: 'change' }
 					],
 					endTime: [
-						{ required: true, message: '请选择结束日期', trigger: 'change' }
+						{ validator: validateEndTime , required: true, trigger: 'change' }
 					]
 				},
 				/* 遏制列表页面数据 */
@@ -158,74 +182,44 @@
 						}
 				],
 				
-
-				activeKey: "suspicious",  // 储存路由页面,默认suspicious
+				activeKey: "restrain",  // 储存路由页面,默认restrain
 
 
 			/* 保存上次查询的数据 */
 				defaultConditions:{},
 				// 查询标记。
 				tag: "",
-				tip: true
-
-			}
-		},
-		// 计算属性。
-		computed: {
-			// 获取当前真正的查询条件
-			ruleForms: function(){
-				let ruleForms = {}
-				this.groupItems.filter((o) => o.key === this.radioNumber).forEach(item => {
-					ruleForms[item.itemCode] = this.materialForm[item.itemCode]
-				})
-				return  ruleForms
-			},
-			rules:function(){
-				let orules = {},
-            		oForm = this.ruleForms,
-				// 验证开始时间。
-				validateStartTime = (rule, value, callback) => {
-	            	if(!value) {
-	            		callback(new Error("请输入开始时间"));
-	            	}else {
-	            		callback();
-	            	}
-				},
-				// 验证结束时间。
-            	validateEndTime = (rule, value, callback) => {
-	            	let sStart = oForm.startTime;
-	            	if(!value) {
-	            		callback(new Error("请输入结束时间"));
-	            	}else if(sStart && sStart > value) {
-	            		// 如果开始时间存在，而且开始时间大于结束时间。
-	            		callback(new Error("结束时间必须大于开始时间"));
-	            	}else {
-	            		callback();
-	            	}
-	            };
-				if(this.radioNumber === "0"){
-					orules = {
+				tip: true,
+				materialFormRules:[
+					{
 						batchNo: [
 							{ required: true, message: '请输入批次号', trigger: 'blur' }
 						],
 						materialCode: [
 							{ required: true, message: '请选择物料编号', trigger: 'change' }
 						]
-					}
-				}else{
-					orules = {
+					},{
 						equipmentCode: [
 							{ required: true, message: '请选择设备编号', trigger: 'change' }
 						],
 						startTime:[
-							{ validator: validateStartTime , required: true, message: '请选择开始日期', trigger: 'change' }
+							{ validator: validateStartTime , required: true, trigger: 'change' }
 						],
 						endTime:[
 							{ validator: validateEndTime , required: true, trigger: 'change' }
 						]
 					}
-				}
-				return orules
+				]
+			}
+		},
+		// 计算属性。
+		computed: {
+			// 获取当前真正的查询条件
+			formDatas: function(){
+				let formDatas = {}
+				debugger
+				formDatas = this.materialForm[this.radioNumber-1]
+				return  formDatas
 			}
 
         },
@@ -239,16 +233,10 @@
 
 			/* 获取传入的查询条件 */
 			this.tag = location.search.split("=")[1];
-
+			
           	let oData = sessionStorage.getItem("searchConditions-" + this.tag);
 
-			if(oData) {									//如果该条件在 session 中有保存
-				oData = JSON.parse(oData);
-				this.render(oData) 						// 根据数据渲染页面
-			}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
-				oData = this.getSearchData();
-				this.render(oData)
-			}
+			
 
 			/* 根据传入数据 */
 			this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
@@ -259,7 +247,7 @@
 					if(o.moduleCode === "restrain"){	
 						(o.groups).forEach((group,index) => {
 							_radioList.push({
-								key: `${index}`,
+								key: index+1,
 								groupName: `${group.groupName}`
 							})
 							var groupItems = group.groupItems
@@ -275,7 +263,7 @@
 									item.placeholder = `请选择${item.itemName}`
 								}
 								_groupItems.push({
-									key: `${index}`,
+									key: index+1,
 									itemCode: `${item.itemCode}`,
 									itemName: `${item.itemName}`,
 									type: `${item.type}`,
@@ -289,13 +277,16 @@
 					}
 				})
 
-				if(oData) {
+				if(oData) {									//如果该条件在 session 中有保存
+					oData = JSON.parse(oData);
+					this.render(oData) 						// 根据数据渲染页面
+				}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
+					oData = this.getSearchData();
 					this.render(oData)
 				}else {
-					this.render({radio: "0"})
+					this.render({radio: 1})
 				}
 
-				render({radio: "0"})
 				this.$nextTick(() => {
 					if(oData) {
 						this._submitForm(oData);
@@ -309,26 +300,22 @@
 			/* 根据传入信息渲染页面 */
 			render(oData){
 				this.activeKey = oData.tab;  //路由
-				this.radioNumber = oData.radio
-				if(oData.radio === '0'){  // 将条件渲染到页面
-					this.materialForm.materialCode = oData.keys.materialCode
-					this.materialForm.batchNo = oData.keys.batchNo
-				}else{
-					this.materialForm.equipmentCode = oData.keys.equipmentCode
-					this.materialForm.startTime = oData.keys.startTime
-					this.materialForm.endTime = oData.keys.endTime
+				this.radioNumber = +oData.radio
+				for(let i in oData.keys){
+					this.materialForm[i] = oData.keys[i]
 				}
 			},
 
 			submitForm(formName) {
-			  this.$refs[formName].validate((valid) => {
+			  this.$refs[formName][0].validate((valid) => {
 					if (valid) {
-						this.activeKey = "suspicious"
+						this.activeKey = "restrain"
                         let oConditions = {
-                            keys: this.ruleForms, // this.keys,
+                            keys: this.formDatas, // this.keys,
 							radio: this.radioNumber,
 							tab: this.activeKey
 						};
+						debugger
                         this._submitForm(oConditions);
                         
                     } else {
@@ -339,6 +326,7 @@
 				});
 			},
 			submitForm1(formName) {
+				
 			  this.$refs[formName].validate((valid) => {
 					if (valid) {
 						sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
@@ -392,9 +380,10 @@
 
 
 			// 数据提交
-			_submitForm(oConditions) {	
+			_submitForm(oConditions) {
+				debugger	
 				this.tip = false
-				let sPath = '/' + this.activeKey;  //this.activeKey  == 'suspicious'
+				let sPath = '/' + this.activeKey;  //this.activeKey  == 'restrain'
 				oConditions.tab = this.activeKey;
 
 				this.defaultConditions = oConditions
@@ -403,15 +392,16 @@
 
 				sPath = sPath + '/' + oConditions.radio;
 				
-				if(this.activeKey  === 'suspicious' && oConditions.radio == 1) {
+				if(this.activeKey  === 'restrain' && oConditions.radio == 2) {//1
 					sPath = '/process'
 				}
-				this.$router.replace({ path: sPath, query: this.getKeys() })
+				let oQuery = this.getKeys()
+				this.$router.replace({ path: sPath, query: oQuery })
 			},
 			
 			getKeys() {
-				
-				let oSearch = this.ruleForms
+				debugger
+				let oSearch = this.formDatas
 				// 加时间戳。生成标记-- 点击查询可多次
 				oSearch._tag = new Date().getTime().toString().substr(-5);
 				
@@ -441,7 +431,7 @@
 				// 返回参数。
 			//	console.log(oData)
 				return oData;
-			},
+			}
 			
 		}
 		

@@ -6,7 +6,7 @@ import ElementUI from 'element-ui'
 import 'element-ui/lib/theme-green/index.css'
 import App from './app.vue'
 import axios from 'axios'
-import echarts  from 'echarts'
+import echarts from 'echarts'
 
 import 'babel-polyfill'
 
@@ -40,13 +40,13 @@ const Repair = r => require.ensure([], () => r(require('components/process/repai
 
 // 定义路由
 const routes = [
-  { path: '/list/:key', component: list },
-  { path: '/suspicious/0/', component: Suspicious },
+  { path: '/list/:key', component: list },            // 遏制列表（未开发）
+  { path: '/restrain/1/', component: Suspicious },    // 可疑品列表
   // { path: '/suspicious/1/', component: Process },  // 设备查询
   { 
     path: '/process', 
     component: Process,
-    // alias: '/suspicious/1/',
+    alias: '/restrain/2/',
     children: [{
       path: '',
       component: Chart
