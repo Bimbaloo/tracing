@@ -217,7 +217,6 @@
 			// 获取当前真正的查询条件
 			formDatas: function(){
 				let formDatas = {}
-				debugger
 				formDatas = this.materialForm[this.radioNumber-1]
 				return  formDatas
 			}
@@ -301,9 +300,12 @@
 			render(oData){
 				this.activeKey = oData.tab;  //路由
 				this.radioNumber = +oData.radio
-				for(let i in oData.keys){
-					this.materialForm[i] = oData.keys[i]
+				if(!!oData.keys){
+					for(let i in oData.keys){
+						this.materialForm[this.radioNumber-1][i] = oData.keys[i]
+					}
 				}
+				
 			},
 
 			submitForm(formName) {
@@ -315,7 +317,6 @@
 							radio: this.radioNumber,
 							tab: this.activeKey
 						};
-						debugger
                         this._submitForm(oConditions);
                         
                     } else {
@@ -380,8 +381,7 @@
 
 
 			// 数据提交
-			_submitForm(oConditions) {
-				debugger	
+			_submitForm(oConditions) {	
 				this.tip = false
 				let sPath = '/' + this.activeKey;  //this.activeKey  == 'restrain'
 				oConditions.tab = this.activeKey;
@@ -400,7 +400,6 @@
 			},
 			
 			getKeys() {
-				debugger
 				let oSearch = this.formDatas
 				// 加时间戳。生成标记-- 点击查询可多次
 				oSearch._tag = new Date().getTime().toString().substr(-5);
@@ -597,13 +596,17 @@
 		.panel-content {
 			display: flex;
 			flex: 1;
-			padding-left: 28px;
-        	padding-right: 28px;
 			.router-container {
 				display: flex;
 				flex: 1;
 				width: 100%;
 				flex-direction: column;
+				.router-content {
+					.innner-content {
+						margin-left: 28px;
+						margin-right: 28px;
+					}
+				}
 				.tip {
 					height: 100%;
 					background: url('../../assets/img/tip.png') no-repeat center center;
