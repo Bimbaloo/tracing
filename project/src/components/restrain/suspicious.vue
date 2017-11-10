@@ -12,8 +12,7 @@
 			</div>
 			<h2 class="title">可疑品列表</h2>
 			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
-			<!-- <v-report v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report> -->
-			<v-report  :hasData="setWidth" :noData="removeWidth" ></v-report>
+			 <v-report v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report> 
 		</div>
 	</div>
 
