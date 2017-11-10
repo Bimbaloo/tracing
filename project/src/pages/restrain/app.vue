@@ -135,12 +135,12 @@
                         }
 				],
 				materialForm:[{
-					equipmentCode:'',   //设备
+					materialCode:'',	//物料编号
 					batchNo: ''			//批次号
 				},{
+					equipmentCode:'',   //设备
 					startTime:'',		//开始时间
-					endTime:'',			//结束时间
-					materialCode:'',	//物料编号
+					endTime:''			//结束时间
 				}],
 				activeName: 'first',
 				radioNumber: '1',
@@ -607,6 +607,16 @@
 						margin-right: 28px;
 					}
 				}
+				.material-stock {
+					.router-path {
+						margin-left: 28px;
+    					margin-right: 28px;
+					}
+					.path-btn {
+						margin-left: 28px;
+    					margin-right: 28px;
+					}
+				}
 				.tip {
 					height: 100%;
 					background: url('../../assets/img/tip.png') no-repeat center center;
@@ -655,6 +665,17 @@
 	#restrain {
 		.router-path {
 			border-bottom-width: 0;
+		}
+	}
+	.el-picker-panel__body-wrapper{
+		.el-picker-panel__body{
+			.el-date-picker__time-header{
+				.el-date-picker__editor-wrap{
+					.el-input {
+						width: 100%;
+					}
+				}
+			}
 		}
 	}
 </style>
