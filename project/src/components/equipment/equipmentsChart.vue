@@ -1332,6 +1332,9 @@
 			getParamter (aQuery) {
 				let oParam = {},
                     oDate = this.getRealTime()
+                if(this.bRestrain) {  //临时方案，目前遏制页面投产表借口不可查，屏蔽
+                    aQuery = aQuery.filter((o)=>{return o!=="doOutIdList" })
+                }
 				aQuery.forEach(param => {
 					switch (param) {
                         case "equipmentName":
