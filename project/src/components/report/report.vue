@@ -884,11 +884,17 @@ export default {
 				return;
 			}
 			
+			let sQuery = oTable.offsetParent.querySelector('.condition-message') ? `
+						<div class="condition-message">${oTable.offsetParent.querySelector('.condition-message').innerHTML}</div>
+						<div class="condition-list">${oTable.offsetParent.querySelector('.condition-list').innerHTML}</div>
+						<div class="content-table condition-table">${oTable.offsetParent.querySelector('.condition-table').innerHTML}</div>
+					` : `
+						<div>${oTable.offsetParent.querySelector('.condition').innerHTML}</div>
+					`
+			
 			let sHtml = `
 					<h2 class="content-title">查询条件</h2>
-					<div class="condition-message">${oTable.offsetParent.querySelector('.condition-message').innerHTML}</div>
-					<div class="condition-list">${oTable.offsetParent.querySelector('.condition-list').innerHTML}</div>
-					<div class="content-table condition-table">${oTable.offsetParent.querySelector('.condition-table').innerHTML}</div>
+					${sQuery}
 					<h2 class="content-title"><span class="table-title">${sTitle}</span></h2>
 	                <div class="table el-table">
 	                    <div class="el-table__header-wrapper">
