@@ -198,6 +198,7 @@ export default {
             bTrack: location.pathname.indexOf("trackIndex") > -1,
             tdResize: true, //是否允许拖动table大小
             condition: {},   // 显示的查询条件
+            filters: {},
             dataName: [      // 条件对应中文名
                 {
                     itemCode: "equipmentName",
@@ -443,28 +444,6 @@ export default {
         },
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
-        },
-        /* 查询条件转数组中文 */
-        filters: function() {
-            let filters = this.condition
-            for (let i in filters) {
-                if (filters[i] === '' || i === '_tag') {
-                    delete filters[i]
-                }
-            }
-            /* 为了将获取到的 barcode等转换为对应的中文 */
-            let b = Object.entries(filters),
-                a = this.dataName;
-
-            b.forEach(o =>
-                a.forEach(function(x) {
-                    if (o[0] === x.itemCode) {
-                        o[0] = x.itemName
-                    }
-                })
-            )
-            return b
-            /* 为了将获取到的 barcode等转换为对应的中文 */
         }
     },
     mounted() {
@@ -485,6 +464,27 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
+    	getFilters() {
+            let filters = this.condition
+            for (let i in filters) {
+                if (filters[i] === '' || i === '_tag') {
+                    delete filters[i]
+                }
+            }
+            /* 为了将获取到的 barcode等转换为对应的中文 */
+            let b = Object.entries(filters),
+                a = this.dataName;
+
+            b.forEach(o =>
+                a.forEach(function(x) {
+                    if (o[0] === x.itemCode) {
+                        o[0] = x.itemName
+                    }
+                })
+            )
+            return b
+            /* 为了将获取到的 barcode等转换为对应的中文 */
+        },
         initData() {
             if (this.bTrack) {
                 // 若为追踪页面，过滤明细产出操作列。
@@ -657,6 +657,7 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
+            this.filters = this.getFilters()
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
         },
         /**
