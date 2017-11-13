@@ -5,10 +5,20 @@
     </header>
     <v-tooltip :config="true" :back="false"></v-tooltip>
     <div class="search-tab-content">
-      <el-tabs  element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab" @tab-click="handleClick">
-        <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-          <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
-          <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
+      <el-tabs  element-loading-text="拼命加载中" 
+      v-model="activeKey" 
+      type="border-card" 
+      class="search-tab" 
+      @tab-click="handleClick">
+        <el-tab-pane 
+        :key="category.key" 
+        v-for="category in categories" 
+        :label="category.title" 
+        :name="category.key">
+          <v-panel 
+          :category="category" 
+          :label-width="labelWidth" 
+          :handle-submit="handleSubmit"></v-panel>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -16,8 +26,11 @@
       <img class="version" :src="version" />
       <span class="version-info">版本: {{ v }}</span>
     </footer>
-    <!--v-dialog v-if="showDialog" :dialog-visible="showDialog" @hideDialog="hideDialog"></v-dialog-->
-    <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" :style="{zIndex: historyZindex}" @mouseover="historyZindex = 2" @mouseleave="historyZindex = 0" >
+    <div 
+    :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" 
+    :style="{zIndex: historyZindex}" 
+    @mouseover="historyZindex = 2" 
+    @mouseleave="historyZindex = 0" >
       <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
       <div class='history-title' v-show="showHistory" >
@@ -25,11 +38,17 @@
         <h3 class="clear-history" @click="clearHistory">清空查询记录</h3>
       </div>
       <div class='history-panal' v-show="showHistory" >
-        <ul class='history-content' v-for="ul in liData">
+        <ul class='history-content' 
+        v-for="(ul,index) in liData" 
+        :key="index">
           <li class="ecorded-time">
             <h3>{{ul.date}}</h3>
           </li>
-          <li class="history-messages-everyday" v-for="data in ul.data" @click="findId(data.id)" :data-id='data.id'>
+          <li class="history-messages-everyday" 
+          v-for="(data,index) in ul.data" 
+          :key="index" 
+          @click="findId(data.id)" 
+          :data-id='data.id'>
             <ul class='information-record'>
               <li>
                 <span class='circle'></span>
@@ -38,7 +57,10 @@
               <li class="ecorded-module">{{data.oData.tab}}</li>
               <li class='records'>
                 <ul class="detail-record-box">
-                  <li class="detail-record" v-for="li in data.oData.keys" v-if="li[1]">{{li[0]}}：{{li[1]}}</li>
+                  <li class="detail-record" 
+                  v-for="(li,index) in data.oData.keys" 
+                  :key="index"
+                  v-if="li[1]">{{li[0]}}：{{li[1]}}</li>
                 </ul>
               </li>
             </ul>
@@ -108,8 +130,6 @@ export default {
     }
   },
   created() {
-    
-    //debugger
     let history = localStorage.getItem("history")
     if(history){
       this.myLocalStorage = JSON.parse(history)
@@ -130,7 +150,7 @@ export default {
       // 请求成功。
       
       this.loading = false;
-      this.categories = fnP.parseData(oData).filter(o => o.key != "restrain" && o.key != "link");
+      this.categories = fnP.parseData(oData);//.filter(o => o.key != "restrain" && o.key != "link");
       this.categories.forEach(o => {
         o.active = {
           radio: "1",
