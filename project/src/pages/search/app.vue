@@ -5,7 +5,7 @@
     </header>
     <v-tooltip :config="true" :back="false"></v-tooltip>
     <div class="search-tab-content">
-      <el-tabs  element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab" @tab-click="handleClick">
+      <el-tabs  element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab">
         <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
           <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
           <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
@@ -42,6 +42,7 @@
                 </ul>
               </li>
             </ul>
+            <i class="el-icon-circle-cross" @click.stop.self="deleteId(data.id)"></i>
           </li>
         </ul>
       </div>
@@ -146,7 +147,6 @@ export default {
     this.fetchDataName()  //获取名称
   },
   methods: {
-    hideDialog() {},
     // 显示提示信息。
     showMessage() {
       this.$message({
@@ -155,9 +155,7 @@ export default {
         type: "error"
       });
     },
-    handleClick(tab, event) {
 
-    },
     _submitForm(oConditions) {
       oConditions.tab = this.activeKey;
       this.updateRecord(oConditions)
@@ -248,6 +246,13 @@ export default {
         }
       })
     },
+    // 单条记录删除
+    deleteId(listId) {
+      this.myLocalStorage = this.myLocalStorage.filter(e=>{
+        return e.id !== listId
+      })
+      localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+    },
     updateRecord(oConditions) {
         //debugger
         delete(oConditions.keys._tag)
@@ -291,8 +296,25 @@ export default {
       },
       // 清空历史记录
       clearHistory(){
-        localStorage.removeItem("history")
-        this.myLocalStorage = []
+        this.$confirm('此操作将永久删除全部记录, 是否继续?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          localStorage.removeItem("history")
+          this.myLocalStorage = []
+          this.$nextTick(function(){
+            this.$message({
+              type: 'success',
+              message: '删除成功!'
+            });
+          })
+        }).catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        })
       }
   }
 }
@@ -469,6 +491,20 @@ footer {
     }
   }
 }
+.el-message-box__headerbtn {
+    border: none;
+    outline: 0;
+    padding: 0;
+}
+.el-message-box__btns {
+  .el-button {
+    width: 80px;
+    height: 30px;
+    padding: 0;
+    box-sizing: border-box;
+    border-radius: 0;
+  }
+}
 
 .history-box {
   position: fixed;
@@ -523,6 +559,9 @@ footer {
       margin-bottom: 30px;
       >li {
         margin: 20px;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: space-between;
       }
       .ecorded-time {
         &>h3 {
@@ -533,13 +572,13 @@ footer {
         }
       }
       .history-messages-everyday {
-        .information-record {
-          display: flex;
-          color: #e5e5e5;
-          font-size: 12px;
-          line-height: 15px;
+        &:hover {
           cursor: pointer;
-          &:hover {
+          &>i {
+            opacity: 1;
+            color: #42af8f;
+          }
+          .information-record {
             color: #42af8f;
             .circle {
               border-color: #42af8f;
@@ -557,6 +596,12 @@ footer {
               top: 2px;
             }
           }
+        }
+        .information-record {
+          display: flex;
+          color: #e5e5e5;
+          font-size: 12px;
+          line-height: 15px;
           &>li {
             margin-right: 10px;
             .circle {
@@ -578,6 +623,10 @@ footer {
               }
             }
           }
+        }
+        i {
+          opacity: 0;
+          font-size: 14px;
         }
       }
     }
