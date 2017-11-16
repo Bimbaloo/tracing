@@ -25,6 +25,24 @@ Vue.prototype.$post = axios.post;
 
 // 添加echarts。
 Vue.prototype.$echarts = echarts
+/* 仓库操作 */
+const Warehouse = r => require.ensure([], () => r(require('components/process/warehouse.vue')), 'group-detail')
+const StockTransfer = r => require.ensure([], () => r(require('components/process/stockTransfer.vue')), 'group-detail')               //库存转储
+const Varastoonotto = r => require.ensure([], () => r(require('components/process/varastoonotto.vue')), 'group-detail')               //库存收货
+const InventoryShipment = r => require.ensure([], () => r(require('components/process/inventoryShipment.vue')), 'group-detail')       //库存发货
+const ProducedStorage = r => require.ensure([], () => r(require('components/process/producedStorage.vue')), 'group-detail')           //生产入库
+const ProduceShipment = r => require.ensure([], () => r(require('components/process/produceShipment.vue')), 'group-detail')           //生产发料
+const ProductionWithdrawal = r => require.ensure([], () => r(require('components/process/productionWithdrawal.vue')), 'group-detail') //生产退料
+const SaleRefunding = r => require.ensure([], () => r(require('components/process/saleRefunding.vue')), 'group-detail')               //销售退库
+const SaleOutWarehouse = r => require.ensure([], () => r(require('components/process/saleOutWarehouse.vue')), 'group-detail')         //销售出库
+const PurchaseStorage = r => require.ensure([], () => r(require('components/process/purchaseStorage.vue')), 'group-detail')           //采购入库
+const PurchasingWithdrawal = r => require.ensure([], () => r(require('components/process/purchasingWithdrawal.vue')), 'group-detail') //采购退库
+const StockGains = r => require.ensure([], () => r(require('components/process/stockGains.vue')), 'group-detail')                     //库存损益
+const StockAdjustment = r => require.ensure([], () => r(require('components/process/stockAdjustment.vue')), 'group-detail')           //库存调整
+const TransferStorage = r => require.ensure([], () => r(require('components/process/transferStorage.vue')), 'group-detail')           //调拨入库
+const TransferOutWarehouse = r => require.ensure([], () => r(require('components/process/transferOutWarehouse.vue')), 'group-detail') //调拨出库
+const ProductDelivery = r => require.ensure([], () => r(require('components/process/ProductDelivery.vue')), 'group-detail')           //成品发货
+
 
 const Stock = r => require.ensure([], () => r(require('components/material/stock.vue')), 'group-detail')
 const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-detail')
@@ -50,7 +68,101 @@ const Track = r => require.ensure([], () => r(require('components/track/track.vu
 
 Vue.use(VueRouter)
 // 定义路由
-const routes = [{ 
+const routes = [{
+    path: '/warehouse', 
+    component: Warehouse,
+    children: [{
+      path: 'stockTransfer',
+      component: StockTransfer,
+      meta: {
+        title: 'stockTransfer'
+      }
+    },{
+      path: 'varastoonotto',
+      component: Varastoonotto,
+      meta: {
+        title: 'varastoonotto'
+      }
+    },{
+      path: 'inventoryShipment',
+      component: InventoryShipment,
+      meta: {
+        title: 'inventoryShipment'
+      }
+    },{
+      path: 'producedStorage',
+      component: ProducedStorage,
+      meta: {
+        title: 'producedStorage'
+      }
+    },{
+      path: 'produceShipment',
+      component: ProduceShipment,
+      meta: {
+        title: 'produceShipment'
+      }
+    },{
+      path: 'productionWithdrawal',
+      component: ProductionWithdrawal,
+      meta: {
+        title: 'productionWithdrawal'
+      }
+    },{
+      path: 'saleRefunding',
+      component: SaleRefunding,
+      meta: {
+        title: 'saleRefunding'
+      }
+    },{
+      path: 'saleOutWarehouse',
+      component: SaleOutWarehouse,
+      meta: {
+        title: 'saleOutWarehouse'
+      }
+    },{
+      path: 'purchaseStorage',
+      component: PurchaseStorage,
+      meta: {
+        title: 'purchaseStorage'
+      }
+    },{
+      path: 'purchasingWithdrawal',
+      component: PurchasingWithdrawal,
+      meta: {
+        title: 'purchasingWithdrawal'
+      }
+    },{
+      path: 'stockGains',
+      component: StockGains,
+      meta: {
+        title: 'stockGains'
+      }
+    },{
+      path: 'stockAdjustment',
+      component: StockAdjustment,
+      meta: {
+        title: 'StockAdjustment'
+      }
+    },{
+      path: 'transferStorage',
+      component: TransferStorage,
+      meta: {
+        title: 'transferStorage'
+      }
+    },{
+      path: 'transferOutWarehouse',
+      component: TransferOutWarehouse,
+      meta: {
+        title: 'transferOutWarehouse'
+      }
+    },{
+      path: 'ProductDelivery',
+      component: ProductDelivery,
+      meta: {
+        title: 'ProductDelivery'
+      }
+    }]
+  },{ 
     path: '/stock', 
     component: Stock,
     children: [{
@@ -184,9 +296,30 @@ const store = new Vuex.Store({
     resize: 0,
     resizeY: 0,
     // 高亮的数据。
-    highted: []
+    highted: [],
+    opType: null,
+    urls: {
+      "op_category": "api/v1/trace/operation-detail/stock/by-id",               //仓库操作
+      "op_category": "api/v1/trace/operation-detail/workshop/by-id",            //车间操作
+      "op_category": "api/v1/trace/operation-detail/barcode-management/by-id",  //条码管理
+      "op_category": "api/v1/trace/operation-detail/inout/by-id",               //投产相关(投入，产出，结转，退料)
+    },
+    url: '',            // 实际请求api
+    operationIdList: [] // 仓库操作,车间操作和条码管理前端传入数据
   },
-  mutations: {  
+  mutations: {
+    // 保存 operationIdList  仓库操作,车间操作和条码管理前端传入数据
+    updateOperationIdList (state, payload) {
+      state.operationIdList = payload.operationIdList;
+    },
+    // 根据 op_category 获取需要的url
+    updateUrl (state, payload) {
+      state.url = state.urls[payload.op_category];
+    },
+    // 存入 opType
+    updateOpType (state, payload) {
+      state.opType = payload.opType;
+    },  
     updateKey (state, payload) {
       state.key = payload.key;
     },
