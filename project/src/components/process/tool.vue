@@ -58,6 +58,7 @@ export default {
             loading: false,
             tdResize: true, //是否允许拖动table大小
             condition:{},   // 查询条件    
+            filters: {},
             dataName:[      // 条件对应中文名
                 {
                     itemCode:"equipmentName",
@@ -138,29 +139,7 @@ export default {
         },
         fullscreen: function(){
             return this.$store && this.$store.state.fullscreen
-        },
-        /* 查询条件转数组中文 */
-        filters: function() {
-			let filters = this.condition
-			for(let i in filters){
-				if(filters[i] === '' || i === '_tag'){
-					delete filters[i]
-				}
-			}
-			/* 为了将获取到的 barcode等转换为对应的中文 */
-			let b = Object.entries(filters),
-				a = this.dataName;
-
-			b.forEach(o =>
-                a.forEach(function (x) {
-                    if(o[0] === x.itemCode){
-                        o[0] = x.itemName
-                    }
-                })
-           )
-		    return b
-			/* 为了将获取到的 barcode等转换为对应的中文 */
-		}
+        }
     },
     mounted(){
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
@@ -184,28 +163,27 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
-        // 判断调用接口是否成功。
-        // judgeLoaderHandler(param, fnSu, fnFail) {
-        //     let bRight = param.data.errorCode;
-            
-        //     // 判断是否调用成功。
-        //     if(!bRight) {
-        //         // 调用成功后的回调函数。
-        //         fnSu && fnSu();
-        //     }else {
-        //         // 提示信息。
-        //         console.log(param.data.errorMsg.message)
-        //         // 失败后的回调函。
-        //         fnFail && fnFail();
-        //     }
-        // },	
-        // 显示提示信息。
-        // showMessage() {
-        //     this.$message({
-        //         message: this.sErrorMessage,
-        //         duration: 3000
-        //     });
-        // },	
+        getFilters() {
+			let filters = this.condition
+			for(let i in filters){
+				if(filters[i] === '' || i === '_tag'){
+					delete filters[i]
+				}
+			}
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+			let b = Object.entries(filters),
+				a = this.dataName;
+
+			b.forEach(o =>
+                a.forEach(function (x) {
+                    if(o[0] === x.itemCode){
+                        o[0] = x.itemName
+                    }
+                })
+           )
+		    return b
+			/* 为了将获取到的 barcode等转换为对应的中文 */
+		},
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
@@ -238,7 +216,7 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
+			this.filters = this.getFilters()
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
 
             // this.$get(url, oQuery)

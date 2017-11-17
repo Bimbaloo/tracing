@@ -65,7 +65,7 @@
         methods: {
             // 初始化路由设置。
             initRoute() {
-                
+        
                 let sRoute = this.$route.path,
                     aPath = sRoute.split("/"),
                     sType = aPath[aPath.length -1]
@@ -122,7 +122,7 @@
                         path: sToRoute,
                         query: this.oQuery[sToType]
                     })                  
-                }else if(sFromType === "process") {
+                }else if(sFromType === "process" && sToType !== "process") {
                     // 从设备分析跳转到其他页面。
                     // 添加开始时间，结束时间。因为可以跳转到设备分析的时候，开始时间结束时间有修改。
                     Object.assign(this.oQuery[sFromType], {

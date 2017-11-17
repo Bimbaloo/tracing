@@ -5,7 +5,7 @@
 		<div class="innner-content">
 			<h2 class="content-title tableData">
 				
-				<span class='table-title'>批次<span class="tag">{{batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;出库信息</span>
+				<span class='table-title'>批次<span class="tag">{{ batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;出库信息</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
@@ -66,7 +66,7 @@
 					loading: false,
 					error: null,
 					height: "100%",
-					filename: this.$route.query.batchNo + "出库",
+					filename: this.batch + "出库",
 					columns: [{
 						prop: "barcode",
 						name: "条码",
@@ -115,7 +115,7 @@
 					loading: false,
 					error: null,
 					height: "100%",
-					filename: this.$route.query.batchNo + "在库",
+					filename: this.batch + "在库",
 					columns: [{
 						prop: "barcode",
 						name: "条码",
@@ -179,6 +179,8 @@
             	if(toTitle == 'batch' && fromTitle == 'storage') {
             		// 同批次出入库
 		            this.fetchPage();
+		            this.batch = this.$route.query.batchNo
+		            this.materialCode = this.$route.query.materialCode
             	}
 			},
 			// 在物料仓储时，放大处理。

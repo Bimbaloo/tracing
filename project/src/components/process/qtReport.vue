@@ -68,6 +68,7 @@ export default {
                 },
             ],
             condition: {},
+            filters: {},
             /* 质检显示数据*/
             tableData: {
                 filename: "质检记录",
@@ -153,28 +154,6 @@ export default {
         },
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
-        },
-        /* 查询条件转数组中文 */
-        filters: function() {
-            let filters = this.condition
-            for (let i in filters) {
-                if (filters[i] === '' || i === '_tag') {
-                    delete filters[i]
-                }
-            }
-            /* 为了将获取到的 barcode等转换为对应的中文 */
-            let b = Object.entries(filters),
-                a = this.dataName;
-
-            b.forEach(o =>
-                a.forEach(function(x) {
-                    if (o[0] === x.itemCode) {
-                        o[0] = x.itemName
-                    }
-                })
-            )
-            return b
-            /* 为了将获取到的 barcode等转换为对应的中文 */
         }
     },
     mounted() {
@@ -199,6 +178,28 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
+    	/* 查询条件转数组中文 */
+    	// 使用keep-alive时。 condition数据变化后，通过计算属性时filters数据没变。
+    	getFilters() {
+    		let filters = this.condition
+            for (let i in filters) {
+                if (filters[i] === '' || i === '_tag') {
+                    delete filters[i]
+                }
+            }
+            /* 为了将获取到的 barcode等转换为对应的中文 */
+            let b = Object.entries(filters),
+                a = this.dataName;
+
+            b.forEach(o =>
+                a.forEach(function(x) {
+                    if (o[0] === x.itemCode) {
+                        o[0] = x.itemName
+                    }
+                })
+            )
+            return b
+    	},
         // 请求成功。
         requestSucess(oData) {
             this.loading = false;
@@ -264,6 +265,7 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
+            this.filters = this.getFilters()
             // oQuery = {
             //     "equipmentId": "208",
             //     "startTime": "2017-05-03 08:19:30", //开始时间 格式：yyyy-MM-dd hh:mm:ss
