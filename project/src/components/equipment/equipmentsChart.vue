@@ -398,6 +398,26 @@
             }
         },
         computed: {
+            // 工厂配置数据。
+            configData() {
+                return this.$store.state.customModule.config
+            },
+            // 配置模块。
+            modulesConfig() {
+                return this.configData.modules
+            },
+            // 追踪或溯源的配置项。
+            currentModule() {
+                let sCurentPage = '',
+                    sPathName = window.location.pathname,
+                    // 溯源、追踪、遏制3个页面用到设备分析。
+                    aPage = ["trace", "track", "restrain"]
+                
+                // 当前页面。
+                sCurentPage = aPage.find((sCategory) => sPathName.indexOf(sCategory) > -1)
+                
+                return this.modulesConfig.filter(o => o.key === sCurentPage)[0]
+            },
             tag () {
                 return window.Rt.utils.getParam("tag");
             },
@@ -736,6 +756,9 @@
             // 此时 data 已经被 observed 了						
         },
         mounted () {
+            // 获取配置数据。
+            this.getConfigData();
+            // 初始化。
             this.init();
         },
         watch: {
@@ -755,7 +778,37 @@
             resizeY: 'resizeChart'
         },
         methods: {
-			init() {                  
+            // 获取配置数据。
+            getConfigData() {
+                // 获取配置数据。
+                this.$store.dispatch('getConfig').then(() => {
+                    // 设置维度数据。
+                    if(this.currentModule.submodules) {
+                        // 维度分析数据。
+                        let oDimensionData = this.currentModule.submodules.find(o => o.key === "dimension");
+                        if(oDimensionData) {
+                            // 根据配置数据修改维度分析开关。
+                            this.dimension = this.dimension.filter(o => {
+                                let oData = oDimensionData.dimension.find(item => o.key === item.key)
+                                if(oData) {
+                                    return !!oData.switch
+                                }else {
+                                    return true
+                                }
+                            })
+                            this.dimension.map(o => {
+                                let oData = oDimensionData.dimension.find(item => o.key === item.key)
+                                o.show = oData.show
+                                o.name = oData.name
+                                return o
+                            })
+                        }
+                    }
+                })
+            },
+            // 初始化。
+			init() { 
+                // 获取存储的数据。                 
                 this.getSessionStorage();     
                 // 初始化图形。              
 				this.setInitData();
@@ -2397,9 +2450,9 @@
 			// padding-top: 30px;
             position: relative;
             
-            // .analysis {
-            //     position: relative;
-            // }
+            .analysis {
+                position: relative;
+            }
 
             .illustration {
                 position: absolute;
