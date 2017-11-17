@@ -1,8 +1,8 @@
 {
-    "key": "keerben",
-    "name": "科尔本",
-    "description": "科尔本工厂定制",
-    "logo": "static/factories/keerben/logo.png",
+    "key": "common",
+    "name": "通用",
+    "description": "通用版本",
+    "logo": "static/factories/common/logo.png",
     "modules": [{
         "name": "查出库",
         "key": "stock",

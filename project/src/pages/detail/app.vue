@@ -91,11 +91,30 @@
         myLocalStorage: []  //查询记录
       }
     },
+    computed: {
+      // 工厂配置数据。
+      configData() {
+        return this.$store.state.customModule.config
+      },
+      // 配置模块。
+      modulesConfig() {
+        return this.configData.modules
+      },
+      reversedMessage() {
+          let _width = this.LayoutLeftWidth+this.changeWidth
+          return _width
+      }
+    },    
     created() {
       // 登录判断。
       this.$register.login(this.$store);
-      // 获取数据。
-      this.fetchData();
+      
+      // 获取配置数据。
+      this.$store.dispatch('getConfig').then(() => {
+        // 获取数据。
+        this.fetchData();
+      })
+
       // 保存查询记录
       let history = localStorage.getItem("history")
       if(history){
@@ -134,7 +153,14 @@
 
         this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
           // 请求成功。
-          this.categories = fnP.parseData(oResult).filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume");
+          this.categories = fnP.parseData(oResult)
+                          .filter(o => {
+                            let oItem = this.modulesConfig.find(item => {
+                              return o.key === item.key
+                            });
+                            return !!(o.key!="restrain" && o.key!="link" && o.key != "resume" && oItem &&!!oItem.switch);                        
+                          });
+          //.filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume");
 
           this.categories.forEach(o => {
             if(oData && oData.tab == o.key) {
@@ -368,12 +394,6 @@
         		this.changeWidth = 0;
             this.LayoutLeftWidth = 360;
         }
-      }
-    },
-    computed: {
-      reversedMessage: function () {
-          let _width = this.LayoutLeftWidth+this.changeWidth
-          return _width
       }
     }
   }

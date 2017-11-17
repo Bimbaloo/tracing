@@ -127,6 +127,14 @@ export default {
   computed: {
     liData() {
       return this.switchData(this.myLocalStorage)
+    },
+    // 工厂配置数据。
+    configData() {
+      return this.$store.state.customModule.config
+    },
+    // 配置模块。
+    modulesConfig() {
+      return this.configData.modules
     }
   },
   created() {
@@ -143,29 +151,45 @@ export default {
     // 登录验证。
     this.$register.login(this.$store);
 
-    this.loading = true;
+    // 获取配置数据。
+    this.$store.dispatch('getConfig').then(() => {
+      // 获取数据。
+      this.fetchData();
+    })
 
-    // 请求判断。   
-    this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
-      // 请求成功。
-      
-      this.loading = false;
-      this.categories = fnP.parseData(oData);//.filter(o => o.key != "restrain" && o.key != "link");
-      this.categories.forEach(o => {
-        o.active = {
-          radio: "1",
-          keys: {}
-        }
-      })
-    }, (sErrorMessage) => {
-      // 请求失败。
-      this.loading = false;
-      this.sErrorMessage = sErrorMessage;
-      this.showMessage();
-    });
     this.fetchDataName()  //获取名称
   },
   methods: {
+    // 获取数据。
+    fetchData() {
+      this.loading = true;
+
+      // 请求判断。   
+      this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
+        // 请求成功。
+        this.loading = false;
+        this.categories = fnP.parseData(oData)
+                          // 获取打开的功能模块。
+                          .filter(o => {
+                            let oItem = this.modulesConfig.find(item => {
+                              return o.key === item.key
+                            });
+                            return !!(oItem &&!!oItem.switch);                        
+                          });//.filter(o => o.key != "restrain" && o.key != "link");
+
+        this.categories.forEach(o => {
+          o.active = {
+            radio: "1",
+            keys: {}
+          }
+        }) 
+      }, (sErrorMessage) => {
+        // 请求失败。
+        this.loading = false;
+        this.sErrorMessage = sErrorMessage;
+        this.showMessage();
+      });
+    },
     hideDialog() {},
     // 显示提示信息。
     showMessage() {
