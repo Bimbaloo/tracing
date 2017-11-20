@@ -1,4 +1,4 @@
-<!--仓库操作-->
+<!--条码管理-->
 <template>
     <div class="material-stock" ref="stock">
         <div class="view-icon">
@@ -10,11 +10,9 @@
             <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
         </div>
         <div class="router-path">
-            <span class="path-item" v-if="true">库存转储</span>
-            <span class="path-item" v-if="true">库存损益</span>
-            <span class="path-item" v-if="true">库存调整</span>
-            <span class="path-item" v-if="true">出库</span>
-			<span class="path-item" v-if="true">入库</span>
+            <span class="path-item" v-if="true">条码绑定</span>
+            <span class="path-item" v-if="true">补料</span>
+            <span class="path-item" v-if="true">容器清空</span>
         </div> 
         <keep-alive>
 	        <router-view></router-view>  
@@ -30,23 +28,9 @@
                 // 右下详情内容区域全屏标识。
 				key: this.$route.params.key,    	//全屏标志
 				routerPath:{
-					1:"stockTransfer", 				//库存转储
-					// 102:"varastoonotto",			//库存收货
-					// 103:"inventoryShipment",		//库存发货
-					// 104:"producedStorage",		//生产入库
-					// 105:"produceShipment",		//生产发料
-					// 106:"productionWithdrawal",	//生产退料
-					// 107:"saleRefunding",			//销售退库
-					// 108:"saleOutWarehouse",		//销售出库
-					// 109:"purchaseStorage",		//采购入库
-					// 110:"purchasingWithdrawal",	//采购退库
-					2:"stockAdjustment",			//库存调整
-					// 113:"transferStorage",		//调拨入库
-					// 114:"transferOutWarehouse",	//调拨出库
-					// 115:"productDelivery",		//成品发货
-					3:"outWarehouse",				//出库
-					4:"putInWarehouse",				//入库
-					5:"stockGains"					//库存损益
+					12:"barcodeBind", 			//条码绑定
+					13:"supplementaryMaterial",	//补料
+					14:"emptyContainer"			//容器清空
 				}
             }
         },
