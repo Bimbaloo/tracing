@@ -73,250 +73,49 @@ var parseData = function(aoGet){
 };
 
 // 转换树数据。
-var parseTreeData1 = function(aPrev) {
-
-	// 转换后的数据。
-	let aNew = [],
-		nIndex = aPrev.length;
-	
-	// 先按level排序。
-//	aPrev.sort( (o1,o2) => o1.level-o2.level );
-	
-	// 增加元素的key值及showName值。
-	aPrev.forEach( (o,index) => {
-		// 新增其属性值。
-		o.key = index+1+"";
-		o.showName = o.name;
-
-		if(!o.group) {
-			o.group = "";
-		}
-	});
-	
-	aPrev.forEach( o => {
-		// 元素合并处理。 -- 将元素加入数据中。
-		// 判断类型。
-		if(o.type == '1') {
-			// 物料。
-			if(!_isBeExist(o)) {
-				// 不存在，修改parent值并加入。
-				let sKey = _getParentNode(o),
-					oCopy = Object.assign({}, o);
-				
-				// 加入数据。
-				oCopy.parent = sKey;
-				aNew.push(oCopy);
-			}
-		}else {
-			// 工序。
-			
-			// 判断是否有group
-			if(o.groupCode) {
-				// 有grop。判断是否存在。-- 不存在则加入。
-				let oGrop = {
-					code: o.groupCode,
-					name: o.groupName,
-					showName: o.groupName,
-//					key: o.groupCode,
-					key: (++nIndex) +"",
-					type: "2",
-					materialInfoList: null,
-					processInfoList: null,
-					subProcess: []
-				};
-				
-				// 判断是否存在。
-				if(!_isBeExist(o)) {		//oGrop
-					o.groupKey = oGrop.key;
-					
-					let aSub = _getSubGroupByName(o),
-						aCopySub = [];
-					
-					// 循环修改subProcess 的parent
-					aCopySub = aSub.map( oSub => {
-						let oCopy = Object.assign({}, oSub),
-							sKey = _getParentNode(oCopy);
-						// 修改parent
-						oCopy.parent = sKey;
-						// 新增groupdekey
-						oCopy.groupKey = oGrop.key;
-						return oCopy;
-					});
-					
-					// 修改oGrop的parent 修改第一条数据的parent
-					oGrop.parent = aCopySub[0].parent;
-					aCopySub[0].parent = "";
-					oGrop.subProcess = aCopySub;
-					// 加入数据
-					aNew.push(oGrop);
-				}
-				
-			}else {
-				// 没有grop 判读是存在，加入。
-				// 修改parent
-				if(!_isBeExist(o)) {
-					// 不存在，修改parent值并加入。
-					let sKey = _getParentNode(o),
-						oCopy = Object.assign({}, o);
-					
-					// 加入数据。
-					oCopy.parent = sKey;
-					aNew.push(oCopy);
-				}
-			}
-			
-		}
-	})
-	
-	// 返回数据。
-	return aNew;
-	
-	
-	// 通过group码获取group组数据并拍好序。
-	/**
-	 * 获取该工序- 组下的所有工序数据。并排序。
-	 * @param {Object} sGroup
-	 */
-	function _getSubGroupByName(o) {
-		
-		let aSubGroup = [],
-			sGropCode = o.groupCode;
-			
-		// 不能直接通过groupCode获取，还得通过当前节点子级。
-		aSubGroup.push(o);
-		_getChild(o);
-		
-		// 获取其子工序并排序。 --- 
-		
-		aSubGroup = aSubGroup.sort((o1,o2)=>o1.processSeq-o2.processSeq);
-		
-		// 返回子级数据。
-		return aSubGroup;
-		
-		/**
-		 * 获取元素的同组子级。
-		 */
-		function _getChild(oNode) {
-			// 工序
-			let aReuslt = [];
-			aReuslt = _get(oNode);
-			
-			if(aReuslt.length) {
-//				aSubGroup = aSubGroup.concat(aReuslt)
-				aReuslt.forEach(o=> {
-					o.groupKey = oNode.groupKey;
-					aSubGroup.push(o);
-					_getChild(o);
-				})
-			}
-			
-			function _get(oLevel) {
-				return aPrev.filter( o => {
-						if(o.type == '2') {
-							return o.level == oNode.level+1 && o.parent == oNode.code && o.groupCode == oNode.groupCode
-						}
-					});
-			}
-			
-		}
-		
-	}
-	
-	// 获取父级元素处理。
-	function _getParentNode(oNode) {
-		// 获取元素的父级。
-		let aParent = [],
-			sParentKey = "";
-		
-		// 父级： 当前级的上级 且code为当前的parent
-		aParent = aPrev.filter(o=> {
-			if(oNode.type == '1') {
-				return o.level == oNode.level && o.code == oNode.parent;
-			}else {
-				return o.level == oNode.level-1 && o.code == oNode.parent;
-			}
-		});
-		
-		// 返回父级元素。---判断当前元素是否含有group，
-		if(aParent && aParent.length) {
-			// 存在。
-			if(aParent[0].groupCode && !oNode.groupCode) {
-				// 存在code 并且当前元素没有group组。 父级指向组
-				sParentKey = aParent[0].groupKey;  // groupCode
-			}else {
-				// 父级指向key
-				sParentKey = aParent[0].key;
-			}
-		}
-		
-		return sParentKey;
-	}
-	
-	// 判断元素是否已处理过。-- 根据key值判断是否存在。
-	function _isBeExist(oJudge) {
-		
-		// 是否存在。
-		let bExist = false;
-		
-		// 没有group则在aNew中判断，有group则在group的subProcess中判断
-		
-		bExist = aNew.some(o => {
-			if(oJudge.groupCode) {
-				return o.key == oJudge.groupKey
-			}else {
-				return o.key == oJudge.key
-			}
-		});
-		
-		
-		// 返回数据。
-		return bExist;
-	}
-}
 var parseTreeData = function(aTreeData) {
-	// 转换后的数据。
+
+	// 转换后的数据
 	let aPrev = JSON.parse(JSON.stringify(aTreeData)),
-		nIndex = aPrev.length;
+		nGroupIndex = aPrev.length;
 
-	// 修改数据。 将group中的
-
-	// 先修改数据，添加group的数据，并将其子工序增加group字段。
-	aPrev.forEach( o => {
-		// 如果是工序。  物料没有组。
-		if(!o.isMaterialNode && o.groupCode && !o.group) {
-			// 当前元素存在，且没有分组。
+	// 修改数据，添加group的数据，并将子工序增加group字段。
+	aPrev.forEach(o => {
+		// 判断是否为组。
+		if(o.groupCode && !o.group) {
+			// 新增组数据。
 			let oGroup = {
 				code: o.groupCode,
 				name: o.groupName,
-				key: (++nIndex) +"",
+				key: "group" + (++nGroupIndex),
 				parents: "",
-				isMaterialNode: false,
+				nodeType: 10001, // 节点类型-工序
+				opType: 10001, // 动作类型-工序
 				isGroup: true,
 				groupCode: null,
 				groupName: null,
-				processSeq: null,
-				materialInfoList: [],
-				processInfoList: []
+				groupSeq: null,
+				detailInfos: []
 			};
-			
-			// 找到改组的所有子节点。 设置改组中子工序的group值。
+
+			// 找到该组下的所有子节点，设置该组中子工序的group值。
 			o.group = oGroup.key;
 			let aSub = _getSubGroupNode(o);
-			
+
 			// 修改数据的组后面数据的parents值。获取最有一个数据的key值，将以改key为parents的数据替换。
 			if(aSub.length) {
 				// 设置parents。
-				_setNewParent(aSub[aSub.length-1].key, oGroup.key);
+				_setNewParent(aSub[aSub.length - 1].key, oGroup.key);
 			}
-			
+
 			// 将新增的group组数据放入数组中。
 			aPrev.push(oGroup);
 		}
-		
+
 	});
-	
+
 	// 循环修改。group的parents为其第一个组的parents值。--- 没有和前一个方法合并，是为了处理不是按顺序的数据。
-	aPrev.forEach( (o,index) => {
+	aPrev.forEach((o, index) => {
 		// 处理组。
 		if(o.isGroup) {
 			let aChild = _getGroupChild(o.key);
@@ -326,10 +125,10 @@ var parseTreeData = function(aTreeData) {
 			}
 		}
 	})
-	
+
 	// 返回数据。
-	return aPrev;
-	
+	return aPrev
+
 	/**
 	 *  修改其parents值。
 	 * @param {String} sParent
@@ -338,54 +137,51 @@ var parseTreeData = function(aTreeData) {
 	 */
 	function _setNewParent(sParent, sNewParent) {
 		// 循环获取修改。
-		aPrev.forEach( o => {
+		aPrev.forEach(o => {
 			let aParent = o.parents.split(","),
 				nIndex = aParent.indexOf(sParent);
-				
-			if(nIndex >-1 ) {
+
+			if(nIndex > -1) {
 				// 修改并替换。
 				aParent.splice(nIndex, 1);
 				aParent.push(sNewParent);
-				
+
 				o.parents = aParent.join(",");
 			}
 		})
 	}
-	
-	
+
 	/**
 	 * 获取组的子工序。
 	 * @param {String}
 	 */
 	function _getGroupChild(sGroupKey) {
 		let aSub = [];
-		
+
 		// 获取组下的子工序，并排序。
-		aSub = aPrev.filter( o => o.group == sGroupKey).sort( (o1,o2) => o1.key - o2.key> 0? 1: -1 );	//o1.processSeq-o2.processSeq
-		
+		aSub = aPrev.filter(o => o.group == sGroupKey).sort((o1, o2) => o1.key - o2.key > 0 ? 1 : -1);
+
 		// 返回组的工序。
 		return aSub;
 	}
-	
-	
-	
+
 	/**
 	 * 获取节点下的所有工序数据。
-	 * @param {Object} 
+	 * @param {Object}
+	 * @return {Array}
 	 */
 	function _getSubGroupNode(o) {
 		let aSub = [];
-		
+
 		aSub.push(o);
 		// 循环处理数据。获取该节点同组数据的集合。
 		_getSubGroup(o);
-		
-//		aSub = aSub.sort((o1,o2)=>o1.processSeq-o2.processSeq);
+
 		// 根据key值排序
-		aSub = aSub.sort( (o1, o2) => o1.key - o2.key>0 ? 1: -1)
-		
+		aSub = aSub.sort((o1, o2) => o1.key - o2.key > 0 ? 1 : -1)
+
 		return aSub;
-		
+
 		/**
 		 * 获取该节点的同组数据。
 		 * @param {Object}
@@ -395,7 +191,7 @@ var parseTreeData = function(aTreeData) {
 			// 工序
 			let aReuslt = [];
 			aReuslt = _get(oNode);
-			
+
 			if(aReuslt.length) {
 				aReuslt.forEach(oSub => {
 					oSub.group = oNode.group;
@@ -403,56 +199,294 @@ var parseTreeData = function(aTreeData) {
 					_getSubGroup(oSub);
 				})
 			}
-			
+
 			function _get(oLevel) {
-				return aPrev.filter( o => {
+				return aPrev.filter(o => {
 					// 当前数据父级包含且属于同一个组。
 					return o.groupCode == oLevel.groupCode && o.parents.split(",").includes(oLevel.key);
 				})
 			}
-			
+
 		}
-			
+
+	}
+
+}
+
+// 获取节点图标及显示模板
+var getNodeIconAndTemp = function(sType) {
+	let oIcon = {
+		icon: "",
+		temp: "",
+		TempMerge: ""
 	}
 	
+	switch(sType) {
+		// 库存转储
+		case 101:
+			oIcon.temp = "warehouseDumpTemp"
+			oIcon.icon = "warehouse"
+			oIcon.TempMerge = "warehouseDump"
+			break;
+		// 库存调整
+		case 112:
+			oIcon.temp = "warehouseAdjustTemp"
+			oIcon.icon = "warehouse"
+			oIcon.TempMerge = "warehouseAdjust"
+			break
+		// 入库
+		case 102:
+			oIcon.temp = "warehouseTemp"
+			oIcon.icon = "warehouse"
+			oIcon.TempMerge = "warehouse"
+			break
+		// 出库
+		case 103:
+			oIcon.temp = "warehouseTemp"
+			oIcon.icon = "warehouse"
+			oIcon.TempMerge = "warehouse"
+			break
+		// 库存损益
+		case 111:
+			oIcon.temp = "warehouseTemp"
+			oIcon.icon = "warehouse"
+			oIcon.TempMerge = "warehouse"
+			break
+//		// 自动入库
+//		case 116:
+//			oIcon.icon = "warehouse"
+//		// 自动出库
+//		case 117:
+//			oIcon.icon = "warehouse"
+		// 投料
+		case 1:
+			oIcon.icon = "process"
+			oIcon.TempMerge = "process"
+			break
+		// 产出
+		case 6:
+			oIcon.icon = "process"
+			oIcon.TempMerge = "process"
+			break
+		// 工序
+		case 10001:
+			oIcon.icon = "process"
+			oIcon.TempMerge = "process"
+			break
+		// 结转转入
+		case 2:
+			oIcon.icon = "workshop"
+			icon.temp = "workshopCarryoverTemp"
+			oIcon.TempMerge = "workshopCarryover"
+			break
+		// 结转转出
+		case 7:
+			oIcon.icon = "workshop"
+			oIcon.temp = "workshopCarryoverTemp"
+			oIcon.TempMerge = "workshopCarryover"
+			break
+		// 结转
+		case 10002:
+			oIcon.icon = "workshop"
+			oIcon.temp = "workshopCarryoverTemp"
+			oIcon.TempMerge = "workshopCarryover"
+		// 退料
+		case 8:
+			oIcon.temp = "workshopReturnMateiralTemp"
+			oIcon.icon = "workshop"
+			oIcon.TempMerge = "workshopReturnMateiral"
+			break
+		// 车间调整
+		case 11:
+			oIcon.temp = "workshopTemp"
+			oIcon.icon = "workshop"
+			oIcon.TempMerge = "workshop"
+			break
+		// 返工入站
+		case 14:
+			oIcon.temp = "reworkTemp"
+			oIcon.icon = "rework"
+			oIcon.TempMerge = "rework"
+			break
+		// 返工出站
+		case 15:
+			oIcon.temp = "reworkTemp"
+			oIcon.icon = "rework"
+			oIcon.TempMerge = "rework"
+			break
+		// 条码绑定
+		case 201:
+			oIcon.temp = "barcodeManageTemp"
+			oIcon.icon = "barcodeManage"
+			oIcon.TempMerge = "barcodeManage"
+			break
+		// 补料
+		case 203:
+			oIcon.temp = "barcodeManageTemp"
+			oIcon.icon = "barcodeManage"
+			oIcon.TempMerge = "barcodeManage"
+			break
+		// 容器清空
+		case 202:
+			oIcon.temp = "barcodeManageTemp"
+			oIcon.icon = "barcodeManage"
+			oIcon.TempMerge = "barcodeManage"
+			break
+//		// 修改失效时间
+//		case 204:
+//			oIcon.icon = "barcodeManage"
+		// 正常物料
+		case 10003:
+			oIcon.temp = "materialTemp"
+			oIcon.icon = "material"
+			oIcon.TempMerge = "material"
+		// 废品
+		case 10004:
+			oIcon.temp = "materialTemp"
+			oIcon.icon = "material"
+			oIcon.TempMerge = "material"
+		default:
+			break
+	}
+	
+	// 返回数据。
+	return oIcon
 }
 
 
+/**
+ * 树形数据修改。
+ * 新增 sumList: [] 详细信息展示数据
+ * 		detailType: 详细信息展示模板
+ * 		detailTitle: 详细信息标题： -- 物料或其他组合
+ * 		iconType: 	图标类型
+ * @param {Object} oRowData
+ */
 var getTreeData = function(oRowData) {
-	let aoData = parseTreeData(oRowData),	
+	let aoData = parseTreeData(oRowData),
 		aoDiagramData = [],
 		aoDiagramLinkData = [];
-	
-	aoData.forEach(oData => {	
-		// 树节点。		
-		if(oData.isMaterialNode) {
-			// 若为物料节点。
-			oData.category = "simple";
-			// 按批次汇总物料。
-			oData.sumList = _sumMaterailList(oData.materialInfoList);
-		}else {
-			// 按设备、批次汇总物料。
-			oData.sumList = _sumProcessList(oData.processInfoList);
-			// 若为工序节点。
-			if(oData.isGroup) {
-				// 若为group
-				let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.processSeq < b.processSeq)[0]
-				if(oLastGroupItem) {
-					// 取最后一道工序的产出。
-					oData.sumList = _sumProcessList(oLastGroupItem.processInfoList);
-					// oData.processInfoList = oLastGroupItem.processInfoList
+
+	// 循环处理数据。
+	aoData.forEach(oData => {
+		
+		oData.category = "simple"
+		// detailInfos按destSnapshotId去重处理。
+		oData.detailInfos = window.Rt.utils.uniqueObject(oData.detailInfos, "destSnapshotId")
+		
+		// 根据节点类型，会哦在那个数据。 -- 增加sumList及明细模板字段 图形字段
+		let oNodeType = getNodeIconAndTemp(oData.nodeType)
+		
+		// 设置icon类型和detailType
+		oData.iconType = oNodeType.icon
+		oData.detailType = oNodeType.temp
+		
+		// 根据节点的名称处理。
+		switch(oNodeType.TempMerge) {
+			/* 仓库操作 */
+			// 库存转储
+			case "warehouseDump" :
+				// 设置详细信息。-- 仓库及库位
+				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo"], ["batchNo", "quantity", "remainQuantity", "srcWarehouse", "srcWarehouseLocation", "destWarehouse", "destWarehouseLocation"], ["quantity", "remainQuantity"])
+				// 设置详细信息标题
+				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : "" 
+				break;
+			// 库存调整
+			case "warehouseAdjust" :
+				// 设置详细信息标题
+				oData.detailTitle = `${oData.detailInfos.length ? oData.detailInfos[0].materialName : ""}(${oData.detailInfos.length ? oData.detailInfos[0].destWarehouse : ""})`
+				oData.sumList = _sumWorkShopData(oData)
+				break;
+				
+			// 入库	
+			// 出库
+			// 库存损益
+			case "warehouse":
+				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo", "destWarehouse", "destWarehouseLocation"], ["batchNo", "destWarehouse", "destWarehouseLocation", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				// 设置详细信息标题
+				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : ""
+				
+				break;
+			
+			// 车间操作-工序
+			case "process":
+				
+				// 如果是工序组时。
+				if(oData.isGroup) {
+					// 若为group
+					let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.key < b.key)[0]
+					if(oLastGroupItem) {
+						// 取最后一道工序的产出。-- 最后一道工序中的数据去重
+						let oCopy = Object.assign({}, oLastGroupItem)
+						oCopy.detailInfos = window.Rt.utils.uniqueObject(oCopy.detailInfos, "destSnapshotId")
+						
+						oData = Object.assign({}, oData, _sumProcessData(oCopy))
+					}
+				}else {
+					oData = Object.assign({}, oData, _sumProcessData(oData))
 				}
-			}
-			if(oData.processInfoList.length) {
-				// 有数据。
-				oData.materialName = oData.processInfoList[0].materialName;
-			}
-			oData.category = "simple";		
-		}	
+				
+				break;
+			// 	结转
+			case "workshopCarryover":
+				oData.sumList = _sumDataList(oData.detailInfos, ["materialCode"], ["materialName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				
+				// 获取源工单及目标工单。 源：操作==转出  目标： 操作==转出的快照==操作==转入的源快照
+				let oOut = oData.detailInfos.filter( o => o.opType == "7")[0] || {},
+					oIn = oData.detailInfos.filter( o => o.opType == "2" && o.srcSnapshotId == oOut.destSnapshotId)[0]
+				
+				oData.detailTitle = `源:${oOut.doCode} 目标:${oIn.doCode}`
+				break;
+			// 	退料
+			case "workshopReturnMateiral":
+				oData.sumList = _sumDataList(oData.detailInfos, ["materialCode"], ["materialName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				// 工单
+				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].doCode : ""
+				
+				break;
+			//	车间调整
+			case "workshop":
+				oData.sumList = _sumWorkShopData(oData)
+				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : "";
+				
+				break;
+			// 返工入站 返工出站
+			case "rework":
+				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo", "qualityTypeName"], ["batchNo", "qualityTypeName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				// 设置详细信息标题
+				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : ""
+				break;
+			
+			// 条码绑定 补料 容器清空
+			case "barcodeManage":
+				oData.sumList = _sumDataList(oData.detailInfos, ["destBarcode", "batchNo"], ["destBarcode", "batchNo", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				// 设置详细信息标题 -- 是否已设定（条码绑定）
+				if(oData.nodeType == "201") {
+					// 条码绑定
+					// 设置详细信息标题 托码+物料名称
+					oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : ""
+				}else {
+					// 补料 容器清空
+					oData.detailTitle = oData.detailTitle ? oData.detailTitle : (oData.detailInfos.length ? oData.detailInfos[0].materialName : "")
+				}
+				
+				break;
+			
+			// 正常物料 废品
+			case "material":
+				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo"], ["batchNo", "quantity"], ["quantity"])
+				// 设置详细信息标题
+				oData.detailTitle = oData.name;
+				// 设置图标类型
+				
+				break;
+			default:
+				break;
+		}
 		
 		aoDiagramData.push(oData);
 		let aoParents = oData.parents.split(",");
-		aoParents.forEach( sParent => {
+		aoParents.forEach(sParent => {
 			aoDiagramLinkData.push({
 				from: sParent,
 				to: oData.key,
@@ -460,75 +494,547 @@ var getTreeData = function(oRowData) {
 				toPort: "TO"
 			});
 		});
-	});
+		
+	})
 
 	return {
 		node: aoDiagramData,
 		link: aoDiagramLinkData
 	}
+	
 
 	/**
-	 * 物料：按照批次汇总。
-	 * @param {Array} aoList
-	 * @return {Array}
+	 * 合并数据处理函数。合并的数量的值。
+	 * @param {Array} 处理的数据。
+	 * @param {Array} 合并的字段-- 分类
+	 * @param {Array} 展示的字段。
+	 * @param {Array} 汇总的字段
+	 * @return {Object} 返回数据。
 	 */
-	function _sumMaterailList(aoList) {
-		let oSumMaterial = {}; 
+	function _sumDataList(aoList, aGroup, aDis, aSum) {
+		let oFlag = {}
 
 		aoList && aoList.forEach(o => {
-			let sKey = o.batchNo;
+			// 需合并的参数值。
+			let sKey = ""
 
-			if(!oSumMaterial[sKey]) {
-				oSumMaterial[sKey] = {
-					sumQuantity: o.sumQuantity,
-					batchNo: o.batchNo
+			aGroup.forEach(sGroup => {
+				sKey += o[sGroup] + '+'
+			})
+
+			if(!oFlag[sKey]) {
+				// 设置展示的值。
+				oFlag[sKey] = {};
+
+				aDis.forEach(sDis => oFlag[sKey][sDis] = (o[sDis] || 0) )
+			} else {
+				// 存在，在汇总数据。
+				// 默认为quantity
+				if(aSum && aSum.length) {
+					aSum.forEach( sSum => oFlag[sKey][sSum] += (o[sSum] || 0) )
+				}else {
+					oFlag[sKey].quantity += (o.quantity || 0)
 				}
-			}else {
-				oSumMaterial[sKey].sumQuantity += o.sumQuantity;
 			}
-										
-		});
+		})
 
-		return window.Rt.utils.getObjectValues(oSumMaterial);
+		// 返回数据。
+		return window.Rt.utils.getObjectValues(oFlag);
+	}
+	
+	/**
+	 * 工序节点数据处理。
+	 * @param {Object}
+	 * @return {}
+	 */
+	function _sumProcessData(oData) {
+		// 返回的数据。
+		let oReturn = {
+				detailType: "",
+				detailTitle: "",
+				sumList: []
+			},
+			aOutputMaterial = new Set(),
+			aInputMaterial = new Set(),
+			bIsSame = false
+		
+		if(oData.detailInfos.length) {
+			
+			// 判断投产物料是否相同。 -- 根据operType合并。
+			oData.detailInfos.forEach( o => {
+				if(o.opType == "6") {	// 产出
+					aOutputMaterial.add(o.materialName)
+				}else if(o.opType == "1") {	// 投入
+					aInputMaterial.add(o.materialName)
+				}
+			})
+			
+			aOutputMaterial = [...aOutputMaterial]
+			aInputMaterial = [...aInputMaterial]
+			
+			let sOutMaterial = aOutputMaterial.join(","),
+				sInMaterial = aInputMaterial.join(",")
+			
+			// 投产物料相同-- 产出只有一个。
+			if(aOutputMaterial.length && sOutMaterial == sInMaterial) {
+				oReturn.detailType = "processSameMaterialTemp"
+				oReturn.detailTitle = sOutMaterial
+				bIsSame = true
+				
+			}else if(aOutputMaterial.length && sOutMaterial != sInMaterial) {
+				// 投产物料不同
+				oReturn.detailType = "processDiffMaterialTemp"
+				oReturn.detailTitle = `投:${sInMaterial} 产:${sOutMaterial}`
+			}
+			
+			// 按设备进行分类。
+			let oFlag = {}
+			oData.detailInfos.forEach( o => {
+				// 需合并的参数值。
+				let sKey = o.equipmentId
+	
+				if(!oFlag[sKey]) {
+					oFlag[sKey] = {
+						equipmentName: o.equipmentName,
+						list: [o]
+					}
+				}else {
+					oFlag[sKey].list.push(o)
+				}
+			})
+			
+			oReturn.sumList = window.Rt.utils.getObjectValues(oFlag);
+			
+			oReturn.sumList.forEach( o => {
+				// 类型参数。
+				oFlag = {}
+				
+				// 按类型分类（投入，产出，滞留）
+				o.list.forEach(oType => {
+					let sKey = oType.opType
+				
+					if(sKey == "1") {	// 投入
+						// 投入。
+						if(!oFlag["touru"]) {
+							oFlag["touru"] = {
+								type: "投入",
+								list: [oType]
+							}
+						}else {
+							oFlag["touru"].list.push(oType)
+						}
+					}else if(sKey == "6" && oType.remainQuantity > 0) {	// 产出
+						// 滞留： 类型为产出且剩余数量大于0
+						if(!oFlag["zhiliu"]) {
+							oFlag["zhiliu"] = {
+								type: "滞留",
+								list: [oType]
+							}
+						}else {
+							oFlag["zhiliu"].list.push(oType)
+						}
+					}else {
+						// 产出。
+						if(!oFlag["chanchu"]) {
+							oFlag["chanchu"] = {
+								type: "产出",
+								list: [oType]
+							}
+						}else {
+							oFlag["chanchu"].list.push(oType)
+						}
+					}
+				})
+				
+				let aType = window.Rt.utils.getObjectValues(oFlag)
+				
+				// 各个分类中按批次合并。（投料不同时，投入按物料批次合并）
+				aType.forEach(o1 => {
+					// 按批次合并。
+					let aMerge = ["batchNo"],
+						aDis = ["batchNo", "quantity", "remainQuantity"]
+					
+					if(o1.type == "投入" && !bIsSame) {
+						aMerge = ["batchNo", "materialCode"]
+						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"]
+					}
+					
+					o1.list = _sumDataList(o1.list, aMerge, aDis, ["quantity", "remainQuantity"])
+				})
+				
+				// 重新设置类型数据。
+				o.list = aType
+			})
+			
+		}
+		
+		// 设置详细信息标题
+		return oReturn
 	}
 
 	/**
-	 * 工序：按照设备+批次汇总。
-	 * @param {Array} aoList
-	 * @return {Array}
+	 * 合并车间调整数据。-- 调整数取destAdjustQuantity 滞留数取 remainQuantity
+	 * @param {Object}
+	 * @return {}
 	 */
-	function _sumProcessList(aoList) {
-		let oSumProcess = {}; 
-
-		aoList && aoList.forEach(o => {
-			let sKey = o.batchNo + o.equipmentId;
-
-			if(!oSumProcess[sKey]) {
-				oSumProcess[sKey] = {
-					sumQuantity: o.sumQuantity,
-					batchNo: o.batchNo,
-					equipmentName: o.equipmentName
+	function _sumWorkShopData(oData) {
+		let oFlag = {}
+		// 先按源条码合并。- 原条码的调整数量，为所有的目标条码和。
+		oData.detailInfos.forEach( o => {
+			let sKey = o.srcBarcode
+			
+			if(!oFlag[sKey]) {
+				oFlag[sKey] = {
+					srcBarcode: sKey,
+					// 加入目标条码及调整数量。
+					list: [{
+						destBarcode: o.destBarcode,
+						// 调整数
+						destAdjustQuantity: o.destAdjustQuantity,
+						// 滞留数
+						remainQuantity: o.remainQuantity
+					}]
 				}
 			}else {
-				oSumProcess[sKey].sumQuantity += o.sumQuantity;
+				// 更改目标条码数据。
+				oFlag[sKey].list.push({
+					destBarcode: o.destBarcode,
+					// 调整数
+					destAdjustQuantity: o.destAdjustQuantity,
+					// 滞留数
+					remainQuantity: o.remainQuantity
+				})
 			}
-										
-		});
+		})
+		
+		// 合并目标条码数据。
+		for( let sParam in oFlag) {
+			let aList = oFlag[sParam].list
+			oFlag[sParam].list = _sumDataList(aList, ["destBarcode"], ["destBarcode", "destAdjustQuantity", "remainQuantity"], ["destAdjustQuantity", "remainQuantity"])
+			oFlag[sParam].destAdjustQuantity = oFlag[sParam].list.map( o => o.destAdjustQuantity).reduce(function(nPrev, nNext) {
+				return nPrev + nNext
+			}, 0)
+		}
+		
+		return window.Rt.utils.getObjectValues(oFlag);
+	}
+}
 
-		return window.Rt.utils.getObjectValues(oSumProcess);
+// 判断是否是正常物料
+var isMaterialNode = function(oData) {
+	
+	if(oData.nodeType == "10003" || oData.nodeType == "10004") {
+		return true
+	}else {
+		return false
+	}
+}
+
+// 第一个节点的parents值。
+const SPARENTKEY = "0"
+
+var getCatalogData = function(aoRowData, sType) {	
+	let aoCatalogData = [],
+		aoCopyData = JSON.parse(JSON.stringify(aoRowData)),
+		aResult = []
+	
+	// 修改节点的类型值。
+	aoCopyData.forEach(o => o.iconType = getNodeIconAndTemp(o.nodeType).icon)
+	
+	
+	if(sType === "trace") {
+		// 溯源。
+		// 判断第一个节点是否为物料节点。 否则加一个虚构的物料节点。
+		let aoFirstNode = aoCopyData.filter( o => o.parents == SPARENTKEY)
+		
+		if(aoFirstNode.length && !isMaterialNode(aoFirstNode[0])) {
+			// 第一个节点不是物料。则增加一个虚拟节点。
+			aoCopyData.push({
+				code: "000",
+				name: "虚构物料节点",
+				key: SPARENTKEY,
+				parents: SPARENTKEY,
+				nodeType: 10003,
+				opType: 0,
+				isCustom: true
+			})
+		}
+		
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i];
+	
+			if(oData && isMaterialNode(oData) && oData.parents == SPARENTKEY) {
+				oData.parent = "";
+				aoCatalogData.push(oData);
+	
+				aoCopyData.splice(i, 1);
+				_findChildrenData(aoCopyData, oData.key, oData.key)
+			}
+		}
+	}else {
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i];
+	
+			if(oData && isMaterialNode(oData) && !aoCatalogData.some(o => o.key == oData.key)) {
+	            oData.parent = "";
+	  			aoCatalogData.push(oData);
+	
+	  			aoCopyData.splice(i, 1);
+	
+	  			_findParentsData(aoCopyData, oData.parents, oData.key)
+	        }
+		}
+	}
+	
+	// 物料的合并
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		let aKey = []
+		if(isMaterialNode(oData) && !_isExist(oData)) {
+			// 物料-找同名
+			aKey = _getKeysOfSameName(oData).key
+			aResult.push(Object.assign({}, oData, {
+				name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
+				sublings: aKey
+			}))
+		}
+	}
+
+	// 获取同名同物料下的工序。
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		if(!isMaterialNode(oData) && !_isExist(oData)) {
+			// 工序-找同名
+			let oValue = _getKeysOfSameName(oData)
+			aResult.push(Object.assign({}, oData, {
+				name: (oValue.key.length-1) ? oData.name + "("+ oValue.key.length +")": oData.name,
+				sublings: oValue.key,
+				parent: oValue.parent
+			}))
+		}
+	}
+	
+	// 返回数据。
+	return aResult;
+	
+	/**
+	 * 递归查找父节点。
+	 * @param {Array} aoCopyData
+	 * @param {String} sKey
+	 * @param {String} sParentKey
+	 * @return {void}
+	 */
+	function _findParentsData(aoCopyData, sKey, sParentKey) {
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i],
+				sNewKey = "",
+				oFlag = {};
+	
+			if(oData && sKey.split(",").includes(oData.key)) {
+				// 当前元素的父级。
+				if(isMaterialNode(oData)) {
+					oData.parent = "";
+					sNewKey = oData.key;
+	
+					oFlag = Object.assign({}, oData)
+					aoCopyData.splice(i, 1);
+					
+				} else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {
+					sNewKey = sParentKey;
+					// 判断该数据是否已加入到aoCatelogData中。
+					if(oData.parent !== undefined) {
+						// 复制该节点。
+						oFlag = Object.assign({}, oData, {
+							parent: sNewKey,
+							// 当前节点的源节点。
+							linkKey: oData.key,
+							// 自定义改节点的key值。
+							key: "new-" + _getLength(oData.key) + "-" + oData.key // 通过长度获取。
+						})
+					} else {
+						oData.parent = sParentKey;
+						oFlag = Object.assign({}, oData)
+					}
+	
+				}
+	
+				// 判断是否已经重复加入。--- key相同且parent相同。
+				if(!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key == oFlag.key && o.parent == oFlag.parent))) {
+					aoCatalogData.push(oFlag);
+	
+					if(oFlag.parents != SPARENTKEY) {
+						_findParentsData(aoCopyData, oFlag.parents, sNewKey)
+					}
+				}
+	
+			}
+		}
+	}
+	
+	/**
+	 * 递归查找子级节点。
+	 * @param {Array} aoCopyData
+	 * @param {String} sKey
+	 * @param {String} sParentKey
+	 * @return {void}
+	 */
+	function _findChildrenData(aoCopyData, sKey, sParentKey) {
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i],
+				sNewKey = "",
+				oFlag = {};
+	
+			if(oData && oData.parents.split(",").includes(sKey)) {
+				// 当前元素的父级。
+				if(isMaterialNode(oData)) {
+					oData.parent = "";
+					sNewKey = oData.key;
+	
+					oFlag = Object.assign({}, oData)
+					aoCopyData.splice(i, 1);
+					
+				} else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {
+					sNewKey = sParentKey;
+					// 判断该数据是否已加入到aoCatelogData中。
+					if(oData.parent !== undefined) {
+						// 复制该节点。
+						oFlag = Object.assign({}, oData, {
+							parent: sNewKey,
+							// 当前节点的源节点。
+							linkKey: oData.key,
+							// 自定义改节点的key值。
+							key: "new-" + _getLength(oData.key) + "-" + oData.key // 通过长度获取。
+						})
+					} else {
+						oData.parent = sParentKey;
+						oFlag = Object.assign({}, oData)
+					}
+	
+				}
+	
+				// 判断是否已经重复加入。--- key相同且parent相同。
+				if(!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key == oFlag.key && o.parent == oFlag.parent))) {
+					aoCatalogData.push(oFlag);
+	
+					_findChildrenData(aoCopyData, (oFlag.linkKey || oFlag.key), sNewKey)
+				}
+	
+			}
+		}
+	}
+	
+	
+	/**
+	 * 复制节点获取其key值。
+	 * @param {String} sKey
+	 * @return {String}
+	 */
+	function _getLength(sKey) {
+	    return aoCatalogData.filter( o => (o.linkKey || o.key) == sKey).length
+	  }
+	
+	/**
+	 * 通过名称获取相同的名称的数据的key中。
+	 * @param {Object} oFilter
+	 * @return {Array}
+	 */
+	function _getKeysOfSameName(oFilter) {
+		let oResult = {
+			key: [],
+			parent: ""
+		};
+		
+		for(let i = 0; i < aoCatalogData.length; i++) {
+			let oData = aoCatalogData[i];
+
+			if(isMaterialNode(oFilter)) {
+				// 物料-找同名
+				if(oData.name === oFilter.name) {
+					oResult.key.push({
+						key:oData.key,
+						parent: oData.parent
+					})
+				}
+			}else {
+				// 工序，找同parent
+				// 找到在aResulte中通存在的subling的值。
+				let oValue = _isSameLevel(oData, oFilter)
+				let sKey = oData.linkKey || oData.key
+				
+				// 如果该节点时复制节点，判断其原节点是否存在，（存在-不加入。 不存在-加入）
+				if(oData.name === oFilter.name && oValue.bSame && !oResult.key.some(o => o.key == sKey)) {
+					
+					oResult.key.push({
+						key: sKey,
+						parent: oData.parent
+					})
+					oResult.parent = oValue.parent
+				}
+			}
+		}
+		
+		// 返回数据。
+		return oResult
+	}
+	
+	/**
+	 * 判断元素是否存在已存在。
+	 * @param {Object} oData
+	 */
+	function _isExist(oData) {
+//		return aResult.some( o => o.sublings.includes(oData.key) )
+		return aResult.some( o => {
+			// key值相同  且节点的parent属于一样的。 || 物料只需判断key值
+			return o.sublings.some( o1 => o1.key == (oData.linkKey || oData.key) && (isMaterialNode(oData) ||  _isExitCopy(o1, oData)) )
+		})
+	}
+	
+	function _isExitCopy(o1, o2) {
+		return aResult.some(o3 => {
+			return o3.sublings.some(o => o.key == o1.parent) && o3.sublings.some(o => o.key == o2.parent) 
+		})
+	}
+	
+	/**
+	 * 判断工序是否是同一个合并后的父级。
+	 */
+	function _isSameLevel(oData, oValue) {
+		let oR = {
+			// 是否属于合并和、后的同一个显示的物料节点
+			bSame: false,
+			// 该显示的物料节点的key值。
+			parent: ''
+		}
+		
+		aResult.forEach( o => {
+//			if(!oR.bSame && o.sublings.includes(oData.parent) && o.sublings.includes(oValue.parent)) {
+//				oR.bSame = true
+//				oR.parent = o.key
+//			}
+			
+			if(!oR.bSame && o.sublings.some(o1 => o1.key == oData.parent) && o.sublings.some(o1 => o1.key == oValue.parent)) {
+				oR.bSame = true
+				oR.parent = o.key
+			}
+		})
+		
+		return oR
 	}
 }
 
 // 获取追溯左侧导航数据。
-var getCatalogData = function(aoRowData) {	
+var getCatalogData1 = function(aoRowData) {	
 	let aoCatalogData = [],
 		aoCopyData = JSON.parse(JSON.stringify(aoRowData)),
 		aResult = []
-		
+	
+	// 修改节点的类型值。
+	aoCopyData.forEach(o => o.iconType = getNodeIconAndTemp(o.nodeType).icon)
+	
 	for(let i = aoCopyData.length - 1; i >= 0; i--) {
 		let oData = aoCopyData[i];
 
-		if(oData && oData.parents === "") {
+		if(oData && oData.parents === SPARENTKEY) {
 			oData.parent = "";
 			aoCatalogData.push(oData);
 
@@ -537,12 +1043,13 @@ var getCatalogData = function(aoRowData) {
 		}
 	}
 	
+	
 	// 物料的合并
 //	for(let i = aoCatalogData.length - 1; i >= 0; i--) {
 	for(let i = 0; i < aoCatalogData.length; i++) {
 		let oData = aoCatalogData[i];
 		let aKey = []
-		if(oData.isMaterialNode && !_isExist(oData)) {
+		if(isMaterialNode(oData) && !_isExist(oData)) {
 			// 物料-找同名
 			aKey = _getKeysOfSameName(oData).key
 			aResult.push(Object.assign({}, oData, {
@@ -556,7 +1063,7 @@ var getCatalogData = function(aoRowData) {
 //	for(let i = aoCatalogData.length - 1; i >= 0; i--) {
 	for(let i = 0; i < aoCatalogData.length; i++) {
 		let oData = aoCatalogData[i];
-		if(!oData.isMaterialNode && !_isExist(oData)) {
+		if(!(isMaterialNode(oData)) && !_isExist(oData)) {
 			// 工序-找同名
 			let oValue = _getKeysOfSameName(oData)
 			aResult.push(Object.assign({}, oData, {
@@ -584,7 +1091,7 @@ var getCatalogData = function(aoRowData) {
 
 			if(oData && oData.parents.split(",").includes(sKey)) {
 				// 当前元素的子级。
-				if(oData.isMaterialNode) {
+				if(isMaterialNode(oData)) {
 					oData.parent = "";
 					sNewKey = oData.key;
 				}else {
@@ -617,7 +1124,7 @@ var getCatalogData = function(aoRowData) {
 		for(let i = 0; i < aoCatalogData.length; i++) {
 			let oData = aoCatalogData[i];
 
-			if(oFilter.isMaterialNode) {
+			if(isMaterialNode(oFilter)) {
 				// 物料-找同名
 				if(oData.name === oFilter.name) {
 					oResult.key.push({
@@ -679,6 +1186,211 @@ var getCatalogData = function(aoRowData) {
 	}
 }
 
+// 处理追踪中树
+var getTrackCatalogData = function(aoRowData) {	
+	let aoCatalogData = [],
+		aoCopyData = JSON.parse(JSON.stringify(aoRowData)),
+		aResult = []
+	
+	// 修改节点的类型值。
+	aoCopyData.forEach(o => o.iconType = getNodeIconAndTemp(o.nodeType).icon)
+	
+	for(let i = aoCopyData.length - 1; i >= 0; i--) {
+		let oData = aoCopyData[i];
+
+		if(oData && isMaterialNode(oData) && !aoCatalogData.some(o => o.key == oData.key)) {
+            oData.parent = "";
+  			aoCatalogData.push(oData);
+
+  			aoCopyData.splice(i, 1);
+
+  			_findParentsData(aoCopyData, oData.parents, oData.key)
+        }
+	}
+	
+	// 物料的合并
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		let aKey = []
+		if(isMaterialNode(oData) && !_isExist(oData)) {
+			// 物料-找同名
+			aKey = _getKeysOfSameName(oData).key
+			aResult.push(Object.assign({}, oData, {
+				name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
+				sublings: aKey
+			}))
+		}
+	}
+
+	// 获取同名同物料下的工序。
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		if(!isMaterialNode(oData) && !_isExist(oData)) {
+			// 工序-找同名
+			let oValue = _getKeysOfSameName(oData)
+			aResult.push(Object.assign({}, oData, {
+				name: (oValue.key.length-1) ? oData.name + "("+ oValue.key.length +")": oData.name,
+				sublings: oValue.key,
+				parent: oValue.parent
+			}))
+		}
+	}
+	
+	// 返回数据。
+	return aResult;
+	
+	/**
+	 * 递归查找父节点。
+	 * @param {Array} aoCopyData
+	 * @param {String} sKey
+	 * @param {String} sParentKey
+	 * @return {void}
+	 */
+	function _findParentsData(aoCopyData, sKey, sParentKey) {
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i],
+				sNewKey = "",
+				oFlag = {};
+	
+			if(oData && sKey.split(",").includes(oData.key)) {
+				// 当前元素的父级。
+				if(isMaterialNode(oData)) {
+					oData.parent = "";
+					sNewKey = oData.key;
+	
+					oFlag = Object.assign({}, oData)
+					aoCopyData.splice(i, 1);
+					
+				} else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {
+					sNewKey = sParentKey;
+					// 判断该数据是否已加入到aoCatelogData中。
+					if(oData.parent !== undefined) {
+						// 复制该节点。
+						oFlag = Object.assign({}, oData, {
+							parent: sNewKey,
+							// 当前节点的源节点。
+							linkKey: oData.key,
+							// 自定义改节点的key值。
+							key: "new-" + _getLength(oData.key) + "-" + oData.key // 通过长度获取。
+						})
+					} else {
+						oData.parent = sParentKey;
+						oFlag = Object.assign({}, oData)
+					}
+	
+				}
+	
+				// 判断是否已经重复加入。--- key相同且parent相同。
+				if(!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key == oFlag.key && o.parent == oFlag.parent))) {
+					aoCatalogData.push(oFlag);
+	
+					if(oFlag.parents != SPARENTKEY) {
+						_findParentsData(aoCopyData, oFlag.parents, sNewKey)
+					}
+				}
+	
+			}
+		}
+	}
+	
+	/**
+	 * 复制节点获取其key值。
+	 * @param {String} sKey
+	 * @return {String}
+	 */
+	function _getLength(sKey) {
+	    return aoCatalogData.filter( o => (o.linkKey || o.key) == sKey).length
+	  }
+	
+	/**
+	 * 通过名称获取相同的名称的数据的key中。
+	 * @param {Object} oFilter
+	 * @return {Array}
+	 */
+	function _getKeysOfSameName(oFilter) {
+		let oResult = {
+			key: [],
+			parent: ""
+		};
+		
+		for(let i = 0; i < aoCatalogData.length; i++) {
+			let oData = aoCatalogData[i];
+
+			if(isMaterialNode(oFilter)) {
+				// 物料-找同名
+				if(oData.name === oFilter.name) {
+					oResult.key.push({
+						key:oData.key,
+						parent: oData.parent
+					})
+				}
+			}else {
+				// 工序，找同parent
+				// 找到在aResulte中通存在的subling的值。
+				let oValue = _isSameLevel(oData, oFilter)
+				let sKey = oData.linkKey || oData.key
+				
+				// 如果该节点时复制节点，判断其原节点是否存在，（存在-不加入。 不存在-加入）
+				if(oData.name === oFilter.name && oValue.bSame && !oResult.key.some(o => o.key == sKey)) {
+					
+					oResult.key.push({
+						key: sKey,
+						parent: oData.parent
+					})
+					oResult.parent = oValue.parent
+				}
+			}
+		}
+		
+		// 返回数据。
+		return oResult
+	}
+	
+	/**
+	 * 判断元素是否存在已存在。
+	 * @param {Object} oData
+	 */
+	function _isExist(oData) {
+//		return aResult.some( o => o.sublings.includes(oData.key) )
+		return aResult.some( o => {
+			// key值相同  且节点的parent属于一样的。 || 物料只需判断key值
+			return o.sublings.some( o1 => o1.key == (oData.linkKey || oData.key) && (isMaterialNode(oData) ||  _isExitCopy(o1, oData)) )
+		})
+	}
+	
+	function _isExitCopy(o1, o2) {
+		return aResult.some(o3 => {
+			return o3.sublings.some(o => o.key == o1.parent) && o3.sublings.some(o => o.key == o2.parent) 
+		})
+	}
+	
+	/**
+	 * 判断工序是否是同一个合并后的父级。
+	 */
+	function _isSameLevel(oData, oValue) {
+		let oR = {
+			// 是否属于合并和、后的同一个显示的物料节点
+			bSame: false,
+			// 该显示的物料节点的key值。
+			parent: ''
+		}
+		
+		aResult.forEach( o => {
+//			if(!oR.bSame && o.sublings.includes(oData.parent) && o.sublings.includes(oValue.parent)) {
+//				oR.bSame = true
+//				oR.parent = o.key
+//			}
+			
+			if(!oR.bSame && o.sublings.some(o1 => o1.key == oData.parent) && o.sublings.some(o1 => o1.key == oValue.parent)) {
+				oR.bSame = true
+				oR.parent = o.key
+			}
+		})
+		
+		return oR
+	}
+}
+
 
 /**
  * 物料，设备等下拉框数据改变，查询时参数处理。
@@ -706,11 +1418,12 @@ var parseQueryParam = function(oQuery, index, bSplit) {
 	return oParam;
 };
 
-
 export default {
 	parseData,
 	parseTreeData,
 	parseQueryParam,
 	getTreeData,
-	getCatalogData
+	getCatalogData,
+	getTrackCatalogData,
+	SPARENTKEY
 }
