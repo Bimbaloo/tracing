@@ -35,11 +35,11 @@ const PutInWarehouse = r => require.ensure([], () => r(require('components/wareh
 
 /* 条码管理 */
 const BarcodeManage = r => require.ensure([], () => r(require('components/barcodeManage/barcodeManage.vue')), 'group-detail')             // 条码管理
-const StockTransfer = r => require.ensure([], () => r(require('components/barcodeManage/supplementaryMaterial.vue')), 'group-detail')     // 补料                 
+const SupplementaryMaterial = r => require.ensure([], () => r(require('components/barcodeManage/supplementaryMaterial.vue')), 'group-detail')     // 补料                 
 
 /* 车间操作 */
 const Workshop = r => require.ensure([], () => r(require('components/workshop/workshop.vue')), 'group-detail')                            //车间操作
-const Process = r => require.ensure([], () => r(require('components/workshop/process.vue')), 'group-detail')                              //工序
+const NewProcess = r => require.ensure([], () => r(require('components/workshop/process.vue')), 'group-detail')                              //工序
 const CarryOver = r => require.ensure([], () => r(require('components/workshop/carryOver.vue')), 'group-detail')                          //结转
 const ReturnMaterial = r => require.ensure([], () => r(require('components/workshop/returnMaterial.vue')), 'group-detail')                //退料
 const AdjustableShop = r => require.ensure([], () => r(require('components/workshop/adjustableShop.vue')), 'group-detail')                //车间调整
