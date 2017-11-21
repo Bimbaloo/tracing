@@ -585,6 +585,9 @@ var getTreeData = function(oRowData) {
 				// 投产物料不同
 				oReturn.detailType = "processDiffMaterialTemp"
 				oReturn.detailTitle = `投:${sInMaterial} 产:${sOutMaterial}`
+			}else {
+				oReturn.detailType = "processDiffMaterialTemp"
+				oReturn.detailTitle = `投:${sInMaterial} 产:${sOutMaterial}`
 			}
 			
 			// 按设备进行分类。
@@ -618,7 +621,8 @@ var getTreeData = function(oRowData) {
 						if(!oFlag["touru"]) {
 							oFlag["touru"] = {
 								type: "投入",
-								list: [oType]
+								list: [oType],
+								order: 1
 							}
 						}else {
 							oFlag["touru"].list.push(oType)
@@ -628,7 +632,8 @@ var getTreeData = function(oRowData) {
 						if(!oFlag["zhiliu"]) {
 							oFlag["zhiliu"] = {
 								type: "滞留",
-								list: [oType]
+								list: [oType],
+								order: 3
 							}
 						}else {
 							oFlag["zhiliu"].list.push(oType)
@@ -638,7 +643,8 @@ var getTreeData = function(oRowData) {
 						if(!oFlag["chanchu"]) {
 							oFlag["chanchu"] = {
 								type: "产出",
-								list: [oType]
+								list: [oType],
+								order: 2
 							}
 						}else {
 							oFlag["chanchu"].list.push(oType)
@@ -647,6 +653,9 @@ var getTreeData = function(oRowData) {
 				})
 				
 				let aType = window.Rt.utils.getObjectValues(oFlag)
+				
+				// 按照投入、产出、滞留顺序。
+				aType.sort( (ot1, ot2) => ot1.order - ot2.order > 0 ? 1 : -1)
 				
 				// 各个分类中按批次合并。（投料不同时，投入按物料批次合并）
 				aType.forEach(o1 => {
