@@ -23,8 +23,18 @@
 					<div class="resume-main" :class="{showDiff:sCurrentTab === 'lines' }">
 						<div class="resume-handler" v-show="!bCarousel">
 							<div class="resume-tabs">
-								<v-button text-data="BOM表" tab-data="tables" :type-data="sBomType"  @query="changeTab('tables')"></v-button>
-								<v-button text-data="时间轴" tab-data="lines"  :type-data="sTimeLineType" @query="changeTab('lines')"></v-button>
+								<v-button 
+								v-if="!!BOMConfig.switch"
+								:text-data="BOMConfig.name" 
+								tab-data="tables" 
+								:type-data="sBomType"  
+								@query="changeTab('tables')"></v-button>
+								<v-button 
+								v-if="!!timelineConfig.switch"
+								:text-data="timelineConfig.name" 
+								tab-data="lines"  
+								:type-data="sTimeLineType" 
+								@query="changeTab('lines')"></v-button>
 							</div>
 							<div class="resume-icons">
 								<i class="resume-icon icon icon-20 icon-print" @click.stop="onPrintHandler"></i>
@@ -33,7 +43,11 @@
 							</div>
 						</div>
 						<!-- 表格 -->
-						<div v-show="sCurrentTab === 'tables'" class="resume-table" ref="table">
+						<div 
+						v-if="!!BOMConfig.switch"
+						v-show="sCurrentTab === 'tables'" 
+						class="resume-table" 
+						ref="table">
 							<div class="table-title" v-show="bShowTitle">
 								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
 								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
@@ -77,9 +91,13 @@
 						
 						<!-- 时间轴 -->
 						<div 
+							v-if="!!timelineConfig.switch"
 							v-loading="oTab.loading"
 							element-loading-text="拼命加载中"
-							v-show="sCurrentTab === 'lines'" class="resume-timeLine" :style="{height: oTab.timelineHeight +'px'}" ref="timeLine">
+							v-show="sCurrentTab === 'lines'" 
+							class="resume-timeLine" 
+							:style="{height: oTab.timelineHeight +'px'}" 
+							ref="timeLine">
 							
 							<div v-if="oTab.error" class="error">
 								{{ oTab.error }}
@@ -191,6 +209,14 @@
         		}
         	};
 			return {
+				BOMConfig: {
+					switch: 0,
+					name: "BOM表"
+				},
+				timelineConfig: {
+					switch: 0,
+					name: "时间轴"
+				},
 				// 查询标记。
 				tag: "",
 				// 默认测试数据。
@@ -305,7 +331,19 @@
 			sTimeLineType: function() {
 				// 返回数据。
 				return this.sCurrentTab=="lines"?"primary":"text";
-			}
+			},
+			// 工厂配置数据。
+			configData() {
+				return this.$store.state.customModule.config
+			},
+			// 配置模块。
+			modulesConfig() {
+				return this.configData.modules
+			},
+            // 履历的配置项。
+            currentModule() {
+                return this.modulesConfig.filter(o => o.key === "resume")[0]
+            },
 		},
 		created() {
 			this.$register.login(this.$restore);
@@ -315,6 +353,21 @@
 			}else {
 				this.myLocalStorage = []
 			}
+
+			// 获取配置数据。
+			this.$store.dispatch('getConfig').then(() => {
+				// 设置是否创建BOM表和时间轴。
+				let aoSubmodules = this.currentModule && this.currentModule.submodules
+
+				if(aoSubmodules) {
+					this.BOMConfig = aoSubmodules.find(o => o.key === "BOM")
+					this.timelineConfig = aoSubmodules.find(o => o.key === "timeline")
+				}
+
+				if(!this.BOMConfig.switch) {
+					this.sCurrentTab = "lines"
+				}
+			})
 		},
 		// 创建时处理。mounted
 		mounted() {
@@ -441,13 +494,13 @@
 				this.oTab.loading = false;
 				// 显示标题。
 				this.bShowTitle = true;
-				this.oTitle.materialName = oData.productMaterialName;
-				this.oTitle.batchNo = oData.productBatchNo;
+				this.oTitle.materialName = oData.materialName//productMaterialName;
+				this.oTitle.batchNo = oData.batchNo//productBatchNo;
 				
 				// 数据修改。
 				this.aoTable = oData.bomResumes;
 				this.aParsedData = this.parseTableData();
-				this.aoTimeLineData = this.parseTimeLineData(oData.timeLineDateResumes);
+				this.aoTimeLineData = this.parseTimeLineData(oData.timeLineResumes);//timeLineDateResumes
 				
 				if(this.bCarousel) {
 					this.$nextTick(function() {
@@ -524,7 +577,7 @@
 				var	_that = this,
 				    aoNew = [];
 				    
-				_getData(-1, 0);
+				_getData(1, 0);//(-1, 0)跟节点从1开始。
 				
 				return aoNew;
 				/**

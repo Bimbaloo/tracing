@@ -168,27 +168,49 @@ export default {
       this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
         // 请求成功。
         this.loading = false;
-        this.categories = fnP.parseData(oData)
-                          // 获取打开的功能模块。
-                          .filter(o => {
-                            let oItem = this.modulesConfig.find(item => {
-                              return o.key === item.key
-                            });
-                            return !!(oItem &&!!oItem.switch);                        
-                          });//.filter(o => o.key != "restrain" && o.key != "link");
-
-        this.categories.forEach(o => {
-          o.active = {
-            radio: "1",
-            keys: {}
-          }
-        }) 
+        // 设置tab数据。
+        this.setCategories(oData)
       }, (sErrorMessage) => {
         // 请求失败。
         this.loading = false;
         this.sErrorMessage = sErrorMessage;
         this.showMessage();
       });
+    },
+    // 设置tab数据。
+    setCategories(oData) {
+      this.categories = fnP.parseData(oData)
+                        // 获取打开的功能模块。
+                        .filter(o => {
+                          let oItem = this.modulesConfig.find(item => {
+                            return o.key === item.key
+                          });
+                          if(oItem) {
+                            return !!oItem.switch
+                          }else {
+                            return true
+                          }                    
+                        })//.filter(o => o.key != "restrain" && o.key != "link");
+                        .map(o => {
+                          let oItem = this.modulesConfig.find(item => {
+                            return o.key === item.key
+                          });
+                          if(oItem) {
+                            o.select = oItem.select
+                            o.name = oItem.name
+                          }
+                          return o
+                        })
+      // 设置激活的tab。
+      let oSelect = this.categories.find(o => !!o.select)
+      this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
+
+      this.categories.forEach(o => {
+        o.active = {
+          radio: "1",
+          keys: {}
+        }
+      }) 
     },
     // 显示提示信息。
     showMessage() {

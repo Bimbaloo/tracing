@@ -107,11 +107,11 @@
         "switch": 1,
         "submodules": [{
             "name": "BOM",
-            "key": "resumeBOM",
+            "key": "BOM",
             "switch": 1
         }, {
             "name": "时间轴",
-            "key": "resumeTimeline",
+            "key": "timeline",
             "switch": 1
         }]
     }, {

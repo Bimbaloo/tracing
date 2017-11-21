@@ -406,7 +406,7 @@
             modulesConfig() {
                 return this.configData.modules
             },
-            // 追踪或溯源的配置项。
+            // 追踪或溯源或遏制的配置项。
             currentModule() {
                 let sCurentPage = '',
                     sPathName = window.location.pathname,

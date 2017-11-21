@@ -38,6 +38,10 @@
                     text:'自定义条件名称',
                     img: 'field',
                     src:'/field'
+                },{
+                    text:'工厂定制',
+                    img: 'factory',
+                    src:'/factory'
                 }],
             }
         },
@@ -123,18 +127,24 @@
                         background-position: 0 0;
                         &.field{
                             background-position: 0 -30px;
-                         }
+                        }
+                        &.factory{
+                        background-position: 0 -60px;
+                    }
                     }
                  }
                  .logo-item{
-                     height:30px;
-                     width: 30px;
-                     margin:20px auto 0;
-                     background: url("../../assets/img/img01.png")no-repeat;
-                     background-position: -30px 0;
-                     &.field{
+                    height:30px;
+                    width: 30px;
+                    margin:20px auto 0;
+                    background: url("../../assets/img/img01.png")no-repeat;
+                    background-position: -30px 0;
+                    &.field{
                         background-position: -30px -30px;
-                      }
+                    }
+                    &.factory{
+                        background-position: -30px -60px;
+                    }
                  }
                 .logo-item-text {
                 	line-height: 40px;
