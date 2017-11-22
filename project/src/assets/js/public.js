@@ -745,7 +745,12 @@ const SPARENTKEY = "0"
 var getCatalogData = function(aoRowData, sType) {	
 	let aoCatalogData = [],
 		aoCopyData = JSON.parse(JSON.stringify(aoRowData)),
-		aResult = []
+		aResult = [],
+		// 追踪中新增的物料节点key值。
+		sNewMateiralNodekey = aoCopyData.length+1 + ""
+	
+	// 追踪中，保存最后节点的key值。（除物料外）
+	let aLastNodeKeys = []
 	
 	// 修改节点的类型值。
 	aoCopyData.forEach(o => o.iconType = getNodeIconAndTemp(o.nodeType).icon)
@@ -765,6 +770,7 @@ var getCatalogData = function(aoRowData, sType) {
 				parents: SPARENTKEY,
 				nodeType: 10003,
 				opType: 0,
+				iconType: "material",
 				isCustom: true
 			})
 		}
@@ -781,6 +787,30 @@ var getCatalogData = function(aoRowData, sType) {
 			}
 		}
 	}else {
+		// 追踪
+		// 判断最后一个节点是否为物料节点，否则，创建一个虚拟的物料节点。-- 在最后创建，否则，会将其他节点加入
+		aoCopyData.forEach( o => {
+			if(!aoCopyData.some( o1 => o1.parents.split(",").includes(o.key)) && !isMaterialNode(o)) {
+				// 当前节点没有子节点，并且不是物料节点
+				aLastNodeKeys.push(o.key)
+			}
+		})
+		
+		// 创建一个物料节点，其parents为当前所有的key值。
+		if(aLastNodeKeys.length) {
+			// 第一个节点不是物料。则增加一个虚拟节点。
+			aoCopyData.unshift({
+				code: "000",
+				name: "虚构物料节点",
+				key: sNewMateiralNodekey,
+				parents: aLastNodeKeys.join(","),
+				nodeType: 10003,
+				opType: 0,
+				iconType: "material",
+				isCustom: true
+			})
+		}
+		
 		for(let i = aoCopyData.length - 1; i >= 0; i--) {
 			let oData = aoCopyData[i];
 	
@@ -838,7 +868,7 @@ var getCatalogData = function(aoRowData, sType) {
 			let oData = aoCopyData[i],
 				sNewKey = "",
 				oFlag = {};
-	
+
 			if(oData && sKey.split(",").includes(oData.key)) {
 				// 当前元素的父级。
 				if(isMaterialNode(oData)) {
@@ -848,7 +878,10 @@ var getCatalogData = function(aoRowData, sType) {
 					oFlag = Object.assign({}, oData)
 					aoCopyData.splice(i, 1);
 					
-				} else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {
+				} else if(sParentKey != sNewMateiralNodekey && (!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) || (aLastNodeKeys.length && sParentKey == sNewMateiralNodekey && !aoCatalogData.some( o => (o.linkKey || o.key) == oData.key) ) ) {
+					// 当不是自定义物料查询时的处理。
+//				} else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {	
+					// 存在最后节点不为物料的数据，且匹配改物料下的数据，且改数据没有被其他物料加载，则会创建该节点。
 					sNewKey = sParentKey;
 					// 判断该数据是否已加入到aoCatelogData中。
 					if(oData.parent !== undefined) {
