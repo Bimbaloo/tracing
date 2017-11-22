@@ -6,11 +6,11 @@ import 'element-ui/lib/theme-green/index.css'
 
 import App from './app.vue'
 import axios from 'axios'
-import echarts from 'echarts'
+import echarts  from 'echarts'
 import Vuex from 'vuex'
 import 'babel-polyfill'
 
-// import 'assets/js/html2canvas.js'
+//import 'assets/js/html2canvas.js'
 import 'assets/js/global.js'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
@@ -20,11 +20,33 @@ Vue.use(ElementUI)
 
 Vue.prototype.$ = go.GraphObject.make;
 Vue.prototype.$ajax = axios;
-Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams});
+Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
 Vue.prototype.$post = axios.post;
 
 // 添加echarts。
-Vue.prototype.$echarts = echarts;
+Vue.prototype.$echarts = echarts
+/* 仓库操作 */
+const Warehouse = r => require.ensure([], () => r(require('components/warehouse/warehouse.vue')), 'group-detail')                         //仓库操作
+const StockTransfer = r => require.ensure([], () => r(require('components/warehouse/stockTransfer.vue')), 'group-detail')                 //库存转储
+const StockGains = r => require.ensure([], () => r(require('components/warehouse/stockGains.vue')), 'group-detail')                       //库存损益
+const StockAdjustment = r => require.ensure([], () => r(require('components/warehouse/stockAdjustment.vue')), 'group-detail')             //库存调整
+const OutWarehouse = r => require.ensure([], () => r(require('components/warehouse/outWarehouse.vue')), 'group-detail')                   //出库
+const PutInWarehouse = r => require.ensure([], () => r(require('components/warehouse/putInWarehouse.vue')), 'group-detail')               //入库
+
+/* 条码管理 */
+const BarcodeManage = r => require.ensure([], () => r(require('components/barcodeManage/barcodeManage.vue')), 'group-detail')             // 条码管理
+const SupplementaryMaterial = r => require.ensure([], () => r(require('components/barcodeManage/supplementaryMaterial.vue')), 'group-detail')     // 补料                 
+
+/* 车间操作 */
+const Workshop = r => require.ensure([], () => r(require('components/workshop/workshop.vue')), 'group-detail')                            //车间操作
+const NewProcess = r => require.ensure([], () => r(require('components/workshop/process.vue')), 'group-detail')                              //工序
+const CarryOver = r => require.ensure([], () => r(require('components/workshop/carryOver.vue')), 'group-detail')                          //结转
+const ReturnMaterial = r => require.ensure([], () => r(require('components/workshop/returnMaterial.vue')), 'group-detail')                //退料
+const AdjustableShop = r => require.ensure([], () => r(require('components/workshop/adjustableShop.vue')), 'group-detail')                //车间调整
+const ReworkInbound = r => require.ensure([], () => r(require('components/workshop/reworkInbound.vue')), 'group-detail')                  //返工入站
+const ReworkOutbound = r => require.ensure([], () => r(require('components/workshop/reworkOutbound.vue')), 'group-detail')                //返工出站
+
+
 
 const Stock = r => require.ensure([], () => r(require('components/material/stock.vue')), 'group-detail')
 const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-detail')
@@ -50,8 +72,96 @@ const Track = r => require.ensure([], () => r(require('components/track/track.vu
 
 Vue.use(VueRouter)
 // 定义路由
-const routes = [{ 
-    path: '/stock', 
+const routes = [  
+  {                                     //仓库操作                                              
+    path: '/warehouse',                 
+    component: Warehouse,
+    children: [
+    {//库存转储
+      path: 'stockTransfer',          
+      component: StockTransfer,
+      meta: {
+        title: 'stockTransfer'
+      }
+    },{//库存损益
+      path: 'stockGains',
+      component: StockGains,          
+      meta: {
+        title: 'stockGains'
+      }
+    },{//库存调整
+      path: 'stockAdjustment',
+      component: StockAdjustment,     
+      meta: {
+        title: 'stockAdjustment'
+      }
+    },{//出库
+      path: 'outWarehouse',           
+      component: OutWarehouse,         
+      meta: {
+        title: 'outWarehouse'
+      }
+    },{//入库
+      path: 'putInWarehouse',
+      component: PutInWarehouse,       
+      meta: {
+        title: 'putInWarehouse'
+      }
+    }]  
+  },{                                   //车间操作            
+    path: '/workshop',                                    
+    component: Workshop,
+    children: [
+    {//工序
+      path: 'newProcess', 
+      component: NewProcess,
+      meta: {
+      	title: 'newProcess'
+      }
+    },{//结转
+      path: 'carryOver', 
+      component: CarryOver,
+      meta: {
+      	title: 'carryOver'
+      }
+    },{//退料
+      path: 'returnMaterial', 
+      component: ReturnMaterial,
+      meta: {
+      	title: 'returnMaterial'
+      }
+    },{//车间调整
+      path: 'adjustableShop', 
+      component: AdjustableShop,
+      meta: {
+      	title: 'adjustableShop'
+      }
+    },{//返工入站
+      path: 'reworkInbound', 
+      component: ReworkInbound,
+      meta: {
+      	title: 'reworkInbound'
+      }
+    },{//返工出站
+      path: 'reworkOutbound', 
+      component: ReworkOutbound,
+      meta: {
+      	title: 'reworkOutbound'
+      }
+    }]
+  },{                                   //条码管理
+    path: '/barcodeManage',                           
+    component: BarcodeManage,
+    children: [
+    {//补料
+      path: 'supplementaryMaterial',
+      component: SupplementaryMaterial,
+      meta: {
+      	title: 'supplementaryMaterial'
+      }
+    }]
+  },{                                   //物料
+    path: '/stock',                           
     component: Stock,
     children: [{
       path: '',
@@ -72,7 +182,7 @@ const routes = [{
       	title: 'restrain'
       }
     }]
-  },{ 
+  },{                                   //工序
     path: '/process', 
     component: Process,
     children: [{
@@ -166,7 +276,6 @@ import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
 
 Vue.prototype.$register = loginFn;
-
 // 定义统一状态。
 const store = new Vuex.Store({
   modules: {
@@ -177,6 +286,7 @@ const store = new Vuex.Store({
     root: [],
     chrome: /chrome/i.test(navigator.userAgent),
     type: "",
+    // 
     fullscreen: false,
     treeFullscreen: true,
     // 原始树数据。
@@ -184,9 +294,21 @@ const store = new Vuex.Store({
     resize: 0,
     resizeY: 0,
     // 高亮的数据。
-    highted: []
+    highted: [],
+    // 存入 nodeType
+    nodeType: null,
+    // 存入 detailInfos
+    detailInfos: []
   },
-  mutations: {  
+  mutations: {
+    // 存入 nodeType
+    updateNodeType (state, payload) {
+      state.nodeType = payload.nodeType;
+    },
+    // 存入 detailInfos
+    updateDetailInfos (state, payload) {
+      state.detailInfos = payload.detailInfos;
+    },  
     updateKey (state, payload) {
       state.key = payload.key;
     },
@@ -197,12 +319,7 @@ const store = new Vuex.Store({
       state.type = payload.key;
     },
     updateData (state, payload) {
-      state.rawData = (payload.data || []).map(o => {
-        if(o && o.key == null) {
-          o.key = o.id;
-        }
-        return o;
-      });
+      state.rawData = payload.data || [];
     },
     updateFullscreen (state, payload) {
       state.fullscreen = payload.key;
