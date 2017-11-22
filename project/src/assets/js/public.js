@@ -394,7 +394,7 @@ var getTreeData = function(oRowData) {
 			// 库存调整
 			case "warehouseAdjust" :
 				// 设置详细信息标题
-				oData.detailTitle = `${oData.detailInfos.length ? oData.detailInfos[0].materialName : ""}(${oData.detailInfos.length ? oData.detailInfos[0].destWarehouse : ""})`
+				oData.detailTitle = `${oData.detailInfos.length ? oData.detailInfos[0].materialName : ""}(${oData.detailInfos.length ? (oData.detailInfos[0].destWarehouse || "") : ""})`
 				oData.sumList = _sumWorkShopData(oData)
 				break;
 				
@@ -502,6 +502,19 @@ var getTreeData = function(oRowData) {
 		link: aoDiagramLinkData
 	}
 	
+	/**
+	 * 获取显示的最短长度名称。
+	 * @param {String} sName
+	 * @param {Number} limited
+	 * @return {String}
+	 */
+	function _getShortedNum(sName, limited = 30) {
+		if(sName.length < limited) {
+			return sName
+		}else {
+			return  sName.substr(0, limited) + "..."
+		}
+	}
 
 	/**
 	 * 合并数据处理函数。合并的数量的值。
@@ -578,16 +591,16 @@ var getTreeData = function(oRowData) {
 			// 投产物料相同-- 产出只有一个。
 			if(aOutputMaterial.length && sOutMaterial == sInMaterial) {
 				oReturn.detailType = "processSameMaterialTemp"
-				oReturn.detailTitle = sOutMaterial
+				oReturn.detailTitle = _getShortedNum(sOutMaterial)
 				bIsSame = true
 				
 			}else if(aOutputMaterial.length && sOutMaterial != sInMaterial) {
 				// 投产物料不同
 				oReturn.detailType = "processDiffMaterialTemp"
-				oReturn.detailTitle = `投:${sInMaterial} 产:${sOutMaterial}`
+				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
 			}else {
 				oReturn.detailType = "processDiffMaterialTemp"
-				oReturn.detailTitle = `投:${sInMaterial} 产:${sOutMaterial}`
+				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
 			}
 			
 			// 按设备进行分类。
@@ -747,7 +760,7 @@ var getCatalogData = function(aoRowData, sType) {
 		aoCopyData = JSON.parse(JSON.stringify(aoRowData)),
 		aResult = [],
 		// 追踪中新增的物料节点key值。
-		sNewMateiralNodekey = aoCopyData.length+1 + ""
+		sNewMateiralNodekey = "customerKey"
 	
 	// 追踪中，保存最后节点的key值。（除物料外）
 	let aLastNodeKeys = []

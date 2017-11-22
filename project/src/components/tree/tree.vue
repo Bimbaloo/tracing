@@ -207,7 +207,7 @@
 		    },
 		    // 工序-投产物料不同。
 		    processDiffMaterialTemplate() {
-		    	return this.$(go.Panel, "TableRow",
+		    	return 	this.$(go.Panel, "TableRow",
 							this.$(go.Panel, "Table",
 								{defaultColumnSeparatorStroke: TABLE_COLOR},
 								this.$(go.TextBlock,
@@ -315,11 +315,11 @@
 											this.$(go.Panel, "TableRow",
 												this.$(go.TextBlock,
 													new go.Binding("text", "destBarcode"),
-													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR}
+													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
 												),
 												this.$(go.TextBlock,
 													new go.Binding("text", "", o => o.destAdjustQuantity + "/" + o.remainQuantity),	// 调整数/滞留数
-													{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR}
+													{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
 												)
 											)
 									}
@@ -571,8 +571,7 @@
 										new go.Binding("visible", "detailTitle", detailTitle => detailTitle ? true : false),
 										this.$(go.TextBlock, new go.Binding("text", "detailTitle"), // 物料名称
 											// 标题显示的总列。
-//											new go.Binding("columnSpan", 'columnIndex'),
-											{ row: 0, column: 0, columnSpan: 3,  margin: 5,  alignment: go.Spot.Center, font: "bold 10pt sans-serif", stroke: "white"})//new go.Margin(2, 2, 0, 2)font: "bold 10pt sans-serif",
+											{ row: 0, column: 0, columnSpan: 3,  margin: 5,  alignment: go.Spot.Center, font: "bold 10pt sans-serif", stroke: "white"})
 									)
 								)
 							),
