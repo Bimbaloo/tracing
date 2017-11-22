@@ -59,6 +59,7 @@
 				// 侧栏是否收缩。
 				collapse: false,
 				url: HOST + "/api/v1/trace/up/trace-info",
+				//url:"static/track.json",
 				treeData: {},
 				catalogData: [],
 				params: []
@@ -194,6 +195,9 @@
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
 					"startPointList": this.params
 				}, this.requestSucess, this.requestFail, this.requestError)
+				// this.$register.sendRequest(this.$store, this.$ajax, this.url, "get", {
+				// 	"startPointList": this.params
+				// }, this.requestSucess, this.requestFail, this.requestError)
 			},
 			/**
 			 * 获取左侧目录树数据。

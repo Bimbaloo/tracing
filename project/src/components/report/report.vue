@@ -14,16 +14,13 @@
 						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('summaryTable', $event, '汇总信息')"></i>
 					</span>
 				</h2>
-				<!--<div class="content-table">
-							<v-table :table-data="reportData.summary" :loading="loading"></v-table>
-						</div>-->
 				<transition name="el-zoom-in-top">
 					<div class="content-table inner" ref="summaryTable">
 						<v-table v-show="active.summary" :table-data="reportData.summary" :loading="loading"></v-table>
 					</div>
 				</transition>
 			</div>
-			<div ref="inStocks" :class="[{ actived: active.inStocks },'report-tablebox']">
+			<div ref="inStocks" :class="[{ actived: active.inStocks },'report-tablebox']" v-if="reportData.inStocks.show">
 				<h2 class="content-title" @click="active.inStocks=!active.inStocks">
 					<span class='table-title'>在库明细
 						<i class="el-icon-d-arrow-right icon"></i>
@@ -39,63 +36,79 @@
 					</div>
 				</transition>
 			</div>
-			<div ref="inMakings" :class="[{ actived: active.inMakings },'report-tablebox']">
+			<div ref="inMakings" :class="[{ actived: active.inMakings },'report-tablebox']" v-if="reportData.inMaking.show || reportData.remain.show">
 				<h2 class="content-title" @click="active.inMakings=!active.inMakings">
 					<span class='table-title'>在制明细
 						<i class="el-icon-d-arrow-right icon"></i>
 					</span>
 				</h2>
 				<transition-group name="el-zoom-in-top" tag="div">
-					<h2 v-show="active.inMakings" key="1" class="inner-title">
+					<h2 v-show="active.inMakings" key="1" class="inner-title" v-if="reportData.inMaking.show">
 						<span class='table-title'>加工中</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.inMaking, $event)"></i>
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inMakingTable', $event, '在制明细-加工中')"></i>
 						</span>
 					</h2>
-					<div class="content-table second-table" ref="inMakingTable" key="2">
+					<div class="content-table second-table" ref="inMakingTable" key="2" v-if="reportData.inMaking.show">
 						<v-table v-show="active.inMakings" key="2" :table-data="reportData.inMaking" :loading="loading"></v-table>
 					</div>
-					<h2 v-show="active.inMakings" key="3" class="inner-title">
+					<h2 v-show="active.inMakings" key="3" class="inner-title" v-if="reportData.remain.show">
 						<span class='table-title'>滞留中</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.remain, $event)"></i>
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('remainTable', $event, '在制明细-滞留中')"></i>
 						</span>
 					</h2>
-					<div class="content-table second-table" ref="remainTable" key="4">
+					<div class="content-table second-table" ref="remainTable" key="4" v-if="reportData.remain.show">
 						<v-table v-show="active.inMakings" :table-data="reportData.remain" :loading="loading"></v-table>
 					</div>
 				</transition-group>
 			</div>
-			<div ref="outStocks" :class="[{ actived: active.outStocks },'report-tablebox']">
+			<div ref="outStocks" :class="[{ actived: active.outStocks },'report-tablebox']" v-if="reportData.outStocks.show || reportData.delivered.show">
 				<h2 class="content-title" @click="active.outStocks=!active.outStocks">
 					<span class='table-title'>出库明细
 						<i class="el-icon-d-arrow-right icon"></i>
 					</span>
 				</h2>
 				<transition-group name="el-zoom-in-top" tag="div">
-					<h2 v-show="active.outStocks" key="5" class="inner-title">
+					<h2 v-show="active.outStocks" key="5" class="inner-title" v-if="reportData.outStocks.show">
 						<span class='table-title'>滞留中</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.outStocks, $event)"></i>
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outStocksTable', $event, '出库明细-滞留中')"></i>
 						</span>
 					</h2>
-					<div class="content-table inner second-table" key="6" ref="outStocksTable">
+					<div class="content-table inner second-table" key="6" ref="outStocksTable" v-if="reportData.outStocks.show">
 						<v-table v-show="active.outStocks" :table-data="reportData.outStocks" :loading="loading"></v-table>
 					</div>
-					<h2 v-show="active.outStocks" key="7" class="inner-title">
+					<h2 v-show="active.outStocks" key="7" class="inner-title" v-if="reportData.delivered.show">
 						<span class='table-title'>已发货</span>
 						<span class='table-handle'>
 							<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.delivered, $event)"></i>
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('deliveredTable', $event, '出库明细-已发货')"></i>
 						</span>
 					</h2>
-					<div class="content-table inner second-table" key="8" ref="deliveredTable">
+					<div class="content-table inner second-table" key="8" ref="deliveredTable" v-if="reportData.delivered.show">
 						<v-table v-show="active.outStocks" :table-data="reportData.delivered" :loading="loading"></v-table>
 					</div>
 				</transition-group>
+			</div>
+			<div ref="loss" :class="[{ actived: active.loss },'report-tablebox']" v-if="reportData.loss.show">
+				<h2 class="content-title" @click="active.loss=!active.loss">
+					<span class='table-title'>库存损益
+						<i class="el-icon-d-arrow-right icon"></i>
+					</span>
+					<span class='table-handle'>
+						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(reportData.loss, $event)"></i>
+						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('lossTable', $event, '库存损益')"></i>
+					</span>
+				</h2>
+				<transition name="el-zoom-in-top">
+					<div class="content-table inner" ref="lossTable">
+						<v-table v-show="active.loss" :table-data="reportData.loss" :loading="loading"></v-table>
+					</div>
+				</transition>
 			</div>
 		</div>
 	</div>
@@ -141,12 +154,14 @@ export default {
 				summary: true,
 				inStocks: false,
 				outStocks: false,
-				inMakings: false
+				inMakings: false,
+				loss: false
 			},
 			reportData: {
 				// 汇总。
 				summary: {
 					filename: "汇总",
+					show: true,
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
@@ -160,7 +175,6 @@ export default {
 					}, {
 						prop: "materialName",
 						name: "物料名称",
-//						width: "300",
 						sortable: true
 					}, {
 						prop: "quantity",
@@ -211,6 +225,7 @@ export default {
 				// 发货。
 				delivered: {
 					filename: "发货",
+					show: true,
 					filteredData: [],
 					filterChange: (filters) => {
 						this.filterChange(filters, 'delivered');
@@ -269,35 +284,12 @@ export default {
 						width: "160",
 						sortable: true
 					}],
-					data: [{
-						"barcode": "003311",
-						"batchNo": "20160331A",
-						"materialCode": "物料编码",
-						"materialName": "物料名称",
-						"quantity": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "上海通用",
-						"outstockType": "出库类型",
-						"person": "出库人",
-						"outstockTime": "2016-03-31 14:28:33"
-					}, {
-						"barcode": "003311",
-						"batchNo": "20160331A",
-						"materialCode": "物料编码",
-						"materialName": "物料名称",
-						"quantity": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "通用",
-						"outstockType": "出库类型",
-						"person": "出库人",
-						"outstockTime": "2016-03-31 14:28:33"
-					}]
+					data: []
 				},
 				// 出库。
 				outStocks: {
 					filename: "出库",
+					show: true,
 					filteredData: [],
 					filterChange: (filters) => {
 						this.filterChange(filters, 'outStocks');
@@ -359,23 +351,12 @@ export default {
 						width: "160",
 						sortable: true
 					}],
-					data: [{
-						"barcode": "003311",
-						"batchNo": "20160331A",
-						"materialCode": "物料编码",
-						"materialName": "物料名称",
-						"quantity": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "客户",
-						"outstockType": "出库类型",
-						"person": "出库人",
-						"outstockTime": "2016-03-31 14:28:33"
-					}]
+					data: []
 				},
 				// 在库
 				inStocks: {
 					filename: "在库",
+					show: true,
 					filteredData: [],
 					filterChange: (filters) => {
 						this.filterChange(filters, 'inStocks');
@@ -441,24 +422,12 @@ export default {
 						width: "160",
 						sortable: true
 					}],
-					data: [{
-						"barcode": "003322",
-						"batchNo": "批次号",
-						"materialCode": "物料编码",
-						"materialName": "物料名称",
-						"quantity": 16,
-						"remainingNum": 16,
-						"stock": "仓库",
-						"stocklot": "库位",
-						"customer": "客户名",
-						"instockType": "入库类型",
-						"person": "入库人",
-						"instockTime": "2016-03-31 14:28:33"
-					}]
+					data: []
 				},
 				// 加工
 				inMaking: {
 					filename: "加工",
+					show: true,
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
@@ -509,21 +478,12 @@ export default {
 						width: "180",
 						sortable: true
 					}],
-					data: [{
-						"batchNo": "批次号",
-						"materialCode": "物料编码",
-						"materialName": "物料名称",
-						"processName": "工序名称",
-						"equipmentName": "设备名称",
-						"inTime": "2016-03-31 14:28:33",
-						"inNum": 16,
-						"consumedNum": 14,
-						"remainingNum": 1
-					}]
+					data: []
 				},
 				// 滞留
 				remain: {
 					filename: "滞留",
+					show: true,
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
@@ -586,19 +546,47 @@ export default {
 						sortable: true
 					}],
 					data: []
-					// 	{
-					// 	"batchNo": "批次号", 
-					// 	"materialCode": "物料编码", 
-					// 	"materialName": "物料名称", 
-					// 	"processName": "工序名称",
-					// 	"equipmentName": "设备名称",
-					// 	"outTimeFirst": "2016-03-31 14:28:33",
-					// 	"outTimeLast": "2016-03-31 14:28:33", //最后产出时间 格式：yyyy-MM-dd hh:mm:ss
-					// 	"outNum": 16, //最后产出数量
-					// 	"qualifiedNum": 14, //最后产出合格数
-					// 	"unqualifiedNum": 1, //最后产出不合格数,
-					// 	"disabilityNum": 1, // 最后产出报废数
-					// }
+				},
+				// 库存损益
+				loss: {
+					filename: "库存损益",
+					show: false, // 只有快速报告才显示。
+					columns: [{
+						prop: "barcode",
+						name: "条码",
+						sortable: true
+					}, {
+						prop: "batchNo",
+						name: "批次",
+						width: "200",
+						sortable: true
+					}, {
+						prop: "materialCode",
+						name: "物料编码",
+						sortable: true
+					}, {
+						prop: "materialName",
+						name: "物料名称",
+						width: "300",
+						sortable: true
+					}, {
+						prop: "quantity",
+						name: "数量",
+						sortable: true,
+						sortMethod: function(a, b) {
+							return a - b;
+						}
+					}, {
+						prop: "opPerson",
+						name: "操作人",
+						width: "300",
+						sortable: true
+					}, {
+						prop: "opTime",
+						name: "操作时间",
+						sortable: true
+					}],
+					data: []
 				}
 			}
 		}
@@ -609,39 +597,21 @@ export default {
 		}
 	},
 	created() {
+		if(this.type === "trace") {
+			// 若为快速报告,展示库存损益。
+			this.reportData.loss.show = true
+		}
 		// 数据加载。
-
 		this.fetchData();
 	},
 	mounted() {
-		//			设置显示顺序.
-		this.setSequence();
+		this.$nextTick(() => {
+			//	设置显示顺序.
+			this.setSequence();
+		})
 	},
 
 	methods: {
-		// 判断调用接口是否成功。
-		// judgeLoaderHandler(param, fnSu, fnFail) {
-		// 	let bRight = param.data.errorCode;
-
-		// 	// 判断是否调用成功。
-		// 	if (!bRight) {
-		// 		// 调用成功后的回调函数。
-		// 		fnSu && fnSu();
-		// 	} else {
-		// 		// 提示信息。
-		// 		this.sErrorMessage = param.data.errorMsg.message;
-		// 		this.showMessage();
-		// 		// 失败后的回调函。
-		// 		fnFail && fnFail();
-		// 	}
-		// },
-		// 显示提示信息。
-		// showMessage() {
-		// 	this.$message({
-		// 		message: this.sErrorMessage,
-		// 		duration: 3000
-		// 	});
-		// },
 		// 请求成功。
 		requestSucess(oResult) {
 			this.loading = false;
@@ -671,6 +641,11 @@ export default {
 				});
 
 				oData[p].filteredData = oData[p].data;
+
+				if(!oResult[p].length) {
+					// 若无数据。
+					oData[p].show = false
+				}
 
 				if (oResult[p].length && !bSetWidth) {
 					bSetWidth = true;
@@ -764,54 +739,6 @@ export default {
 			}
 
 			this.$register.sendRequest(this.$store, this.$ajax, HOST + sUrl, "post", oParam, this.requestSucess, this.requestFail, this.requestError)
-			// this.$post(HOST + sUrl, oParam)
-			// 	.then((res) => {
-			// 		this.loading = false;
-			// 		let bSetWidth = false;
-			// 		this.judgeLoaderHandler(res, () => {
-
-			// 			let oData = this.reportData;
-			// 			for (let p in oData) {
-
-			// 				oData[p].data = res.data.data[p];
-			// 				oData[p].filteredData = oData[p].data;
-			// 				if (res.data.data[p].length && !bSetWidth) {
-			// 					bSetWidth = true;
-			// 					// 设置最小宽度。
-			// 					this.$emit("hasData");
-			// 				}
-
-			// 				if (p == "summary") {
-			// 					// 若为汇总信息。
-			// 					oData[p].data.map(o => {
-			// 						if (o.quantity) {
-
-			// 							o.rate = (o.qualifiedNum / o.quantity).toFixed(4);  //保留小数点后两位
-			// 						} else {
-			// 							o.rate = 0;
-			// 						}
-			// 					})
-			// 				}
-
-			// 				this.setFilters(oData[p]);
-
-			// 			}
-			// 		})
-			// 		if (!bSetWidth) {
-			// 			this.$emit("noData");
-			// 			//							this.error = "查无数据。"
-			// 			console.log("查无数据。")
-			// 		}
-
-			// 	})
-			// 	.catch((err) => {
-			// 		this.loading = false;
-
-			// 		//	this.sErrorMessage = "查询出错。";
-			// 		//	this.showMessage();
-			// 		this.$emit("noData");
-			// 		console.log("查询出错。")
-			// 	})
 
 		},
 		// 设置过滤。
@@ -863,6 +790,7 @@ export default {
 				// 若为快速报告，改变显示顺序：汇总-出库-在制-在库
 				this.$refs.content.insertBefore(this.$refs.outStocks, this.$refs.inMakings);
 				this.$refs.content.append(this.$refs.inStocks);
+				this.$refs.content.append(this.$refs.loss);
 			}
 		},
 		// 表格导出。
@@ -1005,7 +933,7 @@ export default {
 	            `;
 	
 	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
-//			window.Rt.utils.printHtml(html2canvas, oTable);
+
 		}
 	}
 }

@@ -848,38 +848,70 @@
 				}
 				
 				// 点击节点信息展示。
-				if(node.data.isMaterialNode) {
-					// 根据物料节点查询仓储信息。        
+				let nodeType = node.data.nodeType  //被点击节点的 nodeType
+				if(nodeType === 101 || nodeType === 102 || nodeType === 103 || nodeType === 111 || nodeType === 112) {  // 仓库操作     
+					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+						nodeType: nodeType
+					})
+					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+						detailInfos: node.data.detailInfos
+					})
 					this.$router.replace({ 
-						path: "/stock", 
+						path: "/warehouse", 
 						query: {
-							"key": node.data.key,
+							"detailInfos": node.data.detailInfos,
+							"nodeType": node.data.nodeType,
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}
 					})
-				}else {
-					
+				}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10001 || nodeType === 10002) { 					// 车间操作     
+					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+						nodeType: nodeType
+					})
+					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+						detailInfos: node.data.detailInfos
+					})
 					this.$router.replace({ 
-						path: "/process",
+						path: "/workshop",
 						query: {
-							"key": node.data.key,
+							"detailInfos": node.data.detailInfos,
+							"key": node.data.nodeType,
+							"_tag":  new Date().getTime().toString().substr(-5)
+						}										
+					})
+				}else if(nodeType === 201 || nodeType === 202 || nodeType === 203) { 									// 条码管理     
+					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+						nodeType: nodeType
+					})
+					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+						detailInfos: node.data.detailInfos
+					})
+					this.$router.replace({ 
+						path: "/barcodeManage",
+						query: {
+							"detailInfos": node.data.detailInfos,
+							"key": node.data.nodeType,
+							"_tag":  new Date().getTime().toString().substr(-5)
+						}										
+					})
+				}else if(nodeType === 10003 || nodeType === 10004) { 													// 物料  
+					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+						nodeType: nodeType
+					})
+					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+						detailInfos: node.data.detailInfos
+					})   
+					this.$router.replace({ 
+						path: "/stock",
+						query: {
+							"detailInfos": node.data.detailInfos,
+							"key": node.data.nodeType,
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}										
 					})
 				}
 			},
-			// nodeSelectionChangeHandle(node) {				
-			// 	let oSelect = node.findObject("SELECTION");
-			// 	if (oSelect !== null) {
-			// 		if (node.isSelected) {
-			// 			oSelect.fill = "#fff";
-			// 			oSelect.strokeWidth = 2;
-			// 		}else {
-			// 			oSelect.fill = "transparent";
-			// 			oSelect.strokeWidth = 0;
-			// 		}
-			// 	}
-			// },
+
 			// 展开/收起按钮点击事件。
 			treeExpanderButtonClickHandle(e, button) {
 				let node = button.part;
