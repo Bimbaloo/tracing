@@ -25,11 +25,11 @@
         <h3 class="clear-history" @click="clearHistory">清空查询记录</h3>
       </div>
       <div class='history-panal' v-show="showHistory" >
-        <ul class='history-content' v-for="ul in liData">
+        <ul class='history-content' v-for="(ul,index) in liData" :key="index">
           <li class="ecorded-time">
             <h3>{{ul.date}}</h3>
           </li>
-          <li class="history-messages-everyday" v-for="data in ul.data" @click="findId(data.id)" :data-id='data.id'>
+          <li class="history-messages-everyday" v-for="data in ul.data" @click="findId(data.id)" :data-id='data.id':key="data.id">
             <ul class='information-record'>
               <li>
                 <span class='circle'></span>
@@ -38,7 +38,7 @@
               <li class="ecorded-module">{{data.oData.tab}}</li>
               <li class='records'>
                 <ul class="detail-record-box">
-                  <li class="detail-record" v-for="li in data.oData.keys" v-if="li[1]">{{li[0]}}：{{li[1]}}</li>
+                  <li class="detail-record" v-for="(li,index) in data.oData.keys" v-if="li[1]" :key="index">{{li[0]}}：{{li[1]}}</li>
                 </ul>
               </li>
             </ul>
