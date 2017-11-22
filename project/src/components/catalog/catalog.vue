@@ -139,6 +139,15 @@
 							click: (e, node) => {
 								// 溯源中虚构的物料节点不能点击
 								if(node.data.isCustom) {
+									// 其他节点取消选中
+									this.catalog.nodes.each(o => {
+										if(o.data.key != node.data.key) {										
+											o.isSelected = false;
+											o.background = null;
+											o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
+										}
+									})
+									
 									return
 								}
 								

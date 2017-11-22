@@ -63,7 +63,7 @@
 				default: ""
 			},
 			// 当前选中的模块。
-			moduleColde: String 
+			moduleCode: String 
 		},
 		data() {
 			let aRequiredParam = ["barcode","materialCode","doCode","equipmentCode"];
@@ -82,10 +82,19 @@
 		          			return aRequiredParam.includes(o);
 		          		});
 		          		
-		          		if(bRight) {
-		          			callback();
-		          		}else {
+		          		let bHasTrace = value.some( o => {
+		          			return ["traceCode"].includes(o)
+		          		})
+		          		
+		          		// 溯源中只有物流码tab需添加物流码筛选条件，其他不需要。
+		          		if(this.moduleCode == "trace" && value.length == 1 && bHasTrace) {
+		          			callback()
+		          		}else if(bHasTrace) {
+		          			callback(new Error("不需要增加物流码查询条件"))
+		          		}else if(!bRight) {
 		          			callback(new Error("条码，物料，设备，工单必须存在一项"));
+		          		}else {
+		          			callback();
 		          		}
 		          	}
 		        }

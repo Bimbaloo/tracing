@@ -238,6 +238,14 @@
         	    		callback();
         	    	}
 	            		
+	            },
+	            // 物流码判断。
+	            validateTraceCode = (rule, value, callback) => {
+	            	if(!value.trim()) {
+            			callback(new Error("请输入物流码"));
+            		}else {
+            			callback();
+            		}
 	            };
             	
             	// 所有规则。
@@ -255,6 +263,7 @@
             		// 溯源。
             		"trace": {
             			"barcode": [{validator: validateParam, trigger: "change"}],
+            			"traceCode": [{validator: validateTraceCode, trigger: "change"}],
             			"materialCode": [{validator: validateParam, trigger: "change"}],
             			"equipmentCode": [{validator: validateParam, trigger: "change"}],
             			"doCode": [{validator: validateParam, trigger: "change"}],

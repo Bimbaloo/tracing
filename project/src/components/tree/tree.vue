@@ -262,13 +262,13 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock, 
 								new go.Binding("text", "destBarcode"), // 条码
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock,
 								new go.Binding("text", "batchNo"), // 批次
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
-								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
 		    // 返工节点详细信息模板。
@@ -276,13 +276,13 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock,
 								new go.Binding("text", "batchNo"), // 批次
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "qualityTypeName"),	// 质量
-								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
 		    // 车间操作-结转+退料
@@ -290,10 +290,10 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock, 
 								new go.Binding("text", "materialName"), // 条码
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
 		    // 车间操作-车间调整 | 仓库操作-库存调整详细信息模板。
@@ -359,13 +359,13 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock, 
 								new go.Binding("text", "batchNo"), // 批次
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 总数/滞留数
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.destWarehouse + o.destWarehouseLocation),	// 仓库库位
-								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
 			// 简单节点样式。
