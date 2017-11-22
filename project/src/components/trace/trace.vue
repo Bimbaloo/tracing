@@ -67,86 +67,95 @@
         methods: {
         	// 获取显示列
         	getColumns() {
-        		return [{
-	    			width: 30, 
-	    			// 该列为checkbox
-	                checkboxSelection: true,
-	                // 开启表头checkbox
-	                headerCheckboxSelection: true,
-	                // 固定
-	                pinned: true,
-	                // 不支持sort
-	                suppressSorting: true
-                },{
-					headerName: "序号",
-            		field: "index",
-            		pinned: true,
-                    width: 50
-                },{
-                    field: "barcode",
-                    headerName: "条码",
-                    width: 120,
-                    pinned: true
-//              },{
-//                  field: "processName",
-//                  headerName: "工序名称",
-//                  width: 120
-//              },{
-//                  field: "processCode",
-//                  headerName: "工序编码",
-//                  width: 80
-                },{
-                	field: "processCode",
-                	headerName: "工序",
-                	width: 120,
-                	cellRenderer: function(params) {
-						return params.data.processCode + ":" + params.data.processName
-	                }
-                },{
-                    field: "materialCode",
-                    headerName: "物料编码"
-                },{
-                    field: "materialName",
-                    headerName: "物料名称",
-                    width: 300
-                },{
-                    field: "materialUnit",
-                    headerName: "单位",
-                    width: 50
-//              },{
-//                  field: "equipmentName",
-//                  headerName: "设备名称",
-//                  width: 120
-//              },{
-//                  field: "equipmentCode",
-//                  headerName: "设备编码"
-                },{
-                	field: "equipmentCode",
-                	headerName: "设备",
-                	width: 150,
-                	cellRenderer: function(params) {
-						return params.data.equipmentCode + ":" + params.data.equipmentName
-	                }
-                },{
-                    field: "batchNo",
-                    headerName: "批次",
-                    width: 150
-                },{
-                    field: "happenTime",
-                    headerName: "加工时间",
-                    width: 160
-//                  sort: 'asc'
-                },{
-                    field: "moldCode",
-                    headerName: "模号"
-                },{
-                    field: "quantity",
-                    headerName: "数量",
-                    width: 50
-                },{
-                    field: "personName",
-                    headerName: "操作人"
-                }]
+        		// 基本显示列。
+	        	return [{
+		    			width: 30, 
+		                checkboxSelection: true,
+		                headerCheckboxSelection: true,
+		                pinned: true,
+		                suppressSorting: true
+	                },{
+						headerName: "序号",
+	            		field: "index",
+	            		pinned: true,
+	                    width: 50
+	                },{
+	                    field: "barcode",
+	                    headerName: "条码",
+	                    width: 120,
+	                    pinned: true
+	                },{
+	                    field: "batchNo",
+	                    headerName: "批次",
+	                    width: 150
+	                },{
+	                    field: "materialCode",
+	                    headerName: "物料编码"
+	                },{
+	                    field: "materialName",
+	                    headerName: "物料名称",
+	                    width: 300
+	                },{
+	                    field: "quantity",
+	                    headerName: "数量",
+	                    width: 50
+	                },{
+	                    field: "materialUnit",
+	                    headerName: "单位",
+	                    width: 50
+	                },{
+	                    field: "personName",
+	                    headerName: "操作人"
+	                },{
+	                    field: "opTime",
+	                    headerName: "时间",
+	                    width: 160
+	                },{
+	                	field: "opTypeName",
+	                    headerName: "动作"
+	                },{
+	                	field: "srcWarehouse",
+		                headerName: "源仓库"
+	                },{
+	                	field: "srcWarehouseLocation",
+		                headerName: "源库位"
+	                },{
+	                	field: "warehouse",
+		                headerName: "仓库"
+	                },{
+	                	field: "warehouseLocation",
+		                headerName: "库位"
+	                },{
+	                    field: "srcBarcode",
+	                    headerName: "源条码"
+    				},{
+    					field: "customerName",
+	                    headerName: "客户/供应商"
+    				},{
+    					field: "traceCode",
+	                    headerName: "物流码"
+    				},{
+	                    field: "equipmentName",
+	                    headerName: "设备",
+	                    cellRenderer: function(params) {
+	                    	return (params.data.equipmentCode || "") + (params.data.equipmentCode && params.data.equipmentName ? ":" : "") + (params.data.equipmentName || "")
+		                }
+    				},{
+	                    field: "moldCode",
+	                    headerName: "模号"
+    				},{
+	                    field: "srcDoCode",
+	                    headerName: "源工单"
+    				},{
+    					field: "srcEquipmentName",
+	                    headerName: "源设备",
+	                    cellRenderer: function(params) {
+	                    	return (params.data.srcEquipmentCode || "") + (params.data.srcEquipmentCode && params.data.srcEquipmentName ? ":" : "") + (params.data.srcEquipmentName || "")
+		                }
+    				},{
+	                    field: "qualityTypeName",
+	                    headerName: "质量"
+    				}]
         	},
         	// 查询。
             fetchPage() {
@@ -162,7 +171,7 @@
             },
             // 根据时间排序。
             sortByTime (a, b) {
-                return Date.parse(b.happenTime.replace(/-/g,"/"))-Date.parse(a.happenTime.replace(/-/g,"/"));
+                return Date.parse(b.opTime.replace(/-/g,"/"))-Date.parse(a.opTime.replace(/-/g,"/"));
             },
         	// 获取数据。
             fetchData (oData) {
@@ -187,14 +196,17 @@
                     	})
                     })
                    	
+                   	// 是否需要隐藏的列。
+                   	let aHideColumn = ["moldCode", "traceCode"]
                    	
-                    // 判断是否需要moldCode列， 数据全为null时隐藏
-					let isMold = aResult.some( o => o.moldCode)      
-                    
-                    if(!isMold) {
-                    	// 修改该列隐藏。
-                    	aColumns.filter( o => o.field === 'moldCode')[0].hide = true;
-                    }
+                   	aHideColumn.forEach( sColumn => {
+						let isShow = aResult.some( o => o[sColumn])
+						
+						if(!isShow && aColumns.filter( o => o.field === sColumn).length) {
+							// 修改该列隐藏。
+                    		aColumns.filter( o => o.field === sColumn)[0].hide = true;
+						}
+                   	})
                     
 					oData.data = aResult;
 					oData.columns = aColumns;
@@ -202,11 +214,13 @@
                 }, (sErrorMessage) => {
 					// 请求失败。
 					oData.loading = false;
+                	oData.columns = this.getColumns()
 					// 提示信息。
 					console.log(sErrorMessage);
 				}, (err) => {
 					// 请求错误。
 					oData.loading = false;
+					oData.columns = this.getColumns()
 					console.log("接口查询出错。");
                 })
             },
@@ -216,8 +230,7 @@
 	            	this.gridData.selected.forEach(o => {
 	            		let oSelected = {};
 	            		// 解构赋值。
-//	            		({ batchNo: oSelected.batchNo,materialName:oSelected.materialName,materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-	            		({doId: oSelected.doId} = o);
+	            		({ snapshotId: oSelected.snapshotId, batchNo: oSelected.batchNo, materialCode: oSelected.materialCode} = o);
 	            		
 	            		aSelected.push(oSelected);
 	            	})

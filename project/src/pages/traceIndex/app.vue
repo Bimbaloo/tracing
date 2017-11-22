@@ -170,7 +170,7 @@
 					});
 					// 格式化数据。
 					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
-					this.catalogData = fnP.getCatalogData(this.rawData);
+					this.catalogData = fnP.getCatalogData(this.rawData, "trace");
 				}							
 			},
 			// 请求失败。
@@ -192,7 +192,7 @@
 				this.fullscreenLoading = true;
 				
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
-					"startPointDtos": this.params
+					"startPointList": this.params
 				}, this.requestSucess, this.requestFail, this.requestError)
 			},
 			/**

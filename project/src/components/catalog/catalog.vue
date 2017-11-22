@@ -5,6 +5,10 @@
 <script>
 	import material from 'assets/img/material.png'
 	import process from 'assets/img/process.png'
+	import warehouse from 'assets/img/warehouse.png'
+	import workshop from 'assets/img/workshop.png'
+	import rework from 'assets/img/rework.png'
+	import barcodeManage from 'assets/img/barcodeManage.png'
 	import {onDoubleClickNode} from 'assets/js/go-util'
 
 	const HIGHLIGHT_BG_COLOR = "#f5efdc";//"#fff";
@@ -58,6 +62,37 @@
 			resize: 'updateCanvas'
 		},
 		methods: {
+			// 根据节点类型 获取图标。
+			getNodeIcon(sType) {
+				switch(sType) {
+					// 物料
+					case "material":
+						return material
+						break;
+					// 条码管理
+					case "barcodeManage":
+						return barcodeManage
+						break;
+					// 返工
+					case "rework":
+						return rework
+						break;
+					// 工序
+					case "process":
+						return process
+						break;
+					// 车间操作
+					case "workshop":
+						return workshop
+						break;
+					// 仓库操作
+					case "warehouse":
+						return warehouse
+						break;
+					default:
+						break;
+				}
+			},
 			/**
 			 * 初始化左侧树。
 			 * @return {void}
@@ -102,6 +137,12 @@
 					$(go.Node, {
 							// no Adornment: instead change panel background color by binding to Node.isSelected	            
 							click: (e, node) => {
+								// 溯源中虚构的物料节点不能点击
+								if(node.data.isCustom) {
+									return
+								}
+								
+								let sNodeKey = node.data.linkKey || node.data.key
 								this.catalog.nodes.each(o => {
 									if(o.data.key != node.data.key) {										
 										o.isSelected = false;
@@ -129,12 +170,8 @@
 								});
 								this.$store.commit({
 									type: "updateKey",
-									key: node.data.key
+									key: sNodeKey
 								});
-//								this.$store.commit({
-//									type: "updateRoot",
-//									key: aRoot
-//								});
 								// 更新高亮的数据。
 								this.$store.commit({
 									type: "updateHeighted",
@@ -146,7 +183,7 @@
 									this.$router.replace({ 
 										path: "/stock", 
 										query: {
-											"key": node.data.key,
+											"key": sNodeKey,
 											"_tag":  new Date().getTime().toString().substr(-5)
 										}
 									})
@@ -154,7 +191,7 @@
 									this.$router.replace({ 
 										path: "/process",
 										query: {
-											"key": node.data.key,
+											"key": sNodeKey,
 											"_tag":  new Date().getTime().toString().substr(-5)
 										}										
 									})
@@ -186,7 +223,7 @@
 									margin: new go.Margin(0, 0, 0, 2),
 									imageStretch: go.GraphObject.Uniform,
 								},
-								new go.Binding("source", "isMaterialNode", s => s ? material : process)
+								new go.Binding("source", "iconType", this.getNodeIcon)
 							),
 							$(go.TextBlock, {
 									name: "TB",
@@ -219,7 +256,7 @@
 									margin: new go.Margin(0, 5, 0, 2),
 									imageStretch: go.GraphObject.Uniform
 								},
-								new go.Binding("source", "isMaterialNode", s => s ? material : process)
+								new go.Binding("source", "iconType", this.getNodeIcon)
 							),
 							$(go.Placeholder) // this represents the selected Node
 						),
@@ -252,57 +289,40 @@
 			},
 			// 设置选中节点样式。
 			setCatalogSelection() {
-				let oNode = this.catalog.findNodeForKey(this.key);
-				let oSublingNode = null
+//				let oNode = this.catalog.findNodeForKey(this.key);
+//				let oSublingNode = null
+//				
+//				this.catalog.nodes.each(o => {
+//					// 当前节点的同名节点
+//					if(o.data.sublings.some(o1 => o1.key == this.key)) {
+//						oSublingNode = o;
+//					}
+//					o.isSelected = false;
+//					o.background = null;
+//					o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
+//				})
+//				
+//				oNode = oNode ? oNode: oSublingNode
+//				
+//				if(oNode) {
+//					oNode.background = HIGHLIGHT_BG_COLOR;	//"white";
+//					oNode.isSelected = true;
+//					oNode.findObject("TB").stroke = "#333";
+//				}
 				
+				// 设置样式。
 				this.catalog.nodes.each(o => {
 					// 当前节点的同名节点
-//					if(o.data.sublings.includes(this.key)) {
 					if(o.data.sublings.some(o1 => o1.key == this.key)) {
-						oSublingNode = o;
+						o.background = HIGHLIGHT_BG_COLOR;	//"white";
+						o.isSelected = true;
+						o.findObject("TB").stroke = "#333";
+					}else {
+						o.isSelected = false;
+						o.background = null;
+						o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
 					}
-					o.isSelected = false;
-					o.background = null;
-					o.findObject("TB") && (o.findObject("TB").stroke = "#fff");
 				})
-				
-				oNode = oNode ? oNode: oSublingNode
-				
-				if(oNode) {
-					oNode.background = HIGHLIGHT_BG_COLOR;	//"white";
-					oNode.isSelected = true;
-					oNode.findObject("TB").stroke = "#333";
-				}
-//				let nodeInmenutree = null;
-//				if(oCatalog) {
-//					nodeInmenutree = oCatalog.findNodeForKey(node.data.key);
-//			
-//					oCatalog.nodes.each(obj => {
-//						obj.isSelected = false;
-//				    	obj.background = null;
-//				    	obj.findObject("TB").stroke = "#fff";
-//				    });
-//				}
-//			    
-//			    if(node.isSelected){
-//			//  	goPage.pageHandler.getVerboseInfo(node);
-//			    	
-//			    	if(nodeInmenutree) {
-//				    	nodeInmenutree.background = "white";
-//				    	nodeInmenutree.isSelected = true;
-//				    	nodeInmenutree.findObject("TB").stroke = "#333";    		
-//			    	}
-//			
-//			        node.background = "#40484a";
-//			        node.findObject("TB") && (node.findObject("TB").stroke = "#fff");
-//			
-//			    }else {    	
-//					node.background = null;
-//			        
-//			        if(nodeInmenutree) {
-//			        	nodeInmenutree.isSelected = false;
-//			        }
-//			    }				
 			},
 			/* 大小自适应 */
 			updateCanvas(){

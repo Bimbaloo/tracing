@@ -207,8 +207,8 @@
 					});
 					// 格式化数据。
 					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
-					this.tableData = this.parseTableData();
-					this.catalogData = fnP.getCatalogData(this.rawData) // this.parseCatalogData();
+//					this.tableData = this.parseTableData();
+					this.catalogData = fnP.getCatalogData(this.rawData, "track"); //fnP.getTrackCatalogData(this.rawData)
 				}	
 			},
 			// 请求失败。
@@ -229,7 +229,7 @@
 				
 				let sType = this.urlType[this.points.type] || '',
 					oParam =  {
-					"startPointDtos": this.points.selected || []
+					"startPointList": this.points.selected || []
 				}
 				
 				if(sType) {

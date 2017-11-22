@@ -189,7 +189,7 @@
 					let oNewData = {};
 	
 					oData.columns.map(col => {
-						oNewData[col.name] = o[col.prop]==undefined ? '':o[col.prop];
+						oNewData[col.name] = o[col.prop]==undefined ? '':(col.formatter ? col.formatter(o) : o[col.prop]);
 					})
 	
 					aoTableJson.push(oNewData);
@@ -620,6 +620,35 @@
 				}
 				return cookieValue;
 			}
+		},
+		
+		/*
+		 * 去除对象中重复的项
+		 * @public
+		 * @param {Array} aoData
+		 * @param {String} sAttr
+		 * @return {Array} aoNewData
+		 */
+		uniqueObject: function(aoData, sAttr){
+			
+			// 检测数据有效性，如果无效则直接返回一个空数组。
+			if (!aoData) {
+				return [];
+			}
+
+			// 获取所有项，存到一个对象中，可以过滤重复的。
+			var oItems = {};
+			for (var i = aoData.length - 1; i >= 0; i--) {
+				oItems[aoData[i][sAttr]] = aoData[i];
+			}
+
+			// 将所有项再依次放入新数组，完成过滤。
+			var aoNewData = [];
+			for (var p in oItems) {
+				aoNewData.push(oItems[p]);
+			}
+
+			return aoNewData;
 		}
 
 	}
