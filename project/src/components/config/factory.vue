@@ -12,9 +12,9 @@
 			@mouseleave="hideHandleIcons">
 				{{item.name}}
 				<div class="handle">
-					<a href="item.link"><i class="icon icon-24 icon-open" title="打开"></i></a>
-					<i class="icon icon-24 icon-edit" title="编辑"></i>
-					<i class="icon icon-24 icon-delete" title="删除"></i>
+					<a :href="item.link" target="_blank"><i class="icon icon-24 icon-open" title="打开"></i></a>
+					<i class="icon icon-24 icon-edit" title="编辑" @click="editItem(item)"></i>
+					<i class="icon icon-24 icon-delete" title="删除" @click="deleteItem(item)"></i>
 				</div>				
 			</div>
 		</div>
@@ -22,8 +22,8 @@
 			<img :src="icon" alt="增加模块" @click="newLink" style="cursor:pointer;" title="新增模块"/>
 		</div>
 		<el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
-			<el-form :model="oCurrentData" label-width="80px">
-				<el-form-item label="名称">
+			<el-form :model="oCurrentData" label-width="80px" :rules="rules" ref="ruleForm">
+				<el-form-item label="名称" prop="name">
 					<el-input 
 					v-model="oCurrentData.name" 
 					auto-complete="off" 
@@ -31,14 +31,14 @@
 					style="width:80%;"></el-input>
 					还可输入<span class="highlight">{{10-(oCurrentData.name && oCurrentData.name.length)||0}}</span>个字
 				</el-form-item>
-				<el-form-item label="链接">
+				<el-form-item label="链接" prop="link">
 					<el-input 
 					v-model="oCurrentData.link" 
 					auto-complete="off" 
 					placeholder="请输入跳转链接。例：http:127.0.0.1:8010/config.html或config.html"
 					style="width:95%;"></el-input>
 				</el-form-item>
-				<el-form-item label="设备">
+				<el-form-item label="设备" prop="equipmentIds">
 					<el-select 
 					v-model="oCurrentData.equipmentIds" 
 					multiple 
@@ -47,24 +47,31 @@
 						<el-option
 						v-for="item in aoEquipment"
 						:key="item.equipmentId"
-						:label="item.equipmentName"
+						:label="`${item.equipmentName}(${item.equipmentId})`"
 						:value="item.equipmentId">
 						</el-option>
 					</el-select>
 				</el-form-item>
-				<el-form-item label="参数">
+				<el-form-item label="维度" prop="dimension">
+					<el-radio-group v-model="oCurrentData.dimension">
+						<el-radio 
+						v-for="oDimension in aoDimension" 
+						:label="oDimension.value" 
+						:key="oDimension.value">{{oDimension.name}}</el-radio>
+					</el-radio-group>
+				</el-form-item>
+				<el-form-item label="参数" prop="parameters">
 					<el-checkbox-group v-model="oCurrentData.parameters">
 						<el-checkbox 
 						v-for="oParameter in aoParameter" 
 						:label="oParameter.value" 
-						name="type" 
 						:key="oParameter.value">{{oParameter.name}}</el-checkbox>
 					</el-checkbox-group>
 				</el-form-item>
 			</el-form>
 			<div slot="footer" class="dialog-footer">
 				<el-button @click="dialogVisible = false">取 消</el-button>
-				<el-button type="primary" @click="dialogVisible = false">确 定</el-button>
+				<el-button type="primary" @click="submit">确 定</el-button>
 			</div>
 		</el-dialog>		
     </div>
@@ -72,24 +79,42 @@
 
 <script>
 	import $ from "jquery"
-	//表格数据接口http://192.168.20.176:8080
-	const TABLE_DATA_URL= HOST + "/api/v1/customized/items"
-	const EQUIPMENT_DATA_URL = HOST + + "/api/v1/basicinfo/equipments"
+	// 链接模块数据接口。
+	const MODULE_DATA_URL= ''
+	// 模块添加。
+	const MODULE_ADD_DATA_URL = ''
+	// 模块修改。
+	const MODULE_EDIT_DATA_URL = ''
+	// 模块删除。
+	const MODULE_DELETE_DATA_URL = ''
+	// 设备数据。
+	const EQUIPMENT_DATA_URL = ''//HOST + "/api/v1/basicinfo/equipments"
 
 	const EXAMPLE_DATA = [{
 		id: 1,
 		name: "FGB",
 		dimension: "quality",
-		link: "https://www.baidu.com/"
+		equipmentIds: [1],
+		link: "https://www.baidu.com/",
+		parameters: ["equipmentId"]
 	}, {
 		id: 2,
 		name: "工艺参数",
 		dimension: "parameter",
-		link: "https://cn.bing.com/"
+		equipmentIds: [2],
+		link: "https://cn.bing.com/",
+		parameters: []
+	}]
+
+	const EQUIPMENT_DATA = [{
+		equipmentId: 1,
+		equipmentName: "设备1"
+	}, {
+		equipmentId: 2,
+		equipmentName: "设备2"
 	}]
 
 	const oNewModule = {
-		title: "",
 		name: "",
 		link: "",
 		dimension: "",
@@ -108,9 +133,25 @@
 				// 工厂定制数据。
 				aoCustom: [],
 				// 当前打开的配置数据或新建链接数据。
-				oCurrentData: {},
-				// 编辑前的数据。
-				oBefore: {},
+				oCurrentData: {
+					name: "",
+					link: "",
+					dimension: "",
+					// 设备id。
+					equipmentIds: [],
+					// 参数。
+					parameters: []
+				},
+				// 原数据。
+				oBefore: {
+					name: "",
+					link: "",
+					dimension: "",
+					// 设备id。
+					equipmentIds: [],
+					// 参数。
+					parameters: []
+				},
 				// 弹窗名称。
 				dialogTitle: "",
 				// 弹窗可见性。
@@ -118,12 +159,29 @@
 	            // 提示信息。
 				sErrorMessage: "",
 				// 设备。
-				aoEquipment: [{
-					equipmentId: 1,
-					equipmentName: "设备1"
+				aoEquipment: [],
+				// 维度。
+				aoDimension: [{
+					name: "质量",
+					value: "quality"
 				}, {
-					equipmentId: 2,
-					equipmentName: "设备2"
+					name: "投产",
+					value: "pool"
+				}, {
+					name: "工单",
+					value: "work"
+				}, {
+					name: "事件",
+					value: "event"
+				}, {
+					name: "工具",
+					value: "tool"
+				}, {
+					name: "维护",
+					value: "repair"
+				}, {
+					name: "工艺",
+					value: "parameter"
 				}],
 				// 参数。
 				aoParameter: [{
@@ -141,27 +199,37 @@
 				}, {
 					name: "工序编码(processCode)",
 					value: "processCode"
-				}]
+				}],
+				rules: {
+					name: [
+						{ required: true, message: '请输入模块名称', trigger: 'blur' }
+					],
+					link: [
+						{ required: true, message: '请输入链接地址', trigger: 'blur' }
+					],
+					equipmentIds: [
+						{ type: 'array', required: true, message: '请选择设备', trigger: 'change' }
+					],
+					dimension: [
+						{ required: true, message: '请选择维度', trigger: 'change' }
+					],
+					parameters: [
+						{ required: false }
+					]
+				}
 	        }
 	    },
         created() {
-        	this.$store.commit({
-				type: "updateEdit",
-				key: false
-			});
-			
 			// 获取设备数据。 
-			this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENT_DATA_URL, "get", null, (oData) => {
-				// 保存工厂定制数据。
-				debugger
-				this.aoEquipment = JSON.parse(JSON.stringify(oData))
-			}, (sErrorMessage)=>{
-				this.sErrorMessage = sErrorMessage;
-				this.showMessage();          
-			})
+			// this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENT_DATA_URL, "get", null, (oData) => {
+				this.aoEquipment = JSON.parse(JSON.stringify(EQUIPMENT_DATA))
+			// }, (sErrorMessage)=>{
+			// 	this.sErrorMessage = sErrorMessage;
+			// 	this.showMessage();          
+			// })
 			
-			//获取字段接口数据 TABLE_DATA_URL	
-			// this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, (oData) => {
+			//获取模块数据 MODULE_DATA_URL	
+			// this.$register.sendRequest(this.$store, this.$ajax, MODULE_DATA_URL, "get", null, (oData) => {
 				// 保存工厂定制数据。
 				this.aoCustom = JSON.parse(JSON.stringify(EXAMPLE_DATA))
 			// }, (sErrorMessage)=>{
@@ -171,13 +239,9 @@
 			
         },
         computed: {
-	        // 是否编辑的状态。
-	        edit () {
-	          return this.$store.state.edit
-	        }
 	    },
 	    mounted() {
-          // 离开改页面处理
+          // 离开该页面处理
           	let self = this
           	window.onbeforeunload = () => {
           		if(self.edit) {
@@ -187,10 +251,6 @@
           	}
         },
         watch: {
-          	oBefore: {
-            	handler: "changeState",
-            	deep: true
-          	}
         },
         methods: {
 			// 显示操作按钮。
@@ -202,9 +262,9 @@
 				$(event.target).removeClass("in").addClass("out")
 			},
         	// 显示提示信息。
-        	showMessage() {
+        	showMessage(sError) {
         		this.$message({
-        			message: this.sErrorMessage,
+        			message: sError || this.sErrorMessage,
         			duration: 3000
         		});
 			},
@@ -214,6 +274,107 @@
 				this.dialogVisible = true
 				this.dialogTitle = "新建链接"
 				this.oCurrentData = JSON.parse(JSON.stringify(oNewModule))
+			},
+			// 保存数据。
+			submit() {
+				// 关闭弹窗。
+				
+				console.log(this.oCurrentData)
+
+				this.$refs.ruleForm.validate((valid) => {
+					if (valid) {
+						// 验证成功。
+						this.dialogVisible = false
+
+						if(this.oCurrentData.id) {
+							let bEqual = true
+							for(let p in this.oBefore) {
+								if(this.oBefore[p] instanceof Array) {
+									if(this.oBefore[p].length !== this.oCurrentData[p].length) {
+										bEqual = false
+										break
+									}else {
+										this.oBefore[p] = this.oBefore[p].sort()
+										this.oCurrentData[p] = this.oCurrentData[p].sort()
+
+										if(this.oBefore[p].some((value,index) => this.oCurrentData[p][index] !== value)) {
+											bEqual = false
+											break
+										}
+									}
+								}else {
+									if(this.oBefore[p] != this.oCurrentData[p]) {
+										bEqual = false
+										break
+									}
+								}
+							}
+							
+							if(!bEqual) {
+								// 修改配置。
+								this.saveModule()
+							}
+							
+						}else {
+							// 新增链接。
+							this.addModule()
+						}
+					}
+				});
+				
+			},
+			// 修改模块。
+			editItem(item) {
+				this.dialogVisible = true
+				this.dialogTitle = "编辑模块"
+				this.oCurrentData = $.extend(true, {}, item)
+				this.oBefore = $.extend(true, {}, item)
+			},
+			// 删除模块。
+			deleteItem(item) {
+				this.oCurrentData = $.extend(true, {}, item)
+
+				this.$confirm('确定删除该链接模块?', '提示', {
+					confirmButtonText: '确定',
+					cancelButtonText: '取消',
+					type: 'warning'
+				}).then(() => {
+					this.deleteModule()
+				})
+			},
+			// 新增模块。
+			addModule() {
+				this.$register.sendRequest(this.$store, this.$ajax, MODULE_ADD_DATA_URL, "post", this.oCurrentData, (oData) => {
+					// 回传模块id。
+					this.oCurrentData = oData.id
+					// 新增模块。
+					this.aoCustom.push(this.oCurrentData)
+					this.showMessage("新增成功。")
+				}, (sErrorMessage)=>{
+					this.sErrorMessage = sErrorMessage
+					this.showMessage("新增失败。")         
+				})				
+			},
+			// 保存配置。
+			saveModule() {
+				this.$register.sendRequest(this.$store, this.$ajax, MODULE_EDIT_DATA_URL, "post", this.oCurrentData, (oData) => {
+					this.showMessage("修改成功。")
+				}, (sErrorMessage)=>{
+					this.sErrorMessage = sErrorMessage
+					this.showMessage("新增失败。")          
+				})				
+			},
+			// 删除配置。
+			deleteModule() {
+				this.$register.sendRequest(this.$store, this.$ajax, MODULE_DELETE_DATA_URL, "post", {
+					id: this.oCurrentData.id
+				}, (oData) => {
+					this.showMessage("删除成功。")
+					this.aoCustom = this.aoCustom.filter(o => o.id !== this.oCurrentData.id)
+				}, (sErrorMessage)=>{
+					this.sErrorMessage = sErrorMessage
+					this.showMessage("删除失败。")          
+				})				
 			}
         }
     };

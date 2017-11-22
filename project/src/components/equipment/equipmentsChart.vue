@@ -167,6 +167,8 @@
     const TOOLTIP_BORDERCOLOR = '#a8b8cc'
     // 设备分析接口地址。
     const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events"
+    // 设备分析接口地址。
+    const EQUIPMENTS_CUSTOM_URL = ''
     // 默认选中的维度。
     const DEFAULT_SELECTED_DIMENSION = ["quality", "pool", "parameter"]
 
@@ -303,16 +305,19 @@
                     color: "#d89cdd",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "质检",
                         router: "/process/qtReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
+                        type: "route",
                         name: "送检",
                         router: "/process/qcReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
+                        type: "route",
                         name: "FGB",
                         router: "/process/fgbReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
@@ -326,6 +331,7 @@
                     color: "#15a5a7",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "投产表",
                         router: "/process/product",
                         query: ["doOutIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
@@ -347,6 +353,7 @@
                     color: "#f98141",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "事件记录",
                         router: "/process/event",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
@@ -360,11 +367,13 @@
                     color: "#b3b200",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "维修记录",
                         router: "/process/repair",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     }, {
+                        type: "route",
                         name: "点检记录",
                         router: "/process/spotReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
@@ -378,6 +387,7 @@
                     color: "#6979b7",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "工具记录",
                         router: "/process/tool",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
@@ -390,6 +400,7 @@
                     color: "#f9c331",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "工艺参数",
                         router: "/process/parameter",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
@@ -1184,6 +1195,12 @@
                         }
                         return o;
                     })
+                  
+                    // 获取设备定制数据。
+                    this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
+					    id: sId
+                    }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
+                    
                 }
 
                 this.chart.setOption({
@@ -1194,6 +1211,41 @@
 
                 // 设置选中的时间。
                 this.setSelectedTime();
+            },
+            // 获取定制数据成功。
+            requestCustomSucess (aoData) {
+                aoData = [{
+                    name: "FGB",
+                    link: "https://www.baidu.com",
+                    dimension: "quality",
+                    parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
+                },{
+                    name: "条码参数",
+                    link: "https://www.baidu.com",
+                    dimension: "parameter",
+                    parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
+                }]
+
+                this.dimension.forEach(o => {
+                    // 过滤其他设备的定制内容
+                    o.list = o.list.filter(item => item.type)
+
+                    let oData = aoData.filter(item => item.dimension === o.key)[0]
+
+                    if(oData) {
+                        // 添加数据。
+                        o.list.push(oData)
+                    }
+                })
+                
+            },
+            // 获取定制数据失败。
+            requestCustomFail () {
+                console.log("获取定制数据失败。");
+            },
+            // 获取定制数据错误。
+            requestCustomError () {
+                console.log("定制数据查询出错");
             },
             // 悬浮框点击事件。
             suspendTooltipClickHandle (event) {
@@ -1371,10 +1423,13 @@
 				if(oData.router) {				
 					let oQuery = this.getParamter(oData.query);
 					
-                    // 保存数据都本地。
+                    // 保存数据到本地。
                     this.setSessionStorage();
 					this.$router.replace({path: oData.router, query: oQuery});
-				}
+				}else if(oData.link) {
+                    let oParams = this.getParamter(oData.parameters);
+                    window.open(oData.link + "?" + $.param(oParams), "_blank")
+                }
 			},
             /**
 			 * @param {Array}
@@ -1500,7 +1555,12 @@
                 aoData.forEach((o,index) => {
                     if(index === nLength) {
                         // 默认选中第一台设备。
-                        this.selectedEquipmentId = o.equipmentId;
+                        this.selectedEquipmentId = o.equipmentId
+
+                        // 获取设备定制数据。
+                        this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
+                            id: this.selectedEquipmentId
+                        }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
                     }
 
                     // 设置y轴数据。
