@@ -276,7 +276,7 @@ var getNodeIconAndTemp = function(sType) {
 		// 结转转入
 		case 2:
 			oIcon.icon = "workshop"
-			icon.temp = "workshopCarryoverTemp"
+			oIcon.temp = "workshopCarryoverTemp"
 			oIcon.TempMerge = "workshopCarryover"
 			break
 		// 结转转出
@@ -433,9 +433,9 @@ var getTreeData = function(oRowData) {
 				
 				// 获取源工单及目标工单。 源：操作==转出  目标： 操作==转出的快照==操作==转入的源快照
 				let oOut = oData.detailInfos.filter( o => o.opType == "7")[0] || {},
-					oIn = oData.detailInfos.filter( o => o.opType == "2" && o.srcSnapshotId == oOut.destSnapshotId)[0]
+					oIn = oData.detailInfos.filter( o => o.opType == "2" && o.srcSnapshotId == oOut.destSnapshotId)[0] || {}
 				
-				oData.detailTitle = `源:${oOut.doCode} 目标:${oIn.doCode}`
+				oData.detailTitle = `源:${oOut.doCode || ''} 目标:${oIn.doCode || ''}`
 				break;
 			// 	退料
 			case "workshopReturnMateiral":
@@ -754,7 +754,6 @@ var getCatalogData = function(aoRowData, sType) {
 	
 	// 修改节点的类型值。
 	aoCopyData.forEach(o => o.iconType = getNodeIconAndTemp(o.nodeType).icon)
-	
 	
 	if(sType === "trace") {
 		// 溯源。

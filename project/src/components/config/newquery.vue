@@ -36,9 +36,9 @@
     						@click.stop="changeOrder(item.moduleCode,index,indexList,indexList+1)" 
     						class="icon el-icon-arrow-down"></i>
     					<!-- 修改。 -->
-    					<i @click.stop="showModal(item.moduleCode,index,indexList)" class="icon el-icon-edit"></i>
+    					<i @click.stop="showModal(item.moduleCode,index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-edit"></i>
     					<!-- 删除。 -->
-    					<i @click.stop="delItem(index,indexList)" class="icon el-icon-delete"></i>
+    					<i @click.stop="delItem(index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-delete"></i>
     				</div>
     			</li>
     		</div>
@@ -50,7 +50,7 @@
     		:transfer-data="getAllFilter()"
     		:checked-data="getTransferData().aChecked"
     		:title="getTransferData().title"
-    		:module-colde="sCurrentModule"
+    		:module-code="sCurrentModule"
     		@hideModal="hidePopModal"
     	></v-trans>
     </div>
