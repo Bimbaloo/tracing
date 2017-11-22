@@ -618,7 +618,7 @@ footer {
               display: flex;
               flex-wrap: wrap;
               .detail-record {
-                margin-right: 10px;
+                //margin-right: 10px;
                 word-break: break-all;
               }
             }

@@ -7,5 +7,6 @@ var HOST =
 //"http://192.168.20.102:8088"; 
 // var FINE_REPORT_HOST = "http://192.168.20.181:8088";
 // var MI_HOST = "http://report.zjrealtech.com:801";
-
+// "http://192.168.220.182:8088" //尹文才
+"http://192.168.20.199:8088"  //尹文才台式机
 var VERSION = "1.0.0-RC2";
