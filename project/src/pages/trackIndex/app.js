@@ -73,41 +73,94 @@ const Track = r => require.ensure([], () => r(require('components/track/track.vu
 Vue.use(VueRouter)
 // 定义路由
 const routes = [  
-  {                                               //仓库操作
-    path: '/warehouse',               
+  {                                     //仓库操作                                              
+    path: '/warehouse',                 
     component: Warehouse,
-    children: [{
-      path: 'stockTransfer',          //库存转储
+    children: [
+    {//库存转储
+      path: 'stockTransfer',          
       component: StockTransfer,
       meta: {
         title: 'stockTransfer'
       }
-    },{
+    },{//库存损益
       path: 'stockGains',
-      component: StockGains,          //库存损益
+      component: StockGains,          
       meta: {
         title: 'stockGains'
       }
-    },{
+    },{//库存调整
       path: 'stockAdjustment',
-      component: StockAdjustment,     //库存调整
+      component: StockAdjustment,     
       meta: {
         title: 'stockAdjustment'
       }
-    },{
+    },{//出库
       path: 'outWarehouse',           
-      component: OutWarehouse,         //出库
+      component: OutWarehouse,         
       meta: {
         title: 'outWarehouse'
       }
-    },{
+    },{//入库
       path: 'putInWarehouse',
-      component: PutInWarehouse,       //入库
+      component: PutInWarehouse,       
       meta: {
         title: 'putInWarehouse'
       }
+    }]  
+  },{                                   //车间操作            
+    path: '/workshop',                                    
+    component: Workshop,
+    children: [
+    {//工序
+      path: 'newProcess', 
+      component: NewProcess,
+      meta: {
+      	title: 'newProcess'
+      }
+    },{//结转
+      path: 'carryOver', 
+      component: CarryOver,
+      meta: {
+      	title: 'carryOver'
+      }
+    },{//退料
+      path: 'returnMaterial', 
+      component: ReturnMaterial,
+      meta: {
+      	title: 'returnMaterial'
+      }
+    },{//车间调整
+      path: 'adjustableShop', 
+      component: AdjustableShop,
+      meta: {
+      	title: 'adjustableShop'
+      }
+    },{//返工入站
+      path: 'reworkInbound', 
+      component: ReworkInbound,
+      meta: {
+      	title: 'reworkInbound'
+      }
+    },{//返工出站
+      path: 'reworkOutbound', 
+      component: ReworkOutbound,
+      meta: {
+      	title: 'reworkOutbound'
+      }
     }]
-  },{                                             //物料
+  },{                                   //条码管理
+    path: '/barcodeManage',                           
+    component: BarcodeManage,
+    children: [
+    {//补料
+      path: 'supplementaryMaterial',
+      component: SupplementaryMaterial,
+      meta: {
+      	title: 'supplementaryMaterial'
+      }
+    }]
+  },{                                   //物料
     path: '/stock',                           
     component: Stock,
     children: [{
@@ -129,7 +182,7 @@ const routes = [
       	title: 'restrain'
       }
     }]
-  },{                                             //工序
+  },{                                   //工序
     path: '/process', 
     component: Process,
     children: [{
@@ -242,28 +295,19 @@ const store = new Vuex.Store({
     resizeY: 0,
     // 高亮的数据。
     highted: [],
-    opType: null,
-    urls: {
-      "op_category": "api/v1/trace/operation-detail/stock/by-id",               //仓库操作
-      "op_category": "api/v1/trace/operation-detail/workshop/by-id",            //车间操作
-      "op_category": "api/v1/trace/operation-detail/barcode-management/by-id",  //条码管理
-      "op_category": "api/v1/trace/operation-detail/inout/by-id",               //投产相关(投入，产出，结转，退料)
-    },
-    url: '',            // 实际请求api
-    operationIdList: [] // 仓库操作,车间操作和条码管理前端传入数据
+    // 存入 nodeType
+    nodeType: null,
+    // 存入 detailInfos
+    detailInfos: []
   },
   mutations: {
-    // 保存 operationIdList  仓库操作,车间操作和条码管理前端传入数据
-    updateOperationIdList (state, payload) {
-      state.operationIdList = payload.operationIdList;
+    // 存入 nodeType
+    updateNodeType (state, payload) {
+      state.nodeType = payload.nodeType;
     },
-    // 根据 op_category 获取需要的url
-    updateUrl (state, payload) {
-      state.url = state.urls[payload.op_category];
-    },
-    // 存入 opType
-    updateOpType (state, payload) {
-      state.opType = payload.opType;
+    // 存入 detailInfos
+    updateDetailInfos (state, payload) {
+      state.detailInfos = payload.detailInfos;
     },  
     updateKey (state, payload) {
       state.key = payload.key;

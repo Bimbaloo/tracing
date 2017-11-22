@@ -5,10 +5,10 @@
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick(true)"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="fullScreenClick(false)"  title="缩小"></i>
         </div>
-        <div class="path-btn">
+        <!-- <div class="path-btn">
         	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
             <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
-        </div>
+        </div> -->
         <div class="router-path">
             <span class="path-item" v-if="true">库存转储</span>
             <span class="path-item" v-if="true">库存损益</span>
@@ -30,23 +30,11 @@
                 // 右下详情内容区域全屏标识。
 				key: this.$route.params.key,    	//全屏标志
 				routerPath:{
-					1:"stockTransfer", 				//库存转储
-					// 102:"varastoonotto",			//库存收货
-					// 103:"inventoryShipment",		//库存发货
-					// 104:"producedStorage",		//生产入库
-					// 105:"produceShipment",		//生产发料
-					// 106:"productionWithdrawal",	//生产退料
-					// 107:"saleRefunding",			//销售退库
-					// 108:"saleOutWarehouse",		//销售出库
-					// 109:"purchaseStorage",		//采购入库
-					// 110:"purchasingWithdrawal",	//采购退库
-					2:"stockAdjustment",			//库存调整
-					// 113:"transferStorage",		//调拨入库
-					// 114:"transferOutWarehouse",	//调拨出库
-					// 115:"productDelivery",		//成品发货
-					3:"outWarehouse",				//出库
-					4:"putInWarehouse",				//入库
-					5:"stockGains"					//库存损益
+					101:"stockTransfer", 				//库存转储
+					112:"stockAdjustment",				//库存调整
+					103:"outWarehouse",					//出库
+					104:"putInWarehouse",				//入库
+					111:"stockGains"					//库存损益
 				}
             }
         },
@@ -54,23 +42,28 @@
 			fullscreen () {
 		    	return this.$store.state.fullscreen
 			},
-			opType () {
-		    	return this.$store.state.opType
+			detailInfos () {
+		    	return this.$store.state.detailInfos
 			},
-			operationIdList() {
-		    	return this.$store.state.operationIdList
-			},
+			nodeType () {
+				return this.$store.state.nodeType
+			}
 		},
         created () {
             this.setRouteQuery();
         },
         watch: {
+			"detailInfos": "setRouteQuery"
         },
         methods: {
 			// 根据获取的 op_type 默认路由跳转
 			setRouteQuery() {
+				let operationIdList = []
+				this.detailInfos.forEach(el => {
+					operationIdList.push(el.opId)
+				})
 				this.$router.replace({ 
-					path: "/"+this.routerPath[this.opType],
+					path: "warehouse/"+this.routerPath[this.nodeType],
 					query: {
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5)

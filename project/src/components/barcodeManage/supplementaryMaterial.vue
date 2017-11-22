@@ -9,9 +9,6 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-				<div v-if="error" class="error">
-					{{ error }}
-				</div>
                 <v-table :table-data="materialData" :loading="loading"  :resize="tdResize"></v-table>
             </div>
 
@@ -20,7 +17,7 @@
 </template>
 
 <script>
-    // import table from "components/basic/table.vue"
+    import table from "components/basic/table.vue"
 	import XLSX from 'xlsx'
     import Blob from 'blob'
     import FileSaver from 'file-saver'

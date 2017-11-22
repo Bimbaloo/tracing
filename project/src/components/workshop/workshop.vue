@@ -5,10 +5,6 @@
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick(true)"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="fullScreenClick(false)"  title="缩小"></i>
         </div>
-        <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
-            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
-        </div>
         <div class="router-path">
             <span class="path-item" v-if="true">工序</span>
             <span class="path-item" v-if="true">结转</span>
@@ -31,12 +27,12 @@
                 // 右下详情内容区域全屏标识。
 				key: this.$route.params.key,    	//全屏标志
 				routerPath:{
-					6:"process", 				//工序
-					7:"carryOver",				//结转
-					8:"returnMaterial",			//退料
-					9:"adjustableShop",			//车间调整
-					10:"reworkInbound",			//返工入站
-					11:"reworkOutbound"			//返工出站
+					10001:"newProcess", 				//工序
+					10002:"carryOver",					//结转
+					8:"returnMaterial",					//退料
+					11:"adjustableShop",				//车间调整
+					14:"reworkInbound",					//返工入站
+					15:"reworkOutbound"					//返工出站
 				}
             }
         },
@@ -44,23 +40,28 @@
 			fullscreen () {
 		    	return this.$store.state.fullscreen
 			},
-			opType () {
-		    	return this.$store.state.opType
+			detailInfos () {
+		    	return this.$store.state.detailInfos
 			},
-			operationIdList() {
-		    	return this.$store.state.operationIdList
-			},
+			nodeType () {
+				return this.$store.state.nodeType
+			}
 		},
         created () {
             this.setRouteQuery();
         },
         watch: {
+			"detailInfos": "setRouteQuery"
         },
         methods: {
 			// 根据获取的 op_type 默认路由跳转
 			setRouteQuery() {
+				let operationIdList = []
+				this.detailInfos.forEach(el => {
+					operationIdList.push(el.opId)
+				})
 				this.$router.replace({ 
-					path: "/"+this.routerPath[this.opType],
+					path: "workshop/"+this.routerPath[this.nodeType],
 					query: {
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5)

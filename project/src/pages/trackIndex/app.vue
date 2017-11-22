@@ -78,6 +78,7 @@
 				// 侧栏是否收缩。
 				collapse: false,
 				url: HOST + "/api/v1/trace/down/trace-info",
+				//url:"static/track.json",
 				urlType: {
 					barcode: "/by-equipment-barcode",
 					batch: "/by-equipment-batch",
@@ -237,8 +238,9 @@
 					oParam = Object.assign({}, this.points.keys)
 					delete oParam.equipmentName
 				} 
-				
-				this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "post", oParam, this.requestSucess, this.requestFail, this.requestError)
+
+				this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "post", oParam, this.requestSucess, this.requestFail, this.requestError)				
+				//this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "get", oParam, this.requestSucess, this.requestFail, this.requestError)
 			},
 			parseTableData() {			
 				let aoData = this.rawData

@@ -9,10 +9,7 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-				<div v-if="error" class="error">
-					{{ error }}
-				</div>
-                <v-table :table-data="materialData" :loading="loading"  :resize="tdResize"></v-table>
+                <v-table :table-data="materialData" :loading="loading"  :resize="true"></v-table>
             </div>
 
         </div>
@@ -20,7 +17,7 @@
 </template>
 
 <script>
-    // import table from "components/basic/table.vue"
+    import table from "components/basic/table.vue"
 	import XLSX from 'xlsx'
     import Blob from 'blob'
     import FileSaver from 'file-saver'
@@ -162,6 +159,7 @@
 				let newData = []
 				newData = [].concat(oData)
 				this.materialData = newData
+				
             },
             // 请求失败。
             requestFail(sErrorMessage) {
