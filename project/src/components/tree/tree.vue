@@ -193,7 +193,7 @@
 																	{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																),
 																this.$(go.TextBlock,
-																	new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),		// 总数/滞留数
+																	new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),		// 总数/滞留数
 																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																)
 															)
@@ -245,7 +245,7 @@
 																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																),
 																this.$(go.TextBlock,
-																	new go.Binding("text", "",  o => o.quantity + "/" + o.remainQuantity),		// 总数/滞留数
+																	new go.Binding("text", "",  o => o.remainQuantity + "/" + o.quantity),		// 总数/滞留数
 																	{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																)
 															)
@@ -267,7 +267,7 @@
 								new go.Binding("text", "batchNo"), // 批次
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
 								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
@@ -278,7 +278,7 @@
 								new go.Binding("text", "batchNo"), // 批次
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "qualityTypeName"),	// 质量
@@ -292,7 +292,7 @@
 								new go.Binding("text", "materialName"), // 条码
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
@@ -318,7 +318,7 @@
 													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
 												),
 												this.$(go.TextBlock,
-													new go.Binding("text", "", o => o.destAdjustQuantity + "/" + o.remainQuantity),	// 调整数/滞留数
+													new go.Binding("text", "", o => o.remainQuantity + "/" + o.destAdjustQuantity),	// 调整数/滞留数
 													{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
 												)
 											)
@@ -336,7 +336,7 @@
 									new go.Binding("text", "batchNo"), // 批次
 									{column: 0,  margin: 5, stroke: COMMENT_TEXTCOLOR }),
 								this.$(go.TextBlock,
-									new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity), // 总数/滞留数
+									new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity), // 总数/滞留数
 									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 								this.$(go.Panel, "Table",
 										{column: 2, defaultRowSeparatorStroke: TABLE_COLOR},
@@ -361,7 +361,7 @@
 								new go.Binding("text", "batchNo"), // 批次
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 总数/滞留数
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 总数/滞留数
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.destWarehouse + o.destWarehouseLocation),	// 仓库库位
@@ -1126,7 +1126,7 @@
 			fitToCurrentKey() {
 				if(this.treeData.node) {
 					// 如果存在显示的key值，则定位到显示的数据，否则定位到第一个数据。
-					let oData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents == "0")[0]
+					let oData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents.includes("0") )[0]
 					let node = this.tree.findNodeForKey(oData.key);
 					if(node) {
 						this.tree.centerRect(node.actualBounds);

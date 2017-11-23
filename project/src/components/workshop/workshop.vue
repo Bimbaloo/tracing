@@ -79,25 +79,24 @@
 			// 根据获取的 op_type 默认路由跳转
 			setRouteQuery() {
 				let operationIdList = []
-				let traceInOutQueryDtoList = []
-				if(this.nodeType === 10002 || this.nodeType === 11){			//结转 || 车间调整
-					this.detailInfos.forEach(el => {
+				
+				this.detailInfos.forEach(el => {
+					
+					if(this.nodeType === 10002 || this.nodeType === 11) {
+						//其他
 						operationIdList.push(el.opId)
-					})
-				}else {									//投产
-					this.detailInfos.forEach(el => {
-						let obj = {
-							"opId": el.opId,
-							"opType": el.opType,							
-						}
-						traceInOutQueryDtoList.push(obj)
-					})
-				}
+					}else {
+						// 工序时的参数。
+						operationIdList.push({
+							opId: el.opId,
+							opType: el.opType
+						})
+					}
+				})
 				
 				this.$router.replace({ 
 					path: "workshop/"+this.routerPath[this.nodeType],
 					query: {
-						"traceInOutQueryDtoList": traceInOutQueryDtoList,
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5),
 						"url": this.url

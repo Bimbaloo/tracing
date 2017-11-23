@@ -170,7 +170,7 @@
 						data: oData		//fnP.parseTreeData(data)
 					});
 					// 格式化数据。
-					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
+					this.treeData = fnP.getTreeData(this.rawData, "trace");//this.parseTreeData();
 					this.catalogData = fnP.getCatalogData(this.rawData, "trace");
 				}							
 			},
