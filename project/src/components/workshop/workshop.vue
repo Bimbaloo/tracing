@@ -28,15 +28,15 @@
 				key: this.$route.params.key,    	//全屏标志
 				routerPath:{
 					10001:"newProcess", 				//工序
-					10002:"carryOver",					//结转
+					10002:"carryOver",					//结转	  完成	
 					8:"returnMaterial",					//退料	  完成
-					11:"adjustableShop",				//车间调整  待参数更新
+					11:"adjustableShop",				//车间调整  完成
 					14:"reworkInbound",					//返工入站  暂无数据
 					15:"reworkOutbound"					//返工出站	暂无数据
 				},
 				urls:[
 					HOST + "/api/v1/trace/operation-detail/workshop/by-id", 	// 车间接口
-					HOST + "/api/v1/trace/operation-detail/workshop/by-id", 	// 结转接口
+					HOST + "/api/v1/trace/operation-detail/turn-inout/by-id", 	// 结转接口
 					HOST + "/api/v1/trace/operation-detail/inout/by-id", 		// 投产接口				
 				],
 				routerName: {
@@ -80,11 +80,7 @@
 			setRouteQuery() {
 				let operationIdList = []
 				let traceInOutQueryDtoList = []
-				if(this.nodeType === 10002){			//结转
-					this.detailInfos.forEach(el => {
-						operationIdList.push(el.opId)
-					})
-				}else if(this.nodeType === 11) {		//车间调整
+				if(this.nodeType === 10002 || this.nodeType === 11){			//结转 || 车间调整
 					this.detailInfos.forEach(el => {
 						operationIdList.push(el.opId)
 					})
@@ -101,6 +97,7 @@
 				this.$router.replace({ 
 					path: "workshop/"+this.routerPath[this.nodeType],
 					query: {
+						"traceInOutQueryDtoList": traceInOutQueryDtoList,
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5),
 						"url": this.url

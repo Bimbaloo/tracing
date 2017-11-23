@@ -113,7 +113,8 @@
         methods: {
 			// 发起请求
             fetchData () {
-				let operationIdList = this.$route.query.operationIdList	//路由中获取条件
+				let traceInOutQueryDtoList = this.$route.query.traceInOutQueryDtoList	//路由中获取条件
+				
 				// let traceInOutQueryDtoList = [
 				// 	{
 				// 		"opId":"2c2f9a66-279e-465f-973d-eb12af192907",

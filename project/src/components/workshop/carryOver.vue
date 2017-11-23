@@ -39,9 +39,9 @@
                 error: "",
 
                 materialData: {
-					filename: "库存转储",
+					filename: "结转",
                     columns: [{
-                        prop: "destBarcode",
+                        prop: "barcode",
                         name: "条码"
                     },{
                         prop: "batchNo",
@@ -55,13 +55,25 @@
                         prop: "materialName",
                         name: "物料名称"
                     },{
+                        prop: "srcDoCode",
+                        name: "源工单"
+                    },{
+                        prop: "destDoCode",
+                        name: "目标工单"
+                    },{
                         prop: "quantity",
+                        name: "源设备"
+                    },{
+                        prop: "destEquipmentName",
+                        name: "目标设备"
+                    },{
+                        prop: "srcEquipmentId",
                         name: "数量"
                     },{
                         prop: "operatorName",
                         name: "操作人"
                     },{
-                        prop: "vendorName",
+                        prop: "operationTime",
                         name: "时间"
                     }],
                     data: []
@@ -126,7 +138,7 @@
 			// 请求成功。
             requestSucess(oData) {
 				let newData = []
-				newData = [].concat(oData.workshopOperationDetailList)
+				newData = [].concat(oData.turnInOutDetailList)
 				this.materialData.data = newData
             },
             // 请求失败。
