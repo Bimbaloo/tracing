@@ -39,12 +39,12 @@
                 error: "",
 
                 materialData: {
-					filename: "库存转储",
+					filename: "出库",
                     columns: [{
                         prop: "traceCode",
                         name: "物流码"
                     },{
-                        prop: "srcBarcode",
+                        prop: "destBarcode",
                         name: "条码"
                     },{
                         prop: "batchNo",

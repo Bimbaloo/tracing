@@ -27,7 +27,8 @@
 					201:"barcodeBind", 					//条码绑定
 					203:"supplementaryMaterial",		//补料
 					202:"emptyContainer"				//容器清空
-				}
+				},
+				url: HOST + "/api/v1/trace/operation-detail/barcode-management/by-id"
             }
         },
         computed: {
@@ -59,13 +60,7 @@
 					query: {
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5)
-					},
-					// query:{
-					// 	"operationIdList":[
-					// 		"78CBF5D3-77C3-4C9A-8534-44887F3AC35A",
-					// 		"D4E60478-47B4-4CD4-BFE5-FA1A09A48FF7"
-					// 	]
-					// }										
+					},										
 				})
 
 			},

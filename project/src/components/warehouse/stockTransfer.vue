@@ -41,7 +41,7 @@
                 materialData: {
 					filename: "库存转储",
                     columns: [{
-                        prop: "srcBarcode",
+                        prop: "destBarcode",
                         name: "条码"
                     },{
                         prop: "batchNo",

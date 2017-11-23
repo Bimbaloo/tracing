@@ -1,4 +1,4 @@
-<!--出库-->
+<!--入库-->
 <template>
     <div class="router-content">
         <div class="innner-content" >
@@ -39,9 +39,9 @@
                 error: "",
 
                 materialData: {
-					filename: "库存转储",
+					filename: "入库",
                     columns: [{
-                        prop: "batchNo",
+                        prop: "destBarcode",
                         name: "条码"
                     },{
                         prop: "batchNo",
@@ -112,9 +112,7 @@
 			// 发起请求
             fetchData () {
 				let operationIdList = this.$route.query.operationIdList	//路由中获取条件
-				let oQuery = {"operationIdList":operationIdList}
-				
-				// 发起请求
+				let oQuery = {"operationIdList":operationIdList}		
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
 		   },
 		   	// 判断调用接口是否成功。

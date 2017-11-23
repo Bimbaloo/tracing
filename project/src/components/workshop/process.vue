@@ -92,6 +92,9 @@
 			},
 			fullscreen: function() {
 				return this.$store && this.$store.state.fullscreen
+			},
+			url: function() {
+				return this.$route.query.url
 			}
         },
         created () {
@@ -115,8 +118,8 @@
         methods: {
 			// 发起请求
             fetchData () {
-				let oQuery = this.$route.query || {} //路由中获取条件
-				// 发起请求
+				let operationIdList = this.$route.query.operationIdList	//路由中获取条件
+				let oQuery = {"operationIdList":operationIdList}
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
 		   },
 		   	// 判断调用接口是否成功。
@@ -136,30 +139,9 @@
 			},			
 			// 请求成功。
             requestSucess(oData) {
-				/* oData的结构
-				{
-					"traceCode":"UN54523742200000133",          //物流码
-					"srcBarcode":"020400235",                   //源条码
-					"destBarcode":“020400299”,                  //目标条码
-					“batchNo”:"20160419A",                      //批次号
-					"materialCode":"20000375",                  //物料编码
-					"materialName":"MP/C15VVT-S3 活塞毛坯",     //物料名
-					"srcWarehouse":"1001",                      //源仓库
-					"destWarehouse":"1002",                     //目标仓库
-					"srcReservoir":"A01",                       //源库位
-					"destReservoir":"A02",                      //目标库位
-					"quantity":10,                              //操作调整数量
-					"srcQuantity":50,                           //源条码操作后数量
-					"destQuantity":60,                          //目标条码操作后数量
-					"operatorName":"周宇庭",                    //操作人名
-					"customer_name":"天津市多恒商贸有限公司",   //客户名
-					"vendor_name":"东方柴油配件公司3",          //供应商名
-					"operationTime":"2017-11-13 11:34:39"       //操作时间
-				}
-				*/
 				let newData = []
-				newData = [].concat(oData)
-				this.materialData = newData
+				newData = [].concat(oData.stockOperationDetailList)
+				this.materialData.data = newData
             },
             // 请求失败。
             requestFail(sErrorMessage) {

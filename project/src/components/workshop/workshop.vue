@@ -1,4 +1,4 @@
-<!--仓库操作-->
+<!--车间操作-->
 <template>
     <div class="material-stock" ref="stock">
         <div class="view-icon">
@@ -6,12 +6,12 @@
             <i class="icon icon-20 icon-restoreScreen" v-else @click="fullScreenClick(false)"  title="缩小"></i>
         </div>
         <div class="router-path">
-            <span class="path-item" v-if="true">工序</span>
-            <span class="path-item" v-if="true">结转</span>
-            <span class="path-item" v-if="true">退料</span>
-            <span class="path-item" v-if="true">车间调整</span>
-			<span class="path-item" v-if="true">返工入站</span>
-            <span class="path-item" v-if="true">返工出站</span>
+            <span class="path-item" v-if="routerName['newProcess']">工序</span>
+            <span class="path-item" v-if="routerName['carryOver']">结转</span>
+            <span class="path-item" v-if="routerName['returnMaterial']">退料</span>
+            <span class="path-item" v-if="routerName['adjustableShop']">车间调整</span>
+			<span class="path-item" v-if="routerName['reworkInbound']">返工入站</span>
+            <span class="path-item" v-if="routerName['reworkOutbound']">返工出站</span>
         </div> 
         <keep-alive>
 	        <router-view></router-view>  
@@ -29,10 +29,23 @@
 				routerPath:{
 					10001:"newProcess", 				//工序
 					10002:"carryOver",					//结转
-					8:"returnMaterial",					//退料
-					11:"adjustableShop",				//车间调整
-					14:"reworkInbound",					//返工入站
-					15:"reworkOutbound"					//返工出站
+					8:"returnMaterial",					//退料	  完成
+					11:"adjustableShop",				//车间调整  待参数更新
+					14:"reworkInbound",					//返工入站  暂无数据
+					15:"reworkOutbound"					//返工出站	暂无数据
+				},
+				urls:[
+					HOST + "/api/v1/trace/operation-detail/workshop/by-id", 	// 车间接口
+					HOST + "/api/v1/trace/operation-detail/workshop/by-id", 	// 结转接口
+					HOST + "/api/v1/trace/operation-detail/inout/by-id", 		// 投产接口				
+				],
+				routerName: {
+					"newProcess":false,					//工序
+					"carryOver":false,					//结转
+					"returnMaterial":false,				//退料  
+					"adjustableShop":false,				//车间调整
+					"reworkInbound":false,				//返工入站
+					"reworkOutbound":false,				//返工出站
 				}
             }
         },
@@ -45,6 +58,15 @@
 			},
 			nodeType () {
 				return this.$store.state.nodeType
+			},
+			url() {
+				if(this.nodeType === 10002){			//结转
+					return this.urls[1]
+				}else if(this.nodeType === 11) {		//车间调整
+					return this.urls[0]
+				}else {									//投产
+					return this.urls[2]
+				}
 			}
 		},
         created () {
@@ -57,23 +79,35 @@
 			// 根据获取的 op_type 默认路由跳转
 			setRouteQuery() {
 				let operationIdList = []
-				this.detailInfos.forEach(el => {
-					operationIdList.push(el.opId)
-				})
+				let traceInOutQueryDtoList = []
+				if(this.nodeType === 10002){			//结转
+					this.detailInfos.forEach(el => {
+						operationIdList.push(el.opId)
+					})
+				}else if(this.nodeType === 11) {		//车间调整
+					this.detailInfos.forEach(el => {
+						operationIdList.push(el.opId)
+					})
+				}else {									//投产
+					this.detailInfos.forEach(el => {
+						let obj = {
+							"opId": el.opId,
+							"opType": el.opType,							
+						}
+						traceInOutQueryDtoList.push(obj)
+					})
+				}
+				
 				this.$router.replace({ 
 					path: "workshop/"+this.routerPath[this.nodeType],
 					query: {
 						"operationIdList":operationIdList,
-						"_tag":  new Date().getTime().toString().substr(-5)
-					},
-					// query:{
-					// 	"operationIdList":[
-					// 		"78CBF5D3-77C3-4C9A-8534-44887F3AC35A",
-					// 		"D4E60478-47B4-4CD4-BFE5-FA1A09A48FF7"
-					// 	]
-					// }										
+						"_tag":  new Date().getTime().toString().substr(-5),
+						"url": this.url
+					},									
 				})
 
+				this.routerName[this.routerPath[this.nodeType]] = true
 			},
 			// 详情全屏按钮点击事件
             fullScreenClick(isTrue) { 

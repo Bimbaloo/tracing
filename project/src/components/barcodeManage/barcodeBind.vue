@@ -1,4 +1,4 @@
-<!--库存损益-->
+<!--条码绑定-->
 <template>
     <div class="router-content">
         <div class="innner-content" >
@@ -9,7 +9,7 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-                <v-table :table-data="materialData" :loading="loading"  :resize="true"></v-table>
+                <v-table :table-data="materialData" :loading="loading"  :resize="tdResize"></v-table>
             </div>
 
         </div>
@@ -39,10 +39,18 @@
                 error: "",
 
                 materialData: {
-					filename: "库存损益",
+					filename: "条码绑定",
                     columns: [{
-                        prop: "destBarcode",
-                        name: "条码"
+                        prop: "businessType",
+                        name: "动作类型"
+                    },{
+                        prop: "barcode",
+                        name: "单件条码",
+                        class: "batch"
+                    },{
+                        prop: "parentBarcode",
+                        name: "托条码",
+                        class: "batch"
                     },{
                         prop: "batchNo",
                         name: "批次",
@@ -54,13 +62,6 @@
                     },{
                         prop: "materialName",
                         name: "物料名称"
-                    },{
-                        prop: "srcWarehouse",
-                        name: "仓库"
-                    },{
-                        prop: "srcReservoir",
-                        name: "库位",
-                        width: "60px"
                     },{
                         prop: "quantity",
                         name: "数量"
@@ -77,9 +78,6 @@
             }
         },
         computed: {
-			rawData () {
-		    	return this.$store.state.rawData
-			},
 		    resizeY: function() {
             	return this.$store && this.$store.state.resizeY
 			},
@@ -113,7 +111,6 @@
             fetchData () {
 				let operationIdList = this.$route.query.operationIdList	//路由中获取条件
 				let oQuery = {"operationIdList":operationIdList}
-				// 发起请求
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
 		   },
 		   	// 判断调用接口是否成功。
@@ -134,7 +131,7 @@
 			// 请求成功。
             requestSucess(oData) {
 				let newData = []
-				newData = [].concat(oData.stockOperationDetailList)
+				newData = [].concat(oData.barcodeManagementDetailList)
 				this.materialData.data = newData
             },
             // 请求失败。
