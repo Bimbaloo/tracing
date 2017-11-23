@@ -36,6 +36,8 @@ const PutInWarehouse = r => require.ensure([], () => r(require('components/wareh
 /* 条码管理 */
 const BarcodeManage = r => require.ensure([], () => r(require('components/barcodeManage/barcodeManage.vue')), 'group-detail')             // 条码管理
 const SupplementaryMaterial = r => require.ensure([], () => r(require('components/barcodeManage/supplementaryMaterial.vue')), 'group-detail')     // 补料                 
+const EmptyContainer = r => require.ensure([], () => r(require('components/barcodeManage/emptyContainer.vue')), 'group-detail')           // 容器清空                 
+const BarcodeBind = r => require.ensure([], () => r(require('components/barcodeManage/barcodeBind.vue')), 'group-detail')                 // 条码绑定                 
 
 /* 车间操作 */
 const Workshop = r => require.ensure([], () => r(require('components/workshop/workshop.vue')), 'group-detail')                            //车间操作
@@ -158,6 +160,18 @@ const routes = [
       component: SupplementaryMaterial,
       meta: {
       	title: 'supplementaryMaterial'
+      }
+    },{//容器清空
+      path: 'emptyContainer',
+      component: EmptyContainer,
+      meta: {
+      	title: 'emptyContainer'
+      }
+    },{//条码绑定
+      path: 'barcodeBind',
+      component: BarcodeBind,
+      meta: {
+      	title: 'barcodeBind'
       }
     }]
   },{                                   //物料

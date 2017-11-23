@@ -1,4 +1,4 @@
-<!--结转-->
+<!--容器清空-->
 <template>
     <div class="router-content">
         <div class="innner-content" >
@@ -39,7 +39,7 @@
                 error: "",
 
                 materialData: {
-					filename: "结转",
+					filename: "容器清空",
                     columns: [{
                         prop: "barcode",
                         name: "条码"
@@ -55,20 +55,14 @@
                         prop: "materialName",
                         name: "物料名称"
                     },{
-                        prop: "srcDoCode",
-                        name: "源工单"
-                    },{
-                        prop: "destDoCode",
-                        name: "目标工单"
-                    },{
                         prop: "quantity",
-                        name: "源设备"
-                    },{
-                        prop: "destEquipmentName",
-                        name: "目标设备"
-                    },{
-                        prop: "srcEquipmentId",
                         name: "数量"
+                    },{
+                        prop: "effectiveTime",
+                        name: "生效时间"
+                    },{
+                        prop: "expiryTime",
+                        name: "失效时间"
                     },{
                         prop: "operatorName",
                         name: "操作人"
@@ -82,9 +76,6 @@
             }
         },
         computed: {
-			rawData () {
-		    	return this.$store.state.rawData
-			},
 		    resizeY: function() {
             	return this.$store && this.$store.state.resizeY
 			},
@@ -138,7 +129,7 @@
 			// 请求成功。
             requestSucess(oData) {
 				let newData = []
-				newData = [].concat(oData.turnInOutDetailList)
+				newData = [].concat(oData.barcodeManagementDetailList)
 				this.materialData.data = newData
             },
             // 请求失败。

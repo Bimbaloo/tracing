@@ -1,4 +1,4 @@
-<!--结转-->
+<!--条码绑定-->
 <template>
     <div class="router-content">
         <div class="innner-content" >
@@ -39,10 +39,18 @@
                 error: "",
 
                 materialData: {
-					filename: "结转",
+					filename: "条码绑定",
                     columns: [{
+                        prop: "businessType",
+                        name: "动作类型"
+                    },{
                         prop: "barcode",
-                        name: "条码"
+                        name: "单件条码",
+                        class: "batch"
+                    },{
+                        prop: "parentBarcode",
+                        name: "托条码",
+                        class: "batch"
                     },{
                         prop: "batchNo",
                         name: "批次",
@@ -55,19 +63,7 @@
                         prop: "materialName",
                         name: "物料名称"
                     },{
-                        prop: "srcDoCode",
-                        name: "源工单"
-                    },{
-                        prop: "destDoCode",
-                        name: "目标工单"
-                    },{
                         prop: "quantity",
-                        name: "源设备"
-                    },{
-                        prop: "destEquipmentName",
-                        name: "目标设备"
-                    },{
-                        prop: "srcEquipmentId",
                         name: "数量"
                     },{
                         prop: "operatorName",
@@ -82,9 +78,6 @@
             }
         },
         computed: {
-			rawData () {
-		    	return this.$store.state.rawData
-			},
 		    resizeY: function() {
             	return this.$store && this.$store.state.resizeY
 			},
@@ -138,7 +131,7 @@
 			// 请求成功。
             requestSucess(oData) {
 				let newData = []
-				newData = [].concat(oData.turnInOutDetailList)
+				newData = [].concat(oData.barcodeManagementDetailList)
 				this.materialData.data = newData
             },
             // 请求失败。
