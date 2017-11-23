@@ -55,15 +55,18 @@
                         prop: "materialName",
                         name: "物料名称"
                     },{
-                        prop: "srcWarehouse",
+                        prop: "destWarehouse",
                         name: "仓库"
                     },{
-                        prop: "srcReservoir",
+                        prop: "destReservoir",
                         name: "库位",
                         width: "60px"
                     },{
                         prop: "quantity",
                         name: "数量"
+                    },{
+                        prop: "vendorName",
+                        name: "供应商"
                     },{
                         prop: "operatorName",
                         name: "操作人"

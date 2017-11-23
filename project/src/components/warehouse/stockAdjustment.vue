@@ -41,8 +41,11 @@
                 materialData: {
 					filename: "库存调整",
                     columns: [{
+                        prop: "srcBarcode",
+                        name: "源条码"
+                    },{
                         prop: "destBarcode",
-                        name: "条码"
+                        name: "目标条码"
                     },{
                         prop: "batchNo",
                         name: "批次",

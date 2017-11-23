@@ -45,8 +45,7 @@
                         name: "条码"
                     },{
                         prop: "batchNo",
-                        name: "批次",
-                        class: "batch"
+                        name: "批次"
                     },{
                         prop: "materialCode",
                         name: "物料编码",
