@@ -9,7 +9,7 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-                <v-table :table-data="materialData" :loading="loading"  :resize="tdResize"></v-table>
+                <v-table :table-data="materialData" :loading="loading"  :resize="true"></v-table>
             </div>
 
         </div>

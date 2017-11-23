@@ -9,7 +9,7 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-                <v-table :table-data="materialData" :loading="loading"  :resize="tdResize"></v-table>
+                <v-table :table-data="materialData" :loading="loading"  :resize="true"></v-table>
             </div>
 
         </div>
@@ -129,7 +129,7 @@
 			// 请求成功。
             requestSucess(oData) {
 				let newData = []
-				newData = [].concat(oData.stockOperationDetailList)
+				newData = [].concat(oData.barcodeManagementDetailList)
 				this.materialData.data = newData
             },
             // 请求失败。

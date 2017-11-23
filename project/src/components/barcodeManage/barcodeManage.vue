@@ -28,7 +28,15 @@
 					203:"supplementaryMaterial",		//补料
 					202:"emptyContainer"				//容器清空
 				},
-				url: HOST + "/api/v1/trace/operation-detail/barcode-management/by-id"
+				url: HOST + "/api/v1/trace/operation-detail/barcode-management/by-id",
+				routerName: {
+					"newProcess":false,					//工序
+					"carryOver":false,					//结转
+					"returnMaterial":false,				//退料  
+					"adjustableShop":false,				//车间调整
+					"reworkInbound":false,				//返工入站
+					"reworkOutbound":false				//返工出站
+				}
             }
         },
         computed: {
@@ -59,10 +67,12 @@
 					path: "barcodeManage/"+this.routerPath[this.nodeType],
 					query: {
 						"operationIdList":operationIdList,
-						"_tag":  new Date().getTime().toString().substr(-5)
+						"_tag":  new Date().getTime().toString().substr(-5),
+						"url": this.url
 					},										
 				})
 
+				this.routerName[this.routerPath[this.nodeType]] = true
 			},
 			// 详情全屏按钮点击事件
             fullScreenClick(isTrue) { 
