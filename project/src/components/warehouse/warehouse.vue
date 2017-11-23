@@ -5,16 +5,12 @@
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick(true)"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="fullScreenClick(false)"  title="缩小"></i>
         </div>
-        <!-- <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
-            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
-        </div> -->
         <div class="router-path">
-            <span class="path-item" v-if="true">库存转储</span>
-            <span class="path-item" v-if="true">库存损益</span>
-            <span class="path-item" v-if="true">库存调整</span>
-            <span class="path-item" v-if="true">出库</span>
-			<span class="path-item" v-if="true">入库</span>
+            <span class="path-item" v-if="routerName['stockTransfer']">库存转储</span>	<!-- 完成 -->
+            <span class="path-item" v-if="routerName['stockGains']">库存损益</span>			<!-- 暂无数据 -->
+            <span class="path-item" v-if="routerName['stockAdjustment']">库存调整</span>	<!-- 完成 -->
+            <span class="path-item" v-if="routerName['outWarehouse']">出库</span>	<!-- 完成 -->
+			<span class="path-item" v-if="routerName['putInWarehouse']">入库</span> <!-- 完成 -->
         </div> 
         <keep-alive>
 	        <router-view></router-view>  
@@ -33,8 +29,16 @@
 					101:"stockTransfer", 				//库存转储
 					112:"stockAdjustment",				//库存调整
 					103:"outWarehouse",					//出库
-					104:"putInWarehouse",				//入库
+					102:"putInWarehouse",				//入库
 					111:"stockGains"					//库存损益
+				},
+				url: HOST+ "/api/v1/trace/operation-detail/stock/by-id",
+				routerName: {
+					"stockTransfer":false,				//库存转储
+					"stockAdjustment":false,			//库存调整
+					"outWarehouse":false,				//出库
+					"putInWarehouse":false,				//入库
+					"stockGains":false,					//库存损益
 				}
             }
         },
@@ -66,16 +70,12 @@
 					path: "warehouse/"+this.routerPath[this.nodeType],
 					query: {
 						"operationIdList":operationIdList,
-						"_tag":  new Date().getTime().toString().substr(-5)
-					},
-					// query:{
-					// 	"operationIdList":[
-					// 		"78CBF5D3-77C3-4C9A-8534-44887F3AC35A",
-					// 		"D4E60478-47B4-4CD4-BFE5-FA1A09A48FF7"
-					// 	]
-					// }										
+						"_tag":  new Date().getTime().toString().substr(-5),
+						"url": this.url
+					},										
 				})
 
+				this.routerName[this.routerPath[this.nodeType]] = true
 			},
 			// 详情全屏按钮点击事件
             fullScreenClick(isTrue) { 
