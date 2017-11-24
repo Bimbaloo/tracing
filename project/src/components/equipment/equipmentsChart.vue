@@ -1323,7 +1323,8 @@
 					
                     // 保存数据都本地。
                     this.setSessionStorage();
-					this.$router.replace({path: oData.router, query: oQuery});
+                    // 需要传code，配合路由判断是否切换工序。
+					this.$router.replace({path: oData.router, query: Object.assign({code: this.process}), oQuery});
 				}
 			},
             /**

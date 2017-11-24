@@ -825,6 +825,7 @@
 			},
 			// 树节点点击事件。
 			treeNodeClickHandle(e, node) {
+				debugger
 				if(this.treeFullscreen && node.data.nodeType !== 10003 && node.data.nodeType !== 10004) {
 					this.restoreScreenClick();
 				}

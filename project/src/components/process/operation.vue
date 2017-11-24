@@ -22,7 +22,7 @@
                         replace><span v-if="index">></span>{{oRoute.name}}</router-link>
                 </div>
                 <keep-alive>
-                    <router-view name="equipment"></router-view>  
+                    <router-view></router-view>  
                 </keep-alive>
             </el-tab-pane>
         </el-tabs>        
@@ -69,12 +69,19 @@
         computed: {
 			fullscreen () {
 		    	return this.$store && this.$store.state.fullscreen
+            },
+            processCode () {            
+                return this.$route.query.code
             }
 		},
         created () {
             this.initRoute()
         },
         watch: {
+            processCode: function() {
+                this.activeName = "product"
+                this.initRoute()              
+            }
         },
         methods: {
             // tab切换。
@@ -88,7 +95,7 @@
                             query: {
                                 "detailInfos": this.$route.query.detailInfos,
                                 "key": this.$route.query.key,
-                                "code": this.$route.query.code,
+                                "code": this.processCode,
                                 "_tag":  this.$route.query._tag
                             }									
                         }) 

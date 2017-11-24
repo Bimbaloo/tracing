@@ -201,110 +201,73 @@ const routes = [
     component: Process,
     children: [{
       path: 'chart',
-      // component: Chart,
-      components: {
-        // product: Product,
-        equipment: Chart
-      },
+      component: Chart,
       meta: {
       	title: 'chart'
       }
     },{
       path: 'detail',
-      // component: Detail,
-      components: {
-        equipment: Detail
-      },
+      component: Detail,
       meta: {
       	title: 'detail'
       }
     },{
       path: 'product',
-      // component: Product,
-      components: {
-        equipment: Product
-      },
+      component: Product,
       meta: {
       	title: 'product'
       }
     },{//质检
       path: 'qtReport',
-      // component: QtReport,
-      components: {
-        equipment: QtReport
-      },
+      component: QtReport,
       meta: {
       	title: 'qtReport'
       }
     },{//送检
       path: 'qcReport',
-      // component: QcReport,
-      components: {
-        equipment: QcReport
-      },
+      component: QcReport,
       meta: {
       	title: 'qcReport'
       }
     },{//fgb
       path: 'fgbReport',
-      // component: FgbReport,
-      components: {
-        equipment: FgbReport
-      },
+      component: FgbReport,
       meta: {
       	title:'fgbReport'
       }
     },{//工具
       path: 'tool',
-      // component: Tool,
-      components: {
-        equipment: Tool
-      },
+      component: Tool,
       meta: {
       	title: 'tool'
       }
     },{//事件
       path: 'event',
-      // component: Event,
-      components: {
-        equipment: Event
-      },
+      component: Event,
       meta: {
       	title: 'event'
       }
     },{//维修记录
       path: 'repair',
-      // component: Repair,
-      components: {
-        equipment: Repair
-      },
+      component: Repair,
       meta:{
       	title: 'repair'
       }
     },{//点检记录
       path: 'spotReport',
-      // component: SpotReport,
-      components: {
-        equipment: SpotReport
-      },
+      component: SpotReport,
       meta: {
       	title: 'spotReport'
       }
     },{//工艺参数
       path: 'parameter',
-      // component: Parameter,
-      components: {
-        equipment: Parameter
-      },
+      component: Parameter,
       meta: {
       	title: 'parameter'
       }
     },{//遏制
       path: 'restrain',
-      // component: Suspicious,
-      components: {
-        equipment: Suspicious
-      },
+      component: Suspicious,
       meta: {
       	title: 'restrain'
       }
