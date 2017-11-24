@@ -39,9 +39,9 @@
                                     <div 
                                     :class="['cell-content',{ltext: column.prop === 'barcode'}]" 
                                     v-if="column.prop === 'barcode'" 
-                                    :style="{paddingLeft: !!props.row.in ? 15 : 50 +'px'}">
-                                        <i v-if="!!props.row.in" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
-                                        <span>{{ props.row[column.prop]}}</span>
+                                    :style="{paddingLeft: props.row.hasInLen ? 15 : 50 +'px'}">
+                                        <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop]}}</span>
                                         <i 
                                         v-if="showCamera" 
                                         class="icon icon-12 icon-camera" 
@@ -49,13 +49,33 @@
                                         @click="showVideoDialog(props.row)"></i>
                                     </div>
                                     <div class="cell-content" v-else>
-                                        <span>{{ props.row[column.prop] }}</span>
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
                         </el-table>
                     </div>
 
+					<h2 class="content-title inNotOutTitle">
+						<span class='table-title'>有投未产</span>
+                        <span class='table-handle'>
+                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inNotOutItems, $event)"></i>
+                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inNotOutTable', $event)"></i>
+                        </span>
+					</h2>
+					<div class="content-table" ref="inNotOutTable" v-if="show1">
+						<el-table class="table-main" :data="checked?inNotOutItems.data:inNotOutItems.dataFilter" :height="inNotOutItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                            <el-table-column v-for="(column,index) in inNotOutItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                                <template scope="props">
+                                    <div class="cell-content">
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                                    </div>
+                                </template>
+                            </el-table-column>
+                        </el-table>
+					</div>
+					
+					
                 </el-tab-pane>
                 <el-tab-pane label="明细表">
                     <h2 class="content-title outTitle">
@@ -72,10 +92,10 @@
                             <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content" v-if="column.prop !== 'barcode'">
-                                        <span>{{ props.row[column.prop] }}</span>
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                     <div class="cell-content" v-else>
-                                        <span :class="[ bTrack ? '' : 'barcode']" :title="[bTrack ? '' : '条码追踪']" @click="barcodeClick(props.row)">{{ props.row[column.prop] }}</span>
+                                        <span :class="[ bTrack ? '' : 'barcode']" :title="[bTrack ? '' : '条码追踪']" @click="barcodeClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -96,7 +116,7 @@
                             <el-table-column v-for="(column,index) in inItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content">
-                                        <span>{{ props.row[column.prop] }}</span>
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -118,10 +138,10 @@
                             <el-table-column v-for="(column,index) in outAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content" v-if="column.prop !== 'batchNo'">
-                                        <span>{{ props.row[column.prop] }}</span>
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                     <div class="cell-content" v-else>
-                                        <span :class="[ bTrack ? '' : 'batchNo']" :title="[bTrack ? '' : '批次追踪']" @click="batchClick(props.row)">{{ props.row[column.prop] }}</span>
+                                        <span :class="[ bTrack ? '' : 'batchNo']" :title="[bTrack ? '' : '批次追踪']" @click="batchClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -141,7 +161,7 @@
                             <el-table-column v-for="(column,index) in inAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div class="cell-content">
-                                        <span>{{ props.row[column.prop] }}</span>
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -166,9 +186,12 @@ import VideoDialog from 'components/monitor/dialog.vue'
 
 // 是否开启视频监控。
 const CAMERA = 0;
-const url = HOST + "/api/v1/trace/inout/by-trace";
-//const url = "http://rapapi.org/mockjsdata/21533/qqq?"
-//const url = `static/produce.json`
+//const url = HOST + "/api/v1/trace/operation-detail/inout/by-id";
+
+// 产出，退料，结转字段。
+const OUT_FIELD = "outQuantity"
+const RETURN_FIELD = "returnMaterialQuantity"
+const CARRY_FIELD = "carryOverQuantity"
 
 export default {
     components: {
@@ -248,9 +271,30 @@ export default {
                     prop: "personName",
                     width: "120"
                 }, {
-                    name: "投入时间",
+                    name: "时间",
                     prop: "happenTime",
                     width: "200"
+                }, {
+                	name: "产出",
+                	prop: OUT_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[OUT_FIELD] || 0
+                	}
+                }, {
+                	name: "结转",
+                	prop: CARRY_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[CARRY_FIELD] || 0
+                	}
+                }, {
+                	name: "退料",
+                	prop: RETURN_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[RETURN_FIELD] || 0
+                	}
                 }],
                 height: 1,
                 data: [],
@@ -285,16 +329,12 @@ export default {
                     prop: "materialName",
                     width: "300"
                 }, {
-                    name: "模号",
-                    prop: "moldCode",
-                    width: ""
-                }, {
                     name: "数量",
                     prop: "quantity",
                     width: "100"
                 }, {
                     name: "质量",
-                    prop: "quality",
+                    prop: "qualityTypeName",
                     width: "100"
                 }, {
                     name: "班次",
@@ -305,7 +345,7 @@ export default {
                     prop: "personName",
                     width: "120"
                 }, {
-                    name: "产出时间",
+                    name: "时间",
                     prop: "happenTime",
                     width: "200"
                 }],
@@ -313,9 +353,9 @@ export default {
                 dataFilter: [],
                 height: 1
             },
-            /* 关联表 */
+            /* 关联表-投产 */
             uniteItems: {
-                filename: "关联表",
+                filename: "产出投入",
                 columns: [{
                     name: "条码",
                     prop: "barcode",
@@ -323,7 +363,7 @@ export default {
                     fixed: true,
                 }, {
                     name: "类型",
-                    prop: "productionType",
+                    prop: "opTypeName",
                     width: "100"
                 }, {
                     name: "工单",
@@ -347,7 +387,7 @@ export default {
                     width: "120"
                 }, {
                     name: "质量",
-                    prop: "quality",
+                    prop: "qualityTypeName",
                     width: "120"
                 }, {
                     name: "班次",
@@ -358,9 +398,68 @@ export default {
                     prop: "personName",
                     width: "120"
                 }, {
-                    name: "加工时间",
+                    name: "时间",
                     prop: "happenTime",
                     width: "200"
+                }],
+                height: 1,
+                data: [],
+                dataFilter: []
+            },
+            // 有投未产
+            inNotOutItems: {
+                filename: "有投未产",
+                columns: [{
+                    name: "条码",
+                    prop: "barcode",
+                    width: "285",
+                    fixed: true,
+                }, {
+                    name: "工单",
+                    prop: "doCode",
+                    width: "120"
+                }, {
+                    name: "批次",
+                    prop: "batchNo",
+                    width: "250",
+                }, {
+                    name: "物料编码",
+                    prop: "materialCode",
+                    width: "120"
+                }, {
+                    name: "物料名称",
+                    prop: "materialName",
+                    width: "280"
+                }, {
+                    name: "数量",
+                    prop: "quantity",
+                    width: "120"
+                }, {
+                    name: "班次",
+                    prop: "shiftName",
+                    width: "120"
+                }, {
+                    name: "操作人",
+                    prop: "personName",
+                    width: "120"
+                }, {
+                    name: "时间",
+                    prop: "happenTime",
+                    width: "200"
+                }, {
+                	name: "结转",
+                	prop: CARRY_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[CARRY_FIELD] || 0
+                	}
+                }, {
+                	name: "退料",
+                	prop: RETURN_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[RETURN_FIELD] || 0
+                	}
                 }],
                 height: 1,
                 data: [],
@@ -385,8 +484,28 @@ export default {
                     name: "数量",
                     prop: "quantity",
                     width: "100"
-                }
-                ],
+                }, {
+                	name: "产出",
+                	prop: OUT_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[OUT_FIELD] || 0
+                	}
+                }, {
+                	name: "结转",
+                	prop: CARRY_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[CARRY_FIELD] || 0
+                	}
+                }, {
+                	name: "退料",
+                	prop: RETURN_FIELD,
+                	width: "120",
+                	formatter: function(row, column) {
+                		return row[RETURN_FIELD] || 0
+                	}
+                }],
                 height: 1,
                 data: []
             },
@@ -426,7 +545,6 @@ export default {
             show1: true,
             show2: false,
             show3: false
-
         }
 
     },
@@ -444,7 +562,10 @@ export default {
         },
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
-        }
+        },
+        url: function() {
+			return this.$route.query.url
+		}
     },
     mounted() {
         this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
@@ -464,6 +585,7 @@ export default {
         "fullscreen": 'setTbaleHeight'
     },
     methods: {
+    	// 获取筛选条件。
     	getFilters() {
             let filters = this.condition
             for (let i in filters) {
@@ -503,129 +625,187 @@ export default {
                 equipmentId: row.equipmentId,
                 equipmentName: row.equipmentName,
                 time: row.happenTime,
-                type: row.productionType==="产出" ? "2":"1"
+                type: row.opTypeName==="产出" ? "2":"1"
             };
         },
         // 请求成功。
         requestSucess(oData) {
-            this.loading = false;
-            let outDatas = []
-            let outDatasFilter = []
-            let inDatas = []
-            let inDatasFilter = []
-            let uniteDatas = []
-            let uniteDatasFilter = []
-            let outAllDatas = []
-            let outAllDatasFilter = []
-            let inAllDatas = []
-            let inAllDatasFilter = []
-            let startTime = this.condition.startTime
-            let endTime = this.condition.endTime
-
-            let outData = oData.out;
-
-            outData.forEach((e, index) => {
-
-                /* 设置每条产出记录的合格数、报废数、不合格数 */
-                e.qualifiedNum = e.scrapNum = e.unqualifiedNum = 0
-                if (e.type === 1) {                                       // 合格数
-                    e.qualifiedNum = e.quantity
-                } else if (e.type === 2) {                                // 报废数
-                    e.scrapNum = e.quantity
-                } else {                                                 // 不合格数
-                    e.unqualifiedNum = e.quantity
-                }
-
-                e.productionType = "产出"
-                e.productionID = index              //对产出做标记，方便找到对应的投入
-
-                e.in.forEach(el => {
-                    /* 设置每条投入记录的合格数、报废数、不合格数 */
-                    el.qualifiedNum = el.scrapNum = el.unqualifiedNum = 0
-                    if (el.type === 1) {                                       // 合格数
-                        el.qualifiedNum = el.quantity
-                    } else if (el.type === 2) {                                // 报废数
-                        el.scrapNum = el.quantity
-                    } else {                                                 // 不合格数
-                        el.unqualifiedNum = el.quantity
-                    }
-                    el.productionType = "投入"
-                    el.productionID = index         //对投入做标记，方便找到对应的产出
-                })
-
-                inDatas.push(...e.in)               // 获取投入数据
-                outDatas.push(e)                    // 获取产出数据
-                e.in.forEach(data=>{                // 投入记录的质量列为null时，显示为空
-                    if(data.quality === null){
-                        data.quality = ""
-                    }
-                })
-                uniteDatas.push(e)                  // 获取关联数据
-                uniteDatas.push(...e.in)
-                // 获取关联数据 -- 时间内
-                if (startTime <= e.happenTime && e.happenTime <= endTime) {
-                    uniteDatasFilter.push(e)
-                    uniteDatasFilter.push(...e.in)
-                }
-
-                
-            });
-
-            outDatasFilter = outDatas.filter(e => {                     // 获取产出数据 -- 时间内         
-                return startTime <= e.happenTime && e.happenTime <= endTime
-            })
-
-            outDatasFilter.forEach(e => {                               // 获取投入数据--时间内
-                inDatas.filter(el => {
-                    if (e.productionID === el.productionID) {
-                        inDatasFilter.push(el)
-                    }
-                })
-            })
-
-
-            /* 所有投入汇总 */
-            let inDatasCopy = JSON.parse(JSON.stringify(inDatas))
-            inAllDatas = this.gatherDate(inAllDatas,inDatasCopy)
-
-
-            /* 时间内投入汇总 */
-            let inDatasCopyFilter = JSON.parse(JSON.stringify(inDatasFilter))
-            inAllDatasFilter = this.gatherDate(inAllDatasFilter,inDatasCopyFilter)
-
-            /* 如果箱码列内容为空，取消该列 */
-            if(outDatas.some((e)=> e.packetBarcode === '' || e.packetBarcode === null )){ 
-                this.outItems.columns = this.outItems.columns.filter(o => o.prop !== "packetBarcode");
-            }
-            /* 所有产出汇总 */
-            let outDatasCopy = JSON.parse(JSON.stringify(outDatas))
-            outAllDatas = this.gatherDate(outAllDatas,outDatasCopy)
-
-
-            /* 时间内产出汇总 */
-            let outDatasCopyFilter = JSON.parse(JSON.stringify(outDatasFilter))
-            outAllDatasFilter = this.gatherDate(outAllDatasFilter,outDatasCopyFilter)
-
-
-
-
-            this.uniteItems.data = uniteDatas                           // 关联明细
-            this.uniteItems.dataFilter = uniteDatasFilter               // 关联明细--时间内
-
-            this.outItems.data = outDatas                               // 产出明细
-            this.outItems.dataFilter = outDatasFilter                   // 产出明细--时间内
-
-            this.inItems.data = inDatas                                 // 投入明细
-            this.inItems.dataFilter = inDatasFilter                     // 投入明细--时间内
-
-
-            this.outAllItems.data = outAllDatas                         // 产出汇总
-            this.outAllItems.dataFilter = outAllDatasFilter             // 产出汇总--时间内
-            this.inAllItems.data = inAllDatas                           // 投入汇总
-            this.inAllItems.dataFilter = inAllDatasFilter               // 投入汇总--时间内
-        	
-        	this.setTbaleHeight()
-        },
+	
+			this.loading = false
+			
+			let startTime = this.condition.startTime
+			
+		    let endTime = this.condition.endTime
+		    
+		    // 所有产出数据
+			let aoOutData = oData.outList
+			
+			// 所有投入数据。
+			let aoInData = oData.inList
+			
+			// 投产中数据： 产出、退料、结转
+			let oMore = {
+				// 类型（destOpType）-显示的字段
+				// 产出
+				6: OUT_FIELD,
+				// 退料
+				8: RETURN_FIELD,
+				// 结转
+				7: CARRY_FIELD
+			}
+			
+			// 汇总显示的数据
+			let oGroup = {
+				// 产出汇总
+				"out": {
+					group: ["batchNo", "materialCode", "equipmentId", "moldCode"],
+					dis: ["batchNo", "materialName", "materialCode", "equipmentId", "equipmentName", "moldCode", "quantity", "qualifiedNum", "scrapNum", "unqualifiedNum"],
+					merge: ["quantity", "qualifiedNum", "scrapNum", "unqualifiedNum"]
+				},
+				// 投入汇总
+				"in": {
+					group: ["batchNo", "materialCode"],
+					// 包含退料等。。。。
+					dis: ["batchNo", "materialName", "materialCode", "quantity", OUT_FIELD, RETURN_FIELD, CARRY_FIELD],
+					// 包含退料结转
+					merge: ["quantity", OUT_FIELD, RETURN_FIELD, CARRY_FIELD]
+				}
+			}
+			
+			// 所有数据。
+			let oAll = {
+				// 投产
+				"unite": {
+					data: [],
+					dataFilter: []
+				},
+				// 有投未产
+				"inNotOut": {
+					data: [],
+					dataFilter: []
+				},
+				// 产出
+				"out": {
+					data: [],
+					dataFilter: []
+				},
+				// 投入
+				"in": {
+					data: [],
+					dataFilter: []
+				},
+				// 产出汇总
+				"outAll" : {
+					data: [],
+					dataFilter: []
+				},
+				// 投入汇总
+				"inAll": {
+					data: [],
+					dataFilter: []
+				}
+			}
+			
+			// 根据投入记录->找到其只投未产的数据  === 只投未产。
+			aoInData.forEach( o => {
+				
+				// 先获取改投入的
+				o.destinationInfoList.forEach( oNo => {
+					let sKey = oMore[oNo.destOpType]
+					
+					if(sKey) {
+						// 过滤掉不需显示的字段。
+						o[sKey] = oNo.srcDeductionQuantity || 0
+					}
+				})
+				
+				// 判断该数据是否有产出。-- 没有产出则将数据放入有投未产中
+				if(!(o.outputOpIdList && o.outputOpIdList.length)) {
+					// 将数据加入到有投未产中。
+					oAll["inNotOut"].data.push(o)
+				}
+			})
+			
+			// 根据产出数据->找到改产出对应的投入数据。 === 投产数据
+			aoOutData.forEach( o => {
+				
+				// 设置每条记录的合格书、报废数、不合格数
+				let sType = o.qualityType
+				
+				// 操作id值，对应投入记录中 
+				let	sOperId = o.operationId
+				
+				if (sType === 1) { 
+					// 合格数
+		            o.qualifiedNum = o.quantity || 0
+		        } else if (sType === 2) { 
+		        	// 报废数
+		            o.scrapNum = o.quantity || 0
+		        } else {       
+		        	// 不合格数
+		            o.unqualifiedNum = o.quantity || 0
+		        }
+				
+				// 获取该产出对应的投入信息。
+				let aIn = aoInData.filter( oIn => oIn.outputOpIdList.includes(sOperId))
+				
+				if(aIn.length) {
+					// 有投入数据--对应icon的显示
+//					o.hasIn = true
+					o.hasInLen = aIn.length
+					
+					// 添加投产数据中的产出数据
+					oAll["unite"].data.push(o)
+					
+					// 添加投产数据该产出记录对应的投入数据
+					oAll["unite"].data.push(...aIn)
+				}else {
+//					o.hasIn = false
+					o.hasInLen = 0
+					
+					// 添加投产数据中的产出数据
+					oAll["unite"].data.push(o)
+				}
+			})
+			
+			// 设置修改后的产出，投入数据。
+			oAll["in"].data = aoInData
+			oAll["out"].data = aoOutData
+			
+			// 获取投产、有投无产、产出、投入的根据时间过滤后的数据
+			for(let sParam in oAll) {
+				// 过滤掉了汇总的列。
+				if(oAll[sParam].data.length) {
+					oAll[sParam].dataFilter = oAll[sParam].data.filter( o => startTime <= o.happenTime && o.happenTime <= endTime )
+				}
+			}
+			
+			// 获取汇总的数据。
+			for(let sParam in oAll) {
+				
+				// 获取需汇总的处理。
+				let sP = sParam.substr(0, sParam.length-3)
+				
+				if(oAll[sP]) {
+					
+					oAll[sParam].data = this._sumData(oAll[sP].data, oGroup[sP].group, oGroup[sP].dis, oGroup[sP].merge)
+					oAll[sParam].dataFilter = this._sumData(oAll[sP].dataFilter, oGroup[sP].group, oGroup[sP].dis, oGroup[sP].merge)
+				}
+			}
+			
+			// 对于当数据为空时可以隐藏的列的处理。
+			
+			({
+				unite:{data:this.uniteItems.data, dataFilter: this.uniteItems.dataFilter},
+				inNotOut:{data:this.inNotOutItems.data, dataFilter: this.inNotOutItems.dataFilter},
+				out:{data:this.outItems.data, dataFilter: this.outItems.dataFilter},
+				in: {data:this.inItems.data, dataFilter: this.inItems.dataFilter},
+				outAll:{data:this.outAllItems.data, dataFilter: this.outAllItems.dataFilter},
+				inAll: {data:this.inAllItems.data, dataFilter: this.inAllItems.dataFilter}
+			} = oAll)
+			
+			this.setTbaleHeight()
+		},
         // 请求失败。
         requestFail(sErrorMessage) {
             this.loading = false;
@@ -644,13 +824,46 @@ export default {
             console.log(err)
             console.log("数据库查询出错。")
         },
+        /**
+		 * 获取汇总的数据
+		 * @param {Array} 汇总的数据。
+		 * @param {Array} 合并的字段-- 分类
+		 * @param {Array} 展示的数据
+		 * @param {Array} 需汇总的列。
+		 */
+		_sumData(aoList, aGroup, aDis, aMerge) {
+			
+			let oFlag = {}
+			
+			aoList && aoList.forEach( o => {
+				
+				// 需合并的参数值。
+				let sKey = ""
+				
+				aGroup.forEach( sGroup => sKey += o[sGroup] + "+")
+				
+				if(!oFlag[sKey]) {
+					// 设置展示的值。
+					oFlag[sKey] = {}
+					
+					aDis.forEach( sDis => oFlag[sKey][sDis] = (o[sDis] || "") )
+				}else {
+					// 存在，则汇总数据。
+					aMerge.forEach( sMerge => oFlag[sKey][sMerge] = Number(oFlag[sKey][sMerge] || 0) + Number(o[sMerge] || 0) )
+				}
+				
+			})
+			
+			// 返回数据。	
+			return window.Rt.utils.getObjectValues(oFlag);
+		},
         // 获取数据。
         fetchData() {
 
             this.loading = true;
             let oQuery = {}
             Object.keys(this.$route.query).forEach((el) => {
-                if (el === "doOutIdList") {
+                if (el === "operationIdList") {
                     oQuery[el] = this.$route.query[el]
                 }
                 if (el === "equipmentName" || el === "startTime" || el === "endTime") {
@@ -658,7 +871,7 @@ export default {
                 }
             })
             this.filters = this.getFilters()
-            this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
+            this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
         },
         /**
         * 格式化数据。
@@ -835,9 +1048,8 @@ export default {
         setTbaleHeight() {
         	if(this.$route.meta.title == 'product') {
 	            this.routerContent = document.querySelector(".router-content").offsetHeight
-	            this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-	            this.uniteItems.height = 2 * this.adjustHeight() + 70
-	           // console.log(this.adjustHeight())
+	            this.uniteItems.height = this.inNotOutItems.height = this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
+//	            this.uniteItems.height = 2 * this.adjustHeight() + 70
         	}
         },
         /* 设置title */
@@ -852,7 +1064,7 @@ export default {
         /* 点击产出 展开或收拢投入 */
         handleEdit(index, props) {
             let elArr = []
-            const num = props.row.in.length
+            const num = props.row.hasInLen //props.row.in.length
             const trs = document.querySelectorAll(".el-table__body-wrapper")[0].querySelectorAll("tr")
             const trsFix = document.querySelectorAll(".el-table__fixed-body-wrapper")[0].querySelectorAll("tr")
             //const tr = document.querySelectorAll(".el-table__row")

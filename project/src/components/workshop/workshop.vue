@@ -28,9 +28,11 @@
 				key: this.$route.params.key,    	//全屏标志
 				routerPath:{
 					10001:"newProcess", 				//工序
-					10002:"carryOver",					//结转	  完成	
-					8:"returnMaterial",					//退料	  完成
-					11:"adjustableShop",				//车间调整  完成
+					10002:"carryOver",					//结转	  
+					2:"carryOver",						//结转转入	  
+					7:"carryOver",						//结转转出	  	
+					8:"returnMaterial",					//退料	  
+					11:"adjustableShop",				//车间调整  
 					14:"reworkInbound",					//返工入站  暂无数据
 					15:"reworkOutbound"					//返工出站	暂无数据
 				},
@@ -70,16 +72,16 @@
 			}
 		},
         created () {
-            this.setRouteQuery();
+            this.setRouteQuery(0);
         },
         watch: {
-			"detailInfos": "setRouteQuery"
+			 "detailInfos": "setRouteQuery",
         },
         methods: {
 			// 根据获取的 op_type 默认路由跳转
-			setRouteQuery() {
+			setRouteQuery(num) {
+				//console.log(num)
 				let operationIdList = []
-				let traceInOutQueryDtoList = []
 				if(this.nodeType === 10002 || this.nodeType === 11){			//结转 || 车间调整
 					this.detailInfos.forEach(el => {
 						operationIdList.push(el.opId)
@@ -90,21 +92,25 @@
 							"opId": el.opId,
 							"opType": el.opType,							
 						}
-						traceInOutQueryDtoList.push(obj)
+						operationIdList.push(obj)
 					})
 				}
-				
 				this.$router.replace({ 
-					path: "workshop/"+this.routerPath[this.nodeType],
+					path:  "workshop/"+this.routerPath[this.nodeType],
 					query: {
-						"traceInOutQueryDtoList": traceInOutQueryDtoList,
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5),
 						"url": this.url
 					},									
 				})
-
-				this.routerName[this.routerPath[this.nodeType]] = true
+				/* 显示路由 */
+				for(let i in this.routerName){
+					if(i !== this.routerPath[this.nodeType]){
+						this.routerName[i] = false
+					}else{
+						this.routerName[i] = true
+					}
+				}
 			},
 			// 详情全屏按钮点击事件
             fullScreenClick(isTrue) { 
@@ -147,25 +153,30 @@
 			box-sizing: border-box;
 		}
 		
-		.router-content {
+		/deep/.router-content {
 			flex: 1 1;
 			overflow: auto;
-
-			.btn-restrain {
-				right: 10px;
-                z-index: 10;
+			.table-title {
+				display: flex;
+    			align-items: center;
 			}
-			
-			.table {
-	    	    .batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            .cell {
-		                font-weight: 600;
-		            } 
-		        }         
-	    	   
-	    	}    	
+			.innner-content {
+				.tableData {
+					display: flex;
+					margin-top: 0;
+					margin-bottom: -20px;
+				    flex-direction: row;
+    				justify-content: space-between;
+					.table-handle {
+						margin-right: 5px;
+						display: flex;
+						&>i {
+							margin: 7.5px;
+							cursor: pointer;
+						}
+					}
+				}
+			} 	
 		}
 	}
 </style>

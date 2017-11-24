@@ -3,6 +3,9 @@
     <div class="router-content">
         <div class="innner-content" >
             <div class="content-message tableData">
+				<span class='table-title'>
+					<span>物料编码：{{materialData.data[0].materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{materialData.data[0].materialName}}</span>
+				</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
@@ -41,19 +44,15 @@
                 materialData: {
 					filename: "库存调整",
                     columns: [{
+                        prop: "srcBarcode",
+                        name: "源条码"
+                    },{
                         prop: "destBarcode",
-                        name: "条码"
+                        name: "目标条码"
                     },{
                         prop: "batchNo",
                         name: "批次",
                         class: "batch"
-                    },{
-                        prop: "materialCode",
-                        name: "物料编码",
-                        width: "50px"
-                    },{
-                        prop: "materialName",
-                        name: "物料名称"
                     },{
                         prop: "srcWarehouse",
                         name: "仓库"

@@ -6,9 +6,9 @@
             <i class="icon icon-20 icon-restoreScreen" v-else @click="fullScreenClick(false)"  title="缩小"></i>
         </div>
         <div class="router-path">
-            <span class="path-item" v-if="true">条码绑定</span>
-            <span class="path-item" v-if="true">补料</span>
-            <span class="path-item" v-if="true">容器清空</span>
+            <span class="path-item" v-if="routerName['barcodeBind']">条码绑定</span>
+            <span class="path-item" v-if="routerName['supplementaryMaterial']">补料</span>
+            <span class="path-item" v-if="routerName['emptyContainer']">容器清空</span>
         </div> 
         <keep-alive>
 	        <router-view></router-view>  
@@ -30,12 +30,9 @@
 				},
 				url: HOST + "/api/v1/trace/operation-detail/barcode-management/by-id",
 				routerName: {
-					"newProcess":false,					//工序
-					"carryOver":false,					//结转
-					"returnMaterial":false,				//退料  
-					"adjustableShop":false,				//车间调整
-					"reworkInbound":false,				//返工入站
-					"reworkOutbound":false				//返工出站
+					"barcodeBind":false,				//条码绑定
+					"supplementaryMaterial":false,		//补料
+					"emptyContainer":false,				//容器清空  
 				}
             }
         },
@@ -72,7 +69,14 @@
 					},										
 				})
 
-				this.routerName[this.routerPath[this.nodeType]] = true
+				/* 显示路由 */
+				for(let i in this.routerName){
+					if(i !== this.routerPath[this.nodeType]){
+						this.routerName[i] = false
+					}else{
+						this.routerName[i] = true
+					}
+				}
 			},
 			// 详情全屏按钮点击事件
             fullScreenClick(isTrue) { 
@@ -115,25 +119,30 @@
 			box-sizing: border-box;
 		}
 		
-		.router-content {
+		/deep/.router-content {
 			flex: 1 1;
 			overflow: auto;
-
-			.btn-restrain {
-				right: 10px;
-                z-index: 10;
+			.table-title {
+				display: flex;
+    			align-items: center;
 			}
-			
-			.table {
-	    	    .batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            .cell {
-		                font-weight: 600;
-		            } 
-		        }         
-	    	   
-	    	}    	
+			.innner-content {
+				.tableData {
+					display: flex;
+					margin-top: 0;
+					margin-bottom: -20px;
+				    flex-direction: row;
+    				justify-content: space-between;
+					.table-handle {
+						margin-right: 5px;
+						display: flex;
+						&>i {
+							margin: 7.5px;
+							cursor: pointer;
+						}
+					}
+				}
+			} 	
 		}
 	}
 </style>

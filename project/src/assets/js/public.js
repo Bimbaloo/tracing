@@ -362,7 +362,7 @@ var getNodeIconAndTemp = function(sType) {
  * 		iconType: 	图标类型
  * @param {Object} oRowData
  */
-var getTreeData = function(oRowData) {
+var getTreeData = function(oRowData, sPageType) {
 	let aoData = parseTreeData(oRowData),
 		aoDiagramData = [],
 		aoDiagramLinkData = [];
@@ -640,7 +640,7 @@ var getTreeData = function(oRowData) {
 						}else {
 							oFlag["touru"].list.push(oType)
 						}
-					}else if(sKey == "6" && oType.remainQuantity > 0) {	// 产出
+					}else if(sPageType == "track" && sKey == "6" && oType.remainQuantity > 0) {	// 产出
 						// 滞留： 类型为产出且剩余数量大于0
 						if(!oFlag["zhiliu"]) {
 							oFlag["zhiliu"] = {

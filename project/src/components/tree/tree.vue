@@ -193,7 +193,7 @@
 																	{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																),
 																this.$(go.TextBlock,
-																	new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),		// 总数/滞留数
+																	new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),		// 总数/滞留数
 																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																)
 															)
@@ -245,7 +245,7 @@
 																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																),
 																this.$(go.TextBlock,
-																	new go.Binding("text", "",  o => o.quantity + "/" + o.remainQuantity),		// 总数/滞留数
+																	new go.Binding("text", "",  o => o.remainQuantity + "/" + o.quantity),		// 总数/滞留数
 																	{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR}
 																)
 															)
@@ -267,7 +267,7 @@
 								new go.Binding("text", "batchNo"), // 批次
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
 								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
@@ -278,7 +278,7 @@
 								new go.Binding("text", "batchNo"), // 批次
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "qualityTypeName"),	// 质量
@@ -292,7 +292,7 @@
 								new go.Binding("text", "materialName"), // 条码
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 数量
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 						)
 		    },
@@ -318,7 +318,7 @@
 													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
 												),
 												this.$(go.TextBlock,
-													new go.Binding("text", "", o => o.destAdjustQuantity + "/" + o.remainQuantity),	// 调整数/滞留数
+													new go.Binding("text", "", o => o.remainQuantity + "/" + o.destAdjustQuantity),	// 调整数/滞留数
 													{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
 												)
 											)
@@ -336,7 +336,7 @@
 									new go.Binding("text", "batchNo"), // 批次
 									{column: 0,  margin: 5, stroke: COMMENT_TEXTCOLOR }),
 								this.$(go.TextBlock,
-									new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity), // 总数/滞留数
+									new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity), // 总数/滞留数
 									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 								this.$(go.Panel, "Table",
 										{column: 2, defaultRowSeparatorStroke: TABLE_COLOR},
@@ -361,7 +361,7 @@
 								new go.Binding("text", "batchNo"), // 批次
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.quantity + "/" + o.remainQuantity),	// 总数/滞留数
+								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 总数/滞留数
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.destWarehouse + o.destWarehouseLocation),	// 仓库库位
@@ -825,8 +825,7 @@
 			},
 			// 树节点点击事件。
 			treeNodeClickHandle(e, node) {
-				
-				if(this.treeFullscreen) {
+				if(this.treeFullscreen && node.data.nodeType !== 10003 && node.data.nodeType !== 10004) {
 					this.restoreScreenClick();
 				}
 				
@@ -847,7 +846,7 @@
 						data: []
 					});
 				}
-				
+
 				// 点击节点信息展示。
 				let nodeType = node.data.nodeType  //被点击节点的 nodeType
 				if(nodeType === 101 || nodeType === 102 || nodeType === 103 || nodeType === 111 || nodeType === 112) {  // 仓库操作     
@@ -865,7 +864,7 @@
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}
 					})
-				}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10002) { 					// 车间操作     
+				}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10002 || nodeType === 2 || nodeType === 7) { 					// 车间操作     
 					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
 						nodeType: nodeType
 					})
@@ -895,22 +894,24 @@
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}										
 					})
-				}else if(nodeType === 10003 || nodeType === 10004) { 													// 物料  
-					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
-						nodeType: nodeType
-					})
-					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
-						detailInfos: node.data.detailInfos
-					})   
-					this.$router.replace({ 
-						path: "/stock",
-						query: {
-							"detailInfos": node.data.detailInfos,
-							"key": node.data.nodeType,
-							"_tag":  new Date().getTime().toString().substr(-5)
-						}										
-					})
-				}else if(nodeType === 1 || nodeType === 6 || nodeType === 10001) { 													// 物料  
+				}else if(nodeType === 10003 || nodeType === 10004) { 
+					console.log("物料节点不展示。")													// 物料  
+					// this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+					// 	nodeType: nodeType
+					// })
+					// this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+					// 	detailInfos: node.data.detailInfos
+					// })   
+					// this.$router.replace({ 
+					// 	path: "/stock",
+					// 	query: {
+					// 		"detailInfos": node.data.detailInfos,
+					// 		"key": node.data.nodeType,
+					// 		"_tag":  new Date().getTime().toString().substr(-5)
+					// 	}										
+					// })
+				}else if(nodeType === 1 || nodeType === 6 || nodeType === 10001) { 	
+					// 工序。
 					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
 						nodeType: nodeType
 					})
@@ -1145,7 +1146,7 @@
 			fitToCurrentKey() {
 				if(this.treeData.node) {
 					// 如果存在显示的key值，则定位到显示的数据，否则定位到第一个数据。
-					let oData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents == "0")[0]
+					let oData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents.includes("0") )[0]
 					let node = this.tree.findNodeForKey(oData.key);
 					if(node) {
 						this.tree.centerRect(node.actualBounds);

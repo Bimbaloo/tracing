@@ -207,7 +207,7 @@
 						data: oData		//fnP.parseTreeData(data)
 					});
 					// 格式化数据。
-					this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData();
+					this.treeData = fnP.getTreeData(this.rawData, "track");//this.parseTreeData();
 //					this.tableData = this.parseTableData();
 					this.catalogData = fnP.getCatalogData(this.rawData, "track"); //fnP.getTrackCatalogData(this.rawData)
 				}	
