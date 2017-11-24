@@ -4,7 +4,7 @@
         <div class="innner-content" >
             <div class="content-message tableData">
 				<span class='table-title'>
-					<span>物料编码：{{materialData.data[0].materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{materialData.data[0].materialName}}</span>
+					<span>物料编码：{{materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{materialName}}</span>
 				</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
@@ -12,7 +12,7 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-                <v-table :table-data="materialData" :loading="loading"  :resize="true"></v-table>
+                <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table>
             </div>
 
         </div>
@@ -38,7 +38,7 @@
                 styleObject: {
                     "min-width": "1000px"
                 },
-                loading: false,
+                loading: true,
                 error: "",
 
                 materialData: {
@@ -48,8 +48,7 @@
                         name: "条码"
                     },{
                         prop: "batchNo",
-                        name: "批次",
-                        class: "batch"
+                        name: "批次"
                     },{
                         prop: "destWarehouse",
                         name: "仓库"
@@ -76,8 +75,11 @@
             }
         },
         computed: {
-			rawData () {
-		    	return this.$store.state.rawData
+			materialCode () {
+		    	return this.$store.state.detailInfos[0].materialCode
+			},
+			materialName () {
+				return this.$store.state.detailInfos[0].materialName
 			},
 		    resizeY: function() {
             	return this.$store && this.$store.state.resizeY
@@ -134,6 +136,7 @@
 				let newData = []
 				newData = [].concat(oData.stockOperationDetailList)
 				this.materialData.data = newData
+				this.loading = false
             },
             // 请求失败。
             requestFail(sErrorMessage) {

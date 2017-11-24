@@ -12,7 +12,7 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-                <v-table :table-data="materialData" :loading="loading"  :resize="true"></v-table>
+                <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table>
             </div>
 
         </div>
@@ -38,7 +38,7 @@
                 styleObject: {
                     "min-width": "1000px"
                 },
-                loading: false,
+                loading: true,
                 error: "",
 
                 materialData: {
@@ -48,8 +48,7 @@
                         name: "条码"
                     },{
                         prop: "batchNo",
-                        name: "批次",
-                        class: "batch"
+                        name: "批次"
                     },{
                         prop: "srcWarehouse",
                         name: "仓库"
@@ -134,6 +133,7 @@
 				let newData = []
 				newData = [].concat(oData.stockOperationDetailList)
 				this.materialData.data = newData
+				this.loading = false
             },
             // 请求失败。
             requestFail(sErrorMessage) {

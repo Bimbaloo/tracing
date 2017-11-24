@@ -856,6 +856,7 @@
 					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
 						detailInfos: node.data.detailInfos
 					})
+					this.$store.commit('updateNum')
 					this.$router.replace({ 
 						path: "/warehouse", 
 						query: {
@@ -871,6 +872,8 @@
 					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
 						detailInfos: node.data.detailInfos
 					})
+					this.$store.commit('updateNum')
+
 					this.$router.replace({ 
 						path: "/workshop",
 						query: {
@@ -886,6 +889,7 @@
 					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
 						detailInfos: node.data.detailInfos
 					})
+					this.$store.commit('updateNum')
 					this.$router.replace({ 
 						path: "/barcodeManage",
 						query: {

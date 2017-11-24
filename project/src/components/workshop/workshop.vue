@@ -69,6 +69,9 @@
 				}else {									//投产
 					return this.urls[2]
 				}
+			},
+			clickNum() {
+				return this.$store.state.clickNum
 			}
 		},
         created () {
@@ -76,6 +79,9 @@
         },
         watch: {
 			 "detailInfos": "setRouteQuery",
+			 clickNum: function(){
+				 this.setRouteQuery()
+			 }
         },
         methods: {
 			// 根据获取的 op_type 默认路由跳转
@@ -96,7 +102,7 @@
 					})
 				}
 				this.$router.replace({ 
-					path:  "workshop/"+this.routerPath[this.nodeType],
+					path:  "/workshop/"+this.routerPath[this.nodeType],
 					query: {
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5),
