@@ -381,22 +381,6 @@ export default {
                 }, (err) =>{
                     console.log(err);
                 })
-
-                // this.$get(url2, dataId).then((res) => {
-                //     this.judgeLoaderHandler(res, () => {
-                //         let oData= res.data.data
-                //         oData.forEach(el=>{
-                //             let newData = {name:`${el.description}`,prop:`${el.description}`}
-                //             this.tableData.columns.push(newData)
-                //             this.$set(row, `${el.description}`, `${el.value}${el.varUnit}`)
-                //         })
-                //         this.expandedId.push(Id)
-                        
-                //     });
-                // })
-                // .catch((err) => {
-                //     console.log(err)
-                // })
             }
         },
         /* 根据刷选条件显示行 */

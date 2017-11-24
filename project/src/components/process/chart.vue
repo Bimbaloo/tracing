@@ -1,13 +1,13 @@
 <!--设备列表-->
 <template>
     <div class="router-content" id="router-echart">
-        <div class="innner-content">
-            <h2 class="content-title">
-            	工序&nbsp;—&nbsp;{{node.name}}
-            </h2>			
+        <div class="inner-content">
+            <!-- <h2 class="content-title">
+            	工序&nbsp;—&nbsp;{{processName}}
+            </h2>			 -->
 			<v-equipment v-if="bShowEq" 
 				:equipments-id="equipments"
-				:process="node.code"  
+				:process="processKey"  
 				:datetime="datetime">
 			</v-equipment>
 			<div v-else class="empty">{{empty}}</div>
@@ -37,8 +37,17 @@
 			rawData () {
 		    	return this.$store.state.rawData
 		    },
-			processKey () {
+			detailInfos () {
+				return this.$store.state.detailInfos
+			},
+			nodeType () {
 				return (this.$route.query && this.$route.query.key) || ''
+			},
+			processKey () {
+				return (this.$route.query && this.$route.query.code) || ''//key
+			},
+			processName () {
+				return (this.$route.query && this.$route.query.name) || ''
 			},
 			bShowEq() {
 				return this.equipments.length && this.equipments.some(o=>o.shiftStartTime && o.shiftEndTime)
@@ -110,19 +119,20 @@
 				
 				this.equipments = [];
 				
-				let aoData = this.rawData,
-					oNode = null;
-				// 提取选中的工序节点数据。
-				let aoFilter = this.rawData.filter(o => o.key == this.processKey);
-				if(aoFilter.length) {
-					oNode = aoFilter[0];
-				}
+				// let aoData = this.rawData,
+				// 	oNode = null;
+				// // 提取选中的工序节点数据。
+				// let aoFilter = this.rawData.filter(o => o.key == this.processKey);
+				// if(aoFilter.length) {
+				// 	oNode = aoFilter[0];
+				// }
 				
-				this.node = oNode || {};	
+				// this.node = oNode || {};	
 
 				let oEquipments = {}; 	
 				
-				this.node.processInfoList && this.node.processInfoList.forEach(o => {
+				// this.node.processInfoList && this.node.processInfoList.forEach(o => {
+				this.detailInfos.forEach(o => {
 					if(!oEquipments[o.equipmentId]) {
 						oEquipments[o.equipmentId] = [];
 					}
@@ -171,5 +181,9 @@
 <style lang="less"> 
 	#router-echart	{
 		overflow: hidden;
+
+		.inner-content {
+			height: 100%;
+		}
 	}
 </style>

@@ -1,6 +1,6 @@
 <template>
     <div class="router-content">
-        <div class="innner-content" :style="styleObject">
+        <div class="inner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
                     <span v-for="(filter,index) in filters" :key="index">
@@ -8,46 +8,113 @@
                     </span>
                 </div>
             </div>
-            <h2 class="content-title" id='content-title'>
+            <!-- <h2 class="content-title" id='content-title'>
                 <span>工艺参数</span>
-            </h2>
+            </h2> -->
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
-                <div v-if="error" class="error">
+                <div v-if="!barcodeTableData.show && !chartShow" class="error">
                     {{ empty }}
                 </div>
-                <el-tabs v-else v-loading="loading" element-loading-text="拼命加载中">
-                    <el-tab-pane :label="tableData.filename" v-for="(tableData,index) in tableDatas">
-                        <el-switch
-                            v-model="tableData.value"
-                            on-color="#42af8f"
-                            off-color="#42af8f"
-                            on-text="图表"
-                            off-text="表格"
-                            on-value="表格"
-                            off-value="图形"
-                            v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename">
-                        </el-switch>
-                        <div class="content-echarts" v-for="(option,index) in options" v-if="option.series[0].name === tableData.filename" v-show="tableData.value === '图形'">
-                            <div class="charts" :id="`charts`+index"></div>
+                <el-tabs v-else v-model="activeName" @tab-click="tabChange">
+                    <el-tab-pane label="条码表" name="table" v-if="barcodeTableData.show" class="table">
+                        <div class="barcode-input">
+                            <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
+                                <el-form-item label="条码：" > 
+                                    <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
+                                </el-form-item>
+                            </el-form>
+                            <span class='table-handle'>
+                                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(barcodeTableData, $event)"></i>
+                                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('barcodeTable', $event)"></i>
+                            </span>
                         </div>
-                        <div class="content-tables" v-show="tableData.value === '表格'">
-                            <h2 class="content-title tableData">
-                                <span class='table-title'>
-                                    <span>检验参数：{{tableData.varStdId}}</span>
-                                    <span>单位：{{tableData.unit}}</span>
-                                </span>
-                                <span class='table-handle'>
-                                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(index, $event)"></i>
-                                </span>
-                            </h2>
-                            <div class="content-table" ref="tableDataindex">
-                                <v-table :table-data="tableData" :heights="tableHeight" :loading="loading" :resize="tdResize"></v-table>
-                            </div>
+                        <div class="content-table" ref="barcodeTable">
+                            <el-table 
+                            :data="datas" 
+                            stripe 
+                            class="table" 
+                            :row-key="barcodeTableData.data.barcode" 
+                            v-loading="barcodeTableData.loading" 
+                            element-loading-text="拼命加载中" 
+                            style="width: 100%" 
+                            ref="multipleTable" 
+                            @expand="expandRow"> 
+                            <!--:height="barcodeTableData.height"-->
+                                <el-table-column 
+                                v-if="!!column.show" 
+                                v-for="column in columns" 
+                                align="center" 
+                                :type="column.type" 
+                                :prop="column.prop" 
+                                :label="column.name" 
+                                :key="column.prop" 
+                                :class-name="column.class" 
+                                :width="column.width">
+                                    <template scope="props">
+                                        <el-form 
+                                        label-position="left" 
+                                         
+                                        class="demo-table-expand expand-form" 
+                                        v-if="column.type === 'expand'">                             
+                                            <div v-if="props.row.list.length">
+                                                <el-form-item                  
+                                                :label="`${prop.description}${prop.varUnit}`" 
+                                                v-for="(prop,index) in props.row.list" 
+                                                :key="prop.varStdId">
+                                                    <span v-for="(item,index) in prop.params" :key="index">&nbsp;{{ item.value}}({{item.pickTime}})&nbsp;</span>
+                                                </el-form-item>
+                                            </div>                                            
+                                            <div v-else>{{detailTip}}</div>
+                                        </el-form>
+                                        <div v-else :class="[ 'cell-content']">
+                                            {{ props.row[column.prop] }}
+                                        </div>
+                                    </template>
+                                </el-table-column>
+                            </el-table>
                         </div>
                     </el-tab-pane>
+                    <el-tab-pane label="曲线图" name="chart" v-if="chartShow" class="chart">
+                        <el-tabs v-loading="loading">
+                            <el-tab-pane :label="chartData.filename" v-for="(chartData,index) in tableDatas" :key="index">
+                                <el-switch
+                                    v-model="chartData.value"
+                                    on-color="#42af8f"
+                                    off-color="#42af8f"
+                                    on-text="图表"
+                                    off-text="表格"
+                                    on-value="表格"
+                                    off-value="图形"
+                                    v-for="(option,index) in options" 
+                                    v-if="option.series[0].name === chartData.filename"
+                                    :key="index">
+                                </el-switch>
+                                <div class="content-echarts" 
+                                v-for="(option,index) in options" 
+                                :key="index"
+                                v-if="option.series[0].name === chartData.filename" 
+                                v-show="chartData.value === '图形'">
+                                    <div class="charts" :id="`charts`+index"></div>
+                                </div>
+                                <div class="content-tables" v-show="chartData.value === '表格'">
+                                    <h2 class="content-title tableData">
+                                        <span class='table-title'>
+                                            <span>检验参数：{{chartData.varStdId}}</span>
+                                            <span>单位：{{chartData.unit}}</span>
+                                        </span>
+                                        <span class='table-handle'>
+                                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(chartData, $event)"></i>
+                                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(index, $event)"></i>
+                                        </span>
+                                    </h2>
+                                    <div class="content-table" ref="tableDataindex">
+                                        <v-table :table-data="chartData" :heights="tableHeight" :resize="tdResize"></v-table>
+                                    </div>
+                                </div>
+                            </el-tab-pane>
+                        </el-tabs>             
+                    </el-tab-pane>
                 </el-tabs>
-                
             </div>
 
         </div>
@@ -62,9 +129,15 @@ import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
-const url = HOST + "/api/v1/processparameter/by-equipment-time";
+// const url = HOST + "/api/v1/processparameter/by-equipment-time";
 //const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
-//const url = "static/echarts.json"
+const url = "static/echarts.json"
+// 条码表接口
+const BARCODE_TABLE_DATA = HOST + "/api/v1/processparameter/barcode-list"
+// 曲线图接口
+const CHART_DATA = HOST + "/api/v1/processparameter/by-equipment-time"
+// 条码详情接口
+const BARCODE_DETAIL_DATA = HOST + "/api/v1/processparameter/by-equipment-time-barcode"
 
 export default {
     components: {
@@ -72,9 +145,15 @@ export default {
     },
     data() {
         return {
+            // 条码筛选。
+            barcode: '',
+            // 条码详情无数据提示。
+            detailTip: '',
+            activeName: 'table',
             excel: true,
             print: true,
             loading: false,
+            chartShow: true,
             sErrorMessage: "",
             empty: "暂无数据。",
             error: false,
@@ -82,7 +161,8 @@ export default {
                 //  "min-width": "2000px"
             },
             tdResize: true, //是否允许拖动table大小
-            condition: {},   // 显示的查询条件    
+            condition: {},   // 显示的查询条件   
+            oQuery: {}, // 查询条件。 
             filters: {},
             dataName: [      // 条件对应中文名
                 {
@@ -104,12 +184,45 @@ export default {
             routerContent: 0,
             flexbase: 200,
             tableDatas: [],
-            tableHeight: 400
+            chartFetched: false,
+            tableHeight: 400,
+            /* 条码表 */
+            barcodeTableData: {
+                loading: false,
+                show: true,
+                filename: '条码表',
+                columns: [{
+                    type: "expand",
+                    width: "100",
+                    show:true               //是否在表头显示
+                }, {
+                    name: "条码",
+                    prop: "barcode",
+                    show:true
+                }, {
+                    name: "开始时间",
+                    prop: "minPickTime",
+                    show:true
+                }, {
+                    name: "结束时间",
+                    prop: "maxPickTime",
+                    show:true
+                }, {
+                    name: "记录数",
+                    prop: "total",
+                    show:true
+                }],
+                data: [],
+                height: 400
+            },
+            ruleForm:{
+                input: ""
+            },
         }
 
     },
     created() {
-        this.fetchData();
+        this.fetchData();    
     },
     computed: {
 
@@ -124,7 +237,21 @@ export default {
         },
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
-        }
+        },
+
+        /* 列信息 */
+        columns: function() {
+            return this.barcodeTableData.columns 
+        },
+        /* 显示的行信息 */
+        datas: function() {
+            if(this.ruleForm.input === ""){
+                return this.barcodeTableData.data 
+            }else {
+                return this.updateRow(this.ruleForm.input)
+            }
+            
+        }        
     },
     mounted() {
         this.addEvent(); //监听resize变化 触发 echarts.resize()
@@ -136,7 +263,7 @@ export default {
     watch: {
         // 如果路由有变化，会再次执行该方法
         '$route': function(to, from) {
-        	// 当是质检时，更新数据
+        	// 当是工艺参数时，更新数据
         	if(to.meta.title == 'parameter') {
         		this.fetchData();
         	}
@@ -158,6 +285,102 @@ export default {
         }
     },
     methods: {
+        // 获取数据。
+        fetchData() {
+            Object.keys(this.$route.query).forEach((el) => {
+                if (el === "equipmentId" || el === "startTime" || el === "endTime") {//equipmentIdList//equipmentList
+                    this.oQuery[el] = this.$route.query[el]
+                }
+                if (el === "equipmentName" || el === "startTime" || el === "endTime") {
+                    this.condition[el] = this.$route.query[el]
+                }
+            })
+            this.filters = this.getFilters()
+
+            /* 测试数据 */
+            this.oQuery = {
+                "equipmentId": "216",
+                "startTime": "2017-07-01 02:00:00",
+                "endTime": "2017-07-01 04:00:00"
+            }
+
+            if(this.activeName === "table") {
+                // 条码表。
+                this.fetchBarcodeTableData();
+            }else {
+                // 获取曲线图数据。
+                this.fetchChartData();
+            }  
+        },
+        // 获取曲线图数据。
+        fetchChartData() {
+            this.loading = true
+            this.chartFetched = true
+            /* 设置显示信息和查询条件 */
+
+            this.$register.sendRequest(this.$store, 
+                                        this.$ajax, 
+                                        CHART_DATA, 
+                                        "get", 
+                                        this.oQuery, 
+                                        this.requestSucess, 
+                                        this.requestFail, 
+                                        this.requestError)
+        },
+        // 获取条码表数据。
+        fetchBarcodeTableData() {
+            this.barcodeTableData.loading = true
+            this.detailTip = ''
+            this.$register.sendRequest(this.$store, 
+                                        this.$ajax, 
+                                        BARCODE_TABLE_DATA, 
+                                        "get", 
+                                        this.oQuery, 
+                                        this.requestBarcodeDataSucess, 
+                                        this.requestBarcodeDataFail, 
+                                        this.requestBarcodeDataError)
+
+        },
+        // 获取条码数据成功。
+        requestBarcodeDataSucess(aoData) {
+            this.barcodeTableData.loading = false
+            if(aoData.length) {
+                // 若有数据。
+                this.barcodeTableData.show = true
+                this.barcodeTableData.data = aoData.map(o => {
+                    o.list = []
+                    // 是否已请求详情数据。
+                    o.fetched = false
+                    return o
+                })
+            }else {
+                // 若无数据，影藏tab。
+                this.barcodeTableData.show = false
+                // 激活曲线图。
+                this.activeName = "chart"
+                this.fetchChartData()
+
+                this.detailTip = '暂无数据。'
+            }
+        },
+        // 获取条码数据失败。
+        requestBarcodeDataFail() {
+            this.barcodeTableData.loading = false
+            this.barcodeTableData.show = false
+            this.detailTip = '暂无数据。'
+            // 激活曲线图。
+            this.activeName = "chart"
+            this.fetchChartData()
+        },
+        // 获取条码数据错误。
+        requestBarcodeDataError() {
+            this.barcodeTableData.loading = false
+            this.barcodeTableData.show = false
+            this.detailTip = '暂无数据。'
+            // 激活曲线图。
+            this.activeName = "chart"
+            this.fetchChartData()
+        },
     	getFilters() {
             let filters = this.condition
             for (let i in filters) {
@@ -181,8 +404,10 @@ export default {
         },
         // 请求成功。
         requestSucess(oData) {
+            debugger
             if (!oData.length) {  //如果查询结果为空
                 this.error = true
+                this.chartShow = false
             } else {
                 this.error = false
             }
@@ -207,7 +432,7 @@ export default {
                let value =  optionArr.some(el=>{
                     return el.series[0].name === e.filename
                 })
-                //debugger
+               
                 if(!value) {
                     e.value = "表格"
                 }
@@ -216,7 +441,7 @@ export default {
             this.options = optionArr         // 将处理后的 option 放入 options 中
             this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
             this.$nextTick(() => {
-                let tabPanes = document.querySelectorAll(".el-tab-pane")
+                let tabPanes = document.querySelectorAll(".chart .el-tab-pane")
                 tabPanes.forEach(el=>el.style.display = "")
                 this.options.forEach((el, index) => {
                     this.initEcharts(el, index)
@@ -233,6 +458,7 @@ export default {
         requestFail(sErrorMessage) {
             this.loading = false;
             this.error = true;
+            this.chartShow = false
             // 提示信息。
             console.log(sErrorMessage);
         },
@@ -241,31 +467,70 @@ export default {
             this.loading = false;
             this.styleObject.minWidth = 0;
             this.error = true;
+            this.chartShow = false
             console.log("数据库查询出错。")
         },
-        // 获取数据。
-        fetchData() {
-
-            this.loading = true;
-            /* 设置显示信息和查询条件 */
-            let oQuery = {}
-            Object.keys(this.$route.query).forEach((el) => {
-                if (el === "equipmentId" || el === "startTime" || el === "endTime") {//equipmentIdList//equipmentList
-                    oQuery[el] = this.$route.query[el]
+        // 选中修改。
+        tabChange(oTab) {
+            if(oTab.name == "chart") {
+                // 若为曲线图。
+                if(!this.chartFetched) {
+                    // 若未获取数据。
+                    this.fetchChartData()
                 }
-                if (el === "equipmentName" || el === "startTime" || el === "endTime") {
-                    this.condition[el] = this.$route.query[el]
-                }
-            })
-            this.filters = this.getFilters()
-            /* 测试数据 */
-            // oQuery = {
-            //     "equipmentId": "25",
-            //     "startTime": "2017-08-11 01:27:37",
-            //     "endTime": "2017-08-11 01:35:37"
-            // }
-            this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
+            }
+        },
+        /* 根据刷选条件显示行 */
+        updateRow(value) {
+            let odata;
+            if(value !== ""){
+                let reg =new RegExp("\\w*" + value + "\\w*");
+                odata = this.barcodeTableData.data.filter((el)=>{
+                   return reg.test(el.barcode) === true
+                })
+            }else{
+                odata = this.barcodeTableData.data
+            }
+            return odata
+        },
+        // 获取条码对应的详情数据。
+        expandRow(row, expanded) {
+            if(expanded) {
+                // 若为展开。
+                let rowData = this.barcodeTableData.data.filter(o => o.barcode === row.barcode)[0]
 
+                if(!rowData.fetched) {
+                    // 若为第一次打开，获取详情数据。
+                    rowData.fetched = true
+                    this.$register.sendRequest(this.$store, 
+                            this.$ajax, 
+                            BARCODE_DETAIL_DATA, 
+                            "get", 
+                            Object.assign({barcode: row.barcode}, this.oQuery), 
+                            (aoData) => {  
+                                
+                                aoData.forEach(o => {
+                                    let oFilter = rowData.list.filter(item => item.varStdId === o.varStdId)[0]
+                                    if(oFilter) {
+                                        oFilter.params.push({
+                                            pickTime: new Date(o.pickTime).Format("hh:mm:ss"),
+                                            value: o.value
+                                        })
+                                    }else {
+                                        rowData.list.push({
+                                            varStdId: o.varStdId,
+                                            description: o.description,
+                                            varUnit: o.varUnit,
+                                            params: [{
+                                                pickTime: new Date(o.pickTime).Format("hh:mm:ss"),
+                                                value: o.value
+                                            }]
+                                        })
+                                    }
+                                })
+                            })
+                }
+            }
         },
         /* 获取高度函数 */
         adjustHeight() {
@@ -305,12 +570,17 @@ export default {
         },
         /* 处理每个tableData */
         setTableData(data, index) {
+            debugger
             let tableData = {
                 filename: "名称",
                 unit: "",
                 description: '',
                 varStdId: '',
                 columns: [{
+                    name: "条码",
+                    prop: "barcode",
+                    width: ""
+                }, {
                     name: "检测值",
                     prop: "value",
                     width: ""
@@ -330,9 +600,10 @@ export default {
                 let arr = {}
                 arr.value = el.value
                 arr.pickTime = el.pickTime
+                arr.barcode = el.barcode || ''
                 return arr
-            }
-            )
+            })
+            debugger
             return tableData
         },
         /* 处理每个option */
@@ -554,7 +825,7 @@ export default {
         /* 当窗口大小变化，自适应大小 */
         updateEcharts() {
 
-            let tabPanes = document.querySelectorAll(".el-tab-pane")
+            let tabPanes = document.querySelectorAll(".chart .el-tab-pane")
             let index = 0   //记录当前tab页
             tabPanes.forEach((el,i)=>{      // 所有显示
                 if( el.style.display !== "none" ){
@@ -667,29 +938,53 @@ export default {
     }
 }
 .contentBox {
-    .el-tabs {
-        .el-tabs__header {
-            border-bottom-color: #ccc;
-            .el-tabs__nav-wrap {
-                .el-tabs__nav-scroll {
-                    .el-tabs__nav {
-                        .el-tabs__item {
-                            color: #666;
-                            &:hover {
-                                color: #333;
+    &>.el-tabs {
+        &>.el-tabs__header {
+            border-bottom: none;
+            margin: 0;
+
+            .el-tabs__item {
+                background-color: #fff;
+                border: 2px solid #42AF8F;
+                height: 30px;
+                line-height: 30px;
+
+                &.is-active {
+                    background-color: #42AF8F;
+                    color: #fff;
+                }
+            }
+            .el-tabs__active-bar {
+                display: none;
+            }
+        }
+    }
+    .chart {
+        .el-tabs {
+            .el-tabs__header {
+                border-bottom-color: #ccc;
+                .el-tabs__nav-wrap {
+                    .el-tabs__nav-scroll {
+                        .el-tabs__nav {
+                            .el-tabs__item {
+                                color: #666;
+                                &:hover {
+                                    color: #333;
+                                }
                             }
-                        }
-                        .is-active {
-                            color: #42AF8F
+                            .is-active {
+                                color: #42AF8F
+                            }
                         }
                     }
                 }
             }
-        }
-        .el-tabs__content {
-            overflow: auto;
+            .el-tabs__content {
+                overflow: auto;
+            }
         }
     }
+
 }
 .el-switch__label {
     span {
@@ -705,19 +1000,45 @@ export default {
     min-height: 400px
 }
 
-.innner-content {
+.inner-content {
     display: flex;
     flex-direction: column;
+    height: 100%;
+
     .content-title {
         margin-top: 0
     }
     .contentBox {
         display: flex;
+        flex: 1 1;
         flex-direction: column;
+
         .el-tabs {
             display: flex;
             flex: 1;
             flex-direction: column;
+        }
+
+        .barcode-input {
+            margin-top: 10px;
+            .el-form {
+                display: inline-block;
+
+                .el-form-item {
+                    margin-bottom: 0;
+                }
+                .el-input {
+                    width: 300px;
+                }
+            }
+            span {
+                float: right;
+                display: inline-block;
+            }
+        }
+
+        .content-table {
+            margin: 10px 0;
         }
     }
     .content-tables {
@@ -739,6 +1060,14 @@ export default {
                     }
                 }
             }
+        }
+    }
+}
+
+.table {
+    .expand-form {
+        .el-form-item {
+            margin: 5px 10px;
         }
     }
 }

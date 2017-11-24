@@ -55,7 +55,7 @@ const Storage = r => require.ensure([], () => r(require('components/material/sto
 const Batch = r => require.ensure([], () => r(require('components/stock/batch.vue')), 'group-detail')
 const Suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-detail')
 
-const Process = r => require.ensure([], () => r(require('components/process/stock.vue')), 'group-detail')
+const Process = r => require.ensure([], () => r(require('components/process/operation.vue')), 'group-detail')//'components/process/stock.vue'
 const List = r => require.ensure([], () => r(require('components/process/list.vue')), 'group-detail')
 const Chart = r => require.ensure([], () => r(require('components/process/chart.vue')), 'group-detail')
 const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-detail')
@@ -200,74 +200,111 @@ const routes = [
     path: '/process', 
     component: Process,
     children: [{
-      path: '',
-      component: Chart,//List
+      path: 'chart',
+      // component: Chart,
+      components: {
+        // product: Product,
+        equipment: Chart
+      },
       meta: {
       	title: 'chart'
       }
     },{
       path: 'detail',
-      component: Detail,
+      // component: Detail,
+      components: {
+        equipment: Detail
+      },
       meta: {
       	title: 'detail'
       }
     },{
       path: 'product',
-      component: Product,
+      // component: Product,
+      components: {
+        equipment: Product
+      },
       meta: {
       	title: 'product'
       }
     },{//质检
       path: 'qtReport',
-      component: QtReport,
+      // component: QtReport,
+      components: {
+        equipment: QtReport
+      },
       meta: {
       	title: 'qtReport'
       }
     },{//送检
       path: 'qcReport',
-      component: QcReport,
+      // component: QcReport,
+      components: {
+        equipment: QcReport
+      },
       meta: {
       	title: 'qcReport'
       }
     },{//fgb
       path: 'fgbReport',
-      component: FgbReport,
+      // component: FgbReport,
+      components: {
+        equipment: FgbReport
+      },
       meta: {
       	title:'fgbReport'
       }
     },{//工具
       path: 'tool',
-      component: Tool,
+      // component: Tool,
+      components: {
+        equipment: Tool
+      },
       meta: {
       	title: 'tool'
       }
     },{//事件
       path: 'event',
-      component: Event,
+      // component: Event,
+      components: {
+        equipment: Event
+      },
       meta: {
       	title: 'event'
       }
     },{//维修记录
       path: 'repair',
-      component: Repair,
+      // component: Repair,
+      components: {
+        equipment: Repair
+      },
       meta:{
       	title: 'repair'
       }
     },{//点检记录
       path: 'spotReport',
-      component: SpotReport,
+      // component: SpotReport,
+      components: {
+        equipment: SpotReport
+      },
       meta: {
       	title: 'spotReport'
       }
     },{//工艺参数
       path: 'parameter',
-      component: Parameter,
+      // component: Parameter,
+      components: {
+        equipment: Parameter
+      },
       meta: {
       	title: 'parameter'
       }
     },{//遏制
       path: 'restrain',
-      component: Suspicious,
+      // component: Suspicious,
+      components: {
+        equipment: Suspicious
+      },
       meta: {
       	title: 'restrain'
       }

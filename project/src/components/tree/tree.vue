@@ -825,6 +825,7 @@
 			},
 			// 树节点点击事件。
 			treeNodeClickHandle(e, node) {
+				
 				if(this.treeFullscreen) {
 					this.restoreScreenClick();
 				}
@@ -864,7 +865,7 @@
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}
 					})
-				}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10001 || nodeType === 10002) { 					// 车间操作     
+				}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10002) { 					// 车间操作     
 					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
 						nodeType: nodeType
 					})
@@ -906,6 +907,24 @@
 						query: {
 							"detailInfos": node.data.detailInfos,
 							"key": node.data.nodeType,
+							"_tag":  new Date().getTime().toString().substr(-5)
+						}										
+					})
+				}else if(nodeType === 1 || nodeType === 6 || nodeType === 10001) { 													// 物料  
+					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+						nodeType: nodeType
+					})
+					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+						detailInfos: node.data.detailInfos
+					}) 
+
+					this.$router.replace({ 
+						path: "/process",
+						query: {
+							"detailInfos": node.data.detailInfos,
+							"key": node.data.nodeType,
+							"code": node.data.code,
+							// "name": node.data.name,
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}										
 					})

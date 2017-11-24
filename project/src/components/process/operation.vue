@@ -5,35 +5,49 @@
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
         </div>
-        <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
-        </div>
-        <div class="router-path">
-            <router-link 
-                class="path-item" 
-                v-for="(oRoute,index) in aoRoute" 
-                :key="index" 
-                :to="{path: oRoute.path, query: oRoute.query}" 
-                replace><span v-if="index">></span>{{oRoute.name}}</router-link>
-        </div>
-        <keep-alive>
-	        <router-view></router-view>  
-        </keep-alive>
+        <el-tabs v-model="activeName" @tab-click="tabChange">
+            <el-tab-pane label="投产表" name="product">		
+                <v-product></v-product>           
+            </el-tab-pane>
+            <el-tab-pane label="设备分析" name="equipment">
+                <div class="path-btn">
+                    <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
+                </div>
+                <div class="router-path">
+                    <router-link 
+                        class="path-item" 
+                        v-for="(oRoute,index) in aoRoute" 
+                        :key="index" 
+                        :to="{path: oRoute.path, query: oRoute.query}" 
+                        replace><span v-if="index">></span>{{oRoute.name}}</router-link>
+                </div>
+                <keep-alive>
+                    <router-view name="equipment"></router-view>  
+                </keep-alive>
+            </el-tab-pane>
+        </el-tabs>        
+
     </div>
 </template>
 
 <script>
+    import product from "components/process/product.vue"
 
     export default {
+        components: {
+            "v-product": product
+        },
         data () {
             return { 
+                // 默认展示的tab。
+                activeName: "product",
                 // 是否为遏制页面。
                 bRestrain: location.pathname.indexOf("restrain") > -1,
                 // 右下详情内容区域全屏标识。
                 key: this.$route.params.key,
                 oQuery: {},
                 operations: {
-                    "process":"设备分析",
+                    "chart":"时间轴",
                     "product":"投产表",
                     "qtReport":"质检",
                     "qcReport":"送检",
@@ -63,13 +77,35 @@
         watch: {
         },
         methods: {
+            // tab切换。
+            tabChange(oTab) {
+                if(oTab.name === "equipment") {
+                    // 若为设备分析。
+                    if(!this.$route.meta.title) {
+                        // 若未引入图形页面。
+                        this.$router.replace({ 
+                            path: "/process/chart",
+                            query: {
+                                "detailInfos": this.$route.query.detailInfos,
+                                "key": this.$route.query.key,
+                                "code": this.$route.query.code,
+                                "_tag":  this.$route.query._tag
+                            }									
+                        }) 
+                    }                 
+                }
+            },
             // 初始化路由设置。
-            initRoute() {
-        
+            initRoute() {             
                 let sRoute = this.$route.path,
                     aPath = sRoute.split("/"),
                     sType = aPath[aPath.length -1]
                 
+                if(sType === "process") {
+                    sType = "chart"
+                    sRoute = "/process/chart"
+                }
+
                 this.aoRoute = []
                 this.oQuery = {}
                 
@@ -96,7 +132,7 @@
             },
             // 设置路由。
             setRouteQuery(from, to) {
-                
+                debugger
                 if(from.fullPath === to.fullPath) {
                     // 已跳转成功。
                     return
@@ -107,11 +143,14 @@
                     aToPath = sToRoute.split("/"),
                     sFromType = aFromPath[aFromPath.length -1],
                     sToType = aToPath[aToPath.length -1]
-                    
+                
+                if(sFromRoute === "/process") {
+                    return
+                }
                 // 保存查询条件。
                 this.oQuery[sToType] = to.query//this.$route.query
                 
-                if(sToType === "process" && to.query.key && !to.query.startTime) {
+                if(sToType === "chart" && to.query.key && !to.query.startTime) {
                     // 树节点跳转。
                     this.oQuery = {}
                     this.oQuery[sToType] = to.query
@@ -122,7 +161,7 @@
                         path: sToRoute,
                         query: this.oQuery[sToType]
                     })                  
-                }else if(sFromType === "process" && sToType !== "process") {
+                }else if(sFromType === "chart" && sToType !== "chart") {
                     // 从设备分析跳转到其他页面。
                     // 添加开始时间，结束时间。因为可以跳转到设备分析的时候，开始时间结束时间有修改。
                     Object.assign(this.oQuery[sFromType], {
@@ -141,7 +180,7 @@
                         query: this.oQuery[sToType]
                     })
 
-                }else if(sToType === "process") {
+                }else if(sToType === "chart") {
                     // 从其他页面跳回设备分析。
                     let oRoute = this.aoRoute.shift()
                     this.aoRoute = []
@@ -290,18 +329,21 @@
         
         .path-btn {
         	position: absolute;
-            top: 10px;
+            top: 0px;
             right: 50px;
             z-index: 10;
         }
 
 		.router-path {
-			flex: 0 50px;
-			height: 50px;
-			line-height: 50px;
-			border-bottom: 1px solid #ccc;
-			font-size: 16px;
-			box-sizing: border-box;
+			flex: 0 16px;
+			height: 16px;
+			line-height: 16px;
+            border-bottom: none;
+            border-left: 4px solid #42af8f;
+			font-size: 14px;
+            box-sizing: border-box;
+            padding: 0 5px;
+            margin-bottom: 10px;
 		}
 		
 		.router-content {
@@ -326,4 +368,24 @@
 	    	}    	
 		}
 	}
+</style>
+
+<style lang="less">
+    .material-stock {
+        &>.el-tabs {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+
+            &>.el-tabs__content {
+                flex: 1 1;
+
+                &>.el-tab-pane {
+                    height: 100%;
+                    display: flex;
+                    flex-direction: column;
+                }
+            }
+        }
+    }
 </style>

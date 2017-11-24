@@ -938,13 +938,14 @@
             // 设置图形高度。
             setChartHeight () {
                 
-                let jContent = $(".router-content"),
-                    jTitle = jContent.find(".content-title"),
+                let jContent = $("#router-echart"),
+                    // jTitle = jContent.find(".content-title"),(jTitle.outerHeight(true)||0)
                     jSetting = jContent.find(".setting"),
-                    jButtons = jContent.find(".buttons");
+                    jButtons = jContent.find(".buttons"),
+                    jEquipments = $("#equipments")
                     
-                this.panelHeight = jContent.height() - (jTitle.outerHeight(true)||0) - (jSetting.outerHeight(true)||0) - (jButtons.outerHeight(true)||0)//CHART_MARGIN_BOTTOM;
-                $("#equipments").height(this.panelHeight);
+                this.panelHeight = jContent.height() -  (jSetting.outerHeight(true)||0) - (jButtons.outerHeight(true)||0)//CHART_MARGIN_BOTTOM;
+                $("#equipments").height(this.panelHeight || 100);
             }, 
             // 获取当前数据列表。
             getCurrentDataList(nTime) {
@@ -2401,10 +2402,11 @@
     	.content-list {
 			// padding-top: 30px;
             position: relative;
-            
-            // .analysis {
-            //     position: relative;
-            // }
+            height: 100%;
+            .analysis {
+                // position: relative;
+                height: 100%;
+            }
 
             .illustration {
                 position: absolute;
