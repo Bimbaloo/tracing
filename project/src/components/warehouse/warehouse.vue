@@ -75,7 +75,14 @@
 					},										
 				})
 
-				this.routerName[this.routerPath[this.nodeType]] = true
+				/* 显示路由 */
+				for(let i in this.routerName){
+					if(i !== this.routerPath[this.nodeType]){
+						this.routerName[i] = false
+					}else{
+						this.routerName[i] = true
+					}
+				}
 			},
 			// 详情全屏按钮点击事件
             fullScreenClick(isTrue) { 
@@ -118,25 +125,30 @@
 			box-sizing: border-box;
 		}
 		
-		.router-content {
+		/deep/.router-content {
 			flex: 1 1;
 			overflow: auto;
-
-			.btn-restrain {
-				right: 10px;
-                z-index: 10;
+			.table-title {
+				display: flex;
+    			align-items: center;
 			}
-			
-			.table {
-	    	    .batch {
-	    	    	cursor: pointer;
-		            color: #f90;
-		            .cell {
-		                font-weight: 600;
-		            } 
-		        }         
-	    	   
-	    	}    	
+			.innner-content {
+				.tableData {
+					display: flex;
+					margin-top: 0;
+					margin-bottom: -20px;
+				    flex-direction: row;
+    				justify-content: space-between;
+					.table-handle {
+						margin-right: 5px;
+						display: flex;
+						&>i {
+							margin: 7.5px;
+							cursor: pointer;
+						}
+					}
+				}
+			} 	
 		}
 	}
 </style>

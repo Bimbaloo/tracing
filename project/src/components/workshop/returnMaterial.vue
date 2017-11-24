@@ -3,6 +3,9 @@
     <div class="router-content">
         <div class="innner-content" >
             <div class="content-message tableData">
+				<span class='table-title'>
+					<span>物料编码：{{materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{materialName}}</span>
+				</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
@@ -48,13 +51,6 @@
                         name: "批次",
                         class: "batch"
                     },{
-                        prop: "materialCode",
-                        name: "物料编码",
-                        width: "50px"
-                    },{
-                        prop: "materialName",
-                        name: "物料名称"
-                    },{
                         prop: "quantity",
                         name: "数量"
                     },{
@@ -79,8 +75,11 @@
             }
         },
         computed: {
-			rawData () {
-		    	return this.$store.state.rawData
+			materialCode () {
+		    	return this.$store.state.detailInfos[0].materialCode
+			},
+			materialName () {
+				return this.$store.state.detailInfos[0].materialName
 			},
 		    resizeY: function() {
             	return this.$store && this.$store.state.resizeY
@@ -113,7 +112,7 @@
         methods: {
 			// 发起请求
             fetchData () {
-				let traceInOutQueryDtoList = this.$route.query.traceInOutQueryDtoList	//路由中获取条件
+				let operationIdList = this.$route.query.operationIdList	//路由中获取条件
 				
 				// let traceInOutQueryDtoList = [
 				// 	{
@@ -130,7 +129,7 @@
 				// 	}
 				// ]
 
-				let oQuery = {"traceInOutQueryDtoList":traceInOutQueryDtoList}
+				let oQuery = {"operationIdList":operationIdList}
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
 		   },
 		   	// 判断调用接口是否成功。

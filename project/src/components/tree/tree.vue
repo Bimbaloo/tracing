@@ -825,7 +825,7 @@
 			},
 			// 树节点点击事件。
 			treeNodeClickHandle(e, node) {
-				if(this.treeFullscreen) {
+				if(this.treeFullscreen && node.data.nodeType !== 10003 && node.data.nodeType !== 10004) {
 					this.restoreScreenClick();
 				}
 				
@@ -846,7 +846,7 @@
 						data: []
 					});
 				}
-				
+
 				// 点击节点信息展示。
 				let nodeType = node.data.nodeType  //被点击节点的 nodeType
 				if(nodeType === 101 || nodeType === 102 || nodeType === 103 || nodeType === 111 || nodeType === 112) {  // 仓库操作     
@@ -864,7 +864,7 @@
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}
 					})
-				}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10001 || nodeType === 10002) { 					// 车间操作     
+				}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10001 || nodeType === 10002 || nodeType === 2 || nodeType === 7) { 					// 车间操作     
 					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
 						nodeType: nodeType
 					})
@@ -894,21 +894,22 @@
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}										
 					})
-				}else if(nodeType === 10003 || nodeType === 10004) { 													// 物料  
-					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
-						nodeType: nodeType
-					})
-					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
-						detailInfos: node.data.detailInfos
-					})   
-					this.$router.replace({ 
-						path: "/stock",
-						query: {
-							"detailInfos": node.data.detailInfos,
-							"key": node.data.nodeType,
-							"_tag":  new Date().getTime().toString().substr(-5)
-						}										
-					})
+				}else if(nodeType === 10003 || nodeType === 10004) { 	
+					console.log("该节点为物料节点，不展示信息")												// 物料  
+					// this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+					// 	nodeType: nodeType
+					// })
+					// this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+					// 	detailInfos: node.data.detailInfos
+					// })   
+					// this.$router.replace({ 
+					// 	path: "/stock",
+					// 	query: {
+					// 		"detailInfos": node.data.detailInfos,
+					// 		"key": node.data.nodeType,
+					// 		"_tag":  new Date().getTime().toString().substr(-5)
+					// 	}										
+					// })
 				}
 			},
 
