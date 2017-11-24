@@ -139,7 +139,7 @@
             },
             // 设置路由。
             setRouteQuery(from, to) {
-                debugger
+                
                 if(from.fullPath === to.fullPath) {
                     // 已跳转成功。
                     return
