@@ -12,7 +12,7 @@
 				</span>
 			</div>
             <div class="content-table" ref="rawTable"> 
-                <v-table :table-data="materialData" :loading="loading"  :resize="true"></v-table>
+                <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table>
             </div>
 
         </div>
@@ -38,7 +38,7 @@
                 styleObject: {
                     "min-width": "1000px"
                 },
-                loading: false,
+                loading: true,
                 error: "",
 
                 materialData: {
@@ -139,6 +139,7 @@
 				let newData = []
 				newData = [].concat(oData.turnInOutDetailList)
 				this.materialData.data = newData
+				this.loading = false
             },
             // 请求失败。
             requestFail(sErrorMessage) {
