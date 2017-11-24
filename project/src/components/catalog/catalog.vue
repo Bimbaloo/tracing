@@ -187,20 +187,110 @@
 									data: aSublings	//node.data.sublings
 								})
 								
-								if(node.data.isMaterialNode) {		// node.data.type == "1"
-									// 根据物料节点查询仓储信息。        
+
+
+								if(this.treeFullscreen && node.data.nodeType !== 10003 && node.data.nodeType !== 10004) {
+									this.$store.commit({
+										type: "updateTreeFullscreen",
+										key: false
+									});
+
+									this.$emit('recoverSize')
+									
+									this.updateCanvas()
+								}
+								
+
+								this.$store.commit({
+									type: "updateKey",
+									key: node.data.key
+								});
+								
+			
+								// 点击节点信息展示。
+								let nodeType = node.data.nodeType  //被点击节点的 nodeType
+								console.log(nodeType)
+								if(nodeType === 101 || nodeType === 102 || nodeType === 103 || nodeType === 111 || nodeType === 112) {  // 仓库操作     
+									this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+										nodeType: nodeType
+									})
+									this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+										detailInfos: node.data.detailInfos
+									})
+									this.$store.commit('updateNum')
 									this.$router.replace({ 
-										path: "/stock", 
+										path: "/warehouse", 
 										query: {
-											"key": sNodeKey,
+											"detailInfos": node.data.detailInfos,
+											"nodeType": node.data.nodeType,
 											"_tag":  new Date().getTime().toString().substr(-5)
 										}
 									})
-								}else {
+								}else if(nodeType === 8 || nodeType === 11 || nodeType === 14 || nodeType === 15 || nodeType === 10002 || nodeType === 2 || nodeType === 7) { 					// 车间操作     
+									this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+										nodeType: nodeType
+									})
+									this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+										detailInfos: node.data.detailInfos
+									})
+									this.$store.commit('updateNum')
+
+									this.$router.replace({ 
+										path: "/workshop",
+										query: {
+											"detailInfos": node.data.detailInfos,
+											"key": node.data.nodeType,
+											"_tag":  new Date().getTime().toString().substr(-5)
+										}										
+									})
+								}else if(nodeType === 201 || nodeType === 202 || nodeType === 203) { 									// 条码管理     
+									this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+										nodeType: nodeType
+									})
+									this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+										detailInfos: node.data.detailInfos
+									})
+									this.$store.commit('updateNum')
+									this.$router.replace({ 
+										path: "/barcodeManage",
+										query: {
+											"detailInfos": node.data.detailInfos,
+											"key": node.data.nodeType,
+											"_tag":  new Date().getTime().toString().substr(-5)
+										}										
+									})
+								}else if(nodeType === 10003 || nodeType === 10004) { 
+									console.log("物料节点不展示。")													// 物料  
+									// this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+									// 	nodeType: nodeType
+									// })
+									// this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+									// 	detailInfos: node.data.detailInfos
+									// })   
+									// this.$router.replace({ 
+									// 	path: "/stock",
+									// 	query: {
+									// 		"detailInfos": node.data.detailInfos,
+									// 		"key": node.data.nodeType,
+									// 		"_tag":  new Date().getTime().toString().substr(-5)
+									// 	}										
+									// })
+								}else if(nodeType === 1 || nodeType === 6 || nodeType === 10001) { 	
+									// 工序。
+									this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+										nodeType: nodeType
+									})
+									this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+										detailInfos: node.data.detailInfos
+									}) 
+
 									this.$router.replace({ 
 										path: "/process",
 										query: {
-											"key": sNodeKey,
+											"detailInfos": node.data.detailInfos,
+											"key": node.data.nodeType,
+											"code": node.data.code,
+											// "name": node.data.name,
 											"_tag":  new Date().getTime().toString().substr(-5)
 										}										
 									})

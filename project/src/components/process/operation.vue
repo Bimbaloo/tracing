@@ -319,7 +319,7 @@
     }  
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 	.material-stock  {
 		height: 100%;
 		display: flex;
