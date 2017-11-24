@@ -51,13 +51,19 @@
 			},
 			nodeType () {
 				return this.$store.state.nodeType
+			},
+			clickNum() {
+				return this.$store.state.clickNum
 			}
 		},
         created () {
             this.setRouteQuery();
         },
         watch: {
-			"detailInfos": "setRouteQuery"
+			"detailInfos": "setRouteQuery",
+			 clickNum: function(){
+				 this.setRouteQuery()
+			 }
         },
         methods: {
 			// 根据获取的 op_type 默认路由跳转
@@ -67,7 +73,7 @@
 					operationIdList.push(el.opId)
 				})
 				this.$router.replace({ 
-					path: "warehouse/"+this.routerPath[this.nodeType],
+					path: "/warehouse/"+this.routerPath[this.nodeType],
 					query: {
 						"operationIdList":operationIdList,
 						"_tag":  new Date().getTime().toString().substr(-5),
