@@ -329,7 +329,7 @@
                     list: [{
                         name: "投产表",
                         router: "/process/product",
-                        query: ["doOutIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                         // ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }]
                 }, {
@@ -410,6 +410,9 @@
             // 产出id。
             doOutIdList () {
                 return this.equipments.filter(o => o.equipmentId == this.selectedEquipmentId)[0].poolOutId
+            },
+            operationIdList () {
+                return this.equipments.filter(o => o.equipmentId == this.selectedEquipmentId)[0].operationIdList
             },
             // 与起点相关的标记线。
             relatedMarkLine () {
@@ -1335,7 +1338,7 @@
 				let oParam = {},
                     oDate = this.getRealTime()
                 if(this.bRestrain) {  //临时方案，目前遏制页面投产表借口不可查，屏蔽
-                    aQuery = aQuery.filter((o)=>{return o!=="doOutIdList" })
+                    aQuery = aQuery.filter((o)=>{return o!=="operationIdList" })
                 }
 				aQuery.forEach(param => {
 					switch (param) {
@@ -1345,8 +1348,8 @@
 						// case "equipmentList"://equipmentIdList
 						// 	oParam[param] = this.selectedEquipmentId;
                         // 	break;
-                        case "doOutIdList": 
-							oParam[param] = this.doOutIdList;
+                        case "operationIdList": 
+							oParam[param] = this.operationIdList;
 							break;
 						case "equipmentId": 
 							oParam[param] = this.selectedEquipmentId;
@@ -1388,7 +1391,7 @@
                 if(!aoData.length) {
                     return;
                 }
-
+                debugger
                 // 初始化图形数据。
                 this.initChartData(aoData);
                 // 添加图形数据。
@@ -1867,8 +1870,8 @@
    
                                 if(sDimension === "pool" && !this.bRestrain) {
                                     // 若为投产，非遏制。
-                                    if((key === "poolInList" && item.poolInId.indexOf(o.doId) > -1) ||
-                                    (key === "poolOutList" && item.poolOutId.indexOf(o.doId) > -1)) {
+                                    if((key === "poolInList" && item.operationIdList.find(item => item.opId == o.opId)) || 
+                                    (key === "poolOutList" && item.operationIdList.find(item => item.opId == o.opId))) { 
                                         // 若为属于起点的投入或产出。
                                         if(!oFilter[5]) {
                                             // 若未被标记。
@@ -2330,7 +2333,8 @@
                     startTime: oDate.start,
                     endTime: oDate.end,
                     shiftStartTime: this.datetime.start,
-                    shiftEndTime: this.datetime.end
+                    shiftEndTime: this.datetime.end,
+                    code: this.process
                 }})				
 			},
             // 跳转到追踪页面。

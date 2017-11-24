@@ -151,25 +151,32 @@
 					// 最晚班次结束时间。
 					sEnd = oEquipments[p][0].shiftEndTime;
 
-					let aoPoolInId = [], //aoPoolInTime
-						aoPoolOutId = []; //aoPoolOutTime
+					// let aoPoolInId = [], //aoPoolInTime
+					// 	aoPoolOutId = []; //aoPoolOutTime
 
-					oEquipments[p].forEach(o => {
-						aoPoolInId = aoPoolInId.concat(o.doInIdList)//inHappenTimeList
-						aoPoolOutId = aoPoolOutId.concat(o.doOutIdList)//outHappenTimeList
-					})
+					// oEquipments[p].forEach(o => {
+					// 	aoPoolInId = aoPoolInId.concat(o.doInIdList)//inHappenTimeList
+					// 	aoPoolOutId = aoPoolOutId.concat(o.doOutIdList)//outHappenTimeList
+					// })
 					
 					// 去重。
-					aoPoolInId = [...new Set(aoPoolInId)]
-					aoPoolOutId = [...new Set(aoPoolOutId)]
-
+					// aoPoolInId = [...new Set(aoPoolInId)]
+					// aoPoolOutId = [...new Set(aoPoolOutId)]
+					
+					let aoOperationIdList = oEquipments[p].forEach(o => {
+						return {
+							opId: o.opId,
+							opType: o.opType
+						}
+					})
 					this.equipments.push({
 						equipmentId: oEquipments[p][0].equipmentId,
 						equipmentName: oEquipments[p][0].equipmentName,
 						shiftStartTime: sStart,
 						shiftEndTime:　sEnd,
-						poolInId: aoPoolInId,
-						poolOutId: aoPoolOutId
+						// poolInId: aoPoolInId,
+						// poolOutId: aoPoolOutId
+						operationIdList: aoOperationIdList
 					})
 				}
 
