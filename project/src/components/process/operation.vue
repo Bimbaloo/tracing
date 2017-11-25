@@ -7,7 +7,7 @@
         </div>
         <el-tabs v-model="activeName" @tab-click="tabChange">
             <el-tab-pane label="投产表" name="product">		
-                <v-product></v-product>           
+                <v-product :is-in-chart="false"></v-product>           
             </el-tab-pane>
             <el-tab-pane label="设备分析" name="equipment">
                 <div class="path-btn">
@@ -72,6 +72,9 @@
             },
             processCode () {            
                 return this.$route.query.code
+            },
+            activeTabChange() {
+            	return this.$store && this.$store.state.activeTabChange
             }
 		},
         created () {
@@ -86,6 +89,12 @@
         methods: {
             // tab切换。
             tabChange(oTab) {
+            	// tab切换后要更新表格高度。
+            	this.$store.commit({
+					type: "updateTabChange",
+					key: oTab.name
+				});
+				
                 if(oTab.name === "equipment") {
                     // 若为设备分析。
                     if(!this.$route.meta.title) {
@@ -151,9 +160,38 @@
                     sFromType = aFromPath[aFromPath.length -1],
                     sToType = aToPath[aToPath.length -1]
                 
+                // 如果是在设备分析中其他页面，点击tree上的节点（目前选中的节点） 需设置activeName
+                if(!to.meta.title) {
+                	this.$store.commit({
+						type: "updateTabChange",
+						key: "product"
+					});
+                	this.activeName = "product"
+                	
+                	let sType = "chart"
+                    let sRoute = "/process/chart"
+                    
+                	// 重置时间轴路由
+                	this.aoRoute = []
+	                this.oQuery = {}
+	                
+	                // 保存查询条件。
+	                this.oQuery[sType] = this.$route.query
+	
+	                // 设置面包屑路由。
+	                this.aoRoute.push({
+	                    name: this.operations[sType],
+	                    path: sRoute,
+	                    query: this.oQuery[sType]
+	                })
+                	
+                	return
+                }
+                
                 if(sFromRoute === "/process") {
                     return
                 }
+                
                 // 保存查询条件。
                 this.oQuery[sToType] = to.query//this.$route.query
                 

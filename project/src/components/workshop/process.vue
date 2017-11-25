@@ -177,6 +177,7 @@ import VideoDialog from 'components/monitor/dialog.vue'
 const CAMERA = 0;
 //const url = "http://192.168.220.182:8088/api/v1/trace/operation-detail/inout/by-id";
 //const url = `static/produce.json`
+const url = HOST + "/api/v1/trace/operation-detail/inout/by-id";
 
 // 产出，退料，结转字段。
 const OUT_FIELD = "outQuantity"
@@ -593,26 +594,27 @@ export default {
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
         },
-        url: function() {
-			return this.$route.query.url
-		}
+		activeTabChange: function() {
+        	return this.$store && this.$store.state.activeTabChange
+        }
     },
     mounted() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
-        this.setTbaleHeight()
+        this.routerContent = document.querySelector(".el-tabs__content").offsetHeight  //获取初始高度
+        this.setTableHeight()
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
         '$route': function(to, from) {
         	// 当是质检时，更新数据
-        	if(to.meta.title == 'newProcess') {
+        	if(!to.meta.title) {
         		this.fetchData();
         	}
         },
         /* 上下拖动时，重新设置table大小变化 */
-        "resizeY": 'setTbaleHeight',
+        "resizeY": 'setTableHeight',
         /* 全屏大小时，重新设置table大小 */
-        "fullscreen": 'setTbaleHeight'
+        "fullscreen": 'setTableHeight',
+        "activeTabChange": 'setTableHeight'
     },
     methods: {
     	// 设备点击事件。
@@ -843,7 +845,7 @@ export default {
 				inAll: {data:this.inAllItems.data, dataFilter: this.inAllItems.dataFilter}
 			} = oAll)
 			
-			this.setTbaleHeight()
+			this.setTableHeight()
 		},
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -928,7 +930,7 @@ export default {
 //					"opType": 1
 //				}]
 //			}
-			this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
+			this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
         },     
         batchClick(row) {
             if(this.bTrack){
@@ -1049,7 +1051,7 @@ export default {
             let ntable = 0;
             ntable = Math.floor(
                 this.viewHeight
-                - (document.querySelector(".condition") ? this.outerHeight(document.querySelector(".condition")) : 0)
+//              - (document.querySelector(".condition") ? this.outerHeight(document.querySelector(".condition")) : 0)
                 - 20	// search-tab margin值
                 - 30 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
                 - 40 //   this.outerHeight(document.querySelector(".content-title.outTitle"))
@@ -1068,11 +1070,11 @@ export default {
             return height;
         },
         /* 设置table实际高度 */
-        setTbaleHeight() {
-        	if(this.$route.meta.title == 'newProcess') {
-	            this.routerContent = document.querySelector(".router-content").offsetHeight
+        setTableHeight() {
+//      	if(this.$route.meta.title == 'newProcess') {
+	            this.routerContent = document.querySelector(".el-tabs__content").offsetHeight
 	            this.uniteItems.height = this.inNotOutItems.height = this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-        	}
+//      	}
         },
         /* 设置title */
         setTitle(el, title) {

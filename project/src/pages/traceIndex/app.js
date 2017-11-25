@@ -314,9 +314,15 @@ const store = new Vuex.Store({
     // 存入 detailInfos
     detailInfos: [],
     // 点击次数
-    clickNum: 0
+    clickNum: 0,
+    // 记录tab改变
+    activeTabChange: 'product'
   },
   mutations: {
+  	// 记录tab改变事件。
+  	updateTabChange(state, payload) {
+  		state.activeTabChange = payload.key
+  	},
     // 记录点击次数，用于刷新路由
     updateNum (state, payload) {
       state.clickNum ++

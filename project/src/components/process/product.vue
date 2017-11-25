@@ -11,7 +11,7 @@
     		@hideDialog="hideVideoDialog">
 	    </v-dialog>     
         <div class="innner-content" :style="styleObject">
-            <div class="condition" ref='condition'>
+            <div class="condition" ref='condition' v-if="isInChart">
                 <div class='condition-messsage'>
                     <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
@@ -22,8 +22,8 @@
                     <span style='margin-left:5px'>({{this.$route.query.shiftStartTime}}~{{this.$route.query.shiftEndTime}})</span>
                 </div>
             </div>
-            <el-tabs element-loading-text="拼命加载中" class="search-tab" @tab-click="tabChange">
-                <el-tab-pane label="关联表">
+            <el-tabs element-loading-text="拼命加载中" v-model="activeTabName" class="search-tab" @tab-click="tabChange">
+                <el-tab-pane name="unitTable" label="关联表">
                     <h2 class="content-title uniteTitle">
                         <span class='table-title'>产出投入</span>
                         <span class='table-handle'>
@@ -32,15 +32,15 @@
                         </span>
                     </h2>
 
-                    <div class="content-table" ref="uniteTable" v-if="show1">
+                    <div class="content-table" ref="uniteTable" v-show="show1">
                         <el-table class="table-main" :data="checked?uniteItems.data:uniteItems.dataFilter" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="index===0?true:false" :resizable="true" :label="column.name" :width="column.width">
+                            <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div 
                                     :class="['cell-content',{ltext: column.prop === 'barcode'}]" 
                                     v-if="column.prop === 'barcode'" 
                                     :style="{paddingLeft: props.row.hasInLen ? 15 : 50 +'px'}">
-                                        <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props)"></i>
+                                        <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props, $event)"></i>
                                         <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop]}}</span>
                                         <i 
                                         v-if="showCamera" 
@@ -49,7 +49,8 @@
                                         @click="showVideoDialog(props.row)"></i>
                                     </div>
                                     <div class="cell-content" v-else>
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                                    	<span v-if="!isInChart && column.prop =='equipmentName'" class="equipment" @click="equipmentClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                                        <span v-else>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
@@ -63,7 +64,7 @@
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inNotOutTable', $event)"></i>
                         </span>
 					</h2>
-					<div class="content-table" ref="inNotOutTable" v-if="show1">
+					<div class="content-table" ref="inNotOutTable" v-show="show1">
 						<el-table class="table-main" :data="checked?inNotOutItems.data:inNotOutItems.dataFilter" :height="inNotOutItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inNotOutItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
@@ -77,7 +78,7 @@
 					
 					
                 </el-tab-pane>
-                <el-tab-pane label="明细表">
+                <el-tab-pane name="infoTable" label="明细表">
                     <h2 class="content-title outTitle">
                         <span class='table-title'>产出</span>
                         <span class='table-handle'>
@@ -86,8 +87,7 @@
                         </span>
                     </h2>
 
-                    <div class="content-table" ref="outputTable" v-if="show2">
-                        <!-- <v-table :table-data="outItems" :heights="outItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                    <div class="content-table" ref="outputTable" v-show="show2">
                         <el-table class="table-main" :data="checked?outItems.data:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
@@ -110,8 +110,7 @@
                         </span>
                     </h2>
 
-                    <div class="content-table" ref="inputTable" v-if="show2">
-                        <!-- <v-table :table-data="inItems" :heights="inItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                    <div class="content-table" ref="inputTable" v-show="show2">
                         <el-table class="table-main" :data="checked?inItems.data:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
@@ -124,7 +123,7 @@
                     </div>
 
                 </el-tab-pane>
-                <el-tab-pane label="汇总表">
+                <el-tab-pane name="sumTable" label="汇总表">
                     <h2 class="content-title outAllTitle">
                         <span class='table-title'>产出汇总</span>
                         <span class='table-handle'>
@@ -132,8 +131,7 @@
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputAllTable', $event)"></i>
                         </span>
                     </h2>
-                    <div class="content-table" ref="outputAllTable" v-if="show3">
-                        <!-- <v-table :table-data="outAllItems" :heights="outAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                    <div class="content-table" ref="outputAllTable" v-show="show3">
                         <el-table class="table-main" :data="checked?outAllItems.data:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
@@ -155,8 +153,7 @@
                         </span>
                     </h2>
 
-                    <div class="content-table" ref="inputAllTable" v-if="show3">
-                        <!-- <v-table :table-data="inAllItems" :heights="inAllItems.height" :loading="loading" :resize="tdResize"></v-table> -->
+                    <div class="content-table" ref="inputAllTable" v-show="show3">
                         <el-table class="table-main" :data="checked?inAllItems.data:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inAllItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
@@ -183,20 +180,29 @@ import html2canvas from 'html2canvas'
 import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 import VideoDialog from 'components/monitor/dialog.vue'
+import $ from 'jquery'
 
 // 是否开启视频监控。
 const CAMERA = 0;
-//const url = HOST + "/api/v1/trace/operation-detail/inout/by-id";
+//const url = "http://192.168.220.182:8088/api/v1/trace/operation-detail/inout/by-id";
+const url = HOST + "/api/v1/trace/operation-detail/inout/by-id";
 
 // 产出，退料，结转字段。
-const OUT_FIELD = "outQuantity"
-const RETURN_FIELD = "returnMaterialQuantity"
-const CARRY_FIELD = "carryOverQuantity"
+const OUT_FIELD = "outQuantity";
+const RETURN_FIELD = "returnMaterialQuantity";
+const CARRY_FIELD = "carryOverQuantity";
 
 export default {
     components: {
         'v-table': table,
         "v-dialog": VideoDialog
+    },
+    props: {
+    	isInChart: {
+    		required: false,
+    		type: Boolean,
+    		default: true 
+    	}
     },
     data() {
         return {
@@ -208,7 +214,8 @@ export default {
                 equipmentName: '',
                 time: ''
             },
-            checked: false, //是否显示全部数据
+            checked: this.isInChart ? false: true, //是否显示全部数据
+            activeTabName: 'unitTable',
             excel: true,
             print: true,
             loading: false,
@@ -241,7 +248,7 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "200",
-                    fixed: true,
+//                  fixed: true
                 }, {
                     name: "工单",
                     prop: "doCode",
@@ -263,6 +270,14 @@ export default {
                     prop: "quantity",
                     width: "100"
                 }, {
+                	name: "设备",
+                	prop: "equipmentName",
+                	width: "120",
+                }, {
+                	name: "模号",
+                	prop: "moldCode",
+                	width: "120",
+                },{
                     name: "班次",
                     prop: "shiftName",
                     width: "200"
@@ -307,7 +322,7 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "200",
-                    fixed: true
+//                  fixed: true
                 }, {
                     name: "箱码",
                     prop: "packetBarcode",
@@ -332,6 +347,14 @@ export default {
                     name: "数量",
                     prop: "quantity",
                     width: "100"
+                }, {
+                	name: "设备",
+                	prop: "equipmentName",
+                	width: "120",
+                },{
+                    name: "模号",
+                    prop: "moldCode",
+                    width: "",
                 }, {
                     name: "质量",
                     prop: "qualityTypeName",
@@ -360,7 +383,7 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "285",
-                    fixed: true,
+//                  fixed: true
                 }, {
                     name: "类型",
                     prop: "opTypeName",
@@ -385,6 +408,14 @@ export default {
                     name: "数量",
                     prop: "quantity",
                     width: "120"
+                }, {
+                	name: "设备",
+                	prop: "equipmentName",
+                	width: "120"
+                },{
+                	name: "模号",
+                	prop: "moldCode",
+                	width: "120"
                 }, {
                     name: "质量",
                     prop: "qualityTypeName",
@@ -413,7 +444,7 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "285",
-                    fixed: true,
+//                  fixed: true
                 }, {
                     name: "工单",
                     prop: "doCode",
@@ -434,6 +465,14 @@ export default {
                     name: "数量",
                     prop: "quantity",
                     width: "120"
+                }, {
+                	name: "设备",
+                	prop: "equipmentName",
+                	width: "120"
+                },{
+                	name: "模号",
+                	prop: "moldCode",
+                	width: "120"
                 }, {
                     name: "班次",
                     prop: "shiftName",
@@ -536,6 +575,14 @@ export default {
                     name: "不合格数",
                     prop: "unqualifiedNum",
                     width: "100"
+                }, {
+                	name: "设备",
+                	prop: "equipmentName",
+                	width: "120"
+                }, {
+                	name: "模号",
+                	prop: "moldCode",
+                	width: "120"
                 }],
                 height: 1,
                 data: []
@@ -553,7 +600,6 @@ export default {
         this.fetchData();
     },
     computed: {
-
         viewHeight: function() {
             return this.routerContent
         },
@@ -563,28 +609,52 @@ export default {
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
         },
-        url: function() {
-			return this.$route.query.url
-		}
+        activeTabChange: function() {
+        	return this.$store && this.$store.state.activeTabChange
+        }
     },
     mounted() {
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
-        this.setTbaleHeight()
+        this.routerContent = document.querySelector(".el-tabs__content").offsetHeight  //获取初始高度
+        this.setTableHeight()
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': function(to, from) {
-        	// 当是质检时，更新数据
-        	if(to.meta.title == 'product') {
+        '$route': function(to, from) {       	
+        	// 从设备分析过来时，点击tree上的节点时也会重新请求
+        	if(to.meta.title == 'product' || !to.meta.title) {
+        		// 初始化其他显示值。
+        		this.show1 = true
+        		this.show2 = false
+        		this.show3 = false
+        		this.activeTabName = "unitTable"
+        		this.checked = !this.isInChart
+        		
         		this.fetchData();
         	}
         },
         /* 上下拖动时，重新设置table大小变化 */
-        "resizeY": 'setTbaleHeight',
+        "resizeY": 'setTableHeight',
         /* 全屏大小时，重新设置table大小 */
-        "fullscreen": 'setTbaleHeight'
+        "fullscreen": 'setTableHeight',
+//      "activeTabChange": function() {
+//      	if(this.$route.meta.title == 'product' && this.activeTabChange == 'product') {
+//      		// 从设备分析的投产表中进来时，页面会错位。。。fixed导致。。。
+//      		this.fetchData()
+//      	}else {
+//      		this.setTableHeight()
+//      	}
+//      },
+        "activeTabChange": 'setTableHeight'
     },
     methods: {
+    	// 设备点击事件。
+    	equipmentClick(row) {
+    		// 如果设备数据存在，则可点击。
+        	if(!this.isInChart && row.equipmentName) {
+        		console.log(1)
+//              this.$router.replace({ path: '/process/chart', query: {  }})
+        	}
+    	},
     	// 获取筛选条件。
     	getFilters() {
             let filters = this.condition
@@ -613,6 +683,27 @@ export default {
                // this.outItems.columns[0].class = ''
                // this.outItems.columns[0].cellClick = ''
             }
+            
+            if(this.isInChart) {
+	            this.inItems.columns = this.setColumnHide(this.inItems.columns)
+	            this.outItems.columns = this.setColumnHide(this.outItems.columns)
+	            this.uniteItems.columns = this.setColumnHide(this.uniteItems.columns)
+            	this.inNotOutItems.columns = this.setColumnHide(this.inNotOutItems.columns)
+            	this.outAllItems.columns = this.setColumnHide(this.outAllItems.columns)
+            }
+        },
+        // 设置显示列隐藏。
+        setColumnHide(aoColumns) {
+        	// 如果是在设备分析里面，则设置column中列隐藏。
+            let aDisplayColumnProp = ["equipmentName", "moldCode"]
+            
+            for(let i = 0; i< aoColumns.length; i++) {
+            	if(aDisplayColumnProp.includes(aoColumns[i].prop)) {
+            		aoColumns.splice(i,1)
+            		i--
+            	}
+            }
+        	return aoColumns
         },
         // 隐藏监控视频。
         hideVideoDialog() {
@@ -773,10 +864,12 @@ export default {
 			oAll["out"].data = aoOutData
 			
 			// 获取投产、有投无产、产出、投入的根据时间过滤后的数据
-			for(let sParam in oAll) {
-				// 过滤掉了汇总的列。
-				if(oAll[sParam].data.length) {
-					oAll[sParam].dataFilter = oAll[sParam].data.filter( o => startTime <= o.happenTime && o.happenTime <= endTime )
+			if(this.isInChart) {
+				for(let sParam in oAll) {
+					// 过滤掉了汇总的列。
+					if(oAll[sParam].data.length) {
+						oAll[sParam].dataFilter = oAll[sParam].data.filter( o => startTime <= o.happenTime && o.happenTime <= endTime )
+					}
 				}
 			}
 			
@@ -789,7 +882,10 @@ export default {
 				if(oAll[sP]) {
 					
 					oAll[sParam].data = this._sumData(oAll[sP].data, oGroup[sP].group, oGroup[sP].dis, oGroup[sP].merge)
-					oAll[sParam].dataFilter = this._sumData(oAll[sP].dataFilter, oGroup[sP].group, oGroup[sP].dis, oGroup[sP].merge)
+					// 只有存在需要过滤时，才过滤数据。
+					if(this.isInChart) {
+						oAll[sParam].dataFilter = this._sumData(oAll[sP].dataFilter, oGroup[sP].group, oGroup[sP].dis, oGroup[sP].merge)
+					}
 				}
 			}
 			
@@ -804,7 +900,7 @@ export default {
 				inAll: {data:this.inAllItems.data, dataFilter: this.inAllItems.dataFilter}
 			} = oAll)
 			
-			this.setTbaleHeight()
+			this.setTableHeight()
 		},
         // 请求失败。
         requestFail(sErrorMessage) {
@@ -814,6 +910,8 @@ export default {
             let uniteDatas = []
             let outAllDatas = []
             let inAllDatas = []
+            
+            this.setTableHeight()
             // 提示信息。
             console.log(sErrorMessage);
         },
@@ -821,6 +919,7 @@ export default {
         requestError(err) {
             this.loading = false;
             this.styleObject.minWidth = 0;
+            this.setTableHeight()
             console.log(err)
             console.log("数据库查询出错。")
         },
@@ -871,42 +970,26 @@ export default {
                 }
             })
             this.filters = this.getFilters()
-            this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
-        },
-        /**
-        * 格式化数据。
-        * @param {Array} aoData
-        * @return {Array}
-        */
-        formatData(aoData, aocolumns) {
-            // 按照条码进行排序。
-            aoData.sort((a, b) => a.equipmentId > b.equipmentId);
-
-            let oEquipmentId = {},
-                nRow = 0,
-                nIndex = 1;
-            aoData.forEach((o, index) => {
-                if (oEquipmentId[o.equipmentId]) {
-                    oEquipmentId[o.equipmentId]++;
-                    aoData[nRow].rowspan = oEquipmentId[o.equipmentId];
-                    o.hide = true;
-                } else {
-                    o.index = nIndex;
-                    oEquipmentId[o.equipmentId] = 1;
-                    nRow = index;
-                    nIndex++;
-                    o.rowspan = oEquipmentId[o.equipmentId];
-                }
-            })
-
-            aocolumns.forEach(column => {
-                if (aoData.every(o => o[column.prop] === "" || o[column.prop] == undefined)) {
-                    // 若每一行都为空，设置隐藏。
-                    column.hide = true;
-                }
-            })
-
-            return aoData;
+//          oQuery = {
+//				"operationIdList": [{
+//					"opId": "39837166-4657-4c1d-b746-827d7fab95ed",
+//					"opType": 6
+//				},{
+//					"opId": "bfcdffb1-2b5f-43c0-837c-9f61b50648ea",
+//					"opType": 6
+//				},{
+//					"opId": "6c9f4b86-82a9-4b61-a5d4-71063edce107",
+//					"opType": 6
+//				},{
+//					"opId": "5506de6b-08ec-40dd-bb1f-c9e32a8b4661",
+//					"opType": 1
+//				},{
+//					"opId": "254e0267-f53c-4321-9225-c37ca02a72fd",
+//					"opType": 1
+//				}]
+//			}
+            this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
+        	
         },
         batchClick(row) {
             if(this.bTrack){
@@ -1027,11 +1110,12 @@ export default {
             let ntable = 0;
             ntable = Math.floor(
                 this.viewHeight
-                - this.outerHeight(document.querySelector(".condition"))
+//              - (this.isInChart ? this.outerHeight(document.querySelector(".condition")) : 0)
+                - (this.isInChart && document.querySelector(".condition") ? this.outerHeight(document.querySelector(".condition")) : 0)
                 - 30 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
                 - 40 //   this.outerHeight(document.querySelector(".content-title.outTitle"))
                 - 40 //   this.outerHeight(document.querySelector(".content-title.inTitle"))
-                - 70  //修正值
+                - 88  //修正值
             ) / 2;
 
             return ntable;
@@ -1045,12 +1129,11 @@ export default {
             return height;
         },
         /* 设置table实际高度 */
-        setTbaleHeight() {
-        	if(this.$route.meta.title == 'product') {
-	            this.routerContent = document.querySelector(".router-content").offsetHeight
+        setTableHeight() {
+//      	if(this.$route.meta.title == 'product') {
+	            this.routerContent = document.querySelector(".el-tabs__content").offsetHeight
 	            this.uniteItems.height = this.inNotOutItems.height = this.inAllItems.height = this.outAllItems.height = this.inItems.height = this.outItems.height = this.adjustHeight()
-//	            this.uniteItems.height = 2 * this.adjustHeight() + 70
-        	}
+//      	}
         },
         /* 设置title */
         setTitle(el, title) {
@@ -1062,17 +1145,18 @@ export default {
             })
         },
         /* 点击产出 展开或收拢投入 */
-        handleEdit(index, props) {
+        handleEdit(index, props, event) {
             let elArr = []
             const num = props.row.hasInLen //props.row.in.length
-            const trs = document.querySelectorAll(".el-table__body-wrapper")[0].querySelectorAll("tr")
-            const trsFix = document.querySelectorAll(".el-table__fixed-body-wrapper")[0].querySelectorAll("tr")
-            //const tr = document.querySelectorAll(".el-table__row")
+            const icon = event.target
+            let jParent = event.target.closest('.content-table')
+            const trs = jParent.querySelectorAll(".el-table__body-wrapper")[0].querySelectorAll("tr")
+//          const trsFix = jParent.querySelectorAll(".el-table__fixed-body-wrapper")[0].querySelectorAll("tr")
+            
             for (let i = 0; i < num; i++) {
                 elArr.push(trs[index + i + 1])
-                elArr.push(trsFix[index + i + 1])
+//              elArr.push(trsFix[index + i + 1])
             }
-            const icon = trsFix[index].querySelectorAll(".icon-down")[0]
             if (icon.classList.contains("actived")) {  // 判断是否隐藏
                 elArr.forEach((el) => {
                     return el.classList.remove('hide');
@@ -1084,9 +1168,13 @@ export default {
                 })
                 icon.classList.add('actived');
             }
+            
+            
         },
         /* tab切换 */
         tabChange(tab, event) {
+        	this.activeTabName = tab.name
+        	
             const index = tab.index
             switch (index) {
                 case "0":
@@ -1160,7 +1248,8 @@ export default {
 .cell {
     .cell-content {
         .batchNo,
-        .barcode {
+        .barcode,
+        .equipment {
             cursor: pointer;
             color: #f90;
             .cell {
@@ -1288,7 +1377,8 @@ body {
 .inTitle,
 .uniteTitle,
 .inAllTitle,
-.outAllTitle {
+.outAllTitle,
+.inNotOutTitle {
     display: flex;
     justify-content: space-between;
     .table-handle {
