@@ -651,8 +651,11 @@ export default {
     	equipmentClick(row) {
     		// 如果设备数据存在，则可点击。
         	if(!this.isInChart && row.equipmentName) {
-        		console.log(1)
-//              this.$router.replace({ path: '/process/chart', query: {  }})
+				this.$store.commit({
+					type: "updateTabChange",
+					key: "equipment"
+				});
+                this.$router.replace({ path: '/process/chart', query: {  }})
         	}
     	},
     	// 获取筛选条件。

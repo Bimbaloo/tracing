@@ -84,6 +84,9 @@
             processCode: function() {
                 this.activeName = "product"
                 this.initRoute()              
+            },
+            activeTabChange: function() {
+            	this.activeName = this.activeTabChange
             }
         },
         methods: {
