@@ -1,5 +1,5 @@
 <template>
-    <div class="router-content">
+    <div class="router-content" id="parameter">
         <div class="inner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
@@ -38,8 +38,8 @@
                             element-loading-text="拼命加载中" 
                             style="width: 100%" 
                             ref="multipleTable" 
-                            @expand="expandRow"> 
-                            <!--:height="barcodeTableData.height"-->
+                            @expand="expandRow" 
+                            :height="barcodeTableData.height">
                                 <el-table-column 
                                 v-if="!!column.show" 
                                 v-for="column in columns" 
@@ -99,7 +99,7 @@
                                 <div class="content-tables" v-show="chartData.value === '表格'">
                                     <h2 class="content-title tableData">
                                         <span class='table-title'>
-                                            <span>检验参数：{{chartData.varStdId}}</span>
+                                            <span>检验参数：{{chartData.varStdId}}</span>&nbsp;&nbsp;
                                             <span>单位：{{chartData.unit}}</span>
                                         </span>
                                         <span class='table-handle'>
@@ -108,7 +108,7 @@
                                         </span>
                                     </h2>
                                     <div class="content-table" ref="tableDataindex">
-                                        <v-table :table-data="chartData" :heights="tableHeight" :resize="tdResize"></v-table>
+                                        <v-table :table-data="chartData" :heights="chartTableHeight" :resize="tdResize"></v-table>
                                     </div>
                                 </div>
                             </el-tab-pane>
@@ -185,7 +185,7 @@ export default {
             flexbase: 200,
             tableDatas: [],
             chartFetched: false,
-            tableHeight: 400,
+            chartTableHeight: 400,
             /* 条码表 */
             barcodeTableData: {
                 loading: false,
@@ -254,10 +254,15 @@ export default {
         }        
     },
     mounted() {
-        this.addEvent(); //监听resize变化 触发 echarts.resize()
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
-        this.flexbase = this.adjustHeight()
-        this.tableHeight = this.setTableHeight()
+        this.$nextTick(() => {
+            this.addEvent(); //监听resize变化 触发 echarts.resize()
+            
+            this.routerContent = document.querySelector("#parameter").offsetHeight  //获取初始高度
+            this.flexbase = this.adjustHeight()
+            this.chartTableHeight = this.setChartTableHeight()
+            this.barcodeTableData.height = this.setBarcodeTableHeight()
+        })
+
     },
 
     watch: {
@@ -273,20 +278,23 @@ export default {
         "resizeY": function(){
         	if(this.$route.meta.title == 'parameter') {
 	            this.setFlexBase()
-	            this.tableHeight = this.setTableHeight()
+                this.chartTableHeight = this.setChartTableHeight()
+                this.barcodeTableData.height = this.setBarcodeTableHeight()
         	}
         },
         /* 全屏大小时，重新设置flexBase大小 */
         "fullscreen": function(){
             if(this.$route.meta.title == 'parameter') {
 	            this.setFlexBase()
-	            this.tableHeight = this.setTableHeight()
+                this.chartTableHeight = this.setChartTableHeight()
+                this.barcodeTableData.height = this.setBarcodeTableHeight()
         	}
         }
     },
     methods: {
         // 获取数据。
         fetchData() {
+            
             Object.keys(this.$route.query).forEach((el) => {
                 if (el === "equipmentId" || el === "startTime" || el === "endTime") {//equipmentIdList//equipmentList
                     this.oQuery[el] = this.$route.query[el]
@@ -298,11 +306,11 @@ export default {
             this.filters = this.getFilters()
 
             /* 测试数据 */
-            this.oQuery = {
-                "equipmentId": "216",
-                "startTime": "2017-07-01 02:00:00",
-                "endTime": "2017-07-01 04:00:00"
-            }
+            // this.oQuery = {
+            //     "equipmentId": "216",
+            //     "startTime": "2017-07-01 02:00:00",
+            //     "endTime": "2017-07-01 04:00:00"
+            // }
 
             if(this.activeName === "table") {
                 // 条码表。
@@ -317,7 +325,7 @@ export default {
             this.loading = true
             this.chartFetched = true
             /* 设置显示信息和查询条件 */
-
+            
             this.$register.sendRequest(this.$store, 
                                         this.$ajax, 
                                         CHART_DATA, 
@@ -404,7 +412,7 @@ export default {
         },
         // 请求成功。
         requestSucess(oData) {
-            debugger
+            
             if (!oData.length) {  //如果查询结果为空
                 this.error = true
                 this.chartShow = false
@@ -534,12 +542,12 @@ export default {
         },
         /* 获取高度函数 */
         adjustHeight() {
-
+            
             let getHeight = 0;
             getHeight = Math.floor(
                 this.viewHeight
-                - this.outerHeight(document.querySelector(".condition"))
-                - this.outerHeight(document.querySelector("#content-title"))
+                - this.outerHeight(document.querySelector("#parameter .condition"))
+                - this.outerHeight(document.querySelector("#parameter #content-title"))
             );
             return getHeight;
         },
@@ -556,21 +564,35 @@ export default {
         },
         /* 设置table实际高度 */
         setFlexBase() {
-            this.routerContent = document.querySelector(".router-content").offsetHeight
+            this.routerContent = document.querySelector("#parameter").offsetHeight
             this.flexbase = this.adjustHeight()
         },
-        setTableHeight(){
-            let tabs = document.querySelector(".el-tabs")
-            let tableHeight = this.viewHeight
-                              -88
-                              -48
-                              -66   // tabs-head的高
-                              -90   // table上面的标题
-            return tableHeight
+        // 设置图形表高度。
+        setChartTableHeight(){
+            let chartTableHeight = this.flexbase
+                              -30 // 条码表/曲线图tab
+                              -57 // 曲线图参数tab
+                              -35 // 表格标题
+                              -20 // 表格margin-bottom
+            // this.viewHeight
+            //                   -88
+            //                   -48
+            //                   -66   // tabs-head的高
+            //                   -90   // table上面的标题
+            return chartTableHeight
+        },
+        // 设置条码表高度。
+        setBarcodeTableHeight() {
+            let barcodeTableHeight = this.flexbase
+                              -30 // 条码表/曲线图tab
+                              -50 // 条码筛选框
+                              -20 // 表格margin
+
+            return barcodeTableHeight
         },
         /* 处理每个tableData */
         setTableData(data, index) {
-            debugger
+            
             let tableData = {
                 filename: "名称",
                 unit: "",
@@ -603,7 +625,7 @@ export default {
                 arr.barcode = el.barcode || ''
                 return arr
             })
-            debugger
+            
             return tableData
         },
         /* 处理每个option */
@@ -747,7 +769,7 @@ export default {
             const yMin = Math.min(...arrY)             //获取Y轴最小值
             const maximum = data.maxValue             //获取上限值 
             const minimum = data.minValue             //获取下限值 
-            //debugger
+           
             if (data.minValue === data.maxValue) {          // 没有上下限的时候（上限值 === 下限值）
                 optionModal.visualMap.pieces = []
                 optionModal.visualMap.pieces.push({
@@ -759,7 +781,7 @@ export default {
                 // optionModal.visualMap.pieces[0].lte = yMax  //设置上限
                 // optionModal.visualMap.pieces[0].color = '#abcc52' //设置颜色
             } else {
-                //debugger
+                
                 optionModal.series[0].markLine.data = []
                 optionModal.series[0].markLine.data.push({
                     yAxis: data.maxValue,           //设置上限值
@@ -860,7 +882,7 @@ export default {
         },
         // 表格打印。
         printHandle(refTable, event) {
-            //debugger
+          
             let oTable = this.$refs.tableDataindex[refTable];
 
             if (!oTable) {
@@ -992,21 +1014,22 @@ export default {
         top: 4.5px;
     }
 }
-</style>
-<style lang="less" scoped>
-.charts {
+
+#parameter .charts {
     width: 100%;
     box-sizing: border-box;
     min-height: 400px
 }
 
-.inner-content {
+#parameter .inner-content {
     display: flex;
     flex-direction: column;
     height: 100%;
 
     .content-title {
-        margin-top: 0
+        margin-top: 0;
+        height: 20px;
+        line-height: 20px;
     }
     .contentBox {
         display: flex;
@@ -1015,12 +1038,21 @@ export default {
 
         .el-tabs {
             display: flex;
-            flex: 1;
+
+            height: 100%;
             flex-direction: column;
+
+            .el-tabs__content {
+                flex: 1 1;
+
+                .el-tab-pane {
+                    height: 100%;
+                }
+            }
         }
 
         .barcode-input {
-            margin-top: 10px;
+            margin-top: 20px;
             .el-form {
                 display: inline-block;
 
@@ -1045,12 +1077,14 @@ export default {
         margin-top: 0;
         margin-bottom: 20px;
         .tableData {
+            font-size: 14px;
+            text-indent: 0;
             display: flex;
             border-left: 0;
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
-            margin-top: 20px;
+            margin-top: 0;
             .table-handle {
                 margin-right: 5px;
                 i {
@@ -1064,13 +1098,14 @@ export default {
     }
 }
 
-.table {
+#parameter .table {
     .expand-form {
         .el-form-item {
             margin: 5px 10px;
         }
     }
 }
+
 </style>
 
 

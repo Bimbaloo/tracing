@@ -747,7 +747,8 @@
 			// 为了每次点击都会查询。
 			'$route': function(to, from) {
 				// 如果从tree上直接点击，需要更新数据. tag不同
-            	// 从其他页面中进入。from.meta.title不一样
+                // 从其他页面中进入。from.meta.title不一样
+                
 				if(to.meta.title == 'chart' && (from.meta.title == 'chart' || (to.query._tag != undefined && this.treeTag != to.query._tag))) {
 					this.treeTag = to.query._tag;
 					this.updateData()
@@ -850,6 +851,7 @@
             },
             // 重置数据。
             resetData() {
+                
                 this.sErrorMessage = "";
                 this.startIf = true;
 				this.endIf = true;
@@ -1327,7 +1329,7 @@
                     // 保存数据都本地。
                     this.setSessionStorage();
                     // 需要传code，配合路由判断是否切换工序。
-					this.$router.replace({path: oData.router, query: Object.assign({code: this.process}), oQuery});
+					this.$router.replace({path: oData.router, query: Object.assign({code: this.process}, oQuery)});
 				}
 			},
             /**
@@ -1391,7 +1393,7 @@
                 if(!aoData.length) {
                     return;
                 }
-                debugger
+               
                 // 初始化图形数据。
                 this.initChartData(aoData);
                 // 添加图形数据。

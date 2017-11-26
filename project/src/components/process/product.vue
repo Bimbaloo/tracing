@@ -650,13 +650,13 @@ export default {
     	// 设备点击事件。
     	equipmentClick(row) {
     		// 如果设备数据存在，则可点击。
-        	if(!this.isInChart && row.equipmentName) {
-				this.$store.commit({
-					type: "updateTabChange",
-					key: "equipment"
-				});
-                this.$router.replace({ path: '/process/chart', query: {  }})
-        	}
+        	// if(!this.isInChart && row.equipmentName) {
+			// 	this.$store.commit({
+			// 		type: "updateTabChange",
+			// 		key: "equipment"
+			// 	});
+            //     this.$router.replace({ path: '/process/chart', query: {  }})
+        	// }
     	},
     	// 获取筛选条件。
     	getFilters() {
@@ -967,6 +967,13 @@ export default {
             Object.keys(this.$route.query).forEach((el) => {
                 if (el === "operationIdList") {
                     oQuery[el] = this.$route.query[el]
+                }else if (el === "detailInfos") {
+                    oQuery.operationIdList = this.$route.query[el].map(o => {
+                        return {
+                            opId: o.opId, 
+                            opType: o.opType
+                        }
+                    })
                 }
                 if (el === "equipmentName" || el === "startTime" || el === "endTime") {
                     this.condition[el] = this.$route.query[el]
@@ -1330,6 +1337,7 @@ body {
 
 .router-content {
     .condition {
+        margin-bottom: 20px;
         .el-checkbox {
             .el-checkbox__label {
                 margin-left: 0;
@@ -1339,9 +1347,12 @@ body {
     }
 }
 
+.innner-content .search-tab{
+    margin-top: 0;
+}
 
 .search-tab {
-    // padding-top: 20px;
+    
     .el-tabs__header {
         border-bottom: none;
         margin-bottom: 0;

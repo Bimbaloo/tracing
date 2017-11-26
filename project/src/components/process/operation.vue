@@ -387,7 +387,7 @@
 			height: 16px;
 			line-height: 16px;
             border-bottom: none;
-            border-left: 4px solid #42af8f;
+            // border-left: 4px solid #42af8f;
 			font-size: 14px;
             box-sizing: border-box;
             padding: 0 5px;
