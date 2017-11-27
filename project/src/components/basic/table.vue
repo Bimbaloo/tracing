@@ -86,10 +86,13 @@
         },
         data() {
             return {
-                columns: this.tableData.columns
+               // columns: this.tableData.columns
             }
         },
         computed: {
+            columns: function(){
+                return this.tableData.columns
+            },
             selectedData: function(){
                 return this.tableData.selected
             },
