@@ -748,11 +748,11 @@
 						return this.reworkTemplate
 						break;
 					// 工序-投产物料相同
-					case "processSameMaterialTemp":
-						return this.processSameMaterialTemplate
-						break;
-					// 工序-投产物料不同
-					case "processDiffMaterialTemp":
+//					case "processSameMaterialTemp":
+//						return this.processSameMaterialTemplate
+//						break;
+					// 工序-投产物料不同processDiffMaterialTemp
+					case "processTemp":	
 						return this.processDiffMaterialTemplate
 						break;
 					// 车间操作-结转

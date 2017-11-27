@@ -262,16 +262,19 @@ var getNodeIconAndTemp = function(sType) {
 		case 1:
 			oIcon.icon = "process"
 			oIcon.TempMerge = "process"
+			oIcon.temp = "processTemp"
 			break
 		// 产出
 		case 6:
 			oIcon.icon = "process"
 			oIcon.TempMerge = "process"
+			oIcon.temp = "processTemp"
 			break
-		// 工序
+		// 工序-- 工序显示一个模板。
 		case 10001:
 			oIcon.icon = "process"
 			oIcon.TempMerge = "process"
+			oIcon.temp = "processTemp"
 			break
 		// 结转转入
 		case 2:
@@ -563,7 +566,8 @@ var getTreeData = function(oRowData, sPageType) {
 	function _sumProcessData(oData) {
 		// 返回的数据。
 		let oReturn = {
-				detailType: "",
+				// 工序使用一个模板
+//				detailType: "",
 				detailTitle: "",
 				sumList: []
 			},
@@ -590,16 +594,16 @@ var getTreeData = function(oRowData, sPageType) {
 			
 			// 投产物料相同-- 产出只有一个。
 			if(aOutputMaterial.length && sOutMaterial == sInMaterial) {
-				oReturn.detailType = "processSameMaterialTemp"
+//				oReturn.detailType = "processSameMaterialTemp"
 				oReturn.detailTitle = _getShortedNum(sOutMaterial)
 				bIsSame = true
 				
 			}else if(aOutputMaterial.length && sOutMaterial != sInMaterial) {
 				// 投产物料不同
-				oReturn.detailType = "processDiffMaterialTemp"
+//				oReturn.detailType = "processDiffMaterialTemp"
 				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
 			}else {
-				oReturn.detailType = "processDiffMaterialTemp"
+//				oReturn.detailType = "processDiffMaterialTemp"
 				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
 			}
 			
@@ -640,18 +644,7 @@ var getTreeData = function(oRowData, sPageType) {
 						}else {
 							oFlag["touru"].list.push(oType)
 						}
-					}else if(sPageType == "track" && sKey == "6" && oType.remainQuantity > 0) {	// 产出
-						// 滞留： 类型为产出且剩余数量大于0
-						if(!oFlag["zhiliu"]) {
-							oFlag["zhiliu"] = {
-								type: "滞留",
-								list: [oType],
-								order: 3
-							}
-						}else {
-							oFlag["zhiliu"].list.push(oType)
-						}
-					}else {
+					}else if(sKey == "6"){
 						// 产出。
 						if(!oFlag["chanchu"]) {
 							oFlag["chanchu"] = {
@@ -673,13 +666,13 @@ var getTreeData = function(oRowData, sPageType) {
 				// 各个分类中按批次合并。（投料不同时，投入按物料批次合并）
 				aType.forEach(o1 => {
 					// 按批次合并。
-					let aMerge = ["batchNo"],
-						aDis = ["batchNo", "quantity", "remainQuantity"]
-					
-					if(o1.type == "投入" && !bIsSame) {
-						aMerge = ["batchNo", "materialCode"]
+					let aMerge = ["batchNo", "materialCode"],
 						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"]
-					}
+					
+//					if(o1.type == "投入" && !bIsSame) {
+//						aMerge = ["batchNo", "materialCode"]
+//						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"]
+//					}
 					
 					o1.list = _sumDataList(o1.list, aMerge, aDis, ["quantity", "remainQuantity"])
 				})
