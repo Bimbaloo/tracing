@@ -315,12 +315,11 @@
                         name: "送检",
                         router: "/process/qcReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
-
-                    },{
-                        type: "route",
-                        name: "FGB",
-                        router: "/process/fgbReport",
-                        query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
+                    // },{
+                    //     type: "route",
+                    //     name: "FGB",
+                    //     router: "/process/fgbReport",
+                    //     query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
 
                     }]
                 }, {
@@ -1216,7 +1215,7 @@
             requestCustomSucess (aoData) {
                 aoData = [{
                     name: "FGB",
-                    link: "https://www.baidu.com",
+                    link: "FGBReport.html",
                     dimension: "quality",
                     parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
                 },{
