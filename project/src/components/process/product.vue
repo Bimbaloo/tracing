@@ -25,7 +25,7 @@
             <el-tabs element-loading-text="拼命加载中" v-model="activeTabName" class="search-tab" @tab-click="tabChange">
                 <el-tab-pane name="unitTable" label="关联表">
                     <h2 class="content-title uniteTitle">
-                        <span class='table-title'>产出投入</span>
+                        <span class='table-title'>投产关联</span>
                         <span class='table-handle'>
                             <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(uniteItems, $event)"></i>
                             <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('uniteTable', $event)"></i>
