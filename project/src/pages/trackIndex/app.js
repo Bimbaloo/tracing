@@ -25,28 +25,15 @@ Vue.prototype.$post = axios.post;
 
 // 添加echarts。
 Vue.prototype.$echarts = echarts
-/* 仓库操作 */
-const Warehouse = r => require.ensure([], () => r(require('components/warehouse/warehouse.vue')), 'group-detail')                         //仓库操作
-const StockTransfer = r => require.ensure([], () => r(require('components/warehouse/stockTransfer.vue')), 'group-detail')                 //库存转储
-const StockGains = r => require.ensure([], () => r(require('components/warehouse/stockGains.vue')), 'group-detail')                       //库存损益
-const StockAdjustment = r => require.ensure([], () => r(require('components/warehouse/stockAdjustment.vue')), 'group-detail')             //库存调整
-const OutWarehouse = r => require.ensure([], () => r(require('components/warehouse/outWarehouse.vue')), 'group-detail')                   //出库
-const PutInWarehouse = r => require.ensure([], () => r(require('components/warehouse/putInWarehouse.vue')), 'group-detail')               //入库
 
-/* 条码管理 */
-const BarcodeManage = r => require.ensure([], () => r(require('components/barcodeManage/barcodeManage.vue')), 'group-detail')             // 条码管理
-const SupplementaryMaterial = r => require.ensure([], () => r(require('components/barcodeManage/supplementaryMaterial.vue')), 'group-detail')     // 补料                 
-const EmptyContainer = r => require.ensure([], () => r(require('components/barcodeManage/emptyContainer.vue')), 'group-detail')           // 容器清空                 
-const BarcodeBind = r => require.ensure([], () => r(require('components/barcodeManage/barcodeBind.vue')), 'group-detail')                 // 条码绑定                 
 
-/* 车间操作 */
-const Workshop = r => require.ensure([], () => r(require('components/workshop/workshop.vue')), 'group-detail')                            //车间操作
-const NewProcess = r => require.ensure([], () => r(require('components/workshop/process.vue')), 'group-detail')                              //工序
-const CarryOver = r => require.ensure([], () => r(require('components/workshop/carryOver.vue')), 'group-detail')                          //结转
-const ReturnMaterial = r => require.ensure([], () => r(require('components/workshop/returnMaterial.vue')), 'group-detail')                //退料
-const AdjustableShop = r => require.ensure([], () => r(require('components/workshop/adjustableShop.vue')), 'group-detail')                //车间调整
-const ReworkInbound = r => require.ensure([], () => r(require('components/workshop/reworkInbound.vue')), 'group-detail')                  //返工入站
-const ReworkOutbound = r => require.ensure([], () => r(require('components/workshop/reworkOutbound.vue')), 'group-detail')                //返工出站
+
+
+/* 节点动作 */
+const BarcodeManage = r => require.ensure([], () => r(require('components/processNode/barcodeManage.vue')), 'group-detail')             // 条码管理
+const Warehouse = r => require.ensure([], () => r(require('components/processNode/warehouse.vue')), 'group-detail')                         //仓库操作
+const Workshop = r => require.ensure([], () => r(require('components/processNode/workshop.vue')), 'group-detail')                            //车间操作
+
 
 
 
@@ -77,103 +64,13 @@ Vue.use(VueRouter)
 const routes = [  
   {                                     //仓库操作                                              
     path: '/warehouse',                 
-    component: Warehouse,
-    children: [
-    {//库存转储
-      path: 'stockTransfer',          
-      component: StockTransfer,
-      meta: {
-        title: 'stockTransfer'
-      }
-    },{//库存损益
-      path: 'stockGains',
-      component: StockGains,          
-      meta: {
-        title: 'stockGains'
-      }
-    },{//库存调整
-      path: 'stockAdjustment',
-      component: StockAdjustment,     
-      meta: {
-        title: 'stockAdjustment'
-      }
-    },{//出库
-      path: 'outWarehouse',           
-      component: OutWarehouse,         
-      meta: {
-        title: 'outWarehouse'
-      }
-    },{//入库
-      path: 'putInWarehouse',
-      component: PutInWarehouse,       
-      meta: {
-        title: 'putInWarehouse'
-      }
-    }]  
+    component: Warehouse,  
   },{                                   //车间操作            
     path: '/workshop',                                    
     component: Workshop,
-    children: [
-    {//工序
-      path: 'newProcess', 
-      component: NewProcess,
-      meta: {
-      	title: 'newProcess'
-      }
-    },{//结转
-      path: 'carryOver', 
-      component: CarryOver,
-      meta: {
-      	title: 'carryOver'
-      }
-    },{//退料
-      path: 'returnMaterial', 
-      component: ReturnMaterial,
-      meta: {
-      	title: 'returnMaterial'
-      }
-    },{//车间调整
-      path: 'adjustableShop', 
-      component: AdjustableShop,
-      meta: {
-      	title: 'adjustableShop'
-      }
-    },{//返工入站
-      path: 'reworkInbound', 
-      component: ReworkInbound,
-      meta: {
-      	title: 'reworkInbound'
-      }
-    },{//返工出站
-      path: 'reworkOutbound', 
-      component: ReworkOutbound,
-      meta: {
-      	title: 'reworkOutbound'
-      }
-    }]
   },{                                   //条码管理
     path: '/barcodeManage',                           
-    component: BarcodeManage,
-    children: [
-    {//补料
-      path: 'supplementaryMaterial',
-      component: SupplementaryMaterial,
-      meta: {
-      	title: 'supplementaryMaterial'
-      }
-    },{//容器清空
-      path: 'emptyContainer',
-      component: EmptyContainer,
-      meta: {
-      	title: 'emptyContainer'
-      }
-    },{//条码绑定
-      path: 'barcodeBind',
-      component: BarcodeBind,
-      meta: {
-      	title: 'barcodeBind'
-      }
-    }]
+    component: BarcodeManage
   },{                                   //物料
     path: '/stock',                           
     component: Stock,

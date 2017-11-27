@@ -1472,6 +1472,15 @@ var parseQueryParam = function(oQuery, index, bSplit) {
 	return oParam;
 };
 
+const needTableDatas = (pathMapping,nodeType,allColumns)=>{
+	let tableData = {}
+	tableData.filename = pathMapping[nodeType]
+	tableData.columns = allColumns[nodeType]	
+	tableData.data = []	
+
+	return tableData
+}
+
 export default {
 	parseData,
 	parseTreeData,
@@ -1481,3 +1490,5 @@ export default {
 	getTrackCatalogData,
 	SPARENTKEY
 }
+
+export { needTableDatas }
