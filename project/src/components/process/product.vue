@@ -37,9 +37,8 @@
                             <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div 
-                                    :class="['cell-content',{ltext: column.prop === 'barcode'}]" 
-                                    v-if="column.prop === 'barcode'" 
-                                    :style="{paddingLeft: props.row.hasInLen ? 15 : 50 +'px'}">
+                                    :class="['cell-content',{ltext: column.prop === 'barcode'}, {lchildText: !props.row.hasInLen}]" 
+                                    v-if="column.prop === 'barcode'">
                                         <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props, $event)"></i>
                                         <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop]}}</span>
                                         <i 
@@ -1028,7 +1027,6 @@ export default {
             if(this.bTrack){
                 return 0
             }else {
-                debugger
                 // 单件追踪。
                 let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
                     oCondition = {
@@ -1320,6 +1318,9 @@ body {
     .ltext {
         text-align: left;
         padding-left: 15px;
+    }
+    .lchildText {
+    	padding-left: 50px;
     }
 }
 
