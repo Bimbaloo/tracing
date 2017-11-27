@@ -31,7 +31,7 @@
 				description: "",
 				url: "/trace/v1/materialbatchsuppress",
 				styleObject: {
-					"min-width": "1200px"
+					"min-width": "1000px"
 				}
 			}
 		},
@@ -130,7 +130,7 @@
     
 			},
 			setWidth() {
-				this.styleObject.minWidth = "1200px";
+				this.styleObject.minWidth = "1000px";
 			},
 			removeWidth() {
 				this.styleObject.minWidth = 0;

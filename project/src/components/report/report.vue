@@ -165,7 +165,7 @@ export default {
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
-						width: "250",
+						// width: "250",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -237,7 +237,7 @@ export default {
 					}, {
 						prop: "batchNo",
 						name: "批次",
-						width: "200",
+						// width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -301,7 +301,7 @@ export default {
 					}, {
 						prop: "batchNo",
 						name: "批次",
-						width: "200",
+						// width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -368,7 +368,7 @@ export default {
 					}, {
 						prop: "batchNo",
 						name: "批次",
-						width: "200",
+						// width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -431,7 +431,7 @@ export default {
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
-						width: "200",
+						// width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -487,7 +487,7 @@ export default {
 					columns: [{
 						prop: "batchNo",
 						name: "批次",
-						width: "200",
+						// width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -558,7 +558,7 @@ export default {
 					}, {
 						prop: "batchNo",
 						name: "批次",
-						width: "200",
+						// width: "200",
 						sortable: true
 					}, {
 						prop: "materialCode",
@@ -579,7 +579,7 @@ export default {
 					}, {
 						prop: "opPerson",
 						name: "操作人",
-						width: "300",
+						// width: "300",
 						sortable: true
 					}, {
 						prop: "opTime",
@@ -1015,6 +1015,6 @@ export default {
 }
 .second-table {
 	margin-top: 0px;
-	margin-bottom: 0px;
+	// margin-bottom: 0px;
 }
 </style>

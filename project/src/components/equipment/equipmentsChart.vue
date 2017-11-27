@@ -1385,6 +1385,7 @@
             },
             // 请求成功。
             requestSucess(oData) {
+                
                 this.loading = false;
                 this.categories = [];
                 // 保存数据。		
@@ -1548,8 +1549,8 @@
                 });
             },
             // 设置图形数据。
-            setChartData () {  
-                               
+            setChartData () { 
+                                           
                 // 设备状态。
                 this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data = this.showState ? this.getStatusData(): this.getVisualStateData();
                 
@@ -1562,6 +1563,7 @@
                     }
                     
                     if(item.key === 'pool' &&　this.onlyShowRelatedData && !this.bRestrain) {
+                        
                         // 设置可见性，若只展示起点相关。              
                         oFilter.data = oResult.data.filter(arr => arr[5]);
                         // 设置数值显示为起点相关的数量。     
@@ -1841,6 +1843,7 @@
             },
             // 获取事件维度数据。
             getDimensionData (sDimension) {
+                
                 let aoData = [],
                     aoMarkPoint = [],
                     oMap = {};
@@ -1872,8 +1875,7 @@
    
                                 if(sDimension === "pool" && !this.bRestrain) {
                                     // 若为投产，非遏制。
-                                    if((key === "poolInList" && item.operationIdList.find(item => item.opId == o.opId)) || 
-                                    (key === "poolOutList" && item.operationIdList.find(item => item.opId == o.opId))) { 
+                                    if((key === "poolInList" || key === "poolOutList") && item.operationIdList.find(item => item.opId == o.opId)) { 
                                         // 若为属于起点的投入或产出。
                                         if(!oFilter[5]) {
                                             // 若未被标记。
@@ -1897,8 +1899,7 @@
                                 let nTag = 0;
 
                                 if(sDimension === "pool" && !this.bRestrain) {
-                                    if((key === "poolInList" && item.poolInId.indexOf(o.doId) > -1) ||
-                                    (key === "poolOutList" && item.poolOutId.indexOf(o.doId) > -1)) {
+                                    if((key === "poolInList" || key === "poolOutList") && item.operationIdList.find(item => item.opId == o.opId)) {
                                         // 若为属于起点的投入或产出。
                                         // 设置标记点。
                                         aoMarkPoint.push({
@@ -1929,6 +1930,7 @@
             },
             // 设置无数据状态。
             getVisualStateData() {
+                
                 return this.equipments.map((item, index) => {
                     return {
                         name: '',
@@ -1950,6 +1952,7 @@
             },
             // 获取设备状态。
             getStatusData () {
+                
                 let aoData = [];
                 this.equipments.forEach((item, index) => {
                     

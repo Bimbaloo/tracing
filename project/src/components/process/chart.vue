@@ -163,7 +163,7 @@
 					// aoPoolInId = [...new Set(aoPoolInId)]
 					// aoPoolOutId = [...new Set(aoPoolOutId)]
 					
-					let aoOperationIdList = oEquipments[p].forEach(o => {
+					let aoOperationIdList = oEquipments[p].map(o => {
 						return {
 							opId: o.opId,
 							opType: o.opType

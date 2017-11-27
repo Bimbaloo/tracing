@@ -108,7 +108,7 @@
                 },
             
 				styleObject: {
-					"min-width": "1200px"
+					"min-width": "1000px"
 				},
 				result: {
 					whole: 0,
@@ -293,7 +293,7 @@
 				this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, this.requestNameSucess, this.requestFail, this.requestError)
 			},
 			setWidth() {
-				this.styleObject.minWidth = "1200px";
+				this.styleObject.minWidth = "1000px";
 			},
 			removeWidth() {
 				this.styleObject.minWidth = 0;

@@ -49,7 +49,7 @@
                                         @click="showVideoDialog(props.row)"></i>
                                     </div>
                                     <div class="cell-content" v-else>
-                                    	<span v-if="!isInChart && column.prop =='equipmentName'" class="equipment" @click="equipmentClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                                    	<span v-if="!isInChart && column.prop =='equipmentName'" @click="equipmentClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                         <span v-else>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
@@ -1001,11 +1001,12 @@ export default {
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
         	
         },
+        // 批次追踪
         batchClick(row) {
             if(this.bTrack){
                 return 0
             }else {
-                 this.outItems.data
+                debugger
                 // 批次追踪。
                 let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
                 oCondition = {
@@ -1013,8 +1014,8 @@ export default {
                         return {
                             materialCode: o.materialCode,
                             batchNo: o.batchNo,
-                            barcode: o.barcode,
-                            bucketNo: o.bucketNo
+                            // barcode: o.barcode,
+                            snapshotId: o.destSnapshotId
                         }
                     })
                 }
@@ -1022,18 +1023,20 @@ export default {
                 window.open("trackIndex.html?tag=" + tag);
             }
         },
+        // 单件追踪
         barcodeClick(row) {
             if(this.bTrack){
                 return 0
             }else {
+                debugger
                 // 单件追踪。
                 let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
                     oCondition = {
                         selected: [{
                             materialCode: row.materialCode,
                             batchNo: row.batchNo,
-                            barcode: row.barcode,
-                            bucketNo: row.bucketNo
+                            // barcode: row.barcode,
+                            snapshotId: row.destSnapshotId
                         }]
                     }
 
@@ -1122,10 +1125,11 @@ export default {
                 this.viewHeight
 //              - (this.isInChart ? this.outerHeight(document.querySelector(".condition")) : 0)
                 - (this.isInChart && document.querySelector(".condition") ? this.outerHeight(document.querySelector(".condition")) : 0)
+                - (this.isInChart && document.querySelector(".router-path") ? this.outerHeight(document.querySelector(".router-path")) : 0)
                 - 30 //   this.outerHeight(document.querySelector(".el-tabs__header")  初始渲染的时候会有问题
-                - 40 //   this.outerHeight(document.querySelector(".content-title.outTitle"))
-                - 40 //   this.outerHeight(document.querySelector(".content-title.inTitle"))
-                - 88  //修正值
+                - 56 //   this.outerHeight(document.querySelector(".content-title.outTitle"))
+                - 66 //   this.outerHeight(document.querySelector(".content-title.inTitle"))
+                - 20  // 表格margin-bottom
             ) / 2;
 
             return ntable;
@@ -1258,8 +1262,8 @@ export default {
 .cell {
     .cell-content {
         .batchNo,
-        .barcode,
-        .equipment {
+        .barcode {
+        // .equipment 
             cursor: pointer;
             color: #f90;
             .cell {
