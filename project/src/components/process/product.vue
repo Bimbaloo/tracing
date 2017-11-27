@@ -49,8 +49,8 @@
                                         @click="showVideoDialog(props.row)"></i>
                                     </div>
                                     <div class="cell-content" v-else>
-                                    	<span v-if="!isInChart && column.prop =='equipmentName'" class="equipment" @click="equipmentClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                        <span v-else>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                                    	<!--<span v-if="!isInChart && column.prop =='equipmentName'" class="equipment" @click="equipmentClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>-->
+                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
                                 </template>
                             </el-table-column>
