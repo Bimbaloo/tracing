@@ -182,13 +182,13 @@
                     },{
                         prop: "srcWarehouse",
                         name: "仓库"
-                    },{
-                        prop: "srcReservoir",
-                        name: "源库位",
-                        width: "60px"
+                    // },{
+                    //     prop: "srcReservoir",
+                    //     name: "源库位",
+                    //     width: "60px"
                     },{
                         prop: "destReservoir",
-                        name: "目标库位",
+                        name: "库位",
                         width: "60px"
                     },{
                         prop: "quantity",

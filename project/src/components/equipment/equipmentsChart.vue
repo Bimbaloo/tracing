@@ -1186,7 +1186,33 @@
             },
             // 图形缩放处理。
             chartZoomHandle (params) {
-                if((params.dataZoomId && params.dataZoomId.indexOf("1")) || params.type === "datazoom") {
+                if((params.dataZoomId && params.dataZoomId.indexOf("2"))) {
+                    // y轴缩放。
+                    let oYAxis = this.chart.getOption().dataZoom.filter(o => o.type === "slider" && o.yAxisIndex.length === 1)[0]
+                    // console.log(oYAxis)
+                    let nStart = oYAxis.startValue,
+                        nEnd = oYAxis.endValue
+
+                    let aoMarkPoint = this.option.series.filter(o => o.name === "投产")[0].markPoint.data
+                    // console.log(aoMarkPoint)
+                    let aoData = aoMarkPoint.map(o => {
+                        if(o.coord[1] >= nStart && o.coord[1] <= nEnd) {
+                            // 若在y轴缩放范围内。
+                            o.itemStyle.normal.opacity = 1
+                        }else {
+                            o.itemStyle.normal.opacity = 0
+                        }
+                        return o
+                    })
+                    this.chart.setOption({
+                    series: [{
+                        name: "投产",
+                        markPoint: {
+                            data: aoData
+                        }
+                    }]       
+                })
+                }else if((params.dataZoomId && params.dataZoomId.indexOf("1")) || params.type === "datazoom") {
                     // x轴缩放 || 工具栏缩放按钮。
                     let oXAxis = this.getScaledxAxis(),
                         // 缩放后的时间轴时长。
@@ -1474,7 +1500,7 @@
                             startWorkList: this.filterAbnormalData(o.startWorkList),
                             finishWorkList: this.filterAbnormalData(o.finishWorkList)
                         },
-                        // 投产投产
+                        // 投产
                         pool: {
                             poolInList: this.filterAbnormalData(o.poolInList),
                             poolOutList: this.filterAbnormalData(o.poolOutList)
@@ -1576,11 +1602,12 @@
                     }
                     
                 })
-
+        
                 if(this.equipments.length > 1) {
                     // 若大于一台设备。
                     // 添加y轴缩放。
                     this.option.dataZoom.push(Object.assign({
+                        realtime: false,
                         yAxisIndex: [0],
                         width: 16,
                         labelFormatter: function(index, value) {
@@ -1881,7 +1908,12 @@
                                             // 若未被标记。
                                             // 设置标记点。
                                             aoMarkPoint.push({
-                                                coord: [oData.time, nIndex]
+                                                coord: [oData.time, nIndex],
+                                                itemStyle: {
+                                                    normal: {
+                                                        opacity: 1
+                                                    }
+                                                }
                                             })
                                         }
                                         
@@ -1903,7 +1935,12 @@
                                         // 若为属于起点的投入或产出。
                                         // 设置标记点。
                                         aoMarkPoint.push({
-                                            coord: [oData.time, nIndex]
+                                            coord: [oData.time, nIndex],
+                                            itemStyle: {
+                                                normal: {
+                                                    opacity: 1
+                                                }
+                                            }
                                         })
                                         // 设置与起点相关。
                                         // aPointer.push(true)
