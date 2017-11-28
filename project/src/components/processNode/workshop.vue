@@ -84,11 +84,8 @@
                         prop: "destDoCode",
                         name: "目标工单"
                     },{
-                        prop: "srcEquipmentName",
-                        name: "源设备"
-                    },{
-                        prop: "destEquipmentName",
-                        name: "目标设备"
+                        prop: "equipmentName",
+                        name: "设备名称"
                     },{
                         prop: "operatorName",
                         name: "操作人"
@@ -112,11 +109,8 @@
                         prop: "destDoCode",
                         name: "目标工单"
                     },{
-                        prop: "srcEquipmentName",
-                        name: "源设备"
-                    },{
-                        prop: "destEquipmentName",
-                        name: "目标设备"
+                        prop: "equipmentName",
+                        name: "设备名称"
                     },{
                         prop: "operatorName",
                         name: "操作人"
@@ -234,11 +228,8 @@
                         prop: "destDoCode",
                         name: "目标工单"
                     },{
-                        prop: "srcEquipmentName",
-                        name: "源设备"
-                    },{
-                        prop: "destEquipmentName",
-                        name: "目标设备"
+                        prop: "equipmentName",
+                        name: "设备名称"
                     },{
                         prop: "operatorName",
                         name: "操作人"
