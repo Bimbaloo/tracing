@@ -331,6 +331,14 @@
                         router: "/process/product",
                         query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                         // ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
+                    }, {
+                        name: "结转表",
+                        router: "/process/product",
+                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                    }, {
+                        name: "退料表",
+                        router: "/process/product",
+                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                     }]
                 }, {
                     show: false,
@@ -2368,6 +2376,7 @@
                 // 跳转之前保存数据。
                 this.setSessionStorage();
                 let oDate = this.getRealTime();
+                
                 // 根据设备+开始时间+结束时间，查询可疑品列表。
                 this.$router.replace({ path: "/process/restrain", query: {
                     equipmentName: this.selectedEquipmentName,

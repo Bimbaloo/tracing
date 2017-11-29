@@ -8,7 +8,7 @@
 				<span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span>
 			</div>
 			<div class="condition" v-if="'equipmentId' in oQuery">
-				<span>设备名称：{{oQuery.equipmentId}}</span><span>开始时间：{{oQuery.startTime}}</span><span>结束时间：{{oQuery.endTime}}</span>
+				<span>设备名称：{{equipmentName}}</span><span>开始时间：{{oQuery.startTime}}</span><span>结束时间：{{oQuery.endTime}}</span>
 			</div>
 			<h2 class="title">可疑品列表</h2>
 			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
@@ -32,7 +32,8 @@
 				url: "/trace/v1/materialbatchsuppress",
 				styleObject: {
 					"min-width": "1000px"
-				}
+				},
+				equipmentName: ""
 			}
 		},
 		computed: {
@@ -44,13 +45,18 @@
 			}
 		},
 		created() {
+			this.equipmentName = this.oQuery.equipmentName
 			// 组件创建完后获取数据，
 			// 此时 data 已经被 observed 了
 			// this.fetchData();
 		},
 		watch: {
 			// 如果路由有变化，会再次执行该方法
-//			 '$route': 'fetchData'
+			 '$route': function() {			 
+				if(this.$route.meta.title === "restrain") {
+					this.equipmentName = this.oQuery.equipmentName
+				}				
+			 }
 		},
 		methods: {	
 

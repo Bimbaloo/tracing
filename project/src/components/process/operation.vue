@@ -105,7 +105,7 @@
                         this.$router.replace({ 
                             path: "/process/chart",
                             query: {
-                                "detailInfos": this.$route.query.detailInfos,
+                                // "detailInfos": this.$route.query.detailInfos,
                                 "key": this.$route.query.key,
                                 "code": this.processCode,
                                 "_tag":  this.$route.query._tag
@@ -151,7 +151,6 @@
             },
             // 设置路由。
             setRouteQuery(from, to) {
-                
                 if(from.fullPath === to.fullPath) {
                     // 已跳转成功。
                     return
