@@ -538,11 +538,11 @@ var getTreeData = function(oRowData, sPageType) {
 						return (o.batchNo||"").length
 					}
 				},{
-					name: "滞留数/总数",
-					minLen: 6,
+					name: (sPageType == "trace" ? "总数": "滞留数/总数"),
+					minLen: (sPageType == "trace" ? 2: 6),
 					type: 2,
 					formatter: function(o) {
-						return (o.remainQuantity + "/" + o.quantity).length
+						return (sPageType == "trace") ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
 					}
 				}]
 				
@@ -922,9 +922,16 @@ var getTreeData = function(oRowData, sPageType) {
 				aType.forEach(o1 => {
 					// 按批次合并。
 					let aMerge = ["batchNo", "materialCode"],
-						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"]
+						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"],
+						aSum = ["quantity", "remainQuantity"]
 						
-					o1.list = _sumDataList(o1.list, aMerge, aDis, ["quantity", "remainQuantity"])
+					// trace 和 track展示不同。
+					if(sPageType == "trace") {
+						aDis = ["batchNo", "quantity", "materialName"]
+						aSum = ["quantity"]
+					}
+					
+					o1.list = _sumDataList(o1.list, aMerge, aDis, aSum)
 				})
 				
 				// 重新设置类型数据。

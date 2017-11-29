@@ -214,7 +214,14 @@
 																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 																),
 																this.$(go.TextBlock,
-																	new go.Binding("text", "",  o => o.remainQuantity + "/" + o.quantity),		// 总数/滞留数
+																	new go.Binding("text", "",  function(o) {
+																		if(o.remainQuantity === undefined) {
+																			// 溯源处理
+																			return o.quantity
+																		}else {
+																			return o.remainQuantity + "/" + o.quantity
+																		}
+																	}),		// 总数/滞留数
 																	new go.Binding("width", "column4"),
 																	{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 																)
