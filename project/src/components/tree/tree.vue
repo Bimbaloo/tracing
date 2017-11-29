@@ -860,7 +860,7 @@
 					this.$router.replace({ 
 						path: "/warehouse", 
 						query: {
-							"detailInfos": node.data.detailInfos,
+							// "detailInfos": node.data.detailInfos,
 							"nodeType": node.data.nodeType,
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}
@@ -877,7 +877,7 @@
 					this.$router.replace({ 
 						path: "/workshop",
 						query: {
-							"detailInfos": node.data.detailInfos,
+							// "detailInfos": node.data.detailInfos,
 							"key": node.data.nodeType,
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}										
@@ -893,7 +893,7 @@
 					this.$router.replace({ 
 						path: "/barcodeManage",
 						query: {
-							"detailInfos": node.data.detailInfos,
+							// "detailInfos": node.data.detailInfos,
 							"key": node.data.nodeType,
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}										
@@ -922,11 +922,11 @@
 					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
 						detailInfos: node.data.detailInfos
 					}) 
-
+					
 					this.$router.replace({ 
 						path: "/process",
 						query: {
-							"detailInfos": node.data.detailInfos,
+							// "detailInfos": node.data.detailInfos,
 							"key": node.data.nodeType,
 							"code": node.data.code,
 							// "name": node.data.name,

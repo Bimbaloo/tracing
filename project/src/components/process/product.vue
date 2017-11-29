@@ -610,6 +610,9 @@ export default {
         },
         activeTabChange: function() {
         	return this.$store && this.$store.state.activeTabChange
+        },
+        detailInfos () {
+            return this.$store && this.$store.state.detailInfos
         }
     },
     mounted() {
@@ -966,18 +969,20 @@ export default {
             Object.keys(this.$route.query).forEach((el) => {
                 if (el === "operationIdList") {
                     oQuery[el] = this.$route.query[el]
-                }else if (el === "detailInfos") {
-                    oQuery.operationIdList = this.$route.query[el].map(o => {
-                        return {
-                            opId: o.opId, 
-                            opType: o.opType
-                        }
-                    })
                 }
                 if (el === "equipmentName" || el === "startTime" || el === "endTime") {
                     this.condition[el] = this.$route.query[el]
                 }
             })
+
+            if(!oQuery.operationIdList) {
+                oQuery.operationIdList = this.detailInfos.map(o => {
+                    return {
+                        opId: o.opId, 
+                        opType: o.opType
+                    }
+                })
+            }
             this.filters = this.getFilters()
 //          oQuery = {
 //				"operationIdList": [{
