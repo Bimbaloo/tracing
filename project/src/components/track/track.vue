@@ -226,11 +226,18 @@
             setSession () {
             	let aSelected = [];
             	
+            	// 是否为结转
+            	let bIsCarrayOver = (this.gridData.selected[0].opType == 2) ? true: false
+            	
+            	
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-//          		({ doId: oSelected.doId, barcode: oSelected.barcode, batchNo: oSelected.batchNo, productionMode: oSelected.productionMode, materialCode: oSelected.materialCode, bucketNo: oSelected.bucketNo} = o);
-            		({ snapshotId: oSelected.snapshotId, batchNo: oSelected.batchNo, materialCode: oSelected.materialCode} = o);
+            		if(bIsCarrayOver) {
+            			({ srcSnapshotId: oSelected.snapshotId, batchNo: oSelected.batchNo, materialCode: oSelected.materialCode} = o);
+            		}else {
+	            		({ snapshotId: oSelected.snapshotId, batchNo: oSelected.batchNo, materialCode: oSelected.materialCode} = o);
+            		}
             		
             		aSelected.push(oSelected);
             	})
