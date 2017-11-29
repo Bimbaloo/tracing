@@ -191,7 +191,6 @@
 			this.tableHeight = this.setHeight()
         },
         watch: {
-			"detailInfos": "fetchData",
 			"clickNum": "fetchData",
 			/* 视窗大小变化，重新设置table大小 */
 			"resizeY": function(){
