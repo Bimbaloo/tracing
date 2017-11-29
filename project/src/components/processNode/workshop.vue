@@ -353,7 +353,9 @@
 				let oTableData = needTableDatas(this.pathMapping,this.nodeType,this.allColumns)
 				if(this.nodeType === 8){ //退料
 					oTableData.data = [].concat(oData.outList)	
-				}else{
+				}else if ( this.nodeType === 2 || this.nodeType === 7 || this.nodeType === 10002 ){
+					oTableData.data = [].concat(oData.turnInOutDetailList)	
+				}else {
 					oTableData.data = [].concat(oData.barcodeManagementDetailList)	
 				}
 				this.materialData = oTableData
