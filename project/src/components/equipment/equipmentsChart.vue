@@ -329,16 +329,16 @@
                     list: [{
                         name: "投产表",
                         router: "/process/product",
-                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        query: ["operationIdList", "equipmentName", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                         // ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }, {
                         name: "结转表",
                         router: "/process/product",
-                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        query: ["operationIdList", "equipmentName", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                     }, {
                         name: "退料表",
                         router: "/process/product",
-                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        query: ["operationIdList", "equipmentName", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                     }]
                 }, {
                     show: false,
@@ -1743,6 +1743,38 @@
                             {name: "批次", value: o.batchNo},
                             {name: "数量", value: o.quantity},
                             {name: "质量", value: o.qualityType}
+                        ];
+                        break;
+                        // 结转
+                    case "carryForword":
+                        oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
+                        oResult.title = "结转";
+                        oResult.tooltipData = [
+                            {name: "条码", value: o.barcode},
+                            {name: "时间", value: o.happenTime},
+                            {name: "操作人", value: o.personName},
+                            {name: "源工单", value: o.srcDoCode},
+                            {name: "目标工单", value: o.desDoCode},
+                            {name: "物料", value: o.materialName},
+                            {name: "批次", value: o.batchNo},
+                            {name: "数量", value: o.quantity}
+                        ];
+                        break;
+                        // 退料
+                    case "retreatMaterial":
+                        oResult.time = +new Date(o.happenTime);
+                        o.timePoint = o.happenTime;
+                        oResult.title = "退料";
+                        oResult.tooltipData = [
+                            {name: "条码", value: o.barcode},
+                            {name: "时间", value: o.happenTime},
+                            {name: "操作人", value: o.personName},
+                            {name: "工单", value: o.doCode},
+                            {name: "原因", value: o.reason},
+                            {name: "物料", value: o.materialName},
+                            {name: "批次", value: o.batchNo},
+                            {name: "数量", value: o.quantity}
                         ];
                         break;
                         // 质检
