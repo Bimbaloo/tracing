@@ -147,63 +147,27 @@
 					)
 				)
 			},
+			// 节点表头信息模板。
+			headerTemplate() {
+				return this.$(go.Panel, "TableColumn",
+							this.$(go.TextBlock,
+								new go.Binding("text", "name"),
+								new go.Binding("width", "width"),
+								{row: 0, margin: 5, textAlign: "center", font: "bold 8pt sans-serif", stroke: "white"}),
+					)
+			},
 			// 物料节点详细信息模板。
 		    materialTemplate() {
 		      	return this.$(go.Panel, "TableRow",
 		      				this.$(go.TextBlock, 
 		      						new go.Binding("text", "batchNo"), // 批次
-									{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+		      						new go.Binding("width", "column0"),
+									{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
 									new go.Binding("text", "quantity"),	// 数量
-									{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center })
+									new go.Binding("width", "column1"), 
+									{ column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"})
 		      			)
-		    },
-		    // 工序-投产物料相同。
-		    processSameMaterialTemplate() {
-		    	return this.$(go.Panel, "TableRow",
-							this.$(go.Panel, "Table",
-								{defaultColumnSeparatorStroke: TABLE_COLOR},
-								this.$(go.TextBlock,
-									new go.Binding("text", "equipmentName"), // 设备
-									{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
-								this.$(go.Panel, "Table",
-									this.$(go.RowColumnDefinition, { column: 1, separatorStroke: TABLE_COLOR }),
-									this.$(go.RowColumnDefinition, { row: 1, separatorStroke: TABLE_COLOR}),
-									this.$(go.RowColumnDefinition, { row: 2, separatorStroke: TABLE_COLOR}),
-									{column:1},
-									new go.Binding("itemArray", "list"),
-									{
-										itemTemplate:
-											this.$(go.Panel, "TableRow",
-												this.$(go.TextBlock,
-													new go.Binding("text", "type"),
-													{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR}
-												),
-												this.$(go.Panel, "Table",
-													{
-														defaultRowSeparatorStroke: TABLE_COLOR,
-														column: 1
-													},
-													new go.Binding("itemArray", "list"),
-													{
-														itemTemplate:
-															this.$(go.Panel, "TableRow",
-																this.$(go.TextBlock,
-																	new go.Binding("text", "batchNo"),
-																	{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR}
-																),
-																this.$(go.TextBlock,
-																	new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),		// 总数/滞留数
-																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR}
-																)
-															)
-													}
-												)
-											)
-									}
-								)
-							)
-						)
 		    },
 		    // 工序-投产物料不同。
 		    processDiffMaterialTemplate() {
@@ -212,7 +176,8 @@
 								{defaultColumnSeparatorStroke: TABLE_COLOR},
 								this.$(go.TextBlock,
 									new go.Binding("text", "equipmentName"), // 设备
-									{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+									new go.Binding("width", "column0"),
+									{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.Panel, "Table",
 									this.$(go.RowColumnDefinition, { column: 1, separatorStroke: TABLE_COLOR }),
 									this.$(go.RowColumnDefinition, { row: 1, separatorStroke: TABLE_COLOR}),
@@ -224,12 +189,14 @@
 											this.$(go.Panel, "TableRow",
 												this.$(go.TextBlock,
 													new go.Binding("text", "type"),
+													new go.Binding("width", "column1"),
 													{ column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR}
 												),
 												this.$(go.Panel, "Table",
 //													this.$(go.RowColumnDefinition, { column: 1, separatorStroke: TABLE_COLOR }),
 													{
 														defaultRowSeparatorStroke: TABLE_COLOR,
+														defaultColumnSeparatorStroke: TABLE_COLOR,
 														column: 1
 													},
 													new go.Binding("itemArray", "list"),
@@ -238,15 +205,25 @@
 															this.$(go.Panel, "TableRow",
 																this.$(go.TextBlock,
 																	new go.Binding("text", "materialName"),
-																	{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR}
+																	new go.Binding("width", "column2"),
+																	{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 																),
 																this.$(go.TextBlock,
 																	new go.Binding("text", "batchNo"),
-																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR}
+																	new go.Binding("width", "column3"),
+																	{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 																),
 																this.$(go.TextBlock,
-																	new go.Binding("text", "",  o => o.remainQuantity + "/" + o.quantity),		// 总数/滞留数
-																	{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR}
+																	new go.Binding("text", "",  function(o) {
+																		if(o.remainQuantity === undefined) {
+																			// 溯源处理
+																			return o.quantity
+																		}else {
+																			return o.remainQuantity + "/" + o.quantity
+																		}
+																	}),		// 总数/滞留数
+																	new go.Binding("width", "column4"),
+																	{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 																)
 															)
 													}
@@ -262,13 +239,16 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock, 
 								new go.Binding("text", "destBarcode"), // 条码
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column0"),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock,
 								new go.Binding("text", "batchNo"), // 批次
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
+								new go.Binding("width", "column1"),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
-								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column2"),
+								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 						)
 		    },
 		    // 返工节点详细信息模板。
@@ -276,13 +256,16 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock,
 								new go.Binding("text", "batchNo"), // 批次
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column0"),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column1"),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "qualityTypeName"),	// 质量
-								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column2"),
+								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 						)
 		    },
 		    // 车间操作-结转+退料
@@ -290,36 +273,43 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock, 
 								new go.Binding("text", "materialName"), // 条码
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column0"),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column1"),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 						)
 		    },
 		    // 车间操作-车间调整 | 仓库操作-库存调整详细信息模板。
 		    workshopTemplate() {
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.Panel, "Table",
-								this.$(go.RowColumnDefinition, { column: 2, separatorStroke: TABLE_COLOR}),
+								{defaultColumnSeparatorStroke: TABLE_COLOR},
+//								this.$(go.RowColumnDefinition, { column: 2, separatorStroke: TABLE_COLOR}),
 								this.$(go.TextBlock,
 									new go.Binding("text", "srcBarcode"), // 源条码
-									{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+									new go.Binding("width", "column0"),
+									{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.TextBlock,
 									new go.Binding("text", "destAdjustQuantity"), // 源条码
-									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+									new go.Binding("width", "column1"),
+									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.Panel, "Table",
-									{column:2, defaultRowSeparatorStroke: TABLE_COLOR},
+									{column:2, defaultRowSeparatorStroke: TABLE_COLOR, defaultColumnSeparatorStroke: TABLE_COLOR},
 									new go.Binding("itemArray", "list"),
 									{
 										itemTemplate:
 											this.$(go.Panel, "TableRow",
 												this.$(go.TextBlock,
 													new go.Binding("text", "destBarcode"),
-													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
+													new go.Binding("width", "column2"),
+													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 												),
 												this.$(go.TextBlock,
 													new go.Binding("text", "", o => o.remainQuantity + "/" + o.destAdjustQuantity),	// 调整数/滞留数
-													{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}
+													new go.Binding("width", "column3"),
+													{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 												)
 											)
 									}
@@ -334,22 +324,22 @@
 								this.$(go.RowColumnDefinition, { column: 2, separatorStroke: TABLE_COLOR}),
 								this.$(go.TextBlock,
 									new go.Binding("text", "batchNo"), // 批次
-									{column: 0,  margin: 5, stroke: COMMENT_TEXTCOLOR }),
+									new go.Binding("width", "column0"),
+									{column: 0,  margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.TextBlock,
 									new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity), // 总数/滞留数
-									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+									new go.Binding("width", "column1"),
+									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.Panel, "Table",
 										{column: 2, defaultRowSeparatorStroke: TABLE_COLOR},
-									this.$(go.TextBlock, "源:",
-										{row: 0, column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
 									this.$(go.TextBlock, 
-										new go.Binding("text", "", o => o.srcWarehouse + o.srcWarehouseLocation), // 仓库库位
-										{row: 0, column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
-									this.$(go.TextBlock, "目标:",
-										{row: 1, column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+										new go.Binding("width", "column2"),
+										new go.Binding("text", "", o => "源:" + o.srcWarehouse + o.srcWarehouseLocation), // 仓库库位
+										{row: 0, column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 									this.$(go.TextBlock, 
-										new go.Binding("text", "", o => o.destWarehouse + o.destWarehouseLocation), // 仓库库位
-										{row: 1, column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR }),
+										new go.Binding("width", "column2"),
+										new go.Binding("text", "", o => "目标:" + o.destWarehouse + o.destWarehouseLocation), // 仓库库位
+										{row: 1, column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								)
 							)
 						)
@@ -359,13 +349,16 @@
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock, 
 								new go.Binding("text", "batchNo"), // 批次
-								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column0"),
+								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 总数/滞留数
-								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center}),
+								new go.Binding("width", "column1"),
+								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}),
 							this.$(go.TextBlock, 
 								new go.Binding("text", "", o => o.destWarehouse + o.destWarehouseLocation),	// 仓库库位
-								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, alignment: go.Spot.Center }),
+								new go.Binding("width", "column2"),
+								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 						)
 		    },
 			// 简单节点样式。
@@ -539,9 +532,7 @@
 										},
 										new go.Binding("stroke", "", this.getTextColor),
 										new go.Binding("text", "name")//.makeTwoWay() //
-//										new go.Binding("stroke", "isHighlighted", function(h) { return h ? NORMAL_TEXT_COLOR : "#333333" }).ofObject()
 									),
-									// new go.Binding("editable","editable"),
 									this.$("TreeExpanderButton", {
 										portId: "FROM",
 										fromSpot: go.Spot.Right,
@@ -560,18 +551,31 @@
 								this.$(go.Shape, "Rectangle",
 									{stroke: TABLE_COLOR , fill: "white"}),
 								this.$(go.Panel, "Table", { background: "transparent"},
-									new go.Binding("itemArray", "sumList"),//materialInfoList
-									new go.Binding("itemTemplate", "detailType", this.fieldTemplate),		// 绑定节点详细信息模板。
-									{
-										defaultAlignment: go.Spot.Left,
-										defaultRowSeparatorStroke: TABLE_COLOR
-									},
 									this.$(go.Panel, "TableRow",
-										{ isPanelMain: true, background: TABLE_COLOR },  // needed to keep this element when itemArray gets an Array
+										{row:0, background: TABLE_COLOR},
 										new go.Binding("visible", "detailTitle", detailTitle => detailTitle ? true : false),
-										this.$(go.TextBlock, new go.Binding("text", "detailTitle"), // 物料名称
-											// 标题显示的总列。
-											{ row: 0, column: 0, columnSpan: 3,  margin: 5,  alignment: go.Spot.Center, font: "bold 10pt sans-serif", stroke: "white"})
+										this.$(go.TextBlock, new go.Binding("text", "detailTitle"),
+											{ alignment: go.Spot.Center, font: "bold 10pt sans-serif", stroke: "white" }
+										)
+									),
+									this.$(go.Panel, "TableRow",
+										{ row:1, background: TABLE_COLOR},
+										this.$(go.Panel, "Table",
+											new go.Binding("itemArray", "headerList"),
+											{
+												itemTemplate: this.headerTemplate,
+												defaultColumnSeparatorStroke: TABLE_COLOR
+											}
+										)
+									),
+									this.$(go.Panel, "Table",
+										new go.Binding("itemArray", "sumList"),
+										new go.Binding("itemTemplate", "detailType", this.fieldTemplate),
+										{
+											defaultRowSeparatorStroke: TABLE_COLOR,
+											defaultColumnSeparatorStroke: TABLE_COLOR,
+											row:2
+										}
 									)
 								)
 							),
@@ -645,25 +649,39 @@
 							})
 						),
 						this.$(go.Panel,"Auto",
-							this.$(go.Shape, "Rectangle",
-								{stroke: TABLE_COLOR , fill: "white"}),
-							this.$(go.Panel, "Table", { background: "transparent"},
-								new go.Binding("itemArray", "sumList"),//materialInfoList
-								new go.Binding("itemTemplate", "detailType", this.fieldTemplate),		// 绑定节点详细信息模板。
-								{
-									defaultAlignment: go.Spot.Left,
-									defaultRowSeparatorStroke: TABLE_COLOR
-								},
-								this.$(go.Panel, "TableRow",
-									{ isPanelMain: true, background: TABLE_COLOR },  // needed to keep this element when itemArray gets an Array
-									new go.Binding("visible", "detailTitle", detailTitle => detailTitle ? true : false),
-									this.$(go.TextBlock, new go.Binding("text", "detailTitle"), // 物料名称
-											// 标题显示的总列。
-//											new go.Binding("columnSpan", 'columnIndex'),
-										{ row: 0, column: 0, columnSpan: 3,  margin: 5, alignment: go.Spot.Center, font: "bold 10pt sans-serif", stroke: "white"})//new go.Margin(2, 2, 0, 2)font: "bold 10pt sans-serif",
+								this.$(go.Shape, "Rectangle",
+									{stroke: TABLE_COLOR , fill: "white"}),
+								this.$(go.Panel, "Table", { background: "transparent"},
+									this.$(go.Panel, "TableRow",
+										{row:0, background: TABLE_COLOR},
+										new go.Binding("visible", "detailTitle", detailTitle => detailTitle ? true : false),
+										this.$(go.TextBlock, new go.Binding("text", "detailTitle"),
+											{ alignment: go.Spot.Center, font: "bold 10pt sans-serif", stroke: "white" }
+										)
+									),
+									this.$(go.Panel, "TableRow",
+										{ row:1, background: TABLE_COLOR},
+										this.$(go.Panel, "Table",
+											new go.Binding("itemArray", "headerList"),
+											{
+												itemTemplate: this.headerTemplate,
+												defaultAlignment: go.Spot.Center,
+												defaultColumnSeparatorStroke: TABLE_COLOR,
+											}
+										)
+									),
+									this.$(go.Panel, "Table",
+										new go.Binding("itemArray", "sumList"),
+										new go.Binding("itemTemplate", "detailType", this.fieldTemplate),
+										{
+											defaultAlignment: go.Spot.Center,
+											defaultRowSeparatorStroke: TABLE_COLOR,
+											defaultColumnSeparatorStroke: TABLE_COLOR,
+											row:2
+										}
+									)
 								)
 							)
-						)
 					) 	
 			},
 			linkTemplate() {

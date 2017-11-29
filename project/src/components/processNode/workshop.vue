@@ -83,12 +83,9 @@
                     },{
                         prop: "destDoCode",
                         name: "目标工单"
-                    // },{
-                    //     prop: "srcEquipmentName",
-                    //     name: "源设备"
                     },{
-                        prop: "destEquipmentName",
-                        name: "设备"
+                        prop: "equipmentName",
+                        name: "设备名称"
                     },{
                         prop: "operatorName",
                         name: "操作人"
@@ -111,12 +108,9 @@
                     },{
                         prop: "destDoCode",
                         name: "目标工单"
-                    // },{
-                    //     prop: "srcEquipmentName",
-                    //     name: "源设备"
                     },{
-                        prop: "destEquipmentName",
-                        name: "设备"
+                        prop: "equipmentName",
+                        name: "设备名称"
                     },{
                         prop: "operatorName",
                         name: "操作人"
@@ -233,12 +227,9 @@
                     },{
                         prop: "destDoCode",
                         name: "目标工单"
-                    // },{
-                    //     prop: "srcEquipmentName",
-                    //     name: "源设备"
                     },{
-                        prop: "destEquipmentName",
-                        name: "目标设备"
+                        prop: "equipmentName",
+                        name: "设备名称"
                     },{
                         prop: "operatorName",
                         name: "操作人"
@@ -362,7 +353,9 @@
 				let oTableData = needTableDatas(this.pathMapping,this.nodeType,this.allColumns)
 				if(this.nodeType === 8){ //退料
 					oTableData.data = [].concat(oData.outList)	
-				}else{
+				}else if ( this.nodeType === 2 || this.nodeType === 7 || this.nodeType === 10002 ){
+					oTableData.data = [].concat(oData.turnInOutDetailList)	
+				}else {
 					oTableData.data = [].concat(oData.barcodeManagementDetailList)	
 				}
 				this.materialData = oTableData

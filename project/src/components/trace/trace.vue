@@ -147,12 +147,6 @@
 	                    field: "srcDoCode",
 	                    headerName: "源工单"
     				},{
-    					field: "srcEquipmentName",
-	                    headerName: "源设备",
-	                    cellRenderer: function(params) {
-	                    	return (params.data.srcEquipmentCode || "") + (params.data.srcEquipmentCode && params.data.srcEquipmentName ? ":" : "") + (params.data.srcEquipmentName || "")
-		                }
-    				},{
 	                    field: "qualityTypeName",
 	                    headerName: "质量"
     				}]

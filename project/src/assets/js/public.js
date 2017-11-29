@@ -393,12 +393,68 @@ var getTreeData = function(oRowData, sPageType) {
 				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo"], ["batchNo", "quantity", "remainQuantity", "srcWarehouse", "srcWarehouseLocation", "destWarehouse", "destWarehouseLocation"], ["quantity", "remainQuantity"])
 				// 设置详细信息标题
 				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : "" 
+				// 设置表头。
+				oData.headerList = [{
+					name: "批次",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.batchNo || "").length
+					}
+				},{
+					name: "滞留数/总数",
+					minLen: 6,
+					formatter: function(o) {
+						return (o.remainQuantity+"/"+o.quantity).length
+					}
+				},{
+					name: "仓库库位",
+					minLen: 4,
+					formatter: function(o) {
+						return Math.max( ((o.srcWarehouse || "")+(o.srcWarehouseLocation||"")).length, ((o.destWarehouse||"")+(o.destWarehouseLocation||"")).length ) + 3	// 设置为目标:
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
+				
 				break;
 			// 库存调整
 			case "warehouseAdjust" :
 				// 设置详细信息标题
 				oData.detailTitle = `${oData.detailInfos.length ? oData.detailInfos[0].materialName : ""}(${oData.detailInfos.length ? (oData.detailInfos[0].destWarehouse || "") : ""})`
 				oData.sumList = _sumWorkShopData(oData)
+				// 设置表头。
+				oData.headerList = [{
+					name: "源条码",
+					minLen: 3,
+					formatter: function(o) {
+						return (o.srcBarcode||"").length
+					}
+				},{
+					name: "调整数",
+					minLen: 3,
+					formatter: function(o) {
+						return (o.destAdjustQuantity+"").length
+					}
+				},{
+					name: "目标条码",
+					minLen: 4,
+					type: 1,
+					formatter: function(o) {
+						return (o.destBarcode||"").length
+					}
+				},{
+					name: "滞留数/调整数",
+					minLen: 7,
+					type: 1,
+					formatter: function(o) {
+						return (o.remainQuantity+"/"+o.destAdjustQuantity).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
+				
 				break;
 				
 			// 入库	
@@ -408,6 +464,29 @@ var getTreeData = function(oRowData, sPageType) {
 				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo", "destWarehouse", "destWarehouseLocation"], ["batchNo", "destWarehouse", "destWarehouseLocation", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
 				// 设置详细信息标题
 				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : ""
+				// 设置表头。
+				oData.headerList = [{
+					name: "批次",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.batchNo||"").length
+					}
+				},{
+					name: "滞留数/总数",
+					minLen: 6,
+					formatter: function(o) {
+						return (o.remainQuantity + "/" + o.quantity).length
+					}
+				},{
+					name: "仓库库位",
+					minLen: 4,
+					formatter: function(o) {
+						return ((o.destWarehouse||"") + (o.destWarehouseLocation||"")).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
 				
 				break;
 			
@@ -429,6 +508,47 @@ var getTreeData = function(oRowData, sPageType) {
 					oData = Object.assign({}, oData, _sumProcessData(oData))
 				}
 				
+				// 设置表头。
+				oData.headerList = [{
+					name: "设备",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.equipmentName||"").length
+					}
+				},{
+					name: "类型",
+					minLen: 2,
+					type: 1,
+					formatter: function(o) {
+						return o.type.length
+					}
+				},{
+					name: "物料",
+					type: 2,
+					minLen: 2,
+					maxLen: 15,
+					formatter: function(o) {
+						return (o.materialName||"").length
+					}
+				},{
+					name: "批次",
+					minLen: 2,
+					type: 2,
+					formatter: function(o) {
+						return (o.batchNo||"").length
+					}
+				},{
+					name: (sPageType == "trace" ? "总数": "滞留数/总数"),
+					minLen: (sPageType == "trace" ? 2: 6),
+					type: 2,
+					formatter: function(o) {
+						return (sPageType == "trace") ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
+				
 				break;
 			// 	结转
 			case "workshopCarryover":
@@ -439,6 +559,25 @@ var getTreeData = function(oRowData, sPageType) {
 					oIn = oData.detailInfos.filter( o => o.opType == "2" && o.srcSnapshotId == oOut.destSnapshotId)[0] || {}
 				
 				oData.detailTitle = `源:${oOut.doCode || ''} 目标:${oIn.doCode || ''}`
+				
+				oData.headerList = [{
+					name: "物料",
+					minLen: 2,
+					maxLen: 15,
+					formatter: function(o) {
+						return (o.materialName||"").length
+					}
+				}, {
+					name: "滞留数/总数",
+					minLen: 6,
+					formatter: function(o) {
+						return (o.remainQuantity + "/" + o.quantity).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
+				
 				break;
 			// 	退料
 			case "workshopReturnMateiral":
@@ -446,11 +585,61 @@ var getTreeData = function(oRowData, sPageType) {
 				// 工单
 				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].doCode : ""
 				
+				oData.headerList = [{
+					name: "物料",
+					minLen: 2,
+					maxLen: 15,
+					formatter: function(o) {
+						return (o.materialName||"").length
+					}
+				}, {
+					name: "滞留数/总数",
+					minLen: 6,
+					formatter: function(o) {
+						return (o.remainQuantity + "/" + o.quantity).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
+				
 				break;
 			//	车间调整
 			case "workshop":
 				oData.sumList = _sumWorkShopData(oData)
 				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : "";
+				
+				// 设置表头。
+				oData.headerList = [{
+					name: "源条码",
+					minLen: 3,
+					formatter: function(o) {
+						return (o.srcBarcode||"").length
+					}
+				},{
+					name: "调整数",
+					minLen: 3,
+					formatter: function(o) {
+						return (o.destAdjustQuantity+"").length
+					}
+				},{
+					name: "目标条码",
+					type: 1,
+					minLen: 4,
+					formatter: function(o) {
+						return (o.destBarcode||"").length
+					}
+				},{
+					name: "滞留数/调整数",
+					type: 1,
+					minLen: 7,
+					formatter: function(o) {
+						return (o.remainQuantity+"/"+o.destAdjustQuantity).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
 				
 				break;
 			// 返工入站 返工出站
@@ -458,6 +647,31 @@ var getTreeData = function(oRowData, sPageType) {
 				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo", "qualityTypeName"], ["batchNo", "qualityTypeName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
 				// 设置详细信息标题
 				oData.detailTitle = oData.detailInfos.length ? oData.detailInfos[0].materialName : ""
+				
+				// 设置表头。
+				oData.headerList = [{
+					name: "批次",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.batchNo||"").length
+					}
+				},{
+					name: "滞留数/总数",
+					minLen: 7,
+					formatter: function(o) {
+						return (o.remainQuantity+"/"+o.quantity).length
+					}
+				},{
+					name: "质量",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.qualityTypeName||"").length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
+				
 				break;
 			
 			// 条码绑定 补料 容器清空
@@ -473,14 +687,55 @@ var getTreeData = function(oRowData, sPageType) {
 					oData.detailTitle = oData.detailTitle ? oData.detailTitle : (oData.detailInfos.length ? oData.detailInfos[0].materialName : "")
 				}
 				
+				// 设置表头。
+				oData.headerList = [{
+					name: "条码",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.destBarcode||"").length
+					}
+				},{
+					name: "批次",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.batchNo||"").length
+					}
+				},{
+					name: "滞留数/总数",
+					minLen: 6,
+					formatter: function(o) {
+						return (o.remainQuantity+"/"+o.quantity).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
+				
 				break;
 			
 			// 正常物料 废品
 			case "material":
 				oData.sumList = _sumDataList(oData.detailInfos, ["batchNo"], ["batchNo", "quantity"], ["quantity"])
 				// 设置详细信息标题
-				oData.detailTitle = oData.name;
-				// 设置图标类型
+				oData.detailTitle = "";
+				
+				// 设置表头。
+				oData.headerList = [{
+					name: "批次",
+					minLen: 2,
+					formatter: function(o) {
+						return (o.batchNo||"").length
+					}
+				},{
+					name: "总数",
+					minLen: 2,
+					formatter: function(o) {
+						return (""+o.quantity).length
+					}
+				}]
+				
+				// 设置数据显示的宽度。
+				_setTemplateColumnWidth(oData.sumList, oData.headerList);
 				
 				break;
 			default:
@@ -577,35 +832,35 @@ var getTreeData = function(oRowData, sPageType) {
 		
 		if(oData.detailInfos.length) {
 			
-			// 判断投产物料是否相同。 -- 根据operType合并。
-			oData.detailInfos.forEach( o => {
-				if(o.opType == "6") {	// 产出
-					aOutputMaterial.add(o.materialName)
-				}else if(o.opType == "1") {	// 投入
-					aInputMaterial.add(o.materialName)
-				}
-			})
-			
-			aOutputMaterial = [...aOutputMaterial]
-			aInputMaterial = [...aInputMaterial]
-			
-			let sOutMaterial = aOutputMaterial.join(","),
-				sInMaterial = aInputMaterial.join(",")
-			
-			// 投产物料相同-- 产出只有一个。
-			if(aOutputMaterial.length && sOutMaterial == sInMaterial) {
+//			// 判断投产物料是否相同。 -- 根据operType合并。
+//			oData.detailInfos.forEach( o => {
+//				if(o.opType == "6") {	// 产出
+//					aOutputMaterial.add(o.materialName)
+//				}else if(o.opType == "1") {	// 投入
+//					aInputMaterial.add(o.materialName)
+//				}
+//			})
+//			
+//			aOutputMaterial = [...aOutputMaterial]
+//			aInputMaterial = [...aInputMaterial]
+//			
+//			let sOutMaterial = aOutputMaterial.join(","),
+//				sInMaterial = aInputMaterial.join(",")
+//			
+//			// 投产物料相同-- 产出只有一个。
+//			if(aOutputMaterial.length && sOutMaterial == sInMaterial) {
 //				oReturn.detailType = "processSameMaterialTemp"
-				oReturn.detailTitle = _getShortedNum(sOutMaterial)
-				bIsSame = true
-				
-			}else if(aOutputMaterial.length && sOutMaterial != sInMaterial) {
-				// 投产物料不同
+//				oReturn.detailTitle = _getShortedNum(sOutMaterial)
+//				bIsSame = true
+//				
+//			}else if(aOutputMaterial.length && sOutMaterial != sInMaterial) {
+//				// 投产物料不同
 //				oReturn.detailType = "processDiffMaterialTemp"
-				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
-			}else {
+//				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
+//			}else {
 //				oReturn.detailType = "processDiffMaterialTemp"
-				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
-			}
+//				oReturn.detailTitle = `投:${_getShortedNum(sInMaterial)} \n 产:${_getShortedNum(sOutMaterial)}`
+//			}
 			
 			// 按设备进行分类。
 			let oFlag = {}
@@ -667,14 +922,16 @@ var getTreeData = function(oRowData, sPageType) {
 				aType.forEach(o1 => {
 					// 按批次合并。
 					let aMerge = ["batchNo", "materialCode"],
-						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"]
+						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"],
+						aSum = ["quantity", "remainQuantity"]
+						
+					// trace 和 track展示不同。
+					if(sPageType == "trace") {
+						aDis = ["batchNo", "quantity", "materialName"]
+						aSum = ["quantity"]
+					}
 					
-//					if(o1.type == "投入" && !bIsSame) {
-//						aMerge = ["batchNo", "materialCode"]
-//						aDis = ["batchNo", "quantity", "remainQuantity", "materialName"]
-//					}
-					
-					o1.list = _sumDataList(o1.list, aMerge, aDis, ["quantity", "remainQuantity"])
+					o1.list = _sumDataList(o1.list, aMerge, aDis, aSum)
 				})
 				
 				// 重新设置类型数据。
@@ -733,6 +990,66 @@ var getTreeData = function(oRowData, sPageType) {
 		
 		return window.Rt.utils.getObjectValues(oFlag);
 	}
+	
+	
+	/**
+	 * 设置内容的宽度。
+	 * @param {Array} aoSum
+	 * @param {Array} aoHeader
+	 */
+	function _setTemplateColumnWidth(aoSum, aoHeader) {
+		
+		// 循环表头数据。
+		aoHeader.forEach( (o,i) => {
+			
+			let aData = [],
+				// 是否为特殊处理的标识。-- sumList中有list列 调整 工序
+				sType = o.type,
+				nMaxLen = o.maxLen || 100,	// 默认为英文字符
+				nMinLen = o.minLen || 0
+			
+			// 获取得到最大长度
+			aoSum.forEach(oSum => {
+				if(!sType) {
+					// 直接获取数据
+					aData.push( o.formatter(oSum) || 0 )
+				}else if(sType == 1) {
+					// 从list中获取数据。
+					oSum.list.forEach( oLevel => aData.push( o.formatter(oLevel) || 0 ))
+				}else if(sType == 2) {
+					// 从list.list中获取数据。
+					oSum.list.forEach( oLevel => {
+						oLevel.list.forEach( oL => aData.push( o.formatter(oL) || 0 ))
+					})
+				}
+			})
+			
+			let nWidth = Math.max.apply(null, aData)
+			
+			nWidth = nWidth < nMinLen ? nMinLen: nWidth
+			nWidth = nWidth > nMaxLen ? nMaxLen : nWidth
+			nWidth = nWidth*13
+			
+			// 设置当前列宽度
+			o.width = nWidth
+			
+			// 设置所有数据中的长度 [{column0:,column1:},{...}]
+			aoSum.forEach( oSum => {
+				// 每条数据设置每列的宽度
+				if(!sType) {
+					oSum["column"+i] = nWidth
+				}else if(sType == 1){
+					oSum.list.forEach(oLevel => oLevel["column"+i] = nWidth)
+				}else if(sType == 2) {
+					oSum.list.forEach( oLevel => {
+						oLevel.list.forEach( oL => oL["column"+i] = nWidth)
+					})
+				}
+			})
+		})
+		
+	}
+	
 }
 
 // 判断是否是正常物料
