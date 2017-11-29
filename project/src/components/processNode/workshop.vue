@@ -314,7 +314,6 @@
 			this.tableHeight = this.setHeight()
         },
         watch: {
-			"detailInfos": "fetchData",
 			"clickNum": "fetchData",
 			/* 视窗大小变化，重新设置table大小 */
 			"resizeY": function(){
@@ -356,7 +355,7 @@
 				}else if ( this.nodeType === 2 || this.nodeType === 7 || this.nodeType === 10002 ){
 					oTableData.data = [].concat(oData.turnInOutDetailList)	
 				}else {
-					oTableData.data = [].concat(oData.barcodeManagementDetailList)	
+					oTableData.data = [].concat(oData.workshopOperationDetailList)	
 				}
 				this.materialData = oTableData
 				this.loading = false
