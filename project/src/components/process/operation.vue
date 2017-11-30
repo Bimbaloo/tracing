@@ -49,6 +49,8 @@
                 operations: {
                     "chart":"时间轴",
                     "product":"投产表",
+                    "storesReturned":"退料",
+                    "transfer":"结转",
                     "qtReport":"质检",
                     "qcReport":"送检",
                     "fgbReport":"fgb检验",
@@ -57,7 +59,7 @@
                     "repair":"维修记录",
                     "spotReport":"点检记录",
                     "restrain":"可疑品",
-                    "parameter":"工艺参数"
+                    "parameter":"工艺参数" 
                 },
                 aoRoute: [],
                 restrainIf: false,
