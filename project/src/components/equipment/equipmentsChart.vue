@@ -329,16 +329,16 @@
                     list: [{
                         name: "投产表",
                         router: "/process/product",
-                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        query: ["equipmentName", "operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                         // ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]  
                     }, {
                         name: "结转表",
-                        router: "/process/product",
-                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        router: "/process/transfer",
+                        query: ["equipmentName", "operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                     }, {
                         name: "退料表",
-                        router: "/process/product",
-                        query: ["operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
+                        router: "/process/storesReturned",
+                        query: ["equipmentName", "operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
                     }]
                 }, {
                     show: false,

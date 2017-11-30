@@ -47,8 +47,11 @@ const List = r => require.ensure([], () => r(require('components/process/list.vu
 const Chart = r => require.ensure([], () => r(require('components/process/chart.vue')), 'group-detail')
 const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-detail')
 const Product = r => require.ensure([], () => r(require('components/process/product.vue')), 'group-detail')     //投产表
+const StoresReturned = r => require.ensure([], () => r(require('components/process/storesReturned.vue')), 'group-detail')  //退料
+const Transfer = r => require.ensure([], () => r(require('components/process/transfer.vue')), 'group-detail')     //结转
+
 const QtReport = r => require.ensure([], () => r(require('components/process/qtReport.vue')), 'group-detail')   //质检
-const QcReport = r => require.ensure([], () => r(require('components/process/qcReport.vue')), 'group-detail')   //送检检
+const QcReport = r => require.ensure([], () => r(require('components/process/qcReport.vue')), 'group-detail')   //送检
 const FgbReport = r => require.ensure([], () => r(require('components/process/fgbReport.vue')), 'group-detail') //fgb质检
 const Tool = r => require.ensure([], () => r(require('components/process/tool.vue')), 'group-detail')           //工具
 const Event = r => require.ensure([], () => r(require('components/process/event.vue')), 'group-detail')         //事件
@@ -108,11 +111,23 @@ const routes = [
       meta: {
       	title: 'detail'
       }
-    },{
+    },{//投产表
       path: 'product',
       component: Product,
       meta: {
       	title: 'product'
+      }
+    },{//退料
+      path: 'storesReturned',
+      component: StoresReturned,
+      meta: {
+      	title: 'storesReturned'
+      }
+    },{//结转
+      path: 'transfer',
+      component: Transfer,
+      meta: {
+      	title: 'transfer'
       }
     },{//质检
       path: 'qtReport',
