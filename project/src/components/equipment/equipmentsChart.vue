@@ -1746,7 +1746,7 @@
                         ];
                         break;
                         // 结转
-                    case "carryForword":
+                    case "materialTransferList":
                         oResult.time = +new Date(o.happenTime);
                         o.timePoint = o.happenTime;
                         oResult.title = "结转";
@@ -1762,7 +1762,7 @@
                         ];
                         break;
                         // 退料
-                    case "retreatMaterial":
+                    case "materialReturnList":
                         oResult.time = +new Date(o.happenTime);
                         o.timePoint = o.happenTime;
                         oResult.title = "退料";
