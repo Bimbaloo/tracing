@@ -70,6 +70,7 @@
 					columns: [{
 						prop: "barcode",
 						name: "条码",
+						width: "300",
 						fixed: true
 //					}, {
 //						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
@@ -109,6 +110,23 @@
 						width: "160"
 					}],
 					data: []
+					// {
+					// 	"logId":59320,
+                    //     "barcode":"5CK2612674413170727165530",
+                    //     "barcodeTypeName":"单件码",
+                    //     "batchNo":"P170719-LTG_r-0014",
+                    //     "materialCode":"10000151",
+                    //     "materialName":"ZC/LTG 2L 活塞总成/环销卡簧连杆/12626989",
+                    //     "quantity": 1,
+                    //     "stock":"成品库",
+                    //     "stocklot":"A01",
+                    //     "customer":'上汽通用',
+                    //     "opType":1,
+                    //     "stockType":"库存发货",
+                    //     "person":"sysadmin",
+                    //     "createTime":"2017-08-01 08:32:40",
+                    //     "reportStockType":null
+					// }
 				},
 				instockData: {
 					url: HOST + "/api/v1/stock/bybatch",
@@ -236,28 +254,6 @@
 						this.styleError.maxHeight = this.adjustHeight()-50+"px"
 					}
 				})
-
-				// this.$ajax.post(sPath, this.$route.query)
-				// 	.then((res) => {
-				// 		oData.loading = false;
-				// 		// oData.height = this.adjustHeight();
-						
-				// 		if(!res.data.errorCode) {
-				// 			oData.data = res.data.data;
-				// 		}else {
-				// 			this.styleError.maxHeight = this.adjustHeight()-50+"px";
-				// 			// oData.error = res.data.errorMsg.message;
-				// 			console.log(res.data.errorMsg.message);
-				// 		}
-				// 	})
-				// 	.catch((err) => {
-				// 		oData.loading = false;
-				// 		// oData.error = "查询出错。"
-				// 		console.log("接口查询出错。");
-				// 		if(this.outstockData.error && this.instockData.error) {
-				// 			this.styleError.maxHeight = this.adjustHeight()-50+"px"
-				// 		}
-				// 	})
 			},
 			// 可疑品列表。
 			showSuspiciousList() {

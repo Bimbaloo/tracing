@@ -80,15 +80,15 @@
 <script>
 	import $ from "jquery"
 	// 链接模块数据接口。
-	const MODULE_DATA_URL= ''
+	const MODULE_DATA_URL= HOST + '/api/v1/customized/equipment-analysis/items'
 	// 模块添加。
-	const MODULE_ADD_DATA_URL = ''
+	const MODULE_ADD_DATA_URL = HOST + '/api/v1/customized/equipment-analysis/items'
 	// 模块修改。
-	const MODULE_EDIT_DATA_URL = ''
+	const MODULE_EDIT_DATA_URL = HOST + '/api/v1/customized/equipment-analysis/items/'
 	// 模块删除。
-	const MODULE_DELETE_DATA_URL = ''
+	const MODULE_DELETE_DATA_URL = HOST + '/api/v1/customized/equipment-analysis/items/'
 	// 设备数据。
-	const EQUIPMENT_DATA_URL = ''//HOST + "/api/v1/basicinfo/equipments"
+	const EQUIPMENT_DATA_URL = HOST + "/api/v1/basicinfo/equipmentIds"
 
 	const EXAMPLE_DATA = [{
 		id: 1,
@@ -221,21 +221,21 @@
 	    },
         created() {
 			// 获取设备数据。 
-			// this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENT_DATA_URL, "get", null, (oData) => {
-				this.aoEquipment = JSON.parse(JSON.stringify(EQUIPMENT_DATA))
-			// }, (sErrorMessage)=>{
-			// 	this.sErrorMessage = sErrorMessage;
-			// 	this.showMessage();          
-			// })
+			this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENT_DATA_URL, "get", null, (oData) => {
+				this.aoEquipment = JSON.parse(JSON.stringify(oData.equipmentIdInfoList))
+			}, (sErrorMessage)=>{
+				this.sErrorMessage = sErrorMessage;
+				this.showMessage();          
+			})
 			
 			//获取模块数据 MODULE_DATA_URL	
-			// this.$register.sendRequest(this.$store, this.$ajax, MODULE_DATA_URL, "get", null, (oData) => {
+			this.$register.sendRequest(this.$store, this.$ajax, MODULE_DATA_URL, "get", null, (oData) => {
 				// 保存工厂定制数据。
-				this.aoCustom = JSON.parse(JSON.stringify(EXAMPLE_DATA))
-			// }, (sErrorMessage)=>{
-			// 	this.sErrorMessage = sErrorMessage;
-			// 	this.showMessage();          
-			// })
+				this.aoCustom = JSON.parse(JSON.stringify(oData.factoryCustomItemList))
+			}, (sErrorMessage)=>{
+				this.sErrorMessage = sErrorMessage;
+				this.showMessage();          
+			})
 			
         },
         computed: {
@@ -346,7 +346,7 @@
 			addModule() {
 				this.$register.sendRequest(this.$store, this.$ajax, MODULE_ADD_DATA_URL, "post", this.oCurrentData, (oData) => {
 					// 回传模块id。
-					this.oCurrentData = oData.id
+					this.oCurrentData.$set("id", oData.id)
 					// 新增模块。
 					this.aoCustom.push(this.oCurrentData)
 					this.showMessage("新增成功。")
@@ -357,7 +357,7 @@
 			},
 			// 保存配置。
 			saveModule() {
-				this.$register.sendRequest(this.$store, this.$ajax, MODULE_EDIT_DATA_URL, "post", this.oCurrentData, (oData) => {
+				this.$register.sendRequest(this.$store, this.$ajax, MODULE_EDIT_DATA_URL + this.oCurrentData.id, "put", this.oCurrentData, (oData) => {
 					this.showMessage("修改成功。")
 				}, (sErrorMessage)=>{
 					this.sErrorMessage = sErrorMessage
@@ -366,9 +366,7 @@
 			},
 			// 删除配置。
 			deleteModule() {
-				this.$register.sendRequest(this.$store, this.$ajax, MODULE_DELETE_DATA_URL, "post", {
-					id: this.oCurrentData.id
-				}, (oData) => {
+				this.$register.sendRequest(this.$store, this.$ajax, MODULE_DELETE_DATA_URL + this.oCurrentData.id, "delete", null, (oData) => {
 					this.showMessage("删除成功。")
 					this.aoCustom = this.aoCustom.filter(o => o.id !== this.oCurrentData.id)
 				}, (sErrorMessage)=>{

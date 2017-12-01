@@ -232,6 +232,9 @@
 			// 登录判断。
 			this.$register.login(this.$store);
 
+			// 获取配置数据。
+			this.$store.dispatch('getConfig');
+			
 			// 获取所需的查询参数。
       		this.tag = window.Rt.utils.getParam("tag", location.search);
           	let	oData = sessionStorage.getItem("searchConditions-" + this.tag),

@@ -227,6 +227,9 @@
 			// 登录判断。
 			this.$register.login(this.$store);
 
+			// 获取配置数据。
+			this.$store.dispatch('getConfig')
+			
 			/* 设置遏制类表的查询条件 */
 			sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
 

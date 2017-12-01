@@ -129,8 +129,11 @@
 				this.params = JSON.parse(sSelected);
 			}
 			
-			// 加载数据。
-			this.fetchData();
+			// 获取配置数据。
+			this.$store.dispatch('getConfig').then(() => {
+				// 获取数据。
+				this.fetchData();
+			})
 		},
 		mounted() {
 		},

@@ -73,7 +73,7 @@
 
 <script>
 import tooltip from 'components/header/tooltip.vue'
-import logo from 'assets/img/kssp-logo.png'
+// import logo from 'assets/img/logo-w.png'
 import version from 'assets/img/version.png'
 import panel from 'components/panel/panel.vue'
 import fnP from "assets/js/public.js"
@@ -91,7 +91,7 @@ export default {
   data() {
     return {
       showList: false,
-      logo,
+      // logo,
       version,
       v: VERSION,
       activeKey: "stock",
@@ -125,6 +125,14 @@ export default {
     }
   },
   computed: {
+    // 工厂配置数据。
+    configData() {
+      return this.$store.state.customModule.config
+    },
+    // 配置图标。
+    logo() {
+      return this.configData && this.configData.logo
+    },    
     liData() {
       return this.switchData(this.myLocalStorage)
     },

@@ -21,7 +21,10 @@
 				contentHeight: 400	
 			}
 		},
-		created() {},
+		created() {
+			// 获取配置数据。
+        	this.$store.dispatch('getConfig')
+		},
 		mounted() {
 			this.contentHeight = this.$refs.content.clientHeight
 		},

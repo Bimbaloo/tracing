@@ -10,4 +10,4 @@ var HOST =
 
 var VERSION = "1.0.0-RC2";
 
-var FACTORY = "keerben";
+var FACTORY = "common";

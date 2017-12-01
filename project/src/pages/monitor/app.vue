@@ -44,6 +44,8 @@ export default {
         //     time: this.oParams.time || '', 
         //     type: this.oParams.type || '' 
         // }});     
+        // 获取配置数据。
+        this.$store.dispatch('getConfig')
     }
 }
 </script>

@@ -85,7 +85,7 @@
                 },{
                     field: "barcode",
                     headerName: "条码",
-                    width: 120,
+                    width: 220,
                     pinned: true
 //              },{
 //                  field: "processName",
@@ -98,13 +98,14 @@
                 },{
                 	field: "processCode",
                 	headerName: "工序",
-                	width: 120,
+                	width: 80,
                 	cellRenderer: function(params) {
 						return params.data.processCode + ":" + params.data.processName
 	                }
                 },{
                     field: "materialCode",
-                    headerName: "物料编码"
+					headerName: "物料编码",
+					width: 80,
                 },{
                     field: "materialName",
                     headerName: "物料名称",
@@ -123,7 +124,7 @@
                 },{
                 	field: "equipmentCode",
                 	headerName: "设备",
-                	width: 150,
+                	width: 170,
                 	cellRenderer: function(params) {
 						return params.data.equipmentCode + ":" + params.data.equipmentName
 	                }
@@ -138,14 +139,16 @@
 //                  sort: 'asc'
                 },{
                     field: "moldCode",
-                    headerName: "模号"
+					headerName: "模号",
+					width: 60
                 },{
                     field: "quantity",
                     headerName: "数量",
                     width: 50
                 },{
                     field: "personName",
-                    headerName: "操作人"
+					headerName: "操作人",
+					width: 76
                 }]
         	},
         	// 查询。

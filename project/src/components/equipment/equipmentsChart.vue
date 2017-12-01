@@ -167,8 +167,8 @@
     const TOOLTIP_BORDERCOLOR = '#a8b8cc'
     // 设备分析接口地址。
     const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events"
-    // 设备分析接口地址。
-    const EQUIPMENTS_CUSTOM_URL = ''
+    // 工厂定制地址。
+    const MODULE_DATA_URL= HOST + '/api/v1/custom/equipment-analysis/items'
     // 默认选中的维度。
     const DEFAULT_SELECTED_DIMENSION = ["quality", "pool", "parameter"]
 
@@ -415,6 +415,14 @@
             // 配置模块。
             modulesConfig() {
                 return this.configData.modules
+            },
+            // 工厂定制。
+            factoryCustomItemList() {
+                return this.$store.state.factoryModule.factoryCustomItemList
+            },
+            // 工厂定制内容是否获取到的标志判断。
+            factoryDataFecthed() {
+                return this.$store.state.factoryModule.fetched
             },
             // 追踪或溯源或遏制的配置项。
             currentModule() {
@@ -763,7 +771,12 @@
         },
         created () {
             // 组件创建完后获取数据，
-            // 此时 data 已经被 observed 了						
+            // 此时 data 已经被 observed 了	
+            if(!this.factoryDataFecthed) {
+                // 若未获取工厂定制数据。
+                // 获取数据。
+                this.getFactoyData()
+            }				
         },
         mounted () {
             // 获取配置数据。
@@ -788,10 +801,32 @@
             resizeY: 'resizeChart'
         },
         methods: {
+            // 获取工厂定制数据。
+            getFactoyData() {
+                this.$store.dispatch('getFactoryConfig')
+            },
+            // 获取设备定制数据。
+            getEquipmentCustomDataById(id) {       
+                this.dimension.forEach(o => {
+                    // 过滤其他设备的定制内容，只保留非定制的内容。
+                    o.list = o.list.filter(item => item.type)
+
+                    let oData = this.factoryCustomItemList.filter(item => item.dimension === o.key && item.equipmentIds.indexOf(id) > -1)[0]
+
+                    if(oData) {
+                        // 添加数据。
+                        o.list.push({
+                            name: oData.name,
+                            link: oData.link,
+                            parameters: oData.parameters
+                        })
+                    }
+                })
+            },
             // 获取配置数据。
             getConfigData() {
                 // 获取配置数据。
-                this.$store.dispatch('getConfig').then(() => {
+                // this.$store.dispatch('getConfig').then(() => {
                     // 设置维度数据。
                     if(this.currentModule.submodules) {
                         // 维度分析数据。
@@ -814,7 +849,7 @@
                             })
                         }
                     }
-                })
+                // })
             },
             // 初始化。
 			init() { 
@@ -1195,10 +1230,11 @@
                         return o;
                     })
                   
+                    this.getEquipmentCustomDataById(sId)
                     // 获取设备定制数据。
-                    this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
-					    id: sId
-                    }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
+                    // this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
+					//     id: sId
+                    // }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
                     
                 }
 
@@ -1556,10 +1592,11 @@
                         // 默认选中第一台设备。
                         this.selectedEquipmentId = o.equipmentId
 
+                        this.getEquipmentCustomDataById(this.selectedEquipmentId)
                         // 获取设备定制数据。
-                        this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
-                            id: this.selectedEquipmentId
-                        }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
+                        // this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
+                        //     id: this.selectedEquipmentId
+                        // }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
                     }
 
                     // 设置y轴数据。
