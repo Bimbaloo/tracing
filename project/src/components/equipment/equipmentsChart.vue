@@ -321,7 +321,7 @@
                     }]
                 }, {
                     show: true,
-                    name: "投产",
+                    name: "加工",
                     key: "pool",
                     type: "7",
                     color: "#15a5a7",
@@ -1076,7 +1076,7 @@
 
                 // 投产点。
                 oOption.series.push({
-                    name: "投产",
+                    name: "加工",
                     data: raletedData
                 })
                 // 按钮字体颜色。
@@ -1201,7 +1201,7 @@
                     let nStart = oYAxis.startValue,
                         nEnd = oYAxis.endValue
 
-                    let aoMarkPoint = this.option.series.filter(o => o.name === "投产")[0].markPoint.data
+                    let aoMarkPoint = this.option.series.filter(o => o.name === "加工")[0].markPoint.data
                     // console.log(aoMarkPoint)
                     let aoData = aoMarkPoint.map(o => {
                         if(o.coord[1] >= nStart && o.coord[1] <= nEnd) {
@@ -1214,7 +1214,7 @@
                     })
                     this.chart.setOption({
                     series: [{
-                        name: "投产",
+                        name: "加工",
                         markPoint: {
                             data: aoData
                         }
@@ -1373,7 +1373,7 @@
 			getParamter (aQuery) {
 				let oParam = {},
                     oDate = this.getRealTime()
-                if(this.bRestrain) {  //临时方案，目前遏制页面投产表借口不可查，屏蔽
+                if(this.bRestrain) {  //临时方案，目前遏制页面投产表接口不可查，屏蔽
                     aQuery = aQuery.filter((o)=>{return o!=="operationIdList" })
                 }
 				aQuery.forEach(param => {
@@ -1470,7 +1470,7 @@
 					equipmentList: equipmentList, //equipmentIdList
 					startTime: this.datetime.start,
 					endTime: this.datetime.end,
-					type: 0
+                    type: 0
                 }, this.requestSucess, this.requestFail, this.requestError)
 			},
             // 过滤异常数据(组号为-1)。
@@ -1485,7 +1485,7 @@
             initChartData (aoData) {
                 // 更改顺序。
                 aoData.reverse();
-
+                
                 let nLength = aoData.length - 1
 
                 aoData.forEach((o,index) => {
@@ -1508,10 +1508,12 @@
                             startWorkList: this.filterAbnormalData(o.startWorkList),
                             finishWorkList: this.filterAbnormalData(o.finishWorkList)
                         },
-                        // 投产
+                        // 加工
                         pool: {
                             poolInList: this.filterAbnormalData(o.poolInList),
-                            poolOutList: this.filterAbnormalData(o.poolOutList)
+                            poolOutList: this.filterAbnormalData(o.poolOutList),
+                            materialTransferList: this.filterAbnormalData(o.materialTransferList),
+                            materialReturnList: this.filterAbnormalData(o.materialReturnList)
                         },
                         // 质量
                         quality: {
@@ -1544,7 +1546,9 @@
                             shiftStartTime: this.equipmentsCode.shiftStartTime,
                             shiftEndTime: this.equipmentsCode.shiftEndTime
                         })
-                    }            
+                    }    
+                    
+                    console.log(this.equipmentData)
                 })	
             },
             // 设备状态显示切换。
@@ -1590,6 +1594,7 @@
                 
                 // 获取各事件维度数据。
                 this.dimension.forEach(item => {
+                    
                     let oFilter = this.option.series.filter(o => o.name==item.name)[0],
                         oResult = $.extend(true, {}, this.getDimensionData(item.key));
                     if(oResult.markPoint.length) {
@@ -1755,7 +1760,7 @@
                             {name: "时间", value: o.happenTime},
                             {name: "操作人", value: o.personName},
                             {name: "源工单", value: o.srcDoCode},
-                            {name: "目标工单", value: o.desDoCode},
+                            {name: "目标工单", value: o.destDoCode},
                             {name: "物料", value: o.materialName},
                             {name: "批次", value: o.batchNo},
                             {name: "数量", value: o.quantity}
@@ -1957,6 +1962,11 @@
                                             })
                                         }
                                         
+                                        // 设置与起点相关。
+                                        oData.related = true;
+                                        oFilter[5]++;
+                                    }else if((key === "materialTransferList" || key === "materialReturnList")){
+                                        // 若为结转或退料。
                                         // 设置与起点相关。
                                         oData.related = true;
                                         oFilter[5]++;
@@ -2186,8 +2196,8 @@
                                 sGroup = o.groupId
                             }
 
-                            if(o.related) {
-                                // 若为起点相关。
+                            if(o.related &&　(o.title === "投料" || o.title === "产出")) {                     
+                                // 若为起点相关的投产。
                                 sTag = `<i class="icon icon-12 icon-pin"></i>`;
                             }
                             if(sGroup) {
