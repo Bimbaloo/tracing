@@ -142,7 +142,7 @@ export default {
         }
     },
     mounted(){
-        this.routerContent = document.querySelector(".router-content").offsetHeight  //获取初始高度
+        this.routerContent = document.querySelectorAll(".el-tabs")[0].offsetHeight  //获取初始高度
         this.tableData.height  = this.adjustHeight()
        
     },
@@ -300,8 +300,11 @@ export default {
             let ntable = 0;
             ntable = Math.floor(
                         this.viewHeight
-                        -this.outerHeight(document.querySelector(".condition"))
-                        -this.outerHeight(document.querySelector(".tableData"))
+                        - ( document.querySelector(".condition") ? this.outerHeight(document.querySelector(".condition")) : 0)
+                        - ( document.querySelector(".router-path") ? this.outerHeight(document.querySelector(".router-path")) : 0)
+                        - 56 //   this.outerHeight(document.querySelector(".content-title.outTitle"))
+                        - 20  // 表格margin-bottom
+                        - 40
                     );
             return ntable;
         },
@@ -315,10 +318,8 @@ export default {
         },
         /* 设置table实际高度 */
         setTbaleHeight(){
-        	if(this.$route.meta.title == 'tool') {
-	            this.routerContent = document.querySelector(".router-content").offsetHeight
+	            this.routerContent = document.querySelectorAll(".el-tabs")[0].offsetHeight  //获取初始高度
 	            this.tableData.height = this.adjustHeight()
-        	}
         },
         /* 设置title */
         setTitle(el,title){
