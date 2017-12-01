@@ -25,6 +25,7 @@
 	@yellow: #fcc433;
 	@red: #e86b59;
 	@green: #00a656;
+	@purple: #999cf9;
 	
 	.node-outer {
 		width: 18px;
@@ -99,7 +100,7 @@
 			}
 		}
 	
-	/* 黄色 */
+		/* 黄色 */
 		&.yellow {
 			border-color: @yellow;
 			
@@ -116,6 +117,16 @@
 			.node-inner {
 				background-color: @green;
 				border-color: @green;
+			}
+		}
+		
+		/* 紫色 */
+		&.purple {
+			border-color: @purple;
+			
+			.node-inner {
+				background-color: @purple;
+				border-color: @purple;
 			}
 		}
 	}

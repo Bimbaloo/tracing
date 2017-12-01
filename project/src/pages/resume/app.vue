@@ -67,8 +67,8 @@
 											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr(props.$index, props)"></i>
 											<span>{{ props.row.name }}</span>
 										</div>
-										<div v-else :class="[{isVis: !props.row.data[column.prop]}, 'cell-content']">
-											{{ column.formatter ? column.formatter(props.row.data[column.prop]): props.row.data[column.prop] }}
+										<div v-else class="cell-content">
+											{{ column.formatter ? column.formatter(props.row.data): props.row.data[column.prop] }}
 										</div>
 									</template>
 								</el-table-column>
@@ -101,47 +101,12 @@
 											v-for="(item,itemIndex) in timeItem.resumes"
 											:key="itemIndex">
 											<div v-show="!(index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1)" class="node-line"></div>
-											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.time).Format("hh:mm:ss") }}</span>
+											<span class="sub-date" :class="{last:index==aoTimeLineData.length-1&&itemIndex==timeItem.resumes.length-1}">{{ new Date(item.opTime).Format("hh:mm:ss") }}</span>
 											<div class="sub-node">
-												<v-node :color-type="getTimeLineTypeInfo(item.type).color"></v-node>
+												<v-node :color-type="getNodeColor(item.opType)"></v-node>
 											</div>
-											<div class="sub-info" :class="getTimeLineTypeInfo(item.type).color">
-												<div class="sub-item" v-if="getTimeLineTypeInfo(item.type).type==1">
-													<div class="item-type">{{ item.type }} :</div>
-													<div class="item-info">
-														<span class="tips">{{ item.personName || "-" }}</span> 
-														将条码 <span class="tips">{{ item.barcode || "-" }}</span>
-														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName || "-" }}</span>
-														<span class="tips">{{ item.quantity || "-" }}</span> 件，入库到
-														<span class="tips">{{ item.warehouse || "-" }}</span>
-														<span class="tips">{{ item.reservoir || "-" }}</span>
-													</div>
-												</div>
-												<div class="sub-item" v-else-if="getTimeLineTypeInfo(item.type).type==2">
-													<div class="item-type">{{ item.processName + item.type }} :</div>
-													<div class="item-info">
-														<span class="tips">{{ item.personName || "-" }}</span> 在
-														<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上
-														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
-														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														的 <span class="tips">{{ item.materialName || "-" }}</span> 物料
-														{{ item.type }}
-													</div>
-												</div>
-												<div class="sub-item" v-else>
-													<div class="item-type">{{ item.type }} :</div>
-													<div class="item-info">
-														<span class="tips">{{ item.personName || "-" }}</span> 
-														将条码 <span class="tips">{{ item.barcode || "-" }}</span> 
-														，批次 <span class="tips">{{ item.batchNo || "-" }}</span> 
-														，在<span class="tips">{{ item.equipmentName || "-" }}</span> 设备上产出的
-														<span class="tips">{{ item.materialName || "-" }}</span> 物料
-														{{ item.type }}，共计
-														<span class="tips">{{ item.quantity || "-" }}</span> 件，结果为
-														<span class="tips">{{ item.checkResult || "-" }}</span>
-													</div>
-												</div>
+											<div class="sub-info" :class="getNodeColor(item.opType)">
+												<div class="sub-item" v-html="getNodeTextByType(item)"></div>
 											</div>
 										</div>
 									</div>
@@ -235,21 +200,50 @@
 						name: "",
 						width: 550
 					},{
-						prop: "type",
+						prop: "opTypeName",
 						name: "类型",
-						width: 80
+						width: 140,
+						formatter: function(row) {
+							// 出库、入库  条码绑定
+							if(row.opType == 102 || row.opType == 103) {
+								// 出库、入库
+								return `${row.opTypeName}(${row.stockTypeName})`
+							}else if(row.opType == 201) {
+								// 条码绑定
+								return `${row.opTypeName}(${row.businessType == 1 ? '绑定':'解绑'})`
+							}else {
+								// 其他
+								return row.opTypeName
+							}
+						}
 					},{
 						prop: "barcode",
 						name: "条码",
-						width: 240
+						width: 240,
+						formatter: function(row) {
+							if(row.srcBarcode) {
+								return `源条码:${row.srcBarcode}\n目标条码:${row.barcode}`
+							}else {
+								return row.barcode
+							}
+						}
 					},{
-						prop: "time",
+						prop: "opTime",
 						name: "时间",
 						width: 160
 					},{
-						prop: "location",
+						prop: "equipmentName",
 						name: "地点",
-						width: 160
+						width: 160,
+						formatter: function(row) {
+							if(row.srcWarehouse) {
+								return `源仓库:${row.srcWarehouse+"仓库"+row.srcReservoir+"库位"}\n目标仓库:${row.warehouse+"仓库"+row.reservoir+"库位"}`
+							}else if(row.warehouse) {
+								return `${row.warehouse+"仓库"+row.reservoir+"库位"}`
+							}else {
+								return row.equipmentName	
+							}
+						}
 					},{
 						prop: "batchNo",
 						name: "批次",
@@ -263,6 +257,17 @@
 						name: "班次",
 						width: 130
 					},{
+						prop: "doCode",
+						name: "工单",
+						width: 120,
+						formatter: function(row) {
+							if(row.srcDoCode) {
+								return `源工单:${row.srcDoCode}\n目标工单:${row.doCode}`
+							}else {
+								return row.doCode
+							}
+						}
+					},{
 						prop: "personName",
 						name: "人员",
 						width: 80
@@ -271,13 +276,24 @@
 						name: "模号",
 						width: 80
 					},{
-						prop: "vendorName",
+						prop: "contactName",
 						name: "供应商/客户",
 						width: 80
 					},{
 						prop: "checkResult",
 						name: "检验结果",
 						width: 80
+					},{
+						prop: "expiryTime",
+						name: "生效时间/失效时间",
+						width: 180,
+						formatter: function(row) {
+							if(row.effectiveTime || row.expiryTime) {
+								return `生效时间:${row.effectiveTime}\n失效时间:${row.expiryTime}`
+							}else {
+								return ""
+							}
+						}
 					}],
 					bCreated: false,
 					loading: false,
@@ -512,7 +528,7 @@
 				let aoNewData = aoData.sort( (oA, oB) => +new Date(oA.date) - +new Date(oB.date) < 0? 1:-1 )
 				
 				// 按时间排序。
-				aoNewData.forEach( o => o.resumes = o.resumes.sort( ( oA, oB ) => +new Date(oA.time) - +new Date(oB.time) < 0? 1:-1 ) )
+				aoNewData.forEach( o => o.resumes = o.resumes.sort( ( oA, oB ) => +new Date(oA.opTime) - +new Date(oB.opTime) < 0? 1:-1 ) )
 				
 				// 返回数据。
 				return aoNewData
@@ -653,28 +669,250 @@
 					return nIndex;
 				}
 			},
-			// 将时间数据转换为页面显示格式的值。
-			_parseTimeFormat(sTime) {
-				//2016-12-21 13:30:25
-				let sResult = "";
+			// 获取时间轴显示颜色。
+			getNodeColor(nType) {
+				let sDefault = "green"
 				
-				if(sTime) {
-					sResult = new Date(sTime).Format("MM-dd hh:mm");	
+				switch(nType) {
+					// 仓库操作
+					case 102:
+					case 103:
+					case 101:
+					case 112:
+						sDefault = "yellow"
+						break
+					// 车间操作
+					case 1:
+					case 6:
+					case 2:
+					case 8:
+					case 11:
+					case 14:
+					case 15:
+						sDefault = "green"
+						break
+					// 条码管理
+					case 201:
+					case 203:
+					case 204:
+						sDefault = "purple"
+						break
+					// 检验
+					case 1001:
+					case 1002:
+						sDefault = "red"
+						break
+					default:
+						break
 				}
 				
-				// 返回数据。
-				return sResult;
+				// 返回当前显示颜色类。
+				return sDefault
 			},
-			// 设置表格样式。
-			tableRowStyleName(row,index) {
-				if(index%2 == 1) {
-					return {
-						backgroundColor: "#f0f0f0"
-					}
+			// 获取时间轴内容显示
+			getNodeTextByType(o) {
+				// 节点类型
+				let opType = o.opType
+				
+				// 条码绑定： 1:绑定	 -1: 解绑
+				let	nBusinessType = o.businessType 
+				
+				let sDom = null
+				
+				// 获取当前显示的文本。
+				switch(opType) {
+					// 投入
+					case 1:
+					// 产出
+					case 6:
+						sDom = `<div class="item-type">${o.processName + o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>在
+									<span class="tips">${o.equipmentName||"-"}</span> 设备上
+									将条码 <span class="tips">${o.barcode||"-"}</span> 
+									${o.batchNo ? `,批次 <span class="tips">${o.batchNo}</span> `:""}
+									的 <span class="tips">${o.materialName||"-"}</span> 物料,
+									<span class="tips">${o.opTypeName}</span>
+									${o.quantity}件
+								</div>`
+					
+						break
+					// 结转
+					case 2:
+						sDom = `<div class="item-type">${o.processName + o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>在
+									<span class="tips">${o.equipmentName||"-"}</span> 设备上
+									将条码 <span class="tips">${o.barcode||"-"}</span> 
+									,批次 <span class="tips">${o.batchNo||"-"}</span>
+									,工单号<span class="tip">${srcDoCode}</span>
+									的 <span class="tips">${o.materialName||"-"}</span> 物料,
+									<span class="tips">${o.opTypeName}</span>
+									${o.quantity}件
+									到工单号<span class="tips">${doCode}</span>
+								</div>`
+						
+						break
+					// 退料
+					case 8:
+						sDom = `<div class="item-type">${o.processName + o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>在
+									<span class="tips">${o.equipmentName||"-"}</span> 设备上
+									将条码 <span class="tips">${o.srcBarcode||"-"}</span> 
+									,批次 <span class="tips">${o.batchNo||"-"}</span>
+									的 <span class="tips">${o.materialName||"-"}</span> 物料,
+									<span class="tips">${o.opTypeName}</span>
+									${o.quantity}件
+									${(o.srcBarcode != o.barcode) ? ` 到新条码<span class="tips">${o.barcode}</span> `: ''}
+								</div>`
+					
+						break
+					// 车间调整
+					case 11:
+					// 返工入站
+					case 14:
+					// 返工出站
+					case 15:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>
+									将条码 <span class="tips">${o.srcBarcode||"-"}</span> 
+									,批次 <span class="tips">${o.batchNo||"-"}</span>
+									的 <span class="tips">${o.materialName||"-"}</span> 物料,
+									<span class="tips">${o.opTypeName}</span>
+									${o.quantity}件
+									${(o.srcBarcode != o.barcode) ? ` 到新条码<span class="tips">${o.barcode}</span> `: ''}
+								</div>`
+								
+						break
+					// 条码绑定
+					case 201:
+						// 绑定类型
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>
+									将条码 <span class="tips">${o.srcBarcode||"-"}</span> 
+									,批次 <span class="tips">${o.batchNo||"-"}</span>
+									的 <span class="tips">${o.materialName||"-"}</span> 物料,
+									${o.quantity}件
+									${(nBusinessType == 1) ? `绑定到容器条码<span class="tips">${o.barcode}</span>`: `与容器条码<span class="tips">${o.barcode}解绑</span>`}
+								</div>`
+						
+						break
+					// 补料
+					case 203:
+							sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>
+									将条码 <span class="tips">${o.barcode||"-"}</span> 
+									,批次 <span class="tips">${o.batchNo||"-"}</span>
+									的容器添加物料<span class="tips">${o.materialName||"-"}</span>,
+									${o.quantity}件
+								</div>`
+						
+						break
+					// 修改失效时间
+					case 204:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>
+									修改条码 <span class="tips">${o.barcode||"-"}</span> 
+									的生效时间为 <span class="tips">${o.effectiveTime||"-"}</span>,
+									失效时间为<span class="tips">${o.expiryTime||"-"}</span>
+								</div>`
+								
+						break
+					// 入库
+					case 102:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>将
+									供应商<span class="tips">${o.contactName||"-"}</span>,
+									条码 <span class="tips">${o.barcode||"-"}</span>,
+									批次<span class="tips">${o.batchNo||"-"}</span>
+									的物料<span class="tips">${o.materialName||"-"}</span>
+									${o.quantity}件,
+									<span class="tips">${o.stockTypeName}</span>到
+									<span class="tips">${o.warehouse}</span>仓库
+									<span class="tips">${o.reservoir}</span>库位
+								</div>`
+								
+						break
+					// 出库
+					case 103:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>将
+									<span class="tips">${o.srcWarehouse}</span>仓库
+									<span class="tips">${o.srcReservoir}</span>库位
+									条码 <span class="tips">${o.barcode||"-"}</span>,
+									批次<span class="tips">${o.batchNo||"-"}</span>
+									的<span class="tips">${o.materialName||"-"}</span>物料
+									${o.quantity}件,
+									<span class="tips">${o.opTypeName}</span>到
+									<span class="tips">${o.warehouse}</span>仓库
+									<span class="tips">${o.reservoir}</span>库位
+									${o.contactName ? `,联系人<span class="tips">${o.contactName}</span>`:""}
+								</div>`
+								
+						break
+					// 库存转储
+					case 101:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>将
+									<span class="tips">${o.srcWarehouse}</span>仓库
+									<span class="tips">${o.srcReservoir}</span>库位
+									条码 <span class="tips">${o.srcBarcode||"-"}</span>,
+									批次<span class="tips">${o.batchNo||"-"}</span>
+									的<span class="tips">${o.materialName||"-"}</span>物料
+									${o.quantity}件,转储到
+									<span class="tips">${o.warehouse}</span>仓库
+									<span class="tips">${o.reservoir}</span>库位
+								</div>`
+						
+						break
+					// 库存调整
+					case 112:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>将
+									<span class="tips">${o.srcWarehouse}</span>仓库
+									<span class="tips">${o.srcReservoir}</span>库位
+									条码 <span class="tips">${o.srcBarcode||"-"}</span>,
+									批次<span class="tips">${o.batchNo||"-"}</span>
+									的<span class="tips">${o.materialName||"-"}</span>物料
+									${o.quantity}件,调整到
+									<span class="tips">${o.warehouse}</span>仓库
+									<span class="tips">${o.reservoir}</span>库位
+									的条码${o.barcode}
+								</div>`
+								
+						break
+					// 送检
+					case 1001:
+					// 质检
+					case 1002:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>将
+									条码 <span class="tips">${o.srcBarcode||"-"}</span>,
+									批次<span class="tips">${o.batchNo||"-"}</span>
+									,在<span class="tips">${o.equipmentName||"-"}</span>上产出
+									的<span class="tips">${o.materialName||"-"}</span>物料
+									${o.quantity}件
+									<span class="tips">${o.opTypeName}</span>
+									,结果为<span class="tips">${o.checkResult}</span>
+								</div>`
+								
+						break
+					default:
+						break
 				}
-			},
-			setTableRowKey(row) {
-				return row.level;
+				
+				// 返回html
+				return sDom
 			},
 			// 根据列表索引，获取当前行的子集的索引列表。
 			getChildrenIndexArrByParentIndex(nIndex) {
@@ -737,77 +975,6 @@
 				
 				// 返回数据。
 				return aIndex;
-			},
-			// 展开或折叠表格显示列。
-			expandOrCollapseTr1(ev) {
-				var _that = this,
-					jItem = $(ev.target).closest(".table-item"),
-					// 当前行的索引值。
-					nIndex = jItem.index(),
-					// 图表。
-					jIcon = jItem.find(".icon-down"),
-					// 展示的表格。
-					jDisTr = jItem.parents(".el-table").find(".el-table__body-wrapper tbody tr.table-item"),
-					jAllItem = jItem.add(jDisTr.eq(nIndex)),
-					// 数据列表。
-					jList = jAllItem.find(".cell .cell-info"),
-					jAllIcon = jAllItem.find(".icon-down"),
-					// 当前元素的子级索引值。--- 默认是需要展开或折叠。
-					aChildrenIndex = this.getChildrenIndexArrByParentIndex(nIndex),
-					// 是否折叠。-- 默认是展开的。
-					bCollapsed = false,
-					// 在操作过程中过滤掉的数据。
-					aFilterIndex = [],
-					// 保存需要操作的tr列。
-					jATr = [];		
-				
-				// 判断状态。
-				if(!jIcon.hasClass("actived")) {
-					bCollapsed = true;
-				}
-				
-				// 子级内容隐藏。
-				jItem.parents(".el-table").find("tbody").each(function() {
-					let jTbody = $(this);
-					// 重置数据。
-					jATr = [];
-					aFilterIndex = [];
-					
-					jTbody.find("tr.table-item").each(function(index) {
-						let jTr = $(this),
-							jArrow = jTr.find(".icon-down");
-							
-						// 如果当前索引存在于其子级中，则处理状态。
-						if(aChildrenIndex.indexOf(index) > -1) {
-							// 判断当前是否为展开的。
-							jATr.push(jTr);
-							
-							// 只有展开时处理，有的节点是不需展示，隐藏都可以隐藏。
-							if(jArrow.hasClass("actived")) {
-								// 当前及其子级是隐藏的。
-								aFilterIndex = aFilterIndex.concat(_that.getChildrenIndexArrByParentIndex(index));
-							}
-							
-							if(bCollapsed) {
-								jTr.fadeOut(500);
-							}else {
-								// 显示的判断。
-								if(aFilterIndex.indexOf(index) < 0) {
-									jTr.fadeIn(500);
-								}
-							}
-						}
-					})
-				});
-
-				// 内容展开或折叠。
-				if(bCollapsed) {
-					jList.slideUp();
-				}else {
-					jList.slideDown();
-				}
-				
-				jAllIcon.toggleClass("actived");		// jIcon
 			},
 			// 获取某个level下，其所有子级的rowIndex 值。
 			getChildrenLenByData(oData) {
@@ -883,75 +1050,6 @@
 	                })
 	                icon.classList.add('actived');
 	            }
-			},
-			// 创建表格。
-			createTable(aData) {
-				console.log(aData)
-			},
-			// 获取时间轴的数据类型。
-			getTimeLineTypeInfo(sType) {
-				var oReturn = {};
-				
-				switch(sType) {
-					// 出库。1
-					case "出库":
-						oReturn = {
-							color: "yellow",
-							text: "出库",
-							type: "1"
-						};
-						break;
-					// 入库。2
-					case "入库":
-						oReturn = {
-							color: "yellow",
-							text: "入库",
-							type: "1"
-						};
-						break;
-					// 投入。3
-					case　"投入":
-						oReturn = {
-							color: "green",
-							text: "投入",
-							type: "2"
-						};
-						break;
-					// 产出。4
-					case "产出":
-						oReturn = {
-							color: "green",
-							text: "产出",
-							type: "2"
-						};
-						break;
-					// 送检。5
-					case "送检":
-						oReturn = {
-							color: "red",
-							text: "送检",
-							type: "3"
-						};
-						break;
-					// 质检。6
-					case "质检":
-						oReturn = {
-							color: "red",
-							text: "质检",
-							type: "3"
-						};
-						break;
-					// 其他类型，按照出入库进行
-					default: 
-						oReturn = {
-							color: "yellow",
-							text: sType,
-							type: "1"
-						}
-				}
-				
-				// 返回数据。
-				return oReturn;
 			},
 			// 全屏展示。
 			openFullScreen(ev) {
@@ -1173,11 +1271,13 @@
 </script>
     					
 <style lang="less">
-	@green: #42af8f;
+	@green: #42af8f;	/*主题色*/
+	/* 时间轴颜色 */
 	@blue: #0099ff;
 	@yellow: #fcc433;
 	@red: #e86b59;
 	@inVent: #00a656;
+	@purple: #999cf9;
 	
 	body {
 		background-color: #f2f2f2;
@@ -1233,10 +1333,6 @@
 		z-index: -1;
 		/*padding: 0 20px;*/
 		
-		.isVis {
-			// 不显示占位符. - 的话打印会错位
-			color: transparent;
-		}
 		
 		.cell-content {
 			line-height: 40px;
@@ -1340,14 +1436,6 @@
 						}
 						
 						.table-main {
-							
-							.isVis {
-								color: transparent;
-								
-								&::selection {
-									color: transparent;
-								}
-							}
 							
 							.cell-content {
 								line-height: 40px;
@@ -1504,6 +1592,11 @@
 						&.green {
 							.tips {
 								color: @inVent;
+							}
+						}
+						&.purple {
+							.tips {
+								color: @purple
 							}
 						}
 					}
