@@ -16,6 +16,7 @@
                     <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
                     </span>
+                    <br>
                     <span>
                         <el-checkbox v-model="checked">全部数据</el-checkbox>
                     </span>
@@ -1397,6 +1398,13 @@ body {
 </style>
 
 <style lang="less" scoped>
+.condition {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    .condition-messsage {
+        line-height: 23px;
+    }
+}
 .outTitle,
 .inTitle,
 .uniteTitle,

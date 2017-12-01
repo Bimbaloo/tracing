@@ -7,6 +7,7 @@
                     <span v-for="(filter,index) in filters" :key="index">
                         {{filter[0]}} : {{filter[1]}}
                     </span>
+                    <br>
                     <span>
                         <el-checkbox v-model="checked" @change="changeData">全部数据</el-checkbox>
                     </span>
@@ -233,8 +234,9 @@ export default {
             this.loading = false;
             this.allData = [].concat(oData.turnInOutDetailList)
             this.filterDate = oData.turnInOutDetailList.filter((el)=>{
-                el.happenTime >= this.startTime && el.happenTime <= this.endTime
+                return el.operationTime >= this.startTime && el.operationTime <= this.endTime
             })
+            console.log(this.filterDate)
             if( this.startTime === this.startTime && this.shiftEndTime === this.endTime ){
                 this.tableData.data = this.allData; 
             }else{
@@ -389,6 +391,13 @@ export default {
 </style>
 
 <style lang="less" scoped>
+.condition {
+    padding-top: 4px;
+    padding-bottom: 4px;
+    .condition-messsage {
+        line-height: 23px;
+    }
+}
 .tableData {
     display: flex;
     justify-content: space-between;

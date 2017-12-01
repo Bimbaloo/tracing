@@ -8,9 +8,9 @@
                     </span>
                 </div>
             </div>
-            <!-- <h2 class="content-title" id='content-title'>
+            <h2 class="content-title" id='content-title'>
                 <span>工艺参数</span>
-            </h2> -->
+            </h2>
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
                 <div v-if="!barcodeTableData.show && !chartShow" class="error">
                     {{ empty }}
