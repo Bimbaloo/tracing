@@ -35,20 +35,22 @@
 					<el-input 
 					v-model="oCurrentData.link" 
 					auto-complete="off" 
-					placeholder="请输入跳转链接。例：http:127.0.0.1:8010/config.html或config.html"
+					placeholder="请输入跳转链接。例：http://127.0.0.1:8010/config.html或config.html"
 					style="width:95%;"></el-input>
 				</el-form-item>
 				<el-form-item label="设备" prop="equipmentIds">
 					<el-select 
 					v-model="oCurrentData.equipmentIds" 
 					multiple 
+					filterable 
+    				clearable
 					placeholder="请选择设备"
-					 style="width:95%;">
+					style="width:95%;">
 						<el-option
-						v-for="item in aoEquipment"
-						:key="item.equipmentId"
-						:label="`${item.equipmentName}(${item.equipmentId})`"
-						:value="item.equipmentId">
+							v-for="item in aoEquipment"
+							:key="item.equipmentId"
+							:label="`${item.equipmentId}:${item.equipmentName}`"
+							:value="`${item.equipmentId}:${item.equipmentName}`">
 						</el-option>
 					</el-select>
 				</el-form-item>
@@ -327,7 +329,7 @@
 			editItem(item) {
 				this.dialogVisible = true
 				this.dialogTitle = "编辑模块"
-				this.oCurrentData = $.extend(true, {}, item)
+				this.oCurrentData = item//$.extend(true, {}, item)
 				this.oBefore = $.extend(true, {}, item)
 			},
 			// 删除模块。
@@ -346,7 +348,7 @@
 			addModule() {
 				this.$register.sendRequest(this.$store, this.$ajax, MODULE_ADD_DATA_URL, "post", this.oCurrentData, (oData) => {
 					// 回传模块id。
-					this.oCurrentData.$set("id", oData.id)
+					this.oCurrentData.id = oData.id
 					// 新增模块。
 					this.aoCustom.push(this.oCurrentData)
 					this.showMessage("新增成功。")

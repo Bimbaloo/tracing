@@ -811,7 +811,8 @@
                     // 过滤其他设备的定制内容，只保留非定制的内容。
                     o.list = o.list.filter(item => item.type)
 
-                    let oData = this.factoryCustomItemList.filter(item => item.dimension === o.key && item.equipmentIds.indexOf(id) > -1)[0]
+                    let oData = this.factoryCustomItemList
+                    .filter(item => item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length)[0]
 
                     if(oData) {
                         // 添加数据。
