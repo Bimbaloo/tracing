@@ -745,11 +745,11 @@
 									<span class="tips">${o.equipmentName||"-"}</span> 设备上
 									将条码 <span class="tips">${o.barcode||"-"}</span> 
 									,批次 <span class="tips">${o.batchNo||"-"}</span>
-									,工单号<span class="tip">${srcDoCode}</span>
+									,工单号<span class="tip">${o.srcDoCode}</span>
 									的 <span class="tips">${o.materialName||"-"}</span> 物料,
 									<span class="tips">${o.opTypeName}</span>
 									${o.quantity}件
-									到工单号<span class="tips">${doCode}</span>
+									到工单号<span class="tips">${o.doCode}</span>
 								</div>`
 						
 						break
