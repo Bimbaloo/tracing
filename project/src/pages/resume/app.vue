@@ -198,7 +198,7 @@
 					columns: [{
 						prop: "materialName",
 						name: "",
-						width: 550
+						width: 300
 					},{
 						prop: "opTypeName",
 						name: "类型",
