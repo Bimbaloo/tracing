@@ -5,7 +5,7 @@
 		
 		<!-- header 部分-->
 		<v-header ref="headers" v-show="!bFullScreen" :back="'search.html'" :config="false"></v-header>
-		<div class="resume-wraps">
+		<div class="resume-wraps" v-loading="downLoading" element-loading-text="图片生成中">
 			<div class="resume-content-wrap" :class="{full:bFullScreen}">
 				<div class="clone"></div>
 				<div class="resume-content">
@@ -307,7 +307,8 @@
 						{validator: validateBarcode, trigger: "change"}
 					]
 				},
-				myLocalStorage: []
+				myLocalStorage: [],
+				downLoading: false
 			}
 		},
 		// 计算属性。
@@ -1083,16 +1084,26 @@
 					html2canvas(jNow.get(0),{
 						height: jNow.outerHeight(true) + 100,
 						background: isTable?"#fff":"#1d272f",
-						onrendered:function(canvas) {
-							var sImg = canvas.toDataURL("image/png");
-								
-							jDown.attr({
-								"href":sImg,
-								"download": sFileName +".png"
-							}).get(0).click()
+						onrendered:(canvas) => {
+							
+							const webpUrl = canvas.toDataURL("image/webp");
+							console.log(webpUrl.length)
+							if(webpUrl.length > 1950000 || webpUrl.length === 6){  //生成的base64长度大于200W会自动转成6，且无法打印
+								this.$message({
+									message: '抱歉，生成图片过大，无法下载',
+									type: 'warning'
+								});
+							}else{
+								jDown.attr({
+									"href":webpUrl,
+									"download": sFileName +".png"
+								}).get(0).click()
+							}
 							// 重置复制内容。
 							jClone.html("");
+							this.downLoading = false
 						}
+
 					});
 				}
 			},
