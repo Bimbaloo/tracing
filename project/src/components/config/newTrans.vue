@@ -2,7 +2,7 @@
 	<el-dialog class="transfer-dialog" title="条件组合" :visible.sync="dialogVisable" :close-on-click-modal="false" :before-close="closeModal">
         <el-form label-position="left" label-width="60px" :model="ruleForm" :rules="rules" ref="ruleForm">
         	<el-form-item label="名称" prop="name">
-			    <el-input v-model="title" placeholder="请输入条件组合名称"></el-input>
+			    <el-input v-model="titleName" placeholder="请输入条件组合名称"></el-input>
 			</el-form-item>
 			
 			<el-form-item prop="value">
@@ -117,7 +117,8 @@
 					value: [{
 						validator: validateChecked, trigger: "blur" 
 					}]
-				}
+				},
+				conditionTitle: this.title
 			}
 		},
 		watch: {
@@ -139,10 +140,19 @@
 			},
 			ruleForm: function() {
 				return {
-					name: this.title,
+					name: this.titleName,
 					value: this.aCheckedParam
 				}
-			}
+			},
+			titleName: {
+				get: function() {
+					let value = this.conditionTitle
+					return value
+				},
+				set: function(e) {
+					this.conditionTitle = e
+				}
+			} 
 		},
 		methods: {
 			 //穿梭框修改按钮点击事件
