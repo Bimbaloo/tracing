@@ -22,12 +22,13 @@ Vue.prototype.$ajax = axios;
 //import query from '../../components/config/query.vue';
 import query from '../../components/config/newquery.vue';
 import field from '../../components/config/field.vue';
-
+import factory from '../../components/config/factory.vue';
 
 // 定义路由
 const routes = [
     { path: '/query', component: query },
-    { path: '/field', component: field }
+    { path: '/field', component: field },
+    { path: '/factory', component: factory }
 ];
 
 // 创建 router 实例，然后传 `routes` 配置
@@ -41,13 +42,16 @@ Vue.use(Vuex)
 // 引用登录模块。
 import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
+// 引用工厂定制模块
+import { customModule } from 'assets/js/customStore.js'
 
 Vue.prototype.$register = loginFn;
 
 // 定义统一状态。
 const store = new Vuex.Store({
   modules: {
-    loginModule
+    loginModule,
+    customModule
   },
   state: {
     edit: false

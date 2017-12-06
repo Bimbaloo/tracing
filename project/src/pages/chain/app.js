@@ -27,13 +27,16 @@ Vue.use(Vuex)
 // 引用登录模块。
 import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
+// 引用工厂定制模块
+import { customModule } from 'assets/js/customStore.js'
 
 Vue.prototype.$register = loginFn;
 
 // 定义统一状态。
 const store = new Vuex.Store({
 	modules: {
-		loginModule
+		loginModule,
+		customModule
 	},
 	state: {
 		// 编辑状态

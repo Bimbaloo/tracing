@@ -5,10 +5,19 @@
     </header>
     <v-tooltip :config="true" :back="false"></v-tooltip>
     <div class="search-tab-content">
-      <el-tabs  element-loading-text="拼命加载中" v-model="activeKey" type="border-card" class="search-tab">
-        <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-          <v-panel :category="category" :label-width="labelWidth" :handle-submit="handleSubmit"></v-panel>
-          <!--v-panel :panel-data="category.list" :url-data="category.url" :label-data="width" :active-tab="activeTab"></v-panel-->
+      <el-tabs  element-loading-text="拼命加载中" 
+      v-model="activeKey" 
+      type="border-card" 
+      class="search-tab">
+        <el-tab-pane 
+        :key="category.key" 
+        v-for="category in categories" 
+        :label="category.title" 
+        :name="category.key">
+          <v-panel 
+          :category="category" 
+          :label-width="labelWidth" 
+          :handle-submit="handleSubmit"></v-panel>
         </el-tab-pane>
       </el-tabs>
     </div>
@@ -16,8 +25,11 @@
       <img class="version" :src="version" />
       <span class="version-info">版本: {{ v }}</span>
     </footer>
-    <!--v-dialog v-if="showDialog" :dialog-visible="showDialog" @hideDialog="hideDialog"></v-dialog-->
-    <div :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" :style="{zIndex: historyZindex}" @mouseover="historyZindex = 2" @mouseleave="historyZindex = 0" >
+    <div 
+    :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" 
+    :style="{zIndex: historyZindex}" 
+    @mouseover="historyZindex = 2" 
+    @mouseleave="historyZindex = 0" >
       <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
       <div class='history-title' v-show="showHistory" >
@@ -38,7 +50,10 @@
               <li class="ecorded-module">{{data.oData.tab}}</li>
               <li class='records'>
                 <ul class="detail-record-box">
-                  <li class="detail-record" v-for="(li,index) in data.oData.keys" v-if="li[1]" :key="index">{{li[0]}}：{{li[1]}}</li>
+                  <li class="detail-record" 
+                  v-for="(li,index) in data.oData.keys" 
+                  :key="index"
+                  v-if="li[1]">{{li[0]}}：{{li[1]}}</li>
                 </ul>
               </li>
             </ul>
@@ -52,7 +67,7 @@
 
 <script>
 import tooltip from 'components/header/tooltip.vue'
-import logo from 'assets/img/kssp-logo.png'
+// import logo from 'assets/img/logo-w.png'
 import version from 'assets/img/version.png'
 import panel from 'components/panel/panel.vue'
 import fnP from "assets/js/public.js"
@@ -70,7 +85,7 @@ export default {
   data() {
     return {
       showList: false,
-      logo,
+      // logo,
       version,
       v: VERSION,
       activeKey: "stock",
@@ -104,13 +119,27 @@ export default {
     }
   },
   computed: {
+    // 工厂配置数据。
+    configData() {
+      return this.$store.state.customModule.config
+    },
+    // 配置图标。
+    logo() {
+      return this.configData && this.configData.logo
+    },    
     liData() {
       return this.switchData(this.myLocalStorage)
+    },
+    // 工厂配置数据。
+    configData() {
+      return this.$store.state.customModule.config
+    },
+    // 配置模块。
+    modulesConfig() {
+      return this.configData.modules
     }
   },
   created() {
-    
-    //debugger
     let history = localStorage.getItem("history")
     if(history){
       this.myLocalStorage = JSON.parse(history)
@@ -124,29 +153,67 @@ export default {
     // 登录验证。
     this.$register.login(this.$store);
 
-    this.loading = true;
+    // 获取配置数据。
+    this.$store.dispatch('getConfig').then(() => {
+      // 获取数据。
+      this.fetchData();
+    })
 
-    // 请求判断。   
-    this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
-      // 请求成功。
-      
-      this.loading = false;
-      this.categories = fnP.parseData(oData).filter(o => o.key != "restrain" && o.key != "link");
+    this.fetchDataName()  //获取名称
+  },
+  methods: {
+    // 获取数据。
+    fetchData() {
+      this.loading = true;
+
+      // 请求判断。   
+      this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
+        // 请求成功。
+        this.loading = false;
+        // 设置tab数据。
+        this.setCategories(oData)
+      }, (sErrorMessage) => {
+        // 请求失败。
+        this.loading = false;
+        this.sErrorMessage = sErrorMessage;
+        this.showMessage();
+      });
+    },
+    // 设置tab数据。
+    setCategories(oData) {
+      this.categories = fnP.parseData(oData)
+                        // 获取打开的功能模块。
+                        .filter(o => {
+                          let oItem = this.modulesConfig.find(item => {
+                            return o.key === item.key
+                          });
+                          if(oItem) {
+                            return !!oItem.switch
+                          }else {
+                            return true
+                          }                    
+                        })//.filter(o => o.key != "restrain" && o.key != "link");
+                        .map(o => {
+                          let oItem = this.modulesConfig.find(item => {
+                            return o.key === item.key
+                          });
+                          if(oItem) {
+                            o.select = oItem.select
+                            o.name = oItem.name
+                          }
+                          return o
+                        })
+      // 设置激活的tab。
+      let oSelect = this.categories.find(o => !!o.select)
+      this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
+
       this.categories.forEach(o => {
         o.active = {
           radio: "1",
           keys: {}
         }
-      })
-    }, (sErrorMessage) => {
-      // 请求失败。
-      this.loading = false;
-      this.sErrorMessage = sErrorMessage;
-      this.showMessage();
-    });
-    this.fetchDataName()  //获取名称
-  },
-  methods: {
+      }) 
+    },
     // 显示提示信息。
     showMessage() {
       this.$message({

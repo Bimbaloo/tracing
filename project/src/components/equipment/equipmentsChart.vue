@@ -116,7 +116,6 @@
                                 
                             </div>
                         </div>
-                        
                     </div>
                     <div class="line" :style="{left:compareData.left*100+'%', top: panelTop+'px', height: chartHeight-3 + 'px', zIndex: compareData.zIndex}"></div>
                 </div>
@@ -168,6 +167,8 @@
     const TOOLTIP_BORDERCOLOR = '#a8b8cc'
     // 设备分析接口地址。
     const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events"
+    // 工厂定制地址。
+    const MODULE_DATA_URL= HOST + '/api/v1/custom/equipment-analysis/items'
     // 默认选中的维度。
     const DEFAULT_SELECTED_DIMENSION = ["quality", "pool", "parameter"]
 
@@ -304,19 +305,21 @@
                     color: "#d89cdd",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "质检",
                         router: "/process/qtReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     },{
+                        type: "route",
                         name: "送检",
                         router: "/process/qcReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
-
-                    },{
-                        name: "FGB",
-                        router: "/process/fgbReport",
-                        query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
+                    // },{
+                    //     type: "route",
+                    //     name: "FGB",
+                    //     router: "/process/fgbReport",
+                    //     query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]    
 
                     }]
                 }, {
@@ -327,6 +330,7 @@
                     color: "#15a5a7",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "投产表",
                         router: "/process/product",
                         query: ["equipmentName", "operationIdList", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
@@ -356,6 +360,7 @@
                     color: "#f98141",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "事件记录",
                         router: "/process/event",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
@@ -369,11 +374,13 @@
                     color: "#b3b200",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "维修记录",
                         router: "/process/repair",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
 
                     }, {
+                        type: "route",
                         name: "点检记录",
                         router: "/process/spotReport",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
@@ -387,10 +394,10 @@
                     color: "#6979b7",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "工具记录",
                         router: "/process/tool",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
-
                     }]
                 }, {
                     show: true,
@@ -400,6 +407,7 @@
                     color: "#f9c331",
                     listShow: false,
                     list: [{
+                        type: "route",
                         name: "工艺参数",
                         router: "/process/parameter",
                         query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]  
@@ -408,6 +416,34 @@
             }
         },
         computed: {
+            // 工厂配置数据。
+            configData() {
+                return this.$store.state.customModule.config
+            },
+            // 配置模块。
+            modulesConfig() {
+                return this.configData.modules
+            },
+            // 工厂定制。
+            factoryCustomItemList() {
+                return this.$store.state.factoryModule.factoryCustomItemList
+            },
+            // 工厂定制内容是否获取到的标志判断。
+            factoryDataFecthed() {
+                return this.$store.state.factoryModule.fetched
+            },
+            // 追踪或溯源或遏制的配置项。
+            currentModule() {
+                let sCurentPage = '',
+                    sPathName = window.location.pathname,
+                    // 溯源、追踪、遏制3个页面用到设备分析。
+                    aPage = ["trace", "track", "restrain"]
+                
+                // 当前页面。
+                sCurentPage = aPage.find((sCategory) => sPathName.indexOf(sCategory) > -1)
+                
+                return this.modulesConfig.filter(o => o.key === sCurentPage)[0]
+            },
             tag () {
                 return window.Rt.utils.getParam("tag");
             },
@@ -746,9 +782,17 @@
         },
         created () {
             // 组件创建完后获取数据，
-            // 此时 data 已经被 observed 了						
+            // 此时 data 已经被 observed 了	
+            if(!this.factoryDataFecthed) {
+                // 若未获取工厂定制数据。
+                // 获取数据。
+                this.getFactoyData()
+            }				
         },
         mounted () {
+            // 获取配置数据。
+            this.getConfigData();
+            // 初始化。
             this.init();
         },
         watch: {
@@ -769,7 +813,60 @@
             resizeY: 'resizeChart'
         },
         methods: {
-			init() {                  
+            // 获取工厂定制数据。
+            getFactoyData() {
+                this.$store.dispatch('getFactoryConfig')
+            },
+            // 获取设备定制数据。
+            getEquipmentCustomDataById(id) {       
+                this.dimension.forEach(o => {
+                    // 过滤其他设备的定制内容，只保留非定制的内容。
+                    o.list = o.list.filter(item => item.type)
+
+                    let oData = this.factoryCustomItemList
+                    .filter(item => item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length)[0]
+
+                    if(oData) {
+                        // 添加数据。
+                        o.list.push({
+                            name: oData.name,
+                            link: oData.link,
+                            parameters: oData.parameters
+                        })
+                    }
+                })
+            },
+            // 获取配置数据。
+            getConfigData() {
+                // 获取配置数据。
+                // this.$store.dispatch('getConfig').then(() => {
+                    // 设置维度数据。
+                    if(this.currentModule.submodules) {
+                        // 维度分析数据。
+                        let oDimensionData = this.currentModule.submodules.find(o => o.key === "dimension");
+                        if(oDimensionData) {
+                            // 根据配置数据修改维度分析开关。
+                            this.dimension = this.dimension.filter(o => {
+                                let oData = oDimensionData.dimension.find(item => o.key === item.key)
+                                if(oData) {
+                                    return !!oData.switch
+                                }else {
+                                    return true
+                                }
+                            })
+                            this.dimension.map(o => {
+                                let oData = oDimensionData.dimension.find(item => o.key === item.key)
+                                o.show = oData.show
+                                o.name = oData.name
+                                return o
+                            })
+                        }
+                    }
+                // })
+            },
+            // 初始化。
+			init() { 
+                // 获取存储的数据。                 
                 this.getSessionStorage();     
                 // 初始化图形。              
 				this.setInitData();
@@ -1147,6 +1244,13 @@
                         }
                         return o;
                     })
+                  
+                    this.getEquipmentCustomDataById(sId)
+                    // 获取设备定制数据。
+                    // this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
+					//     id: sId
+                    // }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
+                    
                 }
 
                 this.chart.setOption({
@@ -1157,6 +1261,41 @@
 
                 // 设置选中的时间。
                 this.setSelectedTime();
+            },
+            // 获取定制数据成功。
+            requestCustomSucess (aoData) {
+                aoData = [{
+                    name: "FGB",
+                    link: "FGBReport.html",
+                    dimension: "quality",
+                    parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
+                },{
+                    name: "条码参数",
+                    link: "https://www.baidu.com",
+                    dimension: "parameter",
+                    parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
+                }]
+
+                this.dimension.forEach(o => {
+                    // 过滤其他设备的定制内容
+                    o.list = o.list.filter(item => item.type)
+
+                    let oData = aoData.filter(item => item.dimension === o.key)[0]
+
+                    if(oData) {
+                        // 添加数据。
+                        o.list.push(oData)
+                    }
+                })
+                
+            },
+            // 获取定制数据失败。
+            requestCustomFail () {
+                console.log("获取定制数据失败。");
+            },
+            // 获取定制数据错误。
+            requestCustomError () {
+                console.log("定制数据查询出错");
             },
             // 悬浮框点击事件。
             suspendTooltipClickHandle (event) {
@@ -1360,11 +1499,14 @@
 				if(oData.router) {				
 					let oQuery = this.getParamter(oData.query);
 					
-                    // 保存数据都本地。
+                    // 保存数据到本地。
                     this.setSessionStorage();
                     // 需要传code，配合路由判断是否切换工序。
-					this.$router.replace({path: oData.router, query: Object.assign({code: this.process}, oQuery)});
-				}
+					this.$router.replace({path: oData.router, query: Object.assign({code: this.process}, oQuery)});				
+				}else if(oData.link) {
+                    let oParams = this.getParamter(oData.parameters);
+                    window.open(oData.link + "?" + $.param(oParams), "_blank")
+                }
 			},
             /**
 			 * @param {Array}
@@ -1491,7 +1633,13 @@
                 aoData.forEach((o,index) => {
                     if(index === nLength) {
                         // 默认选中第一台设备。
-                        this.selectedEquipmentId = o.equipmentId;
+                        this.selectedEquipmentId = o.equipmentId
+
+                        this.getEquipmentCustomDataById(this.selectedEquipmentId)
+                        // 获取设备定制数据。
+                        // this.$register.sendRequest(this.$store, this.$ajax, EQUIPMENTS_CUSTOM_URL, "get", {
+                        //     id: this.selectedEquipmentId
+                        // }, this.requestCustomSucess, this.requestCustomFail, this.requestCustomError)
                     }
 
                     // 设置y轴数据。
@@ -2502,8 +2650,7 @@
             position: relative;
             height: 100%;
             .analysis {
-                // position: relative;
-                height: 100%;
+                position: relative;
             }
 
             .illustration {

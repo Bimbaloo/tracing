@@ -285,6 +285,10 @@
             		"resume": {
             			"barcode": [{validator: validateBarcode, trigger: "change"}]
             		},
+					// 遏制
+            		"restrain": {
+            	
+            		},
             		// 断链
             		"link": {
             			"batchNo": [{validator: validateBatch,trigger: "change"}],

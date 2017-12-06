@@ -1,0 +1,127 @@
+{
+    "key": "common",
+    "name": "通用",
+    "description": "通用版本",
+    "logo": "static/factories/common/logo.png",
+    "modules": [{
+        "name": "查出库",
+        "key": "stock",
+        "switch": 1
+    }, {
+        "name": "溯源",
+        "key": "trace",
+        "switch": 1,
+        "submodules": [{
+            "name": "维度分析",
+            "key": "dimension",
+            "switch": 1,
+            "dimension": [{
+                "name": "质量",
+                "key": "quality",
+                "switch": 1,
+                "show": true
+            },{
+                "name": "投产",
+                "key": "pool",
+                "switch": 1,
+                "show": true
+            },{
+                "name": "工单",
+                "key": "work",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "事件",
+                "key": "event",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "维护",
+                "key": "repair",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "工具",
+                "key": "tool",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "工艺",
+                "key": "parameter",
+                "switch": 1,
+                "show": true
+            }]
+        }]
+    }, {
+        "name": "追踪",
+        "key": "track",
+        "switch": 1,
+        "submodules": [{
+            "name": "维度分析",
+            "key": "dimension",
+            "switch": 1,
+            "dimension": [{
+                "name": "质量",
+                "key": "quality",
+                "switch": 1,
+                "show": true
+            },{
+                "name": "投产",
+                "key": "pool",
+                "switch": 1,
+                "show": true
+            },{
+                "name": "工单",
+                "key": "work",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "事件",
+                "key": "event",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "维护",
+                "key": "repair",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "工具",
+                "key": "tool",
+                "switch": 1,
+                "show": false
+            },{
+                "name": "工艺",
+                "key": "parameter",
+                "switch": 1,
+                "show": true
+            }]
+        }, {
+            "name": "快速报告",
+            "key": "trackReport",
+            "switch": 1
+        }]
+    }, {
+        "name": "履历",
+        "key": "resume",
+        "switch": 1,
+        "submodules": [{
+            "name": "BOM",
+            "key": "BOM",
+            "switch": 1
+        }, {
+            "name": "时间轴",
+            "key": "timeline",
+            "switch": 1
+        }]
+    }, {
+        "name": "遏制",
+        "key": "restrain",
+        "switch": 0
+    }, {
+        "name": "断链修复",
+        "key": "link",
+        "switch": 0
+    }]
+}
+  

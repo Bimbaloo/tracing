@@ -73,23 +73,6 @@
 				this.sErrorMessage = sErrorMessage;
 				this.showMessage();          
 			})
-			
-
-		    // 请求判断。       
-//             fnP.beforeRequest(this.$store, this.$ajax).get(TABLE_DATA_URL).then((res) => {
-//             	fnP.judgeLoaderHandler(res, () => {
-//             		// 设置表格数据。
-//             		this.tableData = res.data.data;
-//             		// 保存当前数据。
-// //          		this.aBefore = Object.assign([], this.tableData);
-//             		this.aBefore = $.extend(true,[],this.tableData);
-//             	}, (sErrorMessage)=>{
-// 					this.sErrorMessage = sErrorMessage;
-// 					this.showMessage();          
-// 				});
-//             }).catch(function(error) {
-//             	console.log(error)
-//             });
         },
         computed: {
 	        // 是否编辑的状态。
@@ -129,22 +112,6 @@
 					type: "updateEdit",
 					key: bEdit
 				});
-        	},
-        	// 判断调用接口是否成功。
-        	judgeLoaderHandler(param,fnSu,fnFail) {
-        		let bRight = param.data.errorCode;
-            	
-            	// 判断是否调用成功。
-            	if(!bRight) {
-            		// 调用成功后的回调函数。
-            		fnSu && fnSu();
-            	}else {
-            		// 提示信息。
-            		this.sErrorMessage = param.data.errorMsg.message;
-            		this.showMessage();
-            		// 失败后的回调函。
-            		fnFail && fnFail();
-            	}
         	},
         	// 显示提示信息。
         	showMessage() {
@@ -186,26 +153,6 @@
 								this.sErrorMessage = sErrorMessage;
 								this.showMessage();          
 							})
-
-			                // this.$ajax.put(TABLE_DATA_URL,{
-			                // 	"items": this.tableData
-			                // }).then((res) => {
-			                // 	// 判断是否更新成功。
-			                // 	this.judgeLoaderHandler(res,() => {
-			                		
-			                // 		// 修改状态。
-			                // 		this.$store.commit({
-							// 			type: "updateEdit",
-							// 			key: false
-							// 		});
-			                		
-							// 		// 重新设置保存的值。
-							// 		this.aBefore = $.extend(true,[],this.tableData);
-				            // 		this.sErrorMessage="更新成功！";
-			        		// 		this.showMessage();
-				            // 	});
-			                // });
-	            			
 	            		}
 	            	});
             	}

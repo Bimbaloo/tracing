@@ -91,11 +91,30 @@
         myLocalStorage: []  //查询记录
       }
     },
+    computed: {
+      // 工厂配置数据。
+      configData() {
+        return this.$store.state.customModule.config
+      },
+      // 配置模块。
+      modulesConfig() {
+        return this.configData.modules
+      },
+      reversedMessage() {
+          let _width = this.LayoutLeftWidth+this.changeWidth
+          return _width
+      }
+    },    
     created() {
       // 登录判断。
       this.$register.login(this.$store);
-      // 获取数据。
-      this.fetchData();
+      
+      // 获取配置数据。
+      this.$store.dispatch('getConfig').then(() => {
+        // 获取数据。
+        this.fetchData();
+      })
+
       // 保存查询记录
       let history = localStorage.getItem("history")
       if(history){
@@ -125,57 +144,66 @@
         // session 中获取
         if(oData) {
             oData = JSON.parse(oData);
-            this.activeKey = oData.tab;
+            // this.activeKey = oData.tab;
         }else if(window.location.hash.length > 2) {
             // 清空了cookie后，url中有参数。则获取url中的参数。
             oData = this.getSearchData();
-            this.activeKey = oData.tab;
+            // this.activeKey = oData.tab;
         }
 
         this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
           // 请求成功。
-          this.categories = fnP.parseData(oResult).filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume");
+          this.setCategories(oData, oResult)
 
-          this.categories.forEach(o => {
-            if(oData && oData.tab == o.key) {
-              o.active = oData;
-            }else {
-              o.active = {
-                radio: "1",
-                keys: {}
-              }            
-            }
-          })
-          
+          if(oData || window.location.hash.length > 2) {
+              this.activeKey = oData.tab;
+          }
+
           this.$nextTick(() => {
             if(oData) {
               this._submitForm(oData);
             }            
           })
-        }, this.requestFail, this.requestError);
-      // this.$ajax.get(MODULE_ITEM_URL).then((res) => {
-      // 	this.judgeLoaderHandler(res,() => {
-	    //     this.categories = fnP.parseData(res.data.data).filter(o=>o.key!="restrain" && o.key!="link");
-	    //    //	console.log(this.categories)
-	    //    	this.categories.forEach(o => {
-	    //       if(oData && oData.tab == o.key) {
-	    //         o.active = oData;
-	    //       }else {
-	    //         o.active = {
-	    //           radio: "1",
-	    //           keys: {}
-	    //         }            
-	    //       }
-	    //     })
-      		
-      // 		this.$nextTick(() => {
-	    //       if(oData) {
-	    //         this._submitForm(oData);
-	    //       }            
-	    //     })
-      		
-      // 	});
-      // });        
+        }, this.requestFail, this.requestError);       
+      },
+      // 设置tab数据。
+      setCategories(oData, oResult) {
+        this.categories = fnP.parseData(oResult)
+                        .filter(o => {
+                          let oItem = this.modulesConfig.find(item => {
+                            return o.key === item.key
+                          });
+                          if(oItem) {
+                            return o.key!="restrain" && o.key!="link" && o.key != "resume" && !!oItem.switch
+                          }else {
+                            return o.key!="restrain" && o.key!="link" && o.key != "resume"
+                          }                       
+                        })//.filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume");                       
+                        .map(o => {
+                          let oItem = this.modulesConfig.find(item => {
+                            return o.key === item.key
+                          });
+                          if(oItem) {
+                            o.select = oItem.select
+                            o.name = oItem.name
+                          }
+                          return o
+                        })
+
+        // 设置激活的tab。
+        let oSelect = this.categories.find(o => !!o.select)
+        this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
+
+        this.categories.forEach(o => {
+          if(oData && oData.tab == o.key) {
+            o.active = oData;
+          }else {
+            o.active = {
+              radio: "1",
+              keys: {}
+            }            
+          }
+        })        
       },
       // 请求失败。
       requestFail(sErrorMessage) {
@@ -368,12 +396,6 @@
         		this.changeWidth = 0;
             this.LayoutLeftWidth = 360;
         }
-      }
-    },
-    computed: {
-      reversedMessage: function () {
-          let _width = this.LayoutLeftWidth+this.changeWidth
-          return _width
       }
     }
   }
