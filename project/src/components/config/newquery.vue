@@ -9,13 +9,13 @@
     			<span class="header-title"> {{ item.moduleName }} </span>
     			<div class="header-icon">
     				<!-- 编辑。 -->
-    				<i @click.stop="showEditState(item.moduleCode,index)" v-show="!oBefore[item.moduleCode].bEdit" class="icon el-icon-edit"></i>
+    				<i @click.stop="showEditState(item.moduleCode,index)" title="编辑" v-show="!oBefore[item.moduleCode].bEdit" class="icon el-icon-edit"></i>
     				<!-- 取消。 -->
-    				<i @click.stop="hideEditState(item.moduleCode,index)" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-exit"></i>
+    				<i @click.stop="hideEditState(item.moduleCode,index)" title="取消" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-exit"></i>
     				<!-- 保存。 -->
-    				<i @click.stop="saveModuleValue(item.moduleCode,index)" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-save"></i>
+    				<i @click.stop="saveModuleValue(item.moduleCode,index)" title="保存" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-save"></i>
     				<!-- 增加。 -->
-    				<i @click.stop="showModal(item.moduleCode,index)" v-show="oBefore[item.moduleCode].bEdit" class="icon el-icon-plus"></i>
+    				<i @click.stop="showModal(item.moduleCode,index)" title="增加" v-show="oBefore[item.moduleCode].bEdit" class="icon el-icon-plus"></i>
     			</div>
     		</div>
     		<div class="content-item">
