@@ -5,14 +5,14 @@ import axios from 'axios'
  * @return
  */
 function getCommonConfigData () {
-  return axios.get('/static/factories/common/config.json')
+  return axios.get(PAGE_HOST + '/static/factories/common/config.json')
 }
 
 /**
  * 获取工厂配置。
  */
 function getFactoryConfigData (factory) {
-  return axios.get('/static/factories/' + factory + '/config.json')
+  return axios.get(PAGE_HOST + '/static/factories/' + factory + '/config.json')
 }
 
 export const customModule = {

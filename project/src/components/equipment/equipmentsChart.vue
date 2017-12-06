@@ -1696,7 +1696,7 @@
                         })
                     }    
                     
-                    console.log(this.equipmentData)
+                    // console.log(this.equipmentData)
                 })	
             },
             // 设备状态显示切换。
