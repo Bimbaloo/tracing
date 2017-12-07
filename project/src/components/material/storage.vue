@@ -268,39 +268,18 @@
 				this.node = {
 					code: oNode.code || "",
 					name: oNode.name || "",
-					materialInfoList: oNode.materialInfoList || []
+					materialInfoList: oNode.detailInfos.map(o => {
+						return {
+							batchNo: o.batchNo,
+							barcode: o.barcode
+						}
+					})
 				}
-
+				
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
-					code: this.node.code,
+					materialCode: this.node.code,
 					materialInfoList: this.node.materialInfoList
 				}, this.requestSucess, this.requestFail, this.requestError)
-				// this.$post(this.url, {
-				// 	code: this.node.code,
-				// 	materialInfoList: this.node.materialInfoList
-				// })
-				// .then((res) => {
-				// 	this.loading = false;
-				// 	this.error = "";
-				// 	this.judgeLoaderHandler(res, (data) => {
-				// 		// 保存数据。
-				// 		if(!data.length) {
-				// 			this.error = "查无数据。"
-				// 			console.log("查无数据。");
-				// 		}else {
-				// 			oData.data = this.formatData(data);
-				// 			this.styleObject.minWidth = "1200px";
-				// 		}
-						
-				// 	});				 
-				// })
-				// .catch((err) => {
-				// 	this.loading = false;
-				// 	this.error = "查无数据。"
-				// 	// this.sErrorMessage = "查询出错。"
-				// 	// this.showMessage();
-				// 	this.styleObject.minWidth = 0;          
-				// })
            },
            /**
             * 格式化数据。

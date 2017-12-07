@@ -41,8 +41,11 @@
 		    }, 
 		    type () {
 		    	return this.$store.state.type
-		    }
-		    
+		    },
+		    // 版本信息数据。
+			isOpDbBeforeRefact() {
+				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
+			}
 		},
 		mounted() {
 			this.drawCatalog();
@@ -260,21 +263,29 @@
 										}										
 									})
 								}else if(nodeType === 10003 || nodeType === 10004) { 
-									console.log("物料节点不展示。")													// 物料  
-									// this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
-									// 	nodeType: nodeType
-									// })
-									// this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
-									// 	detailInfos: node.data.detailInfos
-									// })   
-									// this.$router.replace({ 
-									// 	path: "/stock",
-									// 	query: {
-									// 		"detailInfos": node.data.detailInfos,
-									// 		"key": node.data.nodeType,
-									// 		"_tag":  new Date().getTime().toString().substr(-5)
-									// 	}										
-									// })
+									// 物料
+					
+									// 如果当前是老版本，则显示内容。
+									if(this.isOpDbBeforeRefact) {
+										// 显示内容.
+										this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+										 	nodeType: nodeType
+										})
+										this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+										 	detailInfos: node.data.detailInfos
+										})   
+										this.$router.replace({ 
+										 	path: "/stock",
+										 	query: {
+//										 		"detailInfos": node.data.detailInfos,
+										 		"key": node.data.key,
+									 			"_tag":  new Date().getTime().toString().substr(-5)
+											}										
+										})
+										
+									}else {
+										console.log("物料节点不展示。")	
+									}
 								}else if(nodeType === 1 || nodeType === 6 || nodeType === 10001) { 	
 									// 工序。
 									this.$store.commit('updateNodeType', {	//将nodeType保存到vuex

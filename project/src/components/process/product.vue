@@ -614,7 +614,11 @@ export default {
         },
         detailInfos () {
             return this.$store && this.$store.state.detailInfos
-        }
+        },
+        // 版本信息数据。
+		isOpDbBeforeRefact() {
+			return this.$store && this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
+		}
     },
     mounted() {
         this.routerContent = document.querySelector(".el-tabs__content").offsetHeight  //获取初始高度
@@ -690,25 +694,44 @@ export default {
                // this.outItems.columns[0].cellClick = ''
             }
             
+            let aoHide = []
+            
+            // 版本信息中显示的列。
+            if(this.isOpDbBeforeRefact) {
+            	aoHide = aoHide.concat([OUT_FIELD, RETURN_FIELD, CARRY_FIELD])
+            }
+            
+        	// 设备分析中显示的列。
             if(this.isInChart) {
-	            this.inItems.columns = this.setColumnHide(this.inItems.columns)
-	            this.outItems.columns = this.setColumnHide(this.outItems.columns)
-	            this.uniteItems.columns = this.setColumnHide(this.uniteItems.columns)
-            	this.inNotOutItems.columns = this.setColumnHide(this.inNotOutItems.columns)
-            	this.outAllItems.columns = this.setColumnHide(this.outAllItems.columns)
+            	aoHide = aoHide.concat(["equipmentName", "moldCode"])
+            }
+            
+            // 存在需隐藏的列，则处理。
+            if(aoHide && aoHide.length) {
+            	this.inItems.columns = this.setColumnHide(this.inItems.columns, aoHide)
+	            this.outItems.columns = this.setColumnHide(this.outItems.columns, aoHide)
+	            this.uniteItems.columns = this.setColumnHide(this.uniteItems.columns, aoHide)
+            	this.inNotOutItems.columns = this.setColumnHide(this.inNotOutItems.columns, aoHide)
+            	this.outAllItems.columns = this.setColumnHide(this.outAllItems.columns, aoHide)
+            	this.inAllItems.columns = this.setColumnHide(this.inAllItems.columns, aoHide)
             }
         },
-        // 设置显示列隐藏。
-        setColumnHide(aoColumns) {
+        /**
+         * 设置显示列隐藏。
+         * @param {Array} aoColumns 当前所有列。
+         * @param {Array} aoHideColumn 当前需隐藏的列。
+         * @return {Array} 过滤后的列。
+         */
+        setColumnHide(aoColumns, aoHideColumn) {
         	// 如果是在设备分析里面，则设置column中列隐藏。
-            let aDisplayColumnProp = ["equipmentName", "moldCode"]
             
             for(let i = 0; i< aoColumns.length; i++) {
-            	if(aDisplayColumnProp.includes(aoColumns[i].prop)) {
+            	if(aoHideColumn.includes(aoColumns[i].prop)) {
             		aoColumns.splice(i,1)
             		i--
             	}
             }
+            
         	return aoColumns
         },
         // 隐藏监控视频。

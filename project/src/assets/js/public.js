@@ -364,8 +364,10 @@ var getNodeIconAndTemp = function(sType) {
  * 		detailTitle: 详细信息标题： -- 物料或其他组合
  * 		iconType: 	图标类型
  * @param {Object} oRowData
+ * @param {String} sPageType 当前页面显示类型 trace|track
+ * @param {Boolean} bIsOld 是否为老版本。  true-老版本  false-新版本
  */
-var getTreeData = function(oRowData, sPageType) {
+var getTreeData = function(oRowData, sPageType, bIsOld) {
 	let aoData = parseTreeData(oRowData),
 		aoDiagramData = [],
 		aoDiagramLinkData = [];
@@ -492,7 +494,6 @@ var getTreeData = function(oRowData, sPageType) {
 			
 			// 车间操作-工序
 			case "process":
-				
 				// 如果是工序组时。
 				if(oData.isGroup) {
 					// 若为group
@@ -538,11 +539,11 @@ var getTreeData = function(oRowData, sPageType) {
 						return (o.batchNo||"").length
 					}
 				},{
-					name: (sPageType == "trace" ? "总数": "滞留数/总数"),
-					minLen: (sPageType == "trace" ? 2: 6),
+					name: (( bIsOld || sPageType == "trace" ) ? "总数": "滞留数/总数"),
+					minLen: (( bIsOld || sPageType == "trace" ) ? 2: 6),
 					type: 2,
 					formatter: function(o) {
-						return (sPageType == "trace") ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
+						return (bIsOld || sPageType == "trace") ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
 					}
 				}]
 				
@@ -926,7 +927,7 @@ var getTreeData = function(oRowData, sPageType) {
 						aSum = ["quantity", "remainQuantity"]
 						
 					// trace 和 track展示不同。
-					if(sPageType == "trace") {
+					if(bIsOld || sPageType == "trace") {
 						aDis = ["batchNo", "quantity", "materialName"]
 						aSum = ["quantity"]
 					}
