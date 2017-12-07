@@ -63,7 +63,13 @@
 				default: ""
 			},
 			// 当前选中的模块。
-			moduleCode: String 
+			moduleCode: String ,
+			category: {
+				required: false
+			},
+			nModuleIndex: {
+				required: false
+			}
 		},
 		data() {
 			let aRequiredParam = ["barcode","materialCode","doCode","equipmentCode"];
@@ -177,9 +183,17 @@
 							title: this.ruleForm.name,
 							aItem: this.aCheckedParam
 						};
+						//debugger
+						let isOnlyName = this.category[this.nModuleIndex].groups.some(e=>{
+							return e.groupName === this.titleName
+						})
+						if(isOnlyName){ //重名了
+							this.$message('该名称以存在，请重新命名');
+						}else{
+							// 传递给父级。
+							this.$emit("hideModal", oResult);
+						}
 						
-						// 传递给父级。
-						this.$emit("hideModal", oResult);
 					}
 				})
 			}

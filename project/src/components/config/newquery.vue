@@ -51,6 +51,8 @@
     		:checked-data="getTransferData().aChecked"
     		:title="getTransferData().title"
     		:module-code="sCurrentModule"
+			:category="category"
+			:nModuleIndex="nModuleIndex"
     		@hideModal="hidePopModal"
     	></v-trans>
     </div>
