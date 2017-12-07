@@ -47,7 +47,6 @@
             //debugger
             bus.$on('timeChange', function (obj){
                 //debugger
-                 //console.log(_that.tab)
                 if(_that.tab === obj.tab && _that.subTab === obj.radio){
                     let datas = obj.keys
                     for(let i in datas){

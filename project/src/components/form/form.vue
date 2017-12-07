@@ -37,6 +37,9 @@
 			},
 			dataId: {
 				required: false
+			},
+			title: {
+				required: false
 			}
         },
         components: {
@@ -350,7 +353,8 @@
                             keys: oKeys, // this.keys,
 							radio: this.active.radio,
 							id: this.dataId,	// id
-							groupOrder: this.subTab //顺序
+							groupOrder: this.subTab, //顺序
+							title: this.title
                         };
                         
 						this.active.keys = oKeys; //this.keys;
@@ -365,9 +369,22 @@
             resetForm(formName) {
             	// 清空所有数据。
                 this.$refs[formName].resetFields();
-                // 清空数据。
+				// 清空数据。
+				//debugger
             	for(let key in this.ruleForm) {
-            		this.ruleForm[key] = "";
+					this.ruleForm[key] = "";
+					let obj = {
+							radio:this.active.radio,
+							tab:this.tab,
+							title:this.title,
+							keys:{
+								endTime:"",
+								startTime:""
+							}
+						}
+					if(key === "startTime" || key === "endTime") {
+						bus.$emit('timeChange', obj)
+					}
             	}
             }
         }    

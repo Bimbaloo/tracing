@@ -310,24 +310,26 @@ export default {
       let historyList = this.myLocalStorage.find(el=>{
         return el.id === listId
       })
-      let searchID = false // 查询方案id
+      let searchTitle = false // 查询方案id
       let searchObj = {}
-      this.categories.forEach(el=>{
-        el.list.forEach(e=>{
-          if(e.id === historyList.oData.id){
-            searchID = true
-            searchObj = e
-            console.log("找到了")
-          }
-        })
+      let categorie = this.categories.find(e=>{
+        return e.key === historyList.oData.tab
       })
-      if( (!!historyList && searchID) || (!!historyList && historyList.oData.tab !=="trace" && historyList.oData.tab !=="track") ){
+      categorie.list.forEach(e=>{
+        if(e.title === historyList.oData.title){
+          searchTitle = true
+          searchObj = e
+          console.log("找到了")
+        }
+      })
+      if( (!!historyList && searchTitle) || (!!historyList && historyList.oData.tab !=="trace" && historyList.oData.tab !=="track") ){
         debugger
         historyList.oData.radio = searchObj.groupOrder || historyList.oData.radio
         bus.$emit('id-selected', historyList.oData)
         this.activeKey = historyList.oData.tab
       }else{
-        console.log("没找到")
+        this.$message('这条记录好像找不到了。。');
+       // console.log("没找到")
       }
     },
     // 单条记录删除

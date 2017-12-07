@@ -19,7 +19,8 @@
 	        			:keys="keys"
 	        			:form-height="sPanelHeight"
 	        			:items="item.items" 
-                        :data-id="item.id">
+                        :data-id="item.id"
+                        :title="item.title">
 	        		</v-form>
 	        	</div>
         </div>
