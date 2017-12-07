@@ -309,17 +309,17 @@
 						prop: "checkResult",
 						name: "检验结果",
 						width: 80
-					},{
-						prop: "expiryTime",
-						name: "生效时间/失效时间",
-						width: 180,
-						formatter: function(row) {
-							if(row.effectiveTime || row.expiryTime) {
-								return `生效时间:${row.effectiveTime}\n失效时间:${row.expiryTime}`
-							}else {
-								return ""
-							}
-						}
+//					},{
+//						prop: "expiryTime",
+//						name: "生效时间/失效时间",
+//						width: 180,
+//						formatter: function(row) {
+//							if(row.effectiveTime || row.expiryTime) {
+//								return `生效时间:${row.effectiveTime}\n失效时间:${row.expiryTime}`
+//							}else {
+//								return ""
+//							}
+//						}
 					}],
 					bCreated: false,
 					loading: false,
@@ -646,7 +646,7 @@
 				})
 				
 				// 排序处理。
-				aResult = aResult.sort( (oA, oB) => +new Date( oA.data ? oA.data.time || 0 : 0 ) - +new Date( oB.data ? oB.data.time || 0 : 0) < 0? 1:-1 )
+				aResult = aResult.sort( (oA, oB) => +new Date( oA.data ? oA.data.opTime || 0 : 0 ) - +new Date( oB.data ? oB.data.opTime || 0 : 0) < 0? 1:-1 )
 //				aResult = this.setDataOrder(aResult);
 				
 				// 返回数据。
@@ -904,10 +904,8 @@
 									批次<span class="tips">${o.batchNo||"-"}</span>
 									的<span class="tips">${o.materialName||"-"}</span>物料
 									${o.quantity}件,
-									<span class="tips">${o.opTypeName}</span>到
-									<span class="tips">${o.warehouse}</span>仓库
-									<span class="tips">${o.reservoir}</span>库位
-									${o.contactName ? `,联系人<span class="tips">${o.contactName}</span>`:""}
+									<span class="tips">${o.stockTypeName}</span>
+									给联系人<span class="tips">${o.contactName}</span>
 								</div>`
 								
 						break
@@ -937,25 +935,35 @@
 									条码 <span class="tips">${o.srcBarcode||"-"}</span>,
 									批次<span class="tips">${o.batchNo||"-"}</span>
 									的<span class="tips">${o.materialName||"-"}</span>物料
-									${o.quantity}件,调整到
-									<span class="tips">${o.warehouse}</span>仓库
-									<span class="tips">${o.reservoir}</span>库位
-									的条码${o.barcode}
+									${o.quantity}件,调整到新条码
+									<span class="tips">${o.barcode}</span>
 								</div>`
 								
 						break
 					// 送检
 					case 1001:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>将
+									条码 <span class="tips">${o.barcode||"-"}</span>,
+									批次<span class="tips">${o.batchNo||"-"}</span>
+									,在<span class="tips">${o.equipmentName||"-"}</span>上产出
+									的<span class="tips">${o.materialName||"-"}</span>物料
+									${o.quantity}件进行
+									<span class="tips">${o.opTypeName}</span>
+									,结果为<span class="tips">${o.checkResult}</span>
+								</div>`
+						
+						break;
 					// 质检
 					case 1002:
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
 									<span class="tips">${o.personName||"-"}</span>将
-									条码 <span class="tips">${o.srcBarcode||"-"}</span>,
+									条码 <span class="tips">${o.barcode||"-"}</span>,
 									批次<span class="tips">${o.batchNo||"-"}</span>
 									,在<span class="tips">${o.equipmentName||"-"}</span>上产出
-									的<span class="tips">${o.materialName||"-"}</span>物料
-									${o.quantity}件
+									的<span class="tips">${o.materialName||"-"}</span>物料进行
 									<span class="tips">${o.opTypeName}</span>
 									,结果为<span class="tips">${o.checkResult}</span>
 								</div>`
