@@ -74,6 +74,7 @@ import fnP from "assets/js/public.js"
 import { bus } from "assets/js/bus.js"
 
 const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+//const MODULE_ITEM_URL = "./static/modules.json";
 // 数据名称接口。
 const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
 
@@ -305,13 +306,29 @@ export default {
     },
     // 点击历史记录后，填充
     findId(listId) {
-      this.myLocalStorage.forEach(el=>{
-        if(el.id === listId){
-          bus.$emit('id-selected', el.oData)
-          this.activeKey = el.oData.tab
-          return 0
-        }
+      //debugger
+      let historyList = this.myLocalStorage.find(el=>{
+        return el.id === listId
       })
+      let searchID = false // 查询方案id
+      let searchObj = {}
+      this.categories.forEach(el=>{
+        el.list.forEach(e=>{
+          if(e.id === historyList.oData.id){
+            searchID = true
+            searchObj = e
+            console.log("找到了")
+          }
+        })
+      })
+      if( (!!historyList && searchID) || (!!historyList && historyList.oData.tab !=="trace" && historyList.oData.tab !=="track") ){
+        debugger
+        historyList.oData.radio = searchObj.groupOrder || historyList.oData.radio
+        bus.$emit('id-selected', historyList.oData)
+        this.activeKey = historyList.oData.tab
+      }else{
+        console.log("没找到")
+      }
     },
     // 单条记录删除
     deleteId(listId) {
@@ -320,6 +337,7 @@ export default {
       })
       localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
     },
+    // 新增和更新历史记录
     updateRecord(oConditions) {
         //debugger
         delete(oConditions.keys._tag)

@@ -34,7 +34,10 @@
             },
             formHeight: {
             	required: false
-            }
+			},
+			dataId: {
+				required: false
+			}
         },
         components: {
             'v-input': Input,
@@ -345,10 +348,12 @@
                        
                         let oConditions = {
                             keys: oKeys, // this.keys,
-                            radio: this.active.radio
+							radio: this.active.radio,
+							id: this.dataId,	// id
+							groupOrder: this.subTab //顺序
                         };
                         
-                        this.active.keys = oKeys; //this.keys;
+						this.active.keys = oKeys; //this.keys;
                         this.handleSubmit(oConditions);
                         
                     } else {
