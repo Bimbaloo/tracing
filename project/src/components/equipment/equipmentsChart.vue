@@ -2958,4 +2958,8 @@
     .el-dialog__body {
         padding: 0;
     }
+      
+    .el-date-picker.has-time .el-input {
+        width: auto;
+    }
 </style>
