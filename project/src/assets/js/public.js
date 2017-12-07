@@ -39,6 +39,8 @@ var parseData = function(aoGet){
 		// 修改list的值。
 		oItem.list = oModule.groups.map( (oGroup,index) => {
 			let oList = {
+				id: oGroup.groupId+"",
+				groupOrder: oGroup.groupOrder+'',
 				title: oGroup.groupName,
 				key: index+1+"",
 				items: []
@@ -62,7 +64,6 @@ var parseData = function(aoGet){
 					placeholder: (oType[o.itemCode]==="select"?"请选择":"请输入")+sPlaceHolderName
 				};
 			})
-				
 			return oList;
 		})
 		
