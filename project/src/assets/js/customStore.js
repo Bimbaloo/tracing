@@ -1,18 +1,31 @@
 import axios from 'axios'
 
 /**
+ * 获取页面地址。
+ * @return {String}
+ */
+function getPageHost() {
+  let aPath = location.pathname.split("/")
+  aPath.splice(0, 1)
+  aPath.splice(aPath.length-1, 1)
+  aPath.unshift(location.origin)
+
+  return aPath.join("/")
+}
+
+/**
  * 获取通用配置。
  * @return
  */
 function getCommonConfigData () {
-  return axios.get(PAGE_HOST + '/static/factories/common/config.json')
+  return axios.get(getPageHost() + '/static/factories/common/config.json')
 }
 
 /**
  * 获取工厂配置。
  */
 function getFactoryConfigData (factory) {
-  return axios.get(PAGE_HOST + '/static/factories/' + factory + '/config.json')
+  return axios.get(getPageHost() + '/static/factories/' + factory + '/config.json')
 }
 
 export const customModule = {
