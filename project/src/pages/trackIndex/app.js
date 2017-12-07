@@ -204,6 +204,8 @@ import {loginModule} from 'assets/js/loginStore.js'
 import { customModule } from 'assets/js/customStore.js'
 // 引用工厂定制模块
 import { factoryModule } from 'assets/js/factoryStore.js'
+// 应用版本信息模块
+import { versionModule } from 'assets/js/versionStore.js'
 
 Vue.prototype.$register = loginFn;
 // 定义统一状态。
@@ -211,7 +213,8 @@ const store = new Vuex.Store({
   modules: {
     loginModule,
     customModule,
-    factoryModule
+    factoryModule,
+    versionModule
   },
   state: {
     key: "",

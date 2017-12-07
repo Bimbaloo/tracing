@@ -6,11 +6,13 @@
     "modules": [{
         "name": "查出库",
         "key": "stock",
-        "switch": 1
+        "switch": 1,
+        "select": 0
     }, {
         "name": "溯源",
         "key": "trace",
         "switch": 1,
+        "select": 1,
         "submodules": [{
             "name": "维度分析",
             "key": "dimension",
@@ -21,7 +23,7 @@
                 "switch": 1,
                 "show": true
             },{
-                "name": "投产",
+                "name": "加工",
                 "key": "pool",
                 "switch": 1,
                 "show": true
@@ -56,6 +58,7 @@
         "name": "追踪",
         "key": "track",
         "switch": 1,
+        "select": 0,
         "submodules": [{
             "name": "维度分析",
             "key": "dimension",
@@ -66,7 +69,7 @@
                 "switch": 1,
                 "show": true
             },{
-                "name": "投产",
+                "name": "加工",
                 "key": "pool",
                 "switch": 1,
                 "show": true
@@ -105,6 +108,7 @@
         "name": "履历",
         "key": "resume",
         "switch": 1,
+        "select": 0,
         "submodules": [{
             "name": "BOM",
             "key": "BOM",
@@ -117,11 +121,13 @@
     }, {
         "name": "遏制",
         "key": "restrain",
-        "switch": 0
+        "switch": 0,
+        "select": 0
     }, {
         "name": "断链修复",
         "key": "link",
-        "switch": 0
+        "switch": 0,
+        "select": 0
     }]
 }
   

@@ -139,7 +139,11 @@
 			_treeHeight() {
 				let _height = this.treeHeight+this.changeHeight
 				return _height
-			}   
+			},
+			// 版本信息数据。
+			isOpDbBeforeRefact() {
+				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
+			}
 		},
 		created() {
 			// 登录验证。
@@ -162,7 +166,10 @@
 				// this.filter = oAll.filters;
 				// this.params = oAll.selected;	
 			}
-
+			
+			// 获取版本信息配置
+			this.$store.dispatch('getVersion');
+			
 			// 获取配置数据。
 			this.$store.dispatch('getConfig').then(() => {
 				// 获取数据。
@@ -178,7 +185,7 @@
 			 *  恢复数据。
 			 */
 			treeDataInit() {
-				this.treeData = fnP.getTreeData(this.rawData);//this.parseTreeData()this.parseTreeData();
+				this.treeData = fnP.getTreeData(this.rawData, "track", this.isOpDbBeforeRefact);//this.parseTreeData()this.parseTreeData();
 				// 重置路由。
 				this.$router.replace("/");
 
@@ -211,7 +218,7 @@
 						data: oData		//fnP.parseTreeData(data)
 					});
 					// 格式化数据。
-					this.treeData = fnP.getTreeData(this.rawData, "track");//this.parseTreeData();
+					this.treeData = fnP.getTreeData(this.rawData, "track", this.isOpDbBeforeRefact);//this.parseTreeData();
 //					this.tableData = this.parseTableData();
 					this.catalogData = fnP.getCatalogData(this.rawData, "track"); //fnP.getTrackCatalogData(this.rawData)
 				}	

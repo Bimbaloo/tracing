@@ -23,7 +23,7 @@
                 "switch": 1,
                 "show": true
             },{
-                "name": "投产",
+                "name": "加工",
                 "key": "pool",
                 "switch": 1,
                 "show": true
@@ -69,7 +69,7 @@
                 "switch": 1,
                 "show": true
             },{
-                "name": "投产",
+                "name": "加工",
                 "key": "pool",
                 "switch": 1,
                 "show": true
