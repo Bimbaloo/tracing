@@ -222,7 +222,7 @@
                     time: ''
                 },
                 // 是否开启视频监控。
-                // showCamera: !!CAMERA,
+                showCamera: !!CAMERA,
             	treeTag: this.$route.query._tag,
                 // 是否展示设备状态。
                 showState: true,
@@ -435,10 +435,6 @@
             // 维护。
             equipmentMaintenance() {
                 return this.$store.state.versionModule &&　this.$store.state.versionModule.equipmentMaintenance
-            },
-            // 是否开启视频监控。
-            showCamera() {
-                return this.$store.state.versionModule &&　this.$store.state.versionModule.camera
             },
             // 工厂定制。
             factoryCustomItemList() {

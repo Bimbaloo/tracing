@@ -10,15 +10,13 @@ export const versionModule = {
 		// 断链修复。
 		linkRepair: false,
 		// 工具。
-		toolManagement: false,
+		toolManagement: true,
 		// 工艺。
-		processParameter: false,
+		processParameter: true,
 		// 维护。
-		equipmentMaintenance: false,
+		equipmentMaintenance: true,
 		// fgb。
-		fgb: false,
-		// 设备监控。
-		camera: false
+		fgb: false
 	},
 	mutations: {
 		updateVersionData (state, payload) {
@@ -37,8 +35,7 @@ export const versionModule = {
 		 * @return {Promise}
 		 */
 		getVersion ({ commit }) {
-			//HOST + '/api/v1/customized/features'
-			return axios.get("../static/version.json").then( response => {
+			return axios.get(HOST + '/api/v1/customized/features').then( response => {//"../static/version.json"
 				// 获取数据
 				// let bBefore = false
 				let oResult = response.data	  
