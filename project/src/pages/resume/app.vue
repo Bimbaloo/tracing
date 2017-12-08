@@ -511,13 +511,13 @@
 				this.oTab.loading = false;
 				// 显示标题。
 				this.bShowTitle = true;
-				this.oTitle.materialName = oData.materialName//productMaterialName;
-				this.oTitle.batchNo = oData.batchNo//productBatchNo;
+				this.oTitle.materialName = oData.productMaterialName;
+				this.oTitle.batchNo = oData.productBatchNo;
 				
 				// 数据修改。
 				this.aoTable = oData.bomResumes;
 				this.aParsedData = this.parseTableData();
-				this.aoTimeLineData = this.parseTimeLineData(oData.timeLineResumes);//timeLineDateResumes
+				this.aoTimeLineData = this.parseTimeLineData(oData.timeLineDateResumes);
 				
 				if(this.bCarousel) {
 					this.$nextTick(function() {
