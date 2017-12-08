@@ -50,7 +50,7 @@
             this.$register.login(this.$store);
             this.$router.replace('query');
             // 获取配置数据。
-			this.$store.dispatch('getConfig');
+			// this.$store.dispatch('getConfig');
         },
         computed: {
         	// 是否编辑的状态。

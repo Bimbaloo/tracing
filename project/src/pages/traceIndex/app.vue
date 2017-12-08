@@ -135,13 +135,16 @@
 			}
 			
 			// 获取版本信息配置
-			this.$store.dispatch('getVersion');
-			
-			// 获取配置数据。
-			this.$store.dispatch('getConfig').then(() => {
+			this.$store.dispatch('getVersion').then(() => {
 				// 获取数据。
 				this.fetchData();
 			})
+			
+			// 获取配置数据。
+			// this.$store.dispatch('getConfig').then(() => {
+			// 	// 获取数据。
+			// 	this.fetchData();
+			// })
 		},
 		mounted() {
 		},

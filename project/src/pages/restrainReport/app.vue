@@ -7,7 +7,7 @@
 				<div class="condition-line"><span>遏制人：{{nickname}}</span><span>遏制时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span><span>遏制描述：{{params.description}}</span></div>
 				<div class="condition-line"><span>物料编码：{{params.materialCode}}</span><span>批次：{{params.batchNo}}</span></div>
 			</div>
-			<v-report :hasData="setWidth" :noData="removeWidth"></v-report>
+			<v-report :hasData="setWidth" :noData="removeWidth" v-if="supression"></v-report>
 		</div>
   	</div>
 </template>
@@ -27,6 +27,10 @@
 			}
 		},
 		computed: {
+			// 是否支持遏制。
+			supression() {
+				return this.$store.state.versionModule && this.$store.state.versionModule.supression
+			},
 			nickname: function() {
 				return this.$store.state.loginModule.nickname;
 			},
@@ -45,6 +49,14 @@
 		},
 		created() {
 			this.$register.login(this.$store);
+
+			this.$store.dispatch('getVersion').then(() => {
+				// 获取数据。
+				if(!this.supression) {
+					// 若不支持遏制。
+					this.$message.error('暂无权限。');
+				}
+			})
 		},
 		methods: {
 			setWidth() {

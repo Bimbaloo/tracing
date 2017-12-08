@@ -14,7 +14,7 @@
 									 <component :is="`v-${item.type}`" :form-data="materialForm[index]" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
 								<el-form-item>
-									<el-button type="primary" class='btn' @click="submitForm(`materialForm${index}`)">查询</el-button>
+									<el-button type="primary" class='btn' @click="submitForm(`materialForm${index}`)" v-if="supression">查询</el-button>
 								</el-form-item>
 							</el-form>
 						</el-radio-group>
@@ -25,7 +25,7 @@
 								 <component :is="`v-${item.type}`" :form-data="equipmentFrom" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 							</el-form-item> 
 							<el-form-item>
-								<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')">查询</el-button>
+								<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')" v-if="supression">查询</el-button>
 							</el-form-item>
 						</el-form>
 					</el-tab-pane>
@@ -219,8 +219,11 @@
 				let formDatas = {}
 				formDatas = this.materialForm[this.radioNumber-1]
 				return  formDatas
+			},
+			// 是否支持遏制。
+			supression() {
+				return this.$store.state.versionModule && this.$store.state.versionModule.supression
 			}
-
         },
 		// 创建时处理。mounted
 		created() {
@@ -228,77 +231,87 @@
 			this.$register.login(this.$store);
 
 			// 获取配置数据。
-			this.$store.dispatch('getConfig')
-			
-			/* 设置遏制类表的查询条件 */
-			sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
-
-			/* 获取传入的查询条件 */
-			this.tag = location.search.split("=")[1];
-			
-          	let oData = sessionStorage.getItem("searchConditions-" + this.tag);
-
-			
-
-			/* 根据传入数据 */
-			this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
-				let datas = oResult
-				let _radioList = []			//用于储存radioList
-				let _groupItems = []		//用于储存groupItems
-				datas.forEach(o => {		//用于获取页面上布局信息
-					if(o.moduleCode === "restrain"){	
-						(o.groups).forEach((group,index) => {
-							_radioList.push({
-								key: index+1,
-								groupName: `${group.groupName}`
-							})
-							var groupItems = group.groupItems
-							groupItems.forEach(function(item){
-								if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
-									item.type = 'select'
-									item.placeholder = `请选择${item.itemName}`
-								}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
-									item.type = 'input'
-									item.placeholder = `请输入${item.itemName}`
-								}else{											//查询条件如果是'时间'
-									item.type = 'datetime'						
-									item.placeholder = `请选择${item.itemName}`
-								}
-								_groupItems.push({
-									key: index+1,
-									itemCode: `${item.itemCode}`,
-									itemName: `${item.itemName}`,
-									type: `${item.type}`,
-									placeholder: `${item.placeholder}`
-								})
-							})						
-						})
-						this.radioList = _radioList
-						this.groupItems = _groupItems
-
-					}
-				})
-
-				if(oData) {									//如果该条件在 session 中有保存
-					oData = JSON.parse(oData);
-					this.render(oData) 						// 根据数据渲染页面
-				}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
-					oData = this.getSearchData();
-					this.render(oData)
+			// this.$store.dispatch('getConfig')
+			this.$store.dispatch('getVersion').then(() => {
+				// 获取数据。
+				if(!this.supression) {
+					// 若不支持遏制。
+					this.$message.error('暂无权限。');
 				}else {
-					this.render({radio: 1})
+					this.fetchData()
 				}
-
-				this.$nextTick(() => {
-					if(oData) {
-						this._submitForm(oData);
-					}            
-				})
 			})
 
 		},
 		// 页面方法。
 		methods: {
+			// 获取数据。
+			fetchData() {
+				
+				/* 设置遏制类表的查询条件 */
+				sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
+
+				/* 获取传入的查询条件 */
+				this.tag = location.search.split("=")[1];
+				
+				let oData = sessionStorage.getItem("searchConditions-" + this.tag);
+
+				/* 根据传入数据 */
+				this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
+					let datas = oResult
+					let _radioList = []			//用于储存radioList
+					let _groupItems = []		//用于储存groupItems
+					datas.forEach(o => {		//用于获取页面上布局信息
+						if(o.moduleCode === "restrain"){	
+							(o.groups).forEach((group,index) => {
+								_radioList.push({
+									key: index+1,
+									groupName: `${group.groupName}`
+								})
+								var groupItems = group.groupItems
+								groupItems.forEach(function(item){
+									if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
+										item.type = 'select'
+										item.placeholder = `请选择${item.itemName}`
+									}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
+										item.type = 'input'
+										item.placeholder = `请输入${item.itemName}`
+									}else{											//查询条件如果是'时间'
+										item.type = 'datetime'						
+										item.placeholder = `请选择${item.itemName}`
+									}
+									_groupItems.push({
+										key: index+1,
+										itemCode: `${item.itemCode}`,
+										itemName: `${item.itemName}`,
+										type: `${item.type}`,
+										placeholder: `${item.placeholder}`
+									})
+								})						
+							})
+							this.radioList = _radioList
+							this.groupItems = _groupItems
+
+						}
+					})
+
+					if(oData) {									//如果该条件在 session 中有保存
+						oData = JSON.parse(oData);
+						this.render(oData) 						// 根据数据渲染页面
+					}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
+						oData = this.getSearchData();
+						this.render(oData)
+					}else {
+						this.render({radio: 1})
+					}
+
+					this.$nextTick(() => {
+						if(oData) {
+							this._submitForm(oData);
+						}            
+					})
+				})
+			},
 			/* 根据传入信息渲染页面 */
 			render(oData){
 				this.activeKey = oData.tab;  //路由

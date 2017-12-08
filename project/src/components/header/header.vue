@@ -7,7 +7,7 @@
 </template>
 <script>
 
-    // import logo from 'assets/img/logo-w.png'
+    import logo from '../../static/logo.png'//'assets/img/logo-w.png'
     import tooltip from 'components/header/tooltip.vue'
     
     export default {
@@ -27,17 +27,19 @@
             }
         },
         data () {
-            return {}
+            return {
+                logo
+            }
         },
         computed: {
-            // 工厂配置数据。
-            configData() {
-                return this.$store.state.customModule.config
-            },
-            // 配置图标。
-            logo() {
-                return this.configData &&　this.configData.logo
-            }            
+            // // 工厂配置数据。
+            // configData() {
+            //     return this.$store.state.customModule.config
+            // },
+            // // 配置图标。
+            // logo() {
+            //     return this.configData &&　this.configData.logo
+            // }            
         },
         methods: {
         	goSearch() {

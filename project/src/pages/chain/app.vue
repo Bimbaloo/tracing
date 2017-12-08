@@ -221,6 +221,10 @@
 			// 数据。
 			rawData() {
 				return this.$store.state.rawData
+			},
+			// 是否支持断链修复。
+			linkRepair() {
+				return this.$store.state.versionModule && this.$store.state.versionModule.linkRepair
 			}
 		},
 		watch: {
@@ -233,65 +237,75 @@
 			this.$register.login(this.$store);
 
 			// 获取配置数据。
-			this.$store.dispatch('getConfig');
-			
-			// 获取所需的查询参数。
-      		this.tag = window.Rt.utils.getParam("tag", location.search);
-          	let	oData = sessionStorage.getItem("searchConditions-" + this.tag),
-				  categories = [];
-			// 用于保存查询记录	  
-			let history = localStorage.getItem("history")
-			if(history){
-				this.myLocalStorage = JSON.parse(history)
-			}else {
-				this.myLocalStorage = []
-			}	  
-
-			// 断链模块。
-		    if(oData) {
-		        oData = JSON.parse(oData);
-		    }
-		    
-		    // 获取参数名
-		    this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
-	         	 // 请求成功。
-	         	categories = fnP.parseData(oResult).filter(o=> o.key == "link");
-	
-			  	if(categories.length) {
-			  		// 存在断链。
-			  		this.category = Object.assign({}, categories[0])
-			  		let oActive = {}
-			  		
-			  		if(oData && oData.tab == categories[0].key) {
-			  			oActive = oData
-			  		}else {
-			  			oActive = {
-			  				radio: "1",
-	                		keys: {}
-			  			}
-			  		}
-			  		
-			  		this.category = Object.assign({}, this.category, {
-			  			active: oActive
-			  		})
-			  	}
-			  	
-			  	let initData = this.category.list.filter(o => o.key == this.radio)[0];    
-            	this.keys = this.getKeys(initData);
-				this.item = this.category.list[0];
+			this.$store.dispatch('getVersion').then(() => {
+				if(this.linkRepair) {
+					this.init()
+				}else {
+					// 若不支持遏制。
+					this.$message.error('暂无权限。');
+				}
 				
-	          this.$nextTick(() => {
-	            if(oData && oData.tab == 'link') {
-	              this.fetchData(oData);
-	            }            
-	          })
-	        }, this.requestFail, this.requestError);
+			});//getConfig
 		    
     		// 默认查询。
 //  		this.fetchData();
 		},
 		mounted() {},
 		methods: {
+			init() {
+			
+				// 获取所需的查询参数。
+				this.tag = window.Rt.utils.getParam("tag", location.search);
+				let	oData = sessionStorage.getItem("searchConditions-" + this.tag),
+					categories = [];
+				// 用于保存查询记录	  
+				let history = localStorage.getItem("history")
+				if(history){
+					this.myLocalStorage = JSON.parse(history)
+				}else {
+					this.myLocalStorage = []
+				}	  
+
+				// 断链模块。
+				if(oData) {
+					oData = JSON.parse(oData);
+				}
+				
+				// 获取参数名
+				this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
+					// 请求成功。
+					categories = fnP.parseData(oResult).filter(o=> o.key == "link");
+		
+					if(categories.length) {
+						// 存在断链。
+						this.category = Object.assign({}, categories[0])
+						let oActive = {}
+						
+						if(oData && oData.tab == categories[0].key) {
+							oActive = oData
+						}else {
+							oActive = {
+								radio: "1",
+								keys: {}
+							}
+						}
+						
+						this.category = Object.assign({}, this.category, {
+							active: oActive
+						})
+					}
+					
+					let initData = this.category.list.filter(o => o.key == this.radio)[0];    
+					this.keys = this.getKeys(initData);
+					this.item = this.category.list[0];
+					
+				this.$nextTick(() => {
+					if(oData && oData.tab == 'link') {
+					this.fetchData(oData);
+					}            
+				})
+				}, this.requestFail, this.requestError);
+			},
 			// 请求失败。
 		    requestFail(sErrorMessage) {
 		        // 提示信息。

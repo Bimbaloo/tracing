@@ -175,11 +175,11 @@
         	};
 			return {
 				BOMConfig: {
-					switch: 0,
+					switch: 1,
 					name: "BOM表"
 				},
 				timelineConfig: {
-					switch: 0,
+					switch: 1,
 					name: "时间轴"
 				},
 				// 查询标记。
@@ -350,17 +350,17 @@
 				return this.sCurrentTab=="lines"?"primary":"text";
 			},
 			// 工厂配置数据。
-			configData() {
-				return this.$store.state.customModule.config
-			},
-			// 配置模块。
-			modulesConfig() {
-				return this.configData.modules
-			},
-            // 履历的配置项。
-            currentModule() {
-                return this.modulesConfig.filter(o => o.key === "resume")[0]
-            },
+			// configData() {
+			// 	return this.$store.state.customModule.config
+			// },
+			// // 配置模块。
+			// modulesConfig() {
+			// 	return this.configData.modules
+			// },
+            // // 履历的配置项。
+            // currentModule() {
+            //     return this.modulesConfig.filter(o => o.key === "resume")[0]
+            // },
 		},
 		created() {
 			this.$register.login(this.$restore);
@@ -372,19 +372,19 @@
 			}
 
 			// 获取配置数据。
-			this.$store.dispatch('getConfig').then(() => {
-				// 设置是否创建BOM表和时间轴。
-				let aoSubmodules = this.currentModule && this.currentModule.submodules
+			// this.$store.dispatch('getConfig').then(() => {
+			// 	// 设置是否创建BOM表和时间轴。
+			// 	let aoSubmodules = this.currentModule && this.currentModule.submodules
 
-				if(aoSubmodules) {
-					this.BOMConfig = aoSubmodules.find(o => o.key === "BOM")
-					this.timelineConfig = aoSubmodules.find(o => o.key === "timeline")
-				}
+			// 	if(aoSubmodules) {
+			// 		this.BOMConfig = aoSubmodules.find(o => o.key === "BOM")
+			// 		this.timelineConfig = aoSubmodules.find(o => o.key === "timeline")
+			// 	}
 
-				if(!this.BOMConfig.switch) {
-					this.sCurrentTab = "lines"
-				}
-			})
+			// 	if(!this.BOMConfig.switch) {
+			// 		this.sCurrentTab = "lines"
+			// 	}
+			// })
 		},
 		// 创建时处理。mounted
 		mounted() {

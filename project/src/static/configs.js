@@ -8,5 +8,4 @@ const HOST =
 // "http://192.168.220.182:8088"  // 尹文才
 // "http://192.168.20.199:8088"   // 尹文才台式机
 
-var VERSION = "1.0.0-RC3";
-var FACTORY = "common";
+var VERSION = "1.0.0-RC4";

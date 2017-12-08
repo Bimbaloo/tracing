@@ -88,18 +88,34 @@
         handleSubmit: this._submitForm,
         sErrorMessage: "",
         tag: "",
-        myLocalStorage: []  //查询记录
+        myLocalStorage: [],  //查询记录
+        // modulesConfig: [{
+        //   "name": "查出库",
+        //   "key": "stock",
+        //   "switch": 1,
+        //   "select": 0
+        // }, {
+        //   "name": "溯源",
+        //   "key": "trace",
+        //   "switch": 1,
+        //   "select": 1,
+        // }, {
+        //   "name": "追踪",
+        //   "key": "track",
+        //   "switch": 1,
+        //   "select": 0,
+        // }]
       }
     },
     computed: {
       // 工厂配置数据。
-      configData() {
-        return this.$store.state.customModule.config
-      },
+      // configData() {
+      //   return this.$store.state.customModule.config
+      // },
       // 配置模块。
-      modulesConfig() {
-        return this.configData.modules
-      },
+      // modulesConfig() {
+      //   return this.configData.modules
+      // },
       reversedMessage() {
           let _width = this.LayoutLeftWidth+this.changeWidth
           return _width
@@ -110,7 +126,7 @@
       this.$register.login(this.$store);
       
       // 获取配置数据。
-      this.$store.dispatch('getConfig').then(() => {
+      this.$store.dispatch('getVersion').then(() => {//getConfig
         // 获取数据。
         this.fetchData();
       })
@@ -169,30 +185,31 @@
       // 设置tab数据。
       setCategories(oData, oResult) {
         this.categories = fnP.parseData(oResult)
-                        .filter(o => {
-                          let oItem = this.modulesConfig.find(item => {
-                            return o.key === item.key
-                          });
-                          if(oItem) {
-                            return o.key!="restrain" && o.key!="link" && o.key != "resume" && !!oItem.switch
-                          }else {
-                            return o.key!="restrain" && o.key!="link" && o.key != "resume"
-                          }                       
-                        })//.filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume");                       
-                        .map(o => {
-                          let oItem = this.modulesConfig.find(item => {
-                            return o.key === item.key
-                          });
-                          if(oItem) {
-                            o.select = oItem.select
-                            o.name = oItem.name
-                          }
-                          return o
-                        })
+                        .filter(o=>o.key!="restrain" && o.key!="link" && o.key != "resume"); 
+                        // .filter(o => {
+                        //   let oItem = this.modulesConfig.find(item => {
+                        //     return o.key === item.key
+                        //   });
+                        //   if(oItem) {
+                        //     return o.key!="restrain" && o.key!="link" && o.key != "resume" && !!oItem.switch
+                        //   }else {
+                        //     return o.key!="restrain" && o.key!="link" && o.key != "resume"
+                        //   }                       
+                        // })                      
+                        // .map(o => {
+                        //   let oItem = this.modulesConfig.find(item => {
+                        //     return o.key === item.key
+                        //   });
+                        //   if(oItem) {
+                        //     o.select = oItem.select
+                        //     o.name = oItem.name
+                        //   }
+                        //   return o
+                        // })
 
         // 设置激活的tab。
-        let oSelect = this.categories.find(o => !!o.select)
-        this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
+        // let oSelect = this.categories.find(o => !!o.select)
+        // this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
 
         this.categories.forEach(o => {
           if(oData && oData.tab == o.key) {
