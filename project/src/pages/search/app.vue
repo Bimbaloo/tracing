@@ -67,7 +67,7 @@
 
 <script>
 import tooltip from 'components/header/tooltip.vue'
-// import logo from 'assets/img/logo-w.png'
+import logo from '../../static/logo.png'//'assets/img/logo-w.png'
 import version from 'assets/img/version.png'
 import panel from 'components/panel/panel.vue'
 import fnP from "assets/js/public.js"
@@ -86,7 +86,7 @@ export default {
   data() {
     return {
       showList: false,
-      // logo,
+      logo,
       version,
       v: VERSION,
       activeKey: "stock",
@@ -121,24 +121,32 @@ export default {
   },
   computed: {
     // 工厂配置数据。
-    configData() {
-      return this.$store.state.customModule.config
-    },
+    // configData() {
+    //   return this.$store.state.customModule.config
+    // },
     // 配置图标。
-    logo() {
-      return this.configData && this.configData.logo
-    },    
+    // logo() {
+    //   return this.configData && this.configData.logo
+    // },    
     liData() {
       return this.switchData(this.myLocalStorage)
     },
-    // 工厂配置数据。
-    configData() {
-      return this.$store.state.customModule.config
+    // 是否支持遏制。
+    supression() {
+      return this.$store.state.versionModule && this.$store.state.versionModule.supression
     },
-    // 配置模块。
-    modulesConfig() {
-      return this.configData.modules
+    // 是否支持断链修复。
+    linkRepair() {
+      return this.$store.state.versionModule && this.$store.state.versionModule.linkRepair
     }
+    // 工厂配置数据。
+    // configData() {
+    //   return this.$store.state.customModule.config
+    // },
+    // 配置模块。
+    // modulesConfig() {
+    //   return this.configData.modules
+    // }
   },
   created() {
     let history = localStorage.getItem("history")
@@ -155,7 +163,7 @@ export default {
     this.$register.login(this.$store);
 
     // 获取配置数据。
-    this.$store.dispatch('getConfig').then(() => {
+    this.$store.dispatch('getVersion').then(() => {//getConfig
       // 获取数据。
       this.fetchData();
     })
@@ -182,31 +190,45 @@ export default {
     },
     // 设置tab数据。
     setCategories(oData) {
+      let unSuport = []
+      if(!this.supression ) {
+        unSuport.push("restrain")
+      }
+      if(!this.linkRepair ) {
+        unSuport.push("link")
+      }
+      
       this.categories = fnP.parseData(oData)
-                        // 获取打开的功能模块。
-                        .filter(o => {
-                          let oItem = this.modulesConfig.find(item => {
-                            return o.key === item.key
-                          });
-                          if(oItem) {
-                            return !!oItem.switch
-                          }else {
-                            return true
-                          }                    
-                        })//.filter(o => o.key != "restrain" && o.key != "link");
-                        .map(o => {
-                          let oItem = this.modulesConfig.find(item => {
-                            return o.key === item.key
-                          });
-                          if(oItem) {
-                            o.select = oItem.select
-                            o.name = oItem.name
-                          }
-                          return o
-                        })
+      if(unSuport.length) {
+        // 获取打开的功能模块。
+        this.categories = this.categories.filter(o => {
+                          return unSuport.indexOf(o.key) < 0
+                        });
+      }
+                        
+                        // .filter(o => {
+                        //   let oItem = this.modulesConfig.find(item => {
+                        //     return o.key === item.key
+                        //   });
+                        //   if(oItem) {
+                        //     return !!oItem.switch
+                        //   }else {
+                        //     return true
+                        //   }                    
+                        // })
+                        // .map(o => {
+                        //   let oItem = this.modulesConfig.find(item => {
+                        //     return o.key === item.key
+                        //   });
+                        //   if(oItem) {
+                        //     o.select = oItem.select
+                        //     o.name = oItem.name
+                        //   }
+                        //   return o
+                        // })
       // 设置激活的tab。
-      let oSelect = this.categories.find(o => !!o.select)
-      this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
+      // let oSelect = this.categories.find(o => !!o.select)
+      // this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
 
       this.categories.forEach(o => {
         o.active = {
@@ -323,7 +345,6 @@ export default {
         }
       })
       if( (!!historyList && searchTitle) || (!!historyList && historyList.oData.tab !=="trace" && historyList.oData.tab !=="track") ){
-        debugger
         historyList.oData.radio = (searchObj.groupOrder !== "undefined") ? searchObj.groupOrder : historyList.oData.radio
         bus.$emit('id-selected', historyList.oData)
         this.activeKey = historyList.oData.tab

@@ -9,7 +9,7 @@
         	</div>
             <div class="path-btn">
             	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
-            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
+            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
             </div>
         </div> 
         <keep-alive>
@@ -30,11 +30,17 @@
                 restrain: {},
                 batchIf: false,
                 restrainIf: false,
-                btnShowRestrain: false,		// 临时屏蔽遏制
+                // btnShowRestrain: false,		// 临时屏蔽遏制
                 description: "",
 				url: "/trace/v1/materialbatchsuppress"
             }
-        },
+		},
+		computed: {
+			// 是否支持遏制。
+            supression() {
+                return this.$store.state.versionModule && this.$store.state.versionModule.supression
+            }
+		},
         created () {
             this.setRouteQuery();
         },

@@ -417,12 +417,24 @@
         },
         computed: {
             // 工厂配置数据。
-            configData() {
-                return this.$store.state.customModule.config
-            },
+            // configData() {
+            //     return this.$store.state.customModule.config
+            // },
             // 配置模块。
-            modulesConfig() {
-                return this.configData.modules
+            // modulesConfig() {
+            //     return this.configData.modules
+            // },
+            // 工具。
+            toolManagement() {
+                return this.$store.state.versionModule &&　this.$store.state.versionModule.toolManagement
+            },
+            // 工艺。
+            processParameter() {
+                return this.$store.state.versionModule &&　this.$store.state.versionModule.processParameter
+            },
+            // 维护。
+            equipmentMaintenance() {
+                return this.$store.state.versionModule &&　this.$store.state.versionModule.equipmentMaintenance
             },
             // 工厂定制。
             factoryCustomItemList() {
@@ -433,17 +445,17 @@
                 return this.$store.state.factoryModule.fetched
             },
             // 追踪或溯源或遏制的配置项。
-            currentModule() {
-                let sCurentPage = '',
-                    sPathName = window.location.pathname,
-                    // 溯源、追踪、遏制3个页面用到设备分析。
-                    aPage = ["trace", "track", "restrain"]
+            // currentModule() {
+            //     let sCurentPage = '',
+            //         sPathName = window.location.pathname,
+            //         // 溯源、追踪、遏制3个页面用到设备分析。
+            //         aPage = ["trace", "track", "restrain"]
                 
-                // 当前页面。
-                sCurentPage = aPage.find((sCategory) => sPathName.indexOf(sCategory) > -1)
+            //     // 当前页面。
+            //     sCurentPage = aPage.find((sCategory) => sPathName.indexOf(sCategory) > -1)
                 
-                return this.modulesConfig.filter(o => o.key === sCurentPage)[0]
-            },
+            //     return this.modulesConfig.filter(o => o.key === sCurentPage)[0]
+            // },
             tag () {
                 return window.Rt.utils.getParam("tag");
             },
@@ -839,30 +851,44 @@
             // 获取配置数据。
             getConfigData() {
                 // 获取配置数据。
-                // this.$store.dispatch('getConfig').then(() => {
-                    // 设置维度数据。
-                    if(this.currentModule.submodules) {
-                        // 维度分析数据。
-                        let oDimensionData = this.currentModule.submodules.find(o => o.key === "dimension");
-                        if(oDimensionData) {
-                            // 根据配置数据修改维度分析开关。
-                            this.dimension = this.dimension.filter(o => {
-                                let oData = oDimensionData.dimension.find(item => o.key === item.key)
-                                if(oData) {
-                                    return !!oData.switch
-                                }else {
-                                    return true
-                                }
-                            })
-                            this.dimension.map(o => {
-                                let oData = oDimensionData.dimension.find(item => o.key === item.key)
-                                o.show = oData.show
-                                o.name = oData.name
-                                return o
-                            })
-                        }
-                    }
-                // })
+               
+                // 设置维度数据。
+                // if(this.currentModule.submodules) {
+                //     // 维度分析数据。
+                //     let oDimensionData = this.currentModule.submodules.find(o => o.key === "dimension");
+                //     if(oDimensionData) {
+                //         // 根据配置数据修改维度分析开关。
+                //         this.dimension = this.dimension.filter(o => {
+                //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
+                //             if(oData) {
+                //                 return !!oData.switch
+                //             }else {
+                //                 return true
+                //             }
+                //         })
+                //         this.dimension.map(o => {
+                //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
+                //             o.show = oData.show
+                //             o.name = oData.name
+                //             return o
+                //         })
+                //     }
+                // }
+                // 根据配置数据修改维度分析开关。
+                let unSuport = []
+                if(!this.toolManagement) {
+                    unSuport.push("tool")
+                }
+                if(!this.processParameter) {
+                    unSuport.push("parameter")
+                }
+                if(!this.equipmentMaintenance) {
+                    unSuport.push("repair")
+                }   
+
+                this.dimension = this.dimension.filter(o => {
+                    return unSuport.indexOf(o.key) < 0
+                })      
             },
             // 初始化。
 			init() { 

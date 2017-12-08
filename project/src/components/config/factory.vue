@@ -21,7 +21,7 @@
 		<div class="item-wrap">
 			<img :src="icon" alt="增加模块" @click="newLink" style="cursor:pointer;" title="新增模块"/>
 		</div>
-		<el-dialog :title="dialogTitle" :visible.sync="dialogVisible">
+		<el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false">
 			<el-form :model="oCurrentData" label-width="80px" :rules="rules" ref="ruleForm">
 				<el-form-item label="名称" prop="name">
 					<el-input 

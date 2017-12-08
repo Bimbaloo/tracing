@@ -22,12 +22,14 @@ Vue.use(Vuex)
 // 引用登录模块。
 import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
+import { versionModule } from 'assets/js/versionStore.js'
 
 Vue.prototype.$register = loginFn;
 
 const store = new Vuex.Store({
   modules: {
-    loginModule
+    loginModule,
+    versionModule
   }
 })
 

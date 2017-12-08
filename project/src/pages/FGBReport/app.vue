@@ -138,7 +138,19 @@ export default {
 
     },
     created() {
-        this.fetchData(); //获取数据
+		this.$register.login(this.$store);
+
+		// 获取配置数据。
+		this.$store.dispatch('getVersion').then(() => {
+			if(this.fgb) {
+				this.fetchData()//获取数据
+			}else {
+				// 若不支持遏制。
+				this.$message.error('暂无权限。');
+			}
+			
+		});//getConfig
+        // this.fetchData(); //获取数据
     },
     computed: {
         /* 列信息 */
@@ -157,6 +169,10 @@ export default {
 		// 参数。
 		oParams: function() {
 			return window.Rt.utils.getParams()
+		},
+		// 是否支持断链修复。
+		fgb() {
+			return this.$store.state.versionModule && this.$store.state.versionModule.fgb
 		}
 		
     },
