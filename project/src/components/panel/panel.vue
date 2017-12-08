@@ -2,24 +2,23 @@
     <div :data="panelHeight" class="panel">
         <div ref="panelTitle" class="panel-title">
           <el-radio-group v-model="radio"  @change="handleChange">
-            <el-radio class="radio" :key="item.groupOrder" v-for="item in category.list" :label="item.key" :data-id="item.id">{{item.title}}</el-radio>
+            <el-radio class="radio" :key="item.key" v-for="item in category.list" :label="item.key">{{item.title}}</el-radio>
          </el-radio-group>
         </div>
         <div class="panel-content"
         	:style="{height: sPanelHeight+'px'}">
             <!--<v-form :tab="category.key" :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>-->
 	        <div class="panel-content-wrap" v-for="(item,index) in category.list" 
-	        		:class="[category.active.radio == item.key?'':'hide']" :key="item.groupOrder">
+	        		:class="[category.active.radio == item.key?'':'hide']" :key="index">
 	        		<v-form 
 	        			:tab="category.key"
-	        			:sub-tab="item.groupOrder+''"
+	        			:sub-tab="item.key"
 	        			:active="category.active"
 	        			:label-width="labelWidth"
 	        			:handle-submit="handleSubmit"
 	        			:keys="keys"
 	        			:form-height="sPanelHeight"
 	        			:items="item.items" 
-                        :data-id="item.id"
                         :title="item.title">
 	        		</v-form>
 	        	</div>

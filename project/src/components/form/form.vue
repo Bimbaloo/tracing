@@ -35,9 +35,6 @@
             formHeight: {
             	required: false
 			},
-			dataId: {
-				required: false
-			},
 			title: {
 				required: false
 			}
@@ -352,8 +349,6 @@
                         let oConditions = {
                             keys: oKeys, // this.keys,
 							radio: this.active.radio,
-							id: this.dataId,	// id
-							groupOrder: this.subTab, //顺序
 							title: this.title
                         };
                         

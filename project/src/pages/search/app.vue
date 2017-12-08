@@ -323,8 +323,8 @@ export default {
         }
       })
       if( (!!historyList && searchTitle) || (!!historyList && historyList.oData.tab !=="trace" && historyList.oData.tab !=="track") ){
-        debugger
-        historyList.oData.radio = (searchObj.groupOrder !== "undefined") ? searchObj.groupOrder : historyList.oData.radio
+        //debugger
+        historyList.oData.radio = searchObj.key
         bus.$emit('id-selected', historyList.oData)
         this.activeKey = historyList.oData.tab
       }else{
