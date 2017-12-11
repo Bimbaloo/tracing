@@ -594,7 +594,7 @@
 				var	_that = this,
 				    aoNew = [];
 				    
-				_getData(1, 0);//(-1, 0)跟节点从1开始。
+				_getData(-1, 0);
 				
 				return aoNew;
 				/**

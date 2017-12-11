@@ -38,7 +38,7 @@
                             <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                                 <template scope="props">
                                     <div 
-                                    :class="['cell-content',{ltext: column.prop === 'barcode'}, {lchildText: !props.row.hasInLen}]" 
+                                    :class="['cell-content',{ltext: column.prop === 'barcode'}, {lchildText: props.row.hasInLen===undefined}]" 
                                     v-if="column.prop === 'barcode'">
                                         <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props, $event)"></i>
                                         <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop]}}</span>
