@@ -141,7 +141,8 @@ export default {
 		this.$register.login(this.$store);
 
 		// 获取配置数据。
-		this.$store.dispatch('getVersion').then(() => {
+		this.$register.getVersion(this.$store, this.$ajax, () => {
+		// this.$store.dispatch('getVersion').then(() => {
 			if(this.fgb) {
 				this.fetchData()//获取数据
 			}else {

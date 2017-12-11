@@ -50,13 +50,13 @@ export default {
         this.$register.login(this.$store);
 
 		// 获取配置数据。
-		this.$store.dispatch('getVersion').then(() => {
-			if(!this.camera) {
-				// 若不支持视频监控。
-				this.$message.error('暂无权限。');
-			}
+		// this.$store.dispatch('getVersion').then(() => {
+		// 	if(!this.camera) {
+		// 		// 若不支持视频监控。
+		// 		this.$message.error('暂无权限。');
+		// 	}
 			
-		});//getConfig
+		// });//getConfig
         // this.fetchData(); //获取数据  
         
         // 获取配置数据。

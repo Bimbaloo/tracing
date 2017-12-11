@@ -165,13 +165,14 @@
 				this.points = JSON.parse(oFilter);
 				// this.filter = oAll.filters;
 				// this.params = oAll.selected;	
-			}
+			}		
 			
 			// 获取版本信息配置
-			this.$store.dispatch('getVersion').then(() => {
-				// 获取数据。
-				this.fetchData();
-			})
+			this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
+			// this.$store.dispatch('getVersion').then(() => {
+			// 	// 获取数据。
+			// 	this.fetchData();
+			// })
 			
 			// 获取配置数据。
 			// this.$store.dispatch('getConfig').then(() => {

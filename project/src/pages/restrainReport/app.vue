@@ -49,8 +49,8 @@
 		},
 		created() {
 			this.$register.login(this.$store);
-
-			this.$store.dispatch('getVersion').then(() => {
+			this.$register.getVersion(this.$store, this.$ajax, () => {
+			// this.$store.dispatch('getVersion').then(() => {
 				// 获取数据。
 				if(!this.supression) {
 					// 若不支持遏制。

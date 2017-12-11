@@ -34,28 +34,36 @@ export const versionModule = {
 		 * @param {Object}
 		 * @return {Promise}
 		 */
-		getVersion ({ commit }) {
-			return axios.get(HOST + '/api/v1/customized/features').then( response => {//"../static/version.json"
-				// 获取数据
-				// let bBefore = false
-				let oResult = response.data	  
-				if(!oResult.errorCode) {
-					let oData = oResult.data.customFeatureInfoList//.filter( o => o.name === 'isOpDbBeforeRefact' )
+		getVersion ({ commit }, oData) {
+			let aoData = oData.customFeatureInfoList
+			if(aoData && aoData.length ) {
+				// 更新数据。
+				commit({
+					type: 'updateVersionData',
+					key: aoData
+				})
+			}
+			// return axios.get(HOST + '/api/v1/customized/features').then( response => {//"../static/version.json"
+			// 	// 获取数据
+			// 	// let bBefore = false
+			// 	let oResult = response.data	  
+			// 	if(!oResult.errorCode) {
+			// 		let oData = oResult.data.customFeatureInfoList//.filter( o => o.name === 'isOpDbBeforeRefact' )
 				
-					if(oData && oData.length ) {
-					// 	bBefore = (oData[0].value === "false" ) ? false : true
-						// 更新数据。
-						commit({
-							type: 'updateVersionData',
-							key: oData//bBefore
-						})
-					}	
+			// 		if(oData && oData.length ) {
+			// 		// 	bBefore = (oData[0].value === "false" ) ? false : true
+			// 			// 更新数据。
+			// 			commit({
+			// 				type: 'updateVersionData',
+			// 				key: oData//bBefore
+			// 			})
+			// 		}	
 					
-				}else {
-					console.log(oResult.errorMsg.message)
-				}
-			})
-			.catch(error => console.log('获取版本信息失败。'))
+			// 	}else {
+			// 		console.log(oResult.errorMsg.message)
+			// 	}
+			// })
+			// .catch(error => console.log('获取版本信息失败。'))
 		}
 	},
 	getters: {}

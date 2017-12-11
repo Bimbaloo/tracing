@@ -237,7 +237,8 @@
 			this.$register.login(this.$store);
 
 			// 获取配置数据。
-			this.$store.dispatch('getVersion').then(() => {
+			// this.$store.dispatch('getVersion').then(() => {
+			this.$register.getVersion(this.$store, this.$ajax, () => {
 				if(this.linkRepair) {
 					this.init()
 				}else {

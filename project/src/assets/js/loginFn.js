@@ -2,6 +2,8 @@
 const LOGIN_URL = HOST + "/api/v1/sso/get-login-info";
 // 退出。
 const LOGOUT_URL = HOST + "/api/v1/sso/logout";
+// 版本信息。
+const VERSION_URL = HOST + '/api/v1/customized/features';
 
 // 清除登录cookie。
 var clearLoginCookie = function() {
@@ -173,6 +175,36 @@ var logout = function (oStore, oAjax) {
 	})
 };
 
+var getVersion = function (oStore, oAxio, fnCallBack) {
+	beforeRequest(oStore, oAxio).get(VERSION_URL)
+		.then((res) => {
+			let oResult = res.data;
+			let bRight = oResult.errorCode;
+
+			if(!bRight) {	
+				oStore.dispatch('getVersion', oResult.data)
+				// 调用成功后的回调函数。
+				fnCallBack && fnCallBack();
+			}else {
+				if(bRight === 10) {
+					// 登录失败。
+					if(oResult.errorMsg.subCode === "1") {
+						// 清cookie，跳转到登录页面。
+						loginFail(oResult.errorMsg.subMsg);
+					}
+
+				}else {
+					// 失败后的回调函。
+					fnCallBack && fnCallBack();
+				}
+			}
+		})
+		.catch((err) => {
+			fnCallBack && fnCallBack();
+		})	
+
+}
+
 export default {
 	login,
 	loginFail,
@@ -181,4 +213,5 @@ export default {
 	clearLoginCookie,
 	judgeLoaderHandler,
 	sendRequest,
+	getVersion
 }

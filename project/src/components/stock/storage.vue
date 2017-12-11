@@ -90,7 +90,8 @@
                         cellClick: this.batchClick
                     },{
                         prop: "materialCode",
-                        name: "物料编码"
+                        name: "物料编码",
+                        width: "160",
                     },{
                         prop: "materialName",
                         name: "物料名称",
@@ -159,7 +160,8 @@
                         cellClick: this.batchClick
                     },{
                         prop: "materialCode",
-                        name: "物料编码"
+                        name: "物料编码",
+                        width: "160",
                     },{
                         prop: "materialName",
                         name: "物料名称",

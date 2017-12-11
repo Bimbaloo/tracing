@@ -81,7 +81,8 @@
 						width: "150"
 					}, {
 						prop: "materialCode",
-						name: "物料编码"
+						name: "物料编码",
+						width: "140",
 					}, {
 						prop: "materialName",
 						name: "物料名称",
@@ -137,6 +138,7 @@
 					columns: [{
 						prop: "barcode",
 						name: "条码",
+						width: "300",
 						fixed: true
 //					}, {
 //						prop: "barcodeTypeName", //1-单件条码 2-箱条码 3-流转框条码 999-其他
@@ -147,7 +149,8 @@
 						width: "150"
 					}, {
 						prop: "materialCode",
-						name: "物料编码"
+						name: "物料编码",
+						width: "140",
 					}, {
 						prop: "materialName",
 						name: "物料名称",

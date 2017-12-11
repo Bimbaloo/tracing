@@ -161,12 +161,13 @@ export default {
     
     // 登录验证。
     this.$register.login(this.$store);
-
     // 获取配置数据。
-    this.$store.dispatch('getVersion').then(() => {//getConfig
-      // 获取数据。
-      this.fetchData();
-    })
+    this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
+    
+    // this.$store.dispatch('getVersion').then(() => {//getConfig
+    //   // 获取数据。
+    //   this.fetchData();
+    // })
 
     this.fetchDataName()  //获取名称
   },
