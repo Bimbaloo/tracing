@@ -13,7 +13,7 @@
 					{{filter[0]}} : {{filter[1]}}
 				</span>
 				<span v-show="!this.filters.materialCode && selectedArrs[0]" class="default-message" >物料：{{selectedArrs[0] ? selectedArrs[0]["materialCode"] : ""}}</span>
-				<span v-show="!this.filters.processName && selectedArrs[0]" class="default-message" >工序：{{selectedArrs[0] ? selectedArrs[0]["processName"] : ""}}</span> 
+				<span v-show="!this.filters.opTypeName && selectedArrs[0]" class="default-message" >动作：{{selectedArrs[0] ? selectedArrs[0]["opTypeName"] : ""}}</span> 
 			</div>
 			<div class='condition-list' @click="active.message = !active.message">
 				<span>查询明细
@@ -228,12 +228,12 @@
 						"barcode":[],
 					}
 					obj["name"] = el["equipmentName"]
-					obj["time"].push(el["happenTime"])
+					obj["time"].push(el["opTime"])
 					obj["barcode"].push(el["barcode"])
 					needArr.push(obj)
 					for (let j = i+1 ; j < selectedArr.length; j++){
 						if (el["equipmentName"] === selectedArr[j]["equipmentName"]){
-							obj["time"].push(selectedArr[j]["happenTime"])
+							obj["time"].push(selectedArr[j]["opTime"])
 							obj["barcode"].push(selectedArr[j]["barcode"])
 							selectedArr.splice(j, 1)
 							j=j-1   
