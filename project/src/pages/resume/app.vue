@@ -234,9 +234,12 @@
 							if(row.opType == 102 || row.opType == 103) {
 								// 出库、入库
 								return `${row.opTypeName}(${row.stockTypeName})`
-							}else if(row.opType == 201) {
+							}else if(row.opType == 205) {
 								// 条码绑定
-								return `${row.opTypeName}(${row.businessType == 1 ? '绑定':'解绑'})`
+								return `${row.opTypeName}(绑定)`
+							}else if(row.opType == 206){
+								// 解绑
+								return `${row.opTypeName}(解绑)`
 							}else {
 								// 其他
 								return row.opTypeName
@@ -746,7 +749,8 @@
 						sDefault = "green"
 						break
 					// 条码管理
-					case 201:
+					case 205:
+					case 206:
 					case 203:
 					case 204:
 						sDefault = "purple"
@@ -841,7 +845,7 @@
 								
 						break
 					// 条码绑定
-					case 201:
+					case 205:
 						// 绑定类型
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
@@ -850,9 +854,21 @@
 									,批次 <span class="tips">${o.batchNo||"-"}</span>
 									的 <span class="tips">${o.materialName||"-"}</span> 物料,
 									${o.quantity}件
-									${(nBusinessType == 1) ? `绑定到容器条码<span class="tips">${o.barcode}</span>`: `与容器条码<span class="tips">${o.barcode}解绑</span>`}
+									绑定到容器条码<span class="tips">${o.barcode}</span>
 								</div>`
 						
+						break
+					// 条码解绑
+					case 206:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>
+									将条码 <span class="tips">${o.srcBarcode||"-"}</span> 
+									,批次 <span class="tips">${o.batchNo||"-"}</span>
+									的 <span class="tips">${o.materialName||"-"}</span> 物料,
+									${o.quantity}件
+									与容器条码<span class="tips">${o.barcode}</span>解绑
+								</div>`
 						break
 					// 补料
 					case 203:
