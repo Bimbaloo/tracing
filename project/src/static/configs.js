@@ -9,4 +9,3 @@ const HOST =
 // "http://192.168.20.199:8088"   // 尹文才台式机
 
 const VERSION = "1.0.0-RC4";
-const FACTORY = "common";
