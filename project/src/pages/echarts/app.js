@@ -36,14 +36,7 @@ import {loginModule} from 'assets/js/loginStore.js'
 
 Vue.prototype.$register = loginFn;
 
-const store = new Vuex.Store({
-  modules: {
-    loginModule
-  }
-})
-
 new Vue({
   el: '#app',
-  store,
   render: h => h(App)
 })

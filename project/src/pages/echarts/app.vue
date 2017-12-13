@@ -10,13 +10,16 @@
 </template>
 
 <script>
-	import {AgGridVue} from "ag-grid-vue";
+	import {AgGridVue} from "ag-grid-vue"
+//	import "ag-grid-enterprise/main"
 	
 	export default {
 		data() {
 			return {
 				gridOptions: {},
-				selected: []
+				selected: [],
+				aoAllData: [],
+				aoDisplay: []
 			}
 		},
 		components: {
@@ -30,71 +33,216 @@
     		rowDeselection: true,
     		enableRangeSelection: true,
     		suppressRowClickSelection: true,
-    		onSelectionChanged: this.selectionChanged
+    		onSelectionChanged: this.selectionChanged,
+            onCellClicked: this.cellClickChanged,
+    		getContextMenuItems: function(params) {
+    			if (params.node == null) return null;
+		    	var result = params.defaultItems.splice(0);
+		    	
+//  			return ["copy", "copyWithHeaders", "paste"];
+    			return []
+    		},
+//  		onCellContextMenu: this.cellContextMenu
     	};
 	    this.gridOptions.rowData = this.createRowData();
 	    this.gridOptions.columnDefs = this.createColumnDefs();
+	    
+	    // 保存数据
+    	this.aoAllData = this.aoDisplay =  this.createRowData();
+    },
+    mounted() {
+    	this.gridOptions.api.sizeColumnsToFit();
     },
     methods: {
+        cellClickChanged(params) {
+//			console.log(params)
+			let icon = params.event.target
+			let sOpId = params.data.operationId
+			let nLen = params.data.hasIn 
+			let bExpand = params.data.isExpand
+			
+			let nRowIndex = params.rowIndex
+			
+			// 当前显示的数据
+			let aDis = this.aoDisplay
+			
+			
+			// 当前点击的target为icon
+			if(icon.classList.contains('icon-down')) {
+				
+//				if(icon.classList.contains('actived')) {
+//					
+//					// 获取当前产出对应的投入数据。
+//					let aIn = this.aoAllData.filter(o => o.outputOpIdList && o.outputOpIdList.includes(sOpId))
+//					
+//					this.aoDisplay = aDis.splice(nRowIndex+1, 0, ...aIn)
+//					
+//					// 展开
+//					icon.classList.remove('actived')
+//					
+//					this.gridOptions.api.updateRowData({
+//						add: aIn,
+//						addIndex: nRowIndex+1
+//					})
+//				}else {
+//				
+//					let aOut = aDis.filter( (o, nIn) => (nIn > nRowIndex && nIn <= (nRowIndex+nLen)))
+//					
+//					this.aoDisplay = aDis.filter( (o, nIn) => !(nIn > nRowIndex && nIn <= (nRowIndex+nLen)))
+//					
+//					// 折叠
+//					icon.classList.add('actived')
+//					
+//					this.gridOptions.api.updateRowData({
+//						remove: aOut
+//					})
+//				}
+				
+				if(bExpand) {
+					
+					// 删除属性
+					// 获取当前产出对应的投入数据。
+					let aIn = this.aoAllData.filter(o => o.outputOpIdList && o.outputOpIdList.includes(sOpId))
+					
+					delete aDis[nRowIndex].isExpand
+					aDis.splice(nRowIndex+1, 0, ...aIn)
+					
+				}else {
+					
+					// 新增属性
+					aDis[nRowIndex].isExpand = true
+					
+					aDis = aDis.filter( (o, nIn) => !(nIn > nRowIndex && nIn <= (nRowIndex+nLen)))
+				}
+				
+				this.aoDisplay = aDis
+				this.gridOptions.api.setRowData(aDis)
+				
+			}
+			
+		},
     	createRowData() {
+    		return [{
+    			index: 1,
+    			name: 1,
+    			age: 1,
+    			hasIn: 1,
+    			operationId: '22'
+    		},{
+    			index: 2,
+    			name: 12,
+    			age: 12,
+    			outputOpIdList: ["22"]
+    		}, {
+    			index: 3,
+    			name: 2,
+    			age: 2,
+    			hasIn: 0,
+    			operationId: '33'
+    		}]
+			
+//			let aArr = [];
+//  		for(let i=0; i< 2000; i++) {
+//  			aArr.push({
+//  				index: i+1,
+//  				name: 'bo'+i,
+//  				age: 20
+//  			})
+//  		}
+//  		
+//  		return aArr;
+			
+//		  return [
+//			  {index: 1, data: {
+//                name: "Bob", age: 10
+//			  }},
+//			  {index: 2, data: {
+//                name: "Harry", age: 3
+//			  }},
+//			  {index: 3, data: {
+//		      		name: "Sally", age: 20}},
+//			  {index: 4, data: null}
+//		  ];
+	    },
+	    createCell(params) {
+    		let nPLeft = (params.data.hasIn === undefined) ? 50 : 15
     		
-    		let aArr = [];
-    		for(let i=0; i< 2000; i++) {
-    			aArr.push({
-    				index: i+1,
-    				name: 'bo'+i,
-    				age: 20
-    			})
-    		}
-    		
-    		return aArr;
-    		
-//      return [
-//          {index: 1,name: "Bob", age: 10},
-//          {index: 2,name: "Harry", age: 3},
-//          {index: 3,name: "Sally", age: 20},
-//          {index: 4,name: "Mary", age: 5},
-//          {index: 5,name: "John", age: 15},
-//          {index: 6,name: "Bob", age: 10},
-//          {index: 7,name: "Harry", age: 3},
-//          {index: 8,name: "Sally", age: 20},
-//          {index: 9,name: "Mary", age: 5},
-//          {index: 10,name: "John", age: 15},
-//          {index: 11,name: "Jack", age: 25},
-//          {index: 12,name: "Sue", age: 43},
-//          {index: 13,name: "Sean", age: 44},
-//          {index: 14,name: "Niall", age: 2},
-//          {index: 15,name: "Alberto", age: 32},
-//          {index: 16,name: "Fred", age: 53},
-//          {index: 17,name: "Jenny", age: 34},
-//          {index: 18,name: "Larry", age: 13},
-//      ];
+			return `<div class="cell-content" style="padding-left: ${nPLeft}px">
+						${params.data.hasIn ? `<i class="icon-down el-icon-arrow-down ${params.data.isExpand?'actived':''}"></i>`: ''}
+						<span>haha</span>
+					</div>`
 	    },
 	    createColumnDefs() {
-	        return [
-	         		{
-                width: 30, 
-                checkboxSelection: true,
-                headerCheckboxSelection: true,
-                pinned: true,
-                suppressSorting: true
+	        return [{
+	            	headerName: "#",
+	                field: "",
+//	                width: 400,
+					pinned: true,
+                	cellRenderer: this.createCell
+//					cellRenderer: (params) => {
+//						let nPLeft = (params.data.hasIn === undefined) ? 50 : 15
+//              		debugger
+//						return `<div class="cell-content" style="padding-left: ${nPLeft}px">
+//									${params.data.hasIn ? `<i class="icon-down el-icon-arrow-down ${params.data.isExpand?'actived':''}"></i>`: ''}
+//									<span>haha</span>
+//								</div>`
+//					}
             	},{
             		headerName: "索引",
             		field: "index",
-            		pinned: true
-            	},
-	            {
+            		enableRowGroup: true,
+                	enablePivot: true,
+	                valueFormatter: function (params) {},
+                	filterParams:{
+                		selectAllOnMiniFilter: true,
+						newRowsAction: 'keep',
+						clearButton: true
+					}
+				},{
 	                headerName: "名称",
-	                field: "name",
-	                width: 400,
-	                pinned: true
+	                field: "name",	// data.name
+//	                width: 400,
+	                enableRowGroup: true,
+                	enablePivot: true,
+                	filterParams:{
+                		selectAllOnMiniFilter: true,
+                    newRowsAction: 'keep',
+			            clearButton: true
+			        }
 	            },
 	            {
 	                headerName: "年龄",
-	                field: "age",
-	                width: 399
+	                field: "age",	// data.age
+//	                width: 399,
+	                enableRowGroup: true,
+	                enablePivot: true,
+	                filterParams:{
+	                	selectAllOnMiniFilter: true,
+                    newRowsAction: 'keep',
+			            clearButton: true
+			        }
 	            }
 	        ];
+	    },
+	    getContextMenuItems(params) {
+		    if (params.node == null) return null;
+		    var result = params.defaultItems.splice(0);
+		    result.push(
+		        {
+		            name: 'Custom Menu Item',
+		            icon: '<img src="../images/lab.png" style="width: 14px;"/>',
+		            //shortcut: 'Alt + M',
+		            action: function () {
+		                var value = params.value ? params.value : '<empty>';
+		                window.alert('You clicked a custom menu item on cell ' + value);
+		            }
+		        }
+		    );
+		
+		    return [];
+		},
+	    cellContextMenu(param) {
+	    	console.log(param)
 	    },
 	    selectionChanged(event) {
 	    	let aSelected = this.gridOptions.api.getSelectedRows(),
@@ -138,6 +286,12 @@
 	}
 </script>
 
-<style lang="less" scoped>
-
+<style lang="less">
+	.icon-down {
+	    transition: transfrom 1s linear;
+	    
+	    &.actived {
+	        transform: rotate(-90deg);
+	    }
+	}
 </style>
