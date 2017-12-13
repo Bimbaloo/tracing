@@ -648,8 +648,35 @@
 					return oData.parentNodeId == sId;
 				})
 				
-				// 排序处理。
-				aResult = aResult.sort( (oA, oB) => +new Date( oA.data ? oA.data.opTime || 0 : 0 ) - +new Date( oB.data ? oB.data.opTime || 0 : 0) < 0? 1:-1 )
+//				aResult = aResult.sort( (oA, oB) => +new Date( oA.data ? oA.data.opTime || 0 : 0 ) - +new Date( oB.data ? oB.data.opTime || 0 : 0) < 0? 1:-1 )
+				
+				// 排序处理。 或者按产出投入处理排序
+				aResult = aResult.sort( (oA, oB) => {
+					let oATime = +new Date( oA.data ? oA.data.opTime || 0 : 0 )
+					let oBTime = +new Date( oB.data ? oB.data.opTime || 0 : 0 )
+					
+					let nDis = oATime - oBTime
+					
+					let oAType = oA.data ? oA.data.opType || '' : ''
+					let oBType = oB.data ? oB.data.opType || '' : ''
+					
+					if(nDis < 0) {
+						return 1
+					}else if(nDis > 0) {
+						return -1
+					}else {
+						// 时间相等，根据类型排  只排产出及投入. 产出6在投入1前。
+						if(oAType == 1 && oBType == 6) {
+							return 1
+						}else if(oAType == 6 && oBType == 1) {
+							return -1
+						}else {
+							return 1
+						}
+					}
+					
+				})
+				
 //				aResult = this.setDataOrder(aResult);
 				
 				// 返回数据。
