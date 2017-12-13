@@ -65,11 +65,11 @@
                         name: "动作类型"
                     },{
                         prop: "barcode",
-						name: "单件条码",
+						name: "子条码",
 						width: 200
                     },{
                         prop: "parentBarcode",
-                        name: "托条码",
+                        name: "父条码",
                     },{
                         prop: "batchNo",
                         name: "批次",
