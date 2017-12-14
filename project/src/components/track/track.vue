@@ -147,6 +147,9 @@
 	                    field: "moldCode",
 	                    headerName: "模号"
     				},{
+    					field: "doCode",
+    					headerName: "工单"
+    				},{
 	                    field: "srcDoCode",
 	                    headerName: "源工单"
     				},{

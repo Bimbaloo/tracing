@@ -493,7 +493,11 @@
 		    // 树的数据全屏。
 		   	treeFullscreen () {
 		   		return this.$store && this.$store.state.treeFullscreen
-			},         
+            },   
+            // tab切换功能。
+            activeTabChange() {
+                return this.$store && this.$store.state.activeTabChange
+            },      
             // echarts图形参数。
             option () {
                 let oSelected = {},
@@ -822,7 +826,8 @@
             fullscreen: 'resizeChart',
             treeFullscreen: 'resizeChart',
             resize: 'resizeChart',
-            resizeY: 'resizeChart'
+            resizeY: 'resizeChart',
+            activeTabChange: 'resizeChart'
         },
         methods: {
             // 获取工厂定制数据。

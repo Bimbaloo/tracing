@@ -128,11 +128,11 @@
 						}),
 						click: (e) => {
 							// 更新高亮的数据。
-							this.$store.commit({
-								type: "updateHeighted",
-								data: []
-							})
-							this.$emit("init");
+//							this.$store.commit({
+//								type: "updateHeighted",
+//								data: []
+//							})
+//							this.$emit("init");
 						}
 					});
 

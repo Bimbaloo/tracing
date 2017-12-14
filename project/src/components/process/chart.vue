@@ -102,11 +102,12 @@
 
 				}
 
-				if(start === end) {
+				if(start && (start === end)) {
 					let date = start.split(" ")[0]
 					start = date + " 00:00:00"
-					end = date + " 22:59:59"
+					end = date + " 23:59:59"
 				}
+				
 				this.datetime = {
 					start: start,
 					initStart: start,

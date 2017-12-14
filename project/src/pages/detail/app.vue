@@ -126,10 +126,11 @@
       this.$register.login(this.$store);
       
       // 获取配置数据。
-      this.$store.dispatch('getVersion').then(() => {//getConfig
-        // 获取数据。
-        this.fetchData();
-      })
+      this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
+      // this.$store.dispatch('getVersion').then(() => {//getConfig
+      //   // 获取数据。
+      //   this.fetchData();
+      // })
 
       // 保存查询记录
       let history = localStorage.getItem("history")

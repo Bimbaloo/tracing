@@ -234,9 +234,12 @@
 							if(row.opType == 102 || row.opType == 103) {
 								// 出库、入库
 								return `${row.opTypeName}(${row.stockTypeName})`
-							}else if(row.opType == 201) {
+							}else if(row.opType == 205) {
 								// 条码绑定
-								return `${row.opTypeName}(${row.businessType == 1 ? '绑定':'解绑'})`
+								return `${row.opTypeName}(绑定)`
+							}else if(row.opType == 206){
+								// 解绑
+								return `${row.opTypeName}(解绑)`
 							}else {
 								// 其他
 								return row.opTypeName
@@ -594,7 +597,7 @@
 				var	_that = this,
 				    aoNew = [];
 				    
-				_getData(1, 0);//(-1, 0)跟节点从1开始。
+				_getData(-1, 0);
 				
 				return aoNew;
 				/**
@@ -645,8 +648,35 @@
 					return oData.parentNodeId == sId;
 				})
 				
-				// 排序处理。
-				aResult = aResult.sort( (oA, oB) => +new Date( oA.data ? oA.data.opTime || 0 : 0 ) - +new Date( oB.data ? oB.data.opTime || 0 : 0) < 0? 1:-1 )
+//				aResult = aResult.sort( (oA, oB) => +new Date( oA.data ? oA.data.opTime || 0 : 0 ) - +new Date( oB.data ? oB.data.opTime || 0 : 0) < 0? 1:-1 )
+				
+				// 排序处理。 或者按产出投入处理排序
+				aResult = aResult.sort( (oA, oB) => {
+					let oATime = +new Date( oA.data ? oA.data.opTime || 0 : 0 )
+					let oBTime = +new Date( oB.data ? oB.data.opTime || 0 : 0 )
+					
+					let nDis = oATime - oBTime
+					
+					let oAType = oA.data ? oA.data.opType || '' : ''
+					let oBType = oB.data ? oB.data.opType || '' : ''
+					
+					if(nDis < 0) {
+						return 1
+					}else if(nDis > 0) {
+						return -1
+					}else {
+						// 时间相等，根据类型排  只排产出及投入. 产出6在投入1前。
+						if(oAType == 1 && oBType == 6) {
+							return 1
+						}else if(oAType == 6 && oBType == 1) {
+							return -1
+						}else {
+							return 1
+						}
+					}
+					
+				})
+				
 //				aResult = this.setDataOrder(aResult);
 				
 				// 返回数据。
@@ -746,7 +776,8 @@
 						sDefault = "green"
 						break
 					// 条码管理
-					case 201:
+					case 205:
+					case 206:
 					case 203:
 					case 204:
 						sDefault = "purple"
@@ -841,7 +872,7 @@
 								
 						break
 					// 条码绑定
-					case 201:
+					case 205:
 						// 绑定类型
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
@@ -850,9 +881,21 @@
 									,批次 <span class="tips">${o.batchNo||"-"}</span>
 									的 <span class="tips">${o.materialName||"-"}</span> 物料,
 									${o.quantity}件
-									${(nBusinessType == 1) ? `绑定到容器条码<span class="tips">${o.barcode}</span>`: `与容器条码<span class="tips">${o.barcode}解绑</span>`}
+									绑定到容器条码<span class="tips">${o.barcode}</span>
 								</div>`
 						
+						break
+					// 条码解绑
+					case 206:
+						sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName||"-"}</span>
+									将条码 <span class="tips">${o.srcBarcode||"-"}</span> 
+									,批次 <span class="tips">${o.batchNo||"-"}</span>
+									的 <span class="tips">${o.materialName||"-"}</span> 物料,
+									${o.quantity}件
+									与容器条码<span class="tips">${o.barcode}</span>解绑
+								</div>`
 						break
 					// 补料
 					case 203:
