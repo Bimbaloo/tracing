@@ -1,49 +1,63 @@
 <template>
     <div class="content-query">
-    	
-    	<div class="query-item" 
-    		v-for="(item,index) in category" 
-    		:item-id = "index"
-    		:key = "item.moduleCode">
-    		<div class="query-header">
-    			<span class="header-title"> {{ item.moduleName }} </span>
-    			<div class="header-icon">
-    				<!-- 编辑。 -->
-    				<i @click.stop="showEditState(item.moduleCode,index)" title="编辑" v-show="!oBefore[item.moduleCode].bEdit" class="icon el-icon-edit"></i>
-    				<!-- 取消。 -->
-    				<i @click.stop="hideEditState(item.moduleCode,index)" title="取消" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-exit"></i>
-    				<!-- 保存。 -->
-    				<i @click.stop="saveModuleValue(item.moduleCode,index)" title="保存" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-save"></i>
-    				<!-- 增加。 -->
-    				<i @click.stop="showModal(item.moduleCode,index)" title="增加" v-show="oBefore[item.moduleCode].bEdit" class="icon el-icon-plus"></i>
-    			</div>
-    		</div>
-    		<div class="content-item">
-    			<li class="item-module"
-    				v-for="(listItem,indexList) in item.groups"
-    				:data-id = "indexList"
-    				:key = "indexList"
-    				@mouseover="isShow=index*10+indexList"
-                    @mouseleave="isShow=null">
-    				<span class="name-item">{{ listItem.groupName }}</span>
-    				<div class="name-icon" :class="{'item-show-transition':oBefore[item.moduleCode].bEdit && isShow==index*10+indexList}">
-    					<!-- 上移。 -->
-    					<i v-if="indexList" 
-    						@click.stop="changeOrder(item.moduleCode,index,indexList-1,indexList)"
-    						 class="icon el-icon-arrow-up"></i>
-    					<!-- 下移。 -->
-    					<i v-if="indexList != item.groups.length-1" 
-    						@click.stop="changeOrder(item.moduleCode,index,indexList,indexList+1)" 
-    						class="icon el-icon-arrow-down"></i>
-    					<!-- 修改。 -->
-    					<i @click.stop="showModal(item.moduleCode,index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-edit"></i>
-    					<!-- 删除。 -->
-    					<i @click.stop="delItem(index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-delete"></i>
-    				</div>
-    			</li>
-    		</div>
+    	<ul class="query-lists">
+            <li class="query-list" 
+				v-for="(item,index) in category"
+				v-dragging="{ list: category, item: item, group: 'category' }"
+				:key="item.moduleCode">
+				<span class="name-list">{{item.moduleName}}</span>
+            </li>
+			<li class="query-list">
+				<i @click.stop="saveEditQueryState('保存')" title="保存" class="icon icon-20 icon-save"></i>
+			</li>
+			<li class="query-list">
+				<i @click.stop="hideEditQueryState('取消')"  title="取消" class="icon icon-20 icon-exit"></i>
+			</li>
+        </ul>
+		<div class="query-items">
+			<div class="query-item" 
+				v-for="(item,index) in category"
+				:item-id = "index"
+				:key = "item.moduleCode">
+				<div class="query-header">
+					<span class="header-title"> {{ item.moduleName }} </span>
+					<div class="header-icon">
+						<!-- 编辑。 -->
+						<i @click.stop="showEditState(item.moduleCode,index)" title="编辑" v-show="!oBefore[item.moduleCode].bEdit" v-if="oBefore[item.moduleCode].isEdit" class="icon el-icon-edit"></i>
+						<!-- 取消。 -->
+						<i @click.stop="hideEditState(item.moduleCode,index)" title="取消" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-exit"></i>
+						<!-- 保存。 -->
+						<i @click.stop="saveModuleValue(item.moduleCode,item.moduleOrder)" title="保存" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-save"></i>
+						<!-- 增加。 -->
+						<i @click.stop="showModal(item.moduleCode,index)" title="增加" v-show="oBefore[item.moduleCode].bEdit" class="icon el-icon-plus"></i>
+					</div>
+				</div>
+				<div class="content-item">
+					<li class="item-module"
+						v-for="(listItem,indexList) in item.groups"
+						:data-id = "indexList"
+						:key = "indexList"
+						@mouseover="isShow=index*10+indexList"
+						@mouseleave="isShow=null">
+						<span class="name-item">{{ listItem.groupName }}</span>
+						<div class="name-icon" :class="{'item-show-transition':oBefore[item.moduleCode].bEdit && isShow==index*10+indexList}">
+							<!-- 上移。 -->
+							<i v-if="indexList" 
+								@click.stop="changeOrder(item.moduleCode,index,indexList-1,indexList)"
+								class="icon el-icon-arrow-up"></i>
+							<!-- 下移。 -->
+							<i v-if="indexList != item.groups.length-1" 
+								@click.stop="changeOrder(item.moduleCode,index,indexList,indexList+1)" 
+								class="icon el-icon-arrow-down"></i>
+							<!-- 修改。 -->
+							<i @click.stop="showModal(item.moduleCode,index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-edit"></i>
+							<!-- 删除。 -->
+							<i @click.stop="delItem(index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-delete"></i>
+						</div>
+					</li>
+				</div>
+			</div>
     	</div>
-    	
     	<v-trans
     		:v-if="showTransfer"
     		:dialog-show="showTransfer"
@@ -61,16 +75,22 @@
 <script>
 	import "assets/css/common.less"
 	import $ from "jquery"
-    import Transfer from "components/config/newTrans.vue"
+	import Transfer from "components/config/newTrans.vue"
 
     // 表格接口。
-    const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
+	const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
+	
     // 自定义项列表接口。
     const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+	//const MODULE_ITEM_URL = "static/modules.json";
+
+	// 排序接口
+	const MODULE_ORDER = HOST + `/api/v1/customized/modules/update-order`
     
     export default {
+		name: 'newquery',
         components:{
-            "v-trans": Transfer
+			"v-trans": Transfer
         },
         data() {
             return {
@@ -82,15 +102,33 @@
             	oBefore: {
             		"stock": {
             			bEdit: false,
-            			value: {}
+						value: {},
+						isEdit: false
             		},
-            		"trace": {
+            		"trace_down": { //追踪
             			bEdit: false,
-            			value: {}
+            			value: {},
+						isEdit: false
             		},
-            		"track": {
+            		"trace_up": {   //溯源
             			bEdit: false,
-            			value: {}
+            			value: {},
+						isEdit: false
+					},
+					"resume": {
+            			bEdit: false,
+            			value: {},
+						isEdit: false
+            		},
+            		"suppress": {   //遏制
+            			bEdit: false,
+            			value: {},
+						isEdit: false
+            		},
+            		"link_repair": { //链路修复
+            			bEdit: false,
+            			value: {},
+						isEdit: false
             		}
             	},
             	// 是否显示弹窗。
@@ -101,7 +139,10 @@
             	nModuleIndex: "",
             	nItemIndex: "",
             	// 错误提示信息
-            	sErrorMessage: ""
+				sErrorMessage: "",
+				// 是否可编辑
+				editable: true,
+				oldModuleOrderList: []
             }
         },
         created() {
@@ -116,25 +157,35 @@
 				// 调用接口数据。
 				this.$nextTick(() => {
 					this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oResult) => {
-						// 成功后设置参数。includes
-						this.category = oResult.filter(o=> ["trace","track"].indexOf(o.moduleCode)>-1)
+						oResult.sort((a,b)=>a.moduleOrder>b.moduleOrder) // 排序
+						oResult.forEach((el)=>{ 						 //模块是否可编辑
+							if(el.editable === 1){
+								this.oBefore[el.moduleCode].isEdit = true
+							}
+						})
+						this.category = [].concat.call(oResult);
+						this.oldModuleOrderList = this.getModuleOrderList()
 					}, (sErrorMessage) => {
 						// 提示信息。
-						this.sErrorMessage = sErrorMessage;
-						this.showMessage();
+						this.showMessage(sErrorMessage);
 					})        
 				})
 			}, (sErrorMessage) => {
 				// 提示信息。
-            	this.sErrorMessage = sErrorMessage;
-        		this.showMessage();
+        		this.showMessage(sErrorMessage);
 			});
         },
         computed: {
 	        // 是否编辑的状态。
 	        edit () {
 	          return this.$store.state.edit
-	        }
+			},
+			ModuleOrderListEdit () {
+				return this.$store.state.ModuleOrderListEdit
+			},
+			moduleOrderList () {
+				return this.getModuleOrderList()
+			}
 	    },
 	    watch: {
           	oBefore: {
@@ -143,14 +194,26 @@
           	}
         },
         mounted() {
-          // 离开改页面处理
+          // 离开改页面处理(刷新、关闭页面等操作)
           	let self = this
           	window.onbeforeunload = () => {
-          		if(self.edit) {
+          		if(self.edit&&this.ModuleOrderListEdit) {
           			// 提示需要保存。
           			return false
           		}
-          	}
+			},
+			// 监听拖动的组件
+			this.$dragging.$on('dragged', ({ value }) => {
+
+			})
+			// 监听到拖动结束 
+			this.$dragging.$on("dragend", (data)=> {
+				// 如果顺序换过就要保存
+				this.$store.commit({
+					type: "updateModuleOrderListEdit",
+					key: true
+				});
+			});
         },
         methods: {
         	// 编辑状态。
@@ -167,9 +230,9 @@
 				});
         	},
         	// 提示信息。
-        	showMessage() {
+        	showMessage(sErrorMessage) {
         		this.$message({
-        			message: this.sErrorMessage,
+        			message: sErrorMessage,
         			duration: 3000
         		});
         	},
@@ -197,79 +260,53 @@
         			return "";
         		}
         	},
-        	// 获取模块的索引值。
-        	getModuleIndexByModule(sModule) {
-        		let nIndex = -1;
-        		
-        		// 获取索引值。
-        		this.category.forEach((o,index)=>{
-        			if(o.moduleCode === sModule) {
-        				nIndex = index;
-        			}
-        		});
-        		
-        		return nIndex;
-        	},
-        	// 获取模块中所有数据
-        	getModuleDataByModule(sModule) {
-
-        		let nIndex = this.getModuleIndexByModule(sModule);
-        		if(nIndex == -1) {
-        			return {}
-        		}else {
-        			return this.category[nIndex];
-        		}
-        		
-        	},
         	// 显示模块项的编辑模式。
         	showEditState(sModule,nIndex){
         		// 设置模块为编辑模式，并保存当前模块中所有的筛选条件。
-        		this.oBefore[sModule].bEdit = true;
-//      		let oData = this.getModuleDataByModule(sModule);
+				this.oBefore[sModule].bEdit = true;
+				// 备份当前状态
 				let oData = this.category[nIndex];
-				this.oBefore[sModule].value = $.extend(true,{},oData);
-        		// 保存数据。
-//      		sessionStorage.setItem(sModule,JSON.stringify(oData));
+				this.oBefore[sModule].value = JSON.parse(JSON.stringify(oData))
         	},
         	// 取消模块项的编辑模式。
         	hideEditState(sModule,nIndex) {
         		// 设置模块为正常模式，重置当前模块中所有的筛选条件。
         		this.oBefore[sModule].bEdit = false;
-        		// 保存数据。
-//      		let oData = JSON.parse(sessionStorage.getItem(sModule));
-        		let oData = this.oBefore[sModule].value;
-        		this.$set(this.category,nIndex,oData)
+        		//从保存的数据中恢复。
+				let oData = this.oBefore[sModule].value;
+				this.$set(this.category,nIndex,oData)
         	},
         	// 保存当前模块的数据。
-        	saveModuleValue(sModule) {
-        		// 参数。
-        		let oResult = this.getModuleDataByModule(sModule);
+        	async saveModuleValue(sModule,index) {
+				// 参数。
+
+        		let oResult = this.category[index-1]
 				
 				// 判断当前是否可以保存。
 				if(!oResult.groups.length) {
 					// 当前项为空，则提示。
-					this.sErrorMessage = "模块下至少有一个条件组合";
-					this.showMessage();
+					this.showMessage("模块下至少有一个条件组合");
 				}else {
-
-					// 可以保存。
-					this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "put", this.getModuleDataByModule(sModule), () => {
-						this.oBefore[sModule].bEdit = false;
-						this.sErrorMessage="保存成功！";
-						this.showMessage();
-					}, (sErrorMessage)=> {
-						this.sErrorMessage = "保存失败";
-						this.showMessage();
-						console.log(sErrorMessage);
-					}, (err)=> {
-						this.sErrorMessage = "保存失败";
-						this.showMessage();
-						console.log(err);
-					})
-
+					this.save(oResult)
 				}
 				
-        	},
+			},
+			// 某个module保存
+			save(oQuery) {
+				oQuery.groups.forEach((el,index)=>{
+					el.groupOrder = index+1
+				})
+				this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "put", oQuery, () => {
+						this.oBefore[oQuery.moduleCode].bEdit = false
+						this.showMessage("保存成功");
+					}, (sErrorMessage)=> {
+						this.showMessage("保存失败");
+						console.log(sErrorMessage);
+					}, (err)=> {
+						this.showMessage("保存失败");
+						console.log(err);
+					})
+			},
         	// 获取transfer显示的值。
         	getTransferData() {
         		let oData = {
@@ -310,20 +347,28 @@
         		// 弹窗隐藏。
         		this.showTransfer = false;		// !this.showTransfer
         		this.sCurrentModule = "";
-        		
+        		//debugger
         		if(oResult) {
         			// 存在数据， 则更新或，增加项。
         			let oValue = {
-        				groupName: oResult.title,
+						groupName: oResult.title,
+						groupOrder: 0,
+						editable: 1,
         				groupItems: (function() {
-        					let aValue = [];
-        					aValue = oResult.aItem.map(o=>{
+							let aValue = [];
+        					aValue = oResult.aItem.map((o,index)=>{
+								let obj = this.aoTable.find(e=>{
+									return e.itemCode === o
+								})
         						return {
-        							itemCode: o
+									itemCode: o,
+									itemName: obj[1],
+									itemOrder: index + 1,
+									visible: 1
         						}
         					})
         					return aValue;
-        				})()
+        				}).bind(this)()
         			};
         			
         			// 判断当前是增加还是更新。
@@ -347,9 +392,56 @@
         		this.$set(this.category[nParentIndex].groups,nPrev,this.category[nParentIndex].groups[nNext]);
         		this.$set(this.category[nParentIndex].groups,nNext,oPrev);
         		// 这样互相交换，需鼠标移开才能看到效果。
-//      		[this.category[nParentIndex].groups[nPrev],this.category[nParentIndex].groups[nNext]] = [this.category[nParentIndex].groups[nNext],this.category[nParentIndex].groups[nPrev]]
+				// [this.category[nParentIndex].groups[nPrev],this.category[nParentIndex].groups[nNext]] = [this.category[nParentIndex].groups[nNext],this.category[nParentIndex].groups[nPrev]]
         		console.log(this.category[nParentIndex])
-        	}
+        	},
+			// 顺序改变保存
+			async saveEditQueryState() {
+				const stateChange = await this.sendResult().then(e=>e.status)
+				if(stateChange) {
+					this.$store.commit({
+						type: "updateModuleOrderListEdit",
+						key: true
+					});
+					this.categoryCopy = [].concat(this.category);
+					this.$message({
+						message: stateChange,
+        				duration: 1000
+					})
+				}else {
+					this.category = [].concat(this.categoryCopy);
+					this.$message({
+						message: `保存失败，请重试`,
+        				duration: 1000
+					})
+				}
+			},
+			// 发送改变顺序请求
+			sendResult() {
+				 return new Promise( (resolve, reject) => {
+					this.$ajax.post(MODULE_ORDER,this.moduleOrderList).then((e)=>{
+						return resolve(e)
+					}).catch((err)=>{
+						return reject(err)
+					})
+				})
+			},
+			// 顺序改变取消
+			hideEditQueryState(e) {
+				this.category = [].concat(this.categoryCopy); //从备份中还原
+			},
+			// 获取顺序 
+			getModuleOrderList() {
+				let arr = []
+				this.category.forEach((el,index)=>{
+					arr.push({
+						"moduleCode": `${el.moduleCode}`,
+						"moduleOrder": index+1
+					})
+				}) 
+				const obj = { "moduleOrderList" : arr }
+				return obj
+			}
         }
     };
 </script>
@@ -359,141 +451,170 @@
 		overflow: auto;
 	}
     .content-query{
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-around;
-        padding: 20px;
-        
-        .query-item{
-            width: 400px;
-            border:2px solid #b3b3b3;
-            margin: 20px;
+		display: flex;
+		flex-direction: column;
+		.query-lists {
+			display: flex;
+			flex-basis: 40px;
+			margin-bottom: 20px;
+			background: #e5e9f2;
+			justify-content: center;
+			// span {
+			// 	display: flex;
+			// 	flex-basis: 40px;
+			// 	justify-content: center;
+				.query-list {
+					min-width: 120px;
+					background-color: #d3dce6;
+					text-align: center; 
+					box-sizing: border-box;
+					padding: 10px;
+					margin-left: 2px;
+					margin-right: 2px; 
+				}
+			// }
+			
+		}
+        .query-items {
+			flex: 1;
+			display: flex;
+			flex-wrap: wrap;
+			justify-content: space-around;
+			padding: 20px;
+			padding-top: 0;
+			overflow: auto;
+			.query-item{
+				width: 400px;
+				border:2px solid #b3b3b3;
+				margin: 20px;
             
-            .query-header{
-                display: flex;
-                justify-content: space-between;
-                height: 40px;
-                color: #ffffff;
-                padding: 0 20px 0 20px;
-                background: #b3b3b3;
-                
-                .header-title,
-                .header-icon {
-                    line-height: 40px;
-                }
-                
-                .header-icon {
-                	cursor: pointer;
-                	font-size: 20px;
-                	
-                	.icon {
-                		margin-right: 10px;
-                		vertical-align: middle;
-                		 
-                		&:last-child {
-                			margin-right: 0;
-                		}
-                	}
-                }
-                .add-item{
-                    margin-top: 20px;
-                }
-            }
-            .content-item{
-                height: 500px;
-                padding: 20px 10px 0px 10px;
-                overflow: auto;
-                
-                .item-module {
-                    /*display: flex;
-                    justify-content: space-between;*/
-                    padding: 5px;
-                    margin-bottom: 10px;
-                    background: #e6e6e6;
-					position:relative;                    
-                    overflow: hidden;
-                    
-                    .name-item,
-                    .name-icon {
-                        line-height: 36px;
-                    }
-                    
-                    .name-item {
-                    	display: block;
-                    	width: 100%;
-                    	cursor: pointer;
-                    	white-space: nowrap;
-                    	overflow: hidden;
-                    	text-overflow: ellipsis;
-                    }
-                    
-                    .name-icon {
-                    	position: absolute;
-                    	right: 5px;
-                    	/*top: 5px;*/
-                    	line-height: 36px;
-                    	cursor: pointer;
-                    	bottom: -26px;
-                    	opacity: 0;
-                    	
-                    	.icon {
-                    		margin-right: 10px;
-                    		
-                    		&:last-child {
-                    			margin-right: 0;
-                    		}
-                    	}
-                    	
-                    	&.item-show-transition {
-	                        /*display: none;*/
-	                        transition: all ease .8s;
-	                        bottom: 0px;
-	                        opacity: 1;
-	                    }
-	                    
-	                    &.item-show-enter,
-	                    &.item-show-leave {
-	                    	transition: all ease .8s;
-	                    	opacity: 0;
-	                    	bottom: -26px;
-	                    }
-                    }
-                    
-                    .btn-item{
-                   	 	margin-top: 8px;
-                   	 		
-                        &.hide{
-                             display: none;
-                         }
-                         .edit-item{
-                             display: inline-block;
-                             margin-right: 5px;
-                         }
-                         .close-btn{
-                             display: inline-block;
-                             width: 20px;
-                             height: 20px;
-                             background: url("../../assets/img/img02.png") no-repeat;
-                             background-position: 0 -40px;
-                             cursor: pointer;
-                            &:hover{
-                                 background-position: -20px -40px;
-                             }
-                         }
-                    }
-                }
-            }
-            &:hover{
-                 border: 2px solid #42af8f;
-               
-                .query-header {
-                    background: #42af8f;
-                }
-                .item-module {
-                	background: #d9f0e9;
-                }
-                
-             }
-        }
+				.query-header{
+					display: flex;
+					justify-content: space-between;
+					height: 40px;
+					color: #ffffff;
+					padding: 0 20px 0 20px;
+					background: #b3b3b3;
+					
+					.header-title,
+					.header-icon {
+						line-height: 40px;
+					}
+					
+					.header-icon {
+						cursor: pointer;
+						font-size: 20px;
+						
+						.icon {
+							margin-right: 10px;
+							vertical-align: middle;
+							
+							&:last-child {
+								margin-right: 0;
+							}
+						}
+					}
+					.add-item{
+						margin-top: 20px;
+					}
+				}
+				.content-item{
+					height: 500px;
+					padding: 20px 10px 0px 10px;
+					overflow: auto;
+					
+					.item-module {
+						/*display: flex;
+						justify-content: space-between;*/
+						padding: 5px;
+						margin-bottom: 10px;
+						background: #e6e6e6;
+						position:relative;                    
+						overflow: hidden;
+						
+						.name-item,
+						.name-icon {
+							line-height: 36px;
+						}
+						
+						.name-item {
+							display: block;
+							width: 100%;
+							cursor: pointer;
+							white-space: nowrap;
+							overflow: hidden;
+							text-overflow: ellipsis;
+						}
+						
+						.name-icon {
+							position: absolute;
+							right: 5px;
+							/*top: 5px;*/
+							line-height: 36px;
+							cursor: pointer;
+							bottom: -26px;
+							opacity: 0;
+							
+							.icon {
+								margin-right: 10px;
+								
+								&:last-child {
+									margin-right: 0;
+								}
+							}
+							
+							&.item-show-transition {
+								/*display: none;*/
+								transition: all ease .8s;
+								bottom: 0px;
+								opacity: 1;
+							}
+							
+							&.item-show-enter,
+							&.item-show-leave {
+								transition: all ease .8s;
+								opacity: 0;
+								bottom: -26px;
+							}
+						}
+						
+						.btn-item{
+							margin-top: 8px;
+								
+							&.hide{
+								display: none;
+							}
+							.edit-item{
+								display: inline-block;
+								margin-right: 5px;
+							}
+							.close-btn{
+								display: inline-block;
+								width: 20px;
+								height: 20px;
+								background: url("../../assets/img/img02.png") no-repeat;
+								background-position: 0 -40px;
+								cursor: pointer;
+								&:hover{
+									background-position: -20px -40px;
+								}
+							}
+						}
+					}
+				}
+				&:hover{
+					border: 2px solid #42af8f;
+				
+					.query-header {
+						background: #42af8f;
+					}
+					.item-module {
+						background: #d9f0e9;
+					}
+					
+				}
+			}
+		}
+        
     }
 </style>

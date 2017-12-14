@@ -264,7 +264,7 @@
 	                	"endTime": [{validator: validateEndTime, trigger: "change"}]
             		},
             		// 溯源。
-            		"trace": {
+            		"trace_down": {
             			"barcode": [{validator: validateParam, trigger: "change"}],
             			"traceCode": [{validator: validateTraceCode, trigger: "change"}],
             			"materialCode": [{validator: validateParam, trigger: "change"}],
@@ -275,7 +275,7 @@
             			"endTime": [{validator: validateTime, trigger: "change"}]
             		},
             		// 追踪。
-            		"track": {
+            		"trace_up": {
             			"barcode": [{validator: validateParam,trigger: "change"}],
             			"materialCode": [{validator: validateParam,trigger: "change"}],
             			"equipmentCode": [{validator: validateParam,trigger: "change"}],
@@ -289,11 +289,11 @@
             			"barcode": [{validator: validateBarcode, trigger: "change"}]
             		},
 					// 遏制
-            		"restrain": {
+            		"suppress": {
             	
             		},
             		// 断链
-            		"link": {
+            		"link_repair": {
             			"batchNo": [{validator: validateBatch,trigger: "change"}],
 	                	"materialCode": [{validator: validateMaterialcode,trigger: "change"}],
 	                	"startTime": [{validator: validateStart, trigger: "change"}],

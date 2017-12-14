@@ -13,6 +13,10 @@ import 'assets/css/reset.css'
 import 'assets/css/common.less'
 import 'assets/css/icon.less'
 
+/* 拖动组件 */
+import VueDND from 'awe-dnd'
+Vue.use(VueDND)
+
 
 Vue.use(VueRouter);
 Vue.use(ElementUI);
@@ -54,11 +58,15 @@ const store = new Vuex.Store({
     // customModule
   },
   state: {
-    edit: false
+    edit: false,
+    ModuleOrderListEdit: false
   },
   mutations: {  
     updateEdit (state, payload) {
       state.edit = payload.key;
+    },
+    updateModuleOrderListEdit (state, payload) {
+      state.ModuleOrderListEdit = payload.key;
     }
   },
   actions: {}

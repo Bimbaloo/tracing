@@ -12,7 +12,9 @@
             <div class="content-bg">
             	<div class="content-wrap">
 	                <div class="content">
-	                    <router-view></router-view>
+                        <keep-alive>
+	                        <router-view></router-view>
+                        </keep-alive>
 	                </div>
             	</div>
             </div>
@@ -56,12 +58,15 @@
         	// 是否编辑的状态。
 	        edit () {
 	          return this.$store.state.edit
-	        }
+            },
+            ModuleOrderListEdit () {
+				return this.$store.state.ModuleOrderListEdit
+			}
         },
         methods: {
             turnTo(routerLink,index){
             	let self = this
-            	if(self.edit && self.isActive != index) {
+            	if(self.edit || self.ModuleOrderListEdit && self.isActive != index) {
 					// 存在未保存，是否处理。  ---- 确定与取消按钮交换
 					self.$confirm('内容未保存，是否离开本页?', '提示', {
 			          	cancelButtonText: '取消',	
@@ -162,13 +167,21 @@
             
             .content-wrap {
             	flex: 1;
-            	position: relative;
+              //  position: relative;
+                display: flex;
             	
-	            .content{
-	            	position: absolute;
-	                width: 100%;
-	                height: 100%;
-	                background: #ffffff;
+	            /deep/.content{
+	            	// position: absolute;
+	                // width: 100%;
+                    // height: 100%;
+                    display: flex;
+                    flex: 1;
+                    background: #ffffff;
+                    &>div {
+                        display: flex;
+                        flex: 1;
+                        flex-direction: column;
+                    }
 	            }
             }
         }

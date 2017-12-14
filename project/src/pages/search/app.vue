@@ -100,19 +100,19 @@ export default {
         itemCode: "stock",
         itemName: "查出库"
       }, {
-        itemCode: "trace",
+        itemCode: "trace_down",
         itemName: "溯源"
       }, {
-        itemCode: "track",
+        itemCode: "trace_up",
         itemName: "追踪"
       }, {
         itemCode: "resume",
         itemName: "履历"
       }, {
-        itemCode: "restrain",
+        itemCode: "suppress",
         itemName: "遏制"
       }, {
-        itemCode: "link",
+        itemCode: "link_repair",
         itemName: "断链"
       }],
       myLocalStorage: [],
@@ -192,12 +192,12 @@ export default {
     setCategories(oData) {
       let unSuport = []
       if(!this.supression ) {
-        unSuport.push("restrain")
+        unSuport.push("suppress")
       }
       if(!this.linkRepair ) {
-        unSuport.push("link")
+        unSuport.push("link_repair")
       }
-      
+
       this.categories = fnP.parseData(oData)
       if(unSuport.length) {
         // 获取打开的功能模块。

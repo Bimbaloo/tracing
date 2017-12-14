@@ -5,15 +5,15 @@ var parseData = function(aoGet){
 		// 查出库。
 		"stock": "detail",
 		// 溯源。
-		"trace": "detail",
+		"trace_up": "detail",
 		// 追踪。
-		"track": "detail",
+		"trace_down": "detail",
 		// 遏制。
-		"restrain": "restrain",
+		"suppress": "restrain",
 		// 履历。
 		"resume": "resume",
 		// 断链。
-		"link": "chain"
+		"link_repair": "chain"
 	};
 	
 	// 类型判断处理。
@@ -39,10 +39,9 @@ var parseData = function(aoGet){
 		// 修改list的值。
 		oItem.list = oModule.groups.map( (oGroup,index) => {
 			let oList = {
-				id: oGroup.groupId+"",
 				groupOrder: oGroup.groupOrder+'',
 				title: oGroup.groupName,
-				key: index+1+"",
+				key: oGroup.groupOrder+'',
 				items: []
 			};
 			
