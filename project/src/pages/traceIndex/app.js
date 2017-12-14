@@ -185,8 +185,8 @@ const routes = [
       }
     }]
   },
-  { path: '/trace', component: Trace },
-  { path: '/track', component: Track }
+  { path: '/trace_up', component: Trace },
+  { path: '/trace_down', component: Track }
 ]
 
 // 创建 router 实例，然后传 `routes` 配置

@@ -1,6 +1,6 @@
 <template>
     <div class="content-query">
-    	<ul class="query-lists">
+    	<!-- <ul class="query-lists">
             <li class="query-list" 
 				v-for="(item,index) in category"
 				v-dragging="{ list: category, item: item, group: 'category' }"
@@ -13,7 +13,41 @@
 			<li class="query-list">
 				<i @click.stop="hideEditQueryState('取消')"  title="取消" class="icon icon-20 icon-exit"></i>
 			</li>
-        </ul>
+        </ul> -->
+		<div :class="['query-lists-container',{ 'no-border': !ModuleOrderListEdit }]">
+			<div class="list-edit" v-show="!ModuleOrderListEdit">
+				<span class="list-title">自定义排序</span>
+				<el-switch
+					on-text=""
+  					off-text=""
+					off-color="#bfcbd9" 
+					v-model="ModuleOrderListEdit">
+				</el-switch>
+			</div>
+			<div class="list-header" v-show="ModuleOrderListEdit">
+				<span class="list-title">自定义排序</span>
+				<span class="list-edit">
+					<!-- <i class="icon el-icon-edit" v-show="!ModuleOrderListEdit" @click.stop="setModuleOrderList(true)" title="编辑"></i> -->
+					<i class="icon el-icon-circle-close"  @click.stop="hideEditQueryState()" title="取消"></i>
+					<i class="icon el-icon-circle-check"  @click.stop="saveEditQueryState('保存')" title="保存"></i>
+				</span>
+			</div>
+			<div class="list-main" v-show="ModuleOrderListEdit">
+				<div class="list-message">
+					<span>系统将根据拖动的顺排列</span>
+					<span>拖动</span>
+				</div>
+				<ul class="list-container">
+					<li class="query-list" 
+						v-for="(item,index) in category"
+						v-dragging="{ list: category, item: item, group: 'category' }"
+						:key="item.moduleCode">
+						<span class="name-list">{{item.moduleName}}</span>
+						<i class="icon icon-14 icon-move"></i>
+					</li>
+				</ul>
+			</div>
+		</div>
 		<div class="query-items">
 			<div class="query-item" 
 				v-for="(item,index) in category"
@@ -97,7 +131,9 @@
             	// 所有字段对应的数据。
             	aoTable: [],
             	// 自定义条件数据。
-            	category: [],
+				category: [],
+				// 临时保存自定义条件数据。
+				categoryCopy: [],
             	// 临时保存数据，
             	oBefore: {
             		"stock": {
@@ -164,6 +200,7 @@
 							}
 						})
 						this.category = [].concat.call(oResult);
+						this.categoryCopy = [].concat.call(oResult)
 						this.oldModuleOrderList = this.getModuleOrderList()
 					}, (sErrorMessage) => {
 						// 提示信息。
@@ -180,8 +217,16 @@
 	        edit () {
 	          return this.$store.state.edit
 			},
-			ModuleOrderListEdit () {
-				return this.$store.state.ModuleOrderListEdit
+			ModuleOrderListEdit: {
+				get() {
+					return this.$store.state.ModuleOrderListEdit
+				},
+				set(isBoolean) {
+					this.$store.commit({
+						type: "updateModuleOrderListEdit",
+						key: isBoolean
+					});
+				} 
 			},
 			moduleOrderList () {
 				return this.getModuleOrderList()
@@ -204,15 +249,9 @@
 			},
 			// 监听拖动的组件
 			this.$dragging.$on('dragged', ({ value }) => {
-
 			})
 			// 监听到拖动结束 
 			this.$dragging.$on("dragend", (data)=> {
-				// 如果顺序换过就要保存
-				this.$store.commit({
-					type: "updateModuleOrderListEdit",
-					key: true
-				});
 			});
         },
         methods: {
@@ -429,6 +468,7 @@
 			// 顺序改变取消
 			hideEditQueryState(e) {
 				this.category = [].concat(this.categoryCopy); //从备份中还原
+				this.setModuleOrderList(false) //取消编辑状态
 			},
 			// 获取顺序 
 			getModuleOrderList() {
@@ -441,6 +481,13 @@
 				}) 
 				const obj = { "moduleOrderList" : arr }
 				return obj
+			},
+			// 编辑顺序
+			setModuleOrderList(isBoolean) {
+				this.$store.commit({
+					type: "updateModuleOrderListEdit",
+					key: isBoolean
+				});
 			}
         }
     };
@@ -453,6 +500,94 @@
     .content-query{
 		display: flex;
 		flex-direction: column;
+		position: relative;
+		.query-lists-container {
+			position: absolute;
+			width: 240px;
+			left: 50px;
+			border: 1px solid #ccc;
+			display: flex;
+			flex-direction: column;
+			z-index: 10;
+			.list-edit {
+				align-items: center;
+				height: 50px;
+				display: flex;
+				.list-title {
+					font-size: 14px;
+					color: #333;
+				}
+				.el-switch {
+					margin-left: 20px;
+				}
+			}
+			.list-header {
+				display: flex;
+				justify-content: space-between;
+				background-color: #f5f8fa;
+				align-items: center;
+				height: 50px;
+				border-bottom: 1px solid #ccc;
+				&>span {
+					margin-left: 20px;
+					margin-right: 20px;
+				}
+				.list-title {
+					font-size: 14px;
+					color: #333;
+				}
+				.list-edit {
+					display: flex;
+					justify-content: space-between;
+					min-width: 50px;
+					&>.icon {
+						color: #999;
+						// &:nth-child(1) {
+						// 	margin-right: 10px;
+						// }
+						// &:nth-child(2) {
+						// 	margin-left: 10px;
+						// }
+						&:hover {
+							color: #42af8f;
+							cursor: pointer;
+						}
+					}
+				}
+			}
+			.list-main {
+				background-color: #fff;
+				box-sizing: border-box;
+				.list-message {
+					display: flex;
+					justify-content: space-between;
+					align-items: center;
+					height: 30px;
+					font-size: 12px;
+					color: #999;
+					margin: 0 20px;
+				}
+				.list-container {
+					.query-list {
+						display: flex;
+						justify-content: space-between;
+						align-items: center;
+						min-height: 32px;
+						color: #333;
+						font-size: 14px;
+						padding: 0 20px;
+						cursor: pointer;
+						&:hover {
+							box-shadow: 1px 1px 10px 1px #888888
+						}
+						
+					}
+				}
+			}
+		}
+		.no-border {
+			border: none;
+		}
 		.query-lists {
 			display: flex;
 			flex-basis: 40px;
@@ -479,14 +614,13 @@
 			flex: 1;
 			display: flex;
 			flex-wrap: wrap;
-			justify-content: space-around;
-			padding: 20px;
-			padding-top: 0;
+			justify-content: space-between;
+    		padding: 30px 50px 20px 50px;
 			overflow: auto;
 			.query-item{
 				width: 400px;
 				border:2px solid #b3b3b3;
-				margin: 20px;
+				margin: 20px 0;
             
 				.query-header{
 					display: flex;
