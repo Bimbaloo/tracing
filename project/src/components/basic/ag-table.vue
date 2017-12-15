@@ -86,7 +86,7 @@
 		    		aFilterd = [];
 		    	
 		    	if(aSelected.length) {
-			    	aFilterd = aAll.filter(el => el.materialCode === aSelected[0].materialCode && el.opType === aSelected[0].opType)
+			    	aFilterd = aAll.filter(el => el.materialCode === aSelected[0].materialCode && el.processCode === aSelected[0].processCode && el.opType === aSelected[0].opType)
 		    	}else {
 		    		aFilterd = aAll
 		    	}
