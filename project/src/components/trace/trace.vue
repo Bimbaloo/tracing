@@ -62,7 +62,18 @@
         },
         watch: {
         	// 如果路由有变化，会再次执行该方法
-			'$route': 'fetchPage'
+			'$route': 'fetchPage',
+			'gridData.selected': function(params) {
+				let aoColumns = this.getColumns()
+	    		
+	    		if(params.length) {
+	    			aoColumns[0].headerCheckboxSelection = true
+	    		}else {
+	    			aoColumns[0].headerCheckboxSelection = false
+	    		}
+	    		
+	    		this.gridData.columns = aoColumns
+			}
         },
         methods: {
         	// 获取显示列
@@ -71,7 +82,8 @@
 	        	return [{
 		    			width: 30, 
 		                checkboxSelection: true,
-		                headerCheckboxSelection: true,
+		                // 默认全选按钮为false，当有选中的时候才能全选
+		                headerCheckboxSelection: false,
 		                pinned: true,
 		                suppressSorting: true
 	                },{
