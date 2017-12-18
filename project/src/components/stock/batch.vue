@@ -66,7 +66,7 @@
 					loading: false,
 					error: null,
 					height: "100%",
-					filename: this.batch + "出库",
+					filename: this.$route.query.batchNo + "出库",
 					columns: [{
 						prop: "barcode",
 						name: "条码",
@@ -134,7 +134,7 @@
 					loading: false,
 					error: null,
 					height: "100%",
-					filename: this.batch + "在库",
+					filename: this.$route.query.batchNo + "在库",
 					columns: [{
 						prop: "barcode",
 						name: "条码",
@@ -208,6 +208,11 @@
 			'$store.state.fullscreen': function() {
 				// 修改页面的内容的高度。
 				this.outstockData.height = this.instockData.height=this.adjustHeight();
+			},
+			'batch': function() {
+				// 修改fielname值。
+				this.instockData.filename = this.batch + '在库'
+				this.outstockData.filename = this.batch + '出库' 
 			}
 		},
 		methods: {
