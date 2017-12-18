@@ -189,7 +189,7 @@
 					let oNewData = {};
 	
 					oData.columns.map(col => {
-						oNewData[col.name] = o[col.prop]==undefined ? '':(col.formatter ? col.formatter(o) : o[col.prop]);
+						oNewData[col.name] = o[col.prop]==undefined ? (col.type==='number' ? 0 : '') :(col.formatter ? col.formatter(o) : o[col.prop]);
 					})
 	
 					aoTableJson.push(oNewData);
