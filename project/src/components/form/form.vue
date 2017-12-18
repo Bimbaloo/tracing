@@ -44,18 +44,9 @@
             'v-select': Select,
             'v-datetime': DateTime
         },
-        data() {
-        	let oFormData = {};
-            this.items.forEach(o => {
-            	if(this.subTab == this.active.radio) {
-                    oFormData[o.key] = this.active.keys[o.key] || "";
-            	}else {
-            		oFormData[o.key] = "";
-            	}
-            });
-            
+        data() {    
             return {
-            	ruleForm: oFormData,
+            	ruleForm: {},
             	conditionHeight: 'auto',
             	nBottomHeight: 10
             };
@@ -67,7 +58,7 @@
         				if(window.Rt.utils.getObjectValues(this.ruleForm).every(o=>!o)) {
 //	        				this.resetForm('ruleForm')
 							// 只重置切换的判断。
-							this.$refs["ruleForm"].resetFields();
+							this.resetForm('ruleForm')
         				}
         			});
         		},
@@ -83,6 +74,16 @@
         mounted () {
 		},
 		created() {
+			let oFormData = {};
+            this.items.forEach(o => {
+            	if(this.subTab == this.active.radio) {
+                    oFormData[o.key] = this.active.keys[o.key] || "";
+            	}else {
+            		oFormData[o.key] = "";
+            	}
+            });
+			this.ruleForm = oFormData
+
 			let _that = this
             bus.$on('id-selected', function (obj) {
 				if(_that.tab === obj.tab && _that.subTab === obj.radio){
