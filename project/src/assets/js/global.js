@@ -301,12 +301,12 @@
 				
 				w.document.body.appendChild(res.image);
 				
-				setTimeout(function() {
+//				setTimeout(function() {
 					// 打印图片。
 					w.print();
 					
 					w.close();
-				},200)
+//				},200)
 			})
 		},
 
