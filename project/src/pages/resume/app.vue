@@ -1176,6 +1176,7 @@
 				 	isTable = true;
 				 }else {
 				 	// 时间轴。
+				 	this.downLoading = true
 				 	jClone.html(jTimeLine.html());
 				 	sFileName = "时间轴";
 					jNow = jClone;
