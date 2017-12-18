@@ -1168,7 +1168,8 @@
 					jClone = $(".clone"),
 					sFileName = "",
 					jNow = null,
-					isTable = false;
+					isTable = false,
+					self = this;
 				
 				 if(this.sCurrentTab === "tables"){
 				 	// 表格。
@@ -1190,19 +1191,21 @@
 						background: isTable?"#fff":"#1d272f",
 						onrendered:(canvas) => {
 							
-							const webpUrl = canvas.toDataURL("image/webp");
-							console.log(webpUrl.length)
-							if(webpUrl.length > 1950000 || webpUrl.length === 6){  //生成的base64长度大于200W会自动转成6，且无法打印
-								this.$message({
-									message: '抱歉，生成图片过大，无法下载',
-									type: 'warning'
-								});
-							}else{
-								jDown.attr({
-									"href":webpUrl,
-									"download": sFileName +".png"
-								}).get(0).click()
-							}
+							self.onDownloadPic(sFileName +".png", canvas.toDataURL("image/png"))
+							
+//							const webpUrl = canvas.toDataURL("image/webp");
+//							console.log(webpUrl.length)
+//							if(webpUrl.length > 1950000 || webpUrl.length === 6){  //生成的base64长度大于200W会自动转成6，且无法打印
+//								this.$message({
+//									message: '抱歉，生成图片过大，无法下载',
+//									type: 'warning'
+//								});
+//							}else{
+//								jDown.attr({
+//									"href":webpUrl,
+//									"download": sFileName +".png"
+//								}).get(0).click()
+//							}
 							// 重置复制内容。
 							jClone.html("");
 							this.downLoading = false
@@ -1210,6 +1213,34 @@
 
 					});
 				}
+			},
+			// 图片下载。
+			onDownloadPic(fileName, content) {
+				let blob = base64Img2Blob(content); //new Blob([content]);
+                let evt = document.createEvent("HTMLEvents");
+                let aLink = document.querySelector('#downloadImage')
+                
+                evt.initEvent("click", false, false);//initEvent 不加后两个参数在FF下会报错
+                aLink.download = fileName;
+                aLink.href = URL.createObjectURL(blob);
+         		aLink.click()
+                aLink.dispatchEvent(evt);
+                
+                // 数据转换。
+				function base64Img2Blob(code){
+	                let parts = code.split(';base64,');
+	                let contentType = parts[0].split(':')[1];
+	                let raw = window.atob(parts[1]);
+	                let rawLength = raw.length;
+	
+	                let uInt8Array = new Uint8Array(rawLength);
+	
+	                for (let i = 0; i < rawLength; ++i) {
+	                  uInt8Array[i] = raw.charCodeAt(i);
+	                }
+	
+	                return new Blob([uInt8Array], {type: contentType}); 
+	            }
 			},
 			// 打印功能。。
 			onPrintHandler() {
