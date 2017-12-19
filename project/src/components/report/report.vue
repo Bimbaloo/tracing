@@ -429,6 +429,11 @@ export default {
 					filename: "加工",
 					show: true,
 					columns: [{
+						prop: "barcode",
+						name: "条码",
+						// width: "200",
+						sortable: true
+					}, {
 						prop: "batchNo",
 						name: "批次",
 						// width: "200",
