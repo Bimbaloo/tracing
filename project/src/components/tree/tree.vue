@@ -1372,6 +1372,11 @@
 				var w=window.open('about:blank','image from canvas');
 
 				w.document.write("<img src='"+sImage+"' alt='from canvas'/>");
+				
+				// 解决打印弹窗不出来问题
+				w.document.close()
+				w.focus()
+				
 				setTimeout(function(){
 					// 判断是否为ie浏览器。
 					if(!!window.ActiveXObject || "ActiveXObject" in window) {
