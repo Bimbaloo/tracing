@@ -93,7 +93,7 @@
 		          		})
 		          		
 		          		// 溯源中只有物流码tab需添加物流码筛选条件，其他不需要。
-		          		if(this.moduleCode == "trace" && value.length == 1 && bHasTrace) {
+		          		if(this.moduleCode == "trace_up" && value.length == 1 && bHasTrace) {
 		          			callback()
 		          		}else if(bHasTrace) {
 		          			callback(new Error("不需要增加物流码查询条件"))
