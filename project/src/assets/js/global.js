@@ -270,17 +270,30 @@
 						
 					// 打印
 					var w = window.open("","image from cancas");
-					w.document.write("<img src='"+sImg+"' alt='from canvas'>")
+
+					var oImg = new Image()
 					
-					// 解决打印弹窗不出来问题
-					w.document.close()
-					w.focus()
-					
-//					setTimeout(function() {
+					oImg.addEventListener("load", () => {
+						// 等图片加载完成，再打印。
 						// 打印图片。
 						w.print();
 						
 						w.close();
+					}, false)
+					
+					oImg.src = sImg
+					w.document.body.appendChild(oImg)
+					// w.document.write("<img src='"+sImg+"' alt='from canvas'>")
+					
+					// 解决打印弹窗不出来问题
+					// w.document.close()
+					w.focus()
+					
+//					setTimeout(function() {
+						// 打印图片。
+						// w.print();
+						
+						// w.close();
 //					},200)
 					
 					if(isClear) {
