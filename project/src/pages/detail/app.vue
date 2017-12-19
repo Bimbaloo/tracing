@@ -35,7 +35,7 @@
   import dialog from 'components/basic/dialogBarcode.vue'
   import fnP from "assets/js/public.js"
   
-	const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+	const MODULE_ITEM_URL = "http://192.168.20.199:8088" + "/api/v1/customized/modules";
 	
   export default {
     components: {

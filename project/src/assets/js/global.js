@@ -270,18 +270,29 @@
 						
 					// 打印
 					var w = window.open("","image from cancas");
-					w.document.write("<img src='"+sImg+"' alt='from canvas'>")
+
+					var myImage = new Image()
+					myImage.addEventListener('load', function() {
+						// 等图片加载完之后再启动打印，不然打印也可能出现空白。
+						w.print();
+						
+						w.close();
+					  }, false);
+
+					myImage.src = sImg;
+					w.document.body.appendChild(myImage)
+					// w.document.write("<img src='"+sImg+"' alt='from canvas'>")
 					
 					// 解决打印弹窗不出来问题
 					w.document.close()
 					w.focus()
 					
-//					setTimeout(function() {
-						// 打印图片。
-						w.print();
+					// setTimeout(function() {
+					// 	// 打印图片。
+					// 	w.print();
 						
-						w.close();
-//					},200)
+					// 	w.close();
+					// },200)
 					
 					if(isClear) {
 						element.innerHTML = "";

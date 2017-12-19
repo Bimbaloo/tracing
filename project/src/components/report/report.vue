@@ -429,11 +429,6 @@ export default {
 					filename: "加工",
 					show: true,
 					columns: [{
-						prop: "barcode",
-						name: "条码",
-						// width: "200",
-						sortable: true
-					}, {
 						prop: "batchNo",
 						name: "批次",
 						// width: "200",
@@ -478,8 +473,13 @@ export default {
 							return a - b > 0;
 						}
 					}, {
-						prop: "inTime",
-						name: "投入时间",
+						prop: "inTimeFirst",
+						name: "最早投入时间",
+						width: "180",
+						sortable: true
+					}, {
+						prop: "inTimeFirstLast",
+						name: "最晚投入时间",
 						width: "180",
 						sortable: true
 					}],
