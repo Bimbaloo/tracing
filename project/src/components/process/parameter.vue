@@ -105,10 +105,10 @@
                                         </span>
                                         <span class='table-handle'>
                                             <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(chartData, $event)"></i>
-                                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(index, $event)"></i>
+                                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
                                         </span>
                                     </h2>
-                                    <div class="content-table" ref="tableDataindex">
+                                    <div class="content-table" :ref="`tableData${index}`">
                                         <v-table :table-data="chartData" :heights="chartTableHeight" :resize="tdResize"></v-table>
                                     </div>
                                 </div>
@@ -131,8 +131,8 @@ import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
 // const url = HOST + "/api/v1/processparameter/by-equipment-time";
-//const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
-const url = "static/echarts.json"
+// const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
+// const url = "static/echarts.json"
 // 条码表接口
 const BARCODE_TABLE_DATA = HOST + "/api/v1/processparameter/barcode-list"
 // 曲线图接口
@@ -660,8 +660,6 @@ export default {
                         dataZoom: {
                             yAxisIndex: 'none'
                         },
-                        dataView: { readOnly: false },
-                        magicType: { type: ['line', 'bar'] },
                         restore: {},
                         saveAsImage: {}
                     },
@@ -884,8 +882,7 @@ export default {
         },
         // 表格打印。
         printHandle(refTable, event) {
-          
-            let oTable = this.$refs.tableDataindex[refTable];
+            let oTable = this.$refs[refTable][0];
 
             if (!oTable) {
                 return;
