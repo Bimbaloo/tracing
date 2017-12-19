@@ -271,13 +271,16 @@
 					// 打印
 					var w = window.open("","image from cancas");
 					w.document.write("<img src='"+sImg+"' alt='from canvas'>")
-				
-					setTimeout(function() {
+					
+					// 解决打印弹窗不出来问题
+					w.document.close()
+					
+//					setTimeout(function() {
 						// 打印图片。
 						w.print();
 						
 						w.close();
-					},200)
+//					},200)
 					
 					if(isClear) {
 						element.innerHTML = "";
@@ -300,6 +303,9 @@
 				var w = window.open("","image from cancas");
 				
 				w.document.body.appendChild(res.image);
+				
+				// 解决打印弹窗不出来问题
+				w.document.close()
 				
 //				setTimeout(function() {
 					// 打印图片。
