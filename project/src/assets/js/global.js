@@ -189,7 +189,7 @@
 					let oNewData = {};
 	
 					oData.columns.map(col => {
-						oNewData[col.name] = o[col.prop]==undefined ? '':(col.formatter ? col.formatter(o) : o[col.prop]);
+						oNewData[col.name] = o[col.prop]==undefined ? (col.type==='number' ? 0 : '') :(col.formatter ? col.formatter(o) : o[col.prop]);
 					})
 	
 					aoTableJson.push(oNewData);
@@ -271,13 +271,17 @@
 					// 打印
 					var w = window.open("","image from cancas");
 					w.document.write("<img src='"+sImg+"' alt='from canvas'>")
-				
-					setTimeout(function() {
+					
+					// 解决打印弹窗不出来问题
+					w.document.close()
+					w.focus()
+					
+//					setTimeout(function() {
 						// 打印图片。
 						w.print();
 						
 						w.close();
-					},200)
+//					},200)
 					
 					if(isClear) {
 						element.innerHTML = "";
@@ -301,12 +305,16 @@
 				
 				w.document.body.appendChild(res.image);
 				
-				setTimeout(function() {
+				// 解决打印弹窗不出来问题
+				w.document.close()
+				w.focus()
+				
+//				setTimeout(function() {
 					// 打印图片。
 					w.print();
 					
 					w.close();
-				},200)
+//				},200)
 			})
 		},
 

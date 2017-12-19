@@ -75,7 +75,7 @@
                         </div>
                     </el-tab-pane>
                     <el-tab-pane label="曲线图" name="chart" v-if="chartShow" class="chart">
-                        <el-tabs v-loading="loading">
+                        <el-tabs v-loading="loading" @tab-click="chartTabChange">
                             <el-tab-pane :label="chartData.filename" v-for="(chartData,index) in tableDatas" :key="index">
                                 <el-switch
                                     v-model="chartData.value"
@@ -86,13 +86,14 @@
                                     on-value="表格"
                                     off-value="图形"
                                     v-for="(option,index) in options" 
-                                    v-if="option.series[0].name === chartData.filename"
-                                    :key="index">
+                                    v-if="option.optionModal.series[0].name === chartData.filename"
+                                    :key="index"
+                                    @change = "switchChange(chartData.value)">
                                 </el-switch>
                                 <div class="content-echarts" 
                                 v-for="(option,index) in options" 
                                 :key="index"
-                                v-if="option.series[0].name === chartData.filename" 
+                                v-if="option.optionModal.series[0].name === chartData.filename" 
                                 v-show="chartData.value === '图形'">
                                     <div class="charts" :id="`charts`+index"></div>
                                 </div>
@@ -104,10 +105,10 @@
                                         </span>
                                         <span class='table-handle'>
                                             <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(chartData, $event)"></i>
-                                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(index, $event)"></i>
+                                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
                                         </span>
                                     </h2>
-                                    <div class="content-table" ref="tableDataindex">
+                                    <div class="content-table" :ref="`tableData${index}`">
                                         <v-table :table-data="chartData" :heights="chartTableHeight" :resize="tdResize"></v-table>
                                     </div>
                                 </div>
@@ -130,8 +131,8 @@ import table from "components/basic/table.vue"
 import rasterizeHTML from 'rasterizehtml'
 
 // const url = HOST + "/api/v1/processparameter/by-equipment-time";
-//const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
-const url = "static/echarts.json"
+// const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
+// const url = "static/echarts.json"
 // 条码表接口
 const BARCODE_TABLE_DATA = HOST + "/api/v1/processparameter/barcode-list"
 // 曲线图接口
@@ -218,6 +219,7 @@ export default {
             ruleForm:{
                 input: ""
             },
+            tabPaneNum: 0
         }
 
     },
@@ -430,6 +432,8 @@ export default {
                     tableDataArr.push(this.setTableData(data, index))
                     return optionArr
                 } else {
+                    /* 没有图就加入一个空的对象 */
+                    optionArr.push({"option":null})
                     /* 做成表格 */
                     tableDataArr.push(this.setTableData(data, index))
                     return tableDataArr
@@ -438,28 +442,29 @@ export default {
             })
             tableDataArr.forEach(e=>{
                let value =  optionArr.some(el=>{
-                    return el.series[0].name === e.filename
+                    return el.optionModal && el.optionModal.series[0].name === e.filename
                 })
                
                 if(!value) {
                     e.value = "表格"
                 }
             })
-
             this.options = optionArr         // 将处理后的 option 放入 options 中
             this.tableDatas = tableDataArr   // 将处理后的 tableData 放入 tableData 中
             this.$nextTick(() => {
-                let tabPanes = document.querySelectorAll(".chart .el-tab-pane")
-                tabPanes.forEach(el=>el.style.display = "")
-                this.options.forEach((el, index) => {
-                    this.initEcharts(el, index)
-                })
-                tabPanes.forEach((el,i)=>{
-                    if(i !== 0){
-                        el.style.display = "none"
-                    }
-                })
-
+                // let tabPanes = document.querySelectorAll(".chart .el-tab-pane")
+                // tabPanes.forEach(el=>el.style.display = "")
+                // this.options.forEach((el, index) => {
+                //     this.initEcharts(el, index)
+                // })
+                // tabPanes.forEach((el,i)=>{
+                //     if(i !== 0){
+                //         el.style.display = "none"
+                //     }
+                // })
+                if(this.options[0].index === 0) { //如果第一个tabs有图表，则渲染
+                    this.initEcharts(this.options[0].optionModal, 0)
+                }
             })
         },
         // 请求失败。
@@ -477,6 +482,7 @@ export default {
             this.error = true;
             this.chartShow = false
             console.log("数据库查询出错。")
+            console.log(err)
         },
         // 选中修改。
         tabChange(oTab) {
@@ -548,6 +554,7 @@ export default {
                 this.viewHeight
                 - this.outerHeight(document.querySelector("#parameter .condition"))
                 - this.outerHeight(document.querySelector("#parameter #content-title"))
+                - this.outerHeight(document.querySelector("#parameter .el-tabs__nav-scroll"))                
             );
             return getHeight;
         },
@@ -653,8 +660,6 @@ export default {
                         dataZoom: {
                             yAxisIndex: 'none'
                         },
-                        dataView: { readOnly: false },
-                        magicType: { type: ['line', 'bar'] },
                         restore: {},
                         saveAsImage: {}
                     },
@@ -835,37 +840,32 @@ export default {
             optionModal.yAxis.min = Math.ceil(Math.min(yMin, minimum) * 0.9)   //设置Y轴开始值为 最小值或最小合格值的0.9倍
             optionModal.yAxis.max = Math.ceil(Math.max(yMax, maximum) * 1.1)   //设置Y轴结束值为 最大值或最大合格值的1.1倍
             //console.log(optionModal)
-            return optionModal
+
+            let obj = {
+                index: index,
+                rendered: false,
+                optionModal: optionModal
+            }
+
+            return obj
         },
         /* 绘制图表 */
         initEcharts(option, index) {
-            let chart = document.getElementById('charts' + index);
-            let echart = this.$echarts.init(chart);
-            echart.setOption(option);
-            this.myEcharts.push(echart)  //将生成的echarts实例对象放到 ' this.myEcharts ' 中
+            //debugger
+            if(this.options[index].rendered) {
+                return 0
+            }else {
+                this.options[index].rendered = true
+                let chart = document.getElementById('charts' + index);
+                let echart = this.$echarts.init(chart);
+                echart.setOption(option);
+                this.myEcharts.push(echart)  //将生成的echarts实例对象放到 ' this.myEcharts ' 中
+            }
+            
         },
         /* 当窗口大小变化，自适应大小 */
         updateEcharts() {
-
-            let tabPanes = document.querySelectorAll(".chart .el-tab-pane")
-            let index = 0   //记录当前tab页
-            tabPanes.forEach((el,i)=>{      // 所有显示
-                if( el.style.display !== "none" ){
-                    index = i
-                }
-                el.style.display = ""
-            })
-            
-            this.myEcharts.forEach((echart,i) => {
-                echart.resize()
-            })
-
-            tabPanes.forEach((el,i)=>{
-                if(i !== index ){
-                    el.style.display = "none"
-                }
-            })
-
+            this.myEcharts[this.tabPaneNum].resize()
         },
         /* 监听窗口大小 更新echarts的大小 */
         addEvent() {
@@ -882,8 +882,7 @@ export default {
         },
         // 表格打印。
         printHandle(refTable, event) {
-          
-            let oTable = this.$refs.tableDataindex[refTable];
+            let oTable = this.$refs[refTable][0];
 
             if (!oTable) {
                 return;
@@ -933,6 +932,28 @@ export default {
             `;
 
             window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+        },
+        // 切换tabs
+        chartTabChange(tab, event) {
+            const index = + tab.index  //当前第几个tabs
+            this.tabPaneNum = index
+            if(!this.options[index].rendered) {
+                this.$nextTick(()=>{
+                    this.initEcharts(this.options[index].optionModal, index)
+                })
+            }else {
+                this.$nextTick(()=>{
+                    this.updateEcharts()
+                })
+            }
+        },
+        // 切花switch
+        switchChange(value) {
+            if(value === `图形`) {
+                this.$nextTick(()=>{
+                    this.updateEcharts()
+                })
+            }
         }
     }
 }
@@ -1016,7 +1037,7 @@ export default {
 }
 
 #parameter .charts {
-    width: 100%;
+    width: calc(100% - 2px);
     box-sizing: border-box;
     min-height: 400px
 }
@@ -1065,7 +1086,6 @@ export default {
             }
             span {
                 float: right;
-                display: inline-block;
             }
         }
 

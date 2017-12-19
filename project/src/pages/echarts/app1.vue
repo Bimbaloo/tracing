@@ -4,6 +4,7 @@
 	   <ag-grid-vue 
 	    	style="width: 800px; height: 350px;" 
 	    	class="ag-fresh"
+	    	:columnDefs="columns"
 	      :gridOptions="gridOptions">
 	   </ag-grid-vue>	  
 	</div>
@@ -22,6 +23,19 @@
 		components: {
 	       'ag-grid-vue': AgGridVue
 	    },
+	    computed: {
+	    	columns() {
+	    		let aoColumns = this.createColumnDefs()
+	    		
+	    		if(this.selected.length) {
+	    			aoColumns[0].headerCheckboxSelection = true
+	    		}else {
+	    			aoColumns[0].headerCheckboxSelection = false
+	    		}
+	    		
+	    		return aoColumns
+	    	}
+	    },
     beforeMount() {
     	this.gridOptions = {
     		enableColResize: true,
@@ -33,19 +47,25 @@
     		onSelectionChanged: this.selectionChanged
     	};
 	    this.gridOptions.rowData = this.createRowData();
-	    this.gridOptions.columnDefs = this.createColumnDefs();
+//	    this.gridOptions.columnDefs = this.createColumnDefs();
     },
     methods: {
     	createRowData() {
     		
     		let aArr = [];
-    		for(let i=0; i< 2000; i++) {
+    		for(let i=0; i< 5; i++) {
     			aArr.push({
     				index: i+1,
     				name: 'bo'+i,
     				age: 20
     			})
     		}
+    		
+    		aArr.push({
+    			index: 6,
+    			name: 'bo0',
+    			age: 10
+    		})
     		
     		return aArr;
     		
@@ -71,13 +91,13 @@
 //      ];
 	    },
 	    createColumnDefs() {
-	        return [
-	         		{
-                width: 30, 
-                checkboxSelection: true,
-                headerCheckboxSelection: true,
-                pinned: true,
-                suppressSorting: true
+	  		return [{
+	                width: 30, 
+	                checkboxSelection: true,
+	                // 表头的checkbox是否显示
+	                headerCheckboxSelection: false,
+	                pinned: true,
+	                suppressSorting: true
             	},{
             		headerName: "索引",
             		field: "index",
@@ -104,14 +124,16 @@
 	    	let aAll = this.createRowData(),
 	    			aFilterd = [];
 	    	
+//	    	if(aSelected.length) {
+//	    		this.gridOptions.columnDefs[0].headerCheckboxSelection=true
+//	    	}
+	    	
 	    	if(aSelected.length) {
-		    	aFilterd = aAll.filter(el => el.name === aSelected[0].name)
+		    	aFilterd = aAll.filter(el => el.name === aSelected[0].name)	
 	    	}else {
 	    		aFilterd = aAll
 	    	}
-				
-				console.log(1)
-				console.log(event)
+	    		    	
 				if(aFilterd.length != this.gridOptions.api.getDisplayedRowCount()) {
 		    	this.gridOptions.api.setRowData(aFilterd)
 				}
@@ -120,7 +142,7 @@
 				if(aSelected.length && aFilterd.length === aAll.length) {
 					this.selected = aFilterd;
 				}else {
-		    	this.selected = aSelected
+		    		this.selected = aSelected
 				}
 				
 	    	// 设置选中,一次。
@@ -132,10 +154,9 @@
 	    			}
 	    		})
 	    	}
-	    	console.log(this.selected)
 	    }
     }
-	}
+}
 </script>
 
 <style lang="less" scoped>

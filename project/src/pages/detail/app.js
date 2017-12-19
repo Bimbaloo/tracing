@@ -54,8 +54,8 @@ const routes = [{
       }
     }]
   },
-  { path: '/trace/:key', component: Trace },
-  { path: '/track/:key', component: Track }
+  { path: '/trace_up/:key', component: Trace },
+  { path: '/trace_down/:key', component: Track }
 ]
 
 // 创建 router 实例，然后传 `routes` 配置

@@ -275,7 +275,7 @@ export default {
                     itemName: "结束时间"
                 },
             ],
-            /* 投入 */
+            /* 投入 valueFormatter-字段没有时，也会执行。cellRenderer则不会*/
             inItems: {
                 filename: "投入",
                 columns: [{
@@ -326,21 +326,21 @@ export default {
                 	headerName: "产出",
                 	field: OUT_FIELD,
                 	width: 120,
-                	cellRender: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[OUT_FIELD] || 0
                 	}
                 }, {
                 	headerName: "结转",
                 	field: CARRY_FIELD,
                 	width: 120,
-                	cellRender: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[CARRY_FIELD] || 0
                 	}
                 }, {
                 	headerName: "退料",
                 	field: RETURN_FIELD,
                 	width: 120,
-                	cellRender: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[RETURN_FIELD] || 0
                 	}
                 }],
@@ -392,6 +392,8 @@ export default {
                 	name: "产出",
                 	prop: OUT_FIELD,
                 	width: "120",
+                	// 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
+                	type: "number",
                 	formatter: function(row, column) {
                 		return row[OUT_FIELD] || 0
                 	}
@@ -399,6 +401,8 @@ export default {
                 	name: "结转",
                 	prop: CARRY_FIELD,
                 	width: "120",
+                	// 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
+                	type: "number",
                 	formatter: function(row, column) {
                 		return row[CARRY_FIELD] || 0
                 	}
@@ -406,6 +410,8 @@ export default {
                 	name: "退料",
                 	prop: RETURN_FIELD,
                 	width: "120",
+                	// 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
+                	type: "number",
                 	formatter: function(row, column) {
                 		return row[RETURN_FIELD] || 0
                 	}
@@ -708,14 +714,14 @@ export default {
                 	headerName: "结转",
                 	field: CARRY_FIELD,
                 	width: 120,
-                	cellRenderer: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[CARRY_FIELD] || 0
                 	}
                 }, {
                 	headerName: "退料",
                 	field: RETURN_FIELD,
                 	width: 120,
-                	cellRenderer: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[RETURN_FIELD] || 0
                 	}
                 }],
@@ -767,6 +773,8 @@ export default {
                 	name: "结转",
                 	prop: CARRY_FIELD,
                 	width: "120",
+                	// 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
+                	type: "number",
                 	formatter: function(row, column) {
                 		return row[CARRY_FIELD] || 0
                 	}
@@ -774,6 +782,8 @@ export default {
                 	name: "退料",
                 	prop: RETURN_FIELD,
                 	width: "120",
+                	// 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
+                	type: "number",
                 	formatter: function(row, column) {
                 		return row[RETURN_FIELD] || 0
                 	}
@@ -804,21 +814,21 @@ export default {
                 	headerName: "产出",
                 	field: OUT_FIELD,
                 	width: 120,
-                	cellRenderer: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[OUT_FIELD] || 0
                 	}
                 }, {
                 	headerName: "结转",
                 	field: CARRY_FIELD,
                 	width: 120,
-                	cellRenderer: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[CARRY_FIELD] || 0
                 	}
                 }, {
                 	headerName: "退料",
                 	field: RETURN_FIELD,
                 	width: 120,
-                	cellRenderer: function(params) {
+                	valueFormatter: function(params) {
                 		return params.data[RETURN_FIELD] || 0
                 	}
                 }],
@@ -882,21 +892,21 @@ export default {
                     headerName: "合格数",
                     field: "qualifiedNum",
                     width: 100,
-                    cellRenderer: function(params) {
+                    valueFormatter: function(params) {
                 		return params.data.qualifiedNum || 0
                 	}
                 }, {
                     headerName: "报废数",
                     field: "scrapNum",
                     width: 100,
-                    cellRenderer: function(params) {
+                    valueFormatter: function(params) {
                 		return params.data.scrapNum || 0
                 	}
                 }, {
                     headerName: "不合格数",
                     field: "unqualifiedNum",
                     width: 100,
-                    cellRenderer: function(params) {
+                    valueFormatter: function(params) {
                 		return params.data.unqualifiedNum || 0
                 	}
                 }, {
@@ -1516,7 +1526,7 @@ export default {
             		// 关联表的特殊处理。
             		let nPLeft = (refTable == 'uniteTable' && oCol.prop=='barcode') ? ((oRow.hasInLen === undefined) ? 50 : 15) : 0
             		
-            		sBodyHtml += `<td class="${sAlign}"><div class="cell"><div class="cell-content" style="padding-left: ${nPLeft}px">${oRow[oCol.prop] == undefined ? '' : (oCol.formatter ? oCol.formatter(oRow) : oRow[oCol.prop])}</div></div></td>`
+            		sBodyHtml += `<td class="${sAlign}"><div class="cell"><div class="cell-content" style="padding-left: ${nPLeft}px">${oRow[oCol.prop] == undefined ? (oCol.type==='number' ? 0 : '') : (oCol.formatter ? oCol.formatter(oRow) : oRow[oCol.prop])}</div></div></td>`
             	})
             	sBodyHtml += '</tr>'
             })

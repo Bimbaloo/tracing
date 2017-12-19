@@ -26,33 +26,6 @@
         </div>
       </div>
     </div>
-     <!-- <el-row :gutter="0" class="content">
-          <el-col :xs="15" :sm="12" :md="9" :lg="5" :class="[{ collapsed: collapse }, 'nav']">      	
-             <div class="flex-wraps">
-    	         <el-tabs 
-    	          v-model="activeKey" 
-    	          type="border-card" 
-    	          class="search-tab"  
-    	          ref="searchTab" 
-    	          @tab-click="handleClick"  
-    	          v-bind:style="{ height: searchTab,position:'absolute' }">
-    	            <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
-    	              <v-panel :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
-    	            </el-tab-pane>
-    	          </el-tabs>            
-             </div>
-          </el-col>
-          <el-col :xs="collapse?24:9" :sm="collapse?24:12" :md="collapse?24:15" :lg="collapse?24:19" class="router">
-          		<div class="flex-wraps">
-    	      		<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
-    	      		<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="collapse=false"></i>
-    	          <div class="router-container" ref="routerContainer">
-    	            <div v-if="tip" class="tip"></div>
-    	            <router-view></router-view>
-    	          </div>
-          		</div>
-          </el-col>
-        </el-row>  -->
   </div>
 </template>
 

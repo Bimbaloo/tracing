@@ -822,7 +822,7 @@ export default {
 						<div class="condition-list">${oTable.offsetParent.querySelector('.condition-list').innerHTML}</div>
 						<div class="content-table condition-table">${oTable.offsetParent.querySelector('.condition-table').innerHTML}</div>
 					` : `
-						<div>${oTable.offsetParent.querySelector('.condition').innerHTML}</div>
+						<div class="condition">${oTable.offsetParent.querySelector('.condition').innerHTML}</div>
 					`
 			
 			let sHtml = `
@@ -848,6 +848,12 @@ export default {
                     	.content-title .table-title {
                     		font-size: 16px;
                     		color: #42AF8F;
+                    	}
+                    	.condition span {
+                    		display: inline-block;
+                    	}
+                    	.condition span + span {
+                    		margin-left: 60px;
                     	}
                     	.condition-message {
                     		box-sizing: border-box;

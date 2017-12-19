@@ -221,6 +221,16 @@
                     newRowsAction: 'keep',
 			            clearButton: true
 			        }
+	            },
+	            {
+	            	headerName: "测试",
+	            	field: "test",
+	            	cellRender: function(params) {
+                		return params.data[CARRY_FIELD] || 0
+                	}
+//	            	valueFormatter: function(params) {
+//	            		return params.data.test || 0
+//	            	}
 	            }
 	        ];
 	    },
