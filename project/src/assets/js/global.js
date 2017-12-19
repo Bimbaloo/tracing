@@ -274,6 +274,7 @@
 					
 					// 解决打印弹窗不出来问题
 					w.document.close()
+					w.focus()
 					
 //					setTimeout(function() {
 						// 打印图片。
@@ -306,6 +307,7 @@
 				
 				// 解决打印弹窗不出来问题
 				w.document.close()
+				w.focus()
 				
 //				setTimeout(function() {
 					// 打印图片。
