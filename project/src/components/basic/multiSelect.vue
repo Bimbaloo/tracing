@@ -297,12 +297,14 @@
     	.el-select__tags {
     		height: 30px;
     		white-space: nowrap;
+    		overflow: hidden;
 			
 			&> span {
 				display: inline-block;
-				width: 100%;
+				/*width: 100%;*/
 				height: 100%;
-				overflow: hidden;
+				/*overflow: hidden;*/
+				vertical-align: middle;
 				
 				.el-tag {
 					border-radius: 0;
