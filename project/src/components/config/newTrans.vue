@@ -3,6 +3,7 @@
         <el-form label-position="left" label-width="60px" :model="ruleForm" :rules="rules" ref="ruleForm">
         	<el-form-item label="名称" prop="name">
 			    <el-input v-model="titleName" placeholder="请输入条件组合名称"></el-input>
+					<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
 			</el-form-item>
 			
 			<el-form-item prop="value">
@@ -131,6 +132,9 @@
 			// 需要监听数据，当变化后直接更新，获取最新值。
 			checkedData: function () {
 				this.aCheckedParam = this.checkedData;
+			},
+			title: function() {
+				this.conditionTitle = this.title
 			}
 		},
 		computed: {
@@ -185,7 +189,7 @@
 						};
 						//debugger
 						let isOnlyName = this.category[this.nModuleIndex].groups.some(e=>{
-							return e.groupName === this.titleName
+							return e.groupName === this.titleName && this.title === ""
 						})
 						if(isOnlyName){ //重名了
 							this.$message('该名称以存在，请重新命名');
