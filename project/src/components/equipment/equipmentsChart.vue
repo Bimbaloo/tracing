@@ -11,7 +11,6 @@
             :type="videoForm.type"
     		@hideDialog="hideVideoDialog">
 	    </v-dialog>  
-	    </v-dialog>
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis">
             <div id="equipments" :style="{height: panelHeight + 'px'}"></div>
