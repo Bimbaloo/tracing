@@ -1,6 +1,6 @@
 <template>
     <el-date-picker
-      v-model="sTime" 
+      v-model="formData[keyData]" 
       :type="dateType"
       :placeholder="hint" 
       :disabled="disabled"
@@ -38,26 +38,11 @@
             return {
                 form: this.formData,
                 hint: this.placeholderData || '',
-                key: this.keyData,
-                sTime: this.formData[this.keyData]
+                key: this.keyData
             }
         },
         created() {
-            let _that = this
-            //debugger
-            bus.$on('timeChange', function (obj){
-                //debugger
-                if(_that.tab === obj.tab && _that.subTab === obj.radio){
-                    let datas = obj.keys
-                    for(let i in datas){
-                        if(i === _that.key) {
-                            _that.sTime = new Date(datas[i])
-                        // console.log(_that.sTime)
-                        }
-                    }
-                }
-                
-            })
+            
         },
         methods: {
         	// 输入处理
