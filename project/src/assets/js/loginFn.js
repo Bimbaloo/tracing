@@ -175,14 +175,14 @@ var logout = function (oStore, oAjax) {
 	})
 };
 
-var getVersion = function (oStore, oAxio, fnCallBack) {
-	beforeRequest(oStore, oAxio).get(VERSION_URL)
+var getBeforeDispatchData = function (sDispatchType, oStore, oAxio, fnCallBack, sUrl) {
+	beforeRequest(oStore, oAxio).get(sUrl)
 		.then((res) => {
 			let oResult = res.data;
 			let bRight = oResult.errorCode;
 
 			if(!bRight) {	
-				oStore.dispatch('getVersion', oResult.data)
+				oStore.dispatch(sDispatchType, oResult.data)
 				// 调用成功后的回调函数。
 				fnCallBack && fnCallBack();
 			}else {
@@ -202,7 +202,36 @@ var getVersion = function (oStore, oAxio, fnCallBack) {
 		.catch((err) => {
 			fnCallBack && fnCallBack();
 		})	
+}
 
+var getVersion = function (oStore, oAxio, fnCallBack) {
+	getBeforeDispatchData('getVersion', oStore, oAxio, fnCallBack, VERSION_URL)
+	// beforeRequest(oStore, oAxio).get(VERSION_URL)
+	// 	.then((res) => {
+	// 		let oResult = res.data;
+	// 		let bRight = oResult.errorCode;
+
+	// 		if(!bRight) {	
+	// 			oStore.dispatch('getVersion', oResult.data)
+	// 			// 调用成功后的回调函数。
+	// 			fnCallBack && fnCallBack();
+	// 		}else {
+	// 			if(bRight === 10) {
+	// 				// 登录失败。
+	// 				if(oResult.errorMsg.subCode === "1") {
+	// 					// 清cookie，跳转到登录页面。
+	// 					loginFail(oResult.errorMsg.subMsg);
+	// 				}
+
+	// 			}else {
+	// 				// 失败后的回调函。
+	// 				fnCallBack && fnCallBack();
+	// 			}
+	// 		}
+	// 	})
+	// 	.catch((err) => {
+	// 		fnCallBack && fnCallBack();
+	// 	})	
 }
 
 export default {
@@ -213,5 +242,6 @@ export default {
 	clearLoginCookie,
 	judgeLoaderHandler,
 	sendRequest,
-	getVersion
+	getVersion,
+	getBeforeDispatchData
 }

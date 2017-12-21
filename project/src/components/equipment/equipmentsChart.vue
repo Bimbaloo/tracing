@@ -168,7 +168,7 @@
     // 设备分析接口地址。
     const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events"
     // 工厂定制地址。
-    const MODULE_DATA_URL= HOST + '/api/v1/custom/equipment-analysis/items'
+    const MODULE_DATA_URL= HOST + '/api/v1/customized/equipment-analysis/items'
     // 默认选中的维度。
     const DEFAULT_SELECTED_DIMENSION = ["quality", "pool", "parameter"]
 
@@ -832,16 +832,19 @@
         methods: {
             // 获取工厂定制数据。
             getFactoyData() {
-                this.$store.dispatch('getFactoryConfig')
+                // 获取配置数据。
+                this.$register.getBeforeDispatchData('getFactoryConfig', this.$store, this.$ajax, this.fetchData, MODULE_DATA_URL)
             },
             // 获取设备定制数据。
             getEquipmentCustomDataById(id) {       
                 this.dimension.forEach(o => {
                     // 过滤其他设备的定制内容，只保留非定制的内容。
                     o.list = o.list.filter(item => item.type)
-
+                    console.log(this.factoryCustomItemList)
                     let oData = this.factoryCustomItemList
-                    .filter(item => item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length)[0]
+                    .filter(item => {
+                        return item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length
+                    })[0]
 
                     if(oData) {
                         // 添加数据。
@@ -1364,7 +1367,7 @@
             },
             // 图形缩放处理。
             chartZoomHandle (params) {
-                if((params.dataZoomId && params.dataZoomId.indexOf("2"))) {
+                if(params.dataZoomId && params.dataZoomId.indexOf("2") > -1) {
                     // y轴缩放。
                     let oYAxis = this.chart.getOption().dataZoom.filter(o => o.type === "slider" && o.yAxisIndex.length === 1)[0]
                     // console.log(oYAxis)
@@ -1390,7 +1393,7 @@
                         }
                     }]       
                 })
-                }else if((params.dataZoomId && params.dataZoomId.indexOf("1")) || params.type === "datazoom") {
+                }else if((params.dataZoomId && params.dataZoomId.indexOf("1") > -1) || params.type === "datazoom") {
                     // x轴缩放 || 工具栏缩放按钮。
                     let oXAxis = this.getScaledxAxis(),
                         // 缩放后的时间轴时长。
