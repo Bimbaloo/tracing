@@ -475,7 +475,8 @@
 								"barcode": this.ruleForm.barcode
 							},
 							"radio": "1",
-							"tab": "resume"
+							"tab": "resume",
+							"title": "成品条码"
 						}
 						this.updateRecord(obj)
 

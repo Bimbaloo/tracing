@@ -101,10 +101,10 @@ export default {
         itemName: "查出库"
       }, {
         itemCode: "trace_down",
-        itemName: "溯源"
+        itemName: "追踪"
       }, {
         itemCode: "trace_up",
-        itemName: "追踪"
+        itemName: "溯源"
       }, {
         itemCode: "resume",
         itemName: "履历"

@@ -36,6 +36,8 @@
             	option: Object.assign({
 			            	enableColResize: true,
 				    		enableSorting: true,
+				    		// 禁止列拖动
+				    		suppressMovableColumns: true,
 				    		rowSelection: "multiple",
 				    		rowHeight: 40,
 				    		headerHeight: 40,
