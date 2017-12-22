@@ -1,5 +1,5 @@
 <template>
-    <div class="content-query">
+    <div class="content-query content-inner">
 		<div :class="['query-lists-container',{ 'no-border': !ModuleOrderListEdit }]">
 			<div class="list-edit" v-show="!ModuleOrderListEdit">
 				<span class="list-title">自定义排序</span>
@@ -85,8 +85,8 @@
     		:transfer-data="getAllFilter()"
     		:checked-data="getTransferData().aChecked"
     		:title="getTransferData().title"
-			:category="category"
-			:nModuleIndex="nModuleIndex"
+        :category="category"
+        :nModuleIndex="nModuleIndex"
     		@hideModal="hidePopModal"
     	></v-trans>
     </div>

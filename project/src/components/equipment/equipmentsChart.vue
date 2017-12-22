@@ -869,6 +869,7 @@
                 this.dimension.forEach(o => {
                     // 过滤其他设备的定制内容，只保留非定制的内容。
                     o.list = o.list.filter(item => item.type)
+                    
                     let oData = this.factoryCustomItemList
                     .filter(item => {
                         return item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length
