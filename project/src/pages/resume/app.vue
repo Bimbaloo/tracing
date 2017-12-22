@@ -672,7 +672,8 @@
 						}else if(oAType == 6 && oBType == 1) {
 							return -1
 						}else {
-							return 1
+							// 其他相等情况，根据nodeId顺序。 nodeId小在前。 由于当前数据是顺序的，因此oA应在oB前
+							return -1
 						}
 					}
 					
