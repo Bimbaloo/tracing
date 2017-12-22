@@ -181,33 +181,25 @@ export default {
 						name: "数量",
 						width: "100",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
 					}, {
 						prop: "qualifiedNum",
 						name: "合格数",
 						width: "100",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "qualifiedNum")
 					}, {
 						prop: "unqualifiedNum",
 						name: "不合格数",
 						width: "100",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "unqualifiedNum")
 					}, {
 						prop: "disabilityNum",
 						name: "报废数",
 						width: "100",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "disabilityNum")
 					}, {
 						prop: "rate",
 						name: "合格率",
@@ -216,9 +208,7 @@ export default {
 						formatter: function(row, column) {
 							return (row.rate * 100).toFixed(2) + "%"
 						},
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "rate")
 					}],
 					data: []
 				},
@@ -317,9 +307,7 @@ export default {
 						name: "数量",
 						width: "100",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
 					}, {
 						prop: "stock",
 						name: "仓库",
@@ -384,9 +372,7 @@ export default {
 						name: "数量",
 						width: "100",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
 					}, {
 						prop: "remainingNum",
 						name: "库存余量",
@@ -455,23 +441,17 @@ export default {
 						name: "投入数量",
 						width: "100",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "inNum")
 					}, {
 						prop: "consumedNum",
 						name: "已消耗数量",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "consumedNum")
 					}, {
 						prop: "remainingNum",
 						name: "剩余量",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "remainingNum")
 					}, {
 						prop: "inTimeFirst",
 						name: "最早投料时间",
@@ -515,30 +495,22 @@ export default {
 						prop: "outNum",
 						name: "数量",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "outNum")
 					}, {
 						prop: "qualifiedNum",
 						name: "合格数",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "qualifiedNum")
 					}, {
 						prop: "unqualifiedNum",
 						name: "不合格数",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "unqualifiedNum")
 					}, {
 						prop: "disabilityNum",
 						name: "报废数",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b > 0;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "disabilityNum")
 					}, {
 						prop: "outTimeFirst",
 						name: "最早产出时间",
@@ -578,9 +550,7 @@ export default {
 						prop: "quantity",
 						name: "数量",
 						sortable: true,
-						sortMethod: function(a, b) {
-							return a - b;
-						}
+						sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
 					}, {
 						prop: "opPerson",
 						name: "操作人",
@@ -617,6 +587,10 @@ export default {
 	},
 
 	methods: {
+		// 排序函数。
+		setSortFun(oA, oB, paramName) {
+			return oA[paramName] - oB[paramName] > 0
+		},
 		// 请求成功。
 		requestSucess(oResult) {
 			this.loading = false;
