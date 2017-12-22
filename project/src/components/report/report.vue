@@ -474,12 +474,12 @@ export default {
 						}
 					}, {
 						prop: "inTimeFirst",
-						name: "最早产出时间",
+						name: "最早投料时间",
 						width: "180",
 						sortable: true
 					}, {
 						prop: "inTimeLast",
-						name: "最晚产出时间",
+						name: "最晚投料时间",
 						width: "180",
 						sortable: true
 					}],

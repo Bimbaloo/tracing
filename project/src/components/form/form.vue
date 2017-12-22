@@ -90,14 +90,8 @@
 					let datas = obj.keys
 					for(let i in datas){
 						_that.ruleForm[i] = datas[i]
-						if(i === "startTime" || i === "endTime") {
-							bus.$emit('timeChange', obj)
-						}else{
-							_that.ruleForm[i] = datas[i]
-						}
 					}
 				}
-				
             })
 		},
         computed: {
@@ -368,19 +362,7 @@
 				// 清空数据。
 				//debugger
             	for(let key in this.ruleForm) {
-					this.ruleForm[key] = "";
-					let obj = {
-							radio:this.active.radio,
-							tab:this.tab,
-							title:this.title,
-							keys:{
-								endTime:"",
-								startTime:""
-							}
-						}
-					if(key === "startTime" || key === "endTime") {
-						bus.$emit('timeChange', obj)
-					}
+					this.ruleForm[key] = ""
             	}
             }
         }    

@@ -25,6 +25,7 @@
 				<ul class="list-container">
 					<li class="query-list" 
 						v-for="item in category"
+						v-if="showItem(item)"
 						v-dragging="{ list: category, item: item, group: 'category' }"
 						:key="item.moduleCode">
 						<span class="name-list">{{item.moduleName}}</span>
@@ -36,6 +37,7 @@
 		<div class="query-items">
 			<div class="query-item" 
 				v-for="(item,index) in category"
+				v-if="showItem(item)"
 				:item-id = "index"
 				:key = "item.moduleCode">
 				<div class="query-header">
@@ -175,47 +177,9 @@ export default {
       key: false
     });
 
-    this.$register.sendRequest(
-      this.$store,
-      this.$ajax,
-      TABLE_DATA_URL,
-      "get",
-      null,
-      oData => {
-				// 成功后的回调函数。
-				this.aoTable = oData
-        // 调用接口数据。
-        this.$nextTick(() => {
-          this.$register.sendRequest(
-            this.$store,
-            this.$ajax,
-            MODULE_ITEM_URL,
-            "get",
-            null,
-            oResult => {
-              oResult.sort((a, b) => a.moduleOrder > b.moduleOrder); // 排序
-              oResult.forEach(el => {
-                //模块是否可编辑
-                if (el.editable === 1) {
-                  this.oBefore[el.moduleCode].isEdit = true;
-                }
-              });
-              this.category = [].concat.call(oResult);
-              this.categoryCopy = [].concat.call(oResult);
-              this.oldModuleOrderList = this.getModuleOrderList();
-            },
-            sErrorMessage => {
-              // 提示信息。
-              this.showMessage(sErrorMessage);
-            }
-          );
-        });
-      },
-      sErrorMessage => {
-        // 提示信息。
-        this.showMessage(sErrorMessage);
-      }
-    );
+	// 获取配置数据。
+    this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
+    
   },
   computed: {
     // 是否编辑的状态。
@@ -235,6 +199,14 @@ export default {
     },
     moduleOrderList() {
       return this.getModuleOrderList();
+    },
+    // 是否支持遏制。
+    supression() {
+      return this.$store.state.versionModule && this.$store.state.versionModule.supression
+    },
+    // 是否支持断链修复。
+    linkRepair() {
+      return this.$store.state.versionModule && this.$store.state.versionModule.linkRepair
     }
   },
   watch: {
@@ -258,6 +230,69 @@ export default {
     this.$dragging.$on("dragend", data => {});
   },
   methods: {
+  	// 是否显示item项。
+  	showItem(item) {
+  		let bShow = true
+  		
+  		switch(item.moduleCode) {
+  			// 遏制
+  			case "suppress":
+  				bShow = this.supression
+  				break;
+  			// 断链
+  			case "link_repair":
+  				bShow = this.linkRepair
+  				break
+  			default:
+  				break
+  		}
+  		
+  		return bShow
+  	},
+  	// 获取数据。
+  	fetchData() {
+  		this.$register.sendRequest(
+	      this.$store,
+	      this.$ajax,
+	      TABLE_DATA_URL,
+	      "get",
+	      null,
+	      oData => {
+					// 成功后的回调函数。
+					this.aoTable = oData
+	        // 调用接口数据。
+	        this.$nextTick(() => {
+	          this.$register.sendRequest(
+	            this.$store,
+	            this.$ajax,
+	            MODULE_ITEM_URL,
+	            "get",
+	            null,
+	            oResult => {
+	              oResult.sort((a, b) => a.moduleOrder > b.moduleOrder); // 排序
+	              oResult.forEach(el => {
+	                //模块是否可编辑
+	                if (el.editable === 1) {
+	                  this.oBefore[el.moduleCode].isEdit = true;
+	                }
+	              });
+	              this.category = [].concat.call(oResult);
+	              this.categoryCopy = [].concat.call(oResult);
+	              this.oldModuleOrderList = this.getModuleOrderList();
+	            },
+	            sErrorMessage => {
+	              // 提示信息。
+	              this.showMessage(sErrorMessage);
+	            }
+	          );
+	        });
+	      },
+	      sErrorMessage => {
+	        // 提示信息。
+	        this.showMessage(sErrorMessage);
+	      }
+	    );
+  	},
     // 编辑状态。
     changeState(oldValue, newValue) {
       let isEdit = false;

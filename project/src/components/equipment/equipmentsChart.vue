@@ -10,7 +10,15 @@
             :time="videoForm.time" 
             :type="videoForm.type"
     		@hideDialog="hideVideoDialog">
-	    </v-dialog>        
+	    </v-dialog> 
+	    <!-- 追踪条件配置。 -->
+	    <v-track-dialog 
+    		v-if="trace && trackConfigForm.visible"
+    		:equipment-list="equipments"
+    		:dialog-visible="trackConfigForm.visible"
+    		:init-data="trackConfigForm.data"
+    		@hideDialog="destoryTrackConfig">
+	    </v-track-dialog>
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis">
             <div id="equipments" :style="{height: panelHeight + 'px'}"></div>
@@ -64,8 +72,9 @@
                 </div>
             </div>
             <div class="buttons" v-show="selectedEquipmentId&&!loading">
+            	<el-button 	@click="goRefresh" class="btn btn-plain" v-if="isDatetimeChange">查询</el-button>
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
-                <el-button  @click="gotoTrack" class="btn btn-plain" v-if="trace">追踪</el-button>
+                <el-button  @click="gotoTrackConfig" class="btn btn-plain" v-if="trace">追踪</el-button>
             </div>	
             <!--提示面板数据-->
             <div class="tooltip-wrapper" :style="{width: chartWidth+'px', margin: grid[0] + 'px ' + grid[1] + 'px ' + grid[2] + 'px ' + grid[3] + 'px'}">
@@ -127,6 +136,7 @@
 <script>
     import pin from 'assets/img/icon-pin.png'
     import VideoDialog from 'components/monitor/dialog.vue'
+    import trackDialog from 'components/equipment/equipmentTrack.vue'
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
 
@@ -211,10 +221,21 @@
 		},
 		components: {
             'v-datetime': DateTime,
-            "v-dialog": VideoDialog
+            "v-dialog": VideoDialog,
+            "v-track-dialog": trackDialog
 		},
         data () {
             return {
+            	// 追踪配置数据。
+            	trackConfigForm: {
+            		visible: false,
+            		data: {
+            			equipmentId: "",
+		        		startTime: "",
+		        		endTime: ""
+            		}
+            	},
+            	// 监控数据。
                 videoForm: {
                     visible: false,
                     equipmentId: '',
@@ -794,6 +815,14 @@
                 }
 
                 return oData
+            },
+            // 时间编辑框的：开始或结束时间是否被改变。
+            isDatetimeChange() {
+            	// 是否显示查询按钮（开始或结束时间被编辑，则会显示）
+            	let {start, end, initStart, initEnd} = this.datetime
+				
+				// 开始时间或结束时间只要变动就显示。
+            	return (start != initStart) || (end != initEnd)
             }
         },
         created () {
@@ -840,7 +869,7 @@
                 this.dimension.forEach(o => {
                     // 过滤其他设备的定制内容，只保留非定制的内容。
                     o.list = o.list.filter(item => item.type)
-                    // console.log(this.factoryCustomItemList)
+                    
                     let oData = this.factoryCustomItemList
                     .filter(item => {
                         return item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length
@@ -1573,10 +1602,11 @@
 							oParam[param] = oDate.end;
 							break;
                         case "shiftStartTime":
-							oParam[param] = this.datetime.start;
+                        	// 班次时间是获取：datetime.start是实时的，不是当前数据真实的时间。
+							oParam[param] = this.getRealTimeLineDateTime().start // this.datetime.start;
 							break;
 						case "shiftEndTime":
-							oParam[param] = this.datetime.end;
+							oParam[param] = this.getRealTimeLineDateTime().end //this.datetime.end;
 							break;
 						case "processCode":
 							oParam[param] = this.process||'';
@@ -1585,6 +1615,14 @@
 					}
 				})
 				return oParam;
+			},
+			// 获取真实的时间轴的开始和结束时间。
+			getRealTimeLineDateTime() {
+				// datetime.start || datetime.end 不一定是真实的整个时间轴的开始和结束时间。
+				return {
+					start: this.isDatetimeChange ? this.datetime.initStart : this.datetime.start,
+					end: this.isDatetimeChange ? this.datetime.initEnd : this.datetime.end
+				}
 			},
 			// 显示提示信息。
 			showMessage() {
@@ -1644,8 +1682,8 @@
                 
                 this.$register.sendRequest(this.$store, this.$ajax, sUrl, "post", {
 					equipmentList: equipmentList, //equipmentIdList
-					startTime: this.datetime.start,
-					endTime: this.datetime.end,
+					startTime: this.getRealTimeLineDateTime().start, //this.datetime.start,
+					endTime: this.getRealTimeLineDateTime().end, //this.datetime.end,
                     type: 0
                 }, this.requestSucess, this.requestFail, this.requestError)
 			},
@@ -2205,11 +2243,11 @@
                         name: '',
                         value: [
                             index,
-                            +new Date(this.datetime.start),
-                            +new Date(this.datetime.end),
-                            +new Date(this.datetime.end) - +new Date(this.datetime.start),
-                            this.datetime.start,
-                            this.datetime.end
+                            +new Date(this.getRealTimeLineDateTime().start),
+                            +new Date(this.getRealTimeLineDateTime().end),
+                            +new Date(this.getRealTimeLineDateTime().end) - +new Date(this.getRealTimeLineDateTime().start),
+                            this.getRealTimeLineDateTime().start,
+                            this.getRealTimeLineDateTime().end
                         ],
                         itemStyle: {
                             normal: {
@@ -2233,13 +2271,13 @@
                         aoData.push({
                             name: '',
                             value: [
-                                index,
-                                +new Date(this.datetime.start),
-                                +new Date(this.datetime.end),
-                                +new Date(this.datetime.end) - +new Date(this.datetime.start),
-                                this.datetime.start,
-                                this.datetime.end
-                            ],
+	                            index,
+	                            +new Date(this.getRealTimeLineDateTime().start),
+	                            +new Date(this.getRealTimeLineDateTime().end),
+	                            +new Date(this.getRealTimeLineDateTime().end) - +new Date(this.getRealTimeLineDateTime().start),
+	                            this.getRealTimeLineDateTime().start,
+	                            this.getRealTimeLineDateTime().end
+	                        ],
                             itemStyle: {
                                 normal: {
                                     color: '#dedede'
@@ -2298,31 +2336,50 @@
 			// 保存开始时间。
 			saveStart () {
 				this.datetime.start = new Date(this.datetime.start).Format();
-                this.datetime.realStart = this.datetime.start;
-				this.datetime.initStart = this.datetime.start;
+				
+				// 保存当前的数据（上一次）: 用于取消时显示
+				this.datetime.beforeStart = this.datetime.start
+//              this.datetime.realStart = this.datetime.start;
+//				this.datetime.initStart = this.datetime.start;
 				this.startIf=true;
 
-				this.refreshData();
+//				this.refreshData();
 			},
 			// 取消保存开始时间。
 			cancelStart () {
-				this.datetime.start = this.datetime.initStart;
+//				this.datetime.start = this.datetime.initStart;
+				// 取消保存时间，恢复到上次datetime的值。
+				this.datetime.start = this.datetime.beforeStart ? this.datetime.beforeStart : this.datetime.initStart
 				this.startIf=true;
 			},
 			// 保存结束时间。
 			saveEnd () {
 				this.datetime.end = new Date(this.datetime.end).Format();
-                this.datetime.realEnd= this.datetime.end;
-				this.datetime.initEnd = this.datetime.end;
+				
+				// 保存当前的数据（上一次）: 用于取消时显示
+				this.datetime.beforeEnd = this.datetime.end
+//              this.datetime.realEnd= this.datetime.end;
+//				this.datetime.initEnd = this.datetime.end;
 				this.endIf=true;
 
-				this.refreshData();
+//				this.refreshData();
 			},
 			// 取消保存结束时间。
 			cancelEnd () {
-				this.datetime.end = this.datetime.initEnd;
+//				this.datetime.end = this.datetime.initEnd;
+				// 取消保存时间，恢复到上次datetime的值。
+				this.datetime.end = this.datetime.beforeEnd ? this.datetime.beforeEnd : this.datetime.initEnd
 				this.endIf=true;
-			},			
+			},
+			// 时间更新，页面刷新操作。
+			goRefresh() {
+				// 更新当前显示时间。
+				this.datetime.realStart = this.datetime.initStart = this.datetime.beforeStart = this.datetime.start;
+				this.datetime.realEnd = this.datetime.initEnd = this.datetime.beforeEnd = this.datetime.end;
+				
+				// 更新数据。
+				this.refreshData()
+			},
 			/**
 			 * 数据刷新。
 			 * @return {void}
@@ -2607,29 +2664,44 @@
                     equipmentId: this.selectedEquipmentId,
                     startTime: oDate.start,
                     endTime: oDate.end,
-                    shiftStartTime: this.datetime.start,
-                    shiftEndTime: this.datetime.end,
+                    shiftStartTime: this.getRealTimeLineDateTime().start, //this.datetime.start,
+                    shiftEndTime: this.getRealTimeLineDateTime().end, //this.datetime.end,
                     code: this.process
                 }})				
 			},
-            // 跳转到追踪页面。
-            gotoTrack() {
-                let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-                    oDate = this.getRealTime(),
-                    oCondition = {
-                        "keys": {
-                            "equipmentId": this.selectedEquipmentId,//'493-017-2',
-                            "equipmentName": this.selectedEquipmentName,
-                            "startTime": oDate.start,
-                            "endTime": oDate.end
-                        }, 
-                        "type": "time"
-                    }
-
-                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
-                window.open("trackIndex.html?tag="+tag);
-      
-            }
+			// 销毁追踪配置弹窗。
+			destoryTrackConfig(oData) {
+				this.trackConfigForm.visible = false
+				
+				if(oData) {
+					let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+	                    oCondition = {
+	                        "keys": {
+	                            "equipmentId": oData.equipmentId,
+	                            "equipmentName": oData.equipmentName,
+	                            "startTime": oData.startTime,
+	                            "endTime": oData.endTime
+	                        }, 
+	                        "type": "time"
+	                    }
+	
+	                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+	                window.open("trackIndex.html?tag="+tag);
+				}
+			},
+			// 显示追踪弹窗配置。
+			gotoTrackConfig() {
+				// 设置数据。
+				let oDate = this.getRealTime(),
+					oData = {
+						"equipmentId": this.selectedEquipmentId + ":" + this.selectedEquipmentName,
+						"startTime": oDate.start,
+                        "endTime": oDate.end
+					}
+					
+				this.trackConfigForm.data = oData
+				this.trackConfigForm.visible = true
+			}
         }
     }  
 </script>

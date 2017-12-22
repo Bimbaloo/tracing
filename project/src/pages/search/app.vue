@@ -329,7 +329,6 @@ export default {
     },
     // 点击历史记录后，填充
     findId(listId) {
-      //debugger
       let historyList = this.myLocalStorage.find(el=>{
         return el.id === listId
       })
@@ -342,11 +341,10 @@ export default {
         if(e.title === historyList.oData.title){
           searchTitle = true
           searchObj = e
-          console.log("找到了")
+          //console.log("找到了")
         }
       })
       if( (!!historyList && searchTitle) || (!!historyList && historyList.oData.tab !=="trace" && historyList.oData.tab !=="track") ){
-        //debugger
         historyList.oData.radio = searchObj.key
         bus.$emit('id-selected', historyList.oData)
         this.activeKey = historyList.oData.tab

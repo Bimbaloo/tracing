@@ -9,7 +9,23 @@
             :time="videoForm.time" 
             :type="videoForm.type"
     		@hideDialog="hideVideoDialog">
-	    </v-dialog>     
+	    </v-dialog>
+	    <!-- 批次追踪详细信息 -->
+	    <el-dialog 
+	    	v-if="!bTrack"
+	    	title="汇总详情" 
+	    	size="large"
+	    	class="outTrack-dialog-wrap"
+	    	:close-on-click-modal="false" 
+	    	:visible.sync="outTrackConfig.visible">
+	    	
+            <v-table :table-data="outTrackConfig" :heights="outTrackConfig.height"></v-table>
+            
+            <div class="dialog-footer">
+                <el-button @click="outTrackConfig.visible = false">取 消</el-button>
+                <el-button type="primary" @click="outTrackDialogHandle">追 踪</el-button>
+            </div>
+        </el-dialog>
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition' v-if="isInChart">
                 <div class='condition-messsage'>
@@ -240,6 +256,44 @@ export default {
     },
     data() {
         return {
+        	// 追踪产出批次汇总弹窗配置。
+        	outTrackConfig: {
+        		visible: false,
+        		loading: false,
+        		height: 200,
+        		// 当前行的数据。
+        		row: {},
+        		columns: [{
+        			name: "条码",
+                    prop: "barcode"
+        		}, {
+        			name: "箱码",
+        			prop: "packetBarcode"
+        		},{
+        			name: "工单",
+                    prop: "doCode"
+        		}, {
+        			name: "数量",
+        			prop: "quantity",
+        			width: "100"
+        		}, {
+        			name: "质量",
+        			prop: "qualityTypeName",
+        			width: "100"
+        		}, {
+        			name: "班次",
+        			prop: "shiftName"
+        		}, {
+        			name: "操作人",
+        			prop: "personName",
+        			width: "120"
+        		}, {
+        			name: "时间",
+        			prop: "happenTime",
+        			width: "200"
+        		}],
+        		data: []
+        	},
             // 是否开启视频监控。
             showCamera: !!CAMERA,
             videoForm: {
@@ -1402,47 +1456,57 @@ export default {
                 })
             }
             this.filters = this.getFilters()
-//          oQuery = {
-//				"operationIdList": [{
-//					"opId": "39837166-4657-4c1d-b746-827d7fab95ed",
-//					"opType": 6
-//				},{
-//					"opId": "bfcdffb1-2b5f-43c0-837c-9f61b50648ea",
-//					"opType": 6
-//				},{
-//					"opId": "6c9f4b86-82a9-4b61-a5d4-71063edce107",
-//					"opType": 6
-//				},{
-//					"opId": "5506de6b-08ec-40dd-bb1f-c9e32a8b4661",
-//					"opType": 1
-//				},{
-//					"opId": "254e0267-f53c-4321-9225-c37ca02a72fd",
-//					"opType": 1
-//				}]
-//			}
             this.$register.sendRequest(this.$store, this.$ajax, url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
+        },
+        // 批次追踪时获取汇总明细信息。
+        getOutDetailListByRow(row) {
+        	// 获取当前产出的所有数据。
+        	let aoAll = this.checked ? this.outItems.dataAll : this.outItems.dataFilter
         	
+        	// 产出汇总合并字段 group: ["batchNo", "materialCode", "equipmentId", "moldCode"]
+        	let aoGroup = ["batchNo", "materialCode", "equipmentId", "moldCode"]
+        	
+        	// 返回匹配当前行过滤的数据。
+        	return aoAll.filter(o => aoGroup.every( param => o[param] == row[param] ) )
         },
         // 批次追踪
         batchClick(row) {
             if(this.bTrack){
                 return 0
             }else {
-                // 批次追踪。
-                let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-                oCondition = {
-                    selected: this.outItems.dataAll.filter(o => o.batchNo === row.batchNo).map(o => {
-                        return {
-                            materialCode: o.materialCode,
-                            batchNo: o.batchNo,
-                            // barcode: o.barcode,
-                            snapshotId: o.destSnapshotId
-                        }
-                    })
-                }
-                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
-                window.open("trackIndex.html?tag=" + tag);
+            	// 显示弹窗
+            	let oBody = document.body || document.documentElement
+            	this.outTrackConfig.visible = true;
+            	this.outTrackConfig.height = oBody.clientHeight * 0.6
+            	// 保存当前追踪的行数据。
+            	this.outTrackConfig.row = row
+            	this.outTrackConfig.data = this.getOutDetailListByRow(row)
             }
+        },
+        // 批次追踪弹窗显示。
+        outTrackDialogHandle() {
+        	this.outTrackConfig.visible = false
+          	// 追踪处理。
+            this.gotoBatchTrack(this.outTrackConfig.row)
+        },
+        // 批次追踪处理。
+        gotoBatchTrack(row) {
+        	 // 批次追踪。
+            let tag = new Date().getTime().toString().substr(-5)// 生成唯一标识。
+            
+            let aoAll = this.checked ? this.outItems.dataAll : this.outItems.dataFilter,
+	            oCondition = {
+	                selected: aoAll.filter(o => o.batchNo === row.batchNo).map(o => {
+	                    return {
+	                        materialCode: o.materialCode,
+	                        batchNo: o.batchNo,
+	                        // barcode: o.barcode,
+	                        snapshotId: o.destSnapshotId
+	                    }
+	                })
+	            }
+            sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+            window.open("trackIndex.html?tag=" + tag);
         },
         // 单件追踪
         barcodeClick(row) {
@@ -1844,6 +1908,16 @@ export default {
 </script>
 
 <style lang="less">
+	.outTrack-dialog-wrap {
+		.el-dialog__body {
+			padding: 20px;
+			
+			.dialog-footer {
+				margin-top: 20px;
+				text-align: center;
+			}
+		}
+	}
 .content-title.table-title {
     margin-top: 10px;
     margin-bottom: 0;
