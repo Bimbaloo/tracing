@@ -21,6 +21,7 @@
 		<div class="item-wrap">
 			<img :src="icon" alt="增加模块" @click="newLink" style="cursor:pointer;" title="新增模块"/>
 		</div>
+		<div v-if="dialogVisible">
 		<el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false">
 			<el-form :model="oCurrentData" label-width="80px" :rules="rules" ref="ruleForm">
 				<el-form-item label="名称" prop="name">
@@ -75,7 +76,9 @@
 				<el-button @click="dialogVisible = false">取 消</el-button>
 				<el-button type="primary" @click="submit">确 定</el-button>
 			</div>
-		</el-dialog>		
+		</el-dialog>	
+		</div>
+	
     </div>
 </template>
 

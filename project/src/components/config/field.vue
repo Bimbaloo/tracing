@@ -1,6 +1,6 @@
 <!--自定义字段名称脚本-->
 <template>
-    <div class="content-wraps">
+    <div class="content-wraps content-inner">
         <span class="title">条件列表</span>
         <el-table
                 class="table-wrapper"

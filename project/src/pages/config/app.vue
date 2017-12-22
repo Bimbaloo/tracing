@@ -1,6 +1,6 @@
 <template>
     <div id="app">
-        <v-header :config="false" :back="'search.html'"></v-header>
+        <v-header :config="false" :back="'search.html'" :tool="false"></v-header>
         <div class="pbody">
             <div class="sidebar">
                 <div class="sidebar-item" v-for="(item,index) in sidebarItems" :key="index" :class="{active: isActive==index}" @click="turnTo(item.src,index)">
@@ -177,7 +177,7 @@
                     display: flex;
                     flex: 1;
                     background: #ffffff;
-                    &>div {
+                    &>.content-inner {
                         display: flex;
                         flex: 1;
                         flex-direction: column;
@@ -203,4 +203,10 @@
     	}
     }
 
+    // .v-modal {
+    //     display: none;
+    // }
+    // .el-dialog__wrapper.transfer-dialog {
+    //     background-color: rgba(0,0,0,0.3)
+    // }
 </style>
