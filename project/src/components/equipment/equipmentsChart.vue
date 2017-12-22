@@ -10,7 +10,15 @@
             :time="videoForm.time" 
             :type="videoForm.type"
     		@hideDialog="hideVideoDialog">
-	    </v-dialog>  
+	    </v-dialog> 
+	    <!-- 追踪条件配置。 -->
+	    <v-track-dialog 
+    		v-if="trace && trackConfigForm.visible"
+    		:equipment-list="equipments"
+    		:dialog-visible="trackConfigForm.visible"
+    		:init-data="trackConfigForm.data"
+    		@hideDialog="destoryTrackConfig">
+	    </v-track-dialog>
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis">
             <div id="equipments" :style="{height: panelHeight + 'px'}"></div>
@@ -66,7 +74,7 @@
             <div class="buttons" v-show="selectedEquipmentId&&!loading">
             	<el-button 	@click="goRefresh" class="btn btn-plain" v-if="isDatetimeChange">查询</el-button>
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
-                <el-button  @click="gotoTrack" class="btn btn-plain" v-if="trace">追踪</el-button>
+                <el-button  @click="gotoTrackConfig" class="btn btn-plain" v-if="trace">追踪</el-button>
             </div>	
             <!--提示面板数据-->
             <div class="tooltip-wrapper" :style="{width: chartWidth+'px', margin: grid[0] + 'px ' + grid[1] + 'px ' + grid[2] + 'px ' + grid[3] + 'px'}">
@@ -128,6 +136,7 @@
 <script>
     import pin from 'assets/img/icon-pin.png'
     import VideoDialog from 'components/monitor/dialog.vue'
+    import trackDialog from 'components/equipment/equipmentTrack.vue'
 	import DateTime from 'components/basic/dateTime.vue'
     import $ from 'jquery'
 
@@ -212,10 +221,21 @@
 		},
 		components: {
             'v-datetime': DateTime,
-            "v-dialog": VideoDialog
+            "v-dialog": VideoDialog,
+            "v-track-dialog": trackDialog
 		},
         data () {
             return {
+            	// 追踪配置数据。
+            	trackConfigForm: {
+            		visible: false,
+            		data: {
+            			equipmentId: "",
+		        		startTime: "",
+		        		endTime: ""
+            		}
+            	},
+            	// 监控数据。
                 videoForm: {
                     visible: false,
                     equipmentId: '',
@@ -849,7 +869,6 @@
                 this.dimension.forEach(o => {
                     // 过滤其他设备的定制内容，只保留非定制的内容。
                     o.list = o.list.filter(item => item.type)
-                    console.log(this.factoryCustomItemList)
                     let oData = this.factoryCustomItemList
                     .filter(item => {
                         return item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length
@@ -2251,13 +2270,13 @@
                         aoData.push({
                             name: '',
                             value: [
-                                index,
-                                +new Date(this.datetime.start),
-                                +new Date(this.datetime.end),
-                                +new Date(this.datetime.end) - +new Date(this.datetime.start),
-                                this.datetime.start,
-                                this.datetime.end
-                            ],
+	                            index,
+	                            +new Date(this.getRealTimeLineDateTime().start),
+	                            +new Date(this.getRealTimeLineDateTime().end),
+	                            +new Date(this.getRealTimeLineDateTime().end) - +new Date(this.getRealTimeLineDateTime().start),
+	                            this.getRealTimeLineDateTime().start,
+	                            this.getRealTimeLineDateTime().end
+	                        ],
                             itemStyle: {
                                 normal: {
                                     color: '#dedede'
@@ -2645,28 +2664,43 @@
                     startTime: oDate.start,
                     endTime: oDate.end,
                     shiftStartTime: this.getRealTimeLineDateTime().start, //this.datetime.start,
-                    shiftEndTime: this.this.getRealTimeLineDateTime().end, //this.datetime.end,
+                    shiftEndTime: this.getRealTimeLineDateTime().end, //this.datetime.end,
                     code: this.process
                 }})				
 			},
-            // 跳转到追踪页面。
-            gotoTrack() {
-                let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
-                    oDate = this.getRealTime(),
-                    oCondition = {
-                        "keys": {
-                            "equipmentId": this.selectedEquipmentId,//'493-017-2',
-                            "equipmentName": this.selectedEquipmentName,
-                            "startTime": oDate.start,
-                            "endTime": oDate.end
-                        }, 
-                        "type": "time"
-                    }
-
-                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
-                window.open("trackIndex.html?tag="+tag);
-      
-            }
+			// 销毁追踪配置弹窗。
+			destoryTrackConfig(oData) {
+				this.trackConfigForm.visible = false
+				
+				if(oData) {
+					let tag = new Date().getTime().toString().substr(-5),// 生成唯一标识。
+	                    oCondition = {
+	                        "keys": {
+	                            "equipmentId": oData.equipmentId,
+	                            "equipmentName": oData.equipmentName,
+	                            "startTime": oData.startTime,
+	                            "endTime": oData.endTime
+	                        }, 
+	                        "type": "time"
+	                    }
+	
+	                sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
+	                window.open("trackIndex.html?tag="+tag);
+				}
+			},
+			// 显示追踪弹窗配置。
+			gotoTrackConfig() {
+				// 设置数据。
+				let oDate = this.getRealTime(),
+					oData = {
+						"equipmentId": this.selectedEquipmentId + ":" + this.selectedEquipmentName,
+						"startTime": oDate.start,
+                        "endTime": oDate.end
+					}
+					
+				this.trackConfigForm.data = oData
+				this.trackConfigForm.visible = true
+			}
         }
     }  
 </script>
