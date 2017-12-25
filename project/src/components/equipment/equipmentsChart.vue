@@ -58,6 +58,7 @@
                             <i class="el-icon-circle-check" @click="saveStart"></i>
                             <i class="el-icon-circle-cross" @click="cancelStart"></i>
                         </span>
+                        <div class="edit-error" v-if="!startValidate">{{ startValidateMessage }}</div>
                     </div>
                 </div>
                 <div class="end">
@@ -68,6 +69,7 @@
                             <i class="el-icon-circle-check" @click="saveEnd"></i>
                             <i class="el-icon-circle-cross" @click="cancelEnd"></i>
                         </span>
+                        <div class="edit-error" v-if="!endValidate">{{ endValidateMessage }}</div>
                     </div>
                 </div>
             </div>
@@ -286,6 +288,12 @@
 				startIf: true,
                 // 是否创建结束时间编辑框。
 				endIf: true,
+				// 开始时间格式判断。
+				startValidate: true,
+				startValidateMessage: '',
+				// 结束时间格式判断。
+				endValidate: true,
+				endValidateMessage: '',
                 // 设备对应的维度数据。
 				equipmentData: {},
                 // 图形。
@@ -821,8 +829,8 @@
             	// 是否显示查询按钮（开始或结束时间被编辑，则会显示）
             	let {start, end, initStart, initEnd} = this.datetime
 				
-				// 开始时间或结束时间只要变动就显示。
-            	return (start != initStart) || (end != initEnd)
+				// 开始时间或结束时间只要变动就显示。 不再处于编辑状态才显示
+            	return (this.startIf && start != initStart) || (this.endIf && end != initEnd)
             }
         },
         created () {
@@ -2333,52 +2341,110 @@
                 
                 return aoData;
             },
+            /**
+             * 时间格式判断。开： 开,结, <; 结： 结,开,>
+             * @param {String} 当前需判断的时间值。
+             * @param {String} 比较的时间。
+             * @param {String} 比较类型 > 或 <
+             */
+            validateTime(dateValue, comValue, sType) {
+            	let oReturn = {
+            		validate: false,	// 验证是否正确
+            		message: ''		// 错误信息
+            	}
+            	
+            	let nNow = +new Date();
+            	
+        		if(dateValue == undefined || dateValue == '') {
+        			oReturn.message = '请输入时间'
+        		}else if(!window.Rt.utils.isDateTime(dateValue)) {
+        			oReturn.message = '请输入正确的时间格式'
+        		}else if(+new Date(dateValue) > nNow) {
+        			oReturn.message = '时间不能超过当前时间'
+        		}else {
+        			// 判断时间格式。
+        			if(sType == '>') {
+        				// 结束时间。
+        				if(+new Date(comValue) > +new Date(dateValue)) {
+        					oReturn.message = '结束时间必须大于开始时间'
+        				}else {
+        					oReturn.validate = true
+        				}
+        			}else {
+        				// 开始时间。
+        				if(+new Date(dateValue) > +new Date(comValue)) {
+        					oReturn.message = '开始时间必须小于结束时间'
+        				}else {
+        					oReturn.validate = true
+        				}
+        			}
+        		}
+            	
+            	return oReturn
+            },
 			// 保存开始时间。
-			saveStart () {
-				this.datetime.start = new Date(this.datetime.start).Format();
+			saveStart (ev) {
 				
-				// 保存当前的数据（上一次）: 用于取消时显示
-				this.datetime.beforeStart = this.datetime.start
-//              this.datetime.realStart = this.datetime.start;
-//				this.datetime.initStart = this.datetime.start;
-				this.startIf=true;
-
-//				this.refreshData();
+				// 判断时间格式。结束时间：编辑时取上次时间，否则取当前时间
+				let oReturn = this.validateTime(this.datetime.start, (this.endIf ? this.datetime.end:(this.datetime.beforeEnd || this.datetime.initEnd)), '<')
+				
+				if(oReturn.validate) {
+					// 保存当前的数据（上一次）: 用于取消时显示
+					this.datetime.start = new Date(this.datetime.start).Format();	
+					
+					this.startValidate = true
+					this.datetime.beforeStart = this.datetime.start
+					this.startIf=true;
+				}else {
+					this.startValidate = false
+					this.startValidateMessage = oReturn.message
+				}
 			},
 			// 取消保存开始时间。
 			cancelStart () {
-//				this.datetime.start = this.datetime.initStart;
 				// 取消保存时间，恢复到上次datetime的值。
 				this.datetime.start = this.datetime.beforeStart ? this.datetime.beforeStart : this.datetime.initStart
 				this.startIf=true;
+				this.startValidate = true
 			},
 			// 保存结束时间。
 			saveEnd () {
-				this.datetime.end = new Date(this.datetime.end).Format();
 				
-				// 保存当前的数据（上一次）: 用于取消时显示
-				this.datetime.beforeEnd = this.datetime.end
-//              this.datetime.realEnd= this.datetime.end;
-//				this.datetime.initEnd = this.datetime.end;
-				this.endIf=true;
+				// 判断时间格式。结束时间：编辑时取上次时间，否则取当前时间
+				let oReturn = this.validateTime(this.datetime.end, (this.startIf ? this.datetime.start:(this.datetime.beforeStart || this.datetime.initStart)), '>')
+				
+				if(oReturn.validate) {
+					// 保存当前的数据（上一次）: 用于取消时显示
+					this.datetime.end = new Date(this.datetime.end).Format();
+					
+					this.endValidate = true
+					this.datetime.beforeEnd = this.datetime.end
+					this.endIf=true;
+				}else {
+					this.endValidate = false
+					this.endValidateMessage = oReturn.message
+				}
 
-//				this.refreshData();
 			},
 			// 取消保存结束时间。
 			cancelEnd () {
-//				this.datetime.end = this.datetime.initEnd;
 				// 取消保存时间，恢复到上次datetime的值。
 				this.datetime.end = this.datetime.beforeEnd ? this.datetime.beforeEnd : this.datetime.initEnd
 				this.endIf=true;
+				this.endValidate = true
 			},
 			// 时间更新，页面刷新操作。
 			goRefresh() {
-				// 更新当前显示时间。
-				this.datetime.realStart = this.datetime.initStart = this.datetime.beforeStart = this.datetime.start;
-				this.datetime.realEnd = this.datetime.initEnd = this.datetime.beforeEnd = this.datetime.end;
-				
-				// 更新数据。
-				this.refreshData()
+				if(this.endValidate && this.startValidate) {
+					// 更新当前显示时间。
+					this.datetime.realStart = this.datetime.initStart = this.datetime.beforeStart = this.datetime.start;
+					this.datetime.realEnd = this.datetime.initEnd = this.datetime.beforeEnd = this.datetime.end;
+					
+					// 更新数据。
+					this.refreshData()
+				}else {
+					this.$message("请确认时间格式")
+				}
 			},
 			/**
 			 * 数据刷新。
@@ -3036,6 +3102,10 @@
                         i + i {
                             margin-left: 5px;
                         }
+                    }
+                    
+                    .edit-error {
+                    	color: red;
                     }
                 }
                 .el-input__inner {
