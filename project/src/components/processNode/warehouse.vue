@@ -180,7 +180,7 @@
                         prop: "batchNo",
                         name: "批次"
                     },{
-                        prop: "srcWarehouse",
+                        prop: "destWarehouse",
                         name: "仓库"
                     // },{
                     //     prop: "srcReservoir",
