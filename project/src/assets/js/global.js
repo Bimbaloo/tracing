@@ -185,11 +185,31 @@
 					oData.data = oData.filteredData;
 				}
 	
-				oData.data.map(o => {
+				oData.data.map((o, nIn) => {
 					let oNewData = {};
 	
 					oData.columns.map(col => {
-						oNewData[col.name] = o[col.prop]==undefined ? (col.type==='number' ? 0 : '') :(col.formatter ? col.formatter(o) : o[col.prop]);
+						let sValue = ""
+						if(o[col.prop] == undefined) {
+							switch(col.type) {
+								// 默认显示数字
+								case 'number':
+									sValue = 0
+									break;
+								// 显示递增数字
+								case 'index':
+									sValue = (nIn + 1)
+									break;
+								default: 
+									break;
+							}
+						}else if(col.formatter) {
+							sValue = col.formatter(o)
+						}else {
+							sValue = o[col.prop]
+						}
+						oNewData[col.name] = sValue
+//						oNewData[col.name] = o[col.prop]==undefined ? (col.type==='number' ? 0 : '') :(col.formatter ? col.formatter(o) : o[col.prop]);
 					})
 	
 					aoTableJson.push(oNewData);

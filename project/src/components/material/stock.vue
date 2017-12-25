@@ -10,7 +10,7 @@
             <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
         </div>
         <div class="router-path">
-            <span class="path-item" @click="checkStock">仓储信息</span>
+            <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":"物料明细" }}</span>
             <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
             <span class="path-item" v-if="restrainIf">>可疑品</span>
         </div> 
@@ -42,6 +42,10 @@
 			fullscreen () {
 		    	return this.$store.state.fullscreen
             },
+            // 版本信息数据。
+			isOpDbBeforeRefact() {
+				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
+			},
             // 是否支持遏制。
             supression() {
                 return this.$store.state.versionModule && this.$store.state.versionModule.supression
