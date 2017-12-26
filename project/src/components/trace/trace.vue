@@ -1,5 +1,5 @@
 <template>
-    <div class="post">
+    <div class="post trace">
     	<h2 class="content-title">查询结果集</h2>
     	<el-button class="btn btn-plain" @click="onTrace">溯源</el-button>
         <div class="router-content" ref="routerContent">
@@ -8,11 +8,40 @@
 	                {{ gridData.error }}
 	            </div>
 	            <div v-if="!gridData.error" class="content-table">
-	            	<v-table
-				    	:table-data="gridData"
-				    	:heights="gridData.height"
-				    	:loading="gridData.loading"
-				    ></v-table>
+	            	<div ref="summary" :class="[{actived: active.summary}]">
+	            		<h2 class="content-title" @click="active.summary=!active.summary">
+							<span class='table-title'>汇总信息
+								<i class="el-icon-d-arrow-right icon"></i>
+							</span>
+						</h2>
+						<transition name="el-zoom-in-top">
+							<div class="content-table inner" ref="summaryTable">
+								<v-table 
+									v-show="active.summary"
+									:max-height="gridData.height"
+									:table-data="summaryData" 
+									:loading="gridData.loading">
+								</v-table>
+							</div>
+						</transition>
+	            	</div>
+	            	<div ref="started" :class="[{actived: active.started}]">
+	            		<h2 class="content-title" @click="active.started=!active.started">
+							<span class='table-title'>起点明细信息
+								<i class="el-icon-d-arrow-right icon"></i>
+							</span>
+						</h2>
+						<transition name="el-zoom-in-top">
+							<div class="content-table inner" ref="startedTable">
+				            	<v-agtable
+				            		v-show="active.started"
+							    	:table-data="gridData"
+							    	:heights="gridData.height"
+							    	:loading="gridData.loading"
+							    ></v-agtable>
+							</div>
+						</transition>
+	            	</div>
 	            </div>   
 	       </div>   
     	</div> 
@@ -20,11 +49,13 @@
 </template>
 
 <script>
-    import table from "components/basic/ag-table.vue"
+    import agTable from "components/basic/ag-table.vue"
+    import table from "components/basic/table.vue"
 	import fnP from "assets/js/public.js"
     	
     export default {
         components: {
+            'v-agtable': agTable,
             'v-table': table
         },
         data () {
@@ -52,7 +83,27 @@
 		            },
 		            columns: [],
                     data: []
-                }
+                },
+                active: {
+					summary: false,
+					started: true
+				},
+				summaryData: {
+					data: [],
+					columns: [{
+						prop: "batchNo",
+						name: "批次"
+					}, {
+						prop: "materialCode",
+						name: "物料编码"
+					}, {
+						prop: "materialName",
+						name: "物料名称"
+					}, {
+						prop: "quantity",
+						name: "总数"
+					}]
+				}
             }
         },
         mounted () {
@@ -170,11 +221,18 @@
             fetchPage() {
             	this.fetchData(this.gridData);
             },
+            outerHeight(el) {
+				var height = el.offsetHeight;
+				var style = el.currentStyle || getComputedStyle(el);
+
+				height += parseInt(style.marginTop) + parseInt(style.marginBottom);
+				return height;
+			},
         	// 获取高度。
             adjustHeight() {
             	let nHeight = 0;
             	
-				nHeight = this.$refs.routerContent.clientHeight - 50
+				nHeight = this.$refs.routerContent.clientHeight - this.outerHeight(document.querySelector('.content-title')) * 2 - 20
 				
             	return nHeight;
             },
@@ -198,6 +256,9 @@
                    	// 数据处理- 排序， 索引
                    	let aResult = oResult.sort(this.sortByTime),
                    		aColumns = this.getColumns()
+                   	
+                   	// 汇总处理函数，设置汇总表格数据。
+                   	this.summaryData.data = this.setSummaryData(aResult)
                    	
                    	aResult = oResult.map((o, n) => {
                     	return Object.assign({}, o, {
@@ -233,6 +294,31 @@
 					console.log("接口查询出错。");
                 })
             },
+            // 汇总表处理函数。--根据批次，物料汇总显示，总数累加处理。
+            setSummaryData(aoList) {
+            	let oFlag = {}
+            	
+            	aoList && aoList.forEach( o => {
+            		// 需合并的参数值。
+            		let sKey = `${o.batchNo}+${o.materialCode}`
+            		
+            		if(!oFlag[sKey]) {
+            			oFlag[sKey] = {
+            				batchNo: o.batchNo,
+            				materialName: o.materialName,
+            				materialCode: o.materialCode,
+            				quantity: o.quantity || 0
+            			}
+            		}else {
+            			// 数量累加。
+            			oFlag[sKey].quantity += (o.quantity || 0)
+            		}
+            		
+            	})
+            	
+            	// 返回数据。
+				return window.Rt.utils.getObjectValues(oFlag);
+            },
             onTrace (event) {
             	if(this.gridData.data && this.gridData.selected.length) {
 	            	let aSelected = [];
@@ -264,5 +350,38 @@
 	    font-size: 14px;
 	    color: red;
 	}
+	.trace {
+		.actived {
+			.icon-excel,
+			.icon-print {
+				margin-left: 10px;
+				position: relative;
+				top: -2px;
+				display: inline-block;
+				cursor: pointer;
+			}
+			.el-icon-d-arrow-right {
+				display: none;
+			}
+			.content-title {
+				color: #333;
+			}
+			.content-table.inner {
+				display: block;
+			}
+		}
+		
+		.el-icon-d-arrow-right {
+			margin-left: 0;
+			font-size: 14px;
+		}
+		.content-title {
+			color: #42AF8F;
 	
+			&:hover {
+				color: #42AF8F;
+				cursor: pointer;
+			}
+		}
+	}
 </style>

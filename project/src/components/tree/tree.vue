@@ -847,8 +847,8 @@
 			},
 			// 树节点点击事件。
 			treeNodeClickHandle(e, node) {
-				// 当前是树图全屏 且 老版本 || (非物料)
-				if(this.treeFullscreen && ( this.isOpDbBeforeRefact || (node.data.nodeType !== 10003 && node.data.nodeType !== 10004))) {
+				// 当前是树图全屏
+				if(this.treeFullscreen) {
 					this.restoreScreenClick();
 				}
 				
@@ -905,7 +905,7 @@
 							"_tag":  new Date().getTime().toString().substr(-5)
 						}										
 					})
-				}else if(nodeType === 201 || nodeType === 202 || nodeType === 203) { 									// 条码管理     
+				}else if(nodeType === 205 || nodeType === 206 || nodeType === 202 || nodeType === 203) { 									// 条码管理     
 					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
 						nodeType: nodeType
 					})
@@ -924,27 +924,20 @@
 				}else if(nodeType === 10003 || nodeType === 10004) { 
 					// 物料
 					
-					// 如果当前是老版本，则显示内容。
-					if(this.isOpDbBeforeRefact) {
-						// 显示内容.
-						this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
-						 	nodeType: nodeType
-						})
-						this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
-						 	detailInfos: node.data.detailInfos
-						})   
-						this.$router.replace({ 
-						 	path: "/stock",
-						 	query: {
-//						 		"detailInfos": node.data.detailInfos,
-						 		"key": node.data.key,
-					 			"_tag":  new Date().getTime().toString().substr(-5)
-							}										
-						})
-						
-					}else {
-						console.log("物料节点不展示。")	
-					}
+					// 显示内容.
+					this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
+					 	nodeType: nodeType
+					})
+					this.$store.commit('updateDetailInfos', {	//将detailInfos保存到vuex
+					 	detailInfos: node.data.detailInfos
+					})   
+					this.$router.replace({ 
+					 	path: "/stock",
+					 	query: {
+					 		"key": node.data.key,
+				 			"_tag":  new Date().getTime().toString().substr(-5)
+						}										
+					})
 
 				}else if(nodeType === 1 || nodeType === 6 || nodeType === 10001) { 	
 					// 工序。

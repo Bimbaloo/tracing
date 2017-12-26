@@ -180,7 +180,7 @@
                         prop: "batchNo",
                         name: "批次"
                     },{
-                        prop: "srcWarehouse",
+                        prop: "destWarehouse",
                         name: "仓库"
                     // },{
                     //     prop: "srcReservoir",
@@ -263,7 +263,12 @@
 			this.tableHeight = this.setHeight()
         },
         watch: {
-			"clickNum": "fetchData",
+//			"clickNum": "fetchData",
+			"$route": function(to, from) {
+				if(to.meta.title == 'warehouse') {
+					this.fetchData()
+				}
+			},
 			/* 视窗大小变化，重新设置table大小 */
 			"resizeY": function(){
 				this.tableHeight = this.setHeight()

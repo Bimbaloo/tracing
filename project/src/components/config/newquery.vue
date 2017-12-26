@@ -493,24 +493,42 @@ export default {
     },
     // 顺序改变保存
     async saveEditQueryState() {
-      const stateChange = await this.sendResult().then(e => e.status);
-      if (stateChange) {
-        this.$store.commit({
-          type: "updateModuleOrderListEdit",
-          key: true
-        });
-        this.categoryCopy = [].concat(this.category);
-        this.$message({
-          message: stateChange,
-          duration: 1000
-        });
-      } else {
-        this.category = [].concat(this.categoryCopy);
-        this.$message({
-          message: `保存失败，请重试`,
-          duration: 1000
-        });
-      }
+    	this.$register.sendRequest(this.$store, this.$ajax, MODULE_ORDER, "post", this.moduleOrderList, (oData) => {
+			this.$store.commit({
+	          type: "updateModuleOrderListEdit",
+	          key: false
+	        });
+	        this.categoryCopy = [].concat(this.category);
+	        this.$message({
+	          message: "保存成功",
+	          duration: 1000
+	        });
+      	}, (sErrorMessage)=>{
+			this.category = [].concat(this.categoryCopy);
+	        this.$message({
+	          message: `保存失败，请重试`,
+	          duration: 1000
+	        });        
+		})
+    	
+//    const stateChange = await this.sendResult().then(e => e.status);
+//    if (stateChange) {
+//      this.$store.commit({
+//        type: "updateModuleOrderListEdit",
+//        key: true
+//      });
+//      this.categoryCopy = [].concat(this.category);
+//      this.$message({
+//        message: stateChange,
+//        duration: 1000
+//      });
+//    } else {
+//      this.category = [].concat(this.categoryCopy);
+//      this.$message({
+//        message: `保存失败，请重试`,
+//        duration: 1000
+//      });
+//    }
     },
     // 发送改变顺序请求
     sendResult() {

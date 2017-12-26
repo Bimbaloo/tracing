@@ -131,7 +131,7 @@
                         prop: "doCode",
                         name: "工单"
                     },{
-                        prop: "equipmentId",
+                        prop: "equipmentName",
                         name: "设备"
                     },{
                         prop: "failReason",
@@ -276,11 +276,11 @@
 			// op_id 传给后端的参数
 			operationIdList () {
 				let operationIdList = []
-				if(this.nodeType === 2 || this.nodeType === 7 || this.nodeType === 10002 || this.nodeType === 11){			//结转 || 车间调整
+				if(this.nodeType === 2 || this.nodeType === 7 || this.nodeType === 11){			//结转.. || 车间调整
 					this.detailInfos.forEach(el => {
 						operationIdList.push(el.opId)
 					})
-				}else {									//投产
+				}else {									//投产 || 结转
 					this.detailInfos.forEach(el => {
 						let obj = {
 							"opId": el.opId,
@@ -314,7 +314,12 @@
 			this.tableHeight = this.setHeight()
         },
         watch: {
-			"clickNum": "fetchData",
+//			"clickNum": "fetchData",
+			"$route": function(to, from) {
+				if(to.meta.title == 'workshop') {
+					this.fetchData()
+				}
+			},
 			/* 视窗大小变化，重新设置table大小 */
 			"resizeY": function(){
 				this.tableHeight = this.setHeight()
@@ -328,7 +333,11 @@
 			// 发起请求
             fetchData () {
 				this.loading = true
-				let oQuery = {"operationIdList":this.operationIdList}
+				let oQuery = {}
+				
+				// 结转参数名修改：turnInOutQueryDtoList
+				let sParamName = (this.nodeType === 10002 ? 'turnInOutQueryDtoList' : 'operationIdList')
+				oQuery[sParamName] = this.operationIdList
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
 		    },
 			// 判断调用接口是否成功。

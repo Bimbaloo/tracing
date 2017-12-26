@@ -11,15 +11,12 @@
                 	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
 				</span>
 			</div>
-            <!--div v-if="error" class="error">
-                {{ error }}
-            </div-->
             <div class="content-table" ref="rawTable"> 
 				<div v-if="error" class="error">
 					{{ error }}
 				</div>
 				<el-table
-					v-else
+					v-else-if="isOpDbBeforeRefact"
     				border
             		v-loading="loading"
             		element-loading-text="拼命加载中"
@@ -44,7 +41,7 @@
 			  			</template>
 			  		</el-table-column>
 			  	</el-table>
-                <!--<v-table :table-data="materialData" :loading="loading">!((column.prop == 'index' || column.prop == 'barcode') && row.hide) || !column.hide"</v-table>-->    
+                <v-table v-else :table-data="materialData" :loading="loading"></v-table>    
             </div>
 
         </div>
@@ -52,7 +49,7 @@
 </template>
 
 <script>
-    // import table from "components/basic/table.vue"
+    import table from "components/basic/table.vue"
 	import XLSX from 'xlsx'
     import Blob from 'blob'
     import FileSaver from 'file-saver'
@@ -60,9 +57,9 @@
 	import rasterizeHTML from 'rasterizehtml'
 
     export default {
-        // components: {
-        //     'v-table': table
-        // },
+        components: {
+           'v-table': table
+        },
         data () {
             return {
 				excel: true,
@@ -73,6 +70,8 @@
                     "min-width": "1000px"
                 },
                 url: HOST + "/api/v1/trace/material-detail",
+                // 是否为溯源页面。
+           		bTrace: location.pathname.indexOf("traceIndex") > -1,
                 // 点击的物料节点信息。
                 node: {},
                 loading: false,
@@ -80,7 +79,66 @@
 				// sErrorMessage: "",
                 materialData: {
 					filename: "仓储表",
-                    columns: [{
+                    columns: [],
+                    data: []
+                },
+				tableHeight: 200
+            }
+        },
+        computed: {
+			rawData () {
+		    	return this.$store.state.rawData
+			},
+		    resizeY: function() {
+            	return this.$store && this.$store.state.resizeY
+			},
+			fullscreen: function() {
+				return this.$store && this.$store.state.fullscreen
+			},
+			// 版本信息数据。
+			isOpDbBeforeRefact() {
+				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
+			},
+			// 当前传入的值。
+			detailInfos () {
+	            return this.$store && this.$store.state.detailInfos
+	        }
+        },
+        created () {
+            // 组件创建完后获取数据，
+            // 此时 data 已经被 observed 了
+            // this.fetchData();
+        },
+        mounted () {
+			this.fetchData();
+			this.tableHeight = this.setHeight()
+        },
+        watch: {
+            // 如果路由有变化，会再次执行该方法
+            '$route': function(to, from){
+            	let toTitle = to.meta.title,
+            		fromTitle = from.meta.title;
+            		
+            	// 如果从tree上直接点击，需要更新数据. tag不同
+            	// 仓储信息: 从可疑品(restrain)或同批次入库(batch)中进入，则不会重新请求 .tag是一样的
+            	if( toTitle == 'storage' && (fromTitle == 'storage' || (to.query._tag != undefined && this.tag != to.query._tag)) ) {
+					this.tag = to.query._tag;
+					this.fetchData()
+					this.tableHeight = this.setHeight()
+            	}
+			},
+			"resizeY": function(){
+				this.tableHeight = this.setHeight()
+			},
+			/* 全屏大小时，重新设置table大小 */
+			"fullscreen": function(){
+				this.tableHeight = this.setHeight()
+			},
+        },
+        methods: {
+        	// 获取业务库的表格显示列。
+        	getTableColumns() {
+        		return this.isOpDbBeforeRefact ? [{
                         prop: "index",
                         name: "序号",
                         width: "50px",
@@ -120,61 +178,30 @@
                     },{
                         prop: "vendorName",
                         name: "供应商/客户"
-//                  },{
-//                      prop: "handle",
-//                      name: "操作",
-//                      condition: {
-//                      	materialType: "1"
-//                      }
-                    }],
-                    data: []
-                },
-				tableHeight: 200
-            }
-        },
-        computed: {
-			rawData () {
-		    	return this.$store.state.rawData
-			},
-		    resizeY: function() {
-            	return this.$store && this.$store.state.resizeY
-			},
-			fullscreen: function() {
-				return this.$store && this.$store.state.fullscreen
-			}
-        },
-        created () {
-            // 组件创建完后获取数据，
-            // 此时 data 已经被 observed 了
-            // this.fetchData();
-        },
-        mounted () {
-			this.fetchData();
-			this.tableHeight = this.setHeight()
-        },
-        watch: {
-            // 如果路由有变化，会再次执行该方法
-            '$route': function(to, from){
-            	let toTitle = to.meta.title,
-            		fromTitle = from.meta.title;
-            		
-            	// 如果从tree上直接点击，需要更新数据. tag不同
-            	// 仓储信息: 从可疑品(restrain)或同批次入库(batch)中进入，则不会重新请求 .tag是一样的
-            	if( toTitle == 'storage' && (fromTitle == 'storage' || (to.query._tag != undefined && this.tag != to.query._tag)) ) {
-					this.tag = to.query._tag;
-					this.fetchData()
-					this.tableHeight = this.setHeight()
-            	}
-			},
-			"resizeY": function(){
-				this.tableHeight = this.setHeight()
-			},
-			/* 全屏大小时，重新设置table大小 */
-			"fullscreen": function(){
-				this.tableHeight = this.setHeight()
-			},
-        },
-        methods: {
+                    }] : [{
+                        type: "index",
+                        name: "序号",
+                        width: "50px"
+                    }, {
+                    	prop: "barcode",
+                    	name: "条码"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
+                    }, {
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "batchNo",
+                    	name: "批次"
+                    }, {
+                    	prop: "quantity",
+                    	name: "总数"
+                    }, {
+                    	prop: "remainQuantity",
+                    	name: "滞留数"
+                    }]
+        	},
 			// 判断调用接口是否成功。
 			judgeLoaderHandler(param, fnSu, fnFail) {
 				let bRight = param.data.errorCode;
@@ -256,11 +283,9 @@
 				this.styleObject.minWidth = 0;  
             },
             fetchData () {
-				let oData = {}
-				//let  oData = this.materialData;
-                oData.data = [];
-                this.loading = true;
-				
+            	// 获取表格显示列。
+            	this.materialData.columns = this.getTableColumns()
+            	
 				let sKey = this.$route.query && this.$route.query.key,
 				// 提取选中的物料节点数据。
 					oNode = this.rawData.filter(o => o.key == sKey)[0] || {};
@@ -276,10 +301,27 @@
 					})
 				}
 				
-				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
-					materialCode: this.node.code,
-					materialInfoList: this.node.materialInfoList
-				}, this.requestSucess, this.requestFail, this.requestError)
+            	if(this.isOpDbBeforeRefact) {
+            		// 老业务版本。
+					let oData = {}
+	                oData.data = [];
+	                this.loading = true;
+					
+					this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
+						materialCode: this.node.code,
+						materialInfoList: this.node.materialInfoList
+					}, this.requestSucess, this.requestFail, this.requestError)
+            	}else {
+            		// 新业务版本。
+            		
+            		// 判断是否为溯源，不显示滞留数列。
+            		if(this.bTrace) {
+	            		this.materialData.columns = this.materialData.columns.filter(o => o.prop != 'remainQuantity')
+            		}
+            		// 显示按照destSnapshotId过滤后的数据
+            		this.materialData.data = window.Rt.utils.uniqueObject(this.detailInfos, "destSnapshotId")
+					this.styleObject.minWidth = "1200px";
+            	}
            },
            /**
             * 格式化数据。
@@ -290,6 +332,8 @@
            		// 按照条码进行排序。
 //				aoData.sort((a, b) => a.barcode>b.barcode);
 				let that = this;
+				// 先按时间降序排序。
+				aoData.sort((oA, oB) => this.sortData(oA.createTime, oB.createTime, 'desc'))
 				aoData.sort(function(oA,oB) {
 					return that.sortData(oA.barcode,oB.barcode);
 				});
@@ -309,7 +353,7 @@
 						nIndex ++;
 						o.rowspan = oBarcode[o.barcode];
 					}
-				})   
+				})
 				
 				this.materialData.columns.forEach(column => {					
 					if(aoData.every(o => o[column.prop] === "" || o[column.prop] == undefined)) {
