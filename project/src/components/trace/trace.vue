@@ -85,8 +85,8 @@
                     data: []
                 },
                 active: {
-					summary: true,
-					started: false
+					summary: false,
+					started: true
 				},
 				summaryData: {
 					data: [],

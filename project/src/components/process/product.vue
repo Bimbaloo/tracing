@@ -1060,9 +1060,11 @@ export default {
     },
     watch: {
         // 如果路由有变化，会再次执行该方法
-        '$route': function(to, from) {       	
+        '$route': function(to, from) { 
         	// 从设备分析过来时，点击tree上的节点时也会重新请求
-        	if(to.meta.title == 'product' || !to.meta.title) {
+        	// 树上点击!to.meta.title && !this.isInChart
+        	// 设备分析上点击，只有设备分析里的可调用: 否则会调用两次。
+        	if((this.isInChart && to.meta.title == 'product') || (!this.isInChart && !to.meta.title) ){
         		// 初始化其他显示值。
         		this.show1 = true
         		this.show2 = false

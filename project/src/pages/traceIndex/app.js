@@ -67,13 +67,22 @@ Vue.use(VueRouter)
 const routes = [  
   {                                     //仓库操作                                              
     path: '/warehouse',                 
-    component: Warehouse,  
+    component: Warehouse,
+    meta: {
+    	title: 'warehouse'
+    }
   },{                                   //车间操作            
     path: '/workshop',                                    
     component: Workshop,
+    meta: {
+    	title: 'workshop'
+    }
   },{                                   //条码管理
     path: '/barcodeManage',                           
-    component: BarcodeManage
+    component: BarcodeManage,
+    meta: {
+    	title: 'barcodeManage'
+    }
   },{                                   //物料
     path: '/stock',                           
     component: Stock,
