@@ -333,7 +333,11 @@
 			// 发起请求
             fetchData () {
 				this.loading = true
-				let oQuery = {"operationIdList":this.operationIdList}
+				let oQuery = {}
+				
+				// 结转参数名修改：turnInOutQueryDtoList
+				let sParamName = (this.nodeType === 10002 ? 'turnInOutQueryDtoList' : 'operationIdList')
+				oQuery[sParamName] = this.operationIdList
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", oQuery, this.requestSucess, this.requestFail, this.requestError)
 		    },
 			// 判断调用接口是否成功。
