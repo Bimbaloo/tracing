@@ -1,6 +1,13 @@
 <!--自定义字段名称脚本-->
 <template>
     <div class="content-factory">
+    	<div class="legend-list">
+    		<span class="item-title">维度:</span>
+    		<div class="item-legend" v-for="item in aoDimension" v-if="item.show">
+    			<span :class="['item-block', `${item.value}`]"></span>
+    			<span class="item-name">{{ item.name }}</span>
+    		</div>
+    	</div>
 		<div 
 		v-for="item in aoCustom"
 		:key="item.id"
@@ -59,6 +66,7 @@
 					<el-radio-group v-model="oCurrentData.dimension">
 						<el-radio 
 						v-for="oDimension in aoDimension" 
+						v-if="oDimension.show"
 						:label="oDimension.value" 
 						:key="oDimension.value">{{oDimension.name}}</el-radio>
 					</el-radio-group>
@@ -166,28 +174,7 @@
 				// 设备。
 				aoEquipment: [],
 				// 维度。
-				aoDimension: [{
-					name: "质量",
-					value: "quality"
-				}, {
-					name: "投产",
-					value: "pool"
-				}, {
-					name: "工单",
-					value: "work"
-				}, {
-					name: "事件",
-					value: "event"
-				}, {
-					name: "工具",
-					value: "tool"
-				}, {
-					name: "维护",
-					value: "repair"
-				}, {
-					name: "工艺",
-					value: "parameter"
-				}],
+//				aoDimension: [],
 				// 参数。
 				aoParameter: [{
 					name: "设备id(equipmentId)",
@@ -244,6 +231,50 @@
 			
         },
         computed: {
+        	// 是否支持工具。
+		    toolManagement() {
+		      return this.$store.state.versionModule && this.$store.state.versionModule.toolManagement
+		    },
+		    // 是否支持工艺。
+		    processParameter() {
+		      return this.$store.state.versionModule && this.$store.state.versionModule.processParameter
+		    },
+		    // 是否支持维护
+		    equipmentMaintenance() {
+		    	return this.$store.state.versionModule && this.$store.state.versionModule.equipmentMaintenance
+		    },
+		    // 维度信息。
+		    aoDimension() {
+		    	return [{
+					name: "质量",
+					value: "quality",
+					show: true
+				}, {
+					name: "投产",
+					value: "pool",
+					show: true
+				}, {
+					name: "工单",
+					value: "work",
+					show: true
+				}, {
+					name: "事件",
+					value: "event",
+					show: true
+				}, {
+					name: "工具",
+					value: "tool",
+					show: this.toolManagement
+				}, {
+					name: "维护",
+					value: "repair",
+					show: this.equipmentMaintenance
+				}, {
+					name: "工艺",
+					value: "parameter",
+					show: this.processParameter
+				}] 
+		    }
 	    },
 	    mounted() {
           // 离开该页面处理
@@ -332,7 +363,7 @@
 			editItem(item) {
 				this.dialogVisible = true
 				this.dialogTitle = "编辑模块"
-				this.oCurrentData = item//$.extend(true, {}, item)
+				this.oCurrentData = $.extend(true, {}, item)
 				this.oBefore = $.extend(true, {}, item)
 			},
 			// 删除模块。
@@ -364,6 +395,10 @@
 			saveModule() {
 				this.$register.sendRequest(this.$store, this.$ajax, MODULE_EDIT_DATA_URL + this.oCurrentData.id, "put", this.oCurrentData, (oData) => {
 					this.showMessage("修改成功。")
+					// 修改数据
+					this.aoCustom = this.aoCustom.map( o => {
+						return o.id == this.oCurrentData.id ? this.oCurrentData : o
+					})
 				}, (sErrorMessage)=>{
 					this.sErrorMessage = sErrorMessage
 					this.showMessage("新增失败。")          
@@ -392,15 +427,65 @@
     }
 	.content-factory {
 		padding: 10px;
-		display: table;
+		/*display: table;*/
 		
+		.legend-list {
+			padding: 10px 0 0 20px;
+			
+			.item-title {
+				display: inline-block;
+				vertical-align: middle;
+				font-size: 12px;
+			}
+			.item-legend {
+				
+				text-align: center;
+				vertical-align: middle;
+				display: inline-block;
+				padding: 0 10px;
+				
+				.item-block {
+					display: inline-block;
+					width: 20px;
+					height: 10px;
+					
+					&.quality {
+						.dimension-color(@quality)
+					}
+					&.pool {
+						.dimension-color(@pool)
+					}
+					&.work {
+						.dimension-color(@work)
+					}
+					&.event {
+						.dimension-color(@event)
+					}
+					&.repair {
+						.dimension-color(@repair)
+					}
+					&.tool {
+						.dimension-color(@tool)
+					}
+					&.parameter {
+						.dimension-color(@parameter)
+					}
+				}
+				
+				.item-name {
+					font-size: 12px;
+				}
+			}
+			
+		}
 	    .item-wrap {
 
 			// line-height: 80px;
 			text-align: center;
 			vertical-align: middle;
 
-			display: table-cell;
+			/*display: table-cell;*/
+			display: inline-block;
 			padding: 20px;
 			width: 180px;
 			height: 80px;				
