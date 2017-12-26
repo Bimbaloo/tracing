@@ -50,7 +50,8 @@
                 loading: true,
                 error: "",
 				pathMapping : {
-					201: "条码绑定", 			
+					205: "条码绑定",
+					206: "条码解绑",
 					202: "容器清空",
 					203: "补料"			
 				},
@@ -60,9 +61,12 @@
                     data: []
 				},
 				allColumns:{
-					201: [{ //条码绑定
-                        prop: "businessType",
-                        name: "动作类型"
+					205: [{ //条码绑定
+                        prop: "opType",
+                        name: "动作类型",
+                        formatter: function(row) {
+                        	return row.opType == "205" ? "绑定" : "解绑"
+                        }
                     },{
                         prop: "barcode",
 						name: "子条码",
@@ -83,7 +87,34 @@
                         prop: "operationTime",
 						name: "时间",
 						width: 200
-                    }], 			  
+                    }], 
+                    206: [{ //条码解绑
+                        prop: "opType",
+                        name: "动作类型",
+                        formatter: function(row) {
+                        	return row.opType == "205" ? "绑定" : "解绑"
+                        }
+                    },{
+                        prop: "barcode",
+						name: "子条码",
+						width: 200
+                    },{
+                        prop: "parentBarcode",
+                        name: "父条码",
+                    },{
+                        prop: "batchNo",
+                        name: "批次",
+                    },{
+                        prop: "quantity",
+                        name: "数量"
+                    },{
+                        prop: "operatorName",
+                        name: "操作人"
+                    },{
+                        prop: "operationTime",
+						name: "时间",
+						width: 200
+                    }],
 					202: [{//容器清空
                         prop: "barcode",
                         name: "条码"
@@ -233,16 +264,6 @@
 				//更新 materialData
 				let oTableData = needTableDatas(this.pathMapping,this.nodeType,this.allColumns)
 				oTableData.data = [].concat(oData.barcodeManagementDetailList)
-				// 条码绑定需特殊处理
-				if(this.nodeType === 201){
-					oTableData.data.forEach((e)=>{
-						if(e.businessType === "1"){
-							e.businessType = "绑定"
-						}else{
-							e.businessType = "解绑"
-						}
-					})
-				}
 				this.materialData = oTableData
 				this.loading = false
             },

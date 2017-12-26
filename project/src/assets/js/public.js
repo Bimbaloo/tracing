@@ -317,8 +317,9 @@ var getNodeIconAndTemp = function(sType) {
 			oIcon.icon = "rework"
 			oIcon.TempMerge = "rework"
 			break
-		// 条码绑定
-		case 201:
+		// 条码绑定： 绑定，解绑
+		case 205:
+		case 206:
 			oIcon.temp = "barcodeManageTemp"
 			oIcon.icon = "barcodeManage"
 			oIcon.TempMerge = "barcodeManage"
@@ -679,10 +680,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			case "barcodeManage":
 				oData.sumList = _sumDataList(oData.detailInfosUnited, ["destBarcode", "batchNo"], ["destBarcode", "batchNo", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
 				// 设置详细信息标题 -- 是否已设定（条码绑定）
-				if(oData.nodeType == "201") {
+				if(oData.nodeType == "205" || oData.nodeType == "206") {
 					// 条码绑定
 					// 设置详细信息标题 托码+物料名称
-					oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ""
+					oData.detailTitle = oData.detailInfosUnited.length ? ((oData.detailInfosUnited[0].srcBarcode ? (oData.detailInfosUnited[0].srcBarcode + "  ") : "")  + oData.detailInfosUnited[0].materialName) : ""
 				}else {
 					// 补料 容器清空
 					oData.detailTitle = oData.detailTitle ? oData.detailTitle : (oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : "")

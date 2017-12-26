@@ -212,7 +212,7 @@
 			
 								// 点击节点信息展示。
 								let nodeType = node.data.nodeType  //被点击节点的 nodeType
-								console.log(nodeType)
+								
 								if(nodeType === 101 || nodeType === 102 || nodeType === 103 || nodeType === 111 || nodeType === 112) {  // 仓库操作     
 									this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
 										nodeType: nodeType
@@ -246,7 +246,7 @@
 											"_tag":  new Date().getTime().toString().substr(-5)
 										}										
 									})
-								}else if(nodeType === 201 || nodeType === 202 || nodeType === 203) { 									// 条码管理     
+								}else if(nodeType === 205 || nodeType === 206 || nodeType === 202 || nodeType === 203) { 									// 条码管理     
 									this.$store.commit('updateNodeType', {	//将nodeType保存到vuex
 										nodeType: nodeType
 									})
