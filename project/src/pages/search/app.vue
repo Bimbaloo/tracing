@@ -159,6 +159,12 @@ export default {
        this.myLocalStorage = []
     }
     
+    let dataName = localStorage.getItem("dataName")
+    if(dataName){
+      let oData = JSON.parse(dataName)
+      this.dataName = oData.concat(this.dataName)
+    }
+
     // 登录验证。
     this.$register.login(this.$store);
     // 获取配置数据。
@@ -305,7 +311,11 @@ export default {
     // 获取名称成功。
     requestNameSucess(oData) {
       // 获取对应的名称。
-      this.dataName = oData.concat(this.dataName)
+      let dataName = localStorage.getItem("dataName")
+      if(!dataName || dataName !== JSON.stringify(oData)){
+        localStorage.setItem('dataName',JSON.stringify(oData))
+        this.dataName = oData.concat(this.dataName)
+      }
     },
     // 获取查询条件的key:value
     fetchDataName() {
