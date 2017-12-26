@@ -392,15 +392,15 @@
     }
 	.content-factory {
 		padding: 10px;
-		display: table;
+		// display: table;
 		
 	    .item-wrap {
 
 			// line-height: 80px;
 			text-align: center;
 			vertical-align: middle;
-
-			display: table-cell;
+			display: inline-block;
+			// display: table-cell;
 			padding: 20px;
 			width: 180px;
 			height: 80px;				

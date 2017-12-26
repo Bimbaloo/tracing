@@ -870,19 +870,20 @@
                     // 过滤其他设备的定制内容，只保留非定制的内容。
                     o.list = o.list.filter(item => item.type)
                     
-                    let oData = this.factoryCustomItemList
+                    let aoData = this.factoryCustomItemList
                     .filter(item => {
                         return item.dimension === o.key && item.equipmentIds.filter(equipment => equipment.split(":")[0] == id).length
-                    })[0]
-
-                    if(oData) {
+                    })
+                    
+                    aoData.forEach( oData => {
                         // 添加数据。
                         o.list.push({
                             name: oData.name,
                             link: oData.link,
                             parameters: oData.parameters
                         })
-                    }
+                    })
+                        
                 })
             },
             // 获取配置数据。
@@ -1327,18 +1328,17 @@
             },
             // 获取定制数据成功。
             requestCustomSucess (aoData) {
-                aoData = [{
-                    name: "FGB",
-                    link: "FGBReport.html",
-                    dimension: "quality",
-                    parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
-                },{
-                    name: "条码参数",
-                    link: "https://www.baidu.com",
-                    dimension: "parameter",
-                    parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
-                }]
-
+                // aoData = [{
+                //     name: "FGB",
+                //     link: "FGBReport.html",
+                //     dimension: "quality",
+                //     parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
+                // },{
+                //     name: "条码参数",
+                //     link: "https://www.baidu.com",
+                //     dimension: "parameter",
+                //     parameters: ["equipmentId", "equipmentName", "startTime", "endTime"]
+                // }]
                 this.dimension.forEach(o => {
                     // 过滤其他设备的定制内容
                     o.list = o.list.filter(item => item.type)
