@@ -189,6 +189,9 @@
 			fullscreen () {
 		    	return this.$store.state.fullscreen
 			},
+			treeFullscreen: function() {
+				return this.$store && this.$store.state.treeFullscreen
+			},
 			// 节点上所有参数
 			detailInfos () {
 		    	return this.$store.state.detailInfos
@@ -234,6 +237,9 @@
 			},
 			/* 全屏大小时，重新设置table大小 */
 			"fullscreen": function(){
+				this.tableHeight = this.setHeight()
+			},
+			"treeFullscreen": function() {
 				this.tableHeight = this.setHeight()
 			}
         },

@@ -1043,6 +1043,9 @@ export default {
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
         },
+        treeFullscreen: function() {
+			return this.$store && this.$store.state.treeFullscreen
+		},
         activeTabChange: function() {
         	return this.$store && this.$store.state.activeTabChange
         },
@@ -1079,6 +1082,7 @@ export default {
         "resizeY": 'setTableHeight',
         /* 全屏大小时，重新设置table大小 */
         "fullscreen": 'setTableHeight',
+        "treeFullscreen": 'setTableHeight',
 //      "activeTabChange": function() {
 //      	if(this.$route.meta.title == 'product' && this.activeTabChange == 'product') {
 //      		// 从设备分析的投产表中进来时，页面会错位。。。fixed导致。。。

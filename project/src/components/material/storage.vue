@@ -95,6 +95,9 @@
 			fullscreen: function() {
 				return this.$store && this.$store.state.fullscreen
 			},
+			treeFullscreen: function() {
+				return this.$store && this.$store.state.treeFullscreen
+			},
 			// 版本信息数据。
 			isOpDbBeforeRefact() {
 				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
@@ -134,6 +137,9 @@
 			"fullscreen": function(){
 				this.tableHeight = this.setHeight()
 			},
+			"treeFullscreen": function() {
+				this.tableHeight = this.setHeight()
+			}
         },
         methods: {
         	// 获取业务库的表格显示列。
