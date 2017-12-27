@@ -77,6 +77,7 @@
                     <el-tab-pane label="曲线图" name="chart" v-if="chartShow" class="chart">
                         <el-tabs v-loading="loading" @tab-click="chartTabChange">
                             <el-tab-pane :label="chartData.filename" v-for="(chartData,index) in tableDatas" :key="index">
+                                <!-- 没有图表时，不显示图表开关 -->
                                 <el-switch
                                     v-model="chartData.value"
                                     on-color="#42af8f"
@@ -86,14 +87,14 @@
                                     on-value="表格"
                                     off-value="图形"
                                     v-for="(option,index) in options" 
-                                    v-if="option.optionModal.series[0].name === chartData.filename"
+                                    v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
                                     :key="index"
                                     @change = "switchChange(chartData.value)">
                                 </el-switch>
                                 <div class="content-echarts" 
                                 v-for="(option,index) in options" 
                                 :key="index"
-                                v-if="option.optionModal.series[0].name === chartData.filename" 
+                                v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename" 
                                 v-show="chartData.value === '图形'">
                                     <div class="charts" :id="`charts`+index"></div>
                                 </div>
@@ -418,6 +419,8 @@ export default {
             if (!oData.length) {  //如果查询结果为空
                 this.error = true
                 this.chartShow = false
+                // 数据不存在时，直接返回。
+                return;
             } else {
                 this.error = false
             }
@@ -859,13 +862,21 @@ export default {
                 let chart = document.getElementById('charts' + index);
                 let echart = this.$echarts.init(chart);
                 echart.setOption(option);
-                this.myEcharts.push(echart)  //将生成的echarts实例对象放到 ' this.myEcharts ' 中
+//              this.myEcharts.push(echart)  //将生成的echarts实例对象放到 ' this.myEcharts ' 中
+                this.myEcharts.push({
+                	index,
+                	echart
+                })
             }
             
         },
         /* 当窗口大小变化，自适应大小 */
         updateEcharts() {
-            this.myEcharts[this.tabPaneNum].resize()
+        	// 图形存在时，则做resize处理。
+        	let oEchart = this.myEcharts.filter(o => o.index == this.tabPaneNum)[0]
+        	
+        	oEchart && oEchart.echart.resize()
+//          this.myEcharts[this.tabPaneNum].resize()
         },
         /* 监听窗口大小 更新echarts的大小 */
         addEvent() {
@@ -937,15 +948,21 @@ export default {
         chartTabChange(tab, event) {
             const index = + tab.index  //当前第几个tabs
             this.tabPaneNum = index
-            if(!this.options[index].rendered) {
-                this.$nextTick(()=>{
-                    this.initEcharts(this.options[index].optionModal, index)
-                })
-            }else {
-                this.$nextTick(()=>{
-                    this.updateEcharts()
-                })
+            
+            // 判断当前是否存在图形。
+            if(this.options[index].optionModal) {
+            	// 存在图形处理。
+	            if(!this.options[index].rendered) {
+	                this.$nextTick(()=>{
+	                    this.initEcharts(this.options[index].optionModal, index)
+	                })
+	            }else {
+	                this.$nextTick(()=>{
+	                    this.updateEcharts()
+	                })
+	            }
             }
+            
         },
         // 切花switch
         switchChange(value) {
