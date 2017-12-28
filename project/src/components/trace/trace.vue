@@ -284,8 +284,9 @@
                 }, (sErrorMessage) => {
 					// 请求失败。
 					oData.loading = false;
-                	oData.columns = this.getColumns()
+//              	oData.columns = this.getColumns()
 					// 提示信息。
+					oData.error = sErrorMessage
 					console.log(sErrorMessage);
 				}, (err) => {
 					// 请求错误。
