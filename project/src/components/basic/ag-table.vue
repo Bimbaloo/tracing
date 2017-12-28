@@ -114,6 +114,15 @@
 				    			o.setSelected(true)	    
 			    			}
 			    		})
+			    		
+			    		// 获取选中的第一条记录在所有数据中的位置。
+			    		let nIndex = 0
+			    		aFilterd.forEach( (o,nIn) => {
+			    			if(o.index == aSelected[0].index) {
+			    				nIndex = nIn
+			    			}
+			    		})
+			    		this.option.api.ensureIndexVisible(nIndex, "top")
 		    		}
 		    	}
 				
