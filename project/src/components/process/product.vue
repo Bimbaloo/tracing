@@ -267,9 +267,6 @@ export default {
         			name: "条码",
                     prop: "barcode"
         		}, {
-        			name: "箱码",
-        			prop: "packetBarcode"
-        		},{
         			name: "工单",
                     prop: "doCode"
         		}, {
@@ -485,10 +482,6 @@ export default {
                     width: 200,
                     cellRenderer: this.createOutItemBarcodeCell
                 }, {
-                    headerName: "箱码",
-                    field: "packetBarcode",
-                    width: 200
-                }, {
                     headerName: "工单",
                     field: "doCode",
                     width: 200
@@ -536,10 +529,6 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "200",
-                }, {
-                    name: "箱码",
-                    prop: "packetBarcode",
-                    width: "200"
                 }, {
                     name: "工单",
                     prop: "doCode",
@@ -1472,8 +1461,8 @@ export default {
         	// 产出汇总合并字段 group: ["batchNo", "materialCode", "equipmentId", "moldCode"]
         	let aoGroup = ["batchNo", "materialCode", "equipmentId", "moldCode"]
         	
-        	// 返回匹配当前行过滤的数据。
-        	return aoAll.filter(o => aoGroup.every( param => o[param] == row[param] ) )
+        	// 返回匹配当前行过滤的数据。产出汇总汇总将不存在的字段值设为了"" 因此这边也需处理
+        	return aoAll.filter(o => aoGroup.every( param => (o[param] || "") == row[param] ) )
         },
         // 批次追踪
         batchClick(row) {

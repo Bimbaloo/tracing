@@ -770,7 +770,8 @@
 					// 车间操作
 					case 1:
 					case 6:
-					case 2:
+					// 结转2,7 合并为10002
+					case 10002:
 					case 8:
 					case 11:
 					case 14:
@@ -785,8 +786,8 @@
 						sDefault = "purple"
 						break
 					// 检验
-					case 1001:
-					case 1002:
+					case 10003:
+					case 10004:
 						sDefault = "red"
 						break
 					default:
@@ -824,8 +825,8 @@
 								</div>`
 					
 						break
-					// 结转
-					case 2:
+					// 结转 2,7 -合并成10002
+					case 10002:
 						sDom = `<div class="item-type">${o.processName + o.opTypeName}:</div>
 								<div class="item-info">
 									<span class="tips">${o.personName||"-"}</span>在
@@ -986,7 +987,7 @@
 								
 						break
 					// 送检
-					case 1001:
+					case 10003:
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
 									<span class="tips">${o.personName||"-"}</span>将
@@ -1001,7 +1002,7 @@
 						
 						break;
 					// 质检
-					case 1002:
+					case 10004:
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
 									<span class="tips">${o.personName||"-"}</span>将
