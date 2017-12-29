@@ -21,9 +21,11 @@
                         :to="{path: oRoute.path, query: oRoute.query}" 
                         replace><span v-if="index">></span>{{oRoute.name}}</router-link>
                 </div>
+                <!-- 目前是时间轴及投产需要缓存 -->
                 <keep-alive>
-                    <router-view></router-view>  
+                    <router-view v-if="$route.meta.keepAlive"></router-view>  
                 </keep-alive>
+                <router-view v-if="!$route.meta.keepAlive"></router-view>  
             </el-tab-pane>
         </el-tabs>        
 

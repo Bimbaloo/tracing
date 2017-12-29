@@ -40,7 +40,7 @@
                 </div>
             </div>
             <el-tabs element-loading-text="拼命加载中" v-model="activeTabName" class="search-tab" @tab-click="tabChange">
-                <el-tab-pane name="unitTable" label="关联表">
+                <el-tab-pane name="unitTable" label="关联表" v-if="showUnited">
                     <h2 class="content-title uniteTitle">
                         <span class='table-title'>投产关联</span>
                         <span class='table-handle'>
@@ -1012,6 +1012,8 @@ export default {
             },
             //  viewHeight:0
             routerContent: 0,
+            // 默认显示关联表，当只有没有投入时，隐藏。
+            showUnited: true,
             show1: true,
             show2: false,
             show3: false
@@ -1058,6 +1060,7 @@ export default {
         	// 设备分析上点击，只有设备分析里的可调用: 否则会调用两次。
         	if((this.isInChart && to.meta.title == 'product') || (!this.isInChart && !to.meta.title) ){
         		// 初始化其他显示值。
+        		this.showUnited = true;
         		this.show1 = true
         		this.show2 = false
         		this.show3 = false
@@ -1090,6 +1093,24 @@ export default {
 			this.inItems.data = this.checked ? this.inItems.dataAll: this.inItems.dataFilter
 			this.outAllItems.data = this.checked ? this.outAllItems.dataAll: this.outAllItems.dataFilter
 			this.inAllItems.data = this.checked ? this.inAllItems.dataAll: this.inAllItems.dataFilter
+       },
+       "inItems.data": function() {
+       		if(!this.inItems.data.length) {
+       			this.showUnited = false;
+       			
+       			// 如果当前默认是显示关联，则处理。
+       			if(this.show1) {
+       				this.activeTabName = "infoTable"
+       				this.show1 = false;
+       				this.show2 = true
+       			}
+       		}else {
+       			this.showUnited = true;
+       			this.activeTabName = "unitTable"
+       			this.show1 = true;
+       			this.show2 = false;
+       			this.show3 = false;
+       		}
        }
     },
     methods: {
@@ -1771,18 +1792,19 @@ export default {
         	this.activeTabName = tab.name
         	
             const index = tab.index
-            switch (index) {
-                case "0":
+            // 由于tab个数不定，不能用index处理
+            switch (tab.name) {
+                case "unitTable":
                     this.show1 = true
                     this.show2 = false
                     this.show3 = false
                     break;
-                case "1":
+                case "infoTable":
                     this.show1 = false
                     this.show2 = true
                     this.show3 = false
                     break;
-                case "2":
+                case "sumTable":
                     this.show1 = false
                     this.show2 = false
                     this.show3 = true

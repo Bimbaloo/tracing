@@ -69,19 +69,22 @@ const routes = [
     path: '/warehouse',                 
     component: Warehouse,
     meta: {
-    	title: 'warehouse'
+    	title: 'warehouse',
+    	keepAlive: false
     }
   },{                                   //车间操作            
     path: '/workshop',                                    
     component: Workshop,
     meta: {
-    	title: 'workshop'
+    	title: 'workshop',
+    	keepAlive: false
     }
   },{                                   //条码管理
     path: '/barcodeManage',                           
     component: BarcodeManage,
     meta: {
-    	title: 'barcodeManage'
+    	title: 'barcodeManage',
+    	keepAlive: false
     }
   },{                                   //物料
     path: '/stock',                           
@@ -112,85 +115,99 @@ const routes = [
       path: 'chart',
       component: Chart,
       meta: {
-      	title: 'chart'
+      	title: 'chart',
+      	keepAlive: true
       }
     },{
       path: 'detail',
       component: Detail,
       meta: {
-      	title: 'detail'
+      	title: 'detail',
+      	keepAlive: false
       }
     },{//投产表
       path: 'product',
       component: Product,
       meta: {
-      	title: 'product'
+      	title: 'product',
+      	keepAlive: true
       }
     },{//退料
       path: 'storesReturned',
       component: StoresReturned,
       meta: {
-      	title: 'storesReturned'
+      	title: 'storesReturned',
+      	keepAlive: false
       }
     },{//结转
       path: 'transfer',
       component: Transfer,
       meta: {
-      	title: 'transfer'
+      	title: 'transfer',
+      	keepAlive: false
       }
     },{//质检
       path: 'qtReport',
       component: QtReport,
       meta: {
-      	title: 'qtReport'
+      	title: 'qtReport',
+      	keepAlive: false
       }
     },{//送检
       path: 'qcReport',
       component: QcReport,
       meta: {
-      	title: 'qcReport'
+      	title: 'qcReport',
+      	keepAlive: false
       }
     },{//fgb
       path: 'fgbReport',
       component: FgbReport,
       meta: {
-      	title:'fgbReport'
+      	title:'fgbReport',
+      	keepAlive: false
       }
     },{//工具
       path: 'tool',
       component: Tool,
       meta: {
-      	title: 'tool'
+      	title: 'tool',
+      	keepAlive: false
       }
     },{//事件
       path: 'event',
       component: Event,
       meta: {
-      	title: 'event'
+      	title: 'event',
+      	keepAlive: false
       }
     },{//维修记录
       path: 'repair',
       component: Repair,
       meta:{
-      	title: 'repair'
+      	title: 'repair',
+      	keepAlive: false
       }
     },{//点检记录
       path: 'spotReport',
       component: SpotReport,
       meta: {
-      	title: 'spotReport'
+      	title: 'spotReport',
+      	keepAlive: false
       }
     },{//工艺参数
       path: 'parameter',
       component: Parameter,
       meta: {
-      	title: 'parameter'
+      	title: 'parameter',
+      	keepAlive: false
       }
     },{//遏制
       path: 'restrain',
       component: Suspicious,
       meta: {
-      	title: 'restrain'
+      	title: 'restrain',
+      	keepAlive: false
       }
     }]
   },

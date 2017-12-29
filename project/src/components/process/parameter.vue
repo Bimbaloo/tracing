@@ -98,7 +98,7 @@
                                 v-show="chartData.value === '图形'">
                                     <div class="charts" :id="`charts`+index"></div>
                                 </div>
-                                <div class="content-tables" v-if="chartData.value === '表格'">
+                                <div class="content-tables" v-if="chartData.value === '表格' && index == tabPaneNum">
                                     <h2 class="content-title tableData">
                                         <span class='table-title'>
                                             <span>检验参数：{{chartData.varStdId}}</span>&nbsp;&nbsp;
