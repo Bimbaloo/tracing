@@ -944,8 +944,8 @@
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
 									<span class="tips">${o.personName||"-"}</span>将
-									<span class="tips">${o.srcWarehouse}</span>仓库
-									<span class="tips">${o.srcReservoir}</span>库位
+									<span class="tips">${o.warehouse}</span>仓库
+									<span class="tips">${o.reservoir}</span>库位
 									条码 <span class="tips">${o.barcode||"-"}</span>,
 									批次<span class="tips">${o.batchNo||"-"}</span>
 									的<span class="tips">${o.materialName||"-"}</span>物料
