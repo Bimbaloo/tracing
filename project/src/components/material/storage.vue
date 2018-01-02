@@ -95,6 +95,9 @@
 			fullscreen: function() {
 				return this.$store && this.$store.state.fullscreen
 			},
+			treeFullscreen: function() {
+				return this.$store && this.$store.state.treeFullscreen
+			},
 			// 版本信息数据。
 			isOpDbBeforeRefact() {
 				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
@@ -134,6 +137,9 @@
 			"fullscreen": function(){
 				this.tableHeight = this.setHeight()
 			},
+			"treeFullscreen": function() {
+				this.tableHeight = this.setHeight()
+			}
         },
         methods: {
         	// 获取业务库的表格显示列。
@@ -332,10 +338,15 @@
            		// 按照条码进行排序。
 //				aoData.sort((a, b) => a.barcode>b.barcode);
 				let that = this;
-				// 先按时间降序排序。
-				aoData.sort((oA, oB) => this.sortData(oA.createTime, oB.createTime, 'desc'))
-				aoData.sort(function(oA,oB) {
-					return that.sortData(oA.barcode,oB.barcode);
+				aoData = aoData.sort(function(oA,oB) {
+					// 先按照barcode排序，然后再按时间排序。
+					let nB = that.sortData(oA.barcode, oB.barcode);
+					
+					if(nB == 0) {
+						return that.sortData(+new Date(oA.createTime), +new Date(oB.createTime), 'desc') > 0 ? 1:-1
+					}else {
+						return nB
+					}
 				});
 				
 				let oBarcode = {},
@@ -444,7 +455,7 @@
                     return param1 - param2;
                 }else {
                     // 字符串。
-                    return param1 > param2 ? 1:-1;
+                    return param1 - param2
                 }
 
             },

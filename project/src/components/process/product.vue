@@ -40,7 +40,7 @@
                 </div>
             </div>
             <el-tabs element-loading-text="拼命加载中" v-model="activeTabName" class="search-tab" @tab-click="tabChange">
-                <el-tab-pane name="unitTable" label="关联表">
+                <el-tab-pane name="unitTable" label="关联表" v-if="showUnited">
                     <h2 class="content-title uniteTitle">
                         <span class='table-title'>投产关联</span>
                         <span class='table-handle'>
@@ -267,9 +267,6 @@ export default {
         			name: "条码",
                     prop: "barcode"
         		}, {
-        			name: "箱码",
-        			prop: "packetBarcode"
-        		},{
         			name: "工单",
                     prop: "doCode"
         		}, {
@@ -485,10 +482,6 @@ export default {
                     width: 200,
                     cellRenderer: this.createOutItemBarcodeCell
                 }, {
-                    headerName: "箱码",
-                    field: "packetBarcode",
-                    width: 200
-                }, {
                     headerName: "工单",
                     field: "doCode",
                     width: 200
@@ -536,10 +529,6 @@ export default {
                     name: "条码",
                     prop: "barcode",
                     width: "200",
-                }, {
-                    name: "箱码",
-                    prop: "packetBarcode",
-                    width: "200"
                 }, {
                     name: "工单",
                     prop: "doCode",
@@ -714,6 +703,7 @@ export default {
                 // 条件过滤后的所有数据
                 dataFilter: [],
                 gridOptions: {
+                	enableSorting: false,
                 	onCellClicked: this.onAgCellClickHandle
                 }
             },
@@ -1023,6 +1013,8 @@ export default {
             },
             //  viewHeight:0
             routerContent: 0,
+            // 默认显示关联表，当只有没有投入时，隐藏。
+            showUnited: true,
             show1: true,
             show2: false,
             show3: false
@@ -1043,6 +1035,9 @@ export default {
         fullscreen: function() {
             return this.$store && this.$store.state.fullscreen
         },
+        treeFullscreen: function() {
+			return this.$store && this.$store.state.treeFullscreen
+		},
         activeTabChange: function() {
         	return this.$store && this.$store.state.activeTabChange
         },
@@ -1066,6 +1061,7 @@ export default {
         	// 设备分析上点击，只有设备分析里的可调用: 否则会调用两次。
         	if((this.isInChart && to.meta.title == 'product') || (!this.isInChart && !to.meta.title) ){
         		// 初始化其他显示值。
+        		this.showUnited = true;
         		this.show1 = true
         		this.show2 = false
         		this.show3 = false
@@ -1079,6 +1075,7 @@ export default {
         "resizeY": 'setTableHeight',
         /* 全屏大小时，重新设置table大小 */
         "fullscreen": 'setTableHeight',
+        "treeFullscreen": 'setTableHeight',
 //      "activeTabChange": function() {
 //      	if(this.$route.meta.title == 'product' && this.activeTabChange == 'product') {
 //      		// 从设备分析的投产表中进来时，页面会错位。。。fixed导致。。。
@@ -1097,6 +1094,24 @@ export default {
 			this.inItems.data = this.checked ? this.inItems.dataAll: this.inItems.dataFilter
 			this.outAllItems.data = this.checked ? this.outAllItems.dataAll: this.outAllItems.dataFilter
 			this.inAllItems.data = this.checked ? this.inAllItems.dataAll: this.inAllItems.dataFilter
+       },
+       "inItems.data": function() {
+       		if(!this.inItems.data.length) {
+       			this.showUnited = false;
+       			
+       			// 如果当前默认是显示关联，则处理。
+       			if(this.show1) {
+       				this.activeTabName = "infoTable"
+       				this.show1 = false;
+       				this.show2 = true
+       			}
+       		}else {
+       			this.showUnited = true;
+       			this.activeTabName = "unitTable"
+       			this.show1 = true;
+       			this.show2 = false;
+       			this.show3 = false;
+       		}
        }
     },
     methods: {
@@ -1267,6 +1282,10 @@ export default {
 					dataFilter: []
 				}
 			}
+			
+			// 投入及产出数据排序。
+			aoInData = aoInData.sort( (oA, oB) => +new Date(oA.happenTime) - +new Date(oB.happenTime) < 0 ? 1 : -1 )
+			aoOutData = aoOutData.sort( (oA, oB) => +new Date(oA.happenTime) - +new Date(oB.happenTime) < 0 ? 1 : -1 )
 			
 			// 根据投入记录->找到其只投未产的数据  === 只投未产。
 			aoInData.forEach( o => {
@@ -1468,8 +1487,8 @@ export default {
         	// 产出汇总合并字段 group: ["batchNo", "materialCode", "equipmentId", "moldCode"]
         	let aoGroup = ["batchNo", "materialCode", "equipmentId", "moldCode"]
         	
-        	// 返回匹配当前行过滤的数据。
-        	return aoAll.filter(o => aoGroup.every( param => o[param] == row[param] ) )
+        	// 返回匹配当前行过滤的数据。产出汇总汇总将不存在的字段值设为了"" 因此这边也需处理
+        	return aoAll.filter(o => aoGroup.every( param => (o[param] || "") == row[param] ) )
         },
         // 批次追踪
         batchClick(row) {
@@ -1778,18 +1797,19 @@ export default {
         	this.activeTabName = tab.name
         	
             const index = tab.index
-            switch (index) {
-                case "0":
+            // 由于tab个数不定，不能用index处理
+            switch (tab.name) {
+                case "unitTable":
                     this.show1 = true
                     this.show2 = false
                     this.show3 = false
                     break;
-                case "1":
+                case "infoTable":
                     this.show1 = false
                     this.show2 = true
                     this.show3 = false
                     break;
-                case "2":
+                case "sumTable":
                     this.show1 = false
                     this.show2 = false
                     this.show3 = true

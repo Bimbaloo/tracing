@@ -2435,7 +2435,10 @@
 			},
 			// 时间更新，页面刷新操作。
 			goRefresh() {
-				if(this.endValidate && this.startValidate) {
+				if( !(this.startIf && this.endIf)) {
+					// 时间还有在编辑。
+					this.$message("请确实时间全部修改完成。")
+				}else if(this.endValidate && this.startValidate) {
 					// 更新当前显示时间。
 					this.datetime.realStart = this.datetime.initStart = this.datetime.beforeStart = this.datetime.start;
 					this.datetime.realEnd = this.datetime.initEnd = this.datetime.beforeEnd = this.datetime.end;
@@ -2445,6 +2448,7 @@
 				}else {
 					this.$message("请确认时间格式")
 				}
+				
 			},
 			/**
 			 * 数据刷新。

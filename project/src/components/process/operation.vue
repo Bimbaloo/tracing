@@ -21,9 +21,11 @@
                         :to="{path: oRoute.path, query: oRoute.query}" 
                         replace><span v-if="index">></span>{{oRoute.name}}</router-link>
                 </div>
+                <!-- 目前是时间轴及投产需要缓存 -->
                 <keep-alive>
-                    <router-view></router-view>  
+                    <router-view v-if="$route.meta.keepAlive"></router-view>  
                 </keep-alive>
+                <router-view v-if="!$route.meta.keepAlive"></router-view>  
             </el-tab-pane>
         </el-tabs>        
 
@@ -72,6 +74,9 @@
 			fullscreen () {
 		    	return this.$store && this.$store.state.fullscreen
             },
+            treeFullscreen: function() {
+				return this.$store && this.$store.state.treeFullscreen
+			},
             processCode () {            
                 return this.$route.query.code
             },
@@ -89,6 +94,16 @@
             },
             activeTabChange: function() {
             	this.activeName = this.activeTabChange
+            },
+            treeFullscreen: function() {
+            	// 设置tab选中的宽度。首次进入工序节点时处理。
+            	if(!this.treeFullscreen) {
+		        	let oTabHead = document.querySelector(".material-stock > .el-tabs .el-tabs__header")
+		        	let oTabHeadActive = oTabHead.querySelector(".el-tabs__active-bar")
+		        	let oTabHeadItem = oTabHead.querySelector(".el-tabs__item")
+		        	
+		      		oTabHeadActive.style.width = oTabHeadItem.offsetWidth + "px"
+            	}
             }
         },
         methods: {

@@ -74,7 +74,8 @@
 			code: "shift"
 		}
 	};
-	const sSessionSelectStorageKey = "selectStorageKey";
+	// 修改数据缓存session名称；否则当在同一个浏览器下切换不同业务库时，加载数据有缓存
+	const sSessionSelectStorageKey = HOST + "selectStorageKey";
 	
     export default {
         props: ["formData", "placeholderData", "keyData", "listData"],

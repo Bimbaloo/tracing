@@ -135,9 +135,9 @@
 	            	},
             		// 验证开始时间。
             	    validateStartTime = (rule, value, callback) => {
-	            		let sTime = value.trim(),
+	            		let sTime = value ? value.trim() : "",
 	            			nNow = +new Date();
-	            		console.log(sTime)
+	            			
 	            		if(!sTime) {
 	            			callback(new Error("请输入开始时间"))
 	            		}else if(!window.Rt.utils.isDateTime(sTime)) {
@@ -151,7 +151,7 @@
             		// 验证结束时间。
             		validateEndTime = (rule, value, callback) => {
 	            		let sStart = oForm.startTime,
-	            			sTime = value.trim(),
+	            			sTime = value ? value.trim() : "",
 	            			bIsFormat = window.Rt.utils.isDateTime(sTime),
 	            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
             	    		nNow = +new Date();
@@ -196,7 +196,7 @@
 	            	
 	            },
 	            validateStart = (rule, value, callback) => {
-	            	let sTime = value.trim(),
+	            	let sTime = value ? value.trim() : "",
 	            		bIsFormat = window.Rt.utils.isDateTime(sTime),
         	    		nNow = +new Date();
         	    	
@@ -215,7 +215,7 @@
 	            // 结束时间。
 	            validateTime = (rule, value, callback) => {
 	            	let sStart = oForm.startTime,
-	            		sTime = value.trim(),
+	            		sTime = value ? value.trim() : "",
             			bIsFormat = window.Rt.utils.isDateTime(sTime),
             			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
         	    		nNow = +new Date();
