@@ -703,6 +703,7 @@ export default {
                 // 条件过滤后的所有数据
                 dataFilter: [],
                 gridOptions: {
+                	enableSorting: false,
                 	onCellClicked: this.onAgCellClickHandle
                 }
             },
@@ -1281,6 +1282,10 @@ export default {
 					dataFilter: []
 				}
 			}
+			
+			// 投入及产出数据排序。
+			aoInData = aoInData.sort( (oA, oB) => +new Date(oA.happenTime) - +new Date(oB.happenTime) < 0 ? 1 : -1 )
+			aoOutData = aoOutData.sort( (oA, oB) => +new Date(oA.happenTime) - +new Date(oB.happenTime) < 0 ? 1 : -1 )
 			
 			// 根据投入记录->找到其只投未产的数据  === 只投未产。
 			aoInData.forEach( o => {
