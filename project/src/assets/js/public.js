@@ -444,7 +444,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					minLen: 4,
 					type: 1,
 					formatter: function(o) {
-						return (o.destBarcode||"").length
+						return (o.barcode||"").length
 					}
 				},{
 					name: "滞留数/调整数",
@@ -629,7 +629,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					type: 1,
 					minLen: 4,
 					formatter: function(o) {
-						return (o.destBarcode||"").length
+						return (o.barcode||"").length
 					}
 				},{
 					name: "滞留数/调整数",
@@ -678,7 +678,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			
 			// 条码绑定 补料 容器清空
 			case "barcodeManage":
-				oData.sumList = _sumDataList(oData.detailInfosUnited, ["destBarcode", "batchNo"], ["destBarcode", "batchNo", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				oData.sumList = _sumDataList(oData.detailInfosUnited, ["barcode", "batchNo"], ["barcode", "batchNo", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
 				// 设置详细信息标题 -- 是否已设定（条码绑定）
 				if(oData.nodeType == "205" || oData.nodeType == "206") {
 					// 条码绑定
@@ -694,7 +694,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					name: "条码",
 					minLen: 2,
 					formatter: function(o) {
-						return (o.destBarcode||"").length
+						return (o.barcode||"").length
 					}
 				},{
 					name: "批次",
@@ -798,8 +798,9 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			if(!oFlag[sKey]) {
 				// 设置展示的值。
 				oFlag[sKey] = {};
-
-				aDis.forEach(sDis => oFlag[sKey][sDis] = (o[sDis] || 0) )
+				
+				// 展示的数据，如果为null 如果需要汇总则为0，否则为空
+				aDis.forEach(sDis => oFlag[sKey][sDis] = (o[sDis] || (aSum.includes(sDis) ? 0 : '')) )
 			} else {
 				// 存在，在汇总数据。
 				// 默认为quantity
@@ -932,7 +933,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					srcBarcode: sKey,
 					// 加入目标条码及调整数量。
 					list: [{
-						destBarcode: o.destBarcode,
+						barcode: o.barcode,
 						// 调整数
 						destAdjustQuantity: o.destAdjustQuantity,
 						// 滞留数
@@ -942,7 +943,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			}else {
 				// 更改目标条码数据。
 				oFlag[sKey].list.push({
-					destBarcode: o.destBarcode,
+					barcode: o.barcode,
 					// 调整数
 					destAdjustQuantity: o.destAdjustQuantity,
 					// 滞留数
@@ -954,7 +955,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 		// 合并目标条码数据。
 		for( let sParam in oFlag) {
 			let aList = oFlag[sParam].list
-			oFlag[sParam].list = _sumDataList(aList, ["destBarcode"], ["destBarcode", "destAdjustQuantity", "remainQuantity"], ["destAdjustQuantity", "remainQuantity"])
+			oFlag[sParam].list = _sumDataList(aList, ["barcode"], ["barcode", "destAdjustQuantity", "remainQuantity"], ["destAdjustQuantity", "remainQuantity"])
 			oFlag[sParam].destAdjustQuantity = oFlag[sParam].list.map( o => o.destAdjustQuantity).reduce(function(nPrev, nNext) {
 				return nPrev + nNext
 			}, 0)
