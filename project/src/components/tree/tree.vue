@@ -242,7 +242,7 @@
 		    barcodeTemplate() {
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.TextBlock, 
-								new go.Binding("text", "destBarcode"), // 条码
+								new go.Binding("text", "barcode"), // 条码
 								new go.Binding("width", "column0"),
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock,
@@ -306,7 +306,7 @@
 										itemTemplate:
 											this.$(go.Panel, "TableRow",
 												this.$(go.TextBlock,
-													new go.Binding("text", "destBarcode"),
+													new go.Binding("text", "barcode"),
 													new go.Binding("width", "column2"),
 													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 												),
