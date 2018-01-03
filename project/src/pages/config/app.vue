@@ -202,11 +202,9 @@
     		color: rgb(31, 61, 55);
     	}
     }
-
-    // .v-modal {
-    //     display: none;
-    // }
-    // .el-dialog__wrapper.transfer-dialog {
-    //     background-color: rgba(0,0,0,0.3)
-    // }
+    
+	.v-modal-enter {
+	    -webkit-animation: v-modal-in .2s ease;
+	    animation: v-modal-in .2s ease;
+    }
 </style>
