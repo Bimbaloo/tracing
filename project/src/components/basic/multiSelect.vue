@@ -6,6 +6,7 @@
     	style="width: 100%;" 
     	multiple 
     	filterable 
+    	remote
     	clearable
     	:loading="loading"
     	loading-text="加载中..."
