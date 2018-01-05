@@ -16,7 +16,7 @@
 					{{ error }}
 				</div>
 				<el-table
-					v-else-if="isOpDbBeforeRefact"
+					v-else
     				border
             		v-loading="loading"
             		element-loading-text="拼命加载中"
@@ -41,7 +41,7 @@
 			  			</template>
 			  		</el-table-column>
 			  	</el-table>
-                <v-table v-else :table-data="materialData" :loading="loading"></v-table>    
+                <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->    
             </div>
 
         </div>
@@ -185,24 +185,22 @@
                         prop: "vendorName",
                         name: "供应商/客户"
                     }] : [{
-                        type: "index",
+                        prop: "index",
                         name: "序号",
-                        width: "50px"
+                        width: "50px",
+                        merge: true
+                    }, {
+                    	prop: "batchNo",
+                    	name: "批次",
+                    	class: "batch",
+                    	click: this.batchClick,
+                    	merge: true
                     }, {
                     	prop: "barcode",
                     	name: "条码"
                     }, {
-                    	prop: "materialCode",
-                    	name: "物料编码"
-                    }, {
-                    	prop: "materialName",
-                    	name: "物料名称"
-                    }, {
-                    	prop: "batchNo",
-                    	name: "批次"
-                    }, {
                     	prop: "quantity",
-                    	name: "总数"
+                    	name: "数量"
                     }, {
                     	prop: "remainQuantity",
                     	name: "滞留数"
@@ -231,8 +229,9 @@
             // 点击批次
             batchClick (row) {
             	if(row.batchNo) {
-            		// 批次存在可点击
-	                this.$router.replace({ path: `/stock/batch`, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
+            		// 批次存在可点击  新版本跳转到可疑品。
+            		let sPath = this. isOpDbBeforeRefact ? '/stock/batch' : '/stock/restrain'
+	                this.$router.replace({ path: sPath, query: { materialCode : row.materialCode, batchNo: row.batchNo }})
             	}
 			},
 			// 请求成功。
@@ -244,7 +243,8 @@
 					this.error = "查无数据。"
 					console.log("查无数据。");
 				}else {
-					oData.data = this.formatData(oData);
+					oData.data = this.isOpDbBeforeRefact ? this.formatData(oData) : this.newFormatData(oData)
+					
 					this.materialData.data = oData.data
 					this.styleObject.minWidth = "1200px";
 					
@@ -324,10 +324,39 @@
             		if(this.bTrace) {
 	            		this.materialData.columns = this.materialData.columns.filter(o => o.prop != 'remainQuantity')
             		}
-            		// 显示按照destSnapshotId过滤后的数据
-            		this.materialData.data = window.Rt.utils.uniqueObject(this.detailInfos, "destSnapshotId")
-					this.styleObject.minWidth = "1200px";
+            		
+            		//  显示按照destSnapshotId过滤后的数据 显示数据。
+            		this.requestSucess(window.Rt.utils.uniqueObject(this.detailInfos, "destSnapshotId"))
             	}
+           },
+           // 表格单元格数据合并处理。
+           arraySpanMethod({ row, column, rowIndex, columnIndex }) {
+           		// 第一列及第二列合并。
+           		console.log(row,column,rowIndex,columnIndex)
+           },
+           // 新业务库数据处理。--elementui 2.0版本表格有合并单元格功能。
+           newFormatData(aoData) {
+           		aoData = aoData.sort( (oA,oB) => this.sortData(oA.batchNo, oB.batchNo));
+           		
+           		let oBatchNo = {},
+					nRow = 0,
+					nIndex = 1;
+					
+				aoData.forEach((o, index) => {
+					if(oBatchNo[o.batchNo]) {							
+						oBatchNo[o.batchNo]++;
+						aoData[nRow].rowspan = oBatchNo[o.batchNo];
+						o.hide = true;
+					}else {
+						o.index = nIndex;
+						oBatchNo[o.batchNo] = 1;
+						nRow = index;
+						nIndex ++;
+						o.rowspan = oBatchNo[o.batchNo];
+					}
+				})
+				
+				return aoData
            },
            /**
             * 格式化数据。
@@ -335,9 +364,8 @@
             * @return {Array}
             */
            formatData (aoData) {
-           		// 按照条码进行排序。
-//				aoData.sort((a, b) => a.barcode>b.barcode);
 				let that = this;
+				
 				aoData = aoData.sort(function(oA,oB) {
 					// 先按照barcode排序，然后再按时间排序。
 					let nB = that.sortData(oA.barcode, oB.barcode);
@@ -352,6 +380,7 @@
 				let oBarcode = {},
 					nRow = 0,
 					nIndex = 1;
+					
 				aoData.forEach((o, index) => {
 					if(oBarcode[o.barcode]) {							
 						oBarcode[o.barcode]++;
@@ -377,6 +406,9 @@
             },
 		   	// 表格导出。
             exportExcelHandle (sTable, oTableData, event) {
+            	
+            	oTableData.filename = this.isOpDbBeforeRefact ? '仓储信息' : '物料明细'
+            	
 				window.Rt.utils.exportMergeTable2Excel(XLSX, Blob, FileSaver, oTableData, this.$refs[sTable])
                 // 下载表格。
                 // window.Rt.utils.exportTable2Excel(XLSX, Blob, FileSaver, this.$refs[sTable], sFileName, {date: "yyyy-mm-dd HH:MM:ss"});      

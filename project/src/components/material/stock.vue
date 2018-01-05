@@ -11,7 +11,8 @@
         </div>
         <div class="router-path">
             <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":"物料明细" }}</span>
-            <span class="path-item" @click="checkBatch" v-if="batchIf">>同批出入库</span>
+            <!-- 新版本中没有同批次入库 -->
+            <span class="path-item" @click="checkBatch" v-if="batchIf && isOpDbBeforeRefact">>同批出入库</span>
             <span class="path-item" v-if="restrainIf">>可疑品</span>
         </div> 
         <keep-alive>
