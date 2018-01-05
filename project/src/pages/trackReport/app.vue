@@ -19,14 +19,14 @@
 				<span>查询明细
 					<i class="el-icon-d-arrow-right icon" v-show="!active.message"></i>
 					<span v-show="active.message">--追踪结果集选中行信息</span>
-					<span v-show="active.message" style="color:#999;margin-left:10px">设备名称：（条码，加工时间）</span>
+					<span v-show="active.message" style="color:#999;margin-left:10px">（条码，加工时间）</span>
 				</span>
 			</div>
 			<div class="content-table condition-table" v-show="active.message">
-				<div class='materialBox' v-for="equipment in equipmentTimes">
-					<div class='material'>{{equipment['name']}}：</div>
+				<div class='materialBox' v-for="(equipment,index) in equipmentTimes" :key="index">
+					<!-- <div class='material'>{{equipment['name']}}：</div> -->
 					<div class='time' >
-						<span v-for='(time,i) in equipment["time"]'>（{{equipment["barcode"][i]}}，{{time}}）</span>
+						<span v-for='(time,i) in equipment["time"]' :key="i">（{{equipment["barcode"][i]}}，{{time}}）</span>
 					</div>
 				</div>
 			</div>
@@ -218,7 +218,7 @@
 				let needArr = []
 				let selectedArr = []
 				this.selected.forEach((o, index) => {
-					selectedArr.push(myData.find(e=> o.bucketNo === e.bucketNo))
+					selectedArr.push(myData.find(e=> o.snapshotId === e.snapshotId))
 				})
 				this.selectedArrs = JSON.parse(JSON.stringify(selectedArr))
 				selectedArr.forEach((el,i)=>{
@@ -247,7 +247,7 @@
 					console.log('查无数据。');
 				}else {
 					this.gridData.data.forEach((o, index) => {
-						if(this.selected.length && this.selected.filter(item => o.bucketNo === item.bucketNo).length) {
+						if(this.selected.length && this.selected.filter(item => o.snapshotId === item.snapshotId).length) {
 							// 标记为选中。
 							o.tag = "selected";
 						}else {
