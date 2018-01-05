@@ -293,6 +293,7 @@ var getNodeIconAndTemp = function(sType) {
 			oIcon.icon = "workshop"
 			oIcon.temp = "workshopCarryoverTemp"
 			oIcon.TempMerge = "workshopCarryover"
+			break;
 		// 退料
 		case 8:
 			oIcon.temp = "workshopReturnMateiralTemp"
