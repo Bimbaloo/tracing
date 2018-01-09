@@ -10,11 +10,11 @@ export const versionModule = {
 		// 断链修复。
 		linkRepair: false,
 		// 工具。
-		toolManagement: true,
+		toolManagement: false,
 		// 工艺。
-		processParameter: true,
+		processParameter: false,
 		// 维护。
-		equipmentMaintenance: true,
+		equipmentMaintenance: false,
 		// fgb。
 		fgb: false
 	},
