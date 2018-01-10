@@ -76,27 +76,28 @@
         },
         computed: {
 	        // 是否编辑的状态。
-	        edit () {
-	          return this.$store.state.edit
-	        }
+//	        edit () {
+//	          return this.$store.state.edit
+//	        }
 	    },
 	    mounted() {
           // 离开改页面处理
-          	let self = this
-          	window.onbeforeunload = () => {
-          		if(self.edit) {
-          			// 提示需要保存。
-          			return false
-          		}
-          	}
+//        	let self = this
+//        	window.onbeforeunload = () => {
+//        		if(self.edit) {
+//        			// 提示需要保存。
+//        			return false
+//        		}
+//        	}
         },
         watch: {
-        	tableData: {
-        		handler: "changeState",
-        		deep: true
-        	}
+//      	tableData: {
+//      		handler: "changeState",
+//      		deep: true
+//      	}
         },
         methods: {
+        	// 暂时不需要，edit只是自定义模块中修改的内容
         	changeState: function(oldValue, newValue) {
         		// 判断是否一致。
         		let bEdit = false,

@@ -12,9 +12,9 @@
             <div class="content-bg">
             	<div class="content-wrap">
 	                <div class="content">
-                        <keep-alive>
+                        <!--<keep-alive>-->
 	                        <router-view></router-view>
-                        </keep-alive>
+                        <!--</keep-alive>-->
 	                </div>
             	</div>
             </div>
@@ -65,8 +65,8 @@
         },
         methods: {
             turnTo(routerLink,index){
-            	let self = this
-            	if(self.edit || self.ModuleOrderListEdit && self.isActive != index) {
+            	let self = this // edit只是处理模块
+            	if((self.edit || self.ModuleOrderListEdit) && self.isActive != index && self.isActive === 0)  {
 					// 存在未保存，是否处理。  ---- 确定与取消按钮交换
 					self.$confirm('内容未保存，是否离开本页?', '提示', {
 			          	cancelButtonText: '取消',	
@@ -79,7 +79,15 @@
 			          			// 取消操作。还在当前页面。
 			        			return false
 			          		}else {
-			          			// 确定操作。离开当前页面
+			          			// 确定操作。离开当前页面。 页面缓存不能使用，否则状态更新不了
+			          			this.$store.commit({
+						          type: "updateEdit",
+						          key: false
+						        });
+						        this.$store.commit({
+						          type: "updateModuleOrderListEdit",
+						          key: false
+						        });
 					        	self.isActive=index;
 		                		self.$router.replace({path:routerLink});
 					        	return true

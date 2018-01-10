@@ -273,18 +273,6 @@
 				}] 
 		    }
 	    },
-	    mounted() {
-          // 离开该页面处理
-          	let self = this
-          	window.onbeforeunload = () => {
-          		if(self.edit) {
-          			// 提示需要保存。
-          			return false
-          		}
-          	}
-        },
-        watch: {
-        },
         methods: {
 			// 显示操作按钮。
 			showHandleIcons(event) {

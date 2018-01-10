@@ -219,7 +219,7 @@ export default {
     // 离开改页面处理(刷新、关闭页面等操作)
     let self = this;
     (window.onbeforeunload = () => {
-      if (self.edit && this.ModuleOrderListEdit) {
+      if (self.edit || this.ModuleOrderListEdit) {
         // 提示需要保存。
         return false;
       }
