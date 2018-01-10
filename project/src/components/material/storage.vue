@@ -160,6 +160,12 @@
 						width: 200,
                         click: this.batchClick
                     },{
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
+                    },{
                         prop: "quantity",
                         name: "数量",
                         width: "50px"
@@ -198,6 +204,12 @@
                     }, {
                     	prop: "barcode",
                     	name: "条码"
+                    }, {
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
                     }, {
                     	prop: "quantity",
                     	name: "数量"

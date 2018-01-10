@@ -962,7 +962,7 @@
 									<span class="tips">${o.personName||"-"}</span>将
 									<span class="tips">${o.srcWarehouse}</span>仓库
 									<span class="tips">${o.srcReservoir}</span>库位
-									条码 <span class="tips">${o.srcBarcode||"-"}</span>,
+									条码 <span class="tips">${o.barcode||"-"}</span>,
 									批次<span class="tips">${o.batchNo||"-"}</span>
 									的<span class="tips">${o.materialName||"-"}</span>物料
 									${o.quantity}件,转储到

@@ -83,6 +83,12 @@
                         name: "新库位",
                         width: "60px"
                     },{
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
+                    },{
                         prop: "quantity",
                         name: "数量"
                     },{
@@ -98,6 +104,12 @@
                     },{
                         prop: "batchNo",
                         name: "批次"
+                    },{
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
                     },{
                         prop: "destWarehouse",
                         name: "仓库"
@@ -127,6 +139,12 @@
                     },{
                         prop: "batchNo",
                         name: "批次"
+                    },{
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
                     },{
                         prop: "destWarehouse",
                         name: "仓库"
@@ -161,6 +179,12 @@
                         name: "库位",
                         width: "60px"
                     },{
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
+                    },{
                         prop: "quantity",
                         name: "数量"
                     },{
@@ -180,12 +204,14 @@
                         prop: "batchNo",
                         name: "批次"
                     },{
+                    	prop: "materialName",
+                    	name: "物料名称"
+                    }, {
+                    	prop: "materialCode",
+                    	name: "物料编码"
+                    },{
                         prop: "destWarehouse",
                         name: "仓库"
-                    // },{
-                    //     prop: "srcReservoir",
-                    //     name: "源库位",
-                    //     width: "60px"
                     },{
                         prop: "destReservoir",
                         name: "库位",
