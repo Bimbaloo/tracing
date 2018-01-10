@@ -359,7 +359,6 @@ export default {
     // 保存当前模块的数据。
     async saveModuleValue(sModule, index) {
       // 参数。
-
       let oResult = this.category[index - 1];
 
       // 判断当前是否可以保存。
@@ -498,6 +497,10 @@ export default {
 	          type: "updateModuleOrderListEdit",
 	          key: false
 	        });
+	        // 修改顺序。			
+			this.category.forEach( o => {
+				o.moduleOrder = this.moduleOrderList.moduleOrderList.filter(om => om.moduleCode == o.moduleCode)[0].moduleOrder
+			})
 	        this.categoryCopy = [].concat(this.category);
 	        this.$message({
 	          message: "保存成功",
