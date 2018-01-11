@@ -16,8 +16,8 @@
 					</el-form-item>
 				</el-form>
 			</div>
-			<div class="error" v-if="error">{{error}}</div>
-			<div v-else class="dialog-main" v-loading="loading" element-loading-text="拼命加载中">
+			<div class="error" v-show="error">{{error}}</div>
+			<div v-show="!error" class="dialog-main" v-loading="loading" element-loading-text="拼命加载中">
 				<div class="main-item item-info">
 					<div class="item-title">条码信息</div>
 					<div class="item-content">
@@ -197,10 +197,11 @@
 								float: left;
 								line-height: 30px;
 								
-								overflow: hidden;
+								/*overflow: hidden;
 								text-overflow: ellipsis;
 								vertical-align: middle;
-								white-space: nowrap;
+								white-space: nowrap;*/
+								word-wrap: break-word;
 							}
 						
 						}
