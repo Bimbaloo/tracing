@@ -348,6 +348,7 @@
            },
            // 新业务库数据处理。--elementui 2.0版本表格有合并单元格功能。
            newFormatData(aoData) {
+           		
            		aoData = aoData.sort( (oA,oB) => this.sortData(oA.batchNo, oB.batchNo));
            		
            		let oBatchNo = {},
@@ -499,7 +500,7 @@
                     return param1 - param2;
                 }else {
                     // 字符串。
-                    return param1 - param2
+                    return param1 > param2
                 }
 
             },
