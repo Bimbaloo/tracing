@@ -213,8 +213,11 @@
                         prop: "destWarehouse",
                         name: "仓库"
                     },{
+                    	prop: "srcReservoir",
+                    	name: "源条码库位"
+                    },{
                         prop: "destReservoir",
-                        name: "库位",
+                        name: "目标条码库位",
                         width: "60px"
                     },{
                         prop: "quantity",
