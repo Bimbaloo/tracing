@@ -379,7 +379,8 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 		
 		oData.category = "simple"
 		// detailInfos按destSnapshotId去重处理。只有计算主图详情的数据才需要去重，传入后面的数据不需去重
-		oData.detailInfosUnited = window.Rt.utils.uniqueObject(oData.detailInfos, "destSnapshotId")
+//		oData.detailInfosUnited = window.Rt.utils.uniqueObject(oData.detailInfos, "destSnapshotId")
+		oData.detailInfosUnited = oData.detailInfos
 		
 		// 根据节点类型，会哦在那个数据。 -- 增加sumList及明细模板字段 图形字段
 		let oNodeType = getNodeIconAndTemp(oData.nodeType)
@@ -503,7 +504,8 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					if(oLastGroupItem) {
 						// 取最后一道工序的产出。-- 最后一道工序中的数据去重
 						let oCopy = Object.assign({}, oLastGroupItem)
-						oCopy.detailInfosUnited = window.Rt.utils.uniqueObject(oCopy.detailInfos, "destSnapshotId")
+//						oCopy.detailInfosUnited = window.Rt.utils.uniqueObject(oCopy.detailInfos, "destSnapshotId")
+						oCopy.detailInfosUnited = oCopy.detailInfos
 						
 						oData = Object.assign({}, oData, _sumProcessData(oCopy))
 					}
@@ -557,11 +559,8 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			case "workshopCarryover":
 				oData.sumList = _sumDataList(oData.detailInfosUnited, ["materialCode"], ["materialName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
 				
-				// 获取源工单及目标工单。 源：操作==转出  目标： 操作==转出的快照==操作==转入的源快照
-				let oOut = oData.detailInfosUnited.filter( o => o.opType == "7")[0] || {},
-					oIn = oData.detailInfosUnited.filter( o => o.opType == "2" && o.srcSnapshotId == oOut.destSnapshotId)[0] || {}
-				
-				oData.detailTitle = `源:${oOut.doCode || ''} 目标:${oIn.doCode || ''}`
+				let oFirst = oData.detailInfosUnited.length ? oData.detailInfosUnited[0] : {}
+				oData.detailTitle = `源:${oFirst.srcDoCode || ''} 目标:${oFirst.doCode || ''}`
 				
 				oData.headerList = [{
 					name: "物料",

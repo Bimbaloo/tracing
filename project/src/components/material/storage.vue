@@ -337,8 +337,7 @@
 	            		this.materialData.columns = this.materialData.columns.filter(o => o.prop != 'remainQuantity')
             		}
             		
-            		//  显示按照destSnapshotId过滤后的数据 显示数据。
-            		this.requestSucess(window.Rt.utils.uniqueObject(this.detailInfos, "destSnapshotId"))
+            		this.requestSucess(this.detailInfos)
             	}
            },
            // 表格单元格数据合并处理。
@@ -500,7 +499,7 @@
                     return param1 - param2;
                 }else {
                     // 字符串。
-                    return param1 > param2
+                    return param1 > param2 ? 1 : -1
                 }
 
             },
