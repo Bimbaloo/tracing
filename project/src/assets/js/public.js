@@ -374,6 +374,8 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 		aoDiagramData = [],
 		aoDiagramLinkData = [];
 
+	let isNoRemain = (bIsOld || sPageType == "trace")
+	
 	// 循环处理数据。
 	aoData.forEach(oData => {
 		
@@ -385,6 +387,9 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 		// 根据节点类型，会哦在那个数据。 -- 增加sumList及明细模板字段 图形字段
 		let oNodeType = getNodeIconAndTemp(oData.nodeType)
 		
+		let aDis = []
+		let aSum = []
+		
 		// 设置icon类型和detailType
 		oData.iconType = oNodeType.icon
 		oData.detailType = oNodeType.temp
@@ -395,7 +400,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			// 库存转储
 			case "warehouseDump" :
 				// 设置详细信息。-- 仓库及库位
-				oData.sumList = _sumDataList(oData.detailInfosUnited, ["batchNo"], ["batchNo", "quantity", "remainQuantity", "srcWarehouse", "srcWarehouseLocation", "destWarehouse", "destWarehouseLocation"], ["quantity", "remainQuantity"])
+				aDis = isNoRemain ? ["batchNo", "quantity", "srcWarehouse", "srcWarehouseLocation", "destWarehouse", "destWarehouseLocation"] : ["batchNo", "quantity", "remainQuantity", "srcWarehouse", "srcWarehouseLocation", "destWarehouse", "destWarehouseLocation"]
+				aSum = isNoRemain ? ["quantity"] : ["quantity", "remainQuantity"]
+				
+				oData.sumList = _sumDataList(oData.detailInfosUnited, ["batchNo"], aDis , aSum)
 				// 设置详细信息标题
 				oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : "" 
 				// 设置表头。
@@ -406,10 +414,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.batchNo || "").length
 					}
 				},{
-					name: "滞留数/总数",
-					minLen: 6,
+					name: (isNoRemain ? "总数": "滞留数/总数"),
+					minLen: (isNoRemain ? 2: 6),
 					formatter: function(o) {
-						return (o.remainQuantity+"/"+o.quantity).length
+						return isNoRemain ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
 					}
 				},{
 					name: "仓库库位",
@@ -427,7 +435,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			case "warehouseAdjust" :
 				// 设置详细信息标题
 				oData.detailTitle = `${oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ""}(${oData.detailInfosUnited.length ? (oData.detailInfosUnited[0].destWarehouse || "") : ""})`
-				oData.sumList = _sumWorkShopData(oData)
+				oData.sumList = _sumWorkShopData(oData, isNoRemain)
 				// 设置表头。
 				oData.headerList = [{
 					name: "源条码",
@@ -449,11 +457,11 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.barcode||"").length
 					}
 				},{
-					name: "滞留数/调整数",
-					minLen: 7,
+					name: (isNoRemain ? "调整数": "滞留数/调整数"),
+					minLen: (isNoRemain ? 3: 7),
 					type: 1,
 					formatter: function(o) {
-						return (o.remainQuantity+"/"+o.destAdjustQuantity).length
+						return isNoRemain ? (o.destAdjustQuantity+"").length : (o.remainQuantity+"/"+o.destAdjustQuantity).length
 					}
 				}]
 				
@@ -466,7 +474,11 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			// 出库
 			// 库存损益
 			case "warehouse":
-				oData.sumList = _sumDataList(oData.detailInfosUnited, ["batchNo", "destWarehouse", "destWarehouseLocation"], ["batchNo", "destWarehouse", "destWarehouseLocation", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				
+				aDis = isNoRemain ? ["batchNo", "destWarehouse", "destWarehouseLocation", "quantity"] : ["batchNo", "destWarehouse", "destWarehouseLocation", "quantity", "remainQuantity"]
+				aSum = isNoRemain ? ["quantity"] : ["quantity", "remainQuantity"]
+			
+				oData.sumList = _sumDataList(oData.detailInfosUnited, ["batchNo", "destWarehouse", "destWarehouseLocation"], aDis, aSum)
 				// 设置详细信息标题
 				oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ""
 				// 设置表头。
@@ -477,10 +489,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.batchNo||"").length
 					}
 				},{
-					name: "滞留数/总数",
-					minLen: 6,
+					name: (isNoRemain ? "总数": "滞留数/总数"),
+					minLen: (isNoRemain ? 2: 6),
 					formatter: function(o) {
-						return (o.remainQuantity + "/" + o.quantity).length
+						return isNoRemain ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
 					}
 				},{
 					name: "仓库库位",
@@ -543,11 +555,11 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.batchNo||"").length
 					}
 				},{
-					name: (( bIsOld || sPageType == "trace" ) ? "总数": "滞留数/总数"),
-					minLen: (( bIsOld || sPageType == "trace" ) ? 2: 6),
+					name: (isNoRemain ? "总数": "滞留数/总数"),
+					minLen: (isNoRemain ? 2: 6),
 					type: 2,
 					formatter: function(o) {
-						return (bIsOld || sPageType == "trace") ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
+						return isNoRemain ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
 					}
 				}]
 				
@@ -557,7 +569,11 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 				break;
 			// 	结转
 			case "workshopCarryover":
-				oData.sumList = _sumDataList(oData.detailInfosUnited, ["materialCode"], ["materialName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				
+				aDis = isNoRemain ? ["materialName", "quantity"] : ["materialName", "quantity", "remainQuantity"]
+				aSum = isNoRemain ? ["quantity"] : ["quantity", "remainQuantity"]
+				
+				oData.sumList = _sumDataList(oData.detailInfosUnited, ["materialCode"], aDis, aSum)
 				
 				let oFirst = oData.detailInfosUnited.length ? oData.detailInfosUnited[0] : {}
 				oData.detailTitle = `源:${oFirst.srcDoCode || ''} 目标:${oFirst.doCode || ''}`
@@ -570,10 +586,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.materialName||"").length
 					}
 				}, {
-					name: "滞留数/总数",
-					minLen: 6,
+					name: (isNoRemain ? "总数": "滞留数/总数"),
+					minLen: (isNoRemain ? 2: 6),
 					formatter: function(o) {
-						return (o.remainQuantity + "/" + o.quantity).length
+						return isNoRemain ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
 					}
 				}]
 				
@@ -583,7 +599,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 				break;
 			// 	退料
 			case "workshopReturnMateiral":
-				oData.sumList = _sumDataList(oData.detailInfosUnited, ["materialCode"], ["materialName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				aDis = isNoRemain ? ["materialName", "quantity"] : ["materialName", "quantity", "remainQuantity"]
+				aSum = isNoRemain ? ["quantity"] : ["quantity", "remainQuantity"]
+				
+				oData.sumList = _sumDataList(oData.detailInfosUnited, ["materialCode"], aDis, aSum)
 				// 工单
 				oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].doCode : ""
 				
@@ -595,10 +614,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.materialName||"").length
 					}
 				}, {
-					name: "滞留数/总数",
-					minLen: 6,
+					name: (isNoRemain ? "总数": "滞留数/总数"),
+					minLen: (isNoRemain ? 2: 6),
 					formatter: function(o) {
-						return (o.remainQuantity + "/" + o.quantity).length
+						return isNoRemain ? (o.quantity+"").length : (o.remainQuantity + "/" + o.quantity).length
 					}
 				}]
 				
@@ -608,7 +627,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 				break;
 			//	车间调整
 			case "workshop":
-				oData.sumList = _sumWorkShopData(oData)
+				oData.sumList = _sumWorkShopData(oData, isNoRemain)
 				oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : "";
 				
 				// 设置表头。
@@ -632,11 +651,11 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.barcode||"").length
 					}
 				},{
-					name: "滞留数/调整数",
+					name: (isNoRemain ? "调整数": "滞留数/调整数"),
 					type: 1,
-					minLen: 7,
+					minLen: (isNoRemain ? 3: 7),
 					formatter: function(o) {
-						return (o.remainQuantity+"/"+o.destAdjustQuantity).length
+						return isNoRemain ? (o.destAdjustQuantity+"").length : (o.remainQuantity+"/"+o.destAdjustQuantity).length
 					}
 				}]
 				
@@ -646,7 +665,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 				break;
 			// 返工入站 返工出站
 			case "rework":
-				oData.sumList = _sumDataList(oData.detailInfosUnited, ["batchNo", "qualityTypeName"], ["batchNo", "qualityTypeName", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				aDis = isNoRemain ? ["batchNo", "qualityTypeName", "quantity"] : ["batchNo", "qualityTypeName", "quantity", "remainQuantity"]
+				aSum = isNoRemain ? ["quantity"] : ["quantity", "remainQuantity"]
+				
+				oData.sumList = _sumDataList(oData.detailInfosUnited, ["batchNo", "qualityTypeName"], aDis, aSum)
 				// 设置详细信息标题
 				oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ""
 				
@@ -658,10 +680,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.batchNo||"").length
 					}
 				},{
-					name: "滞留数/总数",
-					minLen: 7,
+					name: (isNoRemain ? "总数": "滞留数/总数"),
+					minLen: (isNoRemain ? 2: 6),
 					formatter: function(o) {
-						return (o.remainQuantity+"/"+o.quantity).length
+						return isNoRemain ? (o.quantity+"").length : (o.remainQuantity+"/"+o.quantity).length
 					}
 				},{
 					name: "质量",
@@ -678,7 +700,11 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			
 			// 条码绑定 补料 容器清空
 			case "barcodeManage":
-				oData.sumList = _sumDataList(oData.detailInfosUnited, ["barcode", "batchNo"], ["barcode", "batchNo", "quantity", "remainQuantity"], ["quantity", "remainQuantity"])
+				aDis = isNoRemain ? ["barcode", "batchNo", "quantity"] : ["barcode", "batchNo", "quantity", "remainQuantity"]
+				aSum = isNoRemain ? ["quantity"] : ["quantity", "remainQuantity"]
+				
+				oData.sumList = _sumDataList(oData.detailInfosUnited, ["barcode", "batchNo"], aDis, aSum)
+				
 				// 设置详细信息标题 -- 是否已设定（条码绑定）
 				if(oData.nodeType == "205" || oData.nodeType == "206") {
 					// 条码绑定
@@ -703,10 +729,10 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 						return (o.batchNo||"").length
 					}
 				},{
-					name: "滞留数/总数",
-					minLen: 6,
+					name: (isNoRemain ? "总数": "滞留数/总数"),
+					minLen: (isNoRemain ? 2: 6),
 					formatter: function(o) {
-						return (o.remainQuantity+"/"+o.quantity).length
+						return isNoRemain ? (o.quantity+"").length : (o.remainQuantity+"/"+o.quantity).length
 					}
 				}]
 				
@@ -920,10 +946,15 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 	/**
 	 * 合并车间调整数据。-- 调整数取destAdjustQuantity 滞留数取 remainQuantity
 	 * @param {Object}
+	 * @param {Boolean} 不显示滞留数
 	 * @return {}
 	 */
-	function _sumWorkShopData(oData) {
+	function _sumWorkShopData(oData, isNotShowRemain) {
 		let oFlag = {}
+		
+		let aDis = isNotShowRemain ? ["barcode", "destAdjustQuantity"] : ["barcode", "destAdjustQuantity", "remainQuantity"]
+		let aSum = isNotShowRemain ? ["destAdjustQuantity"] : ["destAdjustQuantity", "remainQuantity"]
+		
 		// 先按源条码合并。- 原条码的调整数量，为所有的目标条码和。
 		oData.detailInfosUnited.forEach( o => {
 			let sKey = o.srcBarcode
@@ -932,30 +963,21 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 				oFlag[sKey] = {
 					srcBarcode: sKey,
 					// 加入目标条码及调整数量。
-					list: [{
-						barcode: o.barcode,
-						// 调整数
-						destAdjustQuantity: o.destAdjustQuantity,
-						// 滞留数
-						remainQuantity: o.remainQuantity
-					}]
+					list: []
 				}
-			}else {
-				// 更改目标条码数据。
-				oFlag[sKey].list.push({
-					barcode: o.barcode,
-					// 调整数
-					destAdjustQuantity: o.destAdjustQuantity,
-					// 滞留数
-					remainQuantity: o.remainQuantity
-				})
 			}
+			
+			let oDis = {}
+			aDis.forEach(sKey => {
+				oDis[sKey] = o.sKey
+			})
+			oFlag[sKey].list.push(oDis)
 		})
 		
 		// 合并目标条码数据。
 		for( let sParam in oFlag) {
 			let aList = oFlag[sParam].list
-			oFlag[sParam].list = _sumDataList(aList, ["barcode"], ["barcode", "destAdjustQuantity", "remainQuantity"], ["destAdjustQuantity", "remainQuantity"])
+			oFlag[sParam].list = _sumDataList(aList, ["barcode"], aDis , aSum)
 			oFlag[sParam].destAdjustQuantity = oFlag[sParam].list.map( o => o.destAdjustQuantity).reduce(function(nPrev, nNext) {
 				return nPrev + nNext
 			}, 0)
