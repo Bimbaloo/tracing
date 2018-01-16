@@ -138,7 +138,11 @@
 				this.tableHeight = this.setHeight()
 			},
 			"treeFullscreen": function() {
-				this.tableHeight = this.setHeight()
+				if(!this.treeFullscreen) {
+					this.$nextTick(() => {
+						this.tableHeight = this.setHeight()
+					})
+				}
 			}
         },
         methods: {
