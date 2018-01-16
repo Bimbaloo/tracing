@@ -181,6 +181,9 @@
 	                	field: "opTypeName",
 	                    headerName: "动作"
 	                },{
+	                	field: "processName",
+	                	headerName: "工序"
+	                },{
 	                	field: "srcWarehouse",
 		                headerName: "源仓库"
 	                },{
@@ -196,7 +199,7 @@
 	                    field: "srcBarcode",
 	                    headerName: "源条码"
     				},{
-    					field: "customerName",
+    					field: "contactName",
 	                    headerName: "客户/供应商"
     				},{
     					field: "traceCode",
@@ -329,18 +332,10 @@
             setSession () {
             	let aSelected = [];
             	
-            	// 是否为结转
-            	let bIsCarrayOver = (this.gridData.selected[0].opType == 2) ? true: false
-            	
-            	
             	this.gridData.selected.forEach(o => {
             		let oSelected = {};
             		// 解构赋值。
-            		if(bIsCarrayOver) {
-            			({ srcSnapshotId: oSelected.snapshotId, batchNo: oSelected.batchNo, materialCode: oSelected.materialCode} = o);
-            		}else {
-	            		({ snapshotId: oSelected.snapshotId, batchNo: oSelected.batchNo, materialCode: oSelected.materialCode} = o);
-            		}
+            		({ snapshotId: oSelected.snapshotId, batchNo: oSelected.batchNo, materialCode: oSelected.materialCode} = o);
             		
             		aSelected.push(oSelected);
             	})

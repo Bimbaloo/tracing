@@ -177,6 +177,9 @@
 	                	field: "opTypeName",
 	                    headerName: "动作"
 	                },{
+	                	field: "processName",
+	                	headerName: "工序"
+	                },{
 	                	field: "srcWarehouse",
 		                headerName: "源仓库"
 	                },{
@@ -192,7 +195,7 @@
 	                    field: "srcBarcode",
 	                    headerName: "源条码"
     				},{
-    					field: "customerName",
+    					field: "contactName",
 	                    headerName: "客户/供应商"
     				},{
     					field: "traceCode",

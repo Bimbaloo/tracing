@@ -250,7 +250,15 @@
 								new go.Binding("width", "column1"),
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
+//								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
+								new go.Binding("text", "",  function(o) {
+									if(o.remainQuantity === undefined) {
+										// 溯源处理 | 老版本处理
+										return o.quantity
+									}else {
+										return o.remainQuantity + "/" + o.quantity
+									}
+								}),
 								new go.Binding("width", "column2"),
 								{column: 2, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 						)
@@ -263,7 +271,15 @@
 								new go.Binding("width", "column0"),
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
+//								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
+								new go.Binding("text", "",  function(o) {
+									if(o.remainQuantity === undefined) {
+										// 溯源处理 | 老版本处理
+										return o.quantity
+									}else {
+										return o.remainQuantity + "/" + o.quantity
+									}
+								}),
 								new go.Binding("width", "column1"),
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
@@ -280,7 +296,15 @@
 								new go.Binding("width", "column0"),
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
+//								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 数量
+								new go.Binding("text", "",  function(o) {
+									if(o.remainQuantity === undefined) {
+										// 溯源处理 | 老版本处理
+										return o.quantity
+									}else {
+										return o.remainQuantity + "/" + o.quantity
+									}
+								}),
 								new go.Binding("width", "column1"),
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 						)
@@ -311,7 +335,15 @@
 													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 												),
 												this.$(go.TextBlock,
-													new go.Binding("text", "", o => o.remainQuantity + "/" + o.destAdjustQuantity),	// 调整数/滞留数
+//													new go.Binding("text", "", o => o.remainQuantity + "/" + o.destAdjustQuantity),	// 调整数/滞留数
+													new go.Binding("text", "",  function(o) {
+														if(o.remainQuantity === undefined) {
+															// 溯源处理 | 老版本处理
+															return o.destAdjustQuantity
+														}else {
+															return o.remainQuantity + "/" + o.destAdjustQuantity
+														}
+													}),
 													new go.Binding("width", "column3"),
 													{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 												)
@@ -331,7 +363,15 @@
 									new go.Binding("width", "column0"),
 									{column: 0,  margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.TextBlock,
-									new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity), // 总数/滞留数
+//									new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity), // 总数/滞留数
+									new go.Binding("text", "",  function(o) {
+										if(o.remainQuantity === undefined) {
+											// 溯源处理 | 老版本处理
+											return o.quantity
+										}else {
+											return o.remainQuantity + "/" + o.quantity
+										}
+									}),
 									new go.Binding("width", "column1"),
 									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.Panel, "Table",
@@ -356,7 +396,15 @@
 								new go.Binding("width", "column0"),
 								{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 							this.$(go.TextBlock, 
-								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 总数/滞留数
+//								new go.Binding("text", "", o => o.remainQuantity + "/" + o.quantity),	// 总数/滞留数
+								new go.Binding("text", "",  function(o) {
+									if(o.remainQuantity === undefined) {
+										// 溯源处理 | 老版本处理
+										return o.quantity
+									}else {
+										return o.remainQuantity + "/" + o.quantity
+									}
+								}),
 								new go.Binding("width", "column1"),
 								{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}),
 							this.$(go.TextBlock, 

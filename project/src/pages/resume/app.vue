@@ -991,7 +991,6 @@
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
 									<span class="tips">${o.personName||"-"}</span>将
-									条码 <span class="tips">${o.barcode||"-"}</span>,
 									批次<span class="tips">${o.batchNo||"-"}</span>
 									,在<span class="tips">${o.equipmentName||"-"}</span>上产出
 									的<span class="tips">${o.materialName||"-"}</span>物料
@@ -1006,7 +1005,6 @@
 						sDom = `<div class="item-type">${o.opTypeName}:</div>
 								<div class="item-info">
 									<span class="tips">${o.personName||"-"}</span>将
-									条码 <span class="tips">${o.barcode||"-"}</span>,
 									批次<span class="tips">${o.batchNo||"-"}</span>
 									,在<span class="tips">${o.equipmentName||"-"}</span>上产出
 									的<span class="tips">${o.materialName||"-"}</span>物料进行
