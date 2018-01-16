@@ -1,7 +1,7 @@
 <template>
 	<div id="app" class="report-wrapper" >
 		<!-- 显示节点 -->
-		<div class="report-container" ref="fgbreport">
+		<div class="report-container" ref="fgbreport" v-loading.fullscreen.lock="downLoading" element-loading-text="图片生成中...">
 			<div class="page-icon">
 				<i class="icon icon-20 icon-download" title="下载" @click="downloadHandle('fgbreport', $event)"></i>
             	<i class="icon icon-20 icon-print" title="打印" @click="printPage('fgbreport', $event)"></i>
@@ -95,6 +95,7 @@ export default {
             },
 
             loading: false,
+            downLoading: false,
             condition: {},   // 查询条件    
             // filters: {},
             dataName: [      // 条件对应中文名
@@ -308,6 +309,49 @@ export default {
                         .el-table__empty-block {
                             text-align: center;	
                         }
+                        .el-table__expanded-cell{
+							background-color: #f4fcf9;
+							padding: 0;
+						}	
+						.el-table__expanded-cell .table-form {
+							margin: 0;
+							width: 100%;
+							display: flex;
+							flex-wrap: wrap;
+						}
+						.el-table__expanded-cell .table-form .el-form-item {
+							line-height: 40px;
+							margin-right: 0;
+							margin-bottom: 0;
+							box-sizing: border-box;
+							width: 33.3%;
+							padding-left: 100px;
+							display: flex;
+						}
+						.el-table__expanded-cell .table-form .el-form-item .el-form-item__label {
+							flex-basis: 100px;
+							text-align: right;
+						}
+						.el-table__expanded-cell .table-form .el-form-item .el-form-item__content {
+							overflow: hidden;
+							text-overflow: ellipsis;
+							flex: 1;
+						}
+						.el-input {
+							width: 180px;						
+						}
+						.el-input__inner {
+							border-radius: 0;
+							height: 30px;
+						}					
+						.el-form-input {
+							display: inline-block;
+							margin-left: 60px;
+							width: 240px;
+						}
+						.el-form-input .el-form-item {
+							margin-bottom:0;
+						}
                     </style>
                 </div>
             `;
@@ -373,7 +417,12 @@ export default {
 			if(!oRef) {
 				return;
 			}
-			window.Rt.utils.downloadHtml(html2canvas, oRef, "快速报告");     
+			this.downLoading = true;
+			window.Rt.utils.downloadHtml(html2canvas, oRef, "FGB检验", {}, this.setDownloadEnd);     
+		},
+		// 页面下载后回调函数
+		setDownloadEnd() {
+			this.downLoading = false
 		},
 		// 打印页面。
 		printPage(refHtml, event) {

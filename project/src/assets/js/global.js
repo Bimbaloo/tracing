@@ -356,23 +356,62 @@
 		 * 页面转化为图片并下载。依赖html2Canvas。
 		 * @param {Element} element
 		 * @param {Object} option
+		 * @param {Function} callback
 		 * @return {void}
 		 */
-		downloadHtml: function(html2canvas, element, filename, option) {
+		downloadHtml: function(html2canvas, element, filename, option, callback) {
 			// 将页面转换为图片。
 			html2canvas(element, Object.assign(option || {}, {
-				onrendered: function(canvas) {
+				onrendered: (canvas) => {
 					var sImg = canvas.toDataURL("image/png"),
 						oLink = document.createElement("a");
 	
 					oLink.style.display = "none";
-					oLink.setAttribute("href",sImg); 
-					oLink.setAttribute("download", filename || "page" + ".png"); 
+//					oLink.setAttribute("href",sImg); 
+//					oLink.setAttribute("download", filename || "page" + ".png"); 
 					element.parentNode.appendChild(oLink);
-					oLink.click();
-					oLink.remove();
+//					oLink.click();
+//					oLink.remove();
+					this.onDownloadPic(filename +".png", sImg, oLink, callback)
 				}
 			}));
+		},
+		
+		/**
+		 * html2Canvas中图片过大转换后下载
+		 * @param {Object} fileName
+		 * @param {Object} content
+		 */
+		onDownloadPic: function(fileName, content, aLink, callback) {
+			let blob = base64Img2Blob(content); //new Blob([content]);
+            let evt = document.createEvent("HTMLEvents");
+//          let aLink = document.createElement("a")
+            
+            evt.initEvent("click", false, false);//initEvent 不加后两个参数在FF下会报错
+//          aLink.style.display = "none";
+			aLink.setAttribute("download", fileName || "page.png"); 
+			aLink.setAttribute("href", URL.createObjectURL(blob)); 
+			aLink.click();
+			aLink.dispatchEvent(evt);
+			aLink.remove()
+			
+			callback && callback()
+            
+            // 数据转换。
+			function base64Img2Blob(code){
+                let parts = code.split(';base64,');
+                let contentType = parts[0].split(':')[1];
+                let raw = window.atob(parts[1]);
+                let rawLength = raw.length;
+
+                let uInt8Array = new Uint8Array(rawLength);
+
+                for (let i = 0; i < rawLength; ++i) {
+                  uInt8Array[i] = raw.charCodeAt(i);
+                }
+
+                return new Blob([uInt8Array], {type: contentType}); 
+            }
 		},
 
 
