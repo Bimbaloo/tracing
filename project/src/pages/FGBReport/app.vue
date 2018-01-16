@@ -186,26 +186,6 @@ export default {
     watch: {
     },
     methods: {
-    	// getFilters() {
-        //     let filters = this.condition
-        //     for (let i in filters) {
-        //         if (filters[i] === '' || i === '_tag') {
-        //             delete filters[i]
-        //         }
-        //     }
-        //     /* 为了将获取到的 barcode等转换为对应的中文 */
-        //     let b = Object.entries(filters),
-        //         a = this.dataName;
-
-        //     b.forEach(o =>
-        //         a.forEach(function(x) {
-        //             if (o[0] === x.itemCode) {
-        //                 o[0] = x.itemName
-        //             }
-        //         })
-        //     )
-        //     return b
-        // },
         // 显示提示信息。
         showMessage() {
             this.$message({
@@ -232,7 +212,6 @@ export default {
         },
         // 获取数据。
         fetchData() {
-
             this.loading = true;
             let oQuery = {}
             Object.keys(this.oParams).forEach((el) => {
@@ -243,13 +222,6 @@ export default {
                     this.condition[el] = decodeURIComponent(this.oParams[el])
                 }
             })
-            // this.filters = this.getFilters()
-            /* 测试数据 */
-            // oQuery = {
-            //     "equipmentId": "69",
-            //     "startTime": "2017-08-28 19:00:00",
-            //     "endTime": "2017-08-28 20:00:00"
-            // }
 
             this.$register.sendRequest(this.$store, this.$ajax, url, "get", oQuery, this.requestSucess, this.requestFail, this.requestError)
         },

@@ -9,7 +9,15 @@
 							<div class='radio'>
 								<el-radio :label="radio.key" v-for="(radio,index) in radioList" :key="index">{{radio.groupName}}</el-radio>
 							</div>
-							<el-form :inline="true" :ref="`materialForm${index}`" :model="materialForm[index]"  :class="[ 'demo-form-inline','form-inline']" v-for="(form,index) in radioList" v-show="form.key == radioNumber" :rules="materialFormRules[index]">
+							<el-form 
+							:inline="true" 
+							:ref="`materialForm${index}`" 
+							:model="materialForm[index]"  
+							:class="[ 'demo-form-inline','form-inline']" 
+							v-for="(form,index) in radioList" 
+							:key="index"
+							v-show="form.key == radioNumber" 
+							:rules="materialFormRules[index]">
 								 <el-form-item v-for="(item,num) in groupItems" :label="item.itemName" v-if="item.key === radioNumber" :key="item.itemCode+num" :prop="item.itemCode">
 									 <component :is="`v-${item.type}`" :form-data="materialForm[index]" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
 								</el-form-item> 
