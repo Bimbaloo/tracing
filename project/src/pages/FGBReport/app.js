@@ -13,18 +13,18 @@ import 'assets/js/global.js'
 
 Vue.use(ElementUI)
 
-Vue.prototype.$ajax = axios;
-Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {"params": oParams})
-Vue.prototype.$post = axios.post;
+Vue.prototype.$ajax = axios
+Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, { params: oParams })
+Vue.prototype.$post = axios.post
 
 Vue.use(Vuex)
 
 // 引用登录模块。
 import loginFn from 'assets/js/loginFn.js'
-import {loginModule} from 'assets/js/loginStore.js'
+import { loginModule } from 'assets/js/loginStore.js'
 import { versionModule } from 'assets/js/versionStore.js'
 
-Vue.prototype.$register = loginFn;
+Vue.prototype.$register = loginFn
 
 const store = new Vuex.Store({
   modules: {
