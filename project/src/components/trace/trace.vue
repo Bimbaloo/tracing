@@ -222,6 +222,7 @@
         	},
         	// 查询。
             fetchPage() {
+            	this.gridData.selected = []
             	this.fetchData(this.gridData);
             },
             outerHeight(el) {
