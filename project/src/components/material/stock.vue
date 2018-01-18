@@ -10,7 +10,7 @@
             <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
         </div>
         <div class="router-path">
-            <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":"物料明细" }}</span>
+            <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":`物料明细${isWasteMaterial ? '(废品)':''}` }}</span>
             <!-- 新版本中没有同批次入库 -->
             <span class="path-item" @click="checkBatch" v-if="batchIf && isOpDbBeforeRefact">>同批出入库</span>
             <span class="path-item" v-if="restrainIf">>可疑品</span>
@@ -50,7 +50,14 @@
             // 是否支持遏制。
             supression() {
                 return this.$store.state.versionModule && this.$store.state.versionModule.supression
-            }
+            },
+            nodeType () {
+            	return this.$store && this.$store.state.nodeType
+            },
+	       // 新版本物料判断是否为废品。
+	       isWasteMaterial () {
+	       		return this.nodeType === 10004
+	       }
 		},
         created () {
             this.setRouteQuery();
