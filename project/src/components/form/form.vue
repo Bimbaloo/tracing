@@ -133,6 +133,14 @@
 	            			callback();
 	            		}
 	            	},
+					// 验证设备。
+	            	validatEquipmentCode = (rule, value, callback) => {
+	            		if(!value) {
+	            			callback(new Error("请选择设备"));
+	            		}else {
+	            			callback();
+	            		}
+	            	},
             		// 验证开始时间。
             	    validateStartTime = (rule, value, callback) => {
 	            		let sTime = value ? value.trim() : "",
@@ -285,7 +293,12 @@
             		},
 					// 遏制
             		"suppress": {
-            	
+            			"materialCode": [{validator: validateMaterialcode, trigger: "change"}],
+						"batchNo": [{validator: validateBatch,trigger: "change"}],
+            			"equipmentCode": [{validator: validatEquipmentCode, trigger: "change"}],
+            			"startTime": [{validator: validateStartTime, trigger: "change"}],
+            			// 结束时间。
+            			"endTime": [{validator: validateEndTime, trigger: "change"}]
             		},
             		// 断链
             		"link_repair": {
