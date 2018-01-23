@@ -3,7 +3,7 @@
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
-                    <span v-for="filter in filters">
+                    <span v-for="filter in filters" :key="filter[0]">
                         {{filter[0]}} : {{filter[1]}}
                     </span>
                 </div>
