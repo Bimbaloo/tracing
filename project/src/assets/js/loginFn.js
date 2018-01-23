@@ -74,7 +74,8 @@ var beforeRequest = function(oStore, oAxio) {
 				"token": oLoginInfo.token,
 				"userId": Number(oLoginInfo.userId),
 				"username": oLoginInfo.username,
-				"nickname": oLoginInfo.nickname
+				"nickname": oLoginInfo.nickname,
+				"progressId": oLoginInfo.progressId
 			})
 		}
 	})
@@ -115,9 +116,10 @@ var judgeLoaderHandler = function(param, fnSu, fnFail) {
  * @param {Function} fnSu 接口请求成功回调。
  * @param {Function} fnFail 接口请求失败回调。
  * @param {Function} fnError 接口请求错误回调。
+ * @param {Function} fnBeforeLogin 登录失败，跳转到登录页面之前操作。
  * @return {void}
  */
-var sendRequest = function(oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, fnError) {
+var sendRequest = function(oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, fnError, fnBeforeLogin) {
 	
 	let instance = beforeRequest(oStore, oAxio),
 		fnHandle = (res) => {
@@ -131,6 +133,9 @@ var sendRequest = function(oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, fn
 				if(bRight === 10) {
 					// 登录失败。
 					if(oResult.errorMsg.subCode === "1") {
+						// 调整到登录界面前的操作。
+						fnBeforeLogin && fnBeforeLogin();
+						
 						// 清cookie，跳转到登录页面。
 						loginFail(oResult.errorMsg.subMsg);
 					}

@@ -1,6 +1,6 @@
 <template>
 	<div class="diagram" ref="diagram">
-		<div class="icons">
+		<div class="icons" v-if="!isDialogTree">
 			<i class="icon icon-20 icon-hide" v-if="!tipsShow" @click="showTips"  title="显示详情"></i>
             <i class="icon icon-20 icon-show" v-else @click="hideTips"  title="隐藏详情"></i>
 			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
@@ -8,7 +8,7 @@
 			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
 		</div>
-		<div id="tree" style="height: 100%;"></div>
+		<div :id="treeId" class="tree" style="height: 100%;"></div>
 		<!--div id="overview"></div-->
 		<a href="" ref="downloadImage" v-show="false"></a>
 	</div>
@@ -33,7 +33,17 @@
 	
 	export default {
 		props: {
-			treeData: Object
+			treeData: Object,
+			// 树节点的id属性值。
+			treeId: {
+				required: false,
+				default: 'tree'
+			},
+			// 是否为dialogTree,弹窗中的树。
+			isDialogTree: {
+				required: false,
+				default: false
+			}
 		},
 		data() {
 			return {
@@ -47,16 +57,39 @@
 		},
 		watch: {
 		    data: function () {	
-		    	if(this.tree) {	
-					if(this.tipsShow) {
-						// 若需要显示详情。
-//						this.data.node.forEach(o => o.isMaterialNode ? (o.category = 'material'):(o.category = 'process'))
-						this.data.node.forEach(o => o.category = 'process')
-					}
-					
-					this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    	
-					this.tree.model.linkFromPortIdProperty = "fromPort";
-					this.tree.model.linkToPortIdProperty = "toPort";
+		    	if(this.tree) {
+		    		
+		    		if(this.isDialogTree) {
+						// 更新数据。
+//						this.tree.startTransaction("add nodes")
+//						
+//						let aoBeforeNode = this.tree.model.nodeDataArray
+//						let aoBeforeLink = this.tree.model.linkDataArray
+//						
+//						// 获取新增的节点
+//						let aoAddNode = this.data.node.filter(o => !aoBeforeNode.some(os => os.key === o.key))
+//						let aoAddLink = this.data.link.filter(o => !aoBeforeLink.some(os => os.from === o.from && os.to === o.to))
+//						
+//						this.tree.model.addNodeDataCollection(aoAddNode)
+//						this.tree.model.addLinkDataCollection(aoAddLink)
+//						
+//						this.tree.commitTransaction("add nodes")
+						
+						this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    	
+						this.tree.model.linkFromPortIdProperty = "fromPort";
+						this.tree.model.linkToPortIdProperty = "toPort";
+		    		}else {
+						if(this.tipsShow) {
+							// 若需要显示详情。
+	//						this.data.node.forEach(o => o.isMaterialNode ? (o.category = 'material'):(o.category = 'process'))
+							this.data.node.forEach(o => o.category = 'process')
+						}
+						
+						this.tree.model = new go.GraphLinksModel(this.data.node, this.data.link);	    	
+						this.tree.model.linkFromPortIdProperty = "fromPort";
+						this.tree.model.linkToPortIdProperty = "toPort";
+		    		}
+		    		
 		    	}				
 		    },
 		    key: function() {
@@ -895,6 +928,11 @@
 			},
 			// 树节点点击事件。
 			treeNodeClickHandle(e, node) {
+				// 弹窗中的节点没有点击事件
+				if(this.isDialogTree) {
+					return
+				}
+				
 				// 当前是树图全屏
 				if(this.treeFullscreen) {
 					this.restoreScreenClick();
@@ -1173,24 +1211,26 @@
 			},
 			// 画布双击事件。
 			diagramDblClickHandle(e, node) {
-				zoomDiagram(this.tree, this.flag);
+				zoomDiagram(this.tree, this.flag, this.treeId);
 				this.flag = !this.flag;
 			},
 			// 画布初始化。
 			initDiagram() {
 				this.tree =
-					this.$(go.Diagram, 'tree', {
+					this.$(go.Diagram, this.treeId, {
 						// define the layout for the diagram
 						// initialContentAlignment: go.Spot.Center,
 						contentAlignment: go.Spot.LeftCenter,
 						allowMove: false,
-						allowZoom: true,
+						"animationManager.isEnabled": this.isDialogTree ? false : true,
+						allowZoom: this.isDialogTree ? false : true,
 						allowCopy: false,
 						allowDelete: false,
 						allowHorizontalScroll: true,
 						hasHorizontalScrollbar: this.chrome,
 						hasVerticalScrollbar: this.chrome,
-						allowVerticalScroll: true,					
+						allowVerticalScroll: true,
+						autoScale: this.isDialogTree ? go.Diagram.Uniform : go.Diagram.None,
 				        layout: this.$(go.LayeredDigraphLayout, {layerSpacing: 33, columnSpacing: 25}),
 						doubleClick: this.diagramDblClickHandle						
 					});
@@ -1484,7 +1524,7 @@
 		// }
 	}
 	
-	#tree {
+	.tree {
 		flex: 1 1;
 
 		canvas {

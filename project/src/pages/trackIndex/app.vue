@@ -2,7 +2,7 @@
 	<div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
 		<v-header :config="true" :back="false" :tool="false"></v-header>
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
-		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
+		<div class="content">
 			<!-- <el-col class="router" ref="router"> -->
 			<div :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
@@ -41,6 +41,11 @@
 				</div>
 			</div>
 		</div>
+		<!-- 进度弹窗 -->
+		<v-dTree
+			v-if="fullscreenLoading"
+			:dialog-visible="fullscreenLoading"
+			:progress-id="progressId"></v-dTree>
 	</div>
 </template>
 
@@ -48,6 +53,8 @@
 	import header from 'components/header/header.vue'
 	import tree from 'components/tree/tree.vue'	
 	import catalog from 'components/catalog/catalog.vue'
+	import dialogTree from 'components/basic/dialogProgressTree.vue'
+	
 	import fnP from "assets/js/public.js"
 	import $ from 'jquery'
 	
@@ -55,7 +62,8 @@
 		components: {
 			'v-header': header,
 			'v-tree': tree,
-			'v-catalog': catalog
+			'v-catalog': catalog,
+			'v-dTree': dialogTree
 		},
 		data() {
 			return {
@@ -92,7 +100,9 @@
 				// filter: {},
 				// 起点集或查询条件。
 				points: {},
-				// tip: "暂无数据" 
+				progressId: new Date().getTime().toString().substr(-5), // 当前进程标记。
+				cancelProgressUrl: HOST + "/api/v1/request/kill/"
+				// tip: "暂无数据"
 			}
 		},
 		computed: {
@@ -146,6 +156,8 @@
 			}
 		},
 		created() {
+			// 进入时设置页面的进程标记。
+			window.Rt.utils.cookie("progressId", this.progressId);
 			// 登录验证。
 			this.$register.login(this.$store);
 
@@ -183,6 +195,12 @@
 		},
 		mounted() {
 			// this.$refs.view.style.height = this.$refs.view.clientHeight + "px"
+			
+			(window.onbeforeunload = () => {
+				// 离开页面时，调用接口，清除进程。
+				this.fullscreenLoading=false
+				this.setProgressEndHandle()
+			})
 		},
 		methods: {
 			/**
@@ -192,7 +210,6 @@
 				this.treeData = fnP.getTreeData(this.rawData, "track", this.isOpDbBeforeRefact);//this.parseTreeData()this.parseTreeData();
 				// 重置路由。
 				this.$router.replace("/");
-
 			},
 			/**
 			 * 设置面板高度。
@@ -209,6 +226,15 @@
 				this.$alert(sTip, '提示', {
 					type: 'warn'
 				});
+			},
+			// 关闭进程。
+			setProgressEndHandle() {
+				// 调用接口。
+				this.$register.sendRequest(this.$store, this.$ajax, this.cancelProgressUrl+this.progressId, "post", null)	
+			},
+			// 登录验证失败后跳转到登录页面之前
+			requestToLogin() {
+				this.fullscreenLoading = false;
 			},
 			// 请求成功。
 			requestSucess(oData) {
@@ -241,7 +267,6 @@
 				this.showMessage('查询出错！');
 			},
 			fetchData() {
-				this.fullscreenLoading = true;
 				
 				let sType = this.urlType[this.points.type] || '',
 					oParam =  {
@@ -254,8 +279,8 @@
 					delete oParam.equipmentName
 				} 
 
-				this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "post", oParam, this.requestSucess, this.requestFail, this.requestError)				
-				//this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "get", oParam, this.requestSucess, this.requestFail, this.requestError)
+				this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "post", oParam, this.requestSucess, this.requestFail, this.requestError, this.requestToLogin)				
+				this.fullscreenLoading = true;
 			},
 			parseTableData() {			
 				let aoData = this.rawData
@@ -690,5 +715,10 @@
 		background-color: transparent;
 		border: none;
 		outline: none;
+	}
+	
+	// 进度弹窗
+	.progress-dialog-wrap {
+		text-align: center;
 	}
 </style>
