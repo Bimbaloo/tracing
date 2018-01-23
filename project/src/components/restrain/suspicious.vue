@@ -173,7 +173,7 @@
 		
 		.btn-restrain {
 			position: absolute;
-			right: 0;
+			right: 20px;
 		//	top: 45px;
 		}
 		

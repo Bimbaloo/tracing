@@ -41,7 +41,7 @@
           <li class="ecorded-time">
             <h3>{{ul.date}}</h3>
           </li>
-          <li class="history-messages-everyday" v-for="data in ul.data" @click="findId(data.id)" :data-id='data.id':key="data.id">
+          <li class="history-messages-everyday" v-for="data in ul.data" @click="findId(data.id)" :data-id='data.id' :key="data.id">
             <ul class='information-record'>
               <li>
                 <span class='circle'></span>
@@ -74,7 +74,7 @@ import fnP from "assets/js/public.js"
 import { bus } from "assets/js/bus.js"
 
 const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
-//const MODULE_ITEM_URL = "./static/modules.json";
+// const MODULE_ITEM_URL = "./static/modules.json";
 // 数据名称接口。
 const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
 
@@ -582,7 +582,8 @@ footer {
         height: 42px;
         line-height: 42px;
         /*width: 180px;*/
-        width: 270px; // 216
+        // width: 270px; // 216
+        width: 216px; // 216
         text-align: center;
         font-size: 16px;
         border-top: 4px solid transparent;
