@@ -1,706 +1,577 @@
 <template>
-	<div id="app">
-		<v-header :config="false" :back="'search.html'"></v-header>
-		<div class="panel" id="restrain">
-			<div class='panel-title'>
-				<el-tabs  element-loading-text="拼命加载中"   class="search-tab">
-					<el-tab-pane label="新建遏制"  activeName="first">
-						<el-radio-group v-model="radioNumber">
-							<div class='radio'>
-								<el-radio :label="radio.key" v-for="(radio,index) in radioList" :key="index">{{radio.groupName}}</el-radio>
-							</div>
-							<el-form 
-							:inline="true" 
-							:ref="`materialForm${index}`" 
-							:model="materialForm[index]"  
-							:class="[ 'demo-form-inline','form-inline']" 
-							v-for="(form,index) in radioList" 
-							:key="index"
-							v-show="form.key == radioNumber" 
-							:rules="materialFormRules[index]">
-								 <el-form-item v-for="(item,num) in groupItems" :label="item.itemName" v-if="item.key === radioNumber" :key="item.itemCode+num" :prop="item.itemCode">
-									 <component :is="`v-${item.type}`" :form-data="materialForm[index]" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
-								</el-form-item> 
-								<el-form-item>
-									<el-button type="primary" class='btn' @click="submitForm(`materialForm${index}`)" v-if="supression">查询</el-button>
-								</el-form-item>
-							</el-form>
-						</el-radio-group>
-					</el-tab-pane>
-					<el-tab-pane label="遏制列表" activeName="second">						
-						<el-form :inline="true" ref="equipmentFrom" :model="equipmentFrom"  :class="[ 'demo-form-inline','form-inline']" :rules="equipmentRules">
-							 <el-form-item v-for="(item,index) in groupItems2" :label="item.itemName"  :key="`item`+index" :prop="item.itemCode">
-								 <component :is="`v-${item.type}`" :form-data="equipmentFrom" :placeholder-data="item.placeholder" :key-data="item.itemCode"></component>  
-							</el-form-item> 
-							<el-form-item>
-								<el-button type="primary" class='btn' @click="submitForm1('equipmentFrom')" v-if="supression">查询</el-button>
-							</el-form-item>
-						</el-form>
-					</el-tab-pane>
-				</el-tabs>
-			</div>
-			<div class="panel-content">
-				<div class="router-container" >
-					<div v-if="tip" class='tip'></div>
-					<router-view></router-view>
-				</div>
-			</div>
-		</div>
-	</div>
+  <div id="app" @mousedown="dragstar($event)"  @mouseup="dragend($event)" @mousemove="onMouseMove($event)">
+    <v-header :config="true" :back="'search.html'"></v-header>
+     <div class="content">
+      <div :style="{ width: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">
+        <div class="flex-wraps">
+          <el-tabs v-model="activeKey" type="border-card" class="search-tab" ref="searchTab" @tab-click="handleClick" v-bind:style="{ height: searchTab,position:'absolute' }">
+            <el-tab-pane :key="category.key" v-for="category in categories" :label="category.title" :name="category.key">
+              <v-panel :active-tab="activeKey" :panel-height="panelHeight" :category="category" :label-width="labelWidth" :radioChange="adjustTabHeight" :handle-submit="handleSubmit"></v-panel>
+            </el-tab-pane>
+          </el-tabs>
+        </div>
+      </div>
+      <div  class="router">
+        <div class="flex-wraps">
+          <div id='changeWidth' class='changeWidth'></div>
+          <i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapse=true"></i>
+          <i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="
+          LayoutLeftWidth = reversedMessage;
+          changeWidth = 0;
+          collapse=false"></i>
+          <div class="router-container" ref="routerContainer">
+            <div v-if="tip" class="tip"></div>
+            <router-view></router-view>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
-
 <script>
-	import header from "components/header/header.vue"
+import header from "components/header/header.vue";
+import panel from "components/panel/panel.vue";
+import dialog from "components/basic/dialogBarcode.vue";
+import fnP from "assets/js/public.js";
+import categoriesArr from "assets/js/restrain.js";
 
-	import Input from 'components/basic/input.vue'
-    import Select from 'components/basic/select.vue'
-	import DateTime from 'components/basic/dateTime.vue'
-	import fnP from "assets/js/public.js"
+const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
 
-	//const URL_JOIN = HOST + "";//"http://rapapi.org/mockjsdata/21533/ssss??"    // 测试获取刚进来的数据
-	const URL_JOIN = "../static/2.json"    // 测试获取刚进来的数据
-	//const URL_JOIN = HOST + "/api/v1/customized/modules";
-	export default {
-		// 页面组件。
-		components: {
-			"v-header": header,
-			'v-input': Input,
-            'v-select': Select,
-            'v-datetime': DateTime
-		},
-		// 页面数据。
-		data() {
-			// 验证开始时间。
-			const validateStartTime = (rule, value, callback) => {
-					if(!value) {
-	            		callback(new Error("请输入开始时间"));
-	            	}else if(value && value > new Date().Format()){
-						// 如果开始时间存在，而且开始时间大于结束时间。
-						callback(new Error("开始时间不能大于当前时间"));
-					}else {
-	            		callback();
-	            	}
-				}
-			// 验证结束时间。
-			const validateEndTime = (rule, value, callback) => {
-				let sStart = this.formDatas.startTime;
-				if(!value) {
-					callback(new Error("请输入结束时间"));
-				}else if(sStart && sStart > value) {
-					// 如果开始时间存在，而且开始时间大于结束时间。
-					callback(new Error("结束时间必须大于开始时间"));
-				}else {
-					callback();
-				}
-			};
-			return {
-				radioList:[
-					{
-						key:'1',
-						groupName:'物料'
-					},
-					{
-						key:'2',
-						groupName:'设备'
-					}
-				],
-				groupItems: [
-                        {
-							key:'2',
-                         	itemCode: "equipmentCode",
-							itemName: "设备",
-							type: "select",
-							placeholder:"请选择设备"
-                        },
-                        {
-							key:'2',
-                         	itemCode: "startTime",
-							itemName: "开始时间",
-							type: "datetime",
-							placeholder:"请选择开始时间"
-                        },
-                        {
-							key:'2',
-                         	itemCode: "endTime",
-							itemName: "结束时间",
-							type: "datetime",
-							placeholder:"请选择结束时间"
-						},
-						{
-							key:'1',
-                         	itemCode: "materialCode",
-							itemName: "物料",
-							type: "select",
-							placeholder:"请选择物料"
-                        },
-                        {
-							key:'1',
-                         	itemCode: "batchNo",
-							itemName: "批次",
-							type: "input",
-							placeholder:"请输入批次"
-                        }
-				],
-				materialForm:[{
-					materialCode:'',	//物料编号
-					batchNo: ''			//批次号
-				},{
-					equipmentCode:'',   //设备
-					startTime:'',		//开始时间
-					endTime:''			//结束时间
-				}],
-				activeName: 'first',
-				radioNumber: '1',
-				equipmentRules: {
-					personCode: [
-						{ required: true, message: '请选择人员', trigger: 'change' }
-					],
-					startTime: [
-						{ validator: validateStartTime , required: true, trigger: 'change' }
-					],
-					endTime: [
-						{ validator: validateEndTime , required: true, trigger: 'change' }
-					]
-				},
-				/* 遏制列表页面数据 */
-				equipmentFrom:{
-					startTime:'',		//开始时间
-					endTime:'',			//结束时间
-					personCode:'',		//操作人员
-				},
-				groupItems2: [
-                        {
-                         	itemCode: "personCode",
-							itemName: "人员",
-							type: "select",
-							placeholder:"请选择人员"
-                        },
-                        {
-                         	itemCode: "startTime",
-							itemName: "开始时间",
-							type: "datetime",
-							placeholder:"请选择开始时间"
-                        },
-                        {
-                         	itemCode: "endTime",
-							itemName: "结束时间",
-							type: "datetime",
-							placeholder:"请选择结束时间"
-						}
-				],
-				
-				activeKey: "restrain",  // 储存路由页面,默认restrain
+export default {
+  components: {
+    "v-header": header,
+    "v-panel": panel,
+    "v-dialog": dialog
+  },
+  data() {
+    return {
+      /* 拖动功能添加属性 */
+      _pageX: null,
+      changeWidth: 0,
+      LayoutLeftWidth: 360, //修改detail页面左侧默认宽度
+      dragging: false,
+
+      collapse: false, // 侧栏是否收缩。
+      activeKey: "suppress",
+      categories: [],
+      labelWidth: "70px",
+      searchTab: "100%",
+      panelHeight: "100%",
+      tip: true,
+      handleSubmit: this._submitForm,
+      sErrorMessage: "",
+      tag: "",
+      myLocalStorage: [] //查询记录
+    };
+  },
+  computed: {
+    // 工厂配置数据。
+    // configData() {
+    //   return this.$store.state.customModule.config
+    // },
+    // 配置模块。
+    // modulesConfig() {
+    //   return this.configData.modules
+    // },
+    reversedMessage() {
+      let _width = this.LayoutLeftWidth + this.changeWidth;
+      return _width;
+    }
+  },
+  created() {
+    // 登录判断。
+    this.$register.login(this.$store);
+
+    // 获取配置数据。
+    this.$register.getVersion(this.$store, this.$ajax, this.fetchData);
 
 
-			/* 保存上次查询的数据 */
-				defaultConditions:{},
-				// 查询标记。
-				tag: "",
-				tip: true,
-				materialFormRules:[
-					{
-						batchNo: [
-							{ required: true, message: '请输入批次号', trigger: 'blur' }
-						],
-						materialCode: [
-							{ required: true, message: '请选择物料编号', trigger: 'change' }
-						]
-					},{
-						equipmentCode: [
-							{ required: true, message: '请选择设备编号', trigger: 'change' }
-						],
-						startTime:[
-							{ validator: validateStartTime , required: true, trigger: 'change' }
-						],
-						endTime:[
-							{ validator: validateEndTime , required: true, trigger: 'change' }
-						]
-					}
-				]
-			}
-		},
-		// 计算属性。
-		computed: {
-			// 获取当前真正的查询条件
-			formDatas: function(){
-				let formDatas = {}
-				formDatas = this.materialForm[this.radioNumber-1]
-				return  formDatas
-			},
-			// 是否支持遏制。
-			supression() {
-				return this.$store.state.versionModule && this.$store.state.versionModule.supression
-			}
+    // 保存查询记录
+    let history = localStorage.getItem("history");
+    if (history) {
+      this.myLocalStorage = JSON.parse(history);
+      this.myLocalStorage.forEach(data => {
+        delete data.oData.keys._tag;
+      });
+    } else {
+      this.myLocalStorage = [];
+    }
+  },
+  mounted() {
+    let that = this;
+    that.setParamBlockHeight();
+
+    window.onresize = () => {
+      //      that.adjustTabHeight,
+      that.setParamBlockHeight();
+    };
+  },
+  methods: {
+    fetchData() {
+      this.tag = location.search.split("=")[1];
+      let oData = sessionStorage.getItem("searchConditions-" + this.tag);
+
+      // session 中获取
+      if (oData) {
+        oData = JSON.parse(oData);
+        // this.activeKey = oData.tab;
+      } else if (window.location.hash.length > 2) {
+        // 清空了cookie后，url中有参数。则获取url中的参数。
+        oData = this.getSearchData();
+        // this.activeKey = oData.tab;
+      }
+
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        MODULE_ITEM_URL,
+        "get",
+        null,
+        oResult => {
+          // 请求成功。
+          this.setCategories(oData, oResult);
+
+          if (oData || window.location.hash.length > 2) {
+            this.activeKey = oData.tab;
+          }
+
+          this.$nextTick(() => {
+            if (oData) {
+              this._submitForm(oData);
+            }
+          });
         },
-		// 创建时处理。mounted
-		created() {
-			// 登录判断。
-			this.$register.login(this.$store);
+        this.requestFail,
+        this.requestError
+      );
+    },
+    // 设置tab数据。
+    setCategories(oData, oResult) {
+      this.categories = categoriesArr
 
-			// 获取配置数据。
-			// this.$store.dispatch('getConfig')
-			this.$register.getVersion(this.$store, this.$ajax, () => {
-			// this.$store.dispatch('getVersion').then(() => {
-				// 获取数据。
-				if(!this.supression) {
-					// 若不支持遏制。
-					this.$message.error('暂无权限。');
-				}else {
-					this.fetchData()
-				}
-			})
+      this.categories.forEach(o => {
+        if (oData && oData.tab == o.key) {
+          o.active = oData;
+        } else {
+          o.active = {
+            radio: "1",
+            keys: {}
+          };
+        }
+      });
+    },
+    // 请求失败。
+    requestFail(sErrorMessage) {
+      // 提示信息。
+      this.sErrorMessage = sErrorMessage;
+      this.showMessage();
+    },
+    // 请求错误。
+    requestError(err) {
+      console.log(err);
+    },
+    getSearchData() {
+      let oData = {
+          tab: "",
+          keys: {},
+          radio: "1"
+        },
+        aHref = location.href.split("?"),
+        aParams = aHref[2].split("&"),
+        aInfo = aHref[1].split("/");
 
-		},
-		// 页面方法。
-		methods: {
-			// 获取数据。
-			fetchData() {
-				
-				/* 设置遏制类表的查询条件 */
-				sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom)); //设置默认过滤条件 -- 遏制列表的条件
+      // 设置tab和radio
+      oData.tab = aInfo[aInfo.length - 2];
+      oData.radio = aInfo[aInfo.length - 1];
 
-				/* 获取传入的查询条件 */
-				this.tag = location.search.split("=")[1];
-				
-				let oData = sessionStorage.getItem("searchConditions-" + this.tag);
+      // 设置keys。
+      aParams.forEach(o => {
+        let aAttr = o.split("=");
+        oData.keys[aAttr[0]] = decodeURIComponent(aAttr[1]);
+      });
 
-				/* 根据传入数据 */
-				this.$register.sendRequest(this.$store, this.$ajax, URL_JOIN, "get", null, (oResult) => {
-					let datas = oResult
-					let _radioList = []			//用于储存radioList
-					let _groupItems = []		//用于储存groupItems
-					datas.forEach(o => {		//用于获取页面上布局信息
-						if(o.moduleCode === "restrain"){	
-							(o.groups).forEach((group,index) => {
-								_radioList.push({
-									key: index+1,
-									groupName: `${group.groupName}`
-								})
-								var groupItems = group.groupItems
-								groupItems.forEach(function(item){
-									if(item.itemCode === "equipmentCode" || item.itemCode === "materialCode" ){  //查询条件如果是'物料'或'人员'
-										item.type = 'select'
-										item.placeholder = `请选择${item.itemName}`
-									}else if(item.itemCode === "batchNo"){			//查询条件如果是'批次'
-										item.type = 'input'
-										item.placeholder = `请输入${item.itemName}`
-									}else{											//查询条件如果是'时间'
-										item.type = 'datetime'						
-										item.placeholder = `请选择${item.itemName}`
-									}
-									_groupItems.push({
-										key: index+1,
-										itemCode: `${item.itemCode}`,
-										itemName: `${item.itemName}`,
-										type: `${item.type}`,
-										placeholder: `${item.placeholder}`
-									})
-								})						
-							})
-							this.radioList = _radioList
-							this.groupItems = _groupItems
+      // 返回参数。
+      return oData;
+    },
+    // 显示提示信息。
+    showMessage() {
+      this.$message({
+        message: this.sErrorMessage,
+        duration: 3000
+      });
+    },
+    getKeys(sKey) {
+      let oSearch = this.categories.filter(o => o.key == sKey)[0].active.keys;
+      // 加时间戳。生成标记-- 点击查询可多次
+      oSearch._tag = new Date()
+        .getTime()
+        .toString()
+        .substr(-5);
+      return oSearch;
+    },
+    handleClick(tab, event) {
+      // console.log(tab, event);
+    },
+    // 调整面板高度。
+    adjustTabHeight() {
+      let oSearchTab = this.$refs.searchTab.$el;
+      if (oSearchTab.scrollHeight > oSearchTab.clientHeight) {
+        this.searchTab = oSearchTab.scrollHeight + "px";
+      } else {
+        this.searchTab = "100%";
+      }
+    },
+    // 调整面板中参数设置的高度。
+    setParamBlockHeight() {
+      let oSearchTab = this.$refs.searchTab.$el;
 
-						}
-					})
+      this.panelHeight = oSearchTab.clientHeight - 80;
+    },
+    // 数据提交
+    _submitForm(oConditions) {
+      this.tip = false;
 
-					if(oData) {									//如果该条件在 session 中有保存
-						oData = JSON.parse(oData);
-						this.render(oData) 						// 根据数据渲染页面
-					}else if(window.location.hash.length > 2) { // session中信息丢失，url中有参数。则获取url中的参数。			
-						oData = this.getSearchData();
-						this.render(oData)
-					}else {
-						this.render({radio: 1})
-					}
+      let sPath = "/" + this.activeKey;
+      oConditions.tab = this.activeKey;
+      this.updateRecord(oConditions);
+      // console.log(oConditions);
+      sessionStorage.setItem(
+        "searchConditions-" + this.tag,
+        JSON.stringify(oConditions)
+      );
 
-					this.$nextTick(() => {
-						if(oData) {
-							this._submitForm(oData);
-						}            
-					})
-				})
-			},
-			/* 根据传入信息渲染页面 */
-			render(oData){
-				this.activeKey = oData.tab;  //路由
-				this.radioNumber = +oData.radio
-				if(!!oData.keys){
-					for(let i in oData.keys){
-						this.materialForm[this.radioNumber-1][i] = oData.keys[i]
-					}
-				}
-				
-			},
+      //        if(this.activeKey == "stock") {
+      // 若为查出库。
+      sPath = sPath + "/" + oConditions.radio;
+      //        }
 
-			submitForm(formName) {
-			  this.$refs[formName][0].validate((valid) => {
-					if (valid) {
-						this.activeKey = "restrain"
-                        let oConditions = {
-                            keys: this.formDatas, // this.keys,
-							radio: this.radioNumber,
-							tab: this.activeKey
-						};
-                        this._submitForm(oConditions);
-                        
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                
-				});
-			},
-			submitForm1(formName) {
-				
-			  this.$refs[formName].validate((valid) => {
-					if (valid) {
-						sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
-						this.$router.replace({ 
-							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变，子组件监听路由触发事件
-							
-						})
-                    } else {
-                        console.log('error submit!!');
-                        return false;
-                    }
-                
-				});
-			},
-			// 判断调用接口是否成功。
-			judgeLoaderHandler(param,fnSu,fnFail) {
-				let bRight = param.data.errorCode;
-				
-				// 判断是否调用成功。
-				if(!bRight) {
-					// 调用成功后的回调函数。
-					fnSu && fnSu();
-				}else {
-					// 提示信息。
-					this.sErrorMessage = param.data.errorMsg.message;
-					this.showMessage();
-					// 失败后的回调函。
-					fnFail && fnFail();
-				}
-			},
-			// 显示提示信息。
-			showMessage() {
-				this.$message({
-					message: this.sErrorMessage,
-					duration: 3000
-				});
-			},
-			// 切换tab
-			handleClick(tab) {
-				
-				if(tab.index === '1'){
-					sessionStorage.setItem('restrainList', JSON.stringify(this.equipmentFrom));
-					this.$router.replace({ 
-							path: '/list/'+new Date().getTime().toString().substr(-5) //对路由添加时间戳，促发路由改变(不可见)，子组件监听路由触发事件
-							
-						})
-				}else{
-					this._submitForm(this.defaultConditions)
-				}
-			},
+      // 修改下拉参数值。
+      this.$router.replace({
+        path: sPath,
+        query: this.getKeys(this.activeKey)
+      });
+    },
+    dragstar(e) {
+      //鼠标按下，开始拖动
+      //  console.log('开始')
+      if (e.target.id === "changeWidth") {
+        this.LayoutLeftWidth = this.reversedMessage;
+        this.changeWidth = 0;
+        this.dragging = true;
+        this._pageX = e.pageX;
 
+        if (this.collapse) {
+          this.collapse = false;
+        }
+      }
+    },
+    dragend(e) {
+      //鼠标松开，结束拖动
 
-			// 数据提交
-			_submitForm(oConditions) {	
-				this.tip = false
-				let sPath = '/' + this.activeKey;  //this.activeKey  == 'restrain'
-				oConditions.tab = this.activeKey;
+      //console.log('结束')
+      this.dragging = false;
+      e.stopPropagation = true;
+    },
+    onMouseMove(e) {
+      //拖动过程
 
-				this.defaultConditions = oConditions
-
-          		sessionStorage.setItem('searchConditions-' + this.tag, JSON.stringify(oConditions))
-
-				sPath = sPath + '/' + oConditions.radio;
-				
-				if(this.activeKey  === 'restrain' && oConditions.radio == 2) {//1
-					sPath = '/process'
-				}
-				let oQuery = this.getKeys()
-				this.$router.replace({ path: sPath, query: oQuery })
-			},
-			
-			getKeys() {
-				let oSearch = this.formDatas
-				// 加时间戳。生成标记-- 点击查询可多次
-				oSearch._tag = new Date().getTime().toString().substr(-5);
-				
-				return oSearch;
-			},
-
-			getSearchData () {
-				let oData = {
-					tab: "",
-					keys: {},
-					radio: "1"
-				},
-				aHref = location.href.split("?"),
-				aParams = aHref[1].split("&"),
-				aInfo = aHref[0].split("/");
-					
-				// 设置tab和radio
-				oData.tab = aInfo[aInfo.length-2];
-				oData.radio = aInfo[aInfo.length-1];
-					
-				// 设置keys。
-				aParams.forEach(o=>{
-					let aAttr = o.split("=");
-					oData.keys[aAttr[0]] = decodeURIComponent(aAttr[1]);
-				});
-
-				// 返回参数。
-			//	console.log(oData)
-				return oData;
-			}
-			
-		}
-		
-	}
-	
+      if (this.dragging) {
+        // console.log('开始动了')
+        this.changeWidth = e.pageX - this._pageX;
+      }
+    },
+    /* 生成随机数函数 */
+    guid() {
+      function S4() {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+      }
+      return (
+        S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()
+      );
+    },
+    // 保存查询记录
+    updateRecord(oConditions) {
+      //debugger
+      delete oConditions.keys._tag;
+      let oData = oConditions;
+      let isRepetition = true; //默认不重复
+      let n; //记录和第几个重复
+      this.myLocalStorage.forEach(data => {
+        delete data.oData.keys._tag;
+      });
+      isRepetition = this.myLocalStorage.some((el, j) => {
+        if (JSON.stringify(el.oData) === JSON.stringify(oConditions)) {
+          n = j;
+        }
+        return JSON.stringify(el.oData) === JSON.stringify(oConditions);
+      });
+      if (!isRepetition) {
+        let obj = {
+          id: this.guid(),
+          dateTime: new Date().Format(),
+          oData
+        };
+        delete obj.oData.keys._tag;
+        this.myLocalStorage.unshift(obj);
+        this.myLocalStorage.forEach(data => {
+          delete data.oData.keys._tag;
+        });
+        localStorage.setItem("history", JSON.stringify(this.myLocalStorage));
+      } else {
+        //debugger
+        let olddata = this.myLocalStorage.splice(n, 1)[0];
+        olddata.id = this.guid();
+        let newTime = new Date().Format();
+        olddata.dateTime = newTime;
+        delete olddata.oData.keys._tag;
+        this.myLocalStorage.unshift(olddata);
+        this.myLocalStorage.forEach(data => {
+          delete data.oData.keys._tag;
+        });
+        localStorage.setItem("history", JSON.stringify(this.myLocalStorage));
+      }
+    }
+  },
+  watch: {
+    // 如果 左边小于260px 直接收缩
+    reversedMessage: function() {
+      // console.log('走你')
+      if (this.reversedMessage <= 275 && !this.collapse) {
+        this.collapse = true;
+      }
+    },
+    collapse: function() {
+      // 侧边栏展开时默认325
+      if (!this.collapse) {
+        // 修改当展开时，每次都是原始宽度
+        this.changeWidth = 0;
+        this.LayoutLeftWidth = 360;
+      }
+    }
+  }
+};
 </script>
-    					
+
 <style lang="less">
-	@green: #42af8f;
-	@blue: #0099ff;
-	@yellow: #fcc433;
-	@red: #e86b59;
-	@inVent: #00a656;
-	
-	body {
-		background-color: #f2f2f2;
-		font-size: 14px;
-		overflow: hidden;
+html,
+body {
+  height: 100%;
+}
 
-		.panel {
-			padding: 20px;
-    		box-sizing: border-box;
-			.panel-title {
-				background-color: #fff;
-				.el-radio-group {
-					display:block;
-					text-align: left;
-					.radio {
-						margin-bottom:15px;
+body {
+  background-color: #f2f2f2;
+  font-family: 微软雅黑;
+  color: #333;
+  font-size: 14px;
+}
+
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .content {
+    display: flex;
+    flex: 1;
+
+    .nav {
+      display: flex;
+      border-right: 1px solid #ccc;
+      box-sizing: border-box;
+      /*height: 100%;*/
+
+      &.collapsed {
+        display: none;
+      }
+    }
+
+    .router {
+      display: flex;
+      padding: 20px;
+      box-sizing: border-box;
+      /*height: 100%;*/
+      position: relative;
+      flex-grow: 1;
+      .btn-collapse {
+        position: absolute;
+        left: -18px; // 2px;
+        top: 50%;
+        color: #42af8f;
+        font-weight: bold;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    }
+
+    .flex-wraps {
+      flex: 1;
+      position: relative;
+      .changeWidth {
+        position: absolute;
+        left: -20px;
+        color: #42af8f;
+        cursor: e-resize;
+        width: 20px;
+        //background-color:rgba(0,0,0,0.1);
+        height: 100%;
+        top: 0;
+      }
+    }
+
+    .router-container {
+      position: absolute;
+      border: 1px solid #ccc;
+      background-color: #fff;
+      box-sizing: border-box;
+      width: 100%;
+      height: 100%;
+			overflow: auto;
+			display: flex;
+			.router-content {
+				.innner-content {
+					.title {
+						box-sizing: border-box;
+							padding: 0 20px;
 					}
-					.form-inline {
-						border-bottom:1px solid #ccc
-					}
-				}
-				.form-inline {
-					display: flex;
-					border-bottom:1px solid #ccc
-				}
-			}
-			.el-form-item {
-				margin-right: 40px;
-				.el-select>.el-input {
-					width:180px;
-				}
-				.btn {
-					border-radius: 0;
-					width: 80px;
-					height: 30px;
-					padding: 0;
-					box-sizing: border-box;
-					font-size: 14px;
-				}
-			}
-			.el-form-item:last-child {
-				margin-left:60px;
-			}
-			
-			.panel-content {
-				background-color: #fff;
-			}
-		}
-	}
-
-    .el-radio {
-        &:hover {
-            color: #42af8f;
-
-            .el-radio__inner {
-                border-color: #42af8f;
-            }  
-        }
-    }
-
-    .el-radio__inner {
-        border: 2px solid #999;
-        width: 14px;
-        height: 14px;
-
-        &::after {
-            background-color: #42af8f;
-        }
-    }
-
-    .el-radio__input.is-checked .el-radio__inner {
-        border-color: #42af8f;
-        background: #fff;
-    }
-
-    .el-radio__label {
-        padding-left: 10px;
-    }
-
-    .panel-title {
-        text-align: center;
-        padding-left: 28px;
-        padding-right: 28px;
-    }
-    .panel-content {
-    	overflow: auto;
-    	
-    	.panel-content-wrap {
-    		padding:  0 28px;
-    	}
-    }
-    .hide {
-    	display: none;
-	}
-	.panel-title {
-		.search-tab {
-			.el-tabs__header {
-				border-bottom:none;
-				margin: 20px 0;
-				.el-tabs__item {
-					border-radius: 0;
-					width: 90px;
-					height: 30px;
-					padding: 0;
-					box-sizing: border-box;
-					font-size: 14px;
-					border: 2px solid #42af8f;
-					line-height: 26px;
-					margin-right: 20px;
-				}
-				.el-tabs__active-bar {
-					display:none
-				}
-				.is-active {
-					background-color: #42af8f;
-					color: #fff;
-				}
-			}
-			.el-tabs__content {
-				.el-tab-pane {
-					.el-radio-group {
-						.el-input__inner {
-							height: 30px;
-							border-radius: 0;
-							border-color: #ddd;
+					.report {
+						.error {
+							margin-left: 20px;
+							margin-right: 20px;
+						}
+						.report-content {
+							box-sizing: border-box;
+							padding: 0 20px;
 						}
 					}
-					.el-input__inner {
-						height: 30px;
-						border-radius: 0;
-						border-color: #ddd;
-					}
 				}
-			}
-		}
-	}
-	
-
-	#app {
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		align-items:stretch;
-		
-		.panel {
-			flex: 1;
-			display: flex;
-			flex-direction: column;
-		}
-		.panel-content {
-			display: flex;
-			flex: 1;
-			.router-container {
-				display: flex;
-				flex: 1;
-				width: 100%;
-				flex-direction: column;
-				.router-content {
-					.innner-content {
-						margin-left: 28px;
-						margin-right: 28px;
-					}
-				}
-				.material-stock {
-					.router-path {
-						margin-left: 28px;
-    					margin-right: 28px;
-					}
-					.path-btn {
-						margin-left: 28px;
-    					margin-right: 28px;
-					}
-				}
-				.tip {
-					height: 100%;
-					background: url('../../assets/img/tip.png') no-repeat center center;
-				}
-				// .router-content {
-				// 	.innner-content {
-				// 		position: absolute;
-				// 		left: 28px;
-				// 		right: 28px;
-				// 		margin-bottom: 15px;
-				// 	}
-				// }
-				// .material-stock {
-				// 	.router-path {
-				// 		padding-left: 28px;
-        		// 		padding-right: 28px;
-				// 	}
-				// }
 			}
 			.material-stock {
 				flex: 1;
+				overflow: auto;
+				padding: 0 20px;
+				box-sizing: border-box;
 			}
-		}
-		.condition-messsage {
-			.el-form-input {
-				margin-left: 0;
-				width: 400px;
-				.el-form-item {
-					.el-form-item__label {
-						padding: 8px 10px 8px 0;
-					}
-					.el-form-item__content {
-						.el-input {
-							.el-input__inner {
-								height: 30px;
-								line-height: 30px;
-								border-radius: 0;
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+      .post {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+      }
 
-	#restrain {
-		.router-path {
-			border-bottom-width: 0;
-		}
+      .tip {
+        height: 100%;
+        background: url("../../assets/img/tip.png") no-repeat center center;
+      }
+    }
 	}
-	.el-picker-panel__body-wrapper{
-		.el-picker-panel__body{
-			.el-date-picker__time-header{
-				.el-date-picker__editor-wrap{
-					.el-input {
-						width: 100%;
-					}
-				}
+	.dialog-barcode-wrap,
+	.dialog-wrap {
+		.el-dialog {
+			.el-dialog__body {    
+				padding: 30px 20px;
+				color: rgb(72, 106, 101);
+				font-size: 14px;
 			}
 		}
-	}
+	} 
+}
+
+.panel-title {
+  padding: 30px 0;
+  .el-radio + .el-radio {
+    margin-left: 20px;
+  }
+}
+
+.el-tabs--border-card {
+  & > .el-tabs__header {
+    border-bottom: none;
+
+    .el-tabs__item {
+      margin-right: 0;
+      margin-left: 0;
+      border: none;
+      box-sizing: content-box;
+      padding: 0;
+    }
+  }
+}
+
+.el-tabs__nav-wrap {
+  margin-bottom: 0;
+}
+
+.search-tab {
+  width: 100%;
+  border: none;
+  box-shadow: none;
+
+  &.el-tabs--border-card {
+    & > .el-tabs__header {
+      background-color: #d9dee4;
+
+      .el-tabs__nav {
+        width: 100%;
+      }
+
+      .el-tabs__item {
+        height: 42px;
+        line-height: 42px;
+        width: 130px;
+        text-align: center;
+				font-size: 16px;
+				border: 0;
+        border-top: 4px solid transparent;
+        border-bottom: 4px solid transparent;
+        color: #666;
+        width: 50%;
+				margin: 0;
+        &:hover {
+          color: #333;
+        }
+
+        &.is-active {
+          color: #42af8f;
+          border-top-color: #42af8f;
+        }
+      }
+    }
+  }
+
+  // .form-button {
+  //   margin-top: 80px;
+	// }
+	
+}
+</style>
+
+
+<style lang="less">
+@media screen and (max-width: 1400px) {
+  #app {
+    .search-tab {
+      &.el-tabs--border-card {
+        & > .el-tabs__content {
+          .el-tab-pane {
+            .panel-content {
+              .panel-content-wrap {
+                padding: 0;
+                .el-form {
+                  .form-conditions {
+                    /*max-height: 330px;*/
+                    overflow: auto;
+                    .el-form-item {
+                      padding: 0 28px;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 </style>

@@ -25,7 +25,10 @@ var parseData = function(aoGet){
 		"startTime": "datetime",
 		"endTime": "datetime"
 	};
-
+	
+	// 排序处理。
+	aoGet.sort((a, b) => a.moduleOrder > b.moduleOrder)
+	
 	// 数据转换。
 	let aResult = aoGet.map(oModule => {
 	

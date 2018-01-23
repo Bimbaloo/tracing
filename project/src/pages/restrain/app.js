@@ -43,16 +43,19 @@ const Parameter = r => require.ensure([], () => r(require('components/process/pa
 
 // 定义路由
 const routes = [
-  { path: '/list/:key', component: list },            // 遏制列表（未开发）
-  { path: '/restrain/1/', component: Suspicious,      // 可疑品列表
+  { path: '/suppressList/:key', component: list },    // 遏制列表（未开发）
+  { path: '/suppress/1/', component: Suspicious,      // 可疑品列表
     meta: {
       title: 'restrain'
     }
+  },
+  {
+    path: '/suppress/2/', 
+    redirect:'/process'
   },    
   {                                                   // 设备查询
     path: '/process', 
     component: Process,
-    alias: '/restrain/2/',
     children: [{
       path: '',
       component: Chart,//List
@@ -145,6 +148,8 @@ import { loginModule } from 'assets/js/loginStore.js'
 // 引用工厂定制模块
 // import { customModule } from 'assets/js/customStore.js'
 import { versionModule } from 'assets/js/versionStore.js'
+// 引用工厂定制模块
+import { factoryModule } from 'assets/js/factoryStore.js'
 
 Vue.prototype.$register = loginFn;
 
@@ -152,6 +157,7 @@ const store = new Vuex.Store({
   modules: {
     loginModule,
     // customModule
+    factoryModule,
     versionModule
   }
 })
