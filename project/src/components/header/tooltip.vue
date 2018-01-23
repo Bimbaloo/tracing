@@ -3,7 +3,7 @@
 	<div>
 	    <div class="tooltip-info" @mouseenter="showList=true" @mouseleave="showList=true">
 	        <div v-if="back" class="back" @click="goBack">返回</div>
-	        <div v-if="back && tool" class="division">|</div>
+	        <div v-if="back && (tool || (ssoLogin || (!ssoLogin && config)))" class="division">|</div>
 	        <el-tooltip v-if="tool" class="item" effect="light" content="Bottom Right" placement="bottom-end">
 	            <ul slot="content" class="info-list">
 	                <li @click="goSearchBarcode">条码查询</li>
@@ -12,7 +12,7 @@
 	            <div class="user-name">小工具<i class="el-icon-arrow-down"></i></div>
 	        </el-tooltip>
 	        <div v-if="tool && (ssoLogin || (!ssoLogin && config))" class="division">|</div>
-	        <div v-if="ssoLogin">
+	        <div class="item" v-if="ssoLogin">
 		        <el-tooltip v-if="config || userId" class="item" effect="light" content="Bottom Right" placement="bottom-end">
 		            <ul slot="content" class="info-list">
 		                <li @click="goToConfig" v-if="config">设置</li>
@@ -22,7 +22,7 @@
 		        </el-tooltip>
 		        <div v-else class="user-name" :style="{cursor: nickname?'default':'pointer'}" @click="login">{{nickname || "登录"}}</div>
 	        </div>
-        	<div v-if="!ssoLogin && config" @click="goToConfig" class="user-name" style="{cursor:'pointer'}">设置</div>
+        	<div v-if="!ssoLogin && config" @click="goToConfig" class="user-name">设置</div>
 	    </div>
 	    
 	    <!-- 条码查询 -->
