@@ -140,6 +140,14 @@
 	            		}else {
 	            			callback();
 	            		}
+					},
+					// 验证人员。
+	            	validatePersonCode = (rule, value, callback) => {
+	            		if(!value) {
+	            			callback(new Error("请选择设备"));
+	            		}else {
+	            			callback();
+	            		}
 	            	},
             		// 验证开始时间。
             	    validateStartTime = (rule, value, callback) => {
@@ -291,7 +299,7 @@
             		"resume": {
             			"barcode": [{validator: validateBarcode, trigger: "change"}]
             		},
-					// 遏制
+					// （新建）遏制
             		"suppress": {
             			"materialCode": [{validator: validateMaterialcode, trigger: "change"}],
 						"batchNo": [{validator: validateBatch,trigger: "change"}],
@@ -299,7 +307,14 @@
             			"startTime": [{validator: validateStartTime, trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateEndTime, trigger: "change"}]
-            		},
+					},
+					// 遏制列表
+					"suppressList": {
+						"personCode":[{validator: validatePersonCode, trigger: "change"}],
+            			"startTime": [{validator: validateStartTime, trigger: "change"}],
+            			// 结束时间。
+            			"endTime": [{validator: validateEndTime, trigger: "change"}]
+					},
             		// 断链
             		"link_repair": {
             			"batchNo": [{validator: validateBatch,trigger: "change"}],
