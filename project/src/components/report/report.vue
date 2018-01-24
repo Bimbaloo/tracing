@@ -1,6 +1,5 @@
 <template>
 	<div class="report">
-		<el-button class="btn btn-plain btn-restrain" @click="restrain" v-if="!sErrorMessage">遏制</el-button>
 		<div v-if="sErrorMessage" class="error">
 			{{ sErrorMessage }}
 		</div>
@@ -129,7 +128,7 @@ export default {
   },
   props: {
     type: String,
-    query: [Array, Object],
+    query: [Array, Object,String],
     showTables: {
       type: Array,
       required: false,
@@ -149,7 +148,8 @@ export default {
         barcode: "/api/v1/trace/report/by-equipment-barcode",
         batch: "/api/v1/trace/report/by-equipment-batch",
         time: "/api/v1/trace/report/by-equipment-time",
-        restrainBatch: "/api/v1/trace/report/by-batch"
+				restrainBatch: "/api/v1/trace/report/by-batch",
+				restrainDetails: '/api/v1/suppress/verbose'
       },
       active: {
         summary: true,
@@ -757,7 +757,7 @@ export default {
         this.reportData[param].data = [];
       }
 
-      let oParam = {};
+      let oParam = null;
 
       if (this.type == "trace") {
         this.showTables.forEach(e => {
@@ -776,7 +776,13 @@ export default {
           sUrl = this.oUrl["points"];
           oParam = oQuery;
         }
-      } else {
+			} else if(this.type === "restrainDetails") {  // 遏制详情
+				oParam = this.query
+				console.log(oParam)
+				sUrl = this.oUrl[this.type]
+				this.$ajax.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
+				//debugger
+			} else {
         // 若为遏制报告。
         oParam = this.$route.query;
         if (oParam && "equipmentId" in oParam) {
@@ -1022,71 +1028,6 @@ export default {
 	            `;
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
-    },
-    // 可疑品列表。
-    restrain() {
-      const h = this.$createElement;
-      let bSucess = false;
-      let self = this;
-      this.$msgbox({
-        title: "提示",
-        message: h("el-input", {
-          attrs: {
-            type: "textarea",
-            rows: 4,
-            placeholder: "请输入遏制描述信息"
-          },
-          class: {
-            message: true
-          },
-          domProps: {
-            value: self.description
-          },
-          on: {
-            blur: function(event) {
-              self.description = event.target.value;
-            }
-          }
-        }),
-        showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
-        beforeClose: (action, instance, done) => {
-          if (action === "confirm") {
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "执行中...";
-
-            let oConditions = Object.assign(
-              { description: self.description },
-              this.$route.query
-            );
-
-            done();
-            instance.confirmButtonLoading = false;
-
-            bSucess = true;
-            // 隐藏遏制按钮。
-            self.isRestrained = false;
-            let sSerializion = "";
-            for (let p in oConditions) {
-              sSerializion += `&${p}=${oConditions[p]}`;
-            }
-            sSerializion = sSerializion.substring(1);
-            // 遏制成功，打开到遏制报告。
-            window.open("/restrainReport.html?" + sSerializion);
-          } else {
-            done();
-          }
-        }
-      }).then(action => {
-        if (action == "confirm") {
-          if (bSucess) {
-            this.$message.success("提交成功！");
-          } else {
-            this.$message.error("提交失败！");
-          }
-        }
-      });
     }
   }
 };

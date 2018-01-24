@@ -1,9 +1,17 @@
 <template>
 	<div class="router-content">
 		<div class="innner-content" >
-			<h2 class="content-title path-title">遏制列表</h2>
-			<h2 class="content-title">遏制列表</h2>
-			<v-table :table-data="tableDate" :loading="loading" :resize="resize"></v-table>
+			<h2 class="content-title path-title" >
+        <span :class="{ 'list': isDetails }" @click="isDetails = false">遏制列表</span>
+        <span class="details" v-if="isDetails"  @click="isDetails = true">>遏制详情</span>
+      </h2>
+			<h2 class="content-title" v-show="!isDetails">遏制列表</h2>
+      <h2 class="content-title" v-show="isDetails">操作信息</h2>
+      <div class='condition-table' v-show="isDetails">
+        <span v-for="infor in information" :key="infor.value">{{infor.value}}：{{infor.key}}</span>
+      </div>
+			<v-table v-show="!isDetails" :table-data="tableDate" :loading="loading" :resize="resize" class="raw-table"></v-table>
+      <v-report v-if="isDetails" :hasData="setWidth" :noData="removeWidth" :query="handleId" type="restrainDetails"></v-report>
 		</div>
 	</div>
 	
@@ -12,18 +20,23 @@
 
 <script>
 import table from "components/basic/table.vue";
+import report from "components/report/report.vue"
 
-const URL = HOST + "/api/v1/suppress/list"; // 测试获取遏制列表数据
+const URL = HOST + "/api/v1/suppress/list";           // 遏制列表
+const verboseURL = HOST + "/api/v1/suppress/verbose"; // 遏制详情
+
 
 export default {
   components: {
+    'v-report': report,
     "v-table": table
   },
   data() {
     return {
+      isDetails: false,
       loading: false,
       resize: true, //是否允许拖动table大小
-      tableDate: {
+      tableDate: {  // 遏制列表
         columns: [
           {
             type: "index",
@@ -31,23 +44,21 @@ export default {
             width: "50"
           },
           {
-            prop: "condition",
-            name: "物料信息"
+            prop: "doDescription",
+            name: "遏制详情"
           },
           {
-            prop: "startTime",
-            name: "遏制开始时间"
+            prop: "doTime",
+            name: "遏制时间",
+            width:200
           },
           {
-            prop: "endTime",
-            name: "遏制结束时间"
+            prop: "cancelTime",
+            name: "取消遏制时间",
+            width:200
           },
           {
-            prop: "startDescription",
-            name: "开始遏制详情"
-          },
-          {
-            prop: "startOperator",
+            prop: "doOperator",
             name: "开始遏制人员"
           },
           {
@@ -69,10 +80,12 @@ export default {
       },
       /* 查询条件 */
       restrainList: {
-        "startTime": "",
-        "endTime": "",
-        "personCode": ""
-      }
+        startTime: "",
+        endTime: "",
+        personCode: ""
+      },
+      handleId: '', // 点击行的 handleId
+      index: ''     // 点击行的 index
     };
   },
   created() {
@@ -80,6 +93,51 @@ export default {
     this.getCondition();
     // 调用接口查询
     this.getListhData(this.restrainList);
+  },
+  computed: {
+    information () {
+      const arr = [
+          {
+            prop: "doDescription",
+            name: "遏制详情"
+          },
+          {
+            prop: "condition",
+            name: "遏制条件"
+          },
+          {
+            prop: "doTime",
+            name: "遏制时间"
+          },
+          {
+            prop: "cancelTime",
+            name: "取消遏制时间"
+          },
+          {
+            prop: "doOperator",
+            name: "开始遏制人员"
+          },
+          {
+            prop: "endDescription",
+            name: "结束遏制详情"
+          },
+          {
+            prop: "endOperator",
+            name: "结束遏制人员"
+          }
+      ]
+      let informationArr = Object.assign({}, this.tableDate.data[this.index]) || {}
+      let needArr = []
+      arr.forEach(element => {
+        if(informationArr[element.prop] !== null && informationArr[element.prop] !== undefined) {
+          needArr.push({
+            value: element.name,
+            key: informationArr[element.prop]
+          })
+        }
+      });
+      return needArr
+    }
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
@@ -91,11 +149,11 @@ export default {
   methods: {
     // 获取查询信息
     getCondition() {
-			let { startTime , endTime , personCode} = this.$route.query
-			this.restrainList = { startTime , endTime , personCode}		
-		},
-		
-		// 调用接口查询
+      let { startTime, endTime, personCode } = this.$route.query;
+      this.restrainList = { startTime, endTime, personCode };
+    },
+
+    // 获取遏制列表信息
     getListhData(oCondition) {
       this.$register.sendRequest(
         this.$store,
@@ -106,12 +164,18 @@ export default {
         this.requestSucess,
         this.requestFail,
         this.requestError
-			);
+      );
     },
-    // 请求成功。
+    // 获取遏制列表信息 - 请求成功。
     requestSucess(oData) {
       this.loading = false;
+      oData.forEach((el,index) => {
+        el.handleId = el.handle;
+        el.handle = "查看详情";
+        el.index = index
+      });
       this.tableDate.data = oData;
+      this.isDetails = false
     },
     // 请求失败。
     requestFail(sErrorMessage) {
@@ -120,110 +184,23 @@ export default {
     },
     // 请求错误。
     requestError(err) {
-			console.log(err)
+      console.log(err);
       this.loading = false;
       console.log("数据库查询出错。");
     },
 
-    
     //查看详情
-    viewDetails(index) {
-      console.log(index);
+    viewDetails(oDate) {
+      this.index = oDate.index      
+      this.handleId = oDate.handleId
+      this.isDetails = true
     },
-    // 根据条件过滤
-    // filter() {
-    //   let a = sessionStorage.getItem(
-    //     "restrainList",
-    //     JSON.stringify(this.ruleForm2)
-    //   );
-    //   this.restrainList = JSON.parse(a);
-    //   //console.log(this.restrainList)
-    //   //debugger
-    //   if (
-    //     this.restrainList.personCode !== "" &&
-    //     this.restrainList.startTime !== "" &&
-    //     this.restrainList.endTime !== ""
-    //   ) {
-    //     //三个条件都在
-    //     this.tableDate.data = this.columnsData
-    //       .filter(this.isPerson)
-    //       .filter(this.isStartTime)
-    //       .filter(this.isEndTime);
-    //   } else if (
-    //     this.restrainList.personCode === "" &&
-    //     this.restrainList.startTime !== "" &&
-    //     this.restrainList.endTime !== ""
-    //   ) {
-    //     //未限制人员
-    //     this.tableDate.data = this.columnsData
-    //       .filter(this.isStartTime)
-    //       .filter(this.isEndTime);
-    //   } else if (
-    //     this.restrainList.personCode !== "" &&
-    //     this.restrainList.startTime === "" &&
-    //     this.restrainList.endTime !== ""
-    //   ) {
-    //     //未限制开始时间
-    //     this.tableDate.data = this.columnsData
-    //       .filter(this.isPerson)
-    //       .filter(this.isEndTime);
-    //   } else if (
-    //     this.restrainList.personCode !== "" &&
-    //     this.restrainList.startTime !== "" &&
-    //     this.restrainList.endTime === ""
-    //   ) {
-    //     //未限制结束时间
-    //     this.tableDate.data = this.columnsData
-    //       .filter(this.isPerson)
-    //       .filter(this.isStartTime);
-    //   } else if (
-    //     this.restrainList.personCode !== "" &&
-    //     this.restrainList.startTime === "" &&
-    //     this.restrainList.endTime === ""
-    //   ) {
-    //     //只限制人员
-    //     this.tableDate.data = this.columnsData.filter(this.isPerson);
-    //   } else if (
-    //     this.restrainList.personCode === "" &&
-    //     this.restrainList.startTime !== "" &&
-    //     this.restrainList.endTime === ""
-    //   ) {
-    //     //只限制开始时间
-    //     this.tableDate.data = this.columnsData.filter(this.isStartTime);
-    //   } else if (
-    //     this.restrainList.personCode === "" &&
-    //     this.restrainList.startTime === "" &&
-    //     this.restrainList.endTime !== ""
-    //   ) {
-    //     //只限制结束时间
-    //     this.tableDate.data = this.columnsData.filter(this.isEndTime);
-    //   } else {
-    //     //什么都不限制
-    //     this.tableDate.data = this.columnsData;
-    //   }
-    // },
-    // 根据人员条件过滤
-    // isPerson(obj) {
-    //   return obj.personCode === this.restrainList.personCode;
-    // },
-    // 根据开始时间过滤
-    // isStartTime(obj) {
-    //   return obj.startTime <= this.restrainList.startTime;
-    // },
-    // 根据结束时间过滤
-    // isEndTime(obj) {
-    //   return obj.endTime >= this.restrainList.endTime;
-    // },
-    // 获取一周前的时间
-    // setData() {
-    //   let nowdate = new Date();
-    //   let oneweekdate = new Date(nowdate - 7 * 24 * 3600 * 1000);
-    //   let y = oneweekdate.getFullYear();
-    //   let m = oneweekdate.getMonth() + 1;
-    //   let d = oneweekdate.getDate();
-    //   let formatwdate = y + "-" + m + "-" + d + " " + "00:00:00";
-    //   return formatwdate;
-    // }
+    setWidth() {
+      this.styleObject.minWidth = "1000px";
+    },
+    removeWidth() {
+      this.styleObject.minWidth = 0;
+    }
   }
 };
 </script>
@@ -232,11 +209,13 @@ export default {
 .router-content {
   height: 100%;
 
-  .innner-content {
+  /deep/.innner-content {
     height: 100%;
     display: flex;
     flex-direction: column;
     align-items: stretch;
+    padding: 0 20px;
+    box-sizing: border-box;
 
     .content-table {
       flex: 1;
@@ -245,6 +224,72 @@ export default {
       border-left: 0;
       margin-bottom: 0px;
       margin-left: -10px;
+      .list {
+        &:hover {
+          color: #42af8f;
+          cursor: pointer;
+        }
+      }
+      .details {
+        color: #42af8f;
+      }
+    }
+    .condition-table {
+      margin-top: 0;
+      box-sizing: border-box;
+      border: 1px solid #42AF8F;
+      padding: 10px;
+      display: flex;
+      &>span {
+        display: inline;
+        margin-right: 20px;
+      }
+    }
+    .report {
+      .report-content {
+        padding: 0 !important;
+      }
+    }
+    /deep/ .raw-table {
+      width: 100%;
+      border-collapse: collapse;
+      border-spacing: 0;
+
+      th,
+      td {
+        text-align: center;
+        vertical-align: middle;
+        border: 1px solid #dfece9;
+        box-sizing: border-box;
+      }
+
+      th {
+        height: 36px;
+        background-color: #42af8f;
+        color: #fff;
+        font-weight: bold;
+
+        & > div {
+          font-weight: 600;
+        }
+      }
+
+      td {
+        height: 30px;
+      }
+
+      .el-table__body-wrapper {
+        .batch {
+          .cell {
+            cursor: pointer;
+            color: #f90;
+
+            & > div {
+              font-weight: 600;
+            }
+          }
+        }
+      }
     }
   }
 }

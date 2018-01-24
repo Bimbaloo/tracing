@@ -432,16 +432,16 @@ body {
 				.innner-content {
 					.title {
 						box-sizing: border-box;
-							padding: 0 20px;
+						//padding: 0 20px;
 					}
 					.report {
 						.error {
-							margin-left: 20px;
-							margin-right: 20px;
+							// margin-left: 20px;
+							// margin-right: 20px;
 						}
 						.report-content {
-							box-sizing: border-box;
-							padding: 0 20px;
+							// box-sizing: border-box;
+							// padding: 0 20px;
 						}
 					}
 				}

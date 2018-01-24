@@ -1,6 +1,9 @@
 <!--设备分析路由-->
 <template>
     <div class="material-stock" ref="stock">
+        <div class="path-btn">
+        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
+        </div>
         <div class="router-path">
             <router-link 
                 class="path-item" 
@@ -145,6 +148,82 @@ export default {
         // 从其他页面跳到投产表
         this.aoRoute.pop();
       }
+    },
+    // 遏制
+    showRestrain() {
+      const h = this.$createElement;
+      let bSucess = false;
+      let self = this;
+      this.$msgbox({
+        title: "提示",
+        message: h("el-input", {
+          attrs: {
+            type: "textarea",
+            rows: 4,
+            placeholder: "请输入遏制描述信息"
+          },
+          class: {
+            message: true
+          },
+          domProps: {
+            value: self.description
+          },
+          on: {
+            blur: function(event) {
+              self.description = event.target.value;
+            }
+          }
+        }),
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        beforeClose: (action, instance, done) => {
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "执行中...";
+
+            let oConditions = Object.assign(
+              { description: self.description },
+              this.$route.query
+            );
+
+            //this.$post(this.url, oConditions)
+            //.then((res) => {
+            done();
+            instance.confirmButtonLoading = false;
+            //if(!res.errorCode) {
+            bSucess = true;
+            // 隐藏遏制按钮。
+            self.restrainIf = false;
+            let sSerializion = "";
+            for (let p in oConditions) {
+              sSerializion += `&${p}=${oConditions[p]}`;
+            }
+            sSerializion = sSerializion.substring(1);
+            // 遏制成功，打开到遏制报告。
+            window.open("/restrainReport.html?" + sSerializion);
+
+            //	}
+            //})
+            //.catch((err) => {
+            //	done();
+            //	instance.confirmButtonLoading = false;
+            //});
+          } else {
+            done();
+            //	instance.$slots.default[0].elm.children[0].value = "";
+          }
+        }
+      }).then(action => {
+        if (action == "confirm") {
+          if (bSucess) {
+            this.$message.success("提交成功！");
+          } else {
+            this.$message.error("提交失败！");
+          }
+        }
+        //	self.description = "";
+      });
     }
   },
   // beforeRouteEnter (to, from, next) {
