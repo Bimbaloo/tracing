@@ -10,7 +10,7 @@
 		
 		<div class="loader">
 	        <div class="loader-inner ball-pulse">
-	          	追溯树生成中<div></div><div></div><div></div>
+	          	<span class="ball-text">追溯树生成中</span><div></div><div></div><div></div>
 	        </div>
 		</div>
 		<v-tree 
@@ -80,7 +80,7 @@
 						this.$nextTick(() => {							
 							this.showTreeData()
 						})
-					}, 5000)
+					}, 3000)
 				}, () => {
 					this.loading = false;
 					// 失败处理，清空定时
@@ -135,6 +135,11 @@
     		transform: scale(1);
     		opacity: 1;
     	}
+    }
+    
+    .ball-pulse .ball-text {
+    	color: #42af8f;
+    	font-size: 16px;
     }
     
     .ball-pulse>div:nth-child(0) {
