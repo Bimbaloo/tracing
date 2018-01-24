@@ -1,6 +1,6 @@
 <template>
 	<div class="report">
-		<el-button class="btn btn-plain btn-restrain" @click="restrain" v-if="!sErrorMessage">遏制</el-button>
+		<!-- <el-button class="btn btn-plain btn-restrain" @click="restrain" v-if="!sErrorMessage">遏制</el-button> -->
 		<div v-if="sErrorMessage" class="error">
 			{{ sErrorMessage }}
 		</div>
