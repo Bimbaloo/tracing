@@ -2,7 +2,7 @@
 <template>
     <div class="material-stock" ref="stock">
         <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
+        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-show="supression && restrainIf">遏制</el-button>
         </div>
         <div class="router-path">
             <router-link 
@@ -37,7 +37,9 @@ export default {
         parameter: "工艺参数"
       },
       aoRoute: [],
-      restrainIf: false
+      restrainIf: false,
+      url: HOST + "/api/v1/suppress/do-by-equipment", // 根据设备+时间 进行遏制
+      doDescription: '' // 遏制信息的描述
     };
   },
   computed: {
@@ -166,11 +168,11 @@ export default {
             message: true
           },
           domProps: {
-            value: self.description
+            value: self.doDescription
           },
           on: {
             blur: function(event) {
-              self.description = event.target.value;
+              self.doDescription = event.target.value;
             }
           }
         }),
@@ -180,50 +182,42 @@ export default {
         beforeClose: (action, instance, done) => {
           if (action === "confirm") {
             instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "执行中...";
-
+            instance.confirmButtonText = "遏制中...";
             let oConditions = Object.assign(
-              { description: self.description },
+              { doDescription: self.doDescription },
               this.$route.query
             );
 
-            //this.$post(this.url, oConditions)
-            //.then((res) => {
-            done();
-            instance.confirmButtonLoading = false;
-            //if(!res.errorCode) {
-            bSucess = true;
-            // 隐藏遏制按钮。
-            self.restrainIf = false;
-            let sSerializion = "";
-            for (let p in oConditions) {
-              sSerializion += `&${p}=${oConditions[p]}`;
-            }
-            sSerializion = sSerializion.substring(1);
-            // 遏制成功，打开到遏制报告。
-            window.open("/restrainReport.html?" + sSerializion);
-
-            //	}
-            //})
-            //.catch((err) => {
-            //	done();
-            //	instance.confirmButtonLoading = false;
-            //});
+            this.$post(this.url, oConditions)
+            .then((oData) => {
+              console.log(oData)
+              this.restrainIf = false
+              const handle = oData.data.data.handle
+							sessionStorage.setItem('handleID',handle)
+							instance.confirmButtonLoading = false;
+              this.$message.success('遏制成功')
+              self.doDescription = "";
+							this.$router.replace({ 
+								path: "/suppressList/1", 
+								query: {
+									"_tag":  new Date().getTime().toString().substr(-5)
+								}
+							})
+							done();
+            })
+            .catch(err=>{
+							instance.confirmButtonLoading = false;
+							this.$message.error('遏制失败')
+							self.doDescription = "";
+							console.log(err)
+							done();
+						})
           } else {
+            self.doDescription = "";
             done();
-            //	instance.$slots.default[0].elm.children[0].value = "";
           }
         }
-      }).then(action => {
-        if (action == "confirm") {
-          if (bSucess) {
-            this.$message.success("提交成功！");
-          } else {
-            this.$message.error("提交失败！");
-          }
-        }
-        //	self.description = "";
-      });
+      })
     }
   },
   // beforeRouteEnter (to, from, next) {

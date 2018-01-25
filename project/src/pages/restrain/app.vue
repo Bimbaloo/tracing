@@ -419,7 +419,7 @@ body {
       }
     }
 
-    .router-container {
+    /deep/.router-container {
       position: absolute;
       border: 1px solid #ccc;
       background-color: #fff;
@@ -427,7 +427,29 @@ body {
       width: 100%;
       height: 100%;
 			overflow: auto;
-			display: flex;
+      display: flex;
+      .suspicious {
+        .innner-content {
+          padding: 0 20px;
+          box-sizing: border-box;
+        }
+      }
+      .material-stock {
+        &>.path-btn {
+          right: 20px;
+        }
+        .suspicious {
+          .btn-restrain {  
+            width: 0;
+            height: 0;
+            display: none;
+          }
+          .innner-content {
+            padding: 0;
+            box-sizing: border-box;
+          }
+        }
+      }
 			.router-content {
 				.innner-content {
 					.title {

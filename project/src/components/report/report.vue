@@ -778,7 +778,7 @@ export default {
         }
 			} else if(this.type === "restrainDetails") {  // 遏制详情
 				oParam = this.query
-				console.log(oParam)
+				//console.log(oParam)
 				sUrl = this.oUrl[this.type]
 				this.$ajax.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
 				//debugger

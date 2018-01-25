@@ -1,6 +1,6 @@
 <template>
-	<div class="router-content">
-		<!--<el-button class="btn btn-plain btn-restrain" @click="restrain" v-if="isRestrained">遏制</el-button>-->
+	<div class="router-content suspicious">
+		<el-button class="btn btn-plain btn-restrain" @click="restrain" v-show="isRestrained">遏制</el-button>
 		<div class="innner-content" :style="styleObject">
 			<!--h2 class="title">遏制详情</h2-->
 			<!-- <h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2> -->
@@ -19,181 +19,169 @@
 </template>
 
 <script>
-	import report from "components/report/report.vue"
+import report from "components/report/report.vue";
 
-	export default {
-		components: {
-			'v-report': report
-		},
-		data() {
-			return {
-				isRestrained: true,
-				description: "",
-				url: "/trace/v1/materialbatchsuppress",
-				styleObject: {
-					"min-width": "1000px"
-				},
-				equipmentName: ""
-			}
-		},
-		computed: {
-			isrestrainHtml () {
-				return window.location.pathname.includes("restrain")
-			},
-			oQuery () {
-				return this.$route.query
-			}
-		},
-		created() {
-			this.equipmentName = this.oQuery.equipmentName
-			// 组件创建完后获取数据，
-			// 此时 data 已经被 observed 了
-			// this.fetchData();
-		},
-		watch: {
-			// 如果路由有变化，会再次执行该方法
-			 '$route': function() {			 
-				if(this.$route.meta.title === "restrain") {
-					this.equipmentName = this.oQuery.equipmentName
-				}				
-			 }
-		},
-		methods: {	
+export default {
+  components: {
+    "v-report": report
+  },
+  data() {
+    return {
+      isRestrained: true,
+      doDescription: "",
+      url: HOST + "/api/v1/suppress/do-by-batch", // 根据物料和批次遏制
+      styleObject: {
+        "min-width": "1000px"
+      },
+      equipmentName: ""
+    };
+  },
+  computed: {
+    isrestrainHtml() {
+      return window.location.pathname.includes("restrain");
+    },
+    oQuery() {
+      return this.$route.query;
+    }
+  },
+  created() {
+    this.equipmentName = this.oQuery.equipmentName;
+    // 组件创建完后获取数据，
+    // 此时 data 已经被 observed 了
+    // this.fetchData();
+  },
+  watch: {
+    // 如果路由有变化，会再次执行该方法
+    $route: function() {
+      if (this.$route.meta.title === "restrain") {
+        this.equipmentName = this.oQuery.equipmentName;
+      }
+    }
+  },
+  methods: {
+    // 可疑品列表。
+    restrain() {
+      const h = this.$createElement;
+      let self = this;
+      this.$msgbox({
+        title: "提示",
+        message: h("el-input", {
+          attrs: {
+            type: "textarea",
+            rows: 4,
+            placeholder: "请输入遏制描述信息"
+          },
+          class: {
+            message: true
+          },
+          domProps: {
+            value: self.doDescription
+          },
+          on: {
+            blur: function(event) {
+              self.doDescription = event.target.value;
+            }
+          }
+        }),
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        beforeClose: (action, instance, done) => {
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "遏制中...";
+            let oConditions = Object.assign(
+              { doDescription: self.doDescription },
+              this.$route.query
+            );
 
-			// 可疑品列表。
-			restrain() {
- 
-		        const h = this.$createElement;
-		        let bSucess = false;
-		        let self = this;
-		        this.$msgbox({
-		          title: "提示",
-		          message: h("el-input", {
-		          	  	attrs: {
-		          	  		type: "textarea",
-		          			rows: 4,
-		          			placeholder: "请输入遏制描述信息"
-					  	},
-					  	class: {
-						    message: true
-						},
-						domProps: {
-					      	value: self.description
-					    },
-					    on: {
-						    blur: function (event) {
-						        self.description = event.target.value
-						    }
-					    }
-		          }),
-		          showCancelButton: true,
-		          confirmButtonText: '确定',
-		          cancelButtonText: '取消',
-		          beforeClose: (action, instance, done) => {   
-		
-		            if (action === 'confirm') {
-		              	instance.confirmButtonLoading = true;
-		              	instance.confirmButtonText = '执行中...';
-		     		
-		     			let oConditions = Object.assign({description: self.description}, this.$route.query);
-		     			
-				 //this.$post(this.url, oConditions)
-					//.then((res) => { 		        			
-		        			done();
-		        			instance.confirmButtonLoading = false;
-						  //if(!res.errorCode) {			
-		        				bSucess = true;
-		        				// 隐藏遏制按钮。
-		        				self.isRestrained = false;
-		        				let sSerializion = "";
-		        				for(let p in oConditions) {
-		        					sSerializion += `&${p}=${oConditions[p]}`;
-		        				}
-		        				sSerializion = sSerializion.substring(1);
-		        				// 遏制成功，打开到遏制报告。
-		        				window.open("/restrain/report.html?" +　sSerializion);
-		        				
-						//	}
-						//})
-						//.catch((err) => {        
-						//	done();
-						//	instance.confirmButtonLoading = false;
-					//});
-		
-		            } else {            
-		              	done();
-					// 	instance.$slots.default[0].elm.children[0].value = "";
-		            }
-		            
-		          }
-		        }).then(action => {
-		        	if(action == 'confirm') {
-		        		if(bSucess) {
-		        			this.$message.success('提交成功！');
-		        		}else {
-		        			this.$message.error('提交失败！');
-		        		}
-		        	}
-					//self.description = "";
-		        })
-    
-			},
-			setWidth() {
-				this.styleObject.minWidth = "1000px";
-			},
-			removeWidth() {
-				this.styleObject.minWidth = 0;
-			}
-		}
-	}
+            this.$post(this.url, oConditions)
+            .then((oData) => {
+							console.log(oData)
+							this.isRestrained = false
+							const handle = oData.data.data.handle
+							sessionStorage.setItem('handleID',handle)
+							instance.confirmButtonLoading = false;
+							this.$message.success('遏制成功')
+							self.doDescription = "";
+							this.$router.replace({ 
+								path: "/suppressList/1", 
+								query: {
+									"_tag":  new Date().getTime().toString().substr(-5)
+								}
+							})
+							done();
+						})
+						.catch(err=>{
+							instance.confirmButtonLoading = false;
+							this.$message.error('遏制失败')
+							self.doDescription = "";
+							console.log(err)
+							done();
+						})
+          } else {
+						self.doDescription = "";
+            done();
+          }
+        }
+      })
+    },
+    setWidth() {
+      this.styleObject.minWidth = "1000px";
+    },
+    removeWidth() {
+      this.styleObject.minWidth = 0;
+    }
+  }
+};
 </script>
 
 <style lang="less">
-	.el-message-box {
-		.el-textarea__inner {
-			border-radius: 0;
-		}
-		.el-button {
-			border-radius: 0;
-			padding: 7px 15px;
-		}
-		.el-message-box__headerbtn {
-			padding: 0;
-			border: none;
-		}
-		.el-message-box__content {
-			padding: 0 20px;
-		}
-	}
+.el-message-box {
+  .el-textarea__inner {
+    border-radius: 0;
+  }
+  .el-button {
+    border-radius: 0;
+    padding: 7px 15px;
+  }
+  .el-message-box__headerbtn {
+    padding: 0;
+    border: none;
+  }
+  .el-message-box__content {
+    padding: 0 20px;
+  }
+}
 
-	.router-content {
-		flex: 1 1;
-		overflow: auto;
-		position: relative;
-		
-		.btn-restrain {
-			position: absolute;
-			right: 20px;
-		//	top: 45px;
-		}
-		
-		.condition {
-			border: 2px solid #42AF8F;
-			padding: 20px 12px;
-			margin-bottom: 30px;
-			
-			span {
-				display: inline-block;
-				&+span {
-					margin-left: 60px;
-				}
-			}
-		}
-	}
-	
-	.message {
-		textarea {
-			font-family: "微软雅黑";
-		}
-	}
+.router-content {
+  flex: 1 1;
+  overflow: auto;
+  position: relative;
+
+  .btn-restrain {
+    position: absolute;
+    right: 20px;
+    //	top: 45px;
+  }
+
+  .condition {
+    border: 2px solid #42af8f;
+    padding: 20px 12px;
+    margin-bottom: 30px;
+
+    span {
+      display: inline-block;
+      & + span {
+        margin-left: 60px;
+      }
+    }
+  }
+}
+
+.message {
+  textarea {
+    font-family: "微软雅黑";
+  }
+}
 </style>
