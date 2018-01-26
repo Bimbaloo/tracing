@@ -495,6 +495,21 @@
 	
 	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
 	        },
+	        // 获取批次类型
+	        getSortParamType(param) {
+	        	// 先数字3 再字符串2 再中文1
+	        	 // 根据数据类型设置排序的方式。
+                if(escape(param).indexOf("%u")>-1) {
+                    // 中文。
+                    return 1
+                }else if(!isNaN(Number(param))) {
+                    // 数字。
+                    return 3
+                }else if(isNaN(Number(param))) {
+                    // 字符串。
+                    return 2
+                }
+	        },
             sortData(param1,param2, sType) {
 				
                 // 默认按照从小到大排序。
@@ -502,17 +517,24 @@
                     // 从大到小时。
                     [param1,param2] = [param2,param1];                
                 }
+                
+                // 先数字3 再字符串2 再中文1
+                let param1Type = this.getSortParamType(param1)
+                let param2Type = this.getSortParamType(param2)
+                
 
                 // 根据数据类型设置排序的方式。
-                if(escape(param1).indexOf("%u")>-1) {
+                if((param1Type === param2Type) && param1Type ===1 ) {
                     // 中文。
                     return param1.localeCompare(param2);
-                }else if(!isNaN(Number(param1))) {
+                }else if((param1Type === param2Type) && param1Type ===3) {
                     // 数字。
                     return param1 - param2;
-                }else {
+                }else if((param1Type === param2Type) && param1Type ===2) {
                     // 字符串。
                     return param1 > param2 ? 1 : -1
+                }else {
+                	return param1Type - param2Type
                 }
 
             },

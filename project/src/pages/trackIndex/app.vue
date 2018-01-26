@@ -8,6 +8,10 @@
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
 			</div>
 			<div class="router" ref="router">
+				<v-dTree
+					v-if="fullscreenLoading"
+					:dialog-visible="fullscreenLoading"
+					:progress-id="progressId"></v-dTree>
 				<div id='changeWidth' class='changeWidth'></div>
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapseTree"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="expandTree"></i>
@@ -41,11 +45,6 @@
 				</div>
 			</div>
 		</div>
-		<!-- 进度弹窗 -->
-		<v-dTree
-			v-if="fullscreenLoading"
-			:dialog-visible="fullscreenLoading"
-			:progress-id="progressId"></v-dTree>
 	</div>
 </template>
 
@@ -53,7 +52,7 @@
 	import header from 'components/header/header.vue'
 	import tree from 'components/tree/tree.vue'	
 	import catalog from 'components/catalog/catalog.vue'
-	import dialogTree from 'components/basic/dialogProgressTree.vue'
+	import dialogTree from 'components/basic/dialogProgressTree1.vue'
 	
 	import fnP from "assets/js/public.js"
 	import $ from 'jquery'
@@ -80,9 +79,10 @@
 				_pageY:null,     	 //鼠标的纵向位置
 				changeHeight:0,  	 //改变的高度
 				// resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
-
+				
+				isHasLoading: true,		// 是否需要加载。 页面调用时间短可不需
 				// 页面加载中动画。
-				fullscreenLoading: false,
+				fullscreenLoading: false,	// 弹窗进度加载
 				// 侧栏是否收缩。
 				collapse: false,
 				url: HOST + "/api/v1/trace/down/trace-info",
@@ -198,7 +198,7 @@
 			
 			(window.onbeforeunload = () => {
 				// 离开页面时，调用接口，清除进程。
-				this.fullscreenLoading=false
+				this.closeProgressDialog()
 				this.setProgressEndHandle()
 			})
 		},
@@ -232,13 +232,22 @@
 				// 调用接口。
 				this.$register.sendRequest(this.$store, this.$ajax, this.cancelProgressUrl+this.progressId, "post", null)	
 			},
+			// 关闭进度页面。
+			closeProgressDialog() {
+				// 设置页面取消加载，且弹窗也不需加载
+				this.isHasLoading = false
+				
+				setTimeout(() => {
+					this.fullscreenLoading = false;
+				}, 2000)
+			},
 			// 登录验证失败后跳转到登录页面之前
 			requestToLogin() {
-				this.fullscreenLoading = false;
+				this.closeProgressDialog()
 			},
 			// 请求成功。
 			requestSucess(oData) {
-				this.fullscreenLoading = false;
+				this.closeProgressDialog()
 				if(!oData.length) {
 					console.log('查无数据。');
 					this.showMessage();
@@ -255,14 +264,14 @@
 			},
 			// 请求失败。
 			requestFail(sErrorMessage) {
-				this.fullscreenLoading = false;
+				this.closeProgressDialog()
 				// 提示信息。
 				console.warn(sErrorMessage);
 				this.showMessage(sErrorMessage);
 			},
 			// 请求错误。
 			requestError(err) {
-				this.fullscreenLoading = false;
+				this.closeProgressDialog()
 				console.warn(err)
 				this.showMessage('查询出错！');
 			},
@@ -278,9 +287,15 @@
 					oParam = Object.assign({}, this.points.keys)
 					delete oParam.equipmentName
 				} 
-
+				
 				this.$register.sendRequest(this.$store, this.$ajax, this.url + sType, "post", oParam, this.requestSucess, this.requestFail, this.requestError, this.requestToLogin)				
-				this.fullscreenLoading = true;
+				
+				setTimeout(() => {
+					
+					if(this.isHasLoading) {
+						this.fullscreenLoading = true;
+					}
+				}, 2000)
 			},
 			parseTableData() {			
 				let aoData = this.rawData
@@ -721,4 +736,8 @@
 	.progress-dialog-wrap {
 		text-align: center;
 	}
+	.v-modal-enter {
+	    -webkit-animation: v-modal-in .2s ease;
+	    animation: v-modal-in .2s ease;
+    }
 </style>
