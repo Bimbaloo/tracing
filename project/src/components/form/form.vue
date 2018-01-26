@@ -181,6 +181,26 @@
 	            			callback();
 	            		}
 	            		
+					},
+					// 验证结束时间。(遏制可以没有结束时间)
+					validateSuppressEndTime = (rule, value, callback) => {
+	            		let sStart = oForm.startTime,
+	            			sTime = value ? value.trim() : "",
+	            			bIsFormat = window.Rt.utils.isDateTime(sTime),
+	            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
+            	    		nNow = +new Date();
+            	    		
+	            		if(!bIsFormat) {
+	            			callback(new Error("请输入正确的时间格式"));
+	            		}else if(+new Date(sTime) > nNow) {
+	            			callback(new Error("时间不能超过当前时间"));
+	            		}else if(sStart && bIsStartFormat && +new Date(sStart) > +new Date(sTime) ){
+	            			// 如果开始时间存在，而且开始时间大于结束时间。
+	            			callback(new Error("结束时间必须大于开始时间"));
+	            		}else {
+	            			callback();
+	            		}
+	            		
 	            	};
 	            	
 	            // 验证是否存在
@@ -302,7 +322,7 @@
             			"equipmentCode": [{validator: validatEquipmentCode, trigger: "change"}],
             			"startTime": [{validator: validateStartTime, trigger: "change"}],
             			// 结束时间。
-            			"endTime": [{validator: validateEndTime, trigger: "change"}]
+            			"endTime": [{validator: validateSuppressEndTime, trigger: "change"}]
 					},
 					// 遏制列表
 					"suppressList": {

@@ -196,13 +196,11 @@ export default {
 							sessionStorage.setItem('handleID',handle)
 							instance.confirmButtonLoading = false;
               this.$message.success('遏制成功')
+              let restrain = {...this.$route.query,...{"handleID":handle,"description":this.doDescription,'suppressTime':new Date().Format("yyyy-MM-dd hh:mm:ss")}}
               self.doDescription = "";
-							this.$router.replace({ 
-								path: "/suppressList/1", 
-								query: {
-									"_tag":  new Date().getTime().toString().substr(-5)
-								}
-							})
+              sessionStorage.setItem('restrain',JSON.stringify(restrain))
+              window.open("/restrainReport.html?" + "_tag=" + new Date().getTime().toString().substr(-5));
+
 							done();
             })
             .catch(err=>{

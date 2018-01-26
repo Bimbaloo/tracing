@@ -233,6 +233,7 @@
 		.router-content {
 			flex: 1 1;
 			overflow: auto;
+			position: initial;
 			
 			.btn-restrain {
 				position: absolute;
