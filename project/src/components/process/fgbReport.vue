@@ -24,7 +24,7 @@
             <div class="content-table" ref="fgbTable">
                 <el-table :data="datas" stripe class="table" :row-key="tableData.data.prop" v-loading="loading" element-loading-text="拼命加载中" style="width: 100%" ref="multipleTable" @expand="dataEdit" :height="tableData.height">
                     <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
-                        <template scope="props">
+                        <template slot-scope="props">
                             <el-form label-position="left" inline class="demo-table-expand table-form" v-if="column.type === 'expand'">
                                 <!-- <el-form-item v-for="(prop,index) in props.row" v-if="!!setName(index) && setName(index) !== '采集时间' && setName(index) !=='条码'" :key="index">
                                     <span>{{ setName(index) }}：</span>

@@ -76,7 +76,7 @@
 									:min-width="column.width"
 									:label="column.name"
 									:key="index">
-									<template scope="props">
+									<template slot-scope="props">
 										<div class="cell-content" v-if="!index" :style="{paddingLeft:props.row.level*nLevelDis+nFirstDis+(props.row.bHasNext?0:nIconDis)+'px'}">
 											<i class="icon-down el-icon-arrow-down" v-show="props.row.bHasNext"  @click.stop="expandOrCollapseTr(props.$index, props)"></i>
 											<span>{{ props.row.name }}</span>

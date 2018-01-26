@@ -36,10 +36,10 @@
                     text:'自定义查询入口',
                     img: '',
                     src:'/query'
-                },{
-                    text:'自定义条件名称',
-                    img: 'field',
-                    src:'/field'
+                // },{
+                //     text:'自定义条件名称',
+                //     img: 'field',
+                //     src:'/field'
                 },{
                     text:'工厂定制',
                     img: 'factory',
@@ -50,9 +50,7 @@
         created() {
             // 登录验证。
             this.$register.login(this.$store);
-            this.$router.replace('query');
-            // 获取配置数据。
-			// this.$store.dispatch('getConfig');
+            this.$router.replace('/query');
         },
         computed: {
         	// 是否编辑的状态。

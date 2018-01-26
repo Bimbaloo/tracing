@@ -45,7 +45,7 @@
 				@expand="dataEdit"> 
 				<!--:height="tableData.height"-->
                     <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
-                        <template scope="props">
+                        <template slot-scope="props">
                             <el-form label-position="left" inline class="demo-table-expand table-form" v-if="column.type === 'expand'">
                                 <el-form-item 
                                 :label="setName(index)" 

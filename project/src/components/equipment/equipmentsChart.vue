@@ -2,13 +2,12 @@
 <template>
     <div class="content-list" v-loading="loading" element-loading-text="拼命加载中">
 	    <!-- 设备监控 -->
-	    <v-dialog 
-    		v-if="showCamera" 
+	    <v-dialog
     		:dialog-visible="videoForm.visible"
-            :equipment-id="videoForm.equipmentId" 
-            :equipment-name="videoForm.equipmentName" 
-            :time="videoForm.time" 
-            :type="videoForm.type"
+        :equipment-id="videoForm.equipmentId" 
+        :equipment-name="videoForm.equipmentName" 
+        :time="videoForm.time" 
+        :series="videoForm.series"
     		@hideDialog="hideVideoDialog">
 	    </v-dialog> 
 	    <!-- 追踪条件配置。 -->
@@ -83,8 +82,7 @@
                 <div v-for="compareData in compareList" 
                     :key="compareData.millisecond"              
                     @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)"
-                    v-if="compareData.list.some(item=>dimension.filter(o => o.key === item.dimension)[0].show)">
-                    <!--v-show="dimension.filter(o => o.key === compareData.dimension)[0].show && (compareData.dimension==='pool'?(!onlyShowRelatedData || (compareData.related && onlyShowRelatedData)):true)"-->                    
+                    v-if="compareData.list.some(item=>dimension.filter(o => o.key === item.dimension)[0].show)">                 
                     <div 
                     :class="['tooltip-panel', compareData.reverse ? 'left':'right']" 
                     :style="{left:compareData.position*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
@@ -102,6 +100,11 @@
                                 {{equipment.name}}&nbsp;&nbsp;
                                 {{equipment.series}}&nbsp;&nbsp;
                                 {{`${equipment.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
+                                <i 
+                                  @click="showVideoDialog(equipment.id, equipment.name, compareData.time, equipment.series)"
+                                  v-if="camera && !!factoryCameraConfig[equipment.dimension]" 
+                                  class="icon icon-12 icon-camera" 
+                                  title="监控视频"></i>
                                 </div>
                                 <ul class="event-list">
                                     <li v-for="(event,index) in equipment.event"
@@ -111,11 +114,6 @@
                                             {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
                                             <span v-if="event.group">事件组：{{event.group}}</span>
                                             <i v-if="!!event.related" class="icon icon-12 icon-pin"></i>
-                                            <i 
-                                            @click="showVideoDialog(equipment.id, equipment.name, compareData.time, event.title)"
-                                            v-if="showCamera && equipment.dimension==='pool'" 
-                                            class="icon icon-12 icon-camera" 
-                                            title="监控视频"></i>
                                         </div>
                                         <ul class="content-list">
                                             <li v-for="(content,index) in event.content" :key="index">
@@ -243,10 +241,9 @@ export default {
         visible: false,
         equipmentId: "",
         equipmentName: "",
-        time: ""
+        time: "",
+        series: ''
       },
-      // 是否开启视频监控。
-      showCamera: !!CAMERA,
       treeTag: this.$route.query._tag,
       // 是否展示设备状态。
       showState: true,
@@ -366,11 +363,6 @@ export default {
                 "shiftStartTime",
                 "shiftEndTime"
               ]
-              // },{
-              //     type: "route",
-              //     name: "FGB",
-              //     router: "/process/fgbReport",
-              //     query: ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime"]
             }
           ]
         },
@@ -540,14 +532,10 @@ export default {
     };
   },
   computed: {
-    // 工厂配置数据。
-    // configData() {
-    //     return this.$store.state.customModule.config
-    // },
-    // 配置模块。
-    // modulesConfig() {
-    //     return this.configData.modules
-    // },
+    // 是否开启视频监控。
+    camera() {
+        return this.$store.state.versionModule &&　this.$store.state.versionModule.camera
+    },
     // 工具。
     toolManagement() {
       return (
@@ -560,22 +548,26 @@ export default {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.processParameter
-      );
+      )
     },
     // 维护。
     equipmentMaintenance() {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.equipmentMaintenance
-      );
+      )
     },
     // 工厂定制。
     factoryCustomItemList() {
-      return this.$store.state.factoryModule.factoryCustomItemList;
+      return this.$store.state.factoryModule.factoryCustomItemList
     },
     // 工厂定制内容是否获取到的标志判断。
     factoryDataFecthed() {
-      return this.$store.state.factoryModule.fetched;
+      return this.$store.state.factoryModule.fetched
+    },
+    // 视频监控工厂定制。
+    factoryCameraConfig() {
+      return this.$store.state.factoryModule.factoryCameraConfig
     },
     // 追踪或溯源或遏制的配置项。
     // currentModule() {
@@ -966,7 +958,7 @@ export default {
     if (!this.factoryDataFecthed) {
       // 若未获取工厂定制数据。
       // 获取数据。
-      this.getFactoyData();
+      this.getFactoyData()
     }
   },
   mounted() {
@@ -980,7 +972,6 @@ export default {
     $route: function(to, from) {
       // 如果从tree上直接点击，需要更新数据. tag不同
       // 从其他页面中进入。from.meta.title不一样
-
       if (
         to.meta.title == "chart" &&
         (from.meta.title == "chart" ||
@@ -1005,7 +996,7 @@ export default {
         "getFactoryConfig",
         this.$store,
         this.$ajax,
-        this.fetchData,
+        null,
         MODULE_DATA_URL
       );
     },
@@ -1091,14 +1082,14 @@ export default {
       this.videoForm.visible = false;
     },
     // 打开监控视频。
-    showVideoDialog(id, name, time, type) {
+    showVideoDialog(id, name, time, series) {
       this.videoForm = {
         visible: true,
         equipmentId: id,
         equipmentName: name,
         time: time,
-        type: type === "投料" ? "1" : "2"
-      };
+        series: series
+      }
     },
     // 获取存储的数据。
     getSessionStorage() {
@@ -2772,30 +2763,27 @@ export default {
     },
     // 状态提示。
     stateTooltipFormatter(params) {
-      // if(!params.name) {
-      //     return '';
-      // }
       let time = params.value[3] / 1000,
         hour = 0,
         munite = 0,
-        second = 0;
+        second = 0
 
       if (time / 3600 >= 1) {
-        hour = Math.floor(time / 3600);
+        hour = Math.floor(time / 3600)
       }
 
       if (time / 60 >= 1) {
-        munite = Math.floor((time % 3600) / 60);
+        munite = Math.floor((time % 3600) / 60)
       }
 
-      second = time % 60;
+      second = time % 60
 
       if (hour) {
-        time = hour + "h" + munite + "'" + second + "''";
+        time = hour + "h" + munite + "'" + second + "''"
       } else if (munite) {
-        time = munite + "'" + second + "''";
+        time = munite + "'" + second + "''"
       } else {
-        time = second + "''";
+        time = second + "''"
       }
 
       return `${params.marker}${params.name}：${time}<br/>
@@ -2822,25 +2810,17 @@ export default {
             aGroupId = oGroupId[eqId][dim],
             // 时间点。
             sTime = new Set(),
-            aTime = [];
-
-          // let aoGroupId = {}
+            aTime = []
 
           for (let key in oDimensionData) {
-            let aoEvent = oDimensionData[key];
+            let aoEvent = oDimensionData[key]
             for (let i = 0, l = aoEvent.length; i < l; i++) {
-              let oEvent = aoEvent[i];
+              let oEvent = aoEvent[i]
               if (aGroupId.indexOf(oEvent.groupId) > -1) {
-                // if(!aoGroupId[oEvent.groupId]) {
-                //     aoGroupId[oEvent.groupId] = []
-                // }
-
                 // 保存时间点。
-                // aoGroupId[oEvent.groupId].push(+new Date(oEvent.timePoint))
-                sTime.add(+new Date(oEvent.timePoint));
+                sTime.add(+new Date(oEvent.timePoint))
               }
             }
-            // oGroupId[eqId][dim] = aoGroupId
           }
 
           aTime = [...sTime];
@@ -2848,15 +2828,15 @@ export default {
           aoSeries[dim].data.forEach((arr, index) => {
             if (arr[1] == eqId && aTime.indexOf(arr[0]) > -1) {
               if (!highlightData[dim]) {
-                highlightData[dim] = [];
+                highlightData[dim] = []
               }
-              highlightData[dim].push(index);
+              highlightData[dim].push(index)
             }
           });
         }
       }
 
-      this.setChartDataHighlight(highlightData);
+      this.setChartDataHighlight(highlightData)
     },
     // 设置图形高亮。
     setChartDataHighlight(highlightData) {

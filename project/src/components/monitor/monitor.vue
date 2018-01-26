@@ -24,7 +24,7 @@
         </el-form-item>
     </el-form>
     <!--div class="line"></div-->
-    <div class="content-title">{{name}}&nbsp;&nbsp;{{poolTime}}&nbsp;&nbsp;{{type=="1"?"投料":"产出"}}监控</div>
+    <div class="content-title">{{name}}&nbsp;&nbsp;{{poolTime}}&nbsp;&nbsp;{{serieName}}监控</div>
     <div class="camera" :style="{height: cameraHeight + 'px'}">
         <iframe v-if="cameraPoints.length" ref="video"></iframe>
         <div v-else class="error">暂无监控视频。</div>
@@ -43,8 +43,6 @@ const PRE_TIME = 10;
 const FORWARD_TIME = 10;
 // 视频最大播放时长，单位分钟。
 const MAX_VIDEO_TIME = 60;
-// 视频地址。
-const VIDEO_URL = "/page/commandCenter/camera/history.html";
 
 export default {
     props: {
@@ -60,9 +58,8 @@ export default {
             type: String,
             default: ""
         },
-        // 1-投料；2-产出
-        type: {
-            type: [String, Number],
+        series: {
+            type: String,
             default: ""
         }
     },
@@ -81,13 +78,21 @@ export default {
         } 
     },
     computed: {
+        // 监控地址。
+        url () {
+            return this.$store.state.factoryModule.factoryCameraConfig.url
+        },
         // 投产时间。
         poolTime() {
-            return decodeURIComponent(this.time);
+            return decodeURIComponent(this.time)
         },
         // 设备名称。
         name() {
             return decodeURIComponent(this.equipmentName);
+        },
+        // 系列名称。
+        serieName() {
+            return decodeURIComponent(this.series)
         },
         // 验证规则。
         rules() {
@@ -215,7 +220,7 @@ export default {
                 if (valid) {
                     if(!this.forwardForm || (this.forwardForm && !this.isEqual(this.forwardForm, this.monitorForm))) {
                         // 若条件发生改变。
-                        this.$refs["video"].src = `${VIDEO_URL}?cameraId=${this.monitorForm.cameraId}&startDate=${encodeURIComponent(this.monitorForm.startDate)}&endDate=${encodeURIComponent(this.monitorForm.endDate)}`
+                        this.$refs["video"].src = `${this.url}?cameraId=${this.monitorForm.cameraId}&startDate=${encodeURIComponent(this.monitorForm.startDate)}&endDate=${encodeURIComponent(this.monitorForm.endDate)}`
                     }
                 } else {
                     console.log('error submit!');
@@ -242,8 +247,7 @@ export default {
         // 获取监控点。
         getCameraPoints() {
             // this.$register.sendRequest(this.$store, this.$ajax, this.url, "get", {
-            //     equipmentId: equipmentId,
-            //     type: type
+            //     equipmentId: equipmentId
             // }, this.requestSucess, this.requestFail, this.requestError);    
             this.requestSucess(["001", "002"]);     
         },

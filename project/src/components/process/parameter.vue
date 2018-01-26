@@ -50,7 +50,7 @@
                                 :key="column.prop" 
                                 :class-name="column.class" 
                                 :width="column.width">
-                                    <template scope="props">
+                                    <template slot-scope="props">
                                         <el-form 
                                         label-position="left" 
                                          
@@ -587,8 +587,11 @@ export default {
         },
         /* 设置table实际高度 */
         setFlexBase() {
-            this.routerContent = document.querySelector("#parameter").offsetHeight
-            this.flexbase = this.adjustHeight()
+            if(document.querySelector("#parameter")) {
+                this.routerContent = document.querySelector("#parameter").offsetHeight
+                this.flexbase = this.adjustHeight()
+            }
+            
         },
         // 设置图形表高度。
         setChartTableHeight(){

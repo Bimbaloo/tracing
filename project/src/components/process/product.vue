@@ -172,7 +172,7 @@
                     <div class="content-table" ref="outputAllTable" v-if="show3">
                         <el-table class="table-main" :data="checked?outAllItems.dataAll:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in outAllItems.columns1" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template scope="props">
+                                <template slot-scope="props">
                                     <div class="cell-content" v-if="column.prop !== 'batchNo'">
                                         <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>
@@ -199,7 +199,7 @@
                     <div class="content-table" ref="inputAllTable" v-if="show3">
                         <el-table class="table-main" :data="checked?inAllItems.dataAll:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                             <el-table-column v-for="(column,index) in inAllItems.columns1" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template scope="props">
+                                <template slot-scope="props">
                                     <div class="cell-content">
                                         <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
                                     </div>

@@ -1,7 +1,7 @@
 <template>
-	<el-dialog class="dialog-wrap" title="视频监控" size="large" :visible.sync="dialogVisible" :before-close="handleClose">
+	<el-dialog class="dialog-wrap" title="视频监控" :visible.sync="dialogVisible" :before-close="handleClose">
         <i class="open-icon icon icon-16 icon-openNew" @click="openNewPage"></i>
-        <v-video :equipment-name="equipmentName" :equipment-id="equipmentId" :time="time" :type="type"></v-video>
+        <v-video :equipment-name="equipmentName" :equipment-id="equipmentId" :time="time" :series="series"></v-video>
     </el-dialog>
 </template>
 
@@ -29,9 +29,8 @@ export default {
             type: String,
             default: ""
         },
-        // 1-投料；2-产出
-        type: {
-            type: [String, Number],
+        series: {
+            type: String,
             default: ""
         }
     },
@@ -50,7 +49,7 @@ export default {
             this.$emit("hideDialog")
 
             // 打开 页面。
-            window.open(`monitor.html?equipmentName=${this.equipmentName}&equipmentId=${this.equipmentId}&time=${this.time}&type=${this.type}`, "_blank");
+            window.open(`monitor.html?equipmentName=${this.equipmentName}&equipmentId=${this.equipmentId}&time=${this.time}&series=${this.series}`, "_blank");
         }
     }
 }

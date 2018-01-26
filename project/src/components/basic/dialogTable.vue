@@ -11,7 +11,7 @@
                 :label="column.name"
                 :key="column.prop" 
                 :class-name="column.class">
-                    <template scope="props">
+                    <template slot-scope="props">
                         <div :class="{clicked: (props.row.barcodeTypeName == '2' && column.prop=='barcode')}">{{props.row[column.prop]}}</div>
                     </template>
             </el-table-column>
