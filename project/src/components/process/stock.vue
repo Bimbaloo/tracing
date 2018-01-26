@@ -1,6 +1,9 @@
 <!--设备分析路由-->
 <template>
     <div class="material-stock" ref="stock">
+        <div class="path-btn">
+        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-show="supression && restrainIf">遏制</el-button>
+        </div>
         <div class="router-path">
             <router-link 
                 class="path-item" 
@@ -34,7 +37,9 @@ export default {
         parameter: "工艺参数"
       },
       aoRoute: [],
-      restrainIf: false
+      restrainIf: false,
+      url: HOST + "/api/v1/suppress/do-by-equipment", // 根据设备+时间 进行遏制
+      doDescription: '' // 遏制信息的描述
     };
   },
   computed: {
@@ -145,6 +150,74 @@ export default {
         // 从其他页面跳到投产表
         this.aoRoute.pop();
       }
+    },
+    // 遏制
+    showRestrain() {
+      const h = this.$createElement;
+      let bSucess = false;
+      let self = this;
+      this.$msgbox({
+        title: "提示",
+        message: h("el-input", {
+          attrs: {
+            type: "textarea",
+            rows: 4,
+            placeholder: "请输入遏制描述信息"
+          },
+          class: {
+            message: true
+          },
+          domProps: {
+            value: self.doDescription
+          },
+          on: {
+            blur: function(event) {
+              self.doDescription = event.target.value;
+            }
+          }
+        }),
+        showCancelButton: true,
+        confirmButtonText: "确定",
+        cancelButtonText: "取消",
+        beforeClose: (action, instance, done) => {
+          if (action === "confirm") {
+            instance.confirmButtonLoading = true;
+            instance.confirmButtonText = "遏制中...";
+            let oConditions = Object.assign(
+              { doDescription: self.doDescription },
+              this.$route.query
+            );
+
+            this.$post(this.url, oConditions)
+            .then((oData) => {
+              console.log(oData)
+              this.restrainIf = false
+              const handle = oData.data.data.handle
+							sessionStorage.setItem('handleID',handle)
+							instance.confirmButtonLoading = false;
+              this.$message.success('遏制成功')
+              self.doDescription = "";
+							this.$router.replace({ 
+								path: "/suppressList/1", 
+								query: {
+									"_tag":  new Date().getTime().toString().substr(-5)
+								}
+							})
+							done();
+            })
+            .catch(err=>{
+							instance.confirmButtonLoading = false;
+							this.$message.error('遏制失败')
+							self.doDescription = "";
+							console.log(err)
+							done();
+						})
+          } else {
+            self.doDescription = "";
+            done();
+          }
+        }
+      })
     }
   },
   // beforeRouteEnter (to, from, next) {

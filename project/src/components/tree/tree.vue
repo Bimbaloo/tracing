@@ -450,7 +450,7 @@
 			simpleNodeTemplate() {
 				return	this.$(go.Node, "Horizontal", 
 						{ selectionObjectName: "SELECTION" },  // added this property!
-						{
+						{	selectionAdorned: this.isDialogTree? false: true,
 							selectionChanged: onNodeSelectionChange,//this.nodeSelectionChangeHandle,
 							click: this.treeNodeClickHandle,
 							doubleClick: onDoubleClickNode,
@@ -578,7 +578,8 @@
 			detailNodeTemplate() {
 				return this.$(go.Node, "Horizontal",
 						{ selectionObjectName: "SELECTION" },  // added this property!
-						{	selectionChanged: onNodeSelectionChange,
+						{	selectionAdorned: this.isDialogTree? false: true,
+							selectionChanged: onNodeSelectionChange,
 							click: this.treeNodeClickHandle,
 							doubleClick: onDoubleClickNode,
 							contextClick: onContextClickNode,
@@ -771,11 +772,12 @@
 			},
 			linkTemplate() {
 				return this.$(go.Link, // the whole link panel
+						{routing: this.isDialogTree ? go.Link.Orthogonal : go.Link.AvoidsNodes},
 						new go.Binding("points").makeTwoWay(), {
-							curve: go.Link.Bezier,
+//							curve: go.Link.Bezier,
 							toShortLength: 0,
 							selectable: false,
-							corner: 0
+							corner: 10
 							// adjusting: go.Link.Stretch,
 						},
 							// new go.Binding("curviness", "curviness"),
@@ -1211,8 +1213,10 @@
 			},
 			// 画布双击事件。
 			diagramDblClickHandle(e, node) {
-				zoomDiagram(this.tree, this.flag, this.treeId);
-				this.flag = !this.flag;
+				if(!this.isDialogTree) {
+					zoomDiagram(this.tree, this.flag, this.treeId);
+					this.flag = !this.flag;
+				}
 			},
 			// 画布初始化。
 			initDiagram() {

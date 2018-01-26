@@ -251,30 +251,39 @@
             	}
 			},
 			// 请求成功。
-            requestSucess(oData) {
+            requestSucess(aoData) {
                 this.loading = false;
 				this.error = "";
 				
-				if(!oData.length) {
+				let oData = {
+					data: aoData
+				}
+				
+				if(!aoData.length) {
 					this.error = "查无数据。"
 					console.log("查无数据。");
 				}else {
-					oData.data = this.isOpDbBeforeRefact ? this.formatData(oData) : this.newFormatData(oData)
+					oData.data = this.isOpDbBeforeRefact ? this.formatData(aoData) : this.newFormatData(aoData)
 					
 					this.materialData.data = oData.data
 					this.styleObject.minWidth = "1200px";
 					
 					this.$nextTick(function () {
+						// 先设置说有的列都显示。
 				      	var aMerge = document.querySelectorAll('.merges')
-				    	for(let i=0; i<aMerge.length; i++) {
+				    	for(var i=0; i<aMerge.length; i++) {
+				    		
 				        	let num = Number(aMerge[i].attributes['value'].nodeValue),
 				          	td = aMerge[i].parentNode.parentNode
 				          	
 				      		if(num) {
+				      			if(td.classList.contains('hide')) {
+					            	td.classList.remove('hide')
+				      			}
 				            	td.rowSpan = num
 				            }else {
-//				            	td.style.display = "none"
-								td.remove()
+				            	td.classList.add('hide')
+//								td.remove()
 				            }
 				        }
 				    	
@@ -341,7 +350,7 @@
 	            		this.materialData.columns = this.materialData.columns.filter(o => o.prop != 'remainQuantity')
             		}
             		
-            		this.requestSucess(this.detailInfos)
+            		this.requestSucess(JSON.parse(JSON.stringify(this.detailInfos)))
             	}
            },
            // 表格单元格数据合并处理。
@@ -565,6 +574,10 @@
     			
     			td {
     				height: 30px;
+    				
+    				&.hide {
+    					display: none;
+    				}
     			}
     			
     			.el-table__body-wrapper {

@@ -8,6 +8,7 @@ import 'babel-polyfill'
 
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
+import 'assets/css/icon.less'
 import 'assets/js/global.js'
 
 Vue.use(ElementUI)

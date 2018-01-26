@@ -4,10 +4,10 @@
 			<h1 class="title">遏制报告</h1>
 			<h2 class="content-title">查询条件</h2>
 			<div class="condition">
-				<div class="condition-line"><span>遏制人：{{nickname}}</span><span>遏制时间：{{new Date().Format("yyyy-MM-dd hh:mm:ss")}}</span><span>遏制描述：{{params.description}}</span></div>
+				<div class="condition-line"><span>遏制人：{{nickname}}</span><span>遏制时间：{{restrainQuery.suppressTime}}</span><span>遏制描述：{{params.description}}</span></div>
 				<div class="condition-line"><span>物料编码：{{params.materialCode}}</span><span>批次：{{params.batchNo}}</span></div>
 			</div>
-			<v-report :hasData="setWidth" :noData="removeWidth" v-if="supression"></v-report>
+      <v-report :hasData="setWidth" :noData="removeWidth" :query="restrainQuery.handleID" type="restrainDetails"></v-report>
 		</div>
   	</div>
 </template>
@@ -23,7 +23,8 @@
 			return {
 				styleObject: {
 					"min-width": "1200px"
-				}
+				},
+				restrainQuery: null
 			}
 		},
 		computed: {
@@ -50,13 +51,13 @@
 		created() {
 			this.$register.login(this.$store);
 			this.$register.getVersion(this.$store, this.$ajax, () => {
-			// this.$store.dispatch('getVersion').then(() => {
 				// 获取数据。
 				if(!this.supression) {
 					// 若不支持遏制。
 					this.$message.error('暂无权限。');
 				}
 			})
+			this.restrainQuery = JSON.parse(sessionStorage.getItem("restrain"))
 		},
 		methods: {
 			setWidth() {

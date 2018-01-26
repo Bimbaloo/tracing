@@ -141,13 +141,9 @@
 	            			callback();
 	            		}
 					},
-					// 验证人员。
-	            	validatePersonCode = (rule, value, callback) => {
-	            		if(!value) {
-	            			callback(new Error("请选择设备"));
-	            		}else {
-	            			callback();
-	            		}
+					// 无需验证，可以为null。
+	            	validateNull = (rule, value, callback) => {
+	            		callback();
 	            	},
             		// 验证开始时间。
             	    validateStartTime = (rule, value, callback) => {
@@ -310,10 +306,10 @@
 					},
 					// 遏制列表
 					"suppressList": {
-						"personCode":[{validator: validatePersonCode, trigger: "change"}],
-            			"startTime": [{validator: validateStartTime, trigger: "change"}],
+						"personCode":[{validator: validateNull, trigger: "change"}],
+            			"startTime": [{validator: validateNull, trigger: "change"}],
             			// 结束时间。
-            			"endTime": [{validator: validateEndTime, trigger: "change"}]
+            			"endTime": [{validator: validateNull, trigger: "change"}]
 					},
             		// 断链
             		"link_repair": {

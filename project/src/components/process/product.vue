@@ -1467,8 +1467,7 @@ export default {
                     this.condition[el] = this.$route.query[el]
                 }
             })
-
-            if(!oQuery.operationIdList) {
+            if(!oQuery.operationIdList && this.detailInfos) {
                 oQuery.operationIdList = this.detailInfos.map(o => {
                     return {
                         opId: o.opId, 

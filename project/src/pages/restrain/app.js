@@ -43,13 +43,13 @@ const Parameter = r => require.ensure([], () => r(require('components/process/pa
 
 // 定义路由
 const routes = [
-  { path: '/suppressList/:key', component: list },    // 遏制列表（未开发）
+  { path: '/suppressList/:key', component: list },    // 遏制列表
   { path: '/suppress/1/', component: Suspicious,      // 可疑品列表
     meta: {
       title: 'restrain'
     }
   },
-  {
+  {                                                   // 设备查询
     path: '/suppress/2/', 
     redirect:'/process'
   },    
