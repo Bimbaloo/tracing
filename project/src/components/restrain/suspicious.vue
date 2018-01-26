@@ -1,6 +1,6 @@
 <template>
 	<div class="router-content suspicious">
-		<el-button class="btn btn-plain btn-restrain" @click="restrain" v-show="isRestrained">遏制</el-button>
+		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained">遏制</el-button>
 		<div class="innner-content" :style="styleObject">
 			<!--h2 class="title">遏制详情</h2-->
 			<!-- <h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2> -->
@@ -56,11 +56,12 @@ export default {
       if (this.$route.meta.title === "restrain") {
         this.equipmentName = this.oQuery.equipmentName;
       }
+      this.isRestrained = true
     }
   },
   methods: {
     // 可疑品列表。
-    restrain() {
+    suppres() {
       const h = this.$createElement;
       let self = this;
       this.$msgbox({
@@ -103,13 +104,11 @@ export default {
 							sessionStorage.setItem('handleID',handle)
 							instance.confirmButtonLoading = false;
 							this.$message.success('遏制成功')
-							self.doDescription = "";
-							this.$router.replace({ 
-								path: "/suppressList/1", 
-								query: {
-									"_tag":  new Date().getTime().toString().substr(-5)
-								}
-							})
+              let restrain = {...this.$route.query,...{"handleID":handle,"description":this.doDescription,'suppressTime':new Date().Format("yyyy-MM-dd hh:mm:ss")}}
+              self.doDescription = "";
+              sessionStorage.setItem('restrain',JSON.stringify(restrain))
+              window.open("/restrainReport.html?" + "_tag=" + new Date().getTime().toString().substr(-5));
+              
 							done();
 						})
 						.catch(err=>{

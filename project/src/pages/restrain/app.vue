@@ -234,7 +234,11 @@ export default {
 
       let sPath = "/" + this.activeKey;
       oConditions.tab = this.activeKey;
-      this.updateRecord(oConditions);
+      
+      if(oConditions.tab !== "suppressList") { // 遏制列表不保存
+        this.updateRecord(oConditions);
+      }
+      
       // console.log(oConditions);
       sessionStorage.setItem(
         "searchConditions-" + this.tag,
