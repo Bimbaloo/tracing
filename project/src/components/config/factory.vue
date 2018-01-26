@@ -138,75 +138,73 @@
 
     export default{
 	    data() {
-	        return {
-				icon,
-				// 工厂定制数据。
-				aoCustom: [],
-				// 当前打开的配置数据或新建链接数据。
-				oCurrentData: {
-					name: "",
-					link: "",
-					dimension: "",
-					// 设备id。
-					equipmentIds: [],
+	      return {
+					icon,
+					// 工厂定制数据。
+					aoCustom: [],
+					// 当前打开的配置数据或新建链接数据。
+					oCurrentData: {
+						name: "",
+						link: "",
+						dimension: "",
+						// 设备id。
+						equipmentIds: [],
+						// 参数。
+						parameters: []
+					},
+					// 原数据。
+					oBefore: {
+						name: "",
+						link: "",
+						dimension: "",
+						// 设备id。
+						equipmentIds: [],
+						// 参数。
+						parameters: []
+					},
+					// 弹窗名称。
+					dialogTitle: "",
+					// 弹窗可见性。
+					dialogVisible: false,
+					// 提示信息。
+					sErrorMessage: "",
+					// 设备。
+					aoEquipment: [],
 					// 参数。
-					parameters: []
-				},
-				// 原数据。
-				oBefore: {
-					name: "",
-					link: "",
-					dimension: "",
-					// 设备id。
-					equipmentIds: [],
-					// 参数。
-					parameters: []
-				},
-				// 弹窗名称。
-				dialogTitle: "",
-				// 弹窗可见性。
-				dialogVisible: false,
-	            // 提示信息。
-				sErrorMessage: "",
-				// 设备。
-				aoEquipment: [],
-				// 维度。
-//				aoDimension: [],
-				// 参数。
-				aoParameter: [{
-					name: "设备id(equipmentId)",
-					value: "equipmentId"
-				}, {
-					name: "设备名称(equipmentName)",
-					value: "equipmentName"
-				}, {
-					name: "开始时间(startTime)",
-					value: "startTime"
-				}, {
-					name: "结束时间(endTime)",
-					value: "endTime"
-				}, {
-					name: "工序编码(processCode)",
-					value: "processCode"
-				}],
-				rules: {
-					name: [
-						{ required: true, message: '请输入模块名称', trigger: 'blur' }
-					],
-					link: [
-						{ required: true, message: '请输入链接地址', trigger: 'blur' }
-					],
-					equipmentIds: [
-						{ type: 'array', required: true, message: '请选择设备', trigger: 'change' }
-					],
-					dimension: [
-						{ required: true, message: '请选择维度', trigger: 'change' }
-					],
-					parameters: [
-						{ required: false }
-					]
-				}
-	        }
+					aoParameter: [{
+						name: "设备id(equipmentId)",
+						value: "equipmentId"
+					}, {
+						name: "设备名称(equipmentName)",
+						value: "equipmentName"
+					}, {
+						name: "开始时间(startTime)",
+						value: "startTime"
+					}, {
+						name: "结束时间(endTime)",
+						value: "endTime"
+					}, {
+						name: "工序编码(processCode)",
+						value: "processCode"
+					}],
+					rules: {
+						name: [
+							{ required: true, message: '请输入模块名称', trigger: 'blur' }
+						],
+						link: [
+							{ required: true, message: '请输入链接地址', trigger: 'blur' }
+						],
+						equipmentIds: [
+							{ type: 'array', required: true, message: '请选择设备', trigger: 'change' }
+						],
+						dimension: [
+							{ required: true, message: '请选择维度', trigger: 'change' }
+						],
+						parameters: [
+							{ required: false }
+						]
+					}
+	      }
 	    },
         created() {
 			// 获取设备数据。 

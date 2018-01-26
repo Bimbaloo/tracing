@@ -16,7 +16,9 @@ export const versionModule = {
 		// 维护。
 		equipmentMaintenance: false,
 		// fgb。
-		fgb: false
+		fgb: false,
+		// 是否需要登录
+		ssoLogin: false
 	},
 	mutations: {
 		updateVersionData (state, payload) {

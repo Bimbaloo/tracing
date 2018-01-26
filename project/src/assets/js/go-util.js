@@ -103,11 +103,11 @@ function tooltipTextConverter(data) {
  * 双击背景放大缩小当前画布。
  * @returns {void}
  */
-function zoomDiagram(oTree, bFlag) {
+function zoomDiagram(oTree, bFlag, treeId) {
 	if(bFlag) {
 		oTree.zoomToFit();		
 	}else {
-		let oDiagram = document.getElementById("tree").querySelector("canvas"),
+		let oDiagram = document.getElementById(treeId).querySelector("canvas"),
 			nHeight = oDiagram.clientHeight,
 			nWidth = oDiagram.clientWidth;
 
