@@ -376,9 +376,12 @@
 			// 当初始进入时，点击左侧导航
 			"treeFullscreen": function() {
 				if(!this.treeFullscreen) {
-					this.$nextTick(() => {
+//					this.$nextTick(() => {
+//						this.tableHeight = this.setHeight()
+//					})
+					setTimeout(() => {
 						this.tableHeight = this.setHeight()
-					})
+					}, 2000)
 				}
 			}
         },
