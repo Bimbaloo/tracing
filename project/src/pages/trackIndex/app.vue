@@ -247,15 +247,26 @@
 			},
 			// 请求成功。
 			requestSucess(oData) {
+				
 				this.closeProgressDialog()
-				if(!oData.length) {
+				
+				if(!oData.nodeDtoList.length) {
 					console.log('查无数据。');
 					this.showMessage();
 				} else {
 					this.$store.commit({
 						type: "updateData",
-						data: oData		//fnP.parseTreeData(data)
+						data: oData.nodeDtoList		//fnP.parseTreeData(data)
 					});
+					
+					// 显示提示信息。解决内存泄漏问题
+					if(oData.message) {
+						this.$notify.info({
+							showClose: false,
+				            message: oData.message
+				        })
+					}
+					
 					// 格式化数据。
 					this.treeData = fnP.getTreeData(this.rawData, "track", this.isOpDbBeforeRefact);//this.parseTreeData();
 					this.catalogData = fnP.getCatalogData(this.rawData, "track"); //fnP.getTrackCatalogData(this.rawData)

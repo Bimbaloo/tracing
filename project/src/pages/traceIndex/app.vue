@@ -156,16 +156,26 @@
 			},
 			// 请求成功。
 			requestSucess(oData) {
+				
 				this.fullscreenLoading = false;
-				if(!oData.length) {
+				
+				if(!oData.nodeDtoList.length) {
 					console.log('查无数据。');
 					this.showMessage();
-					// this.$message.warn('查无数据。');
 				} else {
 					this.$store.commit({
 						type: "updateData",
-						data: oData		//fnP.parseTreeData(data)
+						data: oData.nodeDtoList		//fnP.parseTreeData(data)
 					});
+					
+					// 显示提示信息。
+					if(oData.message) {
+						this.$notify.info({
+							showClose: false,
+				            message: oData.message
+				        })
+					}
+					
 					// 格式化数据。
 					this.treeData = fnP.getTreeData(this.rawData, "trace", this.isOpDbBeforeRefact);//this.parseTreeData();
 					this.catalogData = fnP.getCatalogData(this.rawData, "trace");
