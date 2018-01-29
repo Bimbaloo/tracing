@@ -84,7 +84,7 @@
 				// 页面加载中动画。
 				fullscreenLoading: false,	// 弹窗进度加载
 				// 侧栏是否收缩。
-				collapse: false,
+				collapse: true,
 				url: HOST + "/api/v1/trace/down/trace-info",
 				//url:"static/track.json",
 				urlType: {
@@ -258,9 +258,13 @@
 					});
 					// 格式化数据。
 					this.treeData = fnP.getTreeData(this.rawData, "track", this.isOpDbBeforeRefact);//this.parseTreeData();
-//					this.tableData = this.parseTableData();
 					this.catalogData = fnP.getCatalogData(this.rawData, "track"); //fnP.getTrackCatalogData(this.rawData)
-				}	
+					
+					// 展开左侧导航树
+					this.$nextTick(() => {
+						this.expandTree()
+					})
+				}
 			},
 			// 请求失败。
 			requestFail(sErrorMessage) {
