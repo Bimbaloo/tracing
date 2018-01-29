@@ -8,7 +8,7 @@
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
 			</div>
 			<!-- <div :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router"> -->
-			<div  class="router">
+			<div class="router">
 				<div id='changeWidth' class='changeWidth'></div>
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapseTree"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="expandTree"></i>
@@ -67,11 +67,11 @@
 		},
 		computed: {
 			resizeUpdate () {
-		    	return this.$store.state.resize
-		    },
-		    resizeUpdateY () {
-		    	return this.$store.state.resizeY
-		    },
+				return this.$store.state.resize
+			},
+			resizeUpdateY () {
+				return this.$store.state.resizeY
+			},
 			query () {
 				let url = location.search; //获取url中"?"符后的字串 
 				let oRequest = {};
@@ -85,20 +85,20 @@
 				return oRequest;
 			},		    
 			rawData () {
-		    	return this.$store.state.rawData
-		    },
+				return this.$store.state.rawData
+			},
 		    // 表格数据全屏。
 			fullscreen () {
-		    	return this.$store.state.fullscreen
-		    },
-		   	// 树的数据全屏。
-		   	treeFullscreen () {
-		   		return this.$store.state.treeFullscreen
-		   	},
+				return this.$store.state.fullscreen
+			},
+			// 树的数据全屏。
+			treeFullscreen () {
+				return this.$store.state.treeFullscreen
+			},
 			reversedMessage() {
 				let _width = this.LayoutLeftWidth+this.changeWidth
 				return _width
-			  },
+			},
 			_treeFullscreen() {
 				if(!!this.treeFullscreen){
 					return 1
@@ -136,16 +136,6 @@
 			
 			// 获取版本信息配置
 			this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
-			// this.$store.dispatch('getVersion').then(() => {
-			// 	// 获取数据。
-			// 	this.fetchData();
-			// })
-			
-			// 获取配置数据。
-			// this.$store.dispatch('getConfig').then(() => {
-			// 	// 获取数据。
-			// 	this.fetchData();
-			// })
 		},
 		mounted() {
 		},
@@ -159,13 +149,6 @@
 				this.$router.replace("/");
 
 			},
-			/**
-			 * 设置面板高度。
-			 * @return {void}
-			 */
-			setPanelHeight() {
-			},
-
 			showMessage() {
 				this.$alert('查无数据', '提示', {
 					type: 'warn'
@@ -209,9 +192,6 @@
 				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", {
 					"startPointList": this.params
 				}, this.requestSucess, this.requestFail, this.requestError)
-				// this.$register.sendRequest(this.$store, this.$ajax, this.url, "get", {
-				// 	"startPointList": this.params
-				// }, this.requestSucess, this.requestFail, this.requestError)
 			},
 			/**
 			 * 获取左侧目录树数据。

@@ -119,21 +119,21 @@
 			data () {
 				return Object.assign({}, this.treeData);
 			},
-		    key () {
-		      return this.$store.state.key
-		    },
-		    chrome () {
-		    	return this.$store.state.chrome
-		    },
-		    root () {
-		    	return this.$store.state.root
-		    },
-		    type () {
-		    	return this.$store.state.type
-		    },
-		    // 树的数据全屏。
-		   	treeFullscreen () {
-		   		return this.$store.state.treeFullscreen
+			key () {
+				return this.$store.state.key
+			},
+			chrome () {
+				return this.$store.state.chrome
+			},
+			root () {
+				return this.$store.state.root
+			},
+			type () {
+				return this.$store.state.type
+			},
+			// 树的数据全屏。
+			treeFullscreen () {
+				return this.$store.state.treeFullscreen
 			},
 			// 高亮的数据。
 			highted() {
@@ -912,16 +912,16 @@
 				})
 			},
 			fullScreenClick() {
-                // 详情全屏按钮点击事件。
+        // 详情全屏按钮点击事件。
 				this.$store.commit({
 					type: "updateTreeFullscreen",
 					key: true
 				});
 				this.updateCanvas()
-            },
-            restoreScreenClick() {
-                // 详情还原按钮点击事件。
-  				this.$store.commit({
+      },
+      restoreScreenClick() {
+        // 详情还原按钮点击事件。
+  			this.$store.commit({
 					type: "updateTreeFullscreen",
 					key: false
 				});

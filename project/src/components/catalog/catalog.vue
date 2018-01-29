@@ -27,21 +27,25 @@
 			}
 		},
 		computed: {
+			// 树形图是否放大。
+			treeFullscreen () {
+				return this.$store.state.treeFullscreen
+			},
 			resize () {
-		    	return this.$store.state.resize
-		    },
-		    key () {
-		      return this.$store.state.key
-		    },
-		    chrome () {
-		    	return this.$store.state.chrome
-		    },
-		    root () {
-		    	return this.$store.state.root
-		    }, 
-		    type () {
-		    	return this.$store.state.type
-		    },
+				return this.$store.state.resize
+			},
+			key () {
+				return this.$store.state.key
+			},
+			chrome () {
+				return this.$store.state.chrome
+			},
+			root () {
+				return this.$store.state.root
+			}, 
+			type () {
+				return this.$store.state.type
+			},
 		    // 版本信息数据。
 			isOpDbBeforeRefact() {
 				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
@@ -51,16 +55,16 @@
 			this.drawCatalog();
 		},
 		watch: {
-		    // 如果 question 发生改变，这个函数就会运行
-		    catalogData: function () {			
+		  // 如果 question 发生改变，这个函数就会运行
+		  catalogData: function () {			
 				this.catalog && (this.catalog.model = new go.TreeModel(this.catalogData));	
-		    },
-		    key: function() {
-		    	if(this.type == "tree") {
-		    		// 若点击树节点。
-		    		this.setCatalogSelection();
-		    	}
-		    },
+			},
+			key: function() {
+				if(this.type == "tree") {
+					// 若点击树节点。
+					this.setCatalogSelection();
+				}
+			},
 			/* 外部父div大小变化，视图大小更新 */
 			resize: 'updateCanvas'
 		},
@@ -189,8 +193,6 @@
 									type: "updateHeighted",
 									data: aSublings	//node.data.sublings
 								})
-								
-
 
 								if(this.treeFullscreen) {
 									this.$store.commit({
@@ -202,13 +204,12 @@
 									
 									this.updateCanvas()
 								}
-								
 
 								this.$store.commit({
 									type: "updateKey",
 									key: node.data.key
 								});
-								
+
 			
 								// 点击节点信息展示。
 								let nodeType = node.data.nodeType  //被点击节点的 nodeType
