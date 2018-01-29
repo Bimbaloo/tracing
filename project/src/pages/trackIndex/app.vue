@@ -52,7 +52,7 @@
 	import header from 'components/header/header.vue'
 	import tree from 'components/tree/tree.vue'	
 	import catalog from 'components/catalog/catalog.vue'
-	import dialogTree from 'components/basic/dialogProgressTree1.vue'
+	import dialogTree from 'components/basic/dialogProgressTree.vue'
 	
 	import fnP from "assets/js/public.js"
 	import $ from 'jquery'

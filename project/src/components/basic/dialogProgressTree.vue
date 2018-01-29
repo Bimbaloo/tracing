@@ -1,12 +1,5 @@
 <template>
-	<el-dialog 
-		class="progress-dialog-wrap"
-		:visible.sync="dialogVisible" 
-		:close-on-click-modal="false"
-		:modal-append-to-body="false"
-		:show-close="false"
-		:close-on-press-escape="false">
-		
+	<div class="dialog-progress-tree">		
 		<div class="loader">
 	        <div class="loader-inner ball-pulse">
 	          	<span class="ball-text">追溯树生成中</span><div></div><div></div><div></div>
@@ -19,7 +12,7 @@
 			:tree-data="treeData" 
 			:is-dialog-tree="true"
 			:style="{height: treeHeight + 'px'}"></v-tree>
-	</el-dialog>
+	</div>
 </template>
 
 <script>
@@ -28,11 +21,9 @@
 	
 	export default {
 		props: {
-			// 弹窗显示。
 			dialogVisible: {
-	            type: Boolean,
-	            default: false
-	       },
+				type: Boolean
+			},
 	       // 当前进程id
 	       progressId: {
 	       	 	type: String
@@ -55,7 +46,7 @@
 				return this.$store.state.versionModule && this.$store.state.versionModule.isOpDbBeforeRefact
 			},
 			treeHeight() {
-				return document.body.clientHeight - 40
+				return document.querySelector('.router').clientHeight - 80
 			},
 			treeId() {
 				return 'dialogTree' + this.progressId
@@ -77,11 +68,10 @@
 					// 成功处理。更新loading加载文字
 					this.treeData = fnP.getTreeData(data.traceGraphNodeDtoList, "track", this.isOpDbBeforeRefact)
 					
+					this.loading = false;
 					setTimeout(() => {
 						this.$nextTick(() => {
-							
-							this.loading = false;
-							this.showTreeData()
+							this.dialogVisible && this.showTreeData()
 						})
 					}, 3000)
 				}, () => {
@@ -92,16 +82,26 @@
 			// 设置定时器：获取当前进度。
 			setIntervalHandle() {
 				this.loading = true
-				setTimeout(() => {
-					this.showTreeData()
-				}, 2000)
+				this.showTreeData()
 			}
 		}
 	}
 </script>
 
-<style>
-  
+<style lang="less" scoped>
+  	.dialog-progress-tree {
+  		position: relative;
+  		z-index: 1001;
+  		width: 100%;
+  		height: 100%;
+  		background-color: #fff;
+  		
+  		.loader {
+  			text-align: center;
+  			padding: 10px 0;
+  		}
+  	}
+  	
     @-webkit-keyframes scale {
     	0% {
     		-webkit-transform: scale(1);
