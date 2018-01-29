@@ -582,8 +582,8 @@ footer {
         height: 42px;
         line-height: 42px;
         /*width: 180px;*/
-        width: 270px; // 216
-        //width: 216px; // 216
+        //width: 270px; // 216
+        width: 216px; // 216
         text-align: center;
         font-size: 16px;
         border-top: 4px solid transparent;
