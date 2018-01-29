@@ -311,9 +311,9 @@
 			},
 			"treeFullscreen": function() {
 				if(!this.treeFullscreen) {
-					setTimeout(() => {
+					this.$nextTick(() => {
 						this.tableHeight = this.setHeight()
-					}, 2000)
+					})
 				}
 			}
         },
