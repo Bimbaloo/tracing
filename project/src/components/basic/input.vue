@@ -7,7 +7,7 @@
         props: ['formData', 'placeholderData', 'keyData','disabledData'],
         props: {
         	formData: Object,
-        	placeHolderData: String,
+        	placeholderData: String,
         	keyData: String,
         	listData: Array,
         	disabledData: {
