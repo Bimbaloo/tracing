@@ -26,6 +26,7 @@ Vue.prototype.$echarts = echarts;
 
 const list = r => require.ensure([], () => r(require('components/restrain/list.vue')), 'group-detail')
 const Suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-detail')
+const MoldCode = r => require.ensure([], () => r(require('components/restrain/moldCode.vue')), 'group-detail')
 const Chart = r => require.ensure([], () => r(require('components/restrain/chart.vue')), 'group-detail')
 const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-detail')
 
@@ -129,7 +130,9 @@ const routes = [
       	title: 'restrain'
       }
     }]
-  }
+  },
+  { path: '/suppress/3',  redirect:'/moldCode' },        // 模号查询
+  { path: '/moldCode', component: MoldCode }            // 模号查询
 ]
 
 

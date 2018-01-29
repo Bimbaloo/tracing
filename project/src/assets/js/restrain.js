@@ -38,6 +38,31 @@ const categories = [{
       "type": "datetime",
       "placeholder": "请输入结束时间"
     }]
+  }, {
+    "groupOrder": "3",
+    "title": "模号",
+    "key": "3",
+    "items": [{
+      "name": "工序",
+      "key": "processCode",
+      "type": "select",
+      "placeholder": "请选择工序"
+    }, {
+      "name": "模号",
+      "key": "moldCode",
+      "type": "input",
+      "placeholder": "请输入模号"
+    }, {
+      "name": "开始时间",
+      "key": "startTime",
+      "type": "datetime",
+      "placeholder": "请输入开始时间"
+    }, {
+      "name": "结束时间",
+      "key": "endTime",
+      "type": "datetime",
+      "placeholder": "请输入结束时间"
+    }]
   }],
   "active": {
     "radio": "1",

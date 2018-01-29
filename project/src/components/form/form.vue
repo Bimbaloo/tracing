@@ -103,7 +103,7 @@
                 return oFormData;
             },
             rules: function() {
-            	// 验证条码。
+				// 验证条码。
             	let _that = this,
             		oForm = this.ruleForm,
             		oKeys = this.keys,
@@ -141,6 +141,22 @@
 	            			callback();
 	            		}
 					},
+					// 验证工序
+					validatProcessCode = (rule, value, callback) => {
+						if(!value) {
+	            			callback(new Error("请选择工序"));
+	            		}else {
+	            			callback();
+	            		}
+					},
+					// 验证模号
+					validatMoldCode = (rule, value, callback) => {
+						if(!value) {
+	            			callback(new Error("请输入模号"));
+	            		}else {
+	            			callback();
+	            		}
+					},
 					// 无需验证，可以为null。
 	            	validateNull = (rule, value, callback) => {
 	            		callback();
@@ -149,10 +165,10 @@
             	    validateStartTime = (rule, value, callback) => {
 	            		let sTime = value ? value.trim() : "",
 	            			nNow = +new Date();
-	            			
-	            		if(!sTime) {
+						const isMoldCode = Object.keys(oForm).includes("moldCode")  // 是否遏制模号查询
+	            		if(!sTime && !isMoldCode) {  								// 遏制模号状态下可以没有时间
 	            			callback(new Error("请输入开始时间"))
-	            		}else if(!window.Rt.utils.isDateTime(sTime)) {
+	            		}else if(!window.Rt.utils.isDateTime(sTime) && !isMoldCode) {
 	            			callback(new Error("请输入正确的时间格式"));
 	            		}else if(+new Date(value) > nNow) {
 	            			callback(new Error("时间不能超过当前时间"));
@@ -188,9 +204,10 @@
 	            			sTime = value ? value.trim() : "",
 	            			bIsFormat = window.Rt.utils.isDateTime(sTime),
 	            			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
-            	    		nNow = +new Date();
-            	    		
-	            		if(!bIsFormat) {
+							nNow = +new Date();
+							
+						const isMoldCode = Object.keys(oForm).includes("moldCode") 	// 是否遏制模号查询
+	            		if(!bIsFormat && !isMoldCode) {								// 遏制模号状态下可以没有时间
 	            			callback(new Error("请输入正确的时间格式"));
 	            		}else if(+new Date(sTime) > nNow) {
 	            			callback(new Error("时间不能超过当前时间"));
@@ -251,7 +268,6 @@
             			bIsFormat = window.Rt.utils.isDateTime(sTime),
             			bIsStartFormat = window.Rt.utils.isDateTime(sStart),
         	    		nNow = +new Date();
-					
         	    	if(sTime) {
 						// 存在时间。
 	        	    	if(!bIsFormat) {
@@ -319,7 +335,9 @@
             		"suppress": {
             			"materialCode": [{validator: validateMaterialcode, trigger: "change"}],
 						"batchNo": [{validator: validateBatch,trigger: "change"}],
-            			"equipmentCode": [{validator: validatEquipmentCode, trigger: "change"}],
+						"equipmentCode": [{validator: validatEquipmentCode, trigger: "change"}],
+						"processCode": [{validator: validatProcessCode, trigger: "change"}],
+						"moldCode": [{validator: validatMoldCode, trigger: "change"}],						
             			"startTime": [{validator: validateStartTime, trigger: "change"}],
             			// 结束时间。
             			"endTime": [{validator: validateSuppressEndTime, trigger: "change"}]
