@@ -125,8 +125,14 @@
 			// this.$register.sendRequest(this.$store, this.$ajax, GET_DATA_URL, "get", null, (oData) => {
 				// 保存工厂定制数据。
 				let oData = {
-					url: 'http://192',
-					quality: true
+					url: 'http://',
+					quality: true,
+					pool: true,
+					work: false,
+					event: false,
+					tool: false,
+					repair: false,
+					parameter: false
 				}
 				this.form = $.extend(true, this.form, oData)
 			// }, (sErrorMessage)=>{
@@ -157,7 +163,7 @@
 						// 验证成功。
 						this.edit = false
 						//获取模块数据 MODULE_DATA_URL	
-						// this.$register.sendRequest(this.$store, this.$ajax, SAVE_DATA_URL, "post", this.forEach, (oData) => {
+						// this.$register.sendRequest(this.$store, this.$ajax, SAVE_DATA_URL, "post", this.form, (oData) => {
 							// 保存工厂定制数据。
 							this.showMessage('success', '保存成功！');   
 						// }, (sErrorMessage)=>{
