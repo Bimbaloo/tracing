@@ -9,4 +9,4 @@ window.HOST =
 // "http://192.168.220.182:8088"     // 尹文才
 // "http://192.168.20.199:8088"      // 尹文才台式机
 
-window.VERSION = '1.0.0-RC4'
+window.VERSION = '2.0.0-RC1'
