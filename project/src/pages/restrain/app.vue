@@ -30,40 +30,40 @@
 </template>
 
 <script>
-import header from "components/header/header.vue";
-import panel from "components/panel/panel.vue";
-import dialog from "components/basic/dialogBarcode.vue";
-import fnP from "assets/js/public.js";
-import categoriesArr from "assets/js/restrain.js";
+import header from 'components/header/header.vue'
+import panel from 'components/panel/panel.vue'
+import dialog from 'components/basic/dialogBarcode.vue'
+// import fnP from 'assets/js/public.js'
+import categoriesArr from 'assets/js/restrain.js'
 
-const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
 
 export default {
   components: {
-    "v-header": header,
-    "v-panel": panel,
-    "v-dialog": dialog
+    'v-header': header,
+    'v-panel': panel,
+    'v-dialog': dialog
   },
-  data() {
+  data () {
     return {
       /* 拖动功能添加属性 */
       _pageX: null,
       changeWidth: 0,
-      LayoutLeftWidth: 360, //修改detail页面左侧默认宽度
+      LayoutLeftWidth: 360, // 修改detail页面左侧默认宽度
       dragging: false,
 
       collapse: false, // 侧栏是否收缩。
-      activeKey: "suppress",
+      activeKey: 'suppress',
       categories: [],
-      labelWidth: "70px",
-      searchTab: "100%",
-      panelHeight: "100%",
+      labelWidth: '70px',
+      searchTab: '100%',
+      panelHeight: '100%',
       tip: true,
       handleSubmit: this._submitForm,
-      sErrorMessage: "",
-      tag: "",
-      myLocalStorage: [] //查询记录
-    };
+      sErrorMessage: '',
+      tag: '',
+      myLocalStorage: [] // 查询记录
+    }
   },
   computed: {
     // 工厂配置数据。
@@ -74,51 +74,50 @@ export default {
     // modulesConfig() {
     //   return this.configData.modules
     // },
-    reversedMessage() {
-      let _width = this.LayoutLeftWidth + this.changeWidth;
-      return _width;
+    reversedMessage () {
+      let _width = this.LayoutLeftWidth + this.changeWidth
+      return _width
     }
   },
-  created() {
+  created () {
     // 登录判断。
-    this.$register.login(this.$store);
+    this.$register.login(this.$store)
 
     // 获取配置数据。
-    this.$register.getVersion(this.$store, this.$ajax, this.fetchData);
-
+    this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
 
     // 保存查询记录
-    let history = localStorage.getItem("history");
+    let history = localStorage.getItem('history')
     if (history) {
-      this.myLocalStorage = JSON.parse(history);
+      this.myLocalStorage = JSON.parse(history)
       this.myLocalStorage.forEach(data => {
-        delete data.oData.keys._tag;
-      });
+        delete data.oData.keys._tag
+      })
     } else {
-      this.myLocalStorage = [];
+      this.myLocalStorage = []
     }
   },
-  mounted() {
-    let that = this;
-    that.setParamBlockHeight();
+  mounted () {
+    let that = this
+    that.setParamBlockHeight()
 
     window.onresize = () => {
       //      that.adjustTabHeight,
-      that.setParamBlockHeight();
-    };
+      that.setParamBlockHeight()
+    }
   },
   methods: {
-    fetchData() {
-      this.tag = location.search.split("=")[1];
-      let oData = sessionStorage.getItem("searchConditions-" + this.tag);
+    fetchData () {
+      this.tag = location.search.split('=')[1]
+      let oData = sessionStorage.getItem('searchConditions-' + this.tag)
 
       // session 中获取
       if (oData) {
-        oData = JSON.parse(oData);
+        oData = JSON.parse(oData)
         // this.activeKey = oData.tab;
       } else if (window.location.hash.length > 2) {
         // 清空了cookie后，url中有参数。则获取url中的参数。
-        oData = this.getSearchData();
+        oData = this.getSearchData()
         // this.activeKey = oData.tab;
       }
 
@@ -126,235 +125,235 @@ export default {
         this.$store,
         this.$ajax,
         MODULE_ITEM_URL,
-        "get",
+        'get',
         null,
         oResult => {
           // 请求成功。
-          this.setCategories(oData, oResult);
+          this.setCategories(oData, oResult)
 
           if (oData || window.location.hash.length > 2) {
-            this.activeKey = oData.tab;
+            this.activeKey = oData.tab
           }
 
           this.$nextTick(() => {
             if (oData) {
-              this._submitForm(oData);
+              this._submitForm(oData)
             }
-          });
+          })
         },
         this.requestFail,
         this.requestError
-      );
+      )
     },
     // 设置tab数据。
-    setCategories(oData, oResult) {
+    setCategories (oData, oResult) {
       this.categories = categoriesArr
 
       this.categories.forEach(o => {
-        if (oData && oData.tab == o.key) {
-          o.active = oData;
+        if (oData && oData.tab === o.key) {
+          o.active = oData
         } else {
           o.active = {
-            radio: "1",
+            radio: '1',
             keys: {}
-          };
+          }
         }
-      });
+      })
     },
     // 请求失败。
-    requestFail(sErrorMessage) {
+    requestFail (sErrorMessage) {
       // 提示信息。
-      this.sErrorMessage = sErrorMessage;
-      this.showMessage();
+      this.sErrorMessage = sErrorMessage
+      this.showMessage()
     },
     // 请求错误。
-    requestError(err) {
-      console.log(err);
+    requestError (err) {
+      console.log(err)
     },
-    getSearchData() {
+    getSearchData () {
       let oData = {
-          tab: "",
-          keys: {},
-          radio: "1"
-        },
-        aHref = location.href.split("?"),
-        aParams = aHref[2].split("&"),
-        aInfo = aHref[1].split("/");
+        tab: '',
+        keys: {},
+        radio: '1'
+      }
+      let aHref = location.href.split('?')
+      let aParams = aHref[2].split('&')
+      let aInfo = aHref[1].split('/')
 
       // 设置tab和radio
-      oData.tab = aInfo[aInfo.length - 2];
-      oData.radio = aInfo[aInfo.length - 1];
+      oData.tab = aInfo[aInfo.length - 2]
+      oData.radio = aInfo[aInfo.length - 1]
 
       // 设置keys。
       aParams.forEach(o => {
-        let aAttr = o.split("=");
-        oData.keys[aAttr[0]] = decodeURIComponent(aAttr[1]);
-      });
+        let aAttr = o.split('=')
+        oData.keys[aAttr[0]] = decodeURIComponent(aAttr[1])
+      })
 
       // 返回参数。
-      return oData;
+      return oData
     },
     // 显示提示信息。
-    showMessage() {
+    showMessage () {
       this.$message({
         message: this.sErrorMessage,
         duration: 3000
-      });
+      })
     },
-    getKeys(sKey) {
-      let oSearch = this.categories.filter(o => o.key == sKey)[0].active.keys;
+    getKeys (sKey) {
+      let oSearch = this.categories.filter(o => o.key === sKey)[0].active.keys
       // 加时间戳。生成标记-- 点击查询可多次
       oSearch._tag = new Date()
         .getTime()
         .toString()
-        .substr(-5);
-      return oSearch;
+        .substr(-5)
+      return oSearch
     },
-    handleClick(tab, event) {
+    handleClick (tab, event) {
       // console.log(tab, event);
     },
     // 调整面板高度。
-    adjustTabHeight() {
-      let oSearchTab = this.$refs.searchTab.$el;
+    adjustTabHeight () {
+      let oSearchTab = this.$refs.searchTab.$el
       if (oSearchTab.scrollHeight > oSearchTab.clientHeight) {
-        this.searchTab = oSearchTab.scrollHeight + "px";
+        this.searchTab = oSearchTab.scrollHeight + 'px'
       } else {
-        this.searchTab = "100%";
+        this.searchTab = '100%'
       }
     },
     // 调整面板中参数设置的高度。
-    setParamBlockHeight() {
-      let oSearchTab = this.$refs.searchTab.$el;
+    setParamBlockHeight () {
+      let oSearchTab = this.$refs.searchTab.$el
 
-      this.panelHeight = oSearchTab.clientHeight - 80;
+      this.panelHeight = oSearchTab.clientHeight - 80
     },
     // 数据提交
-    _submitForm(oConditions) {
-      this.tip = false;
+    _submitForm (oConditions) {
+      this.tip = false
 
-      let sPath = "/" + this.activeKey;
-      oConditions.tab = this.activeKey;
-      
-      if(oConditions.tab !== "suppressList") { // 遏制列表不保存
-        this.updateRecord(oConditions);
+      let sPath = '/' + this.activeKey
+      oConditions.tab = this.activeKey
+
+      if (oConditions.tab !== 'suppressList') { // 遏制列表不保存
+        this.updateRecord(oConditions)
       }
-      
+
       // console.log(oConditions);
       sessionStorage.setItem(
-        "searchConditions-" + this.tag,
+        'searchConditions-' + this.tag,
         JSON.stringify(oConditions)
-      );
+      )
 
       //        if(this.activeKey == "stock") {
       // 若为查出库。
-      sPath = sPath + "/" + oConditions.radio;
+      sPath = sPath + '/' + oConditions.radio
       //        }
 
       // 修改下拉参数值。
       this.$router.replace({
         path: sPath,
         query: this.getKeys(this.activeKey)
-      });
+      })
     },
-    dragstar(e) {
-      //鼠标按下，开始拖动
+    dragstar (e) {
+      // 鼠标按下，开始拖动
       //  console.log('开始')
-      if (e.target.id === "changeWidth") {
-        this.LayoutLeftWidth = this.reversedMessage;
-        this.changeWidth = 0;
-        this.dragging = true;
-        this._pageX = e.pageX;
+      if (e.target.id === 'changeWidth') {
+        this.LayoutLeftWidth = this.reversedMessage
+        this.changeWidth = 0
+        this.dragging = true
+        this._pageX = e.pageX
 
         if (this.collapse) {
-          this.collapse = false;
+          this.collapse = false
         }
       }
     },
-    dragend(e) {
-      //鼠标松开，结束拖动
+    dragend (e) {
+      // 鼠标松开，结束拖动
 
-      //console.log('结束')
-      this.dragging = false;
-      e.stopPropagation = true;
+      // console.log('结束')
+      this.dragging = false
+      e.stopPropagation = true
     },
-    onMouseMove(e) {
-      //拖动过程
+    onMouseMove (e) {
+      // 拖动过程
 
       if (this.dragging) {
         // console.log('开始动了')
-        this.changeWidth = e.pageX - this._pageX;
+        this.changeWidth = e.pageX - this._pageX
       }
     },
     /* 生成随机数函数 */
-    guid() {
-      function S4() {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    guid () {
+      function S4 () {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
       }
       return (
-        S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4()
-      );
+        S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4()
+      )
     },
     // 保存查询记录
-    updateRecord(oConditions) {
-      //debugger
-      delete oConditions.keys._tag;
-      let oData = oConditions;
-      let isRepetition = true; //默认不重复
-      let n; //记录和第几个重复
+    updateRecord (oConditions) {
+      // debugger
+      delete oConditions.keys._tag
+      let oData = oConditions
+      let isRepetition = true // 默认不重复
+      let n // 记录和第几个重复
       this.myLocalStorage.forEach(data => {
-        delete data.oData.keys._tag;
-      });
+        delete data.oData.keys._tag
+      })
       isRepetition = this.myLocalStorage.some((el, j) => {
         if (JSON.stringify(el.oData) === JSON.stringify(oConditions)) {
-          n = j;
+          n = j
         }
-        return JSON.stringify(el.oData) === JSON.stringify(oConditions);
-      });
+        return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+      })
       if (!isRepetition) {
         let obj = {
           id: this.guid(),
           dateTime: new Date().Format(),
           oData
-        };
-        delete obj.oData.keys._tag;
-        this.myLocalStorage.unshift(obj);
+        }
+        delete obj.oData.keys._tag
+        this.myLocalStorage.unshift(obj)
         this.myLocalStorage.forEach(data => {
-          delete data.oData.keys._tag;
-        });
-        localStorage.setItem("history", JSON.stringify(this.myLocalStorage));
+          delete data.oData.keys._tag
+        })
+        localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
       } else {
-        //debugger
-        let olddata = this.myLocalStorage.splice(n, 1)[0];
-        olddata.id = this.guid();
-        let newTime = new Date().Format();
-        olddata.dateTime = newTime;
-        delete olddata.oData.keys._tag;
-        this.myLocalStorage.unshift(olddata);
+        // debugger
+        let olddata = this.myLocalStorage.splice(n, 1)[0]
+        olddata.id = this.guid()
+        let newTime = new Date().Format()
+        olddata.dateTime = newTime
+        delete olddata.oData.keys._tag
+        this.myLocalStorage.unshift(olddata)
         this.myLocalStorage.forEach(data => {
-          delete data.oData.keys._tag;
-        });
-        localStorage.setItem("history", JSON.stringify(this.myLocalStorage));
+          delete data.oData.keys._tag
+        })
+        localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
       }
     }
   },
   watch: {
     // 如果 左边小于260px 直接收缩
-    reversedMessage: function() {
+    reversedMessage: function () {
       // console.log('走你')
       if (this.reversedMessage <= 275 && !this.collapse) {
-        this.collapse = true;
+        this.collapse = true
       }
     },
-    collapse: function() {
+    collapse: function () {
       // 侧边栏展开时默认325
       if (!this.collapse) {
         // 修改当展开时，每次都是原始宽度
-        this.changeWidth = 0;
-        this.LayoutLeftWidth = 360;
+        this.changeWidth = 0
+        this.LayoutLeftWidth = 360
       }
     }
   }
-};
+}
 </script>
 
 <style lang="less">

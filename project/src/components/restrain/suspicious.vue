@@ -19,58 +19,58 @@
 </template>
 
 <script>
-import report from "components/report/report.vue";
+import report from 'components/report/report.vue'
 
 export default {
   components: {
-    "v-report": report
+    'v-report': report
   },
-  data() {
+  data () {
     return {
       isRestrained: true,
-      doDescription: "",
-      url: HOST + "/api/v1/suppress/do-by-batch", // 根据物料和批次遏制
+      doDescription: '',
+      url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
       styleObject: {
-        "min-width": "1000px"
+        'min-width': '1000px'
       },
-      equipmentName: ""
-    };
-  },
-  computed: {
-    isrestrainHtml() {
-      return window.location.pathname.includes("restrain");
-    },
-    oQuery() {
-      return this.$route.query;
+      equipmentName: ''
     }
   },
-  created() {
-    this.equipmentName = this.oQuery.equipmentName;
+  computed: {
+    isrestrainHtml () {
+      return window.location.pathname.includes('restrain')
+    },
+    oQuery () {
+      return this.$route.query
+    }
+  },
+  created () {
+    this.equipmentName = this.oQuery.equipmentName
     // 组件创建完后获取数据，
     // 此时 data 已经被 observed 了
     // this.fetchData();
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
-    $route: function() {
-      if (this.$route.meta.title === "restrain") {
-        this.equipmentName = this.oQuery.equipmentName;
+    $route: function () {
+      if (this.$route.meta.title === 'restrain') {
+        this.equipmentName = this.oQuery.equipmentName
       }
       this.isRestrained = true
     }
   },
   methods: {
     // 可疑品列表。
-    suppres() {
-      const h = this.$createElement;
-      let self = this;
+    suppres () {
+      const h = this.$createElement
+      let self = this
       this.$msgbox({
-        title: "提示",
-        message: h("el-input", {
+        title: '提示',
+        message: h('el-input', {
           attrs: {
-            type: "textarea",
+            type: 'textarea',
             rows: 4,
-            placeholder: "请输入遏制描述信息"
+            placeholder: '请输入遏制描述信息'
           },
           class: {
             message: true
@@ -79,60 +79,60 @@ export default {
             value: self.doDescription
           },
           on: {
-            blur: function(event) {
-              self.doDescription = event.target.value;
+            blur: function (event) {
+              self.doDescription = event.target.value
             }
           }
         }),
         showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
         beforeClose: (action, instance, done) => {
-          if (action === "confirm") {
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "遏制中...";
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '遏制中...'
             let oConditions = Object.assign(
               { doDescription: self.doDescription },
               this.$route.query
-            );
+            )
 
             this.$post(this.url, oConditions)
             .then((oData) => {
-							console.log(oData)
-							this.isRestrained = false
-							const handle = oData.data.data.handle
-							sessionStorage.setItem('handleID',handle)
-							instance.confirmButtonLoading = false;
-							this.$message.success('遏制成功')
-              let restrain = {...this.$route.query,...{"handleID":handle,"description":this.doDescription,'suppressTime':new Date().Format("yyyy-MM-dd hh:mm:ss")}}
-              self.doDescription = "";
-              sessionStorage.setItem('restrain',JSON.stringify(restrain))
-              window.open("/restrainReport.html?" + "_tag=" + new Date().getTime().toString().substr(-5));
-              
-							done();
-						})
-						.catch(err=>{
-							instance.confirmButtonLoading = false;
-							this.$message.error('遏制失败')
-							self.doDescription = "";
-							console.log(err)
-							done();
-						})
+              console.log(oData)
+              this.isRestrained = false
+              const handle = oData.data.data.handle
+              sessionStorage.setItem('handleID', handle)
+              instance.confirmButtonLoading = false
+              this.$message.success('遏制成功')
+              let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
+              self.doDescription = ''
+              sessionStorage.setItem('restrain', JSON.stringify(restrain))
+              window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+
+              done()
+            })
+            .catch(err => {
+              instance.confirmButtonLoading = false
+              this.$message.error('遏制失败')
+              self.doDescription = ''
+              console.log(err)
+              done()
+            })
           } else {
-						self.doDescription = "";
-            done();
+            self.doDescription = ''
+            done()
           }
         }
       })
     },
-    setWidth() {
-      this.styleObject.minWidth = "1000px";
+    setWidth () {
+      this.styleObject.minWidth = '1000px'
     },
-    removeWidth() {
-      this.styleObject.minWidth = 0;
+    removeWidth () {
+      this.styleObject.minWidth = 0
     }
   }
-};
+}
 </script>
 
 <style lang="less">

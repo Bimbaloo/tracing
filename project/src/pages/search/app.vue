@@ -67,54 +67,61 @@
 
 <script>
 import tooltip from 'components/header/tooltip.vue'
-import logo from '../../static/logo.png'//'assets/img/logo-w.png'
+import logo from '../../static/logo.png' // 'assets/img/logo-w.png'
 import version from 'assets/img/version.png'
 import panel from 'components/panel/panel.vue'
-import fnP from "assets/js/public.js"
-import { bus } from "assets/js/bus.js"
+import fnP from 'assets/js/public.js'
+import { bus } from 'assets/js/bus.js'
 
-const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
+const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
 // const MODULE_ITEM_URL = "./static/modules.json";
 // 数据名称接口。
-const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
+const TABLE_DATA_URL = window.HOST + '/api/v1/customized/items'
 
 export default {
   components: {
     'v-panel': panel,
     'v-tooltip': tooltip
   },
-  data() {
+  data () {
     return {
       showList: false,
       logo,
       version,
-      v: VERSION,
-      activeKey: "stock",
+      v: window.VERSION,
+      activeKey: 'stock',
       categories: [],
-      labelWidth: "100px",
+      labelWidth: '100px',
       handleSubmit: this._submitForm,
-      sErrorMessage: "",
+      sErrorMessage: '',
       loading: false,
       showHistory: true,
-      dataName: [{
-        itemCode: "stock",
-        itemName: "查出库"
-      }, {
-        itemCode: "trace_down",
-        itemName: "追踪"
-      }, {
-        itemCode: "trace_up",
-        itemName: "溯源"
-      }, {
-        itemCode: "resume",
-        itemName: "履历"
-      }, {
-        itemCode: "suppress",
-        itemName: "遏制"
-      }, {
-        itemCode: "link_repair",
-        itemName: "断链"
-      }],
+      dataName: [
+        {
+          itemCode: 'stock',
+          itemName: '查出库'
+        },
+        {
+          itemCode: 'trace_down',
+          itemName: '追踪'
+        },
+        {
+          itemCode: 'trace_up',
+          itemName: '溯源'
+        },
+        {
+          itemCode: 'resume',
+          itemName: '履历'
+        },
+        {
+          itemCode: 'suppress',
+          itemName: '遏制'
+        },
+        {
+          itemCode: 'link_repair',
+          itemName: '断链'
+        }
+      ],
       myLocalStorage: [],
       historyZindex: 0
     }
@@ -127,17 +134,23 @@ export default {
     // 配置图标。
     // logo() {
     //   return this.configData && this.configData.logo
-    // },    
-    liData() {
+    // },
+    liData () {
       return this.switchData(this.myLocalStorage)
     },
     // 是否支持遏制。
-    supression() {
-      return this.$store.state.versionModule && this.$store.state.versionModule.supression
+    supression () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.supression
+      )
     },
     // 是否支持断链修复。
-    linkRepair() {
-      return this.$store.state.versionModule && this.$store.state.versionModule.linkRepair
+    linkRepair () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.linkRepair
+      )
     }
     // 工厂配置数据。
     // configData() {
@@ -148,158 +161,173 @@ export default {
     //   return this.configData.modules
     // }
   },
-  created() {
-    let history = localStorage.getItem("history")
-    if(history){
+  created () {
+    let history = localStorage.getItem('history')
+    if (history) {
       this.myLocalStorage = JSON.parse(history)
-      this.myLocalStorage.forEach(data=>{
-          delete(data.oData.keys._tag)
-        })
-    }else {
-       this.myLocalStorage = []
+      this.myLocalStorage.forEach(data => {
+        delete data.oData.keys._tag
+      })
+    } else {
+      this.myLocalStorage = []
     }
-    
-    let dataName = localStorage.getItem("dataName")
-    if(dataName){
+
+    let dataName = localStorage.getItem('dataName')
+    if (dataName) {
       let oData = JSON.parse(dataName)
       this.dataName = oData.concat(this.dataName)
     }
 
     // 登录验证。
-    this.$register.login(this.$store);
+    this.$register.login(this.$store)
     // 获取配置数据。
     this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
-    
+
     // this.$store.dispatch('getVersion').then(() => {//getConfig
     //   // 获取数据。
     //   this.fetchData();
     // })
 
-    this.fetchDataName()  //获取名称
+    this.fetchDataName() // 获取名称
   },
   methods: {
     // 获取数据。
-    fetchData() {
-      this.loading = true;
+    fetchData () {
+      this.loading = true
 
-      // 请求判断。   
-      this.$register.sendRequest(this.$store, this.$ajax, MODULE_ITEM_URL, "get", null, (oData) => {
-        // 请求成功。
-        this.loading = false;
-        // 设置tab数据。
-        this.setCategories(oData)
-      }, (sErrorMessage) => {
-        // 请求失败。
-        this.loading = false;
-        this.sErrorMessage = sErrorMessage;
-        this.showMessage();
-      });
+      // 请求判断。
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        MODULE_ITEM_URL,
+        'get',
+        null,
+        oData => {
+          // 请求成功。
+          this.loading = false
+          // 设置tab数据。
+          this.setCategories(oData)
+        },
+        sErrorMessage => {
+          // 请求失败。
+          this.loading = false
+          this.sErrorMessage = sErrorMessage
+          this.showMessage()
+        }
+      )
     },
     // 设置tab数据。
-    setCategories(oData) {
+    setCategories (oData) {
       let unSuport = []
-      if(!this.supression ) {
-        unSuport.push("suppress")
+      if (!this.supression) {
+        unSuport.push('suppress')
       }
-      if(!this.linkRepair ) {
-        unSuport.push("link_repair")
+      if (!this.linkRepair) {
+        unSuport.push('link_repair')
       }
 
       this.categories = fnP.parseData(oData)
-      if(unSuport.length) {
+      if (unSuport.length) {
         // 获取打开的功能模块。
         this.categories = this.categories.filter(o => {
-                          return unSuport.indexOf(o.key) < 0
-                        });
+          return unSuport.indexOf(o.key) < 0
+        })
       }
-                        
-                        // .filter(o => {
-                        //   let oItem = this.modulesConfig.find(item => {
-                        //     return o.key === item.key
-                        //   });
-                        //   if(oItem) {
-                        //     return !!oItem.switch
-                        //   }else {
-                        //     return true
-                        //   }                    
-                        // })
-                        // .map(o => {
-                        //   let oItem = this.modulesConfig.find(item => {
-                        //     return o.key === item.key
-                        //   });
-                        //   if(oItem) {
-                        //     o.select = oItem.select
-                        //     o.name = oItem.name
-                        //   }
-                        //   return o
-                        // })
+
+      // .filter(o => {
+      //   let oItem = this.modulesConfig.find(item => {
+      //     return o.key === item.key
+      //   });
+      //   if(oItem) {
+      //     return !!oItem.switch
+      //   }else {
+      //     return true
+      //   }
+      // })
+      // .map(o => {
+      //   let oItem = this.modulesConfig.find(item => {
+      //     return o.key === item.key
+      //   });
+      //   if(oItem) {
+      //     o.select = oItem.select
+      //     o.name = oItem.name
+      //   }
+      //   return o
+      // })
       // 设置激活的tab。
       // let oSelect = this.categories.find(o => !!o.select)
       // this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
 
       this.categories.forEach(o => {
         o.active = {
-          radio: "1",
+          radio: '1',
           keys: {}
         }
-      }) 
+      })
     },
     // 显示提示信息。
-    showMessage() {
+    showMessage () {
       this.$message({
         message: this.sErrorMessage,
         duration: 3000,
-        type: "error"
-      });
+        type: 'error'
+      })
     },
 
-    _submitForm(oConditions) {
-      oConditions.tab = this.activeKey;
+    _submitForm (oConditions) {
+      oConditions.tab = this.activeKey
       this.updateRecord(oConditions)
-      let sTage = (+new Date()).toString().substr(-5);
+      let sTage = (+new Date()).toString().substr(-5)
 
-      sessionStorage.setItem('searchConditions-' + sTage, JSON.stringify(oConditions));
-      // 跳转。       
-      location.assign(this.categories.filter(o => o.key == this.activeKey)[0].url + ".html?tag=" + sTage);
+      sessionStorage.setItem(
+        'searchConditions-' + sTage,
+        JSON.stringify(oConditions)
+      )
+      // 跳转。
+      location.assign(
+        this.categories.filter(o => o.key === this.activeKey)[0].url +
+          '.html?tag=' +
+          sTage
+      )
     },
-    switchData(oldData) {
+    switchData (oldData) {
       let newData = []
       let oData = []
-      if(oldData.length>50){
-        oData = oldData.slice(0,50)
-      }else{
+      if (oldData.length > 50) {
+        oData = oldData.slice(0, 50)
+      } else {
         oData = JSON.parse(JSON.stringify(oldData))
       }
       oData.forEach((el, i) => {
         let a = {
-          "date": "",
-          "data": []
+          date: '',
+          data: []
         }
-        a["date"] = el.dateTime.split(" ")[0]
-        el.time = el.dateTime.split(" ")[1]
+        a['date'] = el.dateTime.split(' ')[0]
+        el.time = el.dateTime.split(' ')[1]
         el.oData.keys = Object.entries(el.oData.keys)
-        a["data"].push(el)
+        a['data'].push(el)
         newData.push(a)
         for (let j = i + 1; j < oData.length; j++) {
-          if (a["date"] === oData[j].dateTime.split(" ")[0]) {
-            oData[j].time = oData[j].dateTime.split(" ")[1]
+          if (a['date'] === oData[j].dateTime.split(' ')[0]) {
+            oData[j].time = oData[j].dateTime.split(' ')[1]
             oData[j].oData.keys = Object.entries(oData[j].oData.keys)
-            a["data"].push(oData[j])
+            a['data'].push(oData[j])
             oData.splice(j, 1)
             j = j - 1
           }
         }
       })
-      newData.forEach(e=>{
-        e.data.forEach(el=>{
-          this.dataName.forEach((data)=>{
-            if(data.itemCode === el.oData.tab){
+      newData.forEach(e => {
+        e.data.forEach(el => {
+          this.dataName.forEach(data => {
+            if (data.itemCode === el.oData.tab) {
               el.oData.tab = data.itemName
             }
           })
-          el.oData.keys.forEach((arr)=>{
-            this.dataName.forEach((data)=>{
-              if(data.itemCode === arr[0]){
+          el.oData.keys.forEach(arr => {
+            this.dataName.forEach(data => {
+              if (data.itemCode === arr[0]) {
                 arr[0] = data.itemName
               }
             })
@@ -309,131 +337,160 @@ export default {
       return newData
     },
     // 获取名称成功。
-    requestNameSucess(oData) {
+    requestNameSucess (oData) {
       // 获取对应的名称。
-      let dataName = localStorage.getItem("dataName")
-      if(!dataName || dataName !== JSON.stringify(oData)){
-        localStorage.setItem('dataName',JSON.stringify(oData))
+      let dataName = localStorage.getItem('dataName')
+      if (!dataName || dataName !== JSON.stringify(oData)) {
+        localStorage.setItem('dataName', JSON.stringify(oData))
         this.dataName = oData.concat(this.dataName)
       }
     },
     // 获取查询条件的key:value
-    fetchDataName() {
-      this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, this.requestNameSucess, this.requestFail, this.requestError)
+    fetchDataName () {
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        TABLE_DATA_URL,
+        'get',
+        null,
+        this.requestNameSucess,
+        this.requestFail,
+        this.requestError
+      )
     },
     // 请求失败。
-    requestFail(sErrorMessage) {
-      console.warn(sErrorMessage);
+    requestFail (sErrorMessage) {
+      console.warn(sErrorMessage)
     },
     // 请求错误。
-    requestError(error) {
-      console.warn(error);
-      console.warn("查询出错。");
+    requestError (error) {
+      console.warn(error)
+      console.warn('查询出错。')
     },
     /* 生成随机数函数 */
-    guid() {
-      function S4() {
-        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1);
+    guid () {
+      function S4 () {
+        return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
       }
-      return (S4() + S4() + "-" + S4() + "-" + S4() + "-" + S4() + "-" + S4() + S4() + S4());
+      return (
+        S4() +
+        S4() +
+        '-' +
+        S4() +
+        '-' +
+        S4() +
+        '-' +
+        S4() +
+        '-' +
+        S4() +
+        S4() +
+        S4()
+      )
     },
     // 点击历史记录后，填充
-    findId(listId) {
-      let historyList = this.myLocalStorage.find(el=>{
+    findId (listId) {
+      let historyList = this.myLocalStorage.find(el => {
         return el.id === listId
       })
       let searchTitle = false // 查询方案id
       let searchObj = {}
-      let categorie = this.categories.find(e=>{
+      let categorie = this.categories.find(e => {
         return e.key === historyList.oData.tab
       })
-      categorie.list.forEach(e=>{
-        if(e.title === historyList.oData.title){
+      categorie.list.forEach(e => {
+        if (e.title === historyList.oData.title) {
           searchTitle = true
           searchObj = e
-          //console.log("找到了")
+          // console.log("找到了")
         }
       })
-      if( (!!historyList && searchTitle) || (!!historyList && historyList.oData.tab !=="trace" && historyList.oData.tab !=="track") ){
+      if (
+        (!!historyList && searchTitle) ||
+        (!!historyList &&
+          historyList.oData.tab !== 'trace' &&
+          historyList.oData.tab !== 'track')
+      ) {
         historyList.oData.radio = searchObj.key
         bus.$emit('id-selected', historyList.oData)
         this.activeKey = historyList.oData.tab
-      }else{
-        this.$message('这条记录好像找不到了。。');
-       // console.log("没找到")
+      } else {
+        this.$message('这条记录好像找不到了。。')
+        // console.log("没找到")
       }
     },
     // 单条记录删除
-    deleteId(listId) {
-      this.myLocalStorage = this.myLocalStorage.filter(e=>{
+    deleteId (listId) {
+      this.myLocalStorage = this.myLocalStorage.filter(e => {
         return e.id !== listId
       })
-      localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+      localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
     },
     // 新增和更新历史记录
-    updateRecord(oConditions) {
-        //debugger
-        delete(oConditions.keys._tag)
-        let oData = oConditions
-        let isRepetition = true //默认不重复
-        let n //记录和第几个重复
-        this.myLocalStorage.forEach(data=>{
-          delete(data.oData.keys._tag)
-        })
-        isRepetition = this.myLocalStorage.some((el,j)=>{
-          if(JSON.stringify(el.oData) === JSON.stringify(oConditions)){
-            n = j
-          }
-          return JSON.stringify(el.oData) === JSON.stringify(oConditions)
-        })
-        if(!isRepetition){
-          let obj = {
-            "id": this.guid(),
-            "dateTime": new Date().Format(),
-            oData
-          }
-          delete(obj.oData.keys._tag)
-          this.myLocalStorage.unshift(obj)
-          this.myLocalStorage.forEach(data=>{
-            delete(data.oData.keys._tag)
-          })
-          localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
-        }else {
-          //debugger
-          let olddata = this.myLocalStorage.splice(n,1)[0]
-          olddata.id = this.guid()
-          let newTime = new Date().Format()
-          olddata.dateTime = newTime
-          delete(olddata.oData.keys._tag)
-          this.myLocalStorage.unshift(olddata)
-          this.myLocalStorage.forEach(data=>{
-            delete(data.oData.keys._tag)
-          })
-          localStorage.setItem("history",JSON.stringify(this.myLocalStorage))
+    updateRecord (oConditions) {
+      // debugger
+      delete oConditions.keys._tag
+      let oData = oConditions
+      let isRepetition = true // 默认不重复
+      let n // 记录和第几个重复
+      this.myLocalStorage.forEach(data => {
+        delete data.oData.keys._tag
+      })
+      isRepetition = this.myLocalStorage.some((el, j) => {
+        if (JSON.stringify(el.oData) === JSON.stringify(oConditions)) {
+          n = j
         }
-      },
-      // 清空历史记录
-      clearHistory(){
-        this.$confirm('此操作将永久删除全部记录, 是否继续?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          localStorage.removeItem("history")
+        return JSON.stringify(el.oData) === JSON.stringify(oConditions)
+      })
+      if (!isRepetition) {
+        let obj = {
+          id: this.guid(),
+          dateTime: new Date().Format(),
+          oData
+        }
+        delete obj.oData.keys._tag
+        this.myLocalStorage.unshift(obj)
+        this.myLocalStorage.forEach(data => {
+          delete data.oData.keys._tag
+        })
+        localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
+      } else {
+        // debugger
+        let olddata = this.myLocalStorage.splice(n, 1)[0]
+        olddata.id = this.guid()
+        let newTime = new Date().Format()
+        olddata.dateTime = newTime
+        delete olddata.oData.keys._tag
+        this.myLocalStorage.unshift(olddata)
+        this.myLocalStorage.forEach(data => {
+          delete data.oData.keys._tag
+        })
+        localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
+      }
+    },
+    // 清空历史记录
+    clearHistory () {
+      this.$confirm('此操作将永久删除全部记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          localStorage.removeItem('history')
           this.myLocalStorage = []
-          this.$nextTick(function(){
+          this.$nextTick(function () {
             this.$message({
               type: 'success',
               message: '删除成功!'
-            });
+            })
           })
-        }).catch(() => {
+        })
+        .catch(() => {
           this.$message({
             type: 'info',
             message: '已取消删除'
-          });          
+          })
         })
-      }
+    }
   }
 }
 </script>
@@ -495,7 +552,7 @@ footer {
 }
 
 .el-tooltip__popper {
-  padding: 0
+  padding: 0;
 } // 设置相关列表。
 .info-list {
   width: 90px; // border: 1px solid #ccc;
@@ -519,7 +576,7 @@ footer {
 
 .panel-title {
   padding: 10px 0; // 19
-  .el-radio+.el-radio {
+  .el-radio + .el-radio {
     margin-left: 60px;
   }
 }
@@ -530,7 +587,7 @@ footer {
 }
 
 .el-tabs--border-card {
-  &>.el-tabs__header {
+  & > .el-tabs__header {
     border-bottom: none;
 
     .el-tabs__item {
@@ -575,28 +632,34 @@ footer {
   box-shadow: none;
 
   &.el-tabs--border-card {
-    &>.el-tabs__header {
+    & > .el-tabs__header {
       background-color: #d9dee4;
+      .el-tabs__nav {
+        display: flex;
+        justify-content: space-around;
+        width: 100%;
 
-      .el-tabs__item {
-        height: 42px;
-        line-height: 42px;
-        /*width: 180px;*/
-        //width: 270px; // 216
-        width: 216px; // 216
-        text-align: center;
-        font-size: 16px;
-        border-top: 4px solid transparent;
-        border-bottom: 4px solid transparent;
-        color: #666;
+        .el-tabs__item {
+          height: 42px;
+          line-height: 42px;
+          /*width: 180px;*/
+          //width: 270px; // 216
+          //width: 216px; // 216
+          flex: 1;
+          text-align: center;
+          font-size: 16px;
+          border-top: 4px solid transparent;
+          border-bottom: 4px solid transparent;
+          color: #666;
 
-        &:hover {
-          color: #333;
-        }
+          &:hover {
+            color: #333;
+          }
 
-        &.is-active {
-          color: #42af8f;
-          border-top-color: #42af8f;
+          &.is-active {
+            color: #42af8f;
+            border-top-color: #42af8f;
+          }
         }
       }
     }
@@ -611,9 +674,9 @@ footer {
   }
 }
 .el-message-box__headerbtn {
-    border: none;
-    outline: 0;
-    padding: 0;
+  border: none;
+  outline: 0;
+  padding: 0;
 }
 .el-message-box__btns {
   .el-button {
@@ -634,11 +697,11 @@ footer {
   display: flex;
   flex-direction: column;
   &.max-history-box {
-    transition: width .5s ease;
+    transition: width 0.5s ease;
     width: 400px;
   }
   &.min-history-box {
-    transition: width .5s ease;
+    transition: width 0.5s ease;
     width: 50px;
   }
   .el-icon-arrow-left,
@@ -652,19 +715,19 @@ footer {
   .history-title {
     box-sizing: border-box;
     margin-top: 50px;
-    &>h2 {
+    & > h2 {
       color: #fff;
       text-align: center;
       margin-bottom: 10px;
     }
-    &>h3 {
+    & > h3 {
       font-size: 14px;
       color: #fff;
       text-align: right;
       margin-right: 20px;
       &:hover {
         cursor: pointer;
-        color: #42af8f
+        color: #42af8f;
       }
     }
   }
@@ -676,14 +739,14 @@ footer {
     overflow: auto;
     .history-content {
       margin-bottom: 30px;
-      >li {
+      > li {
         margin: 20px;
         display: flex;
         flex-wrap: nowrap;
         justify-content: space-between;
       }
       .ecorded-time {
-        &>h3 {
+        & > h3 {
           font-size: 14px;
           color: 14px;
           text-align: left;
@@ -693,7 +756,7 @@ footer {
       .history-messages-everyday {
         &:hover {
           cursor: pointer;
-          &>i {
+          & > i {
             opacity: 1;
             color: #42af8f;
           }
@@ -704,7 +767,7 @@ footer {
               position: relative;
             }
             .circle:before {
-              content: '';
+              content: "";
               border: 2px solid #42af8f;
               border-radius: 50%;
               width: 2px;
@@ -721,7 +784,7 @@ footer {
           color: #e5e5e5;
           font-size: 12px;
           line-height: 15px;
-          &>li {
+          & > li {
             margin-right: 10px;
             .circle {
               border: 2px solid #fff;
@@ -752,8 +815,6 @@ footer {
   }
 }
 
-
-
 @media screen and (max-width: 1400px) {
   footer {
     bottom: 10px;
@@ -767,7 +828,7 @@ footer {
     flex-direction: column;
 
     &.el-tabs--border-card {
-      &>.el-tabs__header {
+      & > .el-tabs__header {
         height: 40px;
         .el-tabs__item {
           height: 32px;

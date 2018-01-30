@@ -19,52 +19,55 @@
 </template>
 
 <script>
-	export default {
-		name: 'v-factory',
-		data () {
-			return {
-				activeKey: '/factory/link'
-			}
-		},
-		created () {
-		},
-		computed: {
-			// 是否支持视频监控查看。
-			camera() {
-				return this.$store.state.versionModule &&　this.$store.state.versionModule.camera
-			},
-			// 功能列表。
-			customList () {
-				let aoList = [{
-					label: '外链页面(自制报表)',
-					route: '/factory/link'
-				}]
+export default {
+  name: 'v-factory',
+  data () {
+    return {
+      activeKey: '/factory/link'
+    }
+  },
+  created () {},
+  computed: {
+    // 是否支持视频监控查看。
+    camera () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.camera
+      )
+    },
+    // 功能列表。
+    customList () {
+      let aoList = [
+        {
+          label: '外链页面(自制报表)',
+          route: '/factory/link'
+        }
+      ]
 
-				if(this.camera) {
-					aoList.push({
-						label: '视频监控', 
-						route: '/factory/camera'
-					})
-				}
+      if (this.camera) {
+        aoList.push({
+          label: '视频监控',
+          route: '/factory/camera'
+        })
+      }
 
-				return aoList
-			}
-		},
-		methods: {
-		}
-	}
+      return aoList
+    }
+  },
+  methods: {}
+}
 </script>
 
 <style lang="less" scoped>
-	// 引用基础定义。
-	@import "../../assets/css/base.less";
-	
-	.content-factory {
-		display: flex;
-		width: 100%;
+// 引用基础定义。
+@import "../../assets/css/base.less";
 
-		.side-menu {
-			flex-grow: 0;
-		}
-	}
+.content-factory {
+  display: flex;
+  width: 100%;
+
+  .side-menu {
+    flex-grow: 0;
+  }
+}
 </style>

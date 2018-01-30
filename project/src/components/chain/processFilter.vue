@@ -73,57 +73,57 @@
 	import DateTime from 'components/basic/dateTime.vue'
 	
 	export default {
-		props: {
-			popShow: Boolean,
-			popData: Object
-		},
-		// 组件
-		components: {
-			'v-button': Button,
-    		'v-multiSelect': MultiSelect,
-    		'v-dateTime': DateTime
-		},
-		data() {
-			return {}
-		},
-		computed: {
-			form() {
-//				console.log(this.popData)
-				return Object.assign({}, this.popData)
-			},
-			title() {
-				return this.popData.name+'过滤'
-			}
-		},
-		methods: {
-			// 下拉框中格式处理函数。
-			parseSelectFormat(aSelect) {
-				var aNewData = [];
-				
-				if(aSelect && aSelect.length) {
-					aSelect.forEach(function(sValue) {
-						aNewData.push({
-							label: sValue,
-							value: sValue
-						})
-					});
-				}
-				// 返回数据。
-				return aNewData;
-			},
-			handleClose() {
-				// 设置弹窗状态。
-				this.$emit("hideFilterPop");
-			},
-			closeModal() {
-				// 设置弹窗状态。
-				this.$emit("hideFilterPop");
-			},
-			setFilter() {
-				// 设置弹窗状态。
-				this.$emit("hideFilterPop", this.form);
-			}
-		}
+	  props: {
+	    popShow: Boolean,
+	    popData: Object
+	  },
+    // 组件
+	  components: {
+    'v-button': Button,
+    'v-multiSelect': MultiSelect,
+    'v-dateTime': DateTime
+	  },
+	  data () {
+	    return {}
+	  },
+	  computed: {
+	    form () {
+     // console.log(this.popData)
+	      return Object.assign({}, this.popData)
+	    },
+	    title () {
+	      return this.popData.name + '过滤'
+	    }
+	  },
+	  methods: {
+    // 下拉框中格式处理函数。
+	    parseSelectFormat (aSelect) {
+	      var aNewData = []
+	
+	      if (aSelect && aSelect.length) {
+	        aSelect.forEach(function (sValue) {
+	          aNewData.push({
+	            label: sValue,
+	            value: sValue
+	          })
+	        })
+	      }
+      // 返回数据。
+	      return aNewData
+	    },
+	    handleClose () {
+      // 设置弹窗状态。
+	      this.$emit('hideFilterPop')
+	    },
+	    closeModal () {
+      // 设置弹窗状态。
+	      this.$emit('hideFilterPop')
+	    },
+	    setFilter () {
+      // 设置弹窗状态。
+	      this.$emit('hideFilterPop', this.form)
+	    }
+	  }
 	}
 	
 </script>

@@ -28,141 +28,140 @@
     
 </template>
 <script>
-    import form from 'components/form/form.vue'
-    import { bus } from "assets/js/bus.js"
+import form from 'components/form/form.vue'
+import { bus } from 'assets/js/bus.js'
 
-    export default {
-        props: {
-            labelWidth: String,
-            category: Object,
-            handleSubmit: Function,
-            panelHeight: Number,
-            activeTab: String
-        },
-        data () {
-            return {
-                radio: "1",          
-                keys: {},
-                // 面板参数高度
-                sPanelHeight: "auto"
-            }
-        },
-        computed: {
-            items: function () {
-                let aList = [];
-                this.category.list.forEach(oData => {
-                    oData.items.forEach(oItem => {
-                        if(!aList.filter(o => o.key == oItem.key).length) {
-                            aList.push(oItem);
-                        }                     
-                    })
-                })
-                return aList;
-            }
-        },
-        watch: {
-        	panelHeight: function() {
-        		this.setPanelHeight();
-        	},
-        	activeTab: function() {
-        		if(this.activeTab == this.category.key) {
-        			this.setPanelHeight();
-        		}
-        	}
-        },
-        created () {
-            // 设置选中的初始值。
-            let _that = this
-            bus.$on('id-selected', function (obj) {
-                if(_that.category.key === obj.tab){
-                     _that.radio = obj.radio
-                }
-            })
-            this.radio = this.category.active.radio;
-            let initData = this.category.list.filter(o => o.key == this.radio)[0];    
-            this.keys = this.getKeys(initData);
-        },
-        components: {
-            'v-form': form
-        },
-        mounted() {
-            this.setPanelHeight()
-        },
-        methods: {
-        	setPanelHeight() {
-        		let oPanelTitle = this.$refs.panelTitle;
-        		if(oPanelTitle) {
-	        		this.sPanelHeight = (this.panelHeight - oPanelTitle.clientHeight)
-        		}
-        	},
-            getKeys(oData) {
-                let oKey = {};
-                
-                if(oData) {
-	                oData.items.forEach(o => oKey[o.key] = '');
-                }
-
-                return oKey;
-            },
-
-            // 切换选中项处理函数
-            handleChange(value) {
-                let currentData = this.category.list.filter(o => o.key == value)[0];
-                this.keys = this.getKeys(currentData);
-
-//              this.$nextTick(() => this.$emit("radioChange"));
-                this.category.active.radio = value;  
-                
-                // 设置内容高度
-				this.setPanelHeight();
-            }
-            
-        }
+export default {
+  props: {
+    labelWidth: String,
+    category: Object,
+    handleSubmit: Function,
+    panelHeight: Number,
+    activeTab: String
+  },
+  data () {
+    return {
+      radio: '1',
+      keys: {},
+      // 面板参数高度
+      sPanelHeight: 'auto'
     }
+  },
+  computed: {
+    items: function () {
+      let aList = []
+      this.category.list.forEach(oData => {
+        oData.items.forEach(oItem => {
+          if (!aList.filter(o => o.key === oItem.key).length) {
+            aList.push(oItem)
+          }
+        })
+      })
+      return aList
+    }
+  },
+  watch: {
+    panelHeight: function () {
+      this.setPanelHeight()
+    },
+    activeTab: function () {
+      if (this.activeTab === this.category.key) {
+        this.setPanelHeight()
+      }
+    }
+  },
+  created () {
+    // 设置选中的初始值。
+    let _that = this
+    bus.$on('id-selected', function (obj) {
+      if (_that.category.key === obj.tab) {
+        _that.radio = obj.radio
+      }
+    })
+    this.radio = this.category.active.radio
+    let initData = this.category.list.filter(o => o.key === this.radio)[0]
+    this.keys = this.getKeys(initData)
+  },
+  components: {
+    'v-form': form
+  },
+  mounted () {
+    this.setPanelHeight()
+  },
+  methods: {
+    setPanelHeight () {
+      let oPanelTitle = this.$refs.panelTitle
+      if (oPanelTitle) {
+        this.sPanelHeight = this.panelHeight - oPanelTitle.clientHeight
+      }
+    },
+    getKeys (oData) {
+      let oKey = {}
+
+      if (oData) {
+        oData.items.forEach(o => (oKey[o.key] = ''))
+      }
+
+      return oKey
+    },
+
+    // 切换选中项处理函数
+    handleChange (value) {
+      let currentData = this.category.list.filter(o => o.key === value)[0]
+      this.keys = this.getKeys(currentData)
+
+      //              this.$nextTick(() => this.$emit("radioChange"));
+      this.category.active.radio = value
+
+      // 设置内容高度
+      this.setPanelHeight()
+    }
+  }
+}
 </script>
-<style lang="less">  
-    .el-radio {
-        &:hover {
-            color: #42af8f;
-
-            .el-radio__inner {
-                border-color: #42af8f;
-            }  
-        }
-    }
+<style lang="less">
+.el-radio {
+  &:hover {
+    color: #42af8f;
 
     .el-radio__inner {
-        border: 2px solid #999;
-        width: 14px;
-        height: 14px;
+      border-color: #42af8f;
+    }
+  }
+}
 
-        &::after {
-            background-color: #42af8f;
-        }
-    }
+.el-radio__inner {
+  border: 2px solid #999;
+  width: 14px;
+  height: 14px;
 
-    .el-radio__input.is-checked .el-radio__inner {
-        border-color: #42af8f;
-        background: #fff;
-    }
+  &::after {
+    background-color: #42af8f;
+  }
+}
 
-    .el-radio__label {
-        padding-left: 10px;
-    }
+.el-radio__input.is-checked .el-radio__inner {
+  border-color: #42af8f;
+  background: #fff;
+}
 
-    .panel-title {
-        text-align: center;
-        // padding-left: 28px;
-        // padding-right: 28px;
-    }
-    .panel-content {
-    	/*overflow: auto;*/
-    	
-    	.panel-content-wrap {
-    		padding:  0 28px;
-    	}
-    }
-    .hide {
-    	display: none;
-    }
+.el-radio__label {
+  padding-left: 10px;
+}
+
+.panel-title {
+  text-align: center;
+  // padding-left: 28px;
+  // padding-right: 28px;
+}
+.panel-content {
+  /*overflow: auto;*/
+
+  .panel-content-wrap {
+    padding: 0 28px;
+  }
+}
+.hide {
+  display: none;
+}
 </style>

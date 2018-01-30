@@ -33,316 +33,355 @@
 </template>
 
 <script>
-import $ from 'jquery'  
-  
+import $ from 'jquery'
+
 // 获取监控点接口地址。
-const CAMERA_POINT_URL = HOST + "";
+// const CAMERA_POINT_URL = HOST + ''
 // 向前推10s。
-const PRE_TIME = 10;
+const PRE_TIME = 10
 // 向后推10s。
-const FORWARD_TIME = 10;
+const FORWARD_TIME = 10
 // 视频最大播放时长，单位分钟。
-const MAX_VIDEO_TIME = 60;
+const MAX_VIDEO_TIME = 60
 
 export default {
-    props: {
-        equipmentName: {
-            type: String,
-            default: ""
-        },
-        equipmentId: {
-            type: [String, Number],
-            default: ""
-        },
-        time: {
-            type: String,
-            default: ""
-        },
-        series: {
-            type: String,
-            default: ""
-        }
+  props: {
+    equipmentName: {
+      type: String,
+      default: ''
     },
-    data() {
-        return {
-            cameraHeight: 300,
-            monitorForm: { 
-                cameraId: "",
-                startDate: "",
-                endDate: ""
-            },
-            // 监控点。
-            cameraPoints: [],
-            // 前一次查询条件。
-            forwardForm: null
-        } 
+    equipmentId: {
+      type: [String, Number],
+      default: ''
     },
-    computed: {
-        // 监控地址。
-        url () {
-            return this.$store.state.factoryModule.factoryCameraConfig.url
-        },
-        // 投产时间。
-        poolTime() {
-            return decodeURIComponent(this.time)
-        },
-        // 设备名称。
-        name() {
-            return decodeURIComponent(this.equipmentName);
-        },
-        // 系列名称。
-        serieName() {
-            return decodeURIComponent(this.series)
-        },
-        // 验证规则。
-        rules() {
-            // 验证开始时间。
-            let validateStartTime = (rule, value, callback) => {
-                    let sEnd = this.monitorForm.endDate,
-                        sTime = value.trim(),
-                        bIsFormat = window.Rt.utils.isDateTime(sTime),
-                        bIsEndFormat = window.Rt.utils.isDateTime(sEnd),
-                        nNow = +new Date();
-                        
-                    if(!sTime) {
-                        callback(new Error("请输入开始时间"))
-                    }else if(!bIsFormat) {
-                        callback(new Error("请输入正确的时间格式"));
-                    }else if(+new Date(sTime) > nNow) {
-                        callback(new Error("时间不能超过当前时间"));
-                    }else if(sEnd && bIsEndFormat && +new Date(sTime) > +new Date(sEnd) ){
-                        // 如果开始时间存在，而且开始时间大于结束时间。
-                        callback(new Error("开始时间必须小于结束时间"));
-                    }else if(sEnd && bIsEndFormat && +new Date(sTime) + MAX_VIDEO_TIME*60*1000 < +new Date(sEnd) ){
-                        // 如果开始时间存在，而且开始时间与结束时间间隔超过MAX_VIDEO_TIME。
-                        callback(new Error("开始时间与结束时间间隔不能超过" + MAX_VIDEO_TIME + "分钟"));
-                    }else {
-                        callback();
-                    }  
-                },
-                // 验证结束时间。
-                validateEndTime = (rule, value, callback) => {
-                    let sStart = this.monitorForm.startDate,
-                        sTime = value.trim(),
-                        bIsFormat = window.Rt.utils.isDateTime(sTime),
-                        bIsStartFormat = window.Rt.utils.isDateTime(sStart),
-                        nNow = +new Date();
-                        
-                    if(!sTime) {
-                        callback(new Error("请输入结束时间"))
-                    }else if(!bIsFormat) {
-                        callback(new Error("请输入正确的时间格式"));
-                    }else if(+new Date(sTime) > nNow) {
-                        callback(new Error("时间不能超过当前时间"));
-                    }else if(sStart && bIsStartFormat && +new Date(sStart) > +new Date(sTime) ){
-                        // 如果开始时间存在，而且开始时间大于结束时间。
-                        callback(new Error("结束时间必须大于开始时间"));
-                    }else if(sStart && bIsStartFormat && +new Date(sStart) + MAX_VIDEO_TIME*60*1000 < +new Date(sTime) ){
-                        // 如果开始时间存在，而且开始时间与结束时间间隔超过MAX_VIDEO_TIME。
-                        callback(new Error("开始时间与结束时间间隔不能超过" + MAX_VIDEO_TIME + "分钟"));
-                    }else {
-                        callback();
-                    }
-                    
-                };
-
-                return {
-                    startDate: [{validator: validateStartTime, trigger: "change", required: true}],
-                    endDate: [{validator: validateEndTime, trigger: "change", required: true}]
-                };
-            }
+    time: {
+      type: String,
+      default: ''
     },
-    created() {
-        // 设置监控时间。
-        this.setTime();
-        // 获取监控点。
-        this.getCameraPoints();
-    },
-    mounted() {
-        this.$nextTick(()=>{
-            this.setHeight();
-        });
-    },
-    methods: {
-        // 设置高度。
-        setHeight() {
-            var nHeight = window.document.documentElement.clientHeight,
-                jWrap = $(".wrap"),
-                jForm = $(".form-inline"),
-                jTitle = $(".content-title"),
-                jHeader = $("header"),
-                jCamera = $(".camera"),
-                nReturnHeight = 0;
-            
-            // 获取页面中的可显示高度。
-            nReturnHeight = nHeight
-                        - jHeader.outerHeight(true)
-                        - (jWrap.outerHeight(true) - jWrap.height())
-                        - jForm.outerHeight(true)
-                        - jTitle.outerHeight(true)
-                        - (jCamera.outerHeight(true) - jCamera.height());
-
-            this.cameraHeight = nReturnHeight;
-        },
-        // 输入处理
-        dateChange(key, event) {
-            let sVal = event.target.value;
-            this.monitorForm[key] = sVal;
-        },
-        // 选中确定处理
-        startClick(value) {
-            if(value != undefined) {
-                this.monitorForm.startDate = value;
-            }else {
-                // 点击插件自动清空，返回是undefined 
-                this.monitorForm.startDate = '';
-            }
-        },
-        // 选中确定处理
-        endClick(value) {
-            if(value != undefined) {
-                this.monitorForm.endDate = value;
-            }else {
-                // 点击插件自动清空，返回是undefined 
-                this.monitorForm.endDate = '';
-            }
-        },
-        // 设置监控时间。
-        setTime() {
-            if(this.poolTime) {
-                this.monitorForm.startDate = new Date(+new Date(this.poolTime) - PRE_TIME*1000).Format();
-                this.monitorForm.endDate = new Date(+new Date(this.poolTime) + FORWARD_TIME*1000).Format();
-            }      
-        },
-        // 提交。
-        submitForm(formName) {
-            this.$refs[formName].validate((valid) => {
-                if (valid) {
-                    if(!this.forwardForm || (this.forwardForm && !this.isEqual(this.forwardForm, this.monitorForm))) {
-                        // 若条件发生改变。
-                        this.$refs["video"].src = `${this.url}?cameraId=${this.monitorForm.cameraId}&startDate=${encodeURIComponent(this.monitorForm.startDate)}&endDate=${encodeURIComponent(this.monitorForm.endDate)}`
-                    }
-                } else {
-                    console.log('error submit!');
-                    return false;
-                }
-            });
-        },
-        /**
-         * 判断两个对象相等。
-         * @param{Object} oCompare
-         * @param{Object} oStandard
-         * @return{Boolean} 
-         */
-        isEqual(oCompare, oStandard) {
-            let bEqual = true;
-            for(let p in oStandard) {
-                if(this.oStandard[p] !== this.oCompare[p]) {
-                    bEqual = false;
-                    break;
-                }  
-            }
-            return bEqual;
-        },
-        // 获取监控点。
-        getCameraPoints() {
-            // this.$register.sendRequest(this.$store, this.$ajax, this.url, "get", {
-            //     equipmentId: equipmentId
-            // }, this.requestSucess, this.requestFail, this.requestError);    
-            this.requestSucess(["001", "002"]);     
-        },
-        // 监控点请求成功。
-        requestSucess(aoData) {
-            if(aoData && aoData.length) {
-                // 保存监控点。
-                this.cameraPoints = aoData;
-                // 设置选中监控点id。
-                this.monitorForm.cameraId = this.cameraPoints[0]; 
-                // 提交。
-                this.$nextTick(() => {
-                    this.submitForm('monitorForm');
-                })  
-            }  
-        },
-        // 请求失败。
-        requestFail(sErrorMessage) {
-            this.cameraPoints = [];
-            this.monitorForm.cameraId = "";
-            console.warn(sErrorMessage);
-        },
-        // 请求错误。
-        requestError(err) {
-            this.cameraPoints = [];
-            this.monitorForm.cameraId = "";
-            console.warn('请求错误。'); 
-        }
+    series: {
+      type: String,
+      default: ''
     }
+  },
+  data () {
+    return {
+      cameraHeight: 300,
+      monitorForm: {
+        cameraId: '',
+        startDate: '',
+        endDate: ''
+      },
+      // 监控点。
+      cameraPoints: [],
+      // 前一次查询条件。
+      forwardForm: null
+    }
+  },
+  computed: {
+    // 监控地址。
+    url () {
+      return this.$store.state.factoryModule.factoryCameraConfig.url
+    },
+    // 投产时间。
+    poolTime () {
+      return decodeURIComponent(this.time)
+    },
+    // 设备名称。
+    name () {
+      return decodeURIComponent(this.equipmentName)
+    },
+    // 系列名称。
+    serieName () {
+      return decodeURIComponent(this.series)
+    },
+    // 验证规则。
+    rules () {
+      // 验证开始时间。
+      let validateStartTime = (rule, value, callback) => {
+        let sEnd = this.monitorForm.endDate
+        let sTime = value.trim()
+        let bIsFormat = window.Rt.utils.isDateTime(sTime)
+        let bIsEndFormat = window.Rt.utils.isDateTime(sEnd)
+        let nNow = +new Date()
+
+        if (!sTime) {
+          callback(new Error('请输入开始时间'))
+        } else if (!bIsFormat) {
+          callback(new Error('请输入正确的时间格式'))
+        } else if (+new Date(sTime) > nNow) {
+          callback(new Error('时间不能超过当前时间'))
+        } else if (
+            sEnd &&
+            bIsEndFormat &&
+            +new Date(sTime) > +new Date(sEnd)
+          ) {
+            // 如果开始时间存在，而且开始时间大于结束时间。
+          callback(new Error('开始时间必须小于结束时间'))
+        } else if (
+            sEnd &&
+            bIsEndFormat &&
+            +new Date(sTime) + MAX_VIDEO_TIME * 60 * 1000 < +new Date(sEnd)
+          ) {
+            // 如果开始时间存在，而且开始时间与结束时间间隔超过MAX_VIDEO_TIME。
+          callback(
+              new Error(
+                '开始时间与结束时间间隔不能超过' + MAX_VIDEO_TIME + '分钟'
+              )
+            )
+        } else {
+          callback()
+        }
+      }
+        // 验证结束时间。
+      let validateEndTime = (rule, value, callback) => {
+        let sStart = this.monitorForm.startDate
+        let sTime = value.trim()
+        let bIsFormat = window.Rt.utils.isDateTime(sTime)
+        let bIsStartFormat = window.Rt.utils.isDateTime(sStart)
+        let nNow = +new Date()
+
+        if (!sTime) {
+          callback(new Error('请输入结束时间'))
+        } else if (!bIsFormat) {
+          callback(new Error('请输入正确的时间格式'))
+        } else if (+new Date(sTime) > nNow) {
+          callback(new Error('时间不能超过当前时间'))
+        } else if (
+            sStart &&
+            bIsStartFormat &&
+            +new Date(sStart) > +new Date(sTime)
+          ) {
+            // 如果开始时间存在，而且开始时间大于结束时间。
+          callback(new Error('结束时间必须大于开始时间'))
+        } else if (
+            sStart &&
+            bIsStartFormat &&
+            +new Date(sStart) + MAX_VIDEO_TIME * 60 * 1000 < +new Date(sTime)
+          ) {
+            // 如果开始时间存在，而且开始时间与结束时间间隔超过MAX_VIDEO_TIME。
+          callback(
+              new Error(
+                '开始时间与结束时间间隔不能超过' + MAX_VIDEO_TIME + '分钟'
+              )
+            )
+        } else {
+          callback()
+        }
+      }
+
+      return {
+        startDate: [
+          { validator: validateStartTime, trigger: 'change', required: true }
+        ],
+        endDate: [
+          { validator: validateEndTime, trigger: 'change', required: true }
+        ]
+      }
+    }
+  },
+  created () {
+    // 设置监控时间。
+    this.setTime()
+    // 获取监控点。
+    this.getCameraPoints()
+  },
+  mounted () {
+    this.$nextTick(() => {
+      this.setHeight()
+    })
+  },
+  methods: {
+    // 设置高度。
+    setHeight () {
+      let nHeight = window.document.documentElement.clientHeight
+      let jWrap = $('.wrap')
+      let jForm = $('.form-inline')
+      let jTitle = $('.content-title')
+      let jHeader = $('header')
+      let jCamera = $('.camera')
+      let nReturnHeight = 0
+
+      // 获取页面中的可显示高度。
+      nReturnHeight =
+        nHeight -
+        jHeader.outerHeight(true) -
+        (jWrap.outerHeight(true) - jWrap.height()) -
+        jForm.outerHeight(true) -
+        jTitle.outerHeight(true) -
+        (jCamera.outerHeight(true) - jCamera.height())
+
+      this.cameraHeight = nReturnHeight
+    },
+    // 输入处理
+    dateChange (key, event) {
+      let sVal = event.target.value
+      this.monitorForm[key] = sVal
+    },
+    // 选中确定处理
+    startClick (value) {
+      if (value !== undefined) {
+        this.monitorForm.startDate = value
+      } else {
+        // 点击插件自动清空，返回是undefined
+        this.monitorForm.startDate = ''
+      }
+    },
+    // 选中确定处理
+    endClick (value) {
+      if (value !== undefined) {
+        this.monitorForm.endDate = value
+      } else {
+        // 点击插件自动清空，返回是undefined
+        this.monitorForm.endDate = ''
+      }
+    },
+    // 设置监控时间。
+    setTime () {
+      if (this.poolTime) {
+        this.monitorForm.startDate = new Date(
+          +new Date(this.poolTime) - PRE_TIME * 1000
+        ).Format()
+        this.monitorForm.endDate = new Date(
+          +new Date(this.poolTime) + FORWARD_TIME * 1000
+        ).Format()
+      }
+    },
+    // 提交。
+    submitForm (formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          if (
+            !this.forwardForm ||
+            (this.forwardForm &&
+              !this.isEqual(this.forwardForm, this.monitorForm))
+          ) {
+            // 若条件发生改变。
+            this.$refs['video'].src = `${this.url}?cameraId=${
+              this.monitorForm.cameraId
+            }&startDate=${encodeURIComponent(
+              this.monitorForm.startDate
+            )}&endDate=${encodeURIComponent(this.monitorForm.endDate)}`
+          }
+        } else {
+          console.log('error submit!')
+          return false
+        }
+      })
+    },
+    /**
+     * 判断两个对象相等。
+     * @param{Object} oCompare
+     * @param{Object} oStandard
+     * @return{Boolean}
+     */
+    isEqual (oCompare, oStandard) {
+      let bEqual = true
+      for (let p in oStandard) {
+        if (this.oStandard[p] !== this.oCompare[p]) {
+          bEqual = false
+          break
+        }
+      }
+      return bEqual
+    },
+    // 获取监控点。
+    getCameraPoints () {
+      // this.$register.sendRequest(this.$store, this.$ajax, this.url, "get", {
+      //     equipmentId: equipmentId
+      // }, this.requestSucess, this.requestFail, this.requestError);
+      this.requestSucess(['001', '002'])
+    },
+    // 监控点请求成功。
+    requestSucess (aoData) {
+      if (aoData && aoData.length) {
+        // 保存监控点。
+        this.cameraPoints = aoData
+        // 设置选中监控点id。
+        this.monitorForm.cameraId = this.cameraPoints[0]
+        // 提交。
+        this.$nextTick(() => {
+          this.submitForm('monitorForm')
+        })
+      }
+    },
+    // 请求失败。
+    requestFail (sErrorMessage) {
+      this.cameraPoints = []
+      this.monitorForm.cameraId = ''
+      console.warn(sErrorMessage)
+    },
+    // 请求错误。
+    requestError (err) {
+      this.cameraPoints = []
+      this.monitorForm.cameraId = ''
+      console.warn('请求错误。')
+      console.log(err)
+    }
+  }
 }
 </script>
 
 <style lang="less" scoped>
-    #monitor {
-        height: 100%;
-        background: #fff;
-    }
+#monitor {
+  height: 100%;
+  background: #fff;
+}
 
-    .form-inline {
-        padding: 20px 20px 0;
-        border-bottom: 1px solid #ccc;
+.form-inline {
+  padding: 20px 20px 0;
+  border-bottom: 1px solid #ccc;
 
-        .el-form-item.parameter {
-            margin-right: 30px;
-        }
+  .el-form-item.parameter {
+    margin-right: 30px;
+  }
 
-        .el-form-item {
-            margin-right: 0px;
-        }
+  .el-form-item {
+    margin-right: 0px;
+  }
 
-        .el-button {
-            border-radius: 0;
-            width: 80px;
-            height: 30px;
-            padding: 0;
-            -webkit-box-sizing: border-box;
-            box-sizing: border-box;
-            font-size: 14px;
-        }
+  .el-button {
+    border-radius: 0;
+    width: 80px;
+    height: 30px;
+    padding: 0;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    font-size: 14px;
+  }
 
-        .split {
-            text-align: center;
-        }
-    }
+  .split {
+    text-align: center;
+  }
+}
 
-    .line {
-        width: 100%;
-        height: 1px;
-        background-color: #CCCCCC;
-    }
+.line {
+  width: 100%;
+  height: 1px;
+  background-color: #cccccc;
+}
 
-    .content-title {
-        height: 16px;
-        line-height: 16px;
-        text-indent: 10px;
-        border-left: 4px solid #42af8f;
-        font-size: 16px;
-        margin: 20px;         
-    }
+.content-title {
+  height: 16px;
+  line-height: 16px;
+  text-indent: 10px;
+  border-left: 4px solid #42af8f;
+  font-size: 16px;
+  margin: 20px;
+}
 
-    .camera {
-        padding: 0 20px 20px;
-    }
+.camera {
+  padding: 0 20px 20px;
+}
 
-    iframe {
-        border: none;
-        width: 100%;
-        height: 100%;
-    }
+iframe {
+  border: none;
+  width: 100%;
+  height: 100%;
+}
 
-    .error {
-        color: red;
-        border: 2px solid #42af8f;
-        padding: 20px;
-    }
+.error {
+  color: red;
+  border: 2px solid #42af8f;
+  padding: 20px;
+}
 </style>
-
-

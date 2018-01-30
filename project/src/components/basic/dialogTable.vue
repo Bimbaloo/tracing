@@ -21,33 +21,30 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            dialogData: Object,
-            //tableData: Object,
-            heights: {
-            	required: false,
-            	default: "100%"
-            }
-        },
-        data() {
-            return {
-            }
-        },
-        computed: {
-        	gridData: function() {
-        		return this.dialogData.data
-        	},
-
-            columns: function() {
-                return this.dialogData.columns
-            }
-
-        }
-       
+export default {
+  props: {
+    dialogData: Object,
+    // tableData: Object,
+    heights: {
+      required: false,
+      default: '100%'
     }
+  },
+  data () {
+    return {}
+  },
+  computed: {
+    gridData: function () {
+      return this.dialogData.data
+    },
+
+    columns: function () {
+      return this.dialogData.columns
+    }
+  }
+}
 </script>
 
 <style lang="less">
-   
+
 </style>

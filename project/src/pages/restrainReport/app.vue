@@ -16,86 +16,85 @@
 </template>
 
 <script>
-import report from "components/report/report.vue";
-const URL = HOST + "/api/v1/suppress/list"; // 遏制列表
-const oCondition = {
-  endTime: null,
-  personName: null,
-  startTime: null
-};
+import report from 'components/report/report.vue'
+const URL = window.HOST + '/api/v1/suppress/list' // 遏制列表
+// const oCondition = {
+//   endTime: null,
+//   personName: null,
+//   startTime: null
+// }
 export default {
   components: {
-    "v-report": report
+    'v-report': report
   },
-  data() {
+  data () {
     return {
       styleObject: {
-        "min-width": "1200px"
+        'min-width': '1200px'
       },
       restrainQuery: null,
       listInfor: {}
-    };
+    }
   },
   computed: {
     // 是否支持遏制。
-    supression() {
+    supression () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.supression
-      );
+      )
     },
-    nickname: function() {
-      return this.$store.state.loginModule.nickname;
+    nickname: function () {
+      return this.$store.state.loginModule.nickname
     },
-    params: function() {
-      let url = location.search; //获取url中"?"符后的字串
-      let oRequest = {};
-      if (url.indexOf("?") != -1) {
-        let strs = url.substr(1).split("&");
+    params: function () {
+      let url = location.search // 获取url中"?"符后的字串
+      let oRequest = {}
+      if (url.indexOf('?') !== -1) {
+        let strs = url.substr(1).split('&')
 
         for (let i = 0; i < strs.length; i++) {
-          oRequest[strs[i].split("=")[0]] = decodeURIComponent(
-            strs[i].split("=")[1]
-          );
+          oRequest[strs[i].split('=')[0]] = decodeURIComponent(
+            strs[i].split('=')[1]
+          )
         }
       }
-      return oRequest;
+      return oRequest
     },
     /* 遏制详情--操作信息 */
-    information() {
+    information () {
       const arr = [
         {
-          prop: "doDescription",
-          name: "遏制详情"
+          prop: 'doDescription',
+          name: '遏制详情'
         },
         {
-          prop: "condition",
-          name: "遏制条件"
+          prop: 'condition',
+          name: '遏制条件'
         },
         {
-          prop: "doTime",
-          name: "遏制时间"
+          prop: 'doTime',
+          name: '遏制时间'
         },
         {
-          prop: "cancelTime",
-          name: "取消遏制时间"
+          prop: 'cancelTime',
+          name: '取消遏制时间'
         },
         {
-          prop: "doOperator",
-          name: "开始遏制人员"
+          prop: 'doOperator',
+          name: '开始遏制人员'
         },
         {
-          prop: "endDescription",
-          name: "结束遏制详情"
+          prop: 'endDescription',
+          name: '结束遏制详情'
         },
         {
-          prop: "endOperator",
-          name: "结束遏制人员"
+          prop: 'endOperator',
+          name: '结束遏制人员'
         }
-      ];
-      let informationArr =
-        Object.assign({}, this.listInfor) || {};
-      let needArr = [];
+      ]
+      let informationArr = Object.assign({}, this.listInfor) || {}
+      let needArr = []
       arr.forEach(element => {
         if (
           informationArr[element.prop] !== null &&
@@ -104,64 +103,64 @@ export default {
           needArr.push({
             value: element.name,
             key: informationArr[element.prop]
-          });
+          })
         }
-      });
-      return needArr;
+      })
+      return needArr
     }
   },
-  created() {
-    this.$register.login(this.$store);
+  created () {
+    this.$register.login(this.$store)
     this.$register.getVersion(this.$store, this.$ajax, () => {
       // 获取数据。
       if (!this.supression) {
         // 若不支持遏制。
-        this.$message.error("暂无权限。");
+        this.$message.error('暂无权限。')
       }
-    });
-    this.restrainQuery = JSON.parse(sessionStorage.getItem("restrain"));
-    this.getListhData();
+    })
+    this.restrainQuery = JSON.parse(sessionStorage.getItem('restrain'))
+    this.getListhData()
   },
   methods: {
-    setWidth() {
-      this.styleObject.minWidth = "1200px";
+    setWidth () {
+      this.styleObject.minWidth = '1200px'
     },
-    removeWidth() {
-      this.styleObject.minWidth = 0;
+    removeWidth () {
+      this.styleObject.minWidth = 0
     },
     // 获取遏制列表信息
-    getListhData(oCondition) {
-      //debugger
+    getListhData (oCondition) {
+      // debugger
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
         URL,
-        "post",
+        'post',
         oCondition,
         this.requestSucess,
         this.requestFail,
         this.requestError
-      );
+      )
     },
     // 获取遏制列表信息 - 请求成功。
-    requestSucess(oData) {
+    requestSucess (oData) {
       this.listInfor = oData.find(el => {
-        return el.handle === this.restrainQuery.handleID;
+        return el.handle === this.restrainQuery.handleID
       })
     },
     // 请求失败。
-    requestFail(sErrorMessage) {
-      this.loading = false;
-      console.log(sErrorMessage);
+    requestFail (sErrorMessage) {
+      this.loading = false
+      console.log(sErrorMessage)
     },
     // 请求错误。
-    requestError(err) {
-      console.log(err);
-      this.loading = false;
-      console.log("数据库查询出错。");
+    requestError (err) {
+      console.log(err)
+      this.loading = false
+      console.log('数据库查询出错。')
     }
   }
-};
+}
 </script>
 
 <style lang="less">

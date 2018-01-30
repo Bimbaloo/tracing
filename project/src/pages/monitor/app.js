@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-green/index.css'
+// import 'element-ui/lib/theme-green/index.css'
+import 'theme/index.css'
 import App from './app.vue'
 import axios from 'axios'
 // import jquery from 'jquery'
@@ -13,6 +14,13 @@ import 'assets/js/global.js'
 import 'assets/css/reset.css'
 import 'assets/css/common.less'
 import 'assets/css/icon.less'
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import { loginModule } from 'assets/js/loginStore.js'
+// 引用工厂定制模块
+import { factoryModule } from 'assets/js/factoryStore.js'
+import { versionModule } from 'assets/js/versionStore.js'
+import Camera from 'components/monitor/monitor.vue'
 
 Vue.prototype.$ajax = axios
 // Vue.prototype.$jquery = jquery
@@ -21,8 +29,6 @@ Vue.use(ElementUI)
 
 // 路由。
 Vue.use(VueRouter)
-
-import Camera from 'components/monitor/monitor.vue'
 
 // 定义路由
 const routes = [{
@@ -39,13 +45,6 @@ const router = new VueRouter({
 // 状态管理。
 Vue.use(Vuex)
 
-// 引用登录模块。
-import loginFn from 'assets/js/loginFn.js'
-import { loginModule } from 'assets/js/loginStore.js'
-// 引用工厂定制模块
-import { factoryModule } from 'assets/js/factoryStore.js'
-import { versionModule } from 'assets/js/versionStore.js'
-
 Vue.prototype.$register = loginFn
 
 const store = new Vuex.Store({
@@ -56,7 +55,7 @@ const store = new Vuex.Store({
   }
 })
 
-new Vue({
+window.vm = new Vue({
   el: '#app',
   router,
   store,
