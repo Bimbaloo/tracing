@@ -134,59 +134,59 @@
 </template>
 
 <script>
-import pin from "assets/img/icon-pin.png";
-import VideoDialog from "components/monitor/dialog.vue";
-import trackDialog from "components/equipment/equipmentTrack.vue";
-import DateTime from "components/basic/dateTime.vue";
-import $ from "jquery";
+import pin from 'assets/img/icon-pin.png'
+import VideoDialog from 'components/monitor/dialog.vue'
+import trackDialog from 'components/equipment/equipmentTrack.vue'
+import DateTime from 'components/basic/dateTime.vue'
+import $ from 'jquery'
 
 // 是否开启视频监控。
-const CAMERA = 0;
+// const CAMERA = 0
 // 设备状态。
-const CHART_STATE_NAME = "状态";
+const CHART_STATE_NAME = '状态'
 // 图形下margin。
-const CHART_MARGIN_BOTTOM = 40;
+// const CHART_MARGIN_BOTTOM = 40
 // tooltip距离鼠标的水平位置。
-const TOOLTIP_X_DISTANCE = 10;
+const TOOLTIP_X_DISTANCE = 10
 // tooltip距离鼠标的水平位置。
-const TOOLTIP_Y_DISTANCE = 10;
+// const TOOLTIP_Y_DISTANCE = 10
 // 悬浮框最小高度。
-const TOOLTIP_MIN_HEIGHT = 20;
+const TOOLTIP_MIN_HEIGHT = 20
 // legend距右侧的距离。
-const LEGEND_RIGHT = 140;
+const LEGEND_RIGHT = 140
 // grid边距。
-const GRID_LEFT = 220;
-const GRID_RIGHT = 220;
-const GRID_TOP = 60;
-const GRID_BOTTOM = 40;
+const GRID_LEFT = 220
+const GRID_RIGHT = 220
+const GRID_TOP = 60
+const GRID_BOTTOM = 40
 // y轴缩放距右侧的距离。
-const Y_AXIS_ZOOM_RIGHT = 50;
+const Y_AXIS_ZOOM_RIGHT = 50
 // y轴标签换行的字符个数
-const Y_LABEL_LENGTH = 7;
+// const Y_LABEL_LENGTH = 7
 // 标记线点的大小。
-const MARKLINE_SYSMBOL_SIZE = 8;
+const MARKLINE_SYSMBOL_SIZE = 8
 // 提示框面板z轴。
-const TOOLTIP_Z_INDEX = 100;
+const TOOLTIP_Z_INDEX = 100
 // 提示框面板宽度。
-const TOOLTIP_WIDTH = 220 - 2;
+const TOOLTIP_WIDTH = 220 - 2
 // 主题色。
-const GREEN = "#42AF8F";
+const GREEN = '#42AF8F'
 // 提示框背景色。
-const TOOLTIP_BGCOLOR = "rgba(164, 184, 204, 0.2)"; //'rgba(255, 255, 255, 0.2)'//
+const TOOLTIP_BGCOLOR = 'rgba(164, 184, 204, 0.2)' // 'rgba(255, 255, 255, 0.2)'//
 // 提示框边框色。
-const TOOLTIP_BORDERCOLOR = "#a8b8cc";
+const TOOLTIP_BORDERCOLOR = '#a8b8cc'
 // 设备分析接口地址。
-const EQUIPMENTS_EVENTS_URL = HOST + "/api/v1/trace/equipments-events";
+const EQUIPMENTS_EVENTS_URL = window.HOST + '/api/v1/trace/equipments-events'
 // 工厂定制地址。
-const MODULE_DATA_URL = HOST + "/api/v1/customized/equipment-analysis/items";
+const MODULE_DATA_URL = window.HOST + '/api/v1/customized/equipment-analysis/items'
 // 默认选中的维度。
-const DEFAULT_SELECTED_DIMENSION = ["quality", "pool", "parameter"];
+const DEFAULT_SELECTED_DIMENSION = ['quality', 'pool', 'parameter']
 
 // 缩放轴
 var oAxis = {
-  type: "slider",
+  type: 'slider',
   // 让 dataItem 部分超出坐标系边界的时候，不会整体被过滤掉。
-  filterMode: "weakFilter",
+  filterMode: 'weakFilter',
   // show: true,
   // 展示图像缩略轴。
   showDataShadow: false,
@@ -194,15 +194,15 @@ var oAxis = {
   // borderColor: 'transparent',
   // backgroundColor: '#e2e2e2',
   handleIcon:
-    "M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z", // jshint ignore:line
+    'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
   handleSize: 16,
   handleStyle: {
     shadowBlur: 6,
     shadowOffsetX: 1,
     shadowOffsetY: 2,
-    shadowColor: "#fff"
+    shadowColor: '#fff'
   }
-};
+}
 
 export default {
   props: {
@@ -221,27 +221,27 @@ export default {
     }
   },
   components: {
-    "v-datetime": DateTime,
-    "v-dialog": VideoDialog,
-    "v-track-dialog": trackDialog
+    'v-datetime': DateTime,
+    'v-dialog': VideoDialog,
+    'v-track-dialog': trackDialog
   },
-  data() {
+  data () {
     return {
       // 追踪配置数据。
       trackConfigForm: {
         visible: false,
         data: {
-          equipmentId: "",
-          startTime: "",
-          endTime: ""
+          equipmentId: '',
+          startTime: '',
+          endTime: ''
         }
       },
       // 监控数据。
       videoForm: {
         visible: false,
-        equipmentId: "",
-        equipmentName: "",
-        time: "",
+        equipmentId: '',
+        equipmentName: '',
+        time: '',
         series: ''
       },
       treeTag: this.$route.query._tag,
@@ -250,41 +250,41 @@ export default {
       // 设备。
       equipments: [],
       // 判断是否为遏制页面。
-      bRestrain: location.pathname.indexOf("restrain") > -1,
+      bRestrain: location.pathname.indexOf('restrain') > -1,
       // legend距右侧的距离。
       legendRight: LEGEND_RIGHT,
       // grid边距。
       grid: [GRID_TOP, GRID_RIGHT, GRID_BOTTOM, GRID_LEFT],
       // 判断是否为溯源页。
-      trace: location.pathname.indexOf("traceIndex") > -1,
+      trace: location.pathname.indexOf('traceIndex') > -1,
       // 区域缩放是否激活。
       zoomActive: false,
       // 选中的设备id。
-      selectedEquipmentId: "",
+      selectedEquipmentId: '',
       loading: false,
-      sErrorMessage: "",
+      sErrorMessage: '',
       url: EQUIPMENTS_EVENTS_URL,
       // 设备状态。
       states: [
         {
-          key: "run",
-          name: "加工",
-          color: "#72b733"
+          key: 'run',
+          name: '加工',
+          color: '#72b733'
         },
         {
-          key: "stop",
-          name: "停机",
-          color: "#fac41b"
+          key: 'stop',
+          name: '停机',
+          color: '#fac41b'
         },
         {
-          key: "debug",
-          name: "调试",
-          color: "#009aff"
+          key: 'debug',
+          name: '调试',
+          color: '#009aff'
         },
         {
-          key: "close",
-          name: "关机",
-          color: "#999"
+          key: 'close',
+          name: '关机',
+          color: '#999'
         }
       ],
       // 是否创建开始时间编辑框。
@@ -293,10 +293,10 @@ export default {
       endIf: true,
       // 开始时间格式判断。
       startValidate: true,
-      startValidateMessage: "",
+      startValidateMessage: '',
       // 结束时间格式判断。
       endValidate: true,
-      endValidateMessage: "",
+      endValidateMessage: '',
       // 设备对应的维度数据。
       equipmentData: {},
       // 图形。
@@ -332,241 +332,244 @@ export default {
       dimension: [
         {
           show: true,
-          name: "质量",
-          key: "quality",
-          type: "3",
-          color: "#d89cdd",
+          name: '质量',
+          key: 'quality',
+          type: '3',
+          color: '#d89cdd',
           listShow: false,
           list: [
             {
-              type: "route",
-              name: "质检",
-              router: "/process/qtReport",
+              type: 'route',
+              name: '质检',
+              router: '/process/qtReport',
               query: [
-                "equipmentName",
-                "equipmentId",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'equipmentId',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             },
             {
-              type: "route",
-              name: "送检",
-              router: "/process/qcReport",
+              type: 'route',
+              name: '送检',
+              router: '/process/qcReport',
               query: [
-                "equipmentName",
-                "equipmentId",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'equipmentId',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             }
           ]
         },
         {
           show: true,
-          name: "加工",
-          key: "pool",
-          type: "7",
-          color: "#15a5a7",
+          name: '加工',
+          key: 'pool',
+          type: '7',
+          color: '#15a5a7',
           listShow: false,
           list: [
             {
-              type: "route",
-              name: "投产表",
-              router: "/process/product",
+              type: 'route',
+              name: '投产表',
+              router: '/process/product',
               query: [
-                "equipmentName",
-                "operationIdList",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'operationIdList',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
               // ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]
             },
             {
-              name: "结转表",
-              router: "/process/transfer",
+              name: '结转表',
+              router: '/process/transfer',
               query: [
-                "equipmentName",
-                "operationIdList",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'operationIdList',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             },
             {
-              name: "退料表",
-              router: "/process/storesReturned",
+              name: '退料表',
+              router: '/process/storesReturned',
               query: [
-                "equipmentName",
-                "operationIdList",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'operationIdList',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             }
           ]
         },
         {
           show: false,
-          name: "工单",
-          key: "work",
-          type: "2",
-          color: "#5ca637",
+          name: '工单',
+          key: 'work',
+          type: '2',
+          color: '#5ca637',
           listShow: false,
           list: []
         },
         {
           show: false,
-          name: "事件",
-          key: "event",
-          type: "4",
-          color: "#f98141",
+          name: '事件',
+          key: 'event',
+          type: '4',
+          color: '#f98141',
           listShow: false,
           list: [
             {
-              type: "route",
-              name: "事件记录",
-              router: "/process/event",
+              type: 'route',
+              name: '事件记录',
+              router: '/process/event',
               query: [
-                "equipmentName",
-                "equipmentId",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'equipmentId',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             }
           ]
         },
         {
           show: false,
-          name: "维护",
-          key: "repair",
-          type: "5",
-          color: "#b3b200",
+          name: '维护',
+          key: 'repair',
+          type: '5',
+          color: '#b3b200',
           listShow: false,
           list: [
             {
-              type: "route",
-              name: "维修记录",
-              router: "/process/repair",
+              type: 'route',
+              name: '维修记录',
+              router: '/process/repair',
               query: [
-                "equipmentName",
-                "equipmentId",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'equipmentId',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             },
             {
-              type: "route",
-              name: "点检记录",
-              router: "/process/spotReport",
+              type: 'route',
+              name: '点检记录',
+              router: '/process/spotReport',
               query: [
-                "equipmentName",
-                "equipmentId",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'equipmentId',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             }
           ]
         },
         {
           show: false,
-          name: "工具",
-          key: "tool",
-          type: "6",
-          color: "#6979b7",
+          name: '工具',
+          key: 'tool',
+          type: '6',
+          color: '#6979b7',
           listShow: false,
           list: [
             {
-              type: "route",
-              name: "工具记录",
-              router: "/process/tool",
+              type: 'route',
+              name: '工具记录',
+              router: '/process/tool',
               query: [
-                "equipmentName",
-                "equipmentId",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'equipmentId',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             }
           ]
         },
         {
           show: true,
-          name: "工艺",
-          key: "parameter",
-          type: "0",
-          color: "#f9c331",
+          name: '工艺',
+          key: 'parameter',
+          type: '0',
+          color: '#f9c331',
           listShow: false,
           list: [
             {
-              type: "route",
-              name: "工艺参数",
-              router: "/process/parameter",
+              type: 'route',
+              name: '工艺参数',
+              router: '/process/parameter',
               query: [
-                "equipmentName",
-                "equipmentId",
-                "startTime",
-                "endTime",
-                "shiftStartTime",
-                "shiftEndTime"
+                'equipmentName',
+                'equipmentId',
+                'startTime',
+                'endTime',
+                'shiftStartTime',
+                'shiftEndTime'
               ]
             }
           ]
         }
       ]
-    };
+    }
   },
   computed: {
     // 是否开启视频监控。
-    camera() {
-        return this.$store.state.versionModule &&　this.$store.state.versionModule.camera
+    camera () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.camera
+      )
     },
     // 工具。
-    toolManagement() {
+    toolManagement () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.toolManagement
-      );
+      )
     },
     // 工艺。
-    processParameter() {
+    processParameter () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.processParameter
       )
     },
     // 维护。
-    equipmentMaintenance() {
+    equipmentMaintenance () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.equipmentMaintenance
       )
     },
     // 工厂定制。
-    factoryCustomItemList() {
+    factoryCustomItemList () {
       return this.$store.state.factoryModule.factoryCustomItemList
     },
     // 工厂定制内容是否获取到的标志判断。
-    factoryDataFecthed() {
+    factoryDataFecthed () {
       return this.$store.state.factoryModule.fetched
     },
     // 视频监控工厂定制。
-    factoryCameraConfig() {
+    factoryCameraConfig () {
       return this.$store.state.factoryModule.factoryCameraConfig
     },
     // 追踪或溯源或遏制的配置项。
@@ -581,61 +584,61 @@ export default {
 
     //     return this.modulesConfig.filter(o => o.key === sCurentPage)[0]
     // },
-    tag() {
-      return window.Rt.utils.getParam("tag");
+    tag () {
+      return window.Rt.utils.getParam('tag')
     },
     // 选中的设备名称。
-    selectedEquipmentName() {
+    selectedEquipmentName () {
       return this.equipments.filter(
-        o => o.equipmentId == this.selectedEquipmentId
-      )[0].equipmentName;
+        o => o.equipmentId === this.selectedEquipmentId
+      )[0].equipmentName
     },
     // 产出id。
-    doOutIdList() {
+    doOutIdList () {
       return this.equipments.filter(
-        o => o.equipmentId == this.selectedEquipmentId
-      )[0].poolOutId;
+        o => o.equipmentId === this.selectedEquipmentId
+      )[0].poolOutId
     },
-    operationIdList() {
+    operationIdList () {
       return this.equipments.filter(
-        o => o.equipmentId == this.selectedEquipmentId
-      )[0].operationIdList;
+        o => o.equipmentId === this.selectedEquipmentId
+      )[0].operationIdList
     },
     // 与起点相关的标记线。
-    relatedMarkLine() {
-      return this.markLine.filter(o => o.related);
+    relatedMarkLine () {
+      return this.markLine.filter(o => o.related)
     },
     // 原始请求数据。
-    rawData() {
-      return this.$store && this.$store.state.rawData;
+    rawData () {
+      return this.$store && this.$store.state.rawData
     },
     // 左右缩放。
-    resize() {
-      return this.$store && this.$store.state.resize;
+    resize () {
+      return this.$store && this.$store.state.resize
     },
     // 上下缩放。
-    resizeY() {
-      return this.$store && this.$store.state.resizeY;
+    resizeY () {
+      return this.$store && this.$store.state.resizeY
     },
     // 是否全屏。
-    fullscreen() {
-      return this.$store && this.$store.state.fullscreen;
+    fullscreen () {
+      return this.$store && this.$store.state.fullscreen
     },
     // 树的数据全屏。
-    treeFullscreen() {
-      return this.$store && this.$store.state.treeFullscreen;
+    treeFullscreen () {
+      return this.$store && this.$store.state.treeFullscreen
     },
     // tab切换功能。
-    activeTabChange() {
-      return this.$store && this.$store.state.activeTabChange;
+    activeTabChange () {
+      return this.$store && this.$store.state.activeTabChange
     },
     // echarts图形参数。
-    option() {
-      let oSelected = {},
-        aoName = this.dimension.map(o => {
-          oSelected[o.name] = o.show;
-          return o.name;
-        });
+    option () {
+      let oSelected = {}
+      let aoName = this.dimension.map(o => {
+        oSelected[o.name] = o.show
+        return o.name
+      })
 
       let oData = {
         legend: {
@@ -662,11 +665,11 @@ export default {
         },
         // 悬浮框。
         tooltip: {
-          trigger: "none",
+          trigger: 'none',
           // triggerOn: "click",
           // padding: 10,
-          backgroundColor: TOOLTIP_BGCOLOR, //'rgba(164, 184, 204, 0.2)',
-          borderColor: TOOLTIP_BORDERCOLOR, //'#a8b8cc',
+          backgroundColor: TOOLTIP_BGCOLOR, // 'rgba(164, 184, 204, 0.2)',
+          borderColor: TOOLTIP_BORDERCOLOR, // '#a8b8cc',
           borderWidth: 1,
           borderRadius: 4,
           transitionDuration: 0,
@@ -674,7 +677,7 @@ export default {
           enterable: true,
           textStyle: {
             fontSize: 12,
-            color: "#000"
+            color: '#000'
           },
           // show: this.show,
           formatter: this.tooltipFormatter,
@@ -685,19 +688,19 @@ export default {
         dataZoom: [
           {
             // x轴滚轮缩放。
-            type: "inside",
-            filterMode: "weakFilter",
+            type: 'inside',
+            filterMode: 'weakFilter',
             xAxisIndex: [0]
           }
         ],
         xAxis: {
-          type: "value",
-          min: "dataMin",
-          max: "dataMax",
+          type: 'value',
+          min: 'dataMin',
+          max: 'dataMax',
           scale: true,
           axisLabel: {
-            formatter: function(val, index) {
-              return new Date(val).Format();
+            formatter: function (val, index) {
+              return new Date(val).Format()
             }
           },
           splitLine: {
@@ -708,35 +711,35 @@ export default {
             show: true,
             snap: true,
             lineStyle: {
-              type: "dashed"
+              type: 'dashed'
             },
             label: {
               show: true,
               margin: 6,
-              backgroundColor: "#556",
+              backgroundColor: '#556',
               textStyle: {
-                color: "#fff"
+                color: '#fff'
               },
-              formatter: function({ value }) {
-                return new Date(value).Format();
+              formatter: function ({ value }) {
+                return new Date(value).Format()
               }
             }
           }
         },
         yAxis: {
-          type: "category",
+          type: 'category',
           data: this.categories,
           triggerEvent: true,
           axisLabel: {
             textStyle: {
               fontSize: 16,
-              color: function(value, index) {
+              color: function (value, index) {
                 // 最后一位代表是否点击选中。
-                return Number(value.split("+")[2]) ? GREEN : "#666"; //d53a35
+                return Number(value.split('+')[2]) ? GREEN : '#666' // d53a35
               }
             },
             formatter: value => {
-              return value.split("+")[0].trim();
+              return value.split('+')[0].trim()
             }
           }
         },
@@ -747,9 +750,9 @@ export default {
           feature: {
             dataZoom: {
               title: {
-                zoom: !this.zoomActive ? "区域缩放" : "取消区域缩放"
+                zoom: !this.zoomActive ? '区域缩放' : '取消区域缩放'
               },
-              yAxisIndex: "none"
+              yAxisIndex: 'none'
             }
           },
           iconStyle: {
@@ -764,7 +767,7 @@ export default {
         },
         series: [
           {
-            type: "custom",
+            type: 'custom',
             name: CHART_STATE_NAME,
             renderItem: this.renderItem,
             itemStyle: {
@@ -784,7 +787,7 @@ export default {
               label: {
                 normal: {
                   show: true,
-                  position: "start"
+                  position: 'start'
                 }
               },
               lineStyle: {
@@ -796,31 +799,31 @@ export default {
               data: []
             },
             tooltip: {
-              trigger: "item",
+              trigger: 'item',
               padding: 10,
               // 设置显示格式。
               formatter: this.stateTooltipFormatter,
               // 设置显示位置。
               position: this.stateTooltipPosition,
-              extraCssText: "height:auto;",
+              extraCssText: 'height:auto;',
               // 鼠标是否可进入悬浮框。
               enterable: false
             }
           }
         ]
-      };
+      }
       // 设置维度。
       this.dimension.forEach(o =>
         oData.series.push({
           name: o.name,
-          type: "scatter",
-          symbol: "circle", //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
+          type: 'scatter',
+          symbol: 'circle', // 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
           symbolSize: 8,
           // 标注点。
           markPoint: {
-            symbol: "image://" + pin, //'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
-            symbolSize: 16, //[8,14],
-            symbolOffset: [0, "-80%"],
+            symbol: 'image://' + pin, // 'rect', 'roundRect', 'triangle', 'diamond', 'pin', 'arrow'
+            symbolSize: 16, // [8,14],
+            symbolOffset: [0, '-80%'],
             label: {
               normal: {
                 show: false
@@ -829,18 +832,18 @@ export default {
             data: [],
             itemStyle: {
               normal: {
-                color: "#D53A35"
+                color: '#D53A35'
               }
             }
           },
           data: [],
-          animationDelay: function(idx) {
-            return idx * 10;
+          animationDelay: function (idx) {
+            return idx * 10
           },
           itemStyle: {
             normal: {
               color: o.color,
-              borderColor: "rgba(255,255,255,0.7)", //rgba(44,52,60,0.7)
+              borderColor: 'rgba(255,255,255,0.7)', // rgba(44,52,60,0.7)
               borderWidth: 1
             },
             emphasis: {
@@ -856,15 +859,15 @@ export default {
               // 是否显示。
               show: true,
               // 显示位置。
-              position: "top",
+              position: 'top',
               // 显示位置偏移。
               // offset: [0, 10],
               // 标签内容格式器。
-              formatter: function({ value }) {
-                if (typeof value[2] === "object") {
-                  return value[2].value;
+              formatter: function ({ value }) {
+                if (typeof value[2] === 'object') {
+                  return value[2].value
                 }
-                return value[2];
+                return value[2]
               },
               textStyle: {
                 fontSize: 14
@@ -872,7 +875,7 @@ export default {
             }
           }
         })
-      );
+      )
 
       // 添加x轴缩放。
       oData.dataZoom.push(
@@ -880,36 +883,36 @@ export default {
           {
             xAxisIndex: [0],
             height: 16,
-            labelFormatter: function(value) {
-              return new Date(value).Format();
+            labelFormatter: function (value) {
+              return new Date(value).Format()
             },
             bottom: 0
           },
           oAxis
         )
-      );
+      )
 
       // 为缩放轴添加开始时间结束时间。
       if (this.datetime.realStart) {
-        oData.dataZoom[0].startValue = +new Date(this.datetime.realStart);
+        oData.dataZoom[0].startValue = +new Date(this.datetime.realStart)
       }
       if (this.datetime.realEnd) {
-        oData.dataZoom[0].endValue = +new Date(this.datetime.realEnd);
+        oData.dataZoom[0].endValue = +new Date(this.datetime.realEnd)
       }
 
       if (!this.bRestrain) {
         // 若不为遏制页面。
         oData.graphic = [
           {
-            type: "group",
-            id: "group",
-            cursor: "pointer",
+            type: 'group',
+            id: 'group',
+            cursor: 'pointer',
             children: [
               {
                 // 箭头。
-                type: "image",
-                id: "polygon",
-                cursor: "pointer",
+                type: 'image',
+                id: 'polygon',
+                cursor: 'pointer',
                 style: {
                   image: pin
                 },
@@ -918,13 +921,13 @@ export default {
               },
               {
                 // 文字。
-                type: "text",
-                id: "text",
-                cursor: "pointer",
+                type: 'text',
+                id: 'text',
+                cursor: 'pointer',
                 style: {
-                  text: this.onlyShowRelatedData ? "相关投产" : "全部投产", //D53A35,
-                  font: "normal bold 16px 微软雅黑",
-                  fill: this.onlyShowRelatedData ? GREEN : "#333" //D53A35
+                  text: this.onlyShowRelatedData ? '相关投产' : '全部投产', // D53A35,
+                  font: 'normal bold 16px 微软雅黑',
+                  fill: this.onlyShowRelatedData ? GREEN : '#333' // D53A35
                 },
                 left: 20,
                 top: 0
@@ -936,23 +939,23 @@ export default {
             height: 20,
             onclick: this.changePoolInAndOutVisibility
           }
-        ];
+        ]
       }
 
-      return oData;
+      return oData
     },
     // 时间编辑框的：开始或结束时间是否被改变。
-    isDatetimeChange() {
+    isDatetimeChange () {
       // 是否显示查询按钮（开始或结束时间被编辑，则会显示）
-      let { start, end, initStart, initEnd } = this.datetime;
+      let { start, end, initStart, initEnd } = this.datetime
 
       // 开始时间或结束时间只要变动就显示。 不再处于编辑状态才显示
       return (
-        (this.startIf && start != initStart) || (this.endIf && end != initEnd)
-      );
+        (this.startIf && start !== initStart) || (this.endIf && end !== initEnd)
+      )
     }
   },
-  created() {
+  created () {
     // 组件创建完后获取数据，
     // 此时 data 已经被 observed 了
     if (!this.factoryDataFecthed) {
@@ -961,58 +964,58 @@ export default {
       this.getFactoyData()
     }
   },
-  mounted() {
+  mounted () {
     // 获取配置数据。
-    this.getConfigData();
+    this.getConfigData()
     // 初始化。
-    this.init();
+    this.init()
   },
   watch: {
     // 为了每次点击都会查询。
-    $route: function(to, from) {
+    $route: function (to, from) {
       // 如果从tree上直接点击，需要更新数据. tag不同
       // 从其他页面中进入。from.meta.title不一样
       if (
-        to.meta.title == "chart" &&
-        (from.meta.title == "chart" ||
-          (to.query._tag != undefined && this.treeTag != to.query._tag))
+        to.meta.title === 'chart' &&
+        (from.meta.title === 'chart' ||
+          (to.query._tag !== undefined && this.treeTag !== to.query._tag))
       ) {
-        this.treeTag = to.query._tag;
-        this.updateData();
+        this.treeTag = to.query._tag
+        this.updateData()
       }
-      this.resizeChart();
+      this.resizeChart()
     },
-    fullscreen: "resizeChart",
-    treeFullscreen: "resizeChart",
-    resize: "resizeChart",
-    resizeY: "resizeChart",
-    activeTabChange: "resizeChart"
+    fullscreen: 'resizeChart',
+    treeFullscreen: 'resizeChart',
+    resize: 'resizeChart',
+    resizeY: 'resizeChart',
+    activeTabChange: 'resizeChart'
   },
   methods: {
     // 获取工厂定制数据。
-    getFactoyData() {
+    getFactoyData () {
       // 获取配置数据。
       this.$register.getBeforeDispatchData(
-        "getFactoryConfig",
+        'getFactoryConfig',
         this.$store,
         this.$ajax,
         null,
         MODULE_DATA_URL
-      );
+      )
     },
     // 获取设备定制数据。
-    getEquipmentCustomDataById(id) {
+    getEquipmentCustomDataById (id) {
       this.dimension.forEach(o => {
         // 过滤其他设备的定制内容，只保留非定制的内容。
-        o.list = o.list.filter(item => item.type);
+        o.list = o.list.filter(item => item.type)
 
         let aoData = this.factoryCustomItemList.filter(item => {
           return (
             item.dimension === o.key &&
-            item.equipmentIds.filter(equipment => equipment.split(":")[0] == id)
+            item.equipmentIds.filter(equipment => equipment.split(':')[0] === id)
               .length
-          );
-        });
+          )
+        })
 
         aoData.forEach(oData => {
           // 添加数据。
@@ -1020,12 +1023,12 @@ export default {
             name: oData.name,
             link: oData.link,
             parameters: oData.parameters
-          });
-        });
-      });
+          })
+        })
+      })
     },
     // 获取配置数据。
-    getConfigData() {
+    getConfigData () {
       // 获取配置数据。
 
       // 设置维度数据。
@@ -1051,38 +1054,38 @@ export default {
       //     }
       // }
       // 根据配置数据修改维度分析开关。
-      let unSuport = [];
+      let unSuport = []
       if (!this.toolManagement) {
-        unSuport.push("tool");
+        unSuport.push('tool')
       }
       if (!this.processParameter) {
-        unSuport.push("parameter");
+        unSuport.push('parameter')
       }
       if (!this.equipmentMaintenance) {
-        unSuport.push("repair");
+        unSuport.push('repair')
       }
 
       this.dimension = this.dimension.filter(o => {
-        return unSuport.indexOf(o.key) < 0;
-      });
+        return unSuport.indexOf(o.key) < 0
+      })
     },
     // 初始化。
-    init() {
+    init () {
       // 获取存储的数据。
-      this.getSessionStorage();
+      this.getSessionStorage()
       // 初始化图形。
-      this.setInitData();
+      this.setInitData()
       // 获取所有数据。
-      this.fetchAllData();
+      this.fetchAllData()
       // 添加事件监听。
-      this.addEvent();
+      this.addEvent()
     },
     // 隐藏监控视频。
-    hideVideoDialog() {
-      this.videoForm.visible = false;
+    hideVideoDialog () {
+      this.videoForm.visible = false
     },
     // 打开监控视频。
-    showVideoDialog(id, name, time, series) {
+    showVideoDialog (id, name, time, series) {
       this.videoForm = {
         visible: true,
         equipmentId: id,
@@ -1092,222 +1095,222 @@ export default {
       }
     },
     // 获取存储的数据。
-    getSessionStorage() {
-      if (!("startTime" in this.$route.query)) {
+    getSessionStorage () {
+      if (!('startTime' in this.$route.query)) {
         // 不含时间的跳转为初始跳转。
-        sessionStorage.removeItem("equipment_analysis_" + this.tag);
-        return;
+        sessionStorage.removeItem('equipment_analysis_' + this.tag)
+        return
       }
-      let sAnalysis = sessionStorage.getItem("equipment_analysis_" + this.tag);
+      let sAnalysis = sessionStorage.getItem('equipment_analysis_' + this.tag)
       if (sAnalysis) {
-        this.storageData = JSON.parse(sAnalysis);
+        this.storageData = JSON.parse(sAnalysis)
 
         // 选中的维度。
-        let aoSelectedDimension = this.storageData.selectedDimension;
+        let aoSelectedDimension = this.storageData.selectedDimension
         this.dimension.forEach(o => {
           if (aoSelectedDimension.indexOf(o.key) > -1) {
-            o.show = true;
+            o.show = true
           } else {
-            o.show = false;
+            o.show = false
           }
-        });
+        })
 
         // 选中的设备。
-        this.selectedEquipmentId = this.storageData.selectedEquipmentId;
+        this.selectedEquipmentId = this.storageData.selectedEquipmentId
         // 相关投产标记。
-        this.onlyShowRelatedData = this.storageData.onlyShowRelatedData;
+        this.onlyShowRelatedData = this.storageData.onlyShowRelatedData
         // 显示的提示框。
-        this.markLine = this.storageData.markLine;
+        this.markLine = this.storageData.markLine
         // 是否显示设置状态。
-        this.showState = this.storageData.showState;
+        this.showState = this.storageData.showState
       }
     },
     // 保存数据到本地。
-    setSessionStorage() {
-      this.storageData = {};
+    setSessionStorage () {
+      this.storageData = {}
 
       // 选中的维度。
-      let aoSelectedDimension = [];
+      let aoSelectedDimension = []
 
       this.dimension.forEach(o => {
         if (o.show) {
-          aoSelectedDimension.push(o.key);
+          aoSelectedDimension.push(o.key)
         }
-      });
+      })
 
-      this.storageData.selectedDimension = aoSelectedDimension;
+      this.storageData.selectedDimension = aoSelectedDimension
 
       // 选中的时间。
-      this.storageData.datetime = this.datetime;
+      this.storageData.datetime = this.datetime
       // 选中的设备。
-      this.storageData.selectedEquipmentId = this.selectedEquipmentId;
+      this.storageData.selectedEquipmentId = this.selectedEquipmentId
       // 相关投产标记。
-      this.storageData.onlyShowRelatedData = this.onlyShowRelatedData;
+      this.storageData.onlyShowRelatedData = this.onlyShowRelatedData
       // 显示的提示框。
-      this.storageData.markLine = this.markLine;
+      this.storageData.markLine = this.markLine
       // 是否显示设置状态。
-      this.storageData.showState = this.showState;
+      this.storageData.showState = this.showState
 
       sessionStorage.setItem(
-        "equipment_analysis_" + this.tag,
+        'equipment_analysis_' + this.tag,
         JSON.stringify(this.storageData)
-      );
+      )
     },
     // 路由变化更新数据。
-    updateData() {
+    updateData () {
       // 重置数据。
-      this.resetData();
+      this.resetData()
     },
     // 重置数据。
-    resetData() {
-      this.sErrorMessage = "";
-      this.startIf = true;
-      this.endIf = true;
+    resetData () {
+      this.sErrorMessage = ''
+      this.startIf = true
+      this.endIf = true
       // 区域缩放是否激活。
-      this.zoomActive = false;
+      this.zoomActive = false
 
       if (!this.bRestrain) {
-        this.equipments = this.equipmentsId;
-        this.onlyShowRelatedData = true;
+        this.equipments = this.equipmentsId
+        this.onlyShowRelatedData = true
       } else {
-        this.equipments = [];
-        this.onlyShowRelatedData = false;
+        this.equipments = []
+        this.onlyShowRelatedData = false
       }
 
       // 选中的维度。
       this.dimension.forEach(o => {
         if (DEFAULT_SELECTED_DIMENSION.indexOf(o.key) > -1) {
-          o.show = true;
+          o.show = true
         } else {
-          o.show = false;
+          o.show = false
         }
-      });
-      this.markLine = [];
-      this.compareList = [];
+      })
+      this.markLine = []
+      this.compareList = []
 
-      this.showState = true;
+      this.showState = true
       // 清空本地存储数据。
-      this.storageData = null;
-      sessionStorage.removeItem("equipment_analysis_" + this.tag);
+      this.storageData = null
+      sessionStorage.removeItem('equipment_analysis_' + this.tag)
 
-      this.$nextTick(function() {
-        this.chart.clear();
-        this.chart = null;
-        this.initChart();
+      this.$nextTick(function () {
+        this.chart.clear()
+        this.chart = null
+        this.initChart()
         // this.setChartHeight();
         // this.chart.clear();
         // 获取所有数据。
-        this.fetchAllData();
-      });
+        this.fetchAllData()
+      })
     },
     // 初始化数据。
-    setInitData() {
+    setInitData () {
       if (!this.bRestrain) {
-        this.equipments = this.equipmentsId;
+        this.equipments = this.equipmentsId
       } else {
-        this.equipments = [];
-        this.onlyShowRelatedData = false;
+        this.equipments = []
+        this.onlyShowRelatedData = false
       }
 
-      this.initChart();
+      this.initChart()
     },
     // 初始化图表。
-    initChart() {
-      this.setChartHeight();
-      this.chart = this.$echarts.init(document.getElementById("equipments"));
-      this.setChartEvent();
+    initChart () {
+      this.setChartHeight()
+      this.chart = this.$echarts.init(document.getElementById('equipments'))
+      this.setChartEvent()
     },
     // 添加事件监听。
-    addEvent() {
-      window.addEventListener("resize", this.resizeChart);
+    addEvent () {
+      window.addEventListener('resize', this.resizeChart)
 
-      $("#equipments").on(
-        "click",
-        ".suspend-tooltip-wrapper",
+      $('#equipments').on(
+        'click',
+        '.suspend-tooltip-wrapper',
         this.suspendTooltipClickHandle
-      );
+      )
     },
     // 重置图形大小。
-    resizeChart() {
+    resizeChart () {
       if (this.chart && this.chart.getOption()) {
-        this.setChartHeight();
-        this.chart.resize();
+        this.setChartHeight()
+        this.chart.resize()
         // 设置提示框的最大高度。
-        this.setTooltipHeight();
+        this.setTooltipHeight()
       }
     },
     // 设置提示框高度。
-    setTooltipHeight() {
+    setTooltipHeight () {
       // if(this.option.series.filter(o => o.name===CHART_STATE_NAME)[0].data.length) {
-      this.chartHeight = this.chart.getHeight() - GRID_TOP - GRID_BOTTOM;
-      this.chartWidth = this.chart.getWidth() - GRID_LEFT - GRID_RIGHT;
+      this.chartHeight = this.chart.getHeight() - GRID_TOP - GRID_BOTTOM
+      this.chartWidth = this.chart.getWidth() - GRID_LEFT - GRID_RIGHT
       // 若数据加载已完成。
-      let nHeight = this.chartHeight; //(this.chartHeight-80)*0.8;
-      nHeight = nHeight > TOOLTIP_MIN_HEIGHT ? nHeight : TOOLTIP_MIN_HEIGHT;
+      let nHeight = this.chartHeight // (this.chartHeight-80)*0.8;
+      nHeight = nHeight > TOOLTIP_MIN_HEIGHT ? nHeight : TOOLTIP_MIN_HEIGHT
       this.chart.setOption({
         tooltip: {
           extraCssText: `max-height:${nHeight}px;overflow-x:hidden;overflow-y:auto;white-space:normal;word-break:break-all;padding:0;left:auto;right:0;`
         }
-      });
+      })
       // }
     },
     // 设置图形高度。
-    setChartHeight() {
-      let jContent = $("#router-echart"),
+    setChartHeight () {
+      let jContent = $('#router-echart')
         // jTitle = jContent.find(".content-title"),(jTitle.outerHeight(true)||0)
-        jSetting = jContent.find(".setting"),
-        jButtons = jContent.find(".buttons"),
-        jEquipments = $("#equipments");
+      let jSetting = jContent.find('.setting')
+      let jButtons = jContent.find('.buttons')
+      // let jEquipments = $('#equipments')
 
       this.panelHeight =
         jContent.height() -
         (jSetting.outerHeight(true) || 0) -
-        (jButtons.outerHeight(true) || 0); //CHART_MARGIN_BOTTOM;
-      $("#equipments").height(this.panelHeight || 100);
+        (jButtons.outerHeight(true) || 0) // CHART_MARGIN_BOTTOM;
+      $('#equipments').height(this.panelHeight || 100)
     },
     // 获取当前数据列表。
-    getCurrentDataList(nTime) {
-      let aoCurrentList = [];
+    getCurrentDataList (nTime) {
+      let aoCurrentList = []
 
       // 若点击的数据点与移动轴不一致。
       this.dimension.forEach(obj => {
-        let oCurrent = obj.data.filter(o => o[0] === nTime)[0],
-          oData = {};
+        let oCurrent = obj.data.filter(o => o[0] === nTime)[0]
+        let oData = {}
 
         if (oCurrent) {
-          let aoEquipmentInfo = this.categories[oCurrent[1]].value.split("+");
-          oData.id = aoEquipmentInfo[1]; // 设备id。
-          oData.name = aoEquipmentInfo[0]; // 设备名称。
-          oData.color = obj.color; // 维度颜色。
-          oData.series = obj.name; // 维度名称。
-          oData.quantity = oCurrent[3].length; // 事件数量。
-          oData.dimension = oCurrent[4]; // 事件维度。
-          oData.relatedQuantity = oCurrent[5]; // 起点相关数量。
-          oData.event = [];
+          let aoEquipmentInfo = this.categories[oCurrent[1]].value.split('+')
+          oData.id = aoEquipmentInfo[1] // 设备id。
+          oData.name = aoEquipmentInfo[0] // 设备名称。
+          oData.color = obj.color // 维度颜色。
+          oData.series = obj.name // 维度名称。
+          oData.quantity = oCurrent[3].length // 事件数量。
+          oData.dimension = oCurrent[4] // 事件维度。
+          oData.relatedQuantity = oCurrent[5] // 起点相关数量。
+          oData.event = []
 
-          let relatedIndex = 0;
+          let relatedIndex = 0
           // 事件列表
           oCurrent[3].forEach((o, index) => {
             if (o.related) {
-              relatedIndex++;
+              relatedIndex++
             }
             oData.event.push({
               // 起点相关标记。
               index: index + 1,
               relatedIndex: relatedIndex,
               related: !!o.related,
-              group: o.groupId == null ? "" : o.groupId,
+              group: o.groupId == null ? '' : o.groupId,
               title: o.title,
               content: o.tooltipData
-            });
-          });
+            })
+          })
 
-          oData.related = !!relatedIndex;
-          aoCurrentList.push(oData);
+          oData.related = !!relatedIndex
+          aoCurrentList.push(oData)
         }
-      });
+      })
 
-      return aoCurrentList;
+      return aoCurrentList
     },
     /**
      * 数据转换。
@@ -1317,31 +1320,31 @@ export default {
      * @param {Number} zIndex z-level
      * @return {Object} 数据对象
      */
-    transformTooltipDataToCompareData(nTime, bRelated, sDimension, zIndex) {
+    transformTooltipDataToCompareData (nTime, bRelated, sDimension, zIndex) {
       //     // 时间轴全长。
       // let nTimeLine = window.Rt.utils.DateDiff(this.datetime.start, this.datetime.end),
       //     // 提示框显示位置。
       //     nTimeLineLeft = window.Rt.utils.DateDiff(this.datetime.start, nTime),
       // 缩放后的时间轴。
-      let oXAxis = this.getScaledxAxis(),
+      let oXAxis = this.getScaledxAxis()
         // 缩放后的时间轴时长。
-        nScaledTimeLine = oXAxis.endValue - oXAxis.startValue,
+      let nScaledTimeLine = oXAxis.endValue - oXAxis.startValue
         // 距左侧距离。
-        nLeft = (nTime - oXAxis.startValue) / nScaledTimeLine,
-        nRealLeft = nLeft,
+      let nLeft = (nTime - oXAxis.startValue) / nScaledTimeLine
+      let nRealLeft = nLeft
         // 数据面板宽度。
-        nViewWidth =
-          document.getElementById("equipments").clientWidth -
+      let nViewWidth =
+          document.getElementById('equipments').clientWidth -
           GRID_LEFT -
-          GRID_RIGHT,
+          GRID_RIGHT
         // 提示框距左侧距离。
-        nPanelLeft = nLeft - TOOLTIP_WIDTH / nViewWidth,
-        nRealPanelLeft = nPanelLeft;
+      let nPanelLeft = nLeft - TOOLTIP_WIDTH / nViewWidth
+      let nRealPanelLeft = nPanelLeft
 
       if (nLeft < 0) {
-        nRealLeft = -1;
+        nRealLeft = -1
       } else if (nLeft > 1) {
-        nRealLeft = 2;
+        nRealLeft = 2
       }
 
       return {
@@ -1355,62 +1358,62 @@ export default {
         panelLeft: nRealPanelLeft,
         time: new Date(nTime).Format(),
         list: this.getCurrentDataList(nTime)
-      };
+      }
     },
     // 设置投产可见性。
-    changePoolInAndOutVisibility() {
-      let sColor = "#333",
-        sText = "全部投产",
-        raletedData = $.extend(
+    changePoolInAndOutVisibility () {
+      let sColor = '#333'
+      let sText = '全部投产'
+      let raletedData = $.extend(
           true,
           [],
-          this.dimension.filter(o => o.key === "pool")[0].data
-        ),
-        oOption = {
-          series: []
-        };
+          this.dimension.filter(o => o.key === 'pool')[0].data
+        )
+      let oOption = {
+        series: []
+      }
 
       // 切换可见性。
-      this.onlyShowRelatedData = !this.onlyShowRelatedData;
+      this.onlyShowRelatedData = !this.onlyShowRelatedData
 
       if (this.onlyShowRelatedData) {
         // 若只展示起点相关。
-        sColor = GREEN;
-        sText = "相关投产";
-        raletedData = raletedData.filter(arr => arr[5]);
+        sColor = GREEN
+        sText = '相关投产'
+        raletedData = raletedData.filter(arr => arr[5])
         raletedData = raletedData.map(arr => {
-          arr[2] = arr[5];
-          return arr;
-        });
+          arr[2] = arr[5]
+          return arr
+        })
       }
 
       // 投产点。
       oOption.series.push({
-        name: "加工",
+        name: '加工',
         data: raletedData
-      });
+      })
       // 按钮字体颜色。
       oOption.graphic = {
-        id: "text",
+        id: 'text',
         style: {
           fill: sColor,
           text: sText
         }
-      };
+      }
 
-      this.chart.setOption(oOption);
+      this.chart.setOption(oOption)
     },
     // 散点图点击事件处理。
-    scatterClickHandle(value) {
+    scatterClickHandle (value) {
       if (!this.markLine.filter(o => o.xAxis === value[0]).length) {
-        let bRelated = !!value[5];
+        let bRelated = !!value[5]
         // 若无该标记线，添加标记线，并标记是否与起点相关。
-        this.markLine.push({ xAxis: value[0] }); //, related: bRelated, dimension: value[4]}
+        this.markLine.push({ xAxis: value[0] }) //, related: bRelated, dimension: value[4]}
 
         this.compareList = this.compareList.map(o => {
-          o.zIndex = TOOLTIP_Z_INDEX;
-          return o;
-        });
+          o.zIndex = TOOLTIP_Z_INDEX
+          return o
+        })
         // 添加对比数据。
         this.compareList.push(
           this.transformTooltipDataToCompareData(
@@ -1419,101 +1422,101 @@ export default {
             value[4],
             TOOLTIP_Z_INDEX + 1
           )
-        );
+        )
       }
     },
     // 标记线点击事件。
-    markLineClickHandle(value) {
-      let nIndex = 0;
+    markLineClickHandle (value) {
+      let nIndex = 0
       this.markLine.map(
-        (o, index) => (o.xAxis === value ? (nIndex = index) : "")
-      );
+        (o, index) => (o.xAxis === value ? (nIndex = index) : '')
+      )
 
       // 删除标记线。
-      let oMark = this.markLine.splice(nIndex, 1)[0];
+      let oMark = this.markLine.splice(nIndex, 1)[0]
 
       // 删除提示框数据。
-      let sTime = new Date(oMark.xAxis).Format();
+      let sTime = new Date(oMark.xAxis).Format()
       this.compareList.map(
-        (o, index) => (o.time === sTime ? (nIndex = index) : "")
-      );
-      this.compareList.splice(nIndex, 1);
+        (o, index) => (o.time === sTime ? (nIndex = index) : '')
+      )
+      this.compareList.splice(nIndex, 1)
     },
     // y轴点击事件。
-    yAxisClickHandle(sEquipment) {
-      let aValue = sEquipment.split("+"),
-        sName = aValue[0],
-        sId = aValue[1],
-        nSelected = Number(aValue[2]);
+    yAxisClickHandle (sEquipment) {
+      let aValue = sEquipment.split('+')
+      // let sName = aValue[0]
+      let sId = aValue[1]
+      let nSelected = Number(aValue[2])
 
       if (nSelected) {
         // 若已经选中，则取消选中。
-        this.selectedEquipmentId = "";
+        this.selectedEquipmentId = ''
         this.categories = this.categories.map(o => {
           if (sEquipment === o.value) {
-            o.value = o.value.slice(0, -1) + 0;
+            o.value = o.value.slice(0, -1) + 0
           }
-          return o;
-        });
+          return o
+        })
       } else {
         // 若未选中，则选中。
-        this.selectedEquipmentId = sId;
+        this.selectedEquipmentId = sId
         this.categories = this.categories.map((o, index) => {
           if (sEquipment === o.value) {
-            o.value = o.value.slice(0, -1) + 1;
+            o.value = o.value.slice(0, -1) + 1
           } else {
-            o.value = o.value.slice(0, -1) + 0;
+            o.value = o.value.slice(0, -1) + 0
           }
-          return o;
-        });
+          return o
+        })
 
-        this.getEquipmentCustomDataById(sId);
+        this.getEquipmentCustomDataById(sId)
       }
 
       this.chart.setOption({
         yAxis: {
           data: this.categories
         }
-      });
+      })
 
       // 设置选中的时间。
-      this.setSelectedTime();
+      this.setSelectedTime()
     },
     // 获取定制数据成功。
-    requestCustomSucess(aoData) {
+    requestCustomSucess (aoData) {
       this.dimension.forEach(o => {
         // 过滤其他设备的定制内容
-        o.list = o.list.filter(item => item.type);
+        o.list = o.list.filter(item => item.type)
 
-        let oData = aoData.filter(item => item.dimension === o.key)[0];
+        let oData = aoData.filter(item => item.dimension === o.key)[0]
 
         if (oData) {
           // 添加数据。
-          o.list.push(oData);
+          o.list.push(oData)
         }
-      });
+      })
     },
     // 获取定制数据失败。
-    requestCustomFail() {
-      console.log("获取定制数据失败。");
+    requestCustomFail () {
+      console.log('获取定制数据失败。')
     },
     // 获取定制数据错误。
-    requestCustomError() {
-      console.log("定制数据查询出错");
+    requestCustomError () {
+      console.log('定制数据查询出错')
     },
     // 悬浮框点击事件。
-    suspendTooltipClickHandle(event) {
-      let aData = this.axisTooltipData[0].value,
-        nTime = aData[0],
-        bRelated = !!aData[5];
+    suspendTooltipClickHandle (event) {
+      let aData = this.axisTooltipData[0].value
+      let nTime = aData[0]
+      let bRelated = !!aData[5]
 
       // 添加标记线。
-      this.markLine.push({ xAxis: nTime }); //, related: bRelated, dimension: value[4]});
+      this.markLine.push({ xAxis: nTime }) //, related: bRelated, dimension: value[4]});
 
       this.compareList = this.compareList.map(o => {
-        o.zIndex = TOOLTIP_Z_INDEX;
-        return o;
-      });
+        o.zIndex = TOOLTIP_Z_INDEX
+        return o
+      })
       // 添加对比数据。
       this.compareList.push(
         this.transformTooltipDataToCompareData(
@@ -1522,361 +1525,362 @@ export default {
           aData[4],
           TOOLTIP_Z_INDEX + 1
         )
-      );
+      )
     },
     // echarts 点击事件。
-    chartClickHandle(params) {
-      let value = params.value;
+    chartClickHandle (params) {
+      let value = params.value
 
-      if (params.componentType == "series" && params.seriesType == "scatter") {
+      if (params.componentType === 'series' && params.seriesType === 'scatter') {
         // 若为散点图系列。
-        this.scatterClickHandle(value);
-      } else if (params.componentType == "markLine") {
+        this.scatterClickHandle(value)
+      } else if (params.componentType === 'markLine') {
         // 若为标记线。
-        this.markLineClickHandle(value);
-      } else if (params.componentType == "yAxis") {
+        this.markLineClickHandle(value)
+      } else if (params.componentType === 'yAxis') {
         // 若为y轴。
-        this.yAxisClickHandle(value);
+        this.yAxisClickHandle(value)
       }
     },
     // 图形缩放处理。
-    chartZoomHandle(params) {
-      if (params.dataZoomId && params.dataZoomId.indexOf("2") > -1) {
+    chartZoomHandle (params) {
+      if (params.dataZoomId && params.dataZoomId.indexOf('2') > -1) {
         // y轴缩放。
         let oYAxis = this.chart
           .getOption()
           .dataZoom.filter(
-            o => o.type === "slider" && o.yAxisIndex.length === 1
-          )[0];
+            o => o.type === 'slider' && o.yAxisIndex.length === 1
+          )[0]
         // console.log(oYAxis)
-        let nStart = oYAxis.startValue,
-          nEnd = oYAxis.endValue;
+        let nStart = oYAxis.startValue
+        let nEnd = oYAxis.endValue
 
-        let aoMarkPoint = this.option.series.filter(o => o.name === "加工")[0]
-          .markPoint.data;
+        let aoMarkPoint = this.option.series.filter(o => o.name === '加工')[0]
+          .markPoint.data
         // console.log(aoMarkPoint)
         let aoData = aoMarkPoint.map(o => {
           if (o.coord[1] >= nStart && o.coord[1] <= nEnd) {
             // 若在y轴缩放范围内。
-            o.itemStyle.normal.opacity = 1;
+            o.itemStyle.normal.opacity = 1
           } else {
-            o.itemStyle.normal.opacity = 0;
+            o.itemStyle.normal.opacity = 0
           }
-          return o;
-        });
+          return o
+        })
         this.chart.setOption({
           series: [
             {
-              name: "加工",
+              name: '加工',
               markPoint: {
                 data: aoData
               }
             }
           ]
-        });
+        })
       } else if (
-        (params.dataZoomId && params.dataZoomId.indexOf("1") > -1) ||
-        params.type === "datazoom"
+        (params.dataZoomId && params.dataZoomId.indexOf('1') > -1) ||
+        params.type === 'datazoom'
       ) {
         // x轴缩放 || 工具栏缩放按钮。
-        let oXAxis = this.getScaledxAxis(),
+        let oXAxis = this.getScaledxAxis()
           // 缩放后的时间轴时长。
-          nScaledTimeLine = oXAxis.endValue - oXAxis.startValue,
+        let nScaledTimeLine = oXAxis.endValue - oXAxis.startValue
           // 时间范围。
-          oTime = this.getRealTime(),
+        let oTime = this.getRealTime()
           // 数据面板宽度。
-          nViewWidth =
-            document.getElementById("equipments").clientWidth -
+        let nViewWidth =
+            document.getElementById('equipments').clientWidth -
             GRID_LEFT -
-            GRID_RIGHT,
+            GRID_RIGHT
           // 提示框宽度占比。
-          nViewLeft = TOOLTIP_WIDTH / nViewWidth;
+        let nViewLeft = TOOLTIP_WIDTH / nViewWidth
 
-        this.datetime.realStart = oTime.start;
-        this.datetime.realEnd = oTime.end;
+        this.datetime.realStart = oTime.start
+        this.datetime.realEnd = oTime.end
         // 设置选中的时间。
-        this.setSelectedTime();
+        this.setSelectedTime()
 
         this.compareList = this.compareList.map(o => {
           // 距左侧距离。
-          let nLeft = (o.millisecond - oXAxis.startValue) / nScaledTimeLine,
-            nRealLeft = nLeft,
+          let nLeft = (o.millisecond - oXAxis.startValue) / nScaledTimeLine
+          let nRealLeft = nLeft
             // 提示框距左侧距离。
-            nPanelLeft = nLeft - nViewLeft,
-            nRealPanelLeft = nPanelLeft;
+          let nPanelLeft = nLeft - nViewLeft
+          let nRealPanelLeft = nPanelLeft
 
           if (!o.reverse) {
             // 若朝右。
             if (nLeft < 0) {
-              nRealLeft = -1;
+              nRealLeft = -1
             } else if (nLeft > 1) {
-              nRealLeft = 2;
+              nRealLeft = 2
             }
 
-            o.position = nRealLeft;
+            o.position = nRealLeft
           } else {
             // 若朝作左。
             if (nLeft < 0) {
-              nRealLeft = -1;
-              nRealPanelLeft = -1;
+              nRealLeft = -1
+              nRealPanelLeft = -1
             } else if (nLeft > 1) {
-              nRealLeft = 2;
-              nRealPanelLeft = 2;
+              nRealLeft = 2
+              nRealPanelLeft = 2
             }
-            o.position = nRealPanelLeft;
+            o.position = nRealPanelLeft
           }
 
-          o.left = nRealLeft;
-          o.panelLeft = nRealPanelLeft;
-          return o;
-        });
+          o.left = nRealLeft
+          o.panelLeft = nRealPanelLeft
+          return o
+        })
       }
     },
     // 设置提示框层级。
-    setCompareTooltipZIndex(value) {
+    setCompareTooltipZIndex (value) {
       this.compareList = this.compareList.map(o => {
         if (o.millisecond === value) {
           // 选中点。
-          o.zIndex = TOOLTIP_Z_INDEX + 1;
+          o.zIndex = TOOLTIP_Z_INDEX + 1
         } else {
-          o.zIndex = TOOLTIP_Z_INDEX;
+          o.zIndex = TOOLTIP_Z_INDEX
         }
-        return o;
-      });
+        return o
+      })
     },
     // 删除提示框对比数据。
-    deleteCompareListData(nTime) {
+    deleteCompareListData (nTime) {
       // 获取该事件点在提示列表中的顺序。
-      let nIndex = this.getIndex(this.compareList, "millisecond", nTime);
-      this.compareList.splice(nIndex, 1);
+      let nIndex = this.getIndex(this.compareList, 'millisecond', nTime)
+      this.compareList.splice(nIndex, 1)
     },
     // 删除标记线。
-    deleteMarkLine(nTime) {
+    deleteMarkLine (nTime) {
       // 获取该事件点在标记线中的顺序。
-      let nIndex = this.getIndex(this.markLine, "xAxis", nTime);
-      this.markLine.splice(nIndex, 1);
+      let nIndex = this.getIndex(this.markLine, 'xAxis', nTime)
+      this.markLine.splice(nIndex, 1)
     },
     // 提示面板点击事件。
-    tooltipPanelClickHandle(nTime) {
+    tooltipPanelClickHandle (nTime) {
       // 面板对应时间点。
       // let nTime = Number(event.currentTarget.getAttribute("data-id"));
 
       // 删除提示框对比数据。
-      this.deleteCompareListData(nTime);
+      this.deleteCompareListData(nTime)
 
       // 删除标记线。
-      this.deleteMarkLine(nTime);
+      this.deleteMarkLine(nTime)
     },
-    reversePanelClickHandle(compareData) {
-      compareData.reverse = !compareData.reverse;
+    reversePanelClickHandle (compareData) {
+      compareData.reverse = !compareData.reverse
       compareData.position = compareData.reverse
         ? compareData.panelLeft
-        : compareData.left;
+        : compareData.left
     },
     // 提示面板鼠标移入事件。
-    tooltipPanelMouseenterHandle(nTime) {
+    tooltipPanelMouseenterHandle (nTime) {
       // 面板对应时间点。
       // let nTime = Number(event.currentTarget.getAttribute("data-id"))
-      this.setCompareTooltipZIndex(nTime);
+      this.setCompareTooltipZIndex(nTime)
     },
     /**
      * 维度点击事件。
      * @param {Object} item
      * @return {void}
      */
-    legendClickHandle(item) {
-      if (item.key === "parameter") {
-        return false;
+    legendClickHandle (item) {
+      if (item.key === 'parameter') {
+        return false
       }
-      let sType;
+      let sType
       if (item.show) {
-        sType = "legendUnSelect";
+        sType = 'legendUnSelect'
       } else {
-        sType = "legendSelect";
+        sType = 'legendSelect'
       }
 
-      item.show = !item.show;
+      item.show = !item.show
 
       // 触发维度选择事件。
       this.chart.dispatchAction({
         type: sType,
         name: item.name
-      });
+      })
     },
 
     // 设置图表事件。
-    setChartEvent() {
-      this.chart.on("click", this.chartClickHandle);
-      this.chart.on("datazoom", this.chartZoomHandle);
+    setChartEvent () {
+      this.chart.on('click', this.chartClickHandle)
+      this.chart.on('datazoom', this.chartZoomHandle)
     },
     /**
      * 跳转按钮点击事件。
      * @param {Object} oData
      * @return {void}
      */
-    listButtonClick(oData) {
+    listButtonClick (oData) {
       if (oData.router) {
-        let oQuery = this.getParamter(oData.query);
+        let oQuery = this.getParamter(oData.query)
 
         // 保存数据到本地。
-        this.setSessionStorage();
+        this.setSessionStorage()
         // 需要传code，配合路由判断是否切换工序。
         this.$router.replace({
           path: oData.router,
           query: Object.assign({ code: this.process }, oQuery)
-        });
+        })
       } else if (oData.link) {
-        let oParams = this.getParamter(oData.parameters);
-        window.open(oData.link + "?" + $.param(oParams), "_blank");
+        let oParams = this.getParamter(oData.parameters)
+        window.open(oData.link + '?' + $.param(oParams), '_blank')
       }
     },
     /**
      * @param {Array}
      * @return {Object}
      */
-    getParamter(aQuery) {
-      let oParam = {},
-        oDate = this.getRealTime();
+    getParamter (aQuery) {
+      let oParam = {}
+      let oDate = this.getRealTime()
       if (this.bRestrain) {
-        //临时方案，目前遏制页面投产表接口不可查，屏蔽
+        // 临时方案，目前遏制页面投产表接口不可查，屏蔽
         aQuery = aQuery.filter(o => {
-          return o !== "operationIdList";
-        });
+          return o !== 'operationIdList'
+        })
       }
       aQuery.forEach(param => {
         switch (param) {
-          case "equipmentName":
-            oParam[param] = this.selectedEquipmentName;
-            break;
+          case 'equipmentName':
+            oParam[param] = this.selectedEquipmentName
+            break
           // case "equipmentList"://equipmentIdList
-          // 	oParam[param] = this.selectedEquipmentId;
-          // 	break;
-          case "operationIdList":
-            oParam[param] = this.operationIdList;
-            break;
-          case "equipmentId":
-            oParam[param] = this.selectedEquipmentId;
-            break;
-          case "startTime":
-            oParam[param] = oDate.start;
-            break;
-          case "endTime":
-            oParam[param] = oDate.end;
-            break;
-          case "shiftStartTime":
+          // oParam[param] = this.selectedEquipmentId;
+          // break;
+          case 'operationIdList':
+            oParam[param] = this.operationIdList
+            break
+          case 'equipmentId':
+            oParam[param] = this.selectedEquipmentId
+            break
+          case 'startTime':
+            oParam[param] = oDate.start
+            break
+          case 'endTime':
+            oParam[param] = oDate.end
+            break
+          case 'shiftStartTime':
             // 班次时间是获取：datetime.start是实时的，不是当前数据真实的时间。
-            oParam[param] = this.getRealTimeLineDateTime().start; // this.datetime.start;
-            break;
-          case "shiftEndTime":
-            oParam[param] = this.getRealTimeLineDateTime().end; //this.datetime.end;
-            break;
-          case "processCode":
-            oParam[param] = this.process || "";
-            break;
+            oParam[param] = this.getRealTimeLineDateTime().start // this.datetime.start;
+            break
+          case 'shiftEndTime':
+            oParam[param] = this.getRealTimeLineDateTime().end // this.datetime.end;
+            break
+          case 'processCode':
+            oParam[param] = this.process || ''
+            break
           default:
         }
-      });
-      return oParam;
+      })
+      return oParam
     },
     // 获取真实的时间轴的开始和结束时间。
-    getRealTimeLineDateTime() {
+    getRealTimeLineDateTime () {
       // datetime.start || datetime.end 不一定是真实的整个时间轴的开始和结束时间。
       return {
         start: this.isDatetimeChange
           ? this.datetime.initStart
           : this.datetime.start,
         end: this.isDatetimeChange ? this.datetime.initEnd : this.datetime.end
-      };
+      }
     },
     // 显示提示信息。
-    showMessage() {
+    showMessage () {
       this.$message({
         message: this.sErrorMessage,
         duration: 3000
-      });
+      })
     },
     // 请求成功。
-    requestSucess(oData) {
-      this.loading = false;
-      this.categories = [];
+    requestSucess (oData) {
+      this.loading = false
+      this.categories = []
       // 保存数据。
-      let aoData = oData;
+      let aoData = oData
 
       if (!aoData.length) {
-        return;
+        return
       }
 
       // 初始化图形数据。
-      this.initChartData(aoData);
+      this.initChartData(aoData)
       // 添加图形数据。
-      this.setChartData();
+      this.setChartData()
     },
     // 请求失败。
-    requestFail(sErrorMessage) {
-      this.loading = false;
-      this.categories = [];
+    requestFail (sErrorMessage) {
+      this.loading = false
+      this.categories = []
       // 提示信息。
-      this.sErrorMessage = "暂无数据";
-      console.log(sErrorMessage);
+      this.sErrorMessage = '暂无数据'
+      console.log(sErrorMessage)
     },
     // 请求错误。
-    requestError(err) {
-      this.loading = false;
-      this.sErrorMessage = "暂无数据";
-      console.log("查询出错");
+    requestError (err) {
+      this.loading = false
+      this.sErrorMessage = '暂无数据'
+      console.log('查询出错')
+      console.log(err)
     },
     // 获取设备所有数据。
-    fetchAllData() {
-      this.loading = true;
-      this.sErrorMessage = "";
+    fetchAllData () {
+      this.loading = true
+      this.sErrorMessage = ''
 
-      let equipmentList = "",
-        sUrl = this.url;
+      let equipmentList = ''
+      let sUrl = this.url
 
       if (this.bRestrain) {
         // 若为设备编码。
-        equipmentList = this.equipmentsCode.equipmentCode;
-        sUrl += "/by-code";
+        equipmentList = this.equipmentsCode.equipmentCode
+        sUrl += '/by-code'
       } else if (this.equipmentsId) {
         // 若为设备id列表。
         equipmentList = this.equipmentsId
           .reduce((prev, curr) => [...prev, curr.equipmentId], [])
-          .join(",");
-        sUrl += "/by-id";
+          .join(',')
+        sUrl += '/by-id'
       }
 
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
         sUrl,
-        "post",
+        'post',
         {
-          equipmentList: equipmentList, //equipmentIdList
-          startTime: this.getRealTimeLineDateTime().start, //this.datetime.start,
-          endTime: this.getRealTimeLineDateTime().end, //this.datetime.end,
+          equipmentList: equipmentList, // equipmentIdList
+          startTime: this.getRealTimeLineDateTime().start, // this.datetime.start,
+          endTime: this.getRealTimeLineDateTime().end, // this.datetime.end,
           type: 0
         },
         this.requestSucess,
         this.requestFail,
         this.requestError
-      );
+      )
     },
     // 过滤异常数据(组号为-1)。
-    filterAbnormalData(aoData) {
+    filterAbnormalData (aoData) {
       if (aoData) {
-        return aoData.filter(out => out.groupId !== -1);
+        return aoData.filter(out => out.groupId !== -1)
       } else {
-        return [];
+        return []
       }
     },
     // 初始化图形数据。
-    initChartData(aoData) {
-      let nLength = aoData.length - 1;
+    initChartData (aoData) {
+      let nLength = aoData.length - 1
 
       aoData.forEach((o, index) => {
         if (index === nLength) {
           // 默认选中第一台设备。
-          this.selectedEquipmentId = o.equipmentId;
+          this.selectedEquipmentId = o.equipmentId
 
           this.getEquipmentCustomDataById(this.selectedEquipmentId)
         }
@@ -1886,7 +1890,7 @@ export default {
           id: o.equipmentId,
           value:
             `${o.equipmentName}+${o.equipmentId}+` + (index === nLength ? 1 : 0) // 默认选中第一台设备。
-        });
+        })
 
         this.equipmentData[o.equipmentId] = {
           // 状态
@@ -1930,7 +1934,7 @@ export default {
             installToolList: this.filterAbnormalData(o.installToolList),
             removeToolList: this.filterAbnormalData(o.removeToolList)
           }
-        };
+        }
 
         if (this.bRestrain) {
           // 若为遏制页面。
@@ -1941,10 +1945,10 @@ export default {
             shiftEndTime: this.equipmentsCode.shiftEndTime
           })
         }
-      });
+      })
     },
     // 设备状态显示切换。
-    toggleStateHandle() {
+    toggleStateHandle () {
       this.showState = !this.showState
 
       if (this.showState) {
@@ -1954,35 +1958,35 @@ export default {
       }
     },
     // 显示状态。
-    showStateHandle() {
+    showStateHandle () {
       this.chart.setOption({
         series: [
           {
             name: CHART_STATE_NAME,
             data: this.getStatusData(),
             tooltip: {
-              trigger: "item"
+              trigger: 'item'
             }
           }
         ]
-      });
+      })
     },
     // 隐藏状态。
-    hideStateHandle() {
+    hideStateHandle () {
       this.chart.setOption({
         series: [
           {
             name: CHART_STATE_NAME,
             data: this.getVisualStateData(),
             tooltip: {
-              trigger: "none"
+              trigger: 'none'
             }
           }
         ]
-      });
+      })
     },
     // 设置图形数据。
-    setChartData() {
+    setChartData () {
       // 设备状态。
       this.option.series.filter(o => o.name === CHART_STATE_NAME)[0].data = this
         .showState
@@ -1991,14 +1995,14 @@ export default {
 
       // 获取各事件维度数据。
       this.dimension.forEach(item => {
-        let oFilter = this.option.series.filter(o => o.name == item.name)[0],
-          oResult = $.extend(true, {}, this.getDimensionData(item.key))
+        let oFilter = this.option.series.filter(o => o.name === item.name)[0]
+        let oResult = $.extend(true, {}, this.getDimensionData(item.key))
         if (oResult.markPoint.length) {
           oFilter.markPoint.data = oResult.markPoint
         }
 
         if (
-          item.key === "pool" &&
+          item.key === 'pool' &&
           this.onlyShowRelatedData &&
           !this.bRestrain
         ) {
@@ -2008,11 +2012,11 @@ export default {
           oFilter.data = oFilter.data.map(arr => {
             arr[2] = arr[5]
             return arr
-          });
+          })
         } else {
           oFilter.data = oResult.data
         }
-      });
+      })
 
       if (this.equipments.length > 1) {
         // 若大于一台设备。
@@ -2023,8 +2027,8 @@ export default {
               realtime: false,
               yAxisIndex: [0],
               width: 16,
-              labelFormatter: function(index, value) {
-                return value.split("+")[0];
+              labelFormatter: function (index, value) {
+                return value.split('+')[0]
               },
               right: Y_AXIS_ZOOM_RIGHT
               // showDetail: false
@@ -2044,7 +2048,7 @@ export default {
       this.setTooltip()
     },
     // 设置提示框。
-    setTooltip() {
+    setTooltip () {
       this.markLine.forEach(o => {
         // 添加对比数据。
         this.compareList.push(
@@ -2054,20 +2058,20 @@ export default {
             o.dimension,
             TOOLTIP_Z_INDEX
           )
-        );
-      });
+        )
+      })
     },
     // 设置选中时间。
-    setSelectedTime() {
+    setSelectedTime () {
       let aoLine = []
       if (this.selectedEquipmentId) {
-        let nIndex;
+        let nIndex
         this.categories.some((o, index) => {
-          if (o.id == this.selectedEquipmentId) {
+          if (o.id === this.selectedEquipmentId) {
             nIndex = index
             return false
           }
-        });
+        })
 
         aoLine = [{ yAxis: nIndex }]
       }
@@ -2081,10 +2085,10 @@ export default {
                 normal: {
                   formatter: () => {
                     return `\n\n\n${new Date(this.datetime.realStart).Format(
-                      "MM-dd hh:mm:ss"
+                      'MM-dd hh:mm:ss'
                     )}~${new Date(this.datetime.realEnd).Format(
-                      "MM-dd hh:mm:ss"
-                    )}`;
+                      'MM-dd hh:mm:ss'
+                    )}`
                   }
                 }
               },
@@ -2092,10 +2096,10 @@ export default {
             }
           }
         ]
-      });
+      })
     },
     // 获取数组顺序。
-    getIndex(arr, key, value) {
+    getIndex (arr, key, value) {
       for (let i = 0, l = arr.length; i < l; i++) {
         if (arr[i][key] === value) {
           return i
@@ -2103,224 +2107,224 @@ export default {
       }
     },
     // 获取提示数据。
-    getToolTipData(key, o) {
+    getToolTipData (key, o) {
       let oResult = {
-          groupId: o.groupId,
-          doId: o.doId
-        },
-        sTitle = ""
+        groupId: o.groupId,
+        doId: o.doId
+      }
+      let sTitle = ''
       switch (key) {
         // 开始加工
-        case "startWorkList":
+        case 'startWorkList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "工单启动"
+          oResult.title = '工单启动'
           oResult.tooltipData = [
-            { name: "工单号", value: o.doCode },
-            { name: "开始时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "工序", value: o.processName }
-          ];
-          break;
+            { name: '工单号', value: o.doCode },
+            { name: '开始时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '工序', value: o.processName }
+          ]
+          break
         // 完工
-        case "finishWorkList":
+        case 'finishWorkList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "工单结束"
+          oResult.title = '工单结束'
           oResult.tooltipData = [
-            { name: "工单号", value: o.doCode },
-            { name: "完工时间", value: o.happenTime },
-            { name: "操作人", value: o.personName }
-          ];
-          break;
+            { name: '工单号', value: o.doCode },
+            { name: '完工时间', value: o.happenTime },
+            { name: '操作人', value: o.personName }
+          ]
+          break
         // 投料
-        case "poolInList":
+        case 'poolInList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "投料"
+          oResult.title = '投料'
           oResult.tooltipData = [
-            { name: "条码", value: o.barcode },
-            { name: "投入时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "工单号", value: o.doCode },
-            { name: "物料", value: o.materialName },
-            { name: "批次", value: o.batchNo },
-            { name: "数量", value: o.quantity }
+            { name: '条码', value: o.barcode },
+            { name: '投入时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '工单号', value: o.doCode },
+            { name: '物料', value: o.materialName },
+            { name: '批次', value: o.batchNo },
+            { name: '数量', value: o.quantity }
           ]
           break
         // 产出
-        case "poolOutList":
+        case 'poolOutList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "产出"
+          oResult.title = '产出'
           oResult.tooltipData = [
-            { name: "条码", value: o.barcode },
-            { name: "产出时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "工单号", value: o.doCode },
-            { name: "物料", value: o.materialName },
-            { name: "批次", value: o.batchNo },
-            { name: "数量", value: o.quantity },
-            { name: "质量", value: o.qualityType }
+            { name: '条码', value: o.barcode },
+            { name: '产出时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '工单号', value: o.doCode },
+            { name: '物料', value: o.materialName },
+            { name: '批次', value: o.batchNo },
+            { name: '数量', value: o.quantity },
+            { name: '质量', value: o.qualityType }
           ]
           break
         // 结转
-        case "materialTransferList":
+        case 'materialTransferList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "结转"
+          oResult.title = '结转'
           oResult.tooltipData = [
-            { name: "条码", value: o.barcode },
-            { name: "时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "源工单", value: o.srcDoCode },
-            { name: "目标工单", value: o.destDoCode },
-            { name: "物料", value: o.materialName },
-            { name: "批次", value: o.batchNo },
-            { name: "数量", value: o.quantity }
+            { name: '条码', value: o.barcode },
+            { name: '时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '源工单', value: o.srcDoCode },
+            { name: '目标工单', value: o.destDoCode },
+            { name: '物料', value: o.materialName },
+            { name: '批次', value: o.batchNo },
+            { name: '数量', value: o.quantity }
           ]
           break
         // 退料
-        case "materialReturnList":
+        case 'materialReturnList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "退料"
+          oResult.title = '退料'
           oResult.tooltipData = [
-            { name: "条码", value: o.barcode },
-            { name: "时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "工单", value: o.doCode },
-            { name: "原因", value: o.reason },
-            { name: "物料", value: o.materialName },
-            { name: "批次", value: o.batchNo },
-            { name: "数量", value: o.quantity }
+            { name: '条码', value: o.barcode },
+            { name: '时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '工单', value: o.doCode },
+            { name: '原因', value: o.reason },
+            { name: '物料', value: o.materialName },
+            { name: '批次', value: o.batchNo },
+            { name: '数量', value: o.quantity }
           ]
           break
         // 质检
-        case "qcList":
+        case 'qcList':
           oResult.time = +new Date(o.startTime)
           o.timePoint = o.startTime
-          oResult.title = "质检-" + o.method
+          oResult.title = '质检-' + o.method
           oResult.tooltipData = [
-            { name: "开始时间", value: o.startTime },
-            { name: "结束时间", value: o.endTime },
-            { name: "检验人", value: o.personName },
-            { name: "检验结果", value: o.result }
+            { name: '开始时间', value: o.startTime },
+            { name: '结束时间', value: o.endTime },
+            { name: '检验人', value: o.personName },
+            { name: '检验结果', value: o.result }
           ]
           break
         // 送检
-        case "submitQcList":
+        case 'submitQcList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "送检"
+          oResult.title = '送检'
           oResult.tooltipData = [
-            { name: "送检时间", value: o.happenTime },
-            { name: "送检人", value: o.personName },
-            { name: "工单号", value: o.doCode },
-            { name: "物料", value: o.materialName },
-            { name: "批次", value: o.batchNo },
-            { name: "检验人", value: o.checkPersonName },
-            { name: "检验结果", value: o.result }
+            { name: '送检时间', value: o.happenTime },
+            { name: '送检人', value: o.personName },
+            { name: '工单号', value: o.doCode },
+            { name: '物料', value: o.materialName },
+            { name: '批次', value: o.batchNo },
+            { name: '检验人', value: o.checkPersonName },
+            { name: '检验结果', value: o.result }
           ]
           break
         // 事件开始
-        case "startEquipWarningList":
+        case 'startEquipWarningList':
           oResult.time = +new Date(o.startTime)
           o.timePoint = o.startTime
-          oResult.title = "事件开始"
+          oResult.title = '事件开始'
           oResult.tooltipData = [
-            { name: "发生时间", value: o.startTime },
-            { name: "上报时间", value: o.reportTime },
-            { name: "上报人", value: o.reportName },
-            { name: "事件类型", value: o.eventType },
-            { name: "事件原因", value: o.reason },
-            { name: "状态", value: o.status }
+            { name: '发生时间', value: o.startTime },
+            { name: '上报时间', value: o.reportTime },
+            { name: '上报人', value: o.reportName },
+            { name: '事件类型', value: o.eventType },
+            { name: '事件原因', value: o.reason },
+            { name: '状态', value: o.status }
           ]
           break
         // 事件结束
-        case "endEquipWarningList":
+        case 'endEquipWarningList':
           oResult.time = +new Date(o.endTime)
           o.timePoint = o.endTime
-          oResult.title = "事件结束"
+          oResult.title = '事件结束'
           oResult.tooltipData = [
-            { name: "事件类型", value: o.eventType },
-            { name: "事件原因", value: o.reason },
-            { name: "结束时间", value: o.endTime }
+            { name: '事件类型', value: o.eventType },
+            { name: '事件原因', value: o.reason },
+            { name: '结束时间', value: o.endTime }
           ]
           break
         // 设备点检
-        case "spotCheckList":
+        case 'spotCheckList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          oResult.title = "设备点检"
+          oResult.title = '设备点检'
           oResult.tooltipData = [
-            { name: "发生时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "点检结果", value: o.result }
+            { name: '发生时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '点检结果', value: o.result }
           ]
-          break;
+          break
         // 设备维护开始
-        case "startEquipRepairList":
+        case 'startEquipRepairList':
           oResult.time = +new Date(o.startTime)
           o.timePoint = o.startTime
-          oResult.title = "设备维护开始"
+          oResult.title = '设备维护开始'
           oResult.tooltipData = [
-            { name: "开始时间", value: o.startTime },
-            { name: "操作人", value: o.personName },
-            { name: "维护原因", value: o.reason }
+            { name: '开始时间', value: o.startTime },
+            { name: '操作人', value: o.personName },
+            { name: '维护原因', value: o.reason }
           ]
           break
         // 设备维护结束
-        case "endEquipRepairList":
+        case 'endEquipRepairList':
           oResult.time = +new Date(o.endTime)
           o.timePoint = o.endTime
-          oResult.title = "设备维护结束"
+          oResult.title = '设备维护结束'
           oResult.tooltipData = [
-            { name: "结束时间", value: o.endTime },
-            { name: "操作人", value: o.personName },
-            { name: "维护原因", value: o.reason }
+            { name: '结束时间', value: o.endTime },
+            { name: '操作人', value: o.personName },
+            { name: '维护原因', value: o.reason }
           ]
           break
         // 上刀/模具
-        case "installToolList":
+        case 'installToolList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          if (o.toolType == "刀具") {
-            sTitle = "上刀";
-          } else if (o.toolType == "模具") {
-            sTitle = "上模";
+          if (o.toolType === '刀具') {
+            sTitle = '上刀'
+          } else if (o.toolType === '模具') {
+            sTitle = '上模'
           } else {
-            sTitle = "其他";
+            sTitle = '其他'
           }
 
           oResult.title = sTitle
           oResult.tooltipData = [
-            { name: "发生时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "工具类型", value: o.toolType },
-            { name: "工具编码", value: o.toolCode },
-            { name: "原因", value: o.reason }
-          ];
-          break;
+            { name: '发生时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '工具类型', value: o.toolType },
+            { name: '工具编码', value: o.toolCode },
+            { name: '原因', value: o.reason }
+          ]
+          break
         // 下刀/模具
-        case "removeToolList":
+        case 'removeToolList':
           oResult.time = +new Date(o.happenTime)
           o.timePoint = o.happenTime
-          if (o.toolType == "刀具") {
-            sTitle = "下刀"
-          } else if (o.toolType == "模具") {
-            sTitle = "下模"
+          if (o.toolType === '刀具') {
+            sTitle = '下刀'
+          } else if (o.toolType === '模具') {
+            sTitle = '下模'
           } else {
-            sTitle = "其他"
+            sTitle = '其他'
           }
 
           oResult.title = sTitle
           oResult.tooltipData = [
-            { name: "发生时间", value: o.happenTime },
-            { name: "操作人", value: o.personName },
-            { name: "工具类型", value: o.toolType },
-            { name: "工具编码", value: o.toolCode },
-            { name: "原因", value: o.reason }
+            { name: '发生时间', value: o.happenTime },
+            { name: '操作人', value: o.personName },
+            { name: '工具类型', value: o.toolType },
+            { name: '工具编码', value: o.toolCode },
+            { name: '原因', value: o.reason }
           ]
           break
         default:
@@ -2328,16 +2332,16 @@ export default {
       return oResult
     },
     // 获取事件维度数据。
-    getDimensionData(sDimension) {
-      let aoData = [],
-        aoMarkPoint = [],
-        oMap = {}
+    getDimensionData (sDimension) {
+      let aoData = []
+      let aoMarkPoint = []
+      let oMap = {}
 
       this.equipments.forEach((item, index) => {
         // 拿到维度数据。
-        let singleData = this.equipmentData[item.equipmentId][sDimension],
+        let singleData = this.equipmentData[item.equipmentId][sDimension]
           // y轴设备顺序。
-          nIndex = this.getIndex(this.categories, "id", item.equipmentId)
+        let nIndex = this.getIndex(this.categories, 'id', item.equipmentId)
 
         if (nIndex == null) {
           return
@@ -2349,8 +2353,8 @@ export default {
 
           aoList.forEach((o, n) => {
             // 拼接scatter数据。[x, y, value, tooltip-data]
-            let oData = this.getToolTipData(key, o),
-              sKey = oData.time + "" + nIndex
+            let oData = this.getToolTipData(key, o)
+            let sKey = oData.time + '' + nIndex
 
             if (oMap[sKey]) {
               // 若存在。
@@ -2360,11 +2364,11 @@ export default {
               )[0]
               oFilter[2]++
 
-              if (sDimension === "pool" && !this.bRestrain) {
+              if (sDimension === 'pool' && !this.bRestrain) {
                 // 若为投产，非遏制。
                 if (
-                  (key === "poolInList" || key === "poolOutList") &&
-                  item.operationIdList.find(item => item.opId == o.opId)
+                  (key === 'poolInList' || key === 'poolOutList') &&
+                  item.operationIdList.find(item => item.opId === o.opId)
                 ) {
                   // 若为属于起点的投入或产出。
                   if (!oFilter[5]) {
@@ -2384,8 +2388,8 @@ export default {
                   oData.related = true
                   oFilter[5]++
                 } else if (
-                  key === "materialTransferList" ||
-                  key === "materialReturnList"
+                  key === 'materialTransferList' ||
+                  key === 'materialReturnList'
                 ) {
                   // 若为结转或退料。
                   // 设置与起点相关。
@@ -2400,10 +2404,10 @@ export default {
 
               let nTag = 0
 
-              if (sDimension === "pool" && !this.bRestrain) {
+              if (sDimension === 'pool' && !this.bRestrain) {
                 if (
-                  (key === "poolInList" || key === "poolOutList") &&
-                  item.operationIdList.find(item => item.opId == o.opId)
+                  (key === 'poolInList' || key === 'poolOutList') &&
+                  item.operationIdList.find(item => item.opId === o.opId)
                 ) {
                   // 若为属于起点的投入或产出。
                   // 设置标记点。
@@ -2414,7 +2418,7 @@ export default {
                         opacity: 1
                       }
                     }
-                  });
+                  })
                   // 设置与起点相关。
                   oData.related = true
                   nTag++
@@ -2425,22 +2429,22 @@ export default {
               // 增加节点。
               aoData.push(aPointer)
             }
-          });
+          })
         }
-      });
+      })
 
       this.dimension.filter(o => o.key === sDimension)[0].data = aoData
 
       return {
         markPoint: aoMarkPoint,
         data: aoData
-      };
+      }
     },
     // 设置无数据状态。
-    getVisualStateData() {
+    getVisualStateData () {
       return this.equipments.map((item, index) => {
         return {
-          name: "",
+          name: '',
           value: [
             index,
             +new Date(this.getRealTimeLineDateTime().start),
@@ -2452,14 +2456,14 @@ export default {
           ],
           itemStyle: {
             normal: {
-              color: "#dedede"
+              color: '#dedede'
             }
           }
         }
       })
     },
     // 获取设备状态。
-    getStatusData() {
+    getStatusData () {
       let aoData = []
       this.equipments.forEach((item, index) => {
         // 拿到状态数据。
@@ -2468,7 +2472,7 @@ export default {
         if (!singleData.length) {
           // 若无数据
           aoData.push({
-            name: "",
+            name: '',
             value: [
               index,
               +new Date(this.getRealTimeLineDateTime().start),
@@ -2480,11 +2484,10 @@ export default {
             ],
             itemStyle: {
               normal: {
-                color: "#dedede"
+                color: '#dedede'
               }
             }
-          });
-          return
+          })
         } else {
           singleData.map(o => {
             let oState = this.states.filter(state => state.key === o.type)[0]
@@ -2509,7 +2512,7 @@ export default {
             } else {
               // 若不存在，即为未知状态。
               aoData.push({
-                name: "无数据",
+                name: '无数据',
                 value: [
                   index,
                   +new Date(o.startTime),
@@ -2520,14 +2523,14 @@ export default {
                 ],
                 itemStyle: {
                   normal: {
-                    color: "#dedede"
+                    color: '#dedede'
                   }
                 }
               })
             }
           })
         }
-      });
+      })
 
       return aoData
     },
@@ -2537,33 +2540,33 @@ export default {
      * @param {String} 比较的时间。
      * @param {String} 比较类型 > 或 <
      */
-    validateTime(dateValue, comValue, sType) {
+    validateTime (dateValue, comValue, sType) {
       let oReturn = {
         validate: false, // 验证是否正确
-        message: "" // 错误信息
+        message: '' // 错误信息
       }
 
       let nNow = +new Date()
 
-      if (dateValue == undefined || dateValue == "") {
-        oReturn.message = "请输入时间"
+      if (dateValue === undefined || dateValue === '') {
+        oReturn.message = '请输入时间'
       } else if (!window.Rt.utils.isDateTime(dateValue)) {
-        oReturn.message = "请输入正确的时间格式"
+        oReturn.message = '请输入正确的时间格式'
       } else if (+new Date(dateValue) > nNow) {
-        oReturn.message = "时间不能超过当前时间"
+        oReturn.message = '时间不能超过当前时间'
       } else {
         // 判断时间格式。
-        if (sType == ">") {
+        if (sType === '>') {
           // 结束时间。
           if (+new Date(comValue) > +new Date(dateValue)) {
-            oReturn.message = "结束时间必须大于开始时间"
+            oReturn.message = '结束时间必须大于开始时间'
           } else {
             oReturn.validate = true
           }
         } else {
           // 开始时间。
           if (+new Date(dateValue) > +new Date(comValue)) {
-            oReturn.message = "开始时间必须小于结束时间"
+            oReturn.message = '开始时间必须小于结束时间'
           } else {
             oReturn.validate = true
           }
@@ -2573,14 +2576,14 @@ export default {
       return oReturn
     },
     // 保存开始时间。
-    saveStart(ev) {
+    saveStart (ev) {
       // 判断时间格式。结束时间：编辑时取上次时间，否则取当前时间
       let oReturn = this.validateTime(
         this.datetime.start,
         this.endIf
           ? this.datetime.end
           : this.datetime.beforeEnd || this.datetime.initEnd,
-        "<"
+        '<'
       )
 
       if (oReturn.validate) {
@@ -2596,7 +2599,7 @@ export default {
       }
     },
     // 取消保存开始时间。
-    cancelStart() {
+    cancelStart () {
       // 取消保存时间，恢复到上次datetime的值。
       this.datetime.start = this.datetime.beforeStart
         ? this.datetime.beforeStart
@@ -2605,15 +2608,15 @@ export default {
       this.startValidate = true
     },
     // 保存结束时间。
-    saveEnd() {
+    saveEnd () {
       // 判断时间格式。结束时间：编辑时取上次时间，否则取当前时间
       let oReturn = this.validateTime(
         this.datetime.end,
         this.startIf
           ? this.datetime.start
           : this.datetime.beforeStart || this.datetime.initStart,
-        ">"
-      );
+        '>'
+      )
 
       if (oReturn.validate) {
         // 保存当前的数据（上一次）: 用于取消时显示
@@ -2628,7 +2631,7 @@ export default {
       }
     },
     // 取消保存结束时间。
-    cancelEnd() {
+    cancelEnd () {
       // 取消保存时间，恢复到上次datetime的值。
       this.datetime.end = this.datetime.beforeEnd
         ? this.datetime.beforeEnd
@@ -2637,10 +2640,10 @@ export default {
       this.endValidate = true
     },
     // 时间更新，页面刷新操作。
-    goRefresh() {
+    goRefresh () {
       if (!(this.startIf && this.endIf)) {
         // 时间还有在编辑。
-        this.$message("请确定时间全部修改完成。")
+        this.$message('请确定时间全部修改完成。')
       } else if (this.endValidate && this.startValidate) {
         // 更新当前显示时间。
         this.datetime.realStart = this.datetime.initStart = this.datetime.beforeStart = this.datetime.start
@@ -2649,124 +2652,124 @@ export default {
         // 更新数据。
         this.refreshData()
       } else {
-        this.$message("请确认时间格式")
+        this.$message('请确认时间格式')
       }
     },
     /**
      * 数据刷新。
      * @return {void}
      */
-    refreshData() {
+    refreshData () {
       this.fetchAllData()
     },
     // 提示框显示位置设置。
-    tooltipPosition(pos, params, el, elRect, size) {
+    tooltipPosition (pos, params, el, elRect, size) {
       return {
         right: 2,
         top: GRID_TOP
       }
     },
     // 数据提示。
-    tooltipFormatter(params) {
+    tooltipFormatter (params) {
       if (this.markLine.filter(o => o.xAxis === params[0].axisValue).length) {
         // 若已存在提示面板。
-        return;
+        return
       }
 
       // 保存提示框数据。
-      this.axisTooltipData = params;
+      this.axisTooltipData = params
 
-      let sHtml = "",
-        oGroupId = {};
+      let sHtml = ''
+      let oGroupId = {}
 
       params.forEach(param => {
-        let aoValue = param.value,
-          sList = "",
-          yAxisIndex = aoValue[1],
-          oGroupIdList = new Set(),
-          nIndex = 0;
+        let aoValue = param.value
+        let sList = ''
+        let yAxisIndex = aoValue[1]
+        let oGroupIdList = new Set()
+        let nIndex = 0
         // sColor = (this.dimension.filter(o => o.name === param.seriesName)[0]).color;
 
         // 第一级设备。
-        oGroupId[yAxisIndex] = {};
+        oGroupId[yAxisIndex] = {}
 
         // 事件列表
         aoValue[3].forEach((o, index) => {
           if (
-            aoValue[4] !== "pool" ||
-            (aoValue[4] === "pool" && !this.onlyShowRelatedData) ||
+            aoValue[4] !== 'pool' ||
+            (aoValue[4] === 'pool' && !this.onlyShowRelatedData) ||
             (this.onlyShowRelatedData && o.related)
           ) {
             // 若展示全部，或只展示与起点相关，且当前点与起点相关。
-            let sGroup = "",
-              sTag = "";
+            let sGroup = ''
+            let sTag = ''
 
             // 保存分组id。
-            if (o.groupId != null && o.groupId !== "") {
-              oGroupIdList.add(o.groupId);
-              sGroup = o.groupId;
+            if (o.groupId != null && o.groupId !== '') {
+              oGroupIdList.add(o.groupId)
+              sGroup = o.groupId
             }
 
-            if (o.related && (o.title === "投料" || o.title === "产出")) {
+            if (o.related && (o.title === '投料' || o.title === '产出')) {
               // 若为起点相关的投产。
-              sTag = `<i class="icon icon-12 icon-pin"></i>`;
+              sTag = `<i class="icon icon-12 icon-pin"></i>`
             }
             if (sGroup) {
               sList += `<div style="color:${param.color}">${++nIndex}.${
                 o.title
-              }&nbsp;&nbsp;事件组：${sGroup}${sTag}</div>`;
+              }&nbsp;&nbsp;事件组：${sGroup}${sTag}</div>`
             } else {
               sList += `<div style="color:${param.color}">${++nIndex}.${
                 o.title
-              }${sTag}</div>`;
+              }${sTag}</div>`
             }
 
             o.tooltipData.forEach(tip => {
               sList += `<div style="padding:0 5px;"><span>${
                 tip.name
-              }:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`;
-            });
+              }:&nbsp;&nbsp;${this.parseData(tip.value)}<span></div>`
+            })
           }
-        });
+        })
 
         // 设备列表
         sHtml += `<div>
                         <div style="color:${param.color};font-weight:bold">${
-          param.name.split("+")[0]
+          param.name.split('+')[0]
         }&nbsp;&nbsp;&nbsp;&nbsp;${param.seriesName}&nbsp;&nbsp;&nbsp;&nbsp;${
-          this.onlyShowRelatedData && aoValue[4] === "pool"
+          this.onlyShowRelatedData && aoValue[4] === 'pool'
             ? aoValue[5]
             : aoValue[2]
         }条记录</div>
                         <div style="margin-top:10px">${sList}</div>
-                    </div>`;
+                    </div>`
 
         // 第二级事件。
-        oGroupId[yAxisIndex][param.seriesIndex] = [...oGroupIdList];
-      });
+        oGroupId[yAxisIndex][param.seriesIndex] = [...oGroupIdList]
+      })
 
-      sHtml = `<div class="suspend-tooltip-wrapper" style="width:188px;padding:10px;">${sHtml}</div>`;
+      sHtml = `<div class="suspend-tooltip-wrapper" style="width:188px;padding:10px;">${sHtml}</div>`
 
-      this.highlightGroup(oGroupId);
+      this.highlightGroup(oGroupId)
 
-      return sHtml;
+      return sHtml
     },
-    stateTooltipPosition(pos, params, el, elRect, size) {
-      pos[0] = pos[0] + TOOLTIP_X_DISTANCE;
+    stateTooltipPosition (pos, params, el, elRect, size) {
+      pos[0] = pos[0] + TOOLTIP_X_DISTANCE
 
       if (pos[0] + size.contentSize[0] > size.viewSize[0]) {
         // 若超出x轴范围
-        pos[0] = pos[0] - TOOLTIP_X_DISTANCE * 2 - size.contentSize[0];
+        pos[0] = pos[0] - TOOLTIP_X_DISTANCE * 2 - size.contentSize[0]
       }
 
-      return pos;
+      return pos
     },
     // 状态提示。
-    stateTooltipFormatter(params) {
-      let time = params.value[3] / 1000,
-        hour = 0,
-        munite = 0,
-        second = 0
+    stateTooltipFormatter (params) {
+      let time = params.value[3] / 1000
+      let hour = 0
+      let munite = 0
+      let second = 0
 
       if (time / 3600 >= 1) {
         hour = Math.floor(time / 3600)
@@ -2779,7 +2782,7 @@ export default {
       second = time % 60
 
       if (hour) {
-        time = hour + "h" + munite + "'" + second + "''"
+        time = hour + 'h' + munite + "'" + second + "''"
       } else if (munite) {
         time = munite + "'" + second + "''"
       } else {
@@ -2788,12 +2791,12 @@ export default {
 
       return `${params.marker}${params.name}：${time}<br/>
                     ${params.value[4]}<br/>
-                    ${params.value[5]}`;
+                    ${params.value[5]}`
     },
     // 设置组高亮。
-    highlightGroup(oGroupId) {
-      let aoSeries = this.chart.getOption().series,
-        highlightData = {};
+    highlightGroup (oGroupId) {
+      let aoSeries = this.chart.getOption().series
+      let highlightData = {}
 
       for (let eqId in oGroupId) {
         for (let dim in oGroupId[eqId]) {
@@ -2801,16 +2804,16 @@ export default {
           // 找到设备维度。
           let oEquipmentData = this.equipmentData[
               this.categories[eqId >> 0].id
-            ],
+            ]
             // 事件类型。
-            sType = this.dimension[(dim >> 0) - 1].key,
+          let sType = this.dimension[(dim >> 0) - 1].key
             // 事件数据。
-            oDimensionData = oEquipmentData[sType],
+          let oDimensionData = oEquipmentData[sType]
             // 事件组id。
-            aGroupId = oGroupId[eqId][dim],
+          let aGroupId = oGroupId[eqId][dim]
             // 时间点。
-            sTime = new Set(),
-            aTime = []
+          let sTime = new Set()
+          let aTime = []
 
           for (let key in oDimensionData) {
             let aoEvent = oDimensionData[key]
@@ -2823,33 +2826,33 @@ export default {
             }
           }
 
-          aTime = [...sTime];
+          aTime = [...sTime]
           // 找到散点图中应该高亮的点。
           aoSeries[dim].data.forEach((arr, index) => {
-            if (arr[1] == eqId && aTime.indexOf(arr[0]) > -1) {
+            if (arr[1] === eqId && aTime.indexOf(arr[0]) > -1) {
               if (!highlightData[dim]) {
                 highlightData[dim] = []
               }
               highlightData[dim].push(index)
             }
-          });
+          })
         }
       }
 
       this.setChartDataHighlight(highlightData)
     },
     // 设置图形高亮。
-    setChartDataHighlight(highlightData) {
+    setChartDataHighlight (highlightData) {
       if (this.highlightedData) {
         // 取消之前设置的高亮。
-        this.chartHighlightSwitch(this.highlightedData, "downplay");
+        this.chartHighlightSwitch(this.highlightedData, 'downplay')
       }
       // 设置新的高亮节点。
-      this.chartHighlightSwitch(highlightData, "highlight");
-      this.highlightedData = Object.assign({}, highlightData);
+      this.chartHighlightSwitch(highlightData, 'highlight')
+      this.highlightedData = Object.assign({}, highlightData)
     },
     // 节点高亮开关。
-    chartHighlightSwitch(oData, sType) {
+    chartHighlightSwitch (oData, sType) {
       Object.keys(oData).forEach(dim => {
         // 若至少有一组数据才高亮显示。
         if (oData[dim].length > 1) {
@@ -2859,36 +2862,36 @@ export default {
             seriesIndex: dim >> 0,
             // 可选，数据的 index
             dataIndex: oData[dim]
-          });
+          })
         }
-      });
+      })
     },
     // 数据格式化。
-    parseData(value) {
-      if (value == null || value === "") {
-        return "-";
+    parseData (value) {
+      if (value == null || value === '') {
+        return '-'
       } else {
-        return value;
+        return value
       }
     },
     // 渲染函数。
-    renderItem(params, api) {
+    renderItem (params, api) {
       // 对于 data 中的每个 dataItem，都会调用这个 renderItem 函数。
       // （但是注意，并不一定是按照 data 的顺序调用）
 
       // 这里进行一些处理，例如，坐标转换。
       // 这里使用 api.value(0) 取出当前 dataItem 中第一个维度的数值。
-      var categoryIndex = api.value(0);
+      var categoryIndex = api.value(0)
       // 这里使用 api.coord(...) 将数值在当前坐标系中转换成为屏幕上的点的像素值。
-      var startPoint = api.coord([api.value(1), categoryIndex]);
-      var endPoint = api.coord([api.value(2), categoryIndex]);
+      var startPoint = api.coord([api.value(1), categoryIndex])
+      var endPoint = api.coord([api.value(2), categoryIndex])
       // 这里使用 api.size(...) 获得 Y 轴上数值范围为 1 的一段所对应的像素长度。
-      var height = 14; //api.size([0, 1])[1] * 0.6
+      var height = 14 // api.size([0, 1])[1] * 0.6
 
       // 这里返回为这个 dataItem 构建的图形元素定义。
       return {
         // 表示这个图形元素是矩形。还可以是 'circle', 'sector', 'polygon' 等等。
-        type: "rect",
+        type: 'rect',
         // shape 属性描述了这个矩形的像素位置和大小。
         // 其中特殊得用到了 echarts.graphic.clipRectByRect，意思是，
         // 如果矩形超出了当前坐标系的包围盒，则剪裁这个矩形。
@@ -2911,84 +2914,84 @@ export default {
         // 用 api.style(...) 得到默认的样式设置。这个样式设置包含了
         // option 中 itemStyle 的配置和视觉映射得到的颜色。
         style: api.style()
-      };
+      }
     },
     // 获取缩放后的X轴
-    getScaledxAxis() {
+    getScaledxAxis () {
       return this.chart
         .getOption()
         .dataZoom.filter(
-          o => o.type === "slider" && o.xAxisIndex.length === 1
-        )[0];
+          o => o.type === 'slider' && o.xAxisIndex.length === 1
+        )[0]
     },
     // 获取实际缩放后的时间。
-    getRealTime() {
-      let oDate = this.getScaledxAxis();
+    getRealTime () {
+      let oDate = this.getScaledxAxis()
 
       return {
         start: new Date(oDate.startValue).Format(),
         end: new Date(oDate.endValue).Format()
-      };
+      }
     },
     // 可疑品列表。
-    showSuspiciousList() {
+    showSuspiciousList () {
       // 跳转之前保存数据。
-      this.setSessionStorage();
-      let oDate = this.getRealTime();
+      this.setSessionStorage()
+      let oDate = this.getRealTime()
 
       // 根据设备+开始时间+结束时间，查询可疑品列表。
       this.$router.replace({
-        path: "/process/restrain",
+        path: '/process/restrain',
         query: {
           equipmentName: this.selectedEquipmentName,
           equipmentId: this.selectedEquipmentId,
           startTime: oDate.start,
           endTime: oDate.end,
-          shiftStartTime: this.getRealTimeLineDateTime().start, //this.datetime.start,
-          shiftEndTime: this.getRealTimeLineDateTime().end, //this.datetime.end,
+          shiftStartTime: this.getRealTimeLineDateTime().start, // this.datetime.start,
+          shiftEndTime: this.getRealTimeLineDateTime().end, // this.datetime.end,
           code: this.process
         }
-      });
+      })
     },
     // 销毁追踪配置弹窗。
-    destoryTrackConfig(oData) {
-      this.trackConfigForm.visible = false;
+    destoryTrackConfig (oData) {
+      this.trackConfigForm.visible = false
 
       if (oData) {
         let tag = new Date()
             .getTime()
             .toString()
-            .substr(-5), // 生成唯一标识。
-          oCondition = {
-            keys: {
-              equipmentId: oData.equipmentId,
-              equipmentName: oData.equipmentName,
-              startTime: oData.startTime,
-              endTime: oData.endTime
-            },
-            type: "time"
-          };
+            .substr(-5) // 生成唯一标识。
+        let oCondition = {
+          keys: {
+            equipmentId: oData.equipmentId,
+            equipmentName: oData.equipmentName,
+            startTime: oData.startTime,
+            endTime: oData.endTime
+          },
+          type: 'time'
+        }
 
-        sessionStorage.setItem("track_" + tag, JSON.stringify(oCondition));
-        window.open("trackIndex.html?tag=" + tag);
+        sessionStorage.setItem('track_' + tag, JSON.stringify(oCondition))
+        window.open('trackIndex.html?tag=' + tag)
       }
     },
     // 显示追踪弹窗配置。
-    gotoTrackConfig() {
+    gotoTrackConfig () {
       // 设置数据。
-      let oDate = this.getRealTime(),
-        oData = {
-          equipmentId:
-            this.selectedEquipmentId + ":" + this.selectedEquipmentName,
-          startTime: oDate.start,
-          endTime: oDate.end
-        };
+      let oDate = this.getRealTime()
+      let oData = {
+        equipmentId:
+            this.selectedEquipmentId + ':' + this.selectedEquipmentName,
+        startTime: oDate.start,
+        endTime: oDate.end
+      }
 
-      this.trackConfigForm.data = oData;
-      this.trackConfigForm.visible = true;
+      this.trackConfigForm.data = oData
+      this.trackConfigForm.visible = true
     }
   }
-};
+}
 </script>
 
 <style lang="less">

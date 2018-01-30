@@ -115,41 +115,41 @@
 </template>
 
 <script>
-import table from "components/basic/table.vue";
-import XLSX from "xlsx";
-import Blob from "blob";
-import FileSaver from "file-saver";
-import html2canvas from "html2canvas";
-import rasterizeHTML from "rasterizehtml";
+import table from 'components/basic/table.vue'
+import XLSX from 'xlsx'
+import Blob from 'blob'
+import FileSaver from 'file-saver'
+// import html2canvas from 'html2canvas'
+import rasterizeHTML from 'rasterizehtml'
 
 export default {
   components: {
-    "v-table": table
+    'v-table': table
   },
   props: {
     type: String,
-    query: [Array, Object,String],
+    query: [Array, Object, String],
     showTables: {
       type: Array,
       required: false,
-      default: function() {
-        return ["summary"];
+      default: function () {
+        return ['summary']
       }
     }
   },
-  data() {
+  data () {
     return {
       excel: true,
       print: true,
       loading: false,
-      sErrorMessage: "",
+      sErrorMessage: '',
       oUrl: {
-        points: "/api/v1/trace/report/by-start-points",
-        barcode: "/api/v1/trace/report/by-equipment-barcode",
-        batch: "/api/v1/trace/report/by-equipment-batch",
-        time: "/api/v1/trace/report/by-equipment-time",
-				restrainBatch: "/api/v1/trace/report/by-batch",
-				restrainDetails: '/api/v1/suppress/verbose'
+        points: '/api/v1/trace/report/by-start-points',
+        barcode: '/api/v1/trace/report/by-equipment-barcode',
+        batch: '/api/v1/trace/report/by-equipment-batch',
+        time: '/api/v1/trace/report/by-equipment-time',
+        restrainBatch: '/api/v1/trace/report/by-batch',
+        restrainDetails: '/api/v1/suppress/verbose'
       },
       active: {
         summary: true,
@@ -161,138 +161,138 @@ export default {
       reportData: {
         // 汇总。
         summary: {
-          filename: "汇总",
+          filename: '汇总',
           show: true,
           columns: [
             {
-              prop: "batchNo",
-              name: "批次",
+              prop: 'batchNo',
+              name: '批次',
               // width: "250",
               sortable: true
             },
             {
-              prop: "materialCode",
-              name: "物料编码",
-              width: "200",
+              prop: 'materialCode',
+              name: '物料编码',
+              width: '200',
               sortable: true
             },
             {
-              prop: "materialName",
-              name: "物料名称",
+              prop: 'materialName',
+              name: '物料名称',
               sortable: true
             },
             {
-              prop: "quantity",
-              name: "数量",
-              width: "100",
+              prop: 'quantity',
+              name: '数量',
+              width: '100',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'quantity')
             },
             {
-              prop: "qualifiedNum",
-              name: "合格数",
-              width: "100",
+              prop: 'qualifiedNum',
+              name: '合格数',
+              width: '100',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "qualifiedNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'qualifiedNum')
             },
             {
-              prop: "unqualifiedNum",
-              name: "不合格数",
-              width: "100",
+              prop: 'unqualifiedNum',
+              name: '不合格数',
+              width: '100',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "unqualifiedNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'unqualifiedNum')
             },
             {
-              prop: "disabilityNum",
-              name: "报废数",
-              width: "100",
+              prop: 'disabilityNum',
+              name: '报废数',
+              width: '100',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "disabilityNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'disabilityNum')
             },
             {
-              prop: "rate",
-              name: "合格率",
-              width: "100",
+              prop: 'rate',
+              name: '合格率',
+              width: '100',
               sortable: true,
-              formatter: function(row, column) {
-                return (row.rate * 100).toFixed(2) + "%";
+              formatter: function (row, column) {
+                return (row.rate * 100).toFixed(2) + '%'
               },
-              sortMethod: (a, b) => this.setSortFun(a, b, "rate")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'rate')
             }
           ],
           data: []
         },
         // 发货。
         delivered: {
-          filename: "发货",
+          filename: '发货',
           show: true,
           filteredData: [],
           filterChange: filters => {
-            this.filterChange(filters, "delivered");
+            this.filterChange(filters, 'delivered')
           },
           columns: [
             {
-              prop: "barcode",
-              name: "条码",
+              prop: 'barcode',
+              name: '条码',
               sortable: true
             },
             {
-              prop: "batchNo",
-              name: "批次",
+              prop: 'batchNo',
+              name: '批次',
               // width: "200",
               sortable: true
             },
             {
-              prop: "materialCode",
-              name: "物料编码",
+              prop: 'materialCode',
+              name: '物料编码',
               sortable: true
             },
             {
-              prop: "materialName",
-              name: "物料名称",
-              width: "300",
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
-              prop: "quantity",
-              name: "数量",
-              width: "100",
+              prop: 'quantity',
+              name: '数量',
+              width: '100',
               sortable: true
             },
             {
-              prop: "stock",
-              name: "仓库",
+              prop: 'stock',
+              name: '仓库',
               sortable: true
             },
             {
-              prop: "stocklot",
-              name: "库位",
+              prop: 'stocklot',
+              name: '库位',
               sortable: true
             },
             {
-              prop: "customer",
-              name: "客户",
+              prop: 'customer',
+              name: '客户',
               sortable: true,
               filters: [],
-              filterMethod: function(value, row) {
-                return row.customer === value;
+              filterMethod: function (value, row) {
+                return row.customer === value
               },
-              filterPlacement: "bottom-end"
+              filterPlacement: 'bottom-end'
             },
             {
-              prop: "outstockType",
-              name: "出库类型",
+              prop: 'outstockType',
+              name: '出库类型',
               sortable: true
             },
             {
-              prop: "person",
-              name: "出库人",
+              prop: 'person',
+              name: '出库人',
               sortable: true
             },
             {
-              prop: "outstockTime", //格式：yyyy-MM-dd hh:mm:ss
-              name: "出库时间",
-              width: "160",
+              prop: 'outstockTime', // 格式：yyyy-MM-dd hh:mm:ss
+              name: '出库时间',
+              width: '160',
               sortable: true
             }
           ],
@@ -300,76 +300,76 @@ export default {
         },
         // 出库。
         outStocks: {
-          filename: "出库",
+          filename: '出库',
           show: true,
           filteredData: [],
           filterChange: filters => {
-            this.filterChange(filters, "outStocks");
+            this.filterChange(filters, 'outStocks')
           },
           columns: [
             {
-              prop: "barcode",
-              name: "条码",
+              prop: 'barcode',
+              name: '条码',
               sortable: true
             },
             {
-              prop: "batchNo",
-              name: "批次",
+              prop: 'batchNo',
+              name: '批次',
               // width: "200",
               sortable: true
             },
             {
-              prop: "materialCode",
-              name: "物料编码",
+              prop: 'materialCode',
+              name: '物料编码',
               sortable: true
             },
             {
-              prop: "materialName",
-              name: "物料名称",
-              width: "300",
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
-              prop: "quantity",
-              name: "数量",
-              width: "100",
+              prop: 'quantity',
+              name: '数量',
+              width: '100',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'quantity')
             },
             {
-              prop: "stock",
-              name: "仓库",
+              prop: 'stock',
+              name: '仓库',
               sortable: true
             },
             {
-              prop: "stocklot",
-              name: "库位",
+              prop: 'stocklot',
+              name: '库位',
               sortable: true
             },
             {
-              prop: "customer",
-              name: "客户",
+              prop: 'customer',
+              name: '客户',
               sortable: true,
               filters: [],
-              filterMethod: function(value, row) {
-                return row.customer === value;
+              filterMethod: function (value, row) {
+                return row.customer === value
               },
-              filterPlacement: "bottom-end"
+              filterPlacement: 'bottom-end'
             },
             {
-              prop: "outstockType",
-              name: "出库类型",
+              prop: 'outstockType',
+              name: '出库类型',
               sortable: true
             },
             {
-              prop: "person",
-              name: "出库人",
+              prop: 'person',
+              name: '出库人',
               sortable: true
             },
             {
-              prop: "outstockTime", //格式：yyyy-MM-dd hh:mm:ss
-              name: "出库时间",
-              width: "160",
+              prop: 'outstockTime', // 格式：yyyy-MM-dd hh:mm:ss
+              name: '出库时间',
+              width: '160',
               sortable: true
             }
           ],
@@ -377,81 +377,81 @@ export default {
         },
         // 在库
         inStocks: {
-          filename: "在库",
+          filename: '在库',
           show: true,
           filteredData: [],
           filterChange: filters => {
-            this.filterChange(filters, "inStocks");
+            this.filterChange(filters, 'inStocks')
           },
           columns: [
             {
-              prop: "barcode",
-              name: "条码",
+              prop: 'barcode',
+              name: '条码',
               sortable: true
             },
             {
-              prop: "batchNo",
-              name: "批次",
+              prop: 'batchNo',
+              name: '批次',
               // width: "200",
               sortable: true
             },
             {
-              prop: "materialCode",
-              name: "物料编码",
+              prop: 'materialCode',
+              name: '物料编码',
               sortable: true
             },
             {
-              prop: "materialName",
-              name: "物料名称",
-              width: "300",
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
-              prop: "quantity",
-              name: "数量",
-              width: "100",
+              prop: 'quantity',
+              name: '数量',
+              width: '100',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'quantity')
             },
             {
-              prop: "remainingNum",
-              name: "库存余量",
+              prop: 'remainingNum',
+              name: '库存余量',
               sortable: true
             },
             {
-              prop: "stock",
-              name: "仓库",
+              prop: 'stock',
+              name: '仓库',
               sortable: true
             },
             {
-              prop: "stocklot",
-              name: "库位",
+              prop: 'stocklot',
+              name: '库位',
               sortable: true
             },
             {
-              prop: "customer",
-              name: "客户",
+              prop: 'customer',
+              name: '客户',
               sortable: true,
               filters: [],
-              filterMethod: function(value, row) {
-                return row.customer === value;
+              filterMethod: function (value, row) {
+                return row.customer === value
               },
-              filterPlacement: "bottom-end"
+              filterPlacement: 'bottom-end'
             },
             {
-              prop: "instockType",
-              name: "入库类型",
+              prop: 'instockType',
+              name: '入库类型',
               sortable: true
             },
             {
-              prop: "person",
-              name: "入库人",
+              prop: 'person',
+              name: '入库人',
               sortable: true
             },
             {
-              prop: "instockTime", //格式：yyyy-MM-dd hh:mm:ss
-              name: "入库时间",
-              width: "160",
+              prop: 'instockTime', // 格式：yyyy-MM-dd hh:mm:ss
+              name: '入库时间',
+              width: '160',
               sortable: true
             }
           ],
@@ -459,65 +459,65 @@ export default {
         },
         // 加工
         inMaking: {
-          filename: "加工",
+          filename: '加工',
           show: true,
           columns: [
             {
-              prop: "batchNo",
-              name: "批次",
+              prop: 'batchNo',
+              name: '批次',
               // width: "200",
               sortable: true
             },
             {
-              prop: "materialCode",
-              name: "物料编码",
+              prop: 'materialCode',
+              name: '物料编码',
               sortable: true
             },
             {
-              prop: "materialName",
-              name: "物料名称",
-              width: "300",
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
-              prop: "processName",
-              name: "工序",
+              prop: 'processName',
+              name: '工序',
               sortable: true
             },
             {
-              prop: "equipmentName",
-              name: "设备",
+              prop: 'equipmentName',
+              name: '设备',
               sortable: true
             },
             {
-              prop: "inNum",
-              name: "投入数量",
-              width: "100",
+              prop: 'inNum',
+              name: '投入数量',
+              width: '100',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "inNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'inNum')
             },
             {
-              prop: "consumedNum",
-              name: "已消耗数量",
+              prop: 'consumedNum',
+              name: '已消耗数量',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "consumedNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'consumedNum')
             },
             {
-              prop: "remainingNum",
-              name: "剩余量",
+              prop: 'remainingNum',
+              name: '剩余量',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "remainingNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'remainingNum')
             },
             {
-              prop: "inTimeFirst",
-              name: "最早投料时间",
-              width: "180",
+              prop: 'inTimeFirst',
+              name: '最早投料时间',
+              width: '180',
               sortable: true
             },
             {
-              prop: "inTimeLast",
-              name: "最晚投料时间",
-              width: "180",
+              prop: 'inTimeLast',
+              name: '最晚投料时间',
+              width: '180',
               sortable: true
             }
           ],
@@ -525,70 +525,70 @@ export default {
         },
         // 滞留
         remain: {
-          filename: "滞留",
+          filename: '滞留',
           show: true,
           columns: [
             {
-              prop: "batchNo",
-              name: "批次",
+              prop: 'batchNo',
+              name: '批次',
               // width: "200",
               sortable: true
             },
             {
-              prop: "materialCode",
-              name: "物料编码",
+              prop: 'materialCode',
+              name: '物料编码',
               sortable: true
             },
             {
-              prop: "materialName",
-              name: "物料名称",
-              width: "300",
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
-              prop: "processName",
-              name: "工序",
+              prop: 'processName',
+              name: '工序',
               sortable: true
             },
             {
-              prop: "equipmentName",
-              name: "设备",
+              prop: 'equipmentName',
+              name: '设备',
               sortable: true
             },
             {
-              prop: "outNum",
-              name: "数量",
+              prop: 'outNum',
+              name: '数量',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "outNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'outNum')
             },
             {
-              prop: "qualifiedNum",
-              name: "合格数",
+              prop: 'qualifiedNum',
+              name: '合格数',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "qualifiedNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'qualifiedNum')
             },
             {
-              prop: "unqualifiedNum",
-              name: "不合格数",
+              prop: 'unqualifiedNum',
+              name: '不合格数',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "unqualifiedNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'unqualifiedNum')
             },
             {
-              prop: "disabilityNum",
-              name: "报废数",
+              prop: 'disabilityNum',
+              name: '报废数',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "disabilityNum")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'disabilityNum')
             },
             {
-              prop: "outTimeFirst",
-              name: "最早产出时间",
-              width: "180",
+              prop: 'outTimeFirst',
+              name: '最早产出时间',
+              width: '180',
               sortable: true
             },
             {
-              prop: "outTimeLast",
-              name: "最晚产出时间",
-              width: "180",
+              prop: 'outTimeLast',
+              name: '最晚产出时间',
+              width: '180',
               sortable: true
             }
           ],
@@ -596,241 +596,243 @@ export default {
         },
         // 库存损益
         loss: {
-          filename: "库存损益",
+          filename: '库存损益',
           show: false, // 只有快速报告才显示。
           columns: [
             {
-              prop: "barcode",
-              name: "条码",
+              prop: 'barcode',
+              name: '条码',
               sortable: true
             },
             {
-              prop: "batchNo",
-              name: "批次",
+              prop: 'batchNo',
+              name: '批次',
               // width: "200",
               sortable: true
             },
             {
-              prop: "materialCode",
-              name: "物料编码",
+              prop: 'materialCode',
+              name: '物料编码',
               sortable: true
             },
             {
-              prop: "materialName",
-              name: "物料名称",
-              width: "300",
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
-              prop: "quantity",
-              name: "数量",
+              prop: 'quantity',
+              name: '数量',
               sortable: true,
-              sortMethod: (a, b) => this.setSortFun(a, b, "quantity")
+              sortMethod: (a, b) => this.setSortFun(a, b, 'quantity')
             },
             {
-              prop: "opPerson",
-              name: "操作人",
+              prop: 'opPerson',
+              name: '操作人',
               // width: "300",
               sortable: true
             },
             {
-              prop: "opTime",
-              name: "操作时间",
+              prop: 'opTime',
+              name: '操作时间',
               sortable: true
             }
           ],
           data: []
         }
       }
-    };
+    }
   },
   watch: {
-    $route: function() {
-      this.fetchData();
+    $route: function () {
+      this.fetchData()
     }
   },
-  created() {
-    if (this.type === "trace") {
+  created () {
+    if (this.type === 'trace') {
       // 若为快速报告,展示库存损益。
-      this.reportData.loss.show = true;
+      this.reportData.loss.show = true
     }
     // 数据加载。
-    this.fetchData();
+    this.fetchData()
   },
-  mounted() {
+  mounted () {
     this.$nextTick(() => {
-      //	设置显示顺序.
-      this.setSequence();
-    });
+      // 设置显示顺序.
+      this.setSequence()
+    })
   },
 
   methods: {
     // 排序函数。
-    setSortFun(oA, oB, paramName) {
-      return oA[paramName] - oB[paramName] > 0;
+    setSortFun (oA, oB, paramName) {
+      return oA[paramName] - oB[paramName] > 0
     },
     // 请求成功。
-    requestSucess(oResult) {
-      this.loading = false;
+    requestSucess (oResult) {
+      this.loading = false
 
-      let bSetWidth = false;
+      let bSetWidth = false
 
-      let oData = this.reportData;
+      let oData = this.reportData
       for (let p in oData) {
-        oData[p].data = oResult[p];
+        oData[p].data = oResult[p]
 
-        oData[p].data.sort(function(a, b) {
+        oData[p].data.sort(function (a, b) {
           if (a.materialCode > b.materialCode) {
-            return 1;
+            return 1
           }
           if (a.materialCode < b.materialCode) {
-            return -1;
+            return -1
           }
           if ((a.materialCode = b.materialCode)) {
             if (a.batchNo > b.batchNo) {
-              return 1;
+              return 1
             }
           }
           // a 必须等于 b
-          return 0;
-        });
+          return 0
+        })
 
-        oData[p].filteredData = oData[p].data;
+        oData[p].filteredData = oData[p].data
 
         if (!oResult[p].length) {
           // 若无数据。
-          oData[p].show = false;
+          oData[p].show = false
         }
 
         if (oResult[p].length && !bSetWidth) {
-          bSetWidth = true;
+          bSetWidth = true
           // 设置最小宽度。
-          this.$emit("hasData");
+          this.$emit('hasData')
         }
 
-        if (p == "summary") {
+        if (p === 'summary') {
           // 若为汇总信息。
           oData[p].data.map(o => {
             if (o.quantity) {
-              o.rate = (o.qualifiedNum / o.quantity).toFixed(4); //保留小数点后两位
+              o.rate = (o.qualifiedNum / o.quantity).toFixed(4) // 保留小数点后两位
             } else {
-              o.rate = 0;
+              o.rate = 0
             }
-          });
+          })
         }
 
-        this.setFilters(oData[p]);
+        this.setFilters(oData[p])
       }
 
       if (!bSetWidth) {
-        this.$emit("noData");
+        this.$emit('noData')
         // this.error = "查无数据。"
-        console.log("查无数据。");
+        console.log('查无数据。')
       }
     },
     // 请求失败。
-    requestFail(sErrorMessage) {
-      this.loading = false;
+    requestFail (sErrorMessage) {
+      this.loading = false
 
-      this.sErrorMessage = sErrorMessage;
+      this.sErrorMessage = sErrorMessage
       // this.showMessage();
 
-      this.$emit("noData");
+      this.$emit('noData')
       // this.error = "查无数据。"
-      console.log(this.sErrorMessage);
+      console.log(this.sErrorMessage)
     },
     // 请求错误。
-    requestError(err) {
-      this.loading = false;
-      this.sErrorMessage = err;
-      this.$emit("noData");
-      console.log("查询出错。");
+    requestError (err) {
+      this.loading = false
+      this.sErrorMessage = err
+      this.$emit('noData')
+      console.log('查询出错。')
     },
-    fetchData() {
-      this.sErrorMessage = "";
-      this.loading = true;
+    fetchData () {
+      this.sErrorMessage = ''
+      this.loading = true
 
-      let sUrl = "";
+      let sUrl = ''
 
       // 初始设置内容为空。
       for (let param in this.reportData) {
-        this.reportData[param].data = [];
+        this.reportData[param].data = []
       }
 
-      let oParam = null;
+      let oParam = null
 
-      if (this.type == "trace") {
+      if (this.type === 'trace') {
         this.showTables.forEach(e => {
-          this.active[e] = true;
-        });
+          this.active[e] = true
+        })
 
         // 若为快速报告。
-        let oQuery = this.query;
+        let oQuery = this.query
 
         if (oQuery.type) {
           // 若为溯源页面跳转。
-          sUrl = this.oUrl[oQuery.type];
-          oParam = oQuery.keys;
-          delete oParam.equipmentName;
+          sUrl = this.oUrl[oQuery.type]
+          oParam = oQuery.keys
+          delete oParam.equipmentName
         } else {
-          sUrl = this.oUrl["points"];
-          oParam = oQuery;
+          sUrl = this.oUrl['points']
+          oParam = oQuery
         }
-			} else if(this.type === "restrainDetails") {  // 遏制详情
-				oParam = this.query
-				//console.log(oParam)
-				sUrl = this.oUrl[this.type]
-				this.$ajax.defaults.headers.post['Content-Type'] = 'application/json;charset=UTF-8';
-				//debugger
-			} else {
+      } else if (this.type === 'restrainDetails') {
+        // 遏制详情
+        oParam = this.query
+        // console.log(oParam)
+        sUrl = this.oUrl[this.type]
+        this.$ajax.defaults.headers.post['Content-Type'] =
+          'application/json;charset=UTF-8'
+        // debugger
+      } else {
         // 若为遏制报告。
-        oParam = this.$route.query;
-        if (oParam && "equipmentId" in oParam) {
+        oParam = this.$route.query
+        if (oParam && 'equipmentId' in oParam) {
           // 若根据设备查询。
-          sUrl = this.oUrl["time"];
-          delete oParam.equipmentName;
+          sUrl = this.oUrl['time']
+          delete oParam.equipmentName
         } else {
           // 根据物料查询。
-          oParam.materialCode = oParam.materialCode.split(":")[0];
-          sUrl = this.oUrl["restrainBatch"];
+          oParam.materialCode = oParam.materialCode.split(':')[0]
+          sUrl = this.oUrl['restrainBatch']
         }
       }
 
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
-        HOST + sUrl,
-        "post",
+        window.HOST + sUrl,
+        'post',
         oParam,
         this.requestSucess,
         this.requestFail,
         this.requestError
-      );
+      )
     },
     // 设置过滤。
-    setFilters(oData) {
-      let aoColumns = oData.columns,
-        aoData = oData.data;
+    setFilters (oData) {
+      let aoColumns = oData.columns
+      let aoData = oData.data
 
       for (let i = 0, l = aoColumns.length; i < l; i++) {
-        if (aoColumns[i].prop == "customer") {
+        if (aoColumns[i].prop === 'customer') {
           // 若有客户信息。
-          let oFilter = {};
+          let oFilter = {}
 
           aoData.map(o => {
             if (!oFilter[o.customer]) {
-              oFilter[o.customer] = 1;
+              oFilter[o.customer] = 1
             }
-          });
+          })
 
           Object.keys(oFilter).map(key =>
             aoColumns[i].filters.push({
               text: key,
               value: key
             })
-          );
+          )
 
-          break;
+          break
         }
       }
     },
@@ -840,197 +842,189 @@ export default {
      * @param {String} param
      * @return {void}
      */
-    filterChange(filters, param) {
-      let selected = [];
+    filterChange (filters, param) {
+      let selected = []
 
       for (let p in filters) {
-        selected = filters[p];
+        selected = filters[p]
       }
 
       // 设置过滤数据。
       selected.map(
         s =>
-          (this.reportData[param].filteredData = this.reportData[
-            param
-          ].data.filter(o => o.customer == s))
-      );
+          (this.reportData[param].filteredData = this.reportData[param].data.filter(o => o.customer === s))
+      )
     },
-    setSequence() {
-      if (this.type == "trace") {
+    setSequence () {
+      if (this.type === 'trace') {
         // 若为快速报告，改变显示顺序：汇总-出库-在制-在库
         this.$refs.content.insertBefore(
           this.$refs.outStocks,
           this.$refs.inMakings
-        );
-        this.$refs.content.append(this.$refs.inStocks);
-        this.$refs.content.append(this.$refs.loss);
+        )
+        this.$refs.content.append(this.$refs.inStocks)
+        this.$refs.content.append(this.$refs.loss)
       }
     },
     // 表格导出。
-    exportExcelHandle(oData, event) {
-      event.stopPropagation();
+    exportExcelHandle (oData, event) {
+      event.stopPropagation()
 
       if (!oData) {
-        return;
+        return
       }
       // 下载表格。
-      window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData);
+      window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData)
     },
     // 表格打印。
-    printHandle(refTable, event, sTitle) {
-      event.stopPropagation();
+    printHandle (refTable, event, sTitle) {
+      event.stopPropagation()
 
-      let oTable = this.$refs[refTable];
+      let oTable = this.$refs[refTable]
       if (!oTable) {
-        return;
+        return
       }
 
-      let sQuery = oTable.offsetParent.querySelector(".condition-message")
+      let sQuery = oTable.offsetParent.querySelector('.condition-message')
         ? `
-						<div class="condition-message">${
-              oTable.offsetParent.querySelector(".condition-message").innerHTML
+            <div class="condition-message">${
+              oTable.offsetParent.querySelector('.condition-message').innerHTML
             }</div>
-						<div class="condition-list">${
-              oTable.offsetParent.querySelector(".condition-list").innerHTML
+            <div class="condition-list">${
+              oTable.offsetParent.querySelector('.condition-list').innerHTML
             }</div>
-						<div class="content-table condition-table">${
-              oTable.offsetParent.querySelector(".condition-table").innerHTML
+            <div class="content-table condition-table">${
+              oTable.offsetParent.querySelector('.condition-table').innerHTML
             }</div>
-					`
+          `
         : `
-						<div class="condition">${
-              oTable.offsetParent.querySelector(".condition").innerHTML
+            <div class="condition">${
+              oTable.offsetParent.querySelector('.condition').innerHTML
             }</div>
-					`;
+          `
 
       let sHtml = `
-					<h2 class="content-title">查询条件</h2>
-					${sQuery}
-					<h2 class="content-title"><span class="table-title">${sTitle}</span></h2>
-					<div class="table el-table">
-						<div class="el-table__header-wrapper">
-							${
-								oTable.querySelector(".el-table__header-wrapper")
-									.innerHTML
-							}
-						</div>
-						<div class="el-table__body-wrapper">
-							${
-								oTable.querySelector(".el-table__body-wrapper")
-									.innerHTML
-							}
-						</div>
-					</div>
-					<style>
-						.content-title {
-								font-size: 16px;
-								height: 16px;
-								line-height: 16px;
-								text-indent: 10px;
-								border-left: 4px solid #42af8f;
-							}
-							.content-title .table-title {
-								font-size: 16px;
-								color: #42AF8F;
-							}
-							.condition span {
-								display: inline-block;
-							}
-							.condition span + span {
-								margin-left: 60px;
-							}
-							.condition-message {
-								box-sizing: border-box;
-								padding-left: 10px;
-							}
-							.condition-message span {
-								font-size: 14px;
-								margin-right: 30px
-							}
-							.condition-message .default-message {
-								color: #999;
-								margin-right: 10px;
-							}
-							.condition-list {
-								box-sizing: border-box;
-								padding-left: 10px;
-							}
-							.condition-list span {
-								font-size: 14px;
-								line-height: 40px;
-								color: #42AF8F;
-							}
-							.condition-list icon {
-								display: none;
-							}
-							.condition-table {
-								margin-top: 0;
-								box-sizing: border-box;
-								border: 1px solid #42AF8F;
-								padding: 10px;
-							}
-							.condition-table .materialBox {
-								display: flex;
-								box-sizing: border-box;
-								padding-left: 10px;
-								color: #666;
-								margin-bottom: 20px;
-								font-size: 14px;
-							}
-							.condition-table .materialBox .material {
-								line-height: 20px;
-							}
-							.condition-table .materialBox .time {
-								display: flex;
-								flex: 1;
-								flex-wrap: wrap;
-								height: auto;
-							}
-							.condition-table .materialBox .time > span {
-								margin-left: 10px; 
-								line-height: 20px;
-							}
-							.el-table td.is-center, .el-table th.is-center {
-									text-align: center;
-							}
-							.table thead th {
-									height: 36px;
-									background-color: #42af8f;
-							}
-							.table thead th .cell {
-									color: #fff;
-							}
-							.el-table__body-wrapper tr:nth-child(even) {
-									background-color: #fafafa;
-							}
-							.el-table__body-wrapper tr:nth-child(odd) {
-									background-color: #fff;
-							}
-							.el-table__body-wrapper td {
-								white-space: normal;
-								word-break: break-all;
-							}
-							.el-table__body-wrapper .cell {
-									min-height: 30px;
-									line-height: 30px;
-									// 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-									//	border: 1px solid #e4efec;
-									box-sizing: border-box;
-							}
-							.el-table__body-wrapper .batch .cell > div {
-									color: #f90;
-								font-weight: 600
-							}
-							.el-table__empty-block {
-									text-align: center;	
-							}
-						</style>
-	            `;
+          <h2 class="content-title">查询条件</h2>
+          ${sQuery}
+          <h2 class="content-title"><span class="table-title">${sTitle}</span></h2>
+          <div class="table el-table">
+            <div class="el-table__header-wrapper">
+              ${oTable.querySelector('.el-table__header-wrapper').innerHTML}
+            </div>
+            <div class="el-table__body-wrapper">
+              ${oTable.querySelector('.el-table__body-wrapper').innerHTML}
+            </div>
+          </div>
+          <style>
+            .content-title {
+              font-size: 16px;
+              height: 16px;
+              line-height: 16px;
+              text-indent: 10px;
+              border-left: 4px solid #42af8f;
+            }
+            .content-title .table-title {
+              font-size: 16px;
+                color: #42AF8F;
+            }
+            .condition span {
+              display: inline-block;
+            }
+            .condition span + span {
+              margin-left: 60px;
+            }
+            .condition-message {
+              box-sizing: border-box;
+              padding-left: 10px;
+            }
+            .condition-message span {
+              font-size: 14px;
+              margin-right: 30px
+            }
+            .condition-message .default-message {
+              color: #999;
+              margin-right: 10px;
+            }
+            .condition-list {
+              box-sizing: border-box;
+              padding-left: 10px;
+            }
+            .condition-list span {
+              font-size: 14px;
+              line-height: 40px;
+              color: #42AF8F;
+            }
+            .condition-list icon {
+              display: none;
+            }
+            .condition-table {
+              margin-top: 0;
+              box-sizing: border-box;
+              border: 1px solid #42AF8F;
+              padding: 10px;
+            }
+            .condition-table .materialBox {
+              display: flex;
+              box-sizing: border-box;
+              padding-left: 10px;
+              color: #666;
+              margin-bottom: 20px;
+              font-size: 14px;
+            }
+            .condition-table .materialBox .material {
+              line-height: 20px;
+            }
+            .condition-table .materialBox .time {
+              display: flex;
+              flex: 1;
+              flex-wrap: wrap;
+              height: auto;
+            }
+            .condition-table .materialBox .time > span {
+              margin-left: 10px; 
+              line-height: 20px;
+            }
+            .el-table td.is-center, .el-table th.is-center {
+                text-align: center;
+            }
+            .table thead th {
+                height: 36px;
+                background-color: #42af8f;
+            }
+            .table thead th .cell {
+                color: #fff;
+            }
+            .el-table__body-wrapper tr:nth-child(even) {
+                background-color: #fafafa;
+            }
+            .el-table__body-wrapper tr:nth-child(odd) {
+                background-color: #fff;
+            }
+            .el-table__body-wrapper td {
+              white-space: normal;
+              word-break: break-all;
+            }
+            .el-table__body-wrapper .cell {
+                min-height: 30px;
+                line-height: 30px;
+                // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+                // border: 1px solid #e4efec;
+                box-sizing: border-box;
+            }
+            .el-table__body-wrapper .batch .cell > div {
+                color: #f90;
+              font-weight: 600
+            }
+            .el-table__empty-block {
+                text-align: center;
+            }
+          </style>
+         `
 
-      window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml);
+      window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
     }
   }
-};
+}
 </script>
 
 <style lang="less">

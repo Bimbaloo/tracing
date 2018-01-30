@@ -1,9 +1,9 @@
 // 登录。
-const LOGIN_URL = HOST + '/api/v1/sso/get-login-info'
+// const LOGIN_URL = window.HOST + '/api/v1/sso/get-login-info'
 // 退出。
-const LOGOUT_URL = HOST + '/api/v1/sso/logout'
+const LOGOUT_URL = window.HOST + '/api/v1/sso/logout'
 // 版本信息。
-const VERSION_URL = HOST + '/api/v1/customized/features'
+const VERSION_URL = window.HOST + '/api/v1/customized/features'
 
 // 清除登录cookie。
 var clearLoginCookie = function () {
@@ -20,17 +20,17 @@ var clearLoginCookie = function () {
  */
 var login = function (oStore) {
   if (!window.Rt.utils.cookie('token')) {
-		// 若cookie中无token。
+    // 若cookie中无token。
     const oParams = window.Rt.utils.getParams()
 
     if (oParams.token && oParams.userId && oParams.username && oParams.nickname) {
-			// 若地址中有token,设置cookie。
+      // 若地址中有token,设置cookie。
       window.Rt.utils.cookie('token', oParams.token)
       window.Rt.utils.cookie('userId', oParams.userId)
       window.Rt.utils.cookie('username', oParams.username)
       window.Rt.utils.cookie('nickname', oParams.nickname)
 
-			// 更新数据。
+      // 更新数据。
       oStore.commit({
         type: 'updateLoginInfo'
       })
@@ -44,7 +44,7 @@ var login = function (oStore) {
  * @return {void}
  */
 var loginFail = function (sUrl) {
-	// 清cookie。
+  // 清cookie。
   clearLoginCookie()
 
   let sTag = window.Rt.utils.getParam('tag')
@@ -54,20 +54,20 @@ var loginFail = function (sUrl) {
     sTag = '?'
   }
 
-	// 登录跳转。
-  location.href = sUrl +
-	encodeURIComponent(location.origin + location.pathname + sTag + 'token={token}&userId={userId}&username={username}&nickname={nickname}')
+  // 登录跳转。
+  window.location.href = sUrl +
+    encodeURIComponent(window.location.origin + window.location.pathname + sTag + 'token={token}&userId={userId}&username={username}&nickname={nickname}')
 }
 
 var beforeRequest = function (oStore, oAxio) {
-	// 更新数据。
+  // 更新数据。
   oStore.commit({
     type: 'updateLoginInfo'
   })
 
   const oLoginInfo = oStore.state.loginModule
 
-	// 设置请求头。
+  // 设置请求头。
   return oAxio.create({
     headers: {
       Authorization: JSON.stringify({
@@ -85,13 +85,13 @@ var beforeRequest = function (oStore, oAxio) {
 var judgeLoaderHandler = function (param, fnSu, fnFail) {
   const bRight = param.data.errorCode
 
-	// 判断是否调用成功。
+  // 判断是否调用成功。
   if (!bRight) {
-		// 调用成功后的回调函数。
+    // 调用成功后的回调函数。
     fnSu && fnSu()
   } else {
     if (bRight === 10) {
-			// 登录失败。
+      // 登录失败。
       if (param.data.errorMsg.subCode === '1') {
         // 清cookie，跳转到登录页面。
         loginFail(param.data.errorMsg.subMsg)
@@ -122,50 +122,54 @@ var sendRequest = function (oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, f
     const oResult = res.data
     const bRight = oResult.errorCode
     if (!bRight) {
-			// 调用成功后的回调函数。
+      // 调用成功后的回调函数。
       fnSu && fnSu(oResult.data)
     } else {
       if (bRight === 10) {
-				// 登录失败。
+        // 登录失败。
         if (oResult.errorMsg.subCode === '1') {
-					// 调整到登录界面前的操作。
+          // 调整到登录界面前的操作。
           fnBeforeLogin && fnBeforeLogin()
 
-					// 清cookie，跳转到登录页面。
+          // 清cookie，跳转到登录页面。
           loginFail(oResult.errorMsg.subMsg)
         }
       } else {
-				// 失败后的回调函。
+        // 失败后的回调函。
         fnFail && fnFail(oResult.errorMsg.message)
       }
     }
   }
 
   if (sType === 'get') {
-		// 若为get类型。
+    // 若为get类型。
     instance.get(sUrl, {
       params: oParams || {}
     })
-		.then(fnHandle)
-		.catch((err) => { fnError && fnError(err) })
+      .then(fnHandle)
+      .catch((err) => {
+        fnError && fnError(err)
+      })
   } else {
     instance[sType](sUrl, oParams || {})
-		.then(fnHandle)
-		.catch((err) => { fnError && fnError(err) })
+      .then(fnHandle)
+      .catch((err) => {
+        fnError && fnError(err)
+      })
   }
 }
 
 // 退出。
 var logout = function (oStore, oAjax) {
   beforeRequest(oStore, oAjax).post(LOGOUT_URL).then((res) => {
-		// 清cookie。
+    // 清cookie。
     clearLoginCookie()
-		// 更新数据。
+    // 更新数据。
     oStore.commit({
       type: 'updateLoginInfo'
     })
 
-		// 跳转到search。
+    // 跳转到search。
     window.open('search.html', '_self')
   })
 }
@@ -177,7 +181,7 @@ var getBeforeDispatchData = function (sDispatchType, oStore, oAxio, fnCallBack, 
 
     if (!bRight) {
       oStore.dispatch(sDispatchType, oResult.data)
-        // 调用成功后的回调函数。
+      // 调用成功后的回调函数。
       fnCallBack && fnCallBack()
     } else {
       if (bRight === 10) {

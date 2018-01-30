@@ -22,69 +22,69 @@
 
 
 <script>
-import table from "components/basic/table.vue";
-import report from "components/report/report.vue";
+import table from 'components/basic/table.vue'
+import report from 'components/report/report.vue'
 
-const URL = HOST + "/api/v1/suppress/list"; // 遏制列表
-const verboseURL = HOST + "/api/v1/suppress/verbose"; // 遏制详情
-const cancelURL = HOST + "/api/v1/suppress/cancel"; //   取消遏制
+const URL = HOST + '/api/v1/suppress/list' // 遏制列表
+const verboseURL = HOST + '/api/v1/suppress/verbose' // 遏制详情
+const cancelURL = HOST + '/api/v1/suppress/cancel' //   取消遏制
 
 export default {
   components: {
-    "v-report": report,
-    "v-table": table
+    'v-report': report,
+    'v-table': table
   },
-  data() {
+  data () {
     return {
       isDetails: false,
       loading: false,
-      resize: true, //是否允许拖动table大小
+      resize: true, // 是否允许拖动table大小
       tableDate: {
         // 遏制列表
         columns: [
           {
-            type: "index",
-            name: "序号",
-            width: "50"
+            type: 'index',
+            name: '序号',
+            width: '50'
           },
           {
-            prop: "doDescription",
-            name: "遏制详情"
+            prop: 'doDescription',
+            name: '遏制详情'
           },
           {
-            prop: "doTime",
-            name: "遏制时间",
+            prop: 'doTime',
+            name: '遏制时间',
             sortable: true,
             width: 200
           },
           {
-            prop: "cancelTime",
-            name: "取消遏制时间",
+            prop: 'cancelTime',
+            name: '取消遏制时间',
             sortable: true,
             width: 200
           },
           {
-            prop: "doOperator",
-            name: "开始遏制人员"
+            prop: 'doOperator',
+            name: '开始遏制人员'
           },
           {
-            prop: "cancelDescription",
-            name: "结束遏制详情"
+            prop: 'cancelDescription',
+            name: '结束遏制详情'
           },
           {
-            prop: "cancelOperator",
-            name: "结束遏制人员"
+            prop: 'cancelOperator',
+            name: '结束遏制人员'
           },
           {
-            prop: "stateName",
-            name: "遏制状态",
+            prop: 'stateName',
+            name: '遏制状态',
             sortable: true
           },
           {
-            prop: "handle",
-            name: "操作",
+            prop: 'handle',
+            name: '操作',
             cellClick: this.viewDetails,
-            class: "batch"
+            class: 'batch'
           }
         ],
         data: [],
@@ -93,65 +93,65 @@ export default {
       },
       /* 查询条件 */
       restrainList: {
-        startTime: "",
-        endTime: "",
-        personCode: ""
+        startTime: '',
+        endTime: '',
+        personCode: ''
       },
       height: 200,
-      handleId: "", // 点击行的 handleId
-      index: 0,    // 点击行的 index
+      handleId: '', // 点击行的 handleId
+      index: 0, // 点击行的 index
       doDescription: '' // 取消遏制的描述信息
-    };
+    }
   },
-  created() {
-    //获取查询条件
-    this.getCondition();
+  created () {
+    // 获取查询条件
+    this.getCondition()
     // 调用接口查询
-    this.getListhData(this.restrainList);
-    window.addEventListener("resize", this.setTableHeight);
+    this.getListhData(this.restrainList)
+    window.addEventListener('resize', this.setTableHeight)
     this.$nextTick(() => {
-      this.setTableHeight();
-    });
+      this.setTableHeight()
+    })
   },
-  destroyed() {
-    window.removeEventListener("resize", this.setTableHeight);
+  destroyed () {
+    window.removeEventListener('resize', this.setTableHeight)
   },
   computed: {
     /* 遏制详情--操作信息 */
-    information() {
+    information () {
       const arr = [
         {
-          prop: "doDescription",
-          name: "遏制详情"
+          prop: 'doDescription',
+          name: '遏制详情'
         },
         {
-          prop: "condition",
-          name: "遏制条件"
+          prop: 'condition',
+          name: '遏制条件'
         },
         {
-          prop: "doTime",
-          name: "遏制时间"
+          prop: 'doTime',
+          name: '遏制时间'
         },
         {
-          prop: "cancelTime",
-          name: "取消遏制时间"
+          prop: 'cancelTime',
+          name: '取消遏制时间'
         },
         {
-          prop: "doOperator",
-          name: "开始遏制人员"
+          prop: 'doOperator',
+          name: '开始遏制人员'
         },
         {
-          prop: "endDescription",
-          name: "结束遏制详情"
+          prop: 'endDescription',
+          name: '结束遏制详情'
         },
         {
-          prop: "endOperator",
-          name: "结束遏制人员"
+          prop: 'endOperator',
+          name: '结束遏制人员'
         }
-      ];
+      ]
       let informationArr =
-        Object.assign({}, this.tableDate.data[this.index]) || {};
-      let needArr = [];
+        Object.assign({}, this.tableDate.data[this.index]) || {}
+      let needArr = []
       arr.forEach(element => {
         if (
           informationArr[element.prop] !== null &&
@@ -160,13 +160,13 @@ export default {
           needArr.push({
             value: element.name,
             key: informationArr[element.prop]
-          });
+          })
         }
-      });
-      return needArr;
+      })
+      return needArr
     },
     /* 当前点击行的状态信息 */
-    state() {
+    state () {
       /* 对照表 */
       // const stateForm = {
       //   "-1":'异常',
@@ -178,99 +178,99 @@ export default {
       // }
       const state = this.tableDate.data[this.index].state || 0
       if (state === 1 || state === 3 || state === 4) {
-        return true;
+        return true
       } else {
-        return false;
+        return false
       }
     }
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
-    $route: function() {
-      this.getCondition();
-      this.getListhData(this.restrainList);
+    $route: function () {
+      this.getCondition()
+      this.getListhData(this.restrainList)
     }
   },
   methods: {
     // 获取查询信息
-    getCondition() {
-      let { startTime, endTime, personCode } = this.$route.query;
-      this.restrainList = { startTime, endTime, personCode };
+    getCondition () {
+      let { startTime, endTime, personCode } = this.$route.query
+      this.restrainList = { startTime, endTime, personCode }
     },
 
     // 获取遏制列表信息
-    getListhData(oCondition) {
+    getListhData (oCondition) {
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
         URL,
-        "post",
+        'post',
         oCondition,
         this.requestSucess,
         this.requestFail,
         this.requestError
-      );
+      )
     },
     // 获取遏制列表信息 - 请求成功。
-    requestSucess(oData) {
-      this.loading = false;
+    requestSucess (oData) {
+      this.loading = false
       oData.forEach((el, index) => {
-        el.handleId = el.handle;
-        el.handle = "查看详情";
-        el.index = index;
-      });
-      this.tableDate.data = oData;
-      this.isDetails = false;
+        el.handleId = el.handle
+        el.handle = '查看详情'
+        el.index = index
+      })
+      this.tableDate.data = oData
+      this.isDetails = false
     },
     // 请求失败。
-    requestFail(sErrorMessage) {
-      this.loading = false;
-      console.log(sErrorMessage);
+    requestFail (sErrorMessage) {
+      this.loading = false
+      console.log(sErrorMessage)
     },
     // 请求错误。
-    requestError(err) {
-      console.log(err);
-      this.loading = false;
-      console.log("数据库查询出错。");
+    requestError (err) {
+      console.log(err)
+      this.loading = false
+      console.log('数据库查询出错。')
     },
 
-    //查看详情
-    viewDetails(oDate) {
-      this.index = oDate.index;
-      this.handleId = oDate.handleId;
-      this.isDetails = true;
+    // 查看详情
+    viewDetails (oDate) {
+      this.index = oDate.index
+      this.handleId = oDate.handleId
+      this.isDetails = true
     },
-    setWidth() {
-      this.styleObject.minWidth = "1000px";
+    setWidth () {
+      this.styleObject.minWidth = '1000px'
     },
-    removeWidth() {
-      this.styleObject.minWidth = 0;
+    removeWidth () {
+      this.styleObject.minWidth = 0
     },
     /* 获取元素实际高度(含margin) */
-    outerHeight(el) {
-      var height = el.offsetHeight;
-      var style = el.currentStyle || getComputedStyle(el);
+    outerHeight (el) {
+      var height = el.offsetHeight
+      var style = el.currentStyle || getComputedStyle(el)
 
-      height += parseInt(style.marginTop) + parseInt(style.marginBottom);
-      return height;
+      height += parseInt(style.marginTop) + parseInt(style.marginBottom)
+      return height
     },
     /* 设置高度 */
-    setTableHeight() {
-      this.tableDate.height = this.outerHeight(this.$refs.suspiciousList) - 110;
+    setTableHeight () {
+      this.tableDate.height = this.outerHeight(this.$refs.suspiciousList) - 110
     },
     /* 取消遏制 */
-    cancelSuppres() {
-      const handleId = this.tableDate.data[this.index].handleId;
-      const h = this.$createElement;
-      let bSucess = false;
-      let self = this;
+    cancelSuppres () {
+      const handleId = this.tableDate.data[this.index].handleId
+      const h = this.$createElement
+      // let bSucess = false
+      let self = this
       this.$msgbox({
-        title: "提示",
-        message: h("el-input", {
+        title: '提示',
+        message: h('el-input', {
           attrs: {
-            type: "textarea",
+            type: 'textarea',
             rows: 4,
-            placeholder: "请输入取消遏制描述信息"
+            placeholder: '请输入取消遏制描述信息'
           },
           class: {
             message: true
@@ -279,48 +279,48 @@ export default {
             value: self.doDescription
           },
           on: {
-            blur: function(event) {
-              self.doDescription = event.target.value;
+            blur: function (event) {
+              self.doDescription = event.target.value
             }
           }
         }),
         showCancelButton: true,
-        confirmButtonText: "确定",
-        cancelButtonText: "取消",
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
         beforeClose: (action, instance, done) => {
-          if (action === "confirm") {
-            instance.confirmButtonLoading = true;
-            instance.confirmButtonText = "取消遏制中...";
+          if (action === 'confirm') {
+            instance.confirmButtonLoading = true
+            instance.confirmButtonText = '取消遏制中...'
             let oConditions = {
-              "description": self.doDescription,
-              "handle": handleId
+              description: self.doDescription,
+              handle: handleId
             }
             this.$post(cancelURL, oConditions)
               .then(oData => {
-                instance.confirmButtonLoading = false;
-                this.$message.success("取消遏制成功");
-                self.doDescription = "";
+                instance.confirmButtonLoading = false
+                this.$message.success('取消遏制成功')
+                self.doDescription = ''
                 debugger
                 this.isDetails = false
-                this.getListhData(this.restrainList);
-                done();
+                this.getListhData(this.restrainList)
+                done()
               })
               .catch(err => {
-                instance.confirmButtonLoading = false;
-                this.$message.error("取消遏制失败");
-                self.doDescription = "";
-                console.log(err);
-                done();
-              });
+                instance.confirmButtonLoading = false
+                this.$message.error('取消遏制失败')
+                self.doDescription = ''
+                console.log(err)
+                done()
+              })
           } else {
-            self.doDescription = "";
-            done();
+            self.doDescription = ''
+            done()
           }
         }
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style scoped lang="less">

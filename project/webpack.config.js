@@ -32,7 +32,7 @@ const config = {
   entry: entries,
   output: {
     path: resolve(__dirname, './dist'),
-    filename: 'assets/js/[name].js',
+    filename: 'assets/js/[name].js'
 //  publicPath: '/'
   },
   resolve: {
@@ -41,7 +41,8 @@ const config = {
       assets: join(__dirname, '/src/assets'),
       components: join(__dirname, '/src/components'),
       root: join(__dirname, 'node_modules'),
-      vue: 'vue/dist/vue.js'
+      vue: 'vue/dist/vue.js',
+      theme: join(__dirname, '/src/assets/theme')
     }
   },
   module: {
@@ -124,19 +125,19 @@ const config = {
     extractCSS,
     new CopyWebpackPlugin([
       {
-          from: 'src/static',
-          to: 'static'/*,
-          ignore: ['.*']*/
+        from: 'src/static',
+        to: 'static'/*,
+          ignore: ['.*'] */
       }
     ])
   ],
   devServer: {
     host: '127.0.0.1', // 0.0.0.0 为了使项目可以ip访问  https://doc.webpack-china.org/configuration/dev-server/#devserver-host
     port: 8010,
-    historyApiFallback: false,
+    // historyApiFallback: false,
     historyApiFallback: {
       rewrites: [
-        { from: /^\/$/, to: '/search.html' },
+        { from: /^\/$/, to: '/search.html' }
       ]
     },
     noInfo: true,
@@ -150,7 +151,7 @@ const config = {
     // useLocalIp: true, // host修改后，会自动打开0.0.0.0:8010/search.html，这个属性使用本地ip作为页面ip https://doc.webpack-china.org/configuration/dev-server/#devserver-uselocalip
     open: true,
     openPage: 'search.html', // 希望自动打开 http://127.0.0.1:8010/search.html
-    compress: true //开启gzip压缩
+    compress: true // 开启gzip压缩
   },
   devtool: '#eval-source-map'
 }

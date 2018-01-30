@@ -2,17 +2,10 @@
 	<div class="router-content suspicious">
 		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained">遏制</el-button>
 		<div class="innner-content" :style="styleObject">
-			<!--h2 class="title">遏制详情</h2-->
-			<!-- <h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2> -->
-			<div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
-				<span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span>
+      <h2 class="title">模具记录</h2>
+      <div class="moldInfo">
+				<span>模具名称：XXX</span><span>规格：XXX</span><span>模具额定寿命：XXX</span>
 			</div>
-			<div class="condition" v-if="'equipmentId' in oQuery">
-				<span>设备名称：{{equipmentName}}</span><span>开始时间：{{oQuery.startTime}}</span><span>结束时间：{{oQuery.endTime}}</span>
-			</div>
-			<h2 class="title">可疑品列表</h2>
-			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
-			<v-report v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report> 
 		</div>
 	</div>
 
@@ -29,7 +22,7 @@ export default {
     return {
       isRestrained: true,
       doDescription: '',
-      url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
+      url: window.HOST + '/api/v1/suppress/do-by-mold', // 根据模号
       styleObject: {
         'min-width': '1000px'
       },
@@ -97,27 +90,41 @@ export default {
             )
 
             this.$post(this.url, oConditions)
-            .then((oData) => {
-              console.log(oData)
-              this.isRestrained = false
-              const handle = oData.data.data.handle
-              sessionStorage.setItem('handleID', handle)
-              instance.confirmButtonLoading = false
-              this.$message.success('遏制成功')
-              let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
-              self.doDescription = ''
-              sessionStorage.setItem('restrain', JSON.stringify(restrain))
-              window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+              .then(oData => {
+                console.log(oData)
+                this.isRestrained = false
+                const handle = oData.data.data.handle
+                sessionStorage.setItem('handleID', handle)
+                instance.confirmButtonLoading = false
+                this.$message.success('遏制成功')
+                let restrain = {
+                  ...this.$route.query,
+                  ...{
+                    handleID: handle,
+                    description: this.doDescription,
+                    suppressTime: new Date().Format('yyyy-MM-dd hh:mm:ss')
+                  }
+                }
+                self.doDescription = ''
+                sessionStorage.setItem('restrain', JSON.stringify(restrain))
+                window.open(
+                  '/restrainReport.html?' +
+                    '_tag=' +
+                    new Date()
+                      .getTime()
+                      .toString()
+                      .substr(-5)
+                )
 
-              done()
-            })
-            .catch(err => {
-              instance.confirmButtonLoading = false
-              this.$message.error('遏制失败')
-              self.doDescription = ''
-              console.log(err)
-              done()
-            })
+                done()
+              })
+              .catch(err => {
+                instance.confirmButtonLoading = false
+                this.$message.error('遏制失败')
+                self.doDescription = ''
+                console.log(err)
+                done()
+              })
           } else {
             self.doDescription = ''
             done()
@@ -164,11 +171,7 @@ export default {
     //	top: 45px;
   }
 
-  .condition {
-    border: 2px solid #42af8f;
-    padding: 20px 12px;
-    margin-bottom: 30px;
-
+  .moldInfo {
     span {
       display: inline-block;
       & + span {

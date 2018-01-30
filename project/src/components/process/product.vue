@@ -14,7 +14,7 @@
 	    <el-dialog 
 	    	v-if="!bTrack"
 	    	title="汇总详情" 
-	    	size="large"
+	    	width='80%'
 	    	class="outTrack-dialog-wrap"
 	    	:close-on-click-modal="false" 
 	    	:visible.sync="outTrackConfig.visible">
