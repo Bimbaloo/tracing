@@ -450,7 +450,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					name: "调整数",
 					minLen: 3,
 					formatter: function(o) {
-						return (o.destAdjustQuantity+"").length
+						return (o.adjustQuantity+"").length
 					}
 				},{
 					name: "目标条码",
@@ -464,7 +464,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					minLen: (isNoRemain ? 3: 7),
 					type: 1,
 					formatter: function(o) {
-						return isNoRemain ? (o.destAdjustQuantity+"").length : (o.remainQuantity+"/"+o.destAdjustQuantity).length
+						return isNoRemain ? (o.adjustQuantity+"").length : (o.remainQuantity+"/"+o.adjustQuantity).length
 					}
 				}]
 				
@@ -644,7 +644,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					name: "调整数",
 					minLen: 3,
 					formatter: function(o) {
-						return (o.destAdjustQuantity+"").length
+						return (o.adjustQuantity+"").length
 					}
 				},{
 					name: "目标条码",
@@ -658,7 +658,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 					type: 1,
 					minLen: (isNoRemain ? 3: 7),
 					formatter: function(o) {
-						return isNoRemain ? (o.destAdjustQuantity+"").length : (o.remainQuantity+"/"+o.destAdjustQuantity).length
+						return isNoRemain ? (o.adjustQuantity+"").length : (o.remainQuantity+"/"+o.adjustQuantity).length
 					}
 				}]
 				
@@ -955,8 +955,8 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 	function _sumWorkShopData(oData, isNotShowRemain) {
 		let oFlag = {}
 		
-		let aDis = isNotShowRemain ? ["barcode", "destAdjustQuantity"] : ["barcode", "destAdjustQuantity", "remainQuantity"]
-		let aSum = isNotShowRemain ? ["destAdjustQuantity"] : ["destAdjustQuantity", "remainQuantity"]
+		let aDis = isNotShowRemain ? ["barcode", "adjustQuantity"] : ["barcode", "adjustQuantity", "remainQuantity"]
+		let aSum = isNotShowRemain ? ["adjustQuantity"] : ["adjustQuantity", "remainQuantity"]
 		
 		// 先按源条码合并。- 原条码的调整数量，为所有的目标条码和。
 		oData.detailInfosUnited.forEach( o => {
@@ -981,7 +981,7 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 		for( let sParam in oFlag) {
 			let aList = oFlag[sParam].list
 			oFlag[sParam].list = _sumDataList(aList, ["barcode"], aDis , aSum)
-			oFlag[sParam].destAdjustQuantity = oFlag[sParam].list.map( o => o.destAdjustQuantity).reduce(function(nPrev, nNext) {
+			oFlag[sParam].adjustQuantity = oFlag[sParam].list.map( o => o.adjustQuantity).reduce(function(nPrev, nNext) {
 				return nPrev + nNext
 			}, 0)
 		}

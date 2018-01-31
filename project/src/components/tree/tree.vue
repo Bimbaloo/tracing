@@ -353,7 +353,7 @@
 									new go.Binding("width", "column0"),
 									{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.TextBlock,
-									new go.Binding("text", "destAdjustQuantity"), // 源条码
+									new go.Binding("text", "adjustQuantity"), // 源条码
 									new go.Binding("width", "column1"),
 									{column: 1, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center" }),
 								this.$(go.Panel, "Table",
@@ -368,13 +368,13 @@
 													{column: 0, margin: 5, stroke: COMMENT_TEXTCOLOR, textAlign: "center"}
 												),
 												this.$(go.TextBlock,
-//													new go.Binding("text", "", o => o.remainQuantity + "/" + o.destAdjustQuantity),	// 调整数/滞留数
+//													new go.Binding("text", "", o => o.remainQuantity + "/" + o.adjustQuantity),	// 调整数/滞留数
 													new go.Binding("text", "",  function(o) {
 														if(o.remainQuantity === undefined) {
 															// 溯源处理 | 老版本处理
-															return o.destAdjustQuantity
+															return o.adjustQuantity
 														}else {
-															return o.remainQuantity + "/" + o.destAdjustQuantity
+															return o.remainQuantity + "/" + o.adjustQuantity
 														}
 													}),
 													new go.Binding("width", "column3"),
