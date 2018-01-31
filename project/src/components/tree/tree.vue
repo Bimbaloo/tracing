@@ -1268,9 +1268,9 @@
 			fitToCurrentKey() {
 				if(this.treeData.node) {
 					// 如果存在显示的key值，则定位到显示的数据，否则定位到第一个数据。
-					let oData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents.split(',').includes('0') )[0]
-					let node = this.tree.findNodeForKey(oData.key);
-					if(node) {
+					let aoData = this.treeData.node.filter(o => this.key ? o.key == this.key : o.parents.split(',').includes('0') )
+					if(aoData.length) {
+						let node = this.tree.findNodeForKey(aoData[0].key);
 						this.tree.centerRect(node.actualBounds);
 					}
 				}
