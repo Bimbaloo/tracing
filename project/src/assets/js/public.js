@@ -971,8 +971,8 @@ var getTreeData = function(oRowData, sPageType, bIsOld) {
 			}
 			
 			let oDis = {}
-			aDis.forEach(sKey => {
-				oDis[sKey] = o.sKey
+			aDis.forEach(sDis => {
+				oDis[sDis] = o[sDis]
 			})
 			oFlag[sKey].list.push(oDis)
 		})

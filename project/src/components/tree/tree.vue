@@ -390,7 +390,8 @@
 		    warehouseDumpTemplate() {
 		    	return this.$(go.Panel, "TableRow",
 							this.$(go.Panel, "Table",
-								this.$(go.RowColumnDefinition, { column: 2, separatorStroke: TABLE_COLOR}),
+								{defaultColumnSeparatorStroke: TABLE_COLOR},
+//								this.$(go.RowColumnDefinition, { column: 2, separatorStroke: TABLE_COLOR}),
 								this.$(go.TextBlock,
 									new go.Binding("text", "batchNo"), // 批次
 									new go.Binding("width", "column0"),
