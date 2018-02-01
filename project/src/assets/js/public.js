@@ -444,7 +444,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
           name: '调整数',
           minLen: 3,
           formatter: function (o) {
-            return (o.destAdjustQuantity + '').length
+            return (o.adjustQuantity + '').length
           }
         }, {
           name: '目标条码',
@@ -458,7 +458,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
           minLen: (isNoRemain ? 3 : 7),
           type: 1,
           formatter: function (o) {
-            return isNoRemain ? (o.destAdjustQuantity + '').length : (o.remainQuantity + '/' + o.destAdjustQuantity).length
+            return isNoRemain ? (o.adjustQuantity + '').length : (o.remainQuantity + '/' + o.adjustQuantity).length
           }
         }]
 
@@ -638,7 +638,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
           name: '调整数',
           minLen: 3,
           formatter: function (o) {
-            return (o.destAdjustQuantity + '').length
+            return (o.adjustQuantity + '').length
           }
         }, {
           name: '目标条码',
@@ -652,7 +652,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
           type: 1,
           minLen: (isNoRemain ? 3 : 7),
           formatter: function (o) {
-            return isNoRemain ? (o.destAdjustQuantity + '').length : (o.remainQuantity + '/' + o.destAdjustQuantity).length
+            return isNoRemain ? (o.adjustQuantity + '').length : (o.remainQuantity + '/' + o.adjustQuantity).length
           }
         }]
 
@@ -851,9 +851,9 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
       detailTitle: '',
       sumList: []
     }
-  //  let aOutputMaterial = new Set()
-  //  let aInputMaterial = new Set()
-  //  let bIsSame = false
+    // let aOutputMaterial = new Set()
+    // let aInputMaterial = new Set()
+    // let bIsSame = false
 
     if (oData.detailInfosUnited.length) {
       // 按设备进行分类。
@@ -946,8 +946,8 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
   function _sumWorkShopData (oData, isNotShowRemain) {
     let oFlag = {}
 
-    let aDis = isNotShowRemain ? ['barcode', 'destAdjustQuantity'] : ['barcode', 'destAdjustQuantity', 'remainQuantity']
-    let aSum = isNotShowRemain ? ['destAdjustQuantity'] : ['destAdjustQuantity', 'remainQuantity']
+    let aDis = isNotShowRemain ? ['barcode', 'adjustQuantity'] : ['barcode', 'adjustQuantity', 'remainQuantity']
+    let aSum = isNotShowRemain ? ['adjustQuantity'] : ['adjustQuantity', 'remainQuantity']
 
     // 先按源条码合并。- 原条码的调整数量，为所有的目标条码和。
     oData.detailInfosUnited.forEach(o => {
@@ -962,8 +962,8 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
       }
 
       let oDis = {}
-      aDis.forEach(sKey => {
-        oDis[sKey] = o.sKey
+      aDis.forEach(sDis => {
+        oDis[sDis] = o[sDis]
       })
       oFlag[sKey].list.push(oDis)
     })
@@ -972,7 +972,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
     for (let sParam in oFlag) {
       let aList = oFlag[sParam].list
       oFlag[sParam].list = _sumDataList(aList, ['barcode'], aDis, aSum)
-      oFlag[sParam].destAdjustQuantity = oFlag[sParam].list.map(o => o.destAdjustQuantity).reduce(function (nPrev, nNext) {
+      oFlag[sParam].adjustQuantity = oFlag[sParam].list.map(o => o.adjustQuantity).reduce(function (nPrev, nNext) {
         return nPrev + nNext
       }, 0)
     }
@@ -1052,14 +1052,16 @@ var getCatalogData = function (aoRowData, sType) {
   let aoCatalogData = []
   let aoCopyData = JSON.parse(JSON.stringify(aoRowData))
   let aResult = []
-    // 追踪中新增的物料节点key值。
+  // 追踪中新增的物料节点key值。
   let sNewMateiralNodekey = 'customerKey'
 
   // 追踪中，保存最后节点的key值。（除物料外）
   let aLastNodeKeys = []
 
   // 修改节点的类型值。
-  aoCopyData.forEach(o => { o.iconType = getNodeIconAndTemp(o.nodeType).icon })
+  aoCopyData.forEach(o => {
+    o.iconType = getNodeIconAndTemp(o.nodeType).icon
+  })
 
   if (sType === 'trace') {
     // 溯源。
@@ -1368,7 +1370,9 @@ var getCatalogData1 = function (aoRowData) {
   let aResult = []
 
   // 修改节点的类型值。
-  aoCopyData.forEach(o => { o.iconType = getNodeIconAndTemp(o.nodeType).icon })
+  aoCopyData.forEach(o => {
+    o.iconType = getNodeIconAndTemp(o.nodeType).icon
+  })
 
   for (let i = aoCopyData.length - 1; i >= 0; i--) {
     let oData = aoCopyData[i]
@@ -1531,7 +1535,9 @@ var getTrackCatalogData = function (aoRowData) {
   let aResult = []
 
   // 修改节点的类型值。
-  aoCopyData.forEach(o => { o.iconType = getNodeIconAndTemp(o.nodeType).icon })
+  aoCopyData.forEach(o => {
+    o.iconType = getNodeIconAndTemp(o.nodeType).icon
+  })
 
   for (let i = aoCopyData.length - 1; i >= 0; i--) {
     let oData = aoCopyData[i]
