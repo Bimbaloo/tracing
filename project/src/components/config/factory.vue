@@ -32,7 +32,7 @@ export default {
     camera () {
       return (
         this.$store.state.versionModule &&
-        this.$store.state.versionModule.camera
+        this.$store.state.versionModule.isVideoMonitorEnabled
       )
     },
     // 功能列表。

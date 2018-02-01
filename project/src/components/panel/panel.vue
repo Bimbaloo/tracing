@@ -113,7 +113,6 @@ export default {
       let currentData = this.category.list.filter(o => o.key === value)[0]
       this.keys = this.getKeys(currentData)
 
-      //              this.$nextTick(() => this.$emit("radioChange"));
       this.radio = this.category.active.radio = value
 
       // 设置内容高度

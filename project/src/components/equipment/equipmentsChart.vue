@@ -179,6 +179,8 @@ const TOOLTIP_BORDERCOLOR = '#a8b8cc'
 const EQUIPMENTS_EVENTS_URL = window.HOST + '/api/v1/trace/equipments-events'
 // 工厂定制地址。
 const MODULE_DATA_URL = window.HOST + '/api/v1/customized/equipment-analysis/items'
+// 视频监控配置地址。
+const CAMERA_DATA_URL = window.HOST + '/api/v1/customized/equipment-analysis/video-monitor/config'
 // 默认选中的维度。
 const DEFAULT_SELECTED_DIMENSION = ['quality', 'pool', 'parameter']
 
@@ -536,7 +538,7 @@ export default {
     camera () {
       return (
         this.$store.state.versionModule &&
-        this.$store.state.versionModule.camera
+        this.$store.state.versionModule.isVideoMonitorEnabled
       )
     },
     // 工具。
@@ -570,7 +572,11 @@ export default {
     },
     // 视频监控工厂定制。
     factoryCameraConfig () {
-      return this.$store.state.factoryModule.factoryCameraConfig
+      let oData = {}
+      this.$store.state.factoryModule.factoryCameraConfig.dimensions_config.forEach(o => {
+        oData[o.name] = o.enabled
+      })
+      return oData
     },
     // 追踪或溯源或遏制的配置项。
     // currentModule() {
@@ -1001,6 +1007,14 @@ export default {
         this.$ajax,
         null,
         MODULE_DATA_URL
+      )
+
+      this.$register.getBeforeDispatchData(
+        'getCameraConfig',
+        this.$store,
+        this.$ajax,
+        null,
+        CAMERA_DATA_URL
       )
     },
     // 获取设备定制数据。
