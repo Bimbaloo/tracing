@@ -56,7 +56,7 @@ var loginFail = function (sUrl) {
 
   // 登录跳转。
   window.location.href = sUrl +
-    encodeURIComponent(window.location.origin + window.location.pathname + sTag + 'token={token}&userId={userId}&username={username}&nickname={nickname}')
+  encodeURIComponent(window.location.origin + window.location.pathname + sTag + 'token={token}&userId={userId}&username={username}&nickname={nickname}' + window.location.hash)
 }
 
 var beforeRequest = function (oStore, oAxio) {
