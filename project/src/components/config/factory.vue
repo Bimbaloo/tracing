@@ -4,10 +4,7 @@
     <el-menu
 			class="side-menu"
       :default-active="activeKey"
-			router
-      background-color="#545c64"
-      text-color="#fff"
-      active-text-color="#ffd04b">
+			router>
       <el-menu-item :index="list.route" v-for="(list,index) in customList" :key="index">
         <span slot="title">{{list.label}}</span>
       </el-menu-item>
