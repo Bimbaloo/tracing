@@ -1038,7 +1038,8 @@ export default {
         let aoData = this.factoryCustomItemList.filter(item => {
           return (
             item.dimension === o.key &&
-            item.equipmentIds.filter(equipment => equipment.split(':')[0] === id)
+            item.equipmentIds
+              .filter(equipment => equipment.split(':')[0] + '' === id + '')
               .length
           )
         })
@@ -2828,9 +2829,7 @@ export default {
         for (let dim in oGroupId[eqId]) {
           // 维度-1，因为绘图的数据维度多了状态这一维度。
           // 找到设备维度。
-          let oEquipmentData = this.equipmentData[
-              this.categories[eqId >> 0].id
-            ]
+          let oEquipmentData = this.equipmentData[this.categories[eqId >> 0].id]
             // 事件类型。
           let sType = this.dimension[(dim >> 0) - 1].key
             // 事件数据。
