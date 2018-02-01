@@ -57,7 +57,7 @@
                 </ul>
               </li>
             </ul>
-            <i class="el-icon-circle-cross" @click.stop.self="deleteId(data.id)"></i>
+            <i class="el-icon-error" @click.stop.self="deleteId(data.id)"></i>
           </li>
         </ul>
       </div>
@@ -411,8 +411,10 @@ export default {
           historyList.oData.tab !== 'track')
       ) {
         historyList.oData.radio = searchObj.key
-        bus.$emit('id-selected', historyList.oData)
         this.activeKey = historyList.oData.tab
+        this.$nextTick(() => {
+          bus.$emit('id-selected', historyList.oData)
+        })
       } else {
         this.$message('这条记录好像找不到了。。')
         // console.log("没找到")
@@ -420,10 +422,29 @@ export default {
     },
     // 单条记录删除
     deleteId (listId) {
-      this.myLocalStorage = this.myLocalStorage.filter(e => {
-        return e.id !== listId
+      this.$confirm('此操作将永久该条记录, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
       })
-      localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
+      .then(() => {
+        this.myLocalStorage = this.myLocalStorage.filter(e => {
+          return e.id !== listId
+        })
+        localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
+        this.$nextTick(function () {
+          this.$message({
+            type: 'success',
+            message: '删除成功!'
+          })
+        })
+      })
+      .catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        })
+      })
     },
     // 新增和更新历史记录
     updateRecord (oConditions) {
@@ -845,19 +866,32 @@ footer {
         }
       }
 
-      .el-form-item {
+      /deep/.el-form-item {
         margin-bottom: 18px;
 
         .el-form-item__label {
           font-size: 14px;
           padding: 6px 10px 6px 0;
         }
-        .el-form-item__content {
+        .el-form-item__content,
+        .el-select {
           line-height: 24px;
           .el-input {
             font-size: 14px;
             .el-input__inner {
-              height: 24px; //color: #999
+              height: 24px !important; //color: #999
+            }
+            .el-input__prefix {
+              .el-icon-time {
+                line-height: 24px;
+              }
+            }
+            .el-input__suffix {
+              .el-input__suffix-inner {
+                .el-input__icon {
+                  line-height: 24px;            
+                }
+              }
             }
           }
         }

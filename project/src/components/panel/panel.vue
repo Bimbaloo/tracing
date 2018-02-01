@@ -9,7 +9,7 @@
         	:style="{height: sPanelHeight+'px'}">
             <!--<v-form :tab="category.key" :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>-->
 	        <div class="panel-content-wrap" v-for="(item,index) in category.list" 
-	        		:class="[category.active.radio == item.key?'':'hide']" :key="index">
+	          :key="index" v-if="category.active.radio == item.key">
 	        		<v-form 
 	        			:tab="category.key"
 	        			:sub-tab="item.key"
@@ -19,7 +19,7 @@
 	        			:keys="keys"
 	        			:form-height="sPanelHeight"
 	        			:items="item.items" 
-                        :title="item.title">
+                :title="item.title">
 	        		</v-form>
 	        	</div>
         </div>
@@ -75,7 +75,10 @@ export default {
     let _that = this
     bus.$on('id-selected', function (obj) {
       if (_that.category.key === obj.tab) {
-        _that.radio = obj.radio
+        _that.handleChange(obj.radio)
+        _that.$nextTick(() => {
+          bus.$emit('formItemChange', obj)
+        })
       }
     })
     this.radio = this.category.active.radio
@@ -111,7 +114,7 @@ export default {
       this.keys = this.getKeys(currentData)
 
       //              this.$nextTick(() => this.$emit("radioChange"));
-      this.category.active.radio = value
+      this.radio = this.category.active.radio = value
 
       // 设置内容高度
       this.setPanelHeight()
