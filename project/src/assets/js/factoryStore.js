@@ -4,9 +4,11 @@
 export const factoryModule = {
   state: {
     fetched: false,
+    cameraFetched: false,
     factoryCustomItemList: [],
     factoryCameraConfig: {
-      url: ''
+      url: '',
+      dimensions_config: []
     }
   },
   mutations: {
@@ -16,8 +18,11 @@ export const factoryModule = {
     updateFetchFlag (state, payload) {
       state.fetched = payload.flag
     },
+    updateCameraFlag (state, payload) {
+      state.cameraFetched = payload.flag
+    },
     updateCameraData (state, payload) {
-      state.factoryCameraConfig = payload.config || { url: '' }
+      state.factoryCameraConfig = payload.config || { url: '', dimensions_config: [] }
     }
   },
   actions: {
@@ -33,26 +38,28 @@ export const factoryModule = {
         flag: true
       })
 
-      const aoData = oData.factoryCustomItemList
-      const oCameraData = oData.cameraData || {
-        url: 'http://192.168.118.220:801/page/commandCenter/camera-iframe-flv.html',
-        quality: true,
-        pool: true,
-        work: true,
-        event: true,
-        repair: true,
-        tool: true,
-        parameter: true
-      }
       // 更新数据。
       commit({
         type: 'updateFactoryData',
-        config: aoData
+        config: oData.factoryCustomItemList
       })
+    },
+    /**
+     * 获取视频监控数据。
+     * @param {Object}
+     * @return {Promise}
+     */
+    getCameraConfig ({ commit }, oData) {
+      // 更新是否获取数据的标记。
+      commit({
+        type: 'updateCameraFlag',
+        flag: true
+      })
+
       // 更新数据。
       commit({
         type: 'updateCameraData',
-        config: oCameraData
+        config: oData
       })
     }
   },
