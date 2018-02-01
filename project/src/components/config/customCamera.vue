@@ -27,10 +27,8 @@
 
 <script>
 import $ from 'jquery'
-// 获取配置。
-const GET_DATA_URL = window.HOST + '/api/v1/customized/equipment-analysis/video-monitor/config'
-// 保存配置。
-const SAVE_DATA_URL = window.HOST + '/api/v1/customized/equipment-analysis/video-monitor/config'
+// 获取、保存配置。
+const MONITOR_DATA_URL = window.HOST + '/api/v1/customized/equipment-analysis/video-monitor/config'
 
 export default {
   name: 'v-camera',
@@ -142,7 +140,7 @@ export default {
   created () {
     this.initForm()
     // 获取模块数据 GET_DATA_URL
-    this.$register.sendRequest(this.$store, this.$ajax, GET_DATA_URL, 'get', null, (oData) => {
+    this.$register.sendRequest(this.$store, this.$ajax, MONITOR_DATA_URL, 'get', null, (oData) => {
       // 保存工厂定制数据。
       // oData = {
       //   url: 'http://192.168.118.220:801/page/commandCenter/camera-iframe-flv.html',
@@ -220,7 +218,7 @@ export default {
             })
           })
 
-          this.$register.sendRequest(this.$store, this.$ajax, SAVE_DATA_URL, 'post', oPostData, (oData) => {
+          this.$register.sendRequest(this.$store, this.$ajax, MONITOR_DATA_URL, 'post', oPostData, (oData) => {
           // 保存工厂定制数据。
             this.showMessage('success', '保存成功！')
           }, (sErrorMessage) => {
