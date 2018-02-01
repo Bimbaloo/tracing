@@ -570,6 +570,10 @@ export default {
     factoryDataFecthed () {
       return this.$store.state.factoryModule.fetched
     },
+    // 工厂定制内容是否获取到的标志判断。
+    factoryCameraFecthed () {
+      return this.$store.state.factoryModule.cameraFetched
+    },
     // 视频监控工厂定制。
     factoryCameraConfig () {
       let oData = {}
@@ -969,6 +973,12 @@ export default {
       // 获取数据。
       this.getFactoyData()
     }
+
+    if (!this.factoryCameraFecthed) {
+        // 若未获取视频定制数据。
+        // 获取数据。
+      this.getCameraData()
+    }
   },
   mounted () {
     // 获取配置数据。
@@ -1008,7 +1018,9 @@ export default {
         null,
         MODULE_DATA_URL
       )
-
+    },
+    // 获取视频定制数据。
+    getCameraData () {
       this.$register.getBeforeDispatchData(
         'getCameraConfig',
         this.$store,

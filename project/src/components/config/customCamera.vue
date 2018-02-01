@@ -145,7 +145,7 @@ export default {
     this.$register.sendRequest(this.$store, this.$ajax, GET_DATA_URL, 'get', null, (oData) => {
       // 保存工厂定制数据。
       // oData = {
-      //   url: 'http://192',
+      //   url: 'http://192.168.118.220:801/page/commandCenter/camera-iframe-flv.html',
       //   'dimensions_config': [
       //     {
       //       'name': 'quality',
@@ -216,7 +216,7 @@ export default {
           this.aoDimension.forEach(o => {
             oPostData.dimensions_config.push({
               name: o.value,
-              enabled: !!this.form[o.name]
+              enabled: !!this.form[o.value]
             })
           })
 

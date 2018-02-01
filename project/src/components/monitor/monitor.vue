@@ -256,7 +256,7 @@ export default {
               !this.isEqual(this.forwardForm, this.monitorForm))
           ) {
             // 若条件发生改变。
-            this.$refs['video'].src = `${this.url}?cameraId=${
+            this.$refs.video.src = `${this.url}?cameraId=${
               this.monitorForm.cameraId
             }&startDate=${encodeURIComponent(
               this.monitorForm.startDate
@@ -328,7 +328,7 @@ export default {
 }
 
 .form-inline {
-  padding: 20px 20px 0;
+  padding: 0 20px;
   border-bottom: 1px solid #ccc;
 
   .el-form-item.parameter {
@@ -337,6 +337,7 @@ export default {
 
   .el-form-item {
     margin-right: 0px;
+    margin-bottom: 0px;
   }
 
   .el-button {

@@ -28751,7 +28751,7 @@
 .el-form--inline .el-form-item {
   display: inline-block;
   margin-right: 10px;
-  vertical-align: top; }
+  vertical-align: middle; }
 
 .el-form--inline .el-form-item__label {
   float: none;
@@ -28759,7 +28759,7 @@
 
 .el-form--inline .el-form-item__content {
   display: inline-block;
-  vertical-align: top; }
+  vertical-align: middle; }
 
 .el-form--inline.el-form--label-top .el-form-item__content {
   display: block; }
