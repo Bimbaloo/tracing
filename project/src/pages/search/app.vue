@@ -667,6 +667,7 @@ footer {
           //width: 270px; // 216
           //width: 216px; // 216
           flex: 1;
+          padding: 0;
           text-align: center;
           font-size: 16px;
           border-top: 4px solid transparent;

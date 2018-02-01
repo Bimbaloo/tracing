@@ -169,32 +169,9 @@ export default {
       this.categories = fnP
         .parseData(oResult)
         .filter(
-          o => o.key !== 'restrain' && o.key !== 'link' && o.key !== 'resume'
+          o => o.key !== 'suppress' && o.key !== 'link_repair' && o.key !== 'resume'
         )
-      // .filter(o => {
-      //   let oItem = this.modulesConfig.find(item => {
-      //     return o.key === item.key
-      //   });
-      //   if(oItem) {
-      //     return o.key!="restrain" && o.key!="link" && o.key != "resume" && !!oItem.switch
-      //   }else {
-      //     return o.key!="restrain" && o.key!="link" && o.key != "resume"
-      //   }
-      // })
-      // .map(o => {
-      //   let oItem = this.modulesConfig.find(item => {
-      //     return o.key === item.key
-      //   });
-      //   if(oItem) {
-      //     o.select = oItem.select
-      //     o.name = oItem.name
-      //   }
-      //   return o
-      // })
 
-      // 设置激活的tab。
-      // let oSelect = this.categories.find(o => !!o.select)
-      // this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
 
       this.categories.forEach(o => {
         if (oData && oData.tab === o.key) {
@@ -528,12 +505,18 @@ body {
   & > .el-tabs__header {
     border-bottom: none;
 
-    .el-tabs__item {
-      margin-right: 0;
-      margin-left: 0;
-      border: none;
-      box-sizing: content-box;
-      padding: 0;
+    .el-tabs__nav {
+      display: flex;
+      justify-content: space-around;
+      width: 100%;
+      .el-tabs__item {
+        margin-right: 0;
+        flex: 1;
+        padding: 0;
+        margin-left: 0;
+        border: none;
+        box-sizing: content-box;
+      }
     }
   }
 }
