@@ -239,7 +239,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 // 引用基础定义。
 @import "../../assets/css/base.less";
 
@@ -249,6 +249,7 @@ export default {
 .content-camera {
   padding: 10px;
   flex-grow: 1;
+  overflow: auto;
 
   .legend-list {
     padding: 10px 0 0 20px;
@@ -318,6 +319,10 @@ export default {
       background-color: #fff;
       color: #42af8f;
     }
+  }
+  /deep/ .el-form-item__content {
+    height: 56px;
+    line-height: 56px;
   }
 }
 </style>
