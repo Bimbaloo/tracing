@@ -891,7 +891,6 @@
 			},
 			showTips() {
 				this.tipsShow = !this.tipsShow;
-//				this.onViewportChanged()
 				this.tree.nodes.each(node=> {
 					let bVisible = node.visible,	
 						cat = "process"
@@ -905,7 +904,6 @@
 			},
 			hideTips() {
 				this.tipsShow = !this.tipsShow;
-//				this.onViewportChanged()
 				this.tree.nodes.each(node=> {
 					let bVisible = node.visible				
 					this.tree.model.setCategoryForNodeData(node.data, "simple");
@@ -1254,49 +1252,6 @@
 				// this.setCommentTemplate();	
 				// 布局完成后的事件处理，设置初始时节点在中间显示。InitialLayoutCompleted(只调用一次，对于setCategoryForNodeData不会触发) LayoutCompleted
 				this.tree.addDiagramListener("InitialLayoutCompleted", this.layoutCompletedHandle);
-				// 视图改变事件
-//				this.tree.addDiagramListener("ViewportBoundsChanged", this.onViewportChanged)
-			},
-			// 视窗改变事件. 设置category的显示与否
-			onViewportChanged() {
-				var viewb = this.tree.viewportBounds
-				var isChanged = false
-				
-				var oldskips = this.tree.skipsUndoManager;
-      			this.tree.skipsUndoManager = true;
-				
-				this.tree.nodes.each(node=> {
-					// 如果节点在可视区内
-					if(node.actualBounds.intersectsRect(viewb)) {
-						// 判断显示与否
-						// 获取当前节点类型。
-						let sCategory = this.tree.model.getCategoryForNodeData(node.data)
-						let bVisible = node.visible
-						
-						if(this.tipsShow && sCategory != 'process') {
-							if(!(node.data.isGroup && node.isSubGraphExpanded)) {
-								isChanged = true
-								// 如果不为组且展开。
-								this.tree.model.setCategoryForNodeData(node.data, 'process');
-								node.visible = 	bVisible
-							}
-						}
-						
-						if(!this.tipsShow && sCategory != 'simple') {
-							isChanged = true
-							this.tree.model.setCategoryForNodeData(node.data, "simple");
-							node.visible = 	bVisible
-						}
-						
-					}
-				})
-				this.tree.skipsUndoManager = oldskips;
-				
-				if(isChanged) {
-					setTimeout(() => {
-						this.onViewportChanged()
-					}, 10)
-				}
 			},
 			// 布局完成后的事件处理，设置初始时节点在中间显示。
 			layoutCompletedHandle(e) {
