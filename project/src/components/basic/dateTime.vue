@@ -6,7 +6,8 @@
       :disabled="disabled"
       style="width: 100%;"
       @change.native = "dateChange"
-      @change = "dateClick">
+      @change = "dateClick"
+      value-format="yyyy-MM-dd hh:mm:ss">
     </el-date-picker>
 </template>
 

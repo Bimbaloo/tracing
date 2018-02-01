@@ -13,6 +13,7 @@ $--color-transition-base: color .2s cubic-bezier(.645,.045,.355,1) !default;
 -------------------------- */
 $--color-white: #fff !default;
 $--color-black: #000 !default;
+$--color-gray: #eaeef2 !default;
 
 $--color-primary: #42af8f !default;
 $--color-primary-light-1: mix($--color-white, $--color-primary, 10%) !default; /* 53a8ff */
@@ -64,8 +65,8 @@ $--border-color-lighter: #ebeef5 !default;
 $--border-color-extra-light: #f2f6fc !default;
 $--border-color-hover: $--color-text-placeholder !default;
 $--border-base: $--border-width-base $--border-style-base $--border-color-base !default;
-$--border-radius-base: 4px !default;
-$--border-radius-small: 2px !default;
+$--border-radius-base: 0 !default; /* 4px */
+$--border-radius-small: 0 !default; /* 2px */
 $--border-radius-circle: 100% !default;
 
 /* Box-shadow
@@ -260,7 +261,7 @@ $--alert-icon-large-size: 28px !default;
 /* Message Box
 -------------------------- */
 $--msgbox-width: 420px !default;
-$--msgbox-border-radius: 4px !default;
+$--msgbox-border-radius: 0 !default; /* 4px */
 $--msgbox-font-size: $--font-size-large !default;
 $--msgbox-content-font-size: $--font-size-base !default;
 $--msgbox-content-color: $--color-text-regular !default;
@@ -292,7 +293,7 @@ $--message-danger-color: $--color-danger !default;
 -------------------------- */
 $--notification-width: 330px !default;
 $--notification-padding: 14px 26px 14px 13px !default;
-$--notification-radius: 8px !default;
+$--notification-radius: 0 !default; /* 8px */
 $--notification-shadow: $--box-shadow-light !default;
 $--notification-border-color: $--border-color-lighter !default;
 $--notification-icon-size: 24px !default;
@@ -316,7 +317,7 @@ $--notification-danger-color: $--color-danger !default;
 $--input-font-size: $--font-size-base !default;
 $--input-color: $--color-text-regular !default;
 $--input-width: 140px !default;
-$--input-height: 40px !default;
+$--input-height: 30px !default; /* 40px */
 $--input-border: $--border-base !default;
 $--input-border-color: $--border-color-base !default;
 $--input-border-radius: $--border-radius-base !default;
@@ -340,13 +341,13 @@ $--input-disabled-color: $--disabled-color-base !default;
 $--input-disabled-placeholder-color: $--color-text-placeholder !default;
 
 $--input-medium-font-size: 14px !default;
-$--input-medium-height: 36px !default;
+$--input-medium-height: 27px !default; /* 36px */
 
 $--input-small-font-size: 13px !default;
-$--input-small-height: 32px !default;
+$--input-small-height: 24px !default; /* 32px */
 
 $--input-mini-font-size: 12px !default;
-$--input-mini-height: 28px !default;
+$--input-mini-height: 21px !default; /* 28px */
 
 /* Cascader
 -------------------------- */
@@ -405,12 +406,12 @@ $--button-medium-padding-vertical: 10px !default;
 $--button-medium-padding-horizontal: 20px !default;
 
 $--button-small-font-size: 12px !default;
-$--button-small-border-radius: #{$--border-radius-base - 1} !default;
+$--button-small-border-radius: $--border-radius-base !default; /* #{$--border-radius-base - 1} */
 $--button-small-padding-vertical: 9px !default;
 $--button-small-padding-horizontal: 15px !default;
 
 $--button-mini-font-size: 12px !default;
-$--button-mini-border-radius: #{$--border-radius-base - 1} !default;
+$--button-mini-border-radius: $--border-radius-base !default; /* #{$--border-radius-base - 1} */
 $--button-mini-padding-vertical: 7px !default;
 $--button-mini-padding-horizontal: 15px !default;
 
@@ -489,7 +490,7 @@ $--table-fixed-box-shadow: 0 0 10px rgba(0, 0, 0, .12) !default;
 $--pagination-font-size: 13px !default;
 $--pagination-fill: $--color-white !default;
 $--pagination-color: $--color-text-primary !default;
-$--pagination-border-radius: 3px !default;
+$--pagination-border-radius: 0 !default; /* 3px */
 $--pagination-button-color: $--color-text-primary !default;
 $--pagination-button-width: 35.5px !default;
 $--pagination-button-height: 28px !default;
@@ -525,7 +526,7 @@ $--tag-fill: rgba($--color-primary, 0.10) !default;
 $--tag-color: $--color-primary !default;
 $--tag-border: rgba($--color-primary, 0.20) !default;
 $--tag-font-size: 12px !default;
-$--tag-border-radius: 4px !default;
+$--tag-border-radius: 0 !default; /* 4px */
 
 $--tag-info-fill: rgba($--color-info, 0.10) !default;
 $--tag-info-border: rgba($--color-info, 0.20) !default;
@@ -570,7 +571,7 @@ $--badge-size: 18px !default;
 /* Card
 --------------------------*/
 $--card-border-color: $--border-color-lighter !default;
-$--card-border-radius: 4px !default;
+$--card-border-radius: 0 !default; /* 4px */
 $--card-padding: 20px !default;
 
 /* Slider

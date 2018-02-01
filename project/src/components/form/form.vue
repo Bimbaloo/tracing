@@ -84,12 +84,14 @@ export default {
     this.ruleForm = oFormData
 
     let _that = this
-    bus.$on('id-selected', function (obj) {
+    bus.$on('formItemChange', function (obj) {
       if (_that.tab === obj.tab && _that.subTab === obj.radio) {
-        let datas = obj.keys
-        for (let i in datas) {
-          _that.ruleForm[i] = datas[i]
-        }
+        _that.$nextTick(() => {
+          let datas = obj.keys
+          for (let i in datas) {
+            _that.ruleForm[i] = datas[i]
+          }
+        })
       }
     })
   },
