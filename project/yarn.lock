@@ -34,8 +34,8 @@ acorn@^4.0.3:
   resolved "http://registry.npm.taobao.org/acorn/download/acorn-4.0.13.tgz#105495ae5361d697bd195c825192e1ad7f253787"
 
 acorn@^5.0.0, acorn@^5.1.1, acorn@^5.2.1:
-  version "5.3.0"
-  resolved "http://registry.npm.taobao.org/acorn/download/acorn-5.3.0.tgz#7446d39459c54fb49a80e6ee6478149b940ec822"
+  version "5.4.0"
+  resolved "http://registry.npm.taobao.org/acorn/download/acorn-5.4.0.tgz#51c581c9d4b1943dda59a3e73bcf02661ac727ea"
 
 adler-32@~1.1.0:
   version "1.1.0"
@@ -1358,8 +1358,8 @@ caniuse-api@^1.5.2:
     lodash.uniq "^4.5.0"
 
 caniuse-db@^1.0.30000529, caniuse-db@^1.0.30000634, caniuse-db@^1.0.30000639:
-  version "1.0.30000795"
-  resolved "http://registry.npm.taobao.org/caniuse-db/download/caniuse-db-1.0.30000795.tgz#644f03fab00dd8bd1693e5e1e70d86b31c5cfece"
+  version "1.0.30000800"
+  resolved "http://registry.npm.taobao.org/caniuse-db/download/caniuse-db-1.0.30000800.tgz#a86e6bc23bd9a707d5df42f33e64d0495cfda218"
 
 caniuse-lite@^1.0.30000791, caniuse-lite@^1.0.30000792:
   version "1.0.30000792"
@@ -1387,7 +1387,7 @@ cfb@~0.12.0:
     commander "~2.11.0"
     printj "~1.1.0"
 
-chalk@*, chalk@^2.0.1, chalk@^2.3.0:
+chalk@*, chalk@^2.0.1, chalk@^2.1.0, chalk@^2.3.0:
   version "2.3.0"
   resolved "http://registry.npm.taobao.org/chalk/download/chalk-2.3.0.tgz#b5ea48efc9c1793dccc9b4767c93914d3f2d52ba"
   dependencies:
@@ -1506,7 +1506,7 @@ cli-spinners@^0.2.0:
   version "0.2.0"
   resolved "http://registry.npm.taobao.org/cli-spinners/download/cli-spinners-0.2.0.tgz#85078737913b880f6ec9ffe7b65e83ec7776284f"
 
-cli-spinners@^1.0.0:
+cli-spinners@^1.0.1:
   version "1.1.0"
   resolved "http://registry.npm.taobao.org/cli-spinners/download/cli-spinners-1.1.0.tgz#f1847b168844d917a671eb9d147e3df497c90d06"
 
@@ -2210,7 +2210,7 @@ dns-equal@^1.0.0:
   version "1.0.0"
   resolved "http://registry.npm.taobao.org/dns-equal/download/dns-equal-1.0.0.tgz#b39e7f1da6eb0a75ba9c17324b34753c47e0654d"
 
-dns-packet@^1.0.1:
+dns-packet@^1.3.1:
   version "1.3.1"
   resolved "http://registry.npm.taobao.org/dns-packet/download/dns-packet-1.3.1.tgz#12aa426981075be500b910eedcd0b47dd7deda5a"
   dependencies:
@@ -2333,12 +2333,12 @@ ejs@^2.5.6:
   resolved "http://registry.npm.taobao.org/ejs/download/ejs-2.5.7.tgz#cc872c168880ae3c7189762fd5ffc00896c9518a"
 
 electron-to-chromium@^1.2.7, electron-to-chromium@^1.3.30:
-  version "1.3.31"
-  resolved "http://registry.npm.taobao.org/electron-to-chromium/download/electron-to-chromium-1.3.31.tgz#00d832cba9fe2358652b0c48a8816c8e3a037e9f"
+  version "1.3.32"
+  resolved "http://registry.npm.taobao.org/electron-to-chromium/download/electron-to-chromium-1.3.32.tgz#11d0684c0840e003c4be8928f8ac5f35dbc2b4e6"
 
 element-theme-chalk@^2.0.11:
-  version "2.0.11"
-  resolved "http://registry.npm.taobao.org/element-theme-chalk/download/element-theme-chalk-2.0.11.tgz#72f891d11dc6763cd2b2d06cb9292c3e07760aff"
+  version "2.1.0"
+  resolved "http://registry.npm.taobao.org/element-theme-chalk/download/element-theme-chalk-2.1.0.tgz#1244c3d37d78217cd342508666657b10068ab226"
 
 element-theme@^2.0.1:
   version "2.0.1"
@@ -2353,13 +2353,14 @@ element-theme@^2.0.1:
     ora "^0.3.0"
     run-sequence "^1.2.2"
 
-element-ui@^2.0.11:
-  version "2.0.11"
-  resolved "http://registry.npm.taobao.org/element-ui/download/element-ui-2.0.11.tgz#efc19d10270c13aa2b235f65bcb6ced3226550b8"
+element-ui@^2.1.0:
+  version "2.1.0"
+  resolved "http://registry.npm.taobao.org/element-ui/download/element-ui-2.1.0.tgz#eec860e3d3b131e61c2974a3e2b19a689d040f14"
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
     deepmerge "^1.2.0"
+    normalize-wheel "^1.0.1"
     throttle-debounce "^1.0.1"
 
 elliptic@^6.0.0:
@@ -2650,8 +2651,8 @@ eslint-plugin-promise@~3.5.0:
   resolved "http://registry.npm.taobao.org/eslint-plugin-promise/download/eslint-plugin-promise-3.5.0.tgz#78fbb6ffe047201627569e85a6c5373af2a68fca"
 
 eslint-plugin-react@^7.0.0:
-  version "7.6.0"
-  resolved "http://registry.npm.taobao.org/eslint-plugin-react/download/eslint-plugin-react-7.6.0.tgz#351651188c74c5b2fecc2717e3936b7207baa728"
+  version "7.6.1"
+  resolved "http://registry.npm.taobao.org/eslint-plugin-react/download/eslint-plugin-react-7.6.1.tgz#5d0e908be599f0c02fbf4eef0c7ed6f29dff7633"
   dependencies:
     doctrine "^2.0.2"
     has "^1.0.1"
@@ -3475,8 +3476,8 @@ glogg@^1.0.0:
     sparkles "^1.0.0"
 
 gojs@^1.7.11:
-  version "1.8.10"
-  resolved "http://registry.npm.taobao.org/gojs/download/gojs-1.8.10.tgz#bbec0d5bcf9d68c462a8089a6b2e8f1b59b9bc9e"
+  version "1.8.11"
+  resolved "http://registry.npm.taobao.org/gojs/download/gojs-1.8.11.tgz#59abb5731acb7d7fb733689766c546fe65ed1704"
 
 graceful-fs@^3.0.0:
   version "3.0.11"
@@ -4362,13 +4363,9 @@ jquery@^3.2.1:
   version "3.3.1"
   resolved "http://registry.npm.taobao.org/jquery/download/jquery-3.3.1.tgz#958ce29e81c9790f31be7792df5d4d95fc57fbca"
 
-js-base64@^2.1.8:
+js-base64@^2.1.8, js-base64@^2.1.9:
   version "2.4.3"
   resolved "http://registry.npm.taobao.org/js-base64/download/js-base64-2.4.3.tgz#2e545ec2b0f2957f41356510205214e98fad6582"
-
-js-base64@^2.1.9:
-  version "2.4.2"
-  resolved "http://registry.npm.taobao.org/js-base64/download/js-base64-2.4.2.tgz#1896da010ef8862f385d8887648e9b6dc4a7a2e9"
 
 js-tokens@^3.0.0, js-tokens@^3.0.2:
   version "3.0.2"
@@ -4840,6 +4837,12 @@ log-symbols@^1.0.2:
   dependencies:
     chalk "^1.0.0"
 
+log-symbols@^2.1.0:
+  version "2.2.0"
+  resolved "http://registry.npm.taobao.org/log-symbols/download/log-symbols-2.2.0.tgz#5740e1c5d6f0dfda4ad9323b5332107ef6b4c40a"
+  dependencies:
+    chalk "^2.0.1"
+
 loglevel@^1.4.1:
   version "1.6.1"
   resolved "http://registry.npm.taobao.org/loglevel/download/loglevel-1.6.1.tgz#e0fc95133b6ef276cdc8887cdaf24aa6f156f8fa"
@@ -5035,8 +5038,8 @@ mime@^1.2.11, mime@^1.5.0:
   resolved "http://registry.npm.taobao.org/mime/download/mime-1.6.0.tgz#32cd9e5c64553bd58d19a568af452acff04981b1"
 
 mimic-fn@^1.0.0:
-  version "1.1.0"
-  resolved "http://registry.npm.taobao.org/mimic-fn/download/mimic-fn-1.1.0.tgz#e667783d92e89dbd342818b5230b9d62a672ad18"
+  version "1.2.0"
+  resolved "http://registry.npm.taobao.org/mimic-fn/download/mimic-fn-1.2.0.tgz#820c86a39334640e99516928bd03fca88057d022"
 
 minimalistic-assert@^1.0.0:
   version "1.0.0"
@@ -5125,11 +5128,11 @@ multicast-dns-service-types@^1.1.0:
   resolved "http://registry.npm.taobao.org/multicast-dns-service-types/download/multicast-dns-service-types-1.1.0.tgz#899f11d9686e5e05cb91b35d5f0e63b773cfc901"
 
 multicast-dns@^6.0.1:
-  version "6.2.2"
-  resolved "http://registry.npm.taobao.org/multicast-dns/download/multicast-dns-6.2.2.tgz#300b6133361f8aaaf2b8d1248e85c363fe5b95a0"
+  version "6.2.3"
+  resolved "http://registry.npm.taobao.org/multicast-dns/download/multicast-dns-6.2.3.tgz#a0ec7bd9055c4282f790c3c82f4e28db3b31b229"
   dependencies:
-    dns-packet "^1.0.1"
-    thunky "^0.1.0"
+    dns-packet "^1.3.1"
+    thunky "^1.0.2"
 
 multipipe@^0.1.0, multipipe@^0.1.2:
   version "0.1.2"
@@ -5192,9 +5195,9 @@ node-fetch@^1.0.1:
     encoding "^0.1.11"
     is-stream "^1.0.1"
 
-node-forge@0.6.33:
-  version "0.6.33"
-  resolved "http://registry.npm.taobao.org/node-forge/download/node-forge-0.6.33.tgz#463811879f573d45155ad6a9f43dc296e8e85ebc"
+node-forge@0.7.1:
+  version "0.7.1"
+  resolved "http://registry.npm.taobao.org/node-forge/download/node-forge-0.7.1.tgz#9da611ea08982f4b94206b3beb4cc9665f20c300"
 
 node-gyp@^3.3.1:
   version "3.6.2"
@@ -5331,6 +5334,10 @@ normalize-url@^1.4.0, normalize-url@^1.9.1:
     prepend-http "^1.0.0"
     query-string "^4.1.0"
     sort-keys "^1.0.0"
+
+normalize-wheel@^1.0.1:
+  version "1.0.1"
+  resolved "http://registry.npm.taobao.org/normalize-wheel/download/normalize-wheel-1.0.1.tgz#aec886affdb045070d856447df62ecf86146ec45"
 
 npm-run-path@^2.0.0:
   version "2.0.2"
@@ -5507,13 +5514,13 @@ ora@^0.3.0:
     log-symbols "^1.0.2"
 
 ora@^1.2.0:
-  version "1.3.0"
-  resolved "http://registry.npm.taobao.org/ora/download/ora-1.3.0.tgz#80078dd2b92a934af66a3ad72a5b910694ede51a"
+  version "1.4.0"
+  resolved "http://registry.npm.taobao.org/ora/download/ora-1.4.0.tgz#884458215b3a5d4097592285f93321bb7a79e2e5"
   dependencies:
-    chalk "^1.1.1"
+    chalk "^2.1.0"
     cli-cursor "^2.1.0"
-    cli-spinners "^1.0.0"
-    log-symbols "^1.0.2"
+    cli-spinners "^1.0.1"
+    log-symbols "^2.1.0"
 
 orchestrator@^0.3.0:
   version "0.3.8"
@@ -5917,13 +5924,13 @@ postcss-load-plugins@^2.3.0:
     object-assign "^4.1.0"
 
 postcss-loader@^2.0.6:
-  version "2.0.10"
-  resolved "http://registry.npm.taobao.org/postcss-loader/download/postcss-loader-2.0.10.tgz#090db0540140bd56a7a7f717c41bc29aeef4c674"
+  version "2.1.0"
+  resolved "http://registry.npm.taobao.org/postcss-loader/download/postcss-loader-2.1.0.tgz#038c2d6d59753fef4667827fd3ae03f5dc5e6a7a"
   dependencies:
     loader-utils "^1.1.0"
     postcss "^6.0.0"
     postcss-load-config "^1.2.0"
-    schema-utils "^0.3.0"
+    schema-utils "^0.4.0"
 
 postcss-merge-idents@^2.1.5:
   version "2.1.7"
@@ -6103,8 +6110,8 @@ postcss@^5.0.10, postcss@^5.0.11, postcss@^5.0.12, postcss@^5.0.13, postcss@^5.0
     supports-color "^3.2.3"
 
 postcss@^6.0.0, postcss@^6.0.1, postcss@^6.0.16, postcss@^6.0.8:
-  version "6.0.16"
-  resolved "http://registry.npm.taobao.org/postcss/download/postcss-6.0.16.tgz#112e2fe2a6d2109be0957687243170ea5589e146"
+  version "6.0.17"
+  resolved "http://registry.npm.taobao.org/postcss/download/postcss-6.0.17.tgz#e259a051ca513f81e9afd0c21f7f82eda50c65c5"
   dependencies:
     chalk "^2.3.0"
     source-map "^0.6.1"
@@ -6314,8 +6321,8 @@ raw-body@2.3.2:
     unpipe "1.0.0"
 
 rc@^1.1.7:
-  version "1.2.4"
-  resolved "http://registry.npm.taobao.org/rc/download/rc-1.2.4.tgz#a0f606caae2a3b862bbd0ef85482c0125b315fa3"
+  version "1.2.5"
+  resolved "http://registry.npm.taobao.org/rc/download/rc-1.2.5.tgz#275cd687f6e3b36cc756baa26dfee80a790301fd"
   dependencies:
     deep-extend "~0.4.0"
     ini "~1.3.0"
@@ -6755,7 +6762,7 @@ schema-utils@^0.3.0:
   dependencies:
     ajv "^5.0.0"
 
-schema-utils@^0.4.2:
+schema-utils@^0.4.0, schema-utils@^0.4.2:
   version "0.4.3"
   resolved "http://registry.npm.taobao.org/schema-utils/download/schema-utils-0.4.3.tgz#e2a594d3395834d5e15da22b48be13517859458e"
   dependencies:
@@ -6774,10 +6781,10 @@ select-hose@^2.0.0:
   resolved "http://registry.npm.taobao.org/select-hose/download/select-hose-2.0.0.tgz#625d8658f865af43ec962bfc376a37359a4994ca"
 
 selfsigned@^1.9.1:
-  version "1.10.1"
-  resolved "http://registry.npm.taobao.org/selfsigned/download/selfsigned-1.10.1.tgz#bf8cb7b83256c4551e31347c6311778db99eec52"
+  version "1.10.2"
+  resolved "http://registry.npm.taobao.org/selfsigned/download/selfsigned-1.10.2.tgz#b4449580d99929b65b10a48389301a6592088758"
   dependencies:
-    node-forge "0.6.33"
+    node-forge "0.7.1"
 
 "semver@2 || 3 || 4 || 5", semver@^5.3.0, semver@^5.4.1:
   version "5.5.0"
@@ -7409,9 +7416,9 @@ through@^2.3.6, through@~2.3.4, through@~2.3.6:
   version "2.3.8"
   resolved "http://registry.npm.taobao.org/through/download/through-2.3.8.tgz#0dd4c9ffaabc357960b1b724115d7e0e86a2e1f5"
 
-thunky@^0.1.0:
-  version "0.1.0"
-  resolved "http://registry.npm.taobao.org/thunky/download/thunky-0.1.0.tgz#bf30146824e2b6e67b0f2d7a4ac8beb26908684e"
+thunky@^1.0.2:
+  version "1.0.2"
+  resolved "http://registry.npm.taobao.org/thunky/download/thunky-1.0.2.tgz#a862e018e3fb1ea2ec3fce5d55605cf57f247371"
 
 tildify@^1.0.0:
   version "1.2.0"
@@ -7533,8 +7540,8 @@ uglify-es@^3.3.4:
     source-map "~0.6.1"
 
 uglify-js@3.3.x:
-  version "3.3.8"
-  resolved "http://registry.npm.taobao.org/uglify-js/download/uglify-js-3.3.8.tgz#51e9a5db73afb53ac98603d08224edcd0be45fd8"
+  version "3.3.9"
+  resolved "http://registry.npm.taobao.org/uglify-js/download/uglify-js-3.3.9.tgz#33869666c8ab7f7658ce3d22f0f1ced40097d33a"
   dependencies:
     commander "~2.13.0"
     source-map "~0.6.1"
@@ -7561,8 +7568,8 @@ uglifyjs-webpack-plugin@^0.4.6:
     webpack-sources "^1.0.1"
 
 uglifyjs-webpack-plugin@^1.1.1:
-  version "1.1.6"
-  resolved "http://registry.npm.taobao.org/uglifyjs-webpack-plugin/download/uglifyjs-webpack-plugin-1.1.6.tgz#f4ba8449edcf17835c18ba6ae99b9d610857fb19"
+  version "1.1.8"
+  resolved "http://registry.npm.taobao.org/uglifyjs-webpack-plugin/download/uglifyjs-webpack-plugin-1.1.8.tgz#1302fb9471a7daf3d0a5174da6d65f0f415e75ad"
   dependencies:
     cacache "^10.0.1"
     find-cache-dir "^1.0.0"
@@ -7810,8 +7817,8 @@ vue-hot-reload-api@^2.2.0:
   resolved "http://registry.npm.taobao.org/vue-hot-reload-api/download/vue-hot-reload-api-2.2.4.tgz#683bd1d026c0d3b3c937d5875679e9a87ec6cd8f"
 
 vue-loader@^13.0.4:
-  version "13.7.0"
-  resolved "http://registry.npm.taobao.org/vue-loader/download/vue-loader-13.7.0.tgz#4d6a35b169c2a0a488842fb95c85052105fa9729"
+  version "13.7.1"
+  resolved "http://registry.npm.taobao.org/vue-loader/download/vue-loader-13.7.1.tgz#d9009d0abd392b4efe8b8fb1f542f6723b02dd3a"
   dependencies:
     consolidate "^0.14.0"
     hash-sum "^1.0.2"
@@ -7832,8 +7839,8 @@ vue-router@^3.0.1:
   resolved "http://registry.npm.taobao.org/vue-router/download/vue-router-3.0.1.tgz#d9b05ad9c7420ba0f626d6500d693e60092cc1e9"
 
 vue-style-loader@^3.0.0, vue-style-loader@^3.0.1:
-  version "3.1.1"
-  resolved "http://registry.npm.taobao.org/vue-style-loader/download/vue-style-loader-3.1.1.tgz#74fdef91a81d38bc0125746a1b5505e62d69e32c"
+  version "3.1.2"
+  resolved "http://registry.npm.taobao.org/vue-style-loader/download/vue-style-loader-3.1.2.tgz#6b66ad34998fc9520c2f1e4d5fa4091641c1597a"
   dependencies:
     hash-sum "^1.0.2"
     loader-utils "^1.0.2"

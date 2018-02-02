@@ -1,5 +1,5 @@
 <template>
-	<div id="app" class="report-wrapper" >
+	<div id="app" class="report-wrapper" ref="app">
 		<!-- 显示节点 -->
 		<div class="report-container" ref="fgbreport" v-loading.fullscreen.lock="downLoading" element-loading-text="图片生成中...">
 			<div class="page-icon">
@@ -7,7 +7,7 @@
         <i class="icon icon-20 icon-print" title="打印" @click="printPage('fgbreport', $event)"></i>
 			</div>
 			<h1 class="title">FGB检验</h1>
-			<h2 class="content-title">查询条件</h2>
+			<h2 class="content-title" ref="content-title">查询条件</h2>
       <div class="condition" ref='condition'>
         <div class='condition-message'>
 					<span v-for="(filter,index) in dataName" :key="index">
@@ -36,7 +36,8 @@
 				v-loading="loading" 
 				element-loading-text="拼命加载中" 
 				style="width: 100%" 
-				ref="multipleTable" 
+				ref="multipleTable"
+        :height='tableHeight' 
 				@expand-change="dataEdit"> 
           <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
             <template slot-scope="props">
@@ -132,7 +133,8 @@ export default {
       ruleForm: {
         input: ''
       },
-      expandedId: [] // 用于保存展开过的行的id
+      expandedId: [], // 用于保存展开过的行的id
+      tableHeight: 100 // 表格的高度
     }
   },
   created () {
@@ -147,8 +149,12 @@ export default {
         // 若不支持遏制。
         this.$message.error('暂无权限。')
       }
-    }) // getConfig
-    // this.fetchData(); //获取数据
+    })
+
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.setTableHeight)
+      this.setTableHeight()
+    })
   },
   computed: {
     /* 列信息 */
@@ -354,6 +360,7 @@ export default {
     },
     /* 根据新获取的检验值，设置中文名和英文名对应关系 */
     dataEdit (row, expanded) {
+      debugger
       let Id = row.dataId
       if (!!expanded && !this.expandedId.some(el => el === Id)) {
         // 如果展开的话
@@ -598,6 +605,18 @@ export default {
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml, {
         width: document.body.clientWidth
+      })
+    },
+    // 设置表格高度
+    setTableHeight () {
+      this.tableHeight = 100
+      this.$nextTick(() => {
+        const reportHeight = this.outerHeight(this.$refs.fgbreport)  // 页面高度
+        const titleHeight = this.outerHeight(document.querySelector('.title'))
+        const contentTitleHeight = this.outerHeight(this.$refs['content-title'])
+        const condition = this.outerHeight(this.$refs.condition)
+        const tableData = this.outerHeight(document.querySelector('.tableData'))
+        this.tableHeight = reportHeight - titleHeight - contentTitleHeight - condition - tableData - 20
       })
     }
   }
