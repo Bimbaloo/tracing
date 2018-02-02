@@ -34,9 +34,10 @@
 
 <script>
 import $ from 'jquery'
+import axios from 'axios'
 
 // 获取监控点接口地址。
-// const CAMERA_POINT_URL = HOST + ''
+const CAMERA_POINT_URL = window.MI_HOST + '/api/commandCenter/camera/getCameraList'
 // 向前推10s。
 const PRE_TIME = 10
 // 向后推10s。
@@ -256,7 +257,7 @@ export default {
               !this.isEqual(this.forwardForm, this.monitorForm))
           ) {
             // 若条件发生改变。
-            this.$refs['video'].src = `${this.url}?cameraId=${
+            this.$refs.video.src = `${this.url}?cameraId=${
               this.monitorForm.cameraId
             }&startDate=${encodeURIComponent(
               this.monitorForm.startDate
@@ -286,10 +287,24 @@ export default {
     },
     // 获取监控点。
     getCameraPoints () {
-      // this.$register.sendRequest(this.$store, this.$ajax, this.url, "get", {
-      //     equipmentId: equipmentId
-      // }, this.requestSucess, this.requestFail, this.requestError);
-      this.requestSucess(['001', '002'])
+      axios.get(`${CAMERA_POINT_URL}?equipmentId=${this.equipmentId}`)
+        .then((oAjaxData) => {
+          if (oAjaxData.status === 200) {
+            if (oAjaxData.data.c === 1) {
+              // 请求成功。
+              this.requestSucess(oAjaxData.data.r.map(o => {
+                return o.cameraId
+              }))
+            } else {
+              console.log('请求失败。')
+            }
+          } else {
+            console.log('请求失败。')
+          }
+        })
+        .catch((err) => {
+          console.log(err)
+        })
     },
     // 监控点请求成功。
     requestSucess (aoData) {
@@ -328,7 +343,7 @@ export default {
 }
 
 .form-inline {
-  padding: 20px 20px 0;
+  padding: 0 20px;
   border-bottom: 1px solid #ccc;
 
   .el-form-item.parameter {
@@ -337,6 +352,7 @@ export default {
 
   .el-form-item {
     margin-right: 0px;
+    margin-bottom: 0px;
   }
 
   .el-button {

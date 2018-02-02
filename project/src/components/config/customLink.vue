@@ -450,7 +450,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 // 引用基础定义。
 @import "../../assets/css/base.less";
 
@@ -460,7 +460,8 @@ export default {
 .content-link {
   padding: 10px;
   flex-grow: 1;
-
+  overflow: auto;
+  
   .legend-list {
     padding: 10px 0 0 20px;
 
