@@ -4,36 +4,31 @@
 		<div class="report-container" ref="fgbreport" v-loading.fullscreen.lock="downLoading" element-loading-text="图片生成中...">
 			<div class="page-icon">
 				<i class="icon icon-20 icon-download" title="下载" @click="downloadHandle('fgbreport', $event)"></i>
-            	<i class="icon icon-20 icon-print" title="打印" @click="printPage('fgbreport', $event)"></i>
+        <i class="icon icon-20 icon-print" title="打印" @click="printPage('fgbreport', $event)"></i>
 			</div>
 			<h1 class="title">FGB检验</h1>
 			<h2 class="content-title">查询条件</h2>
-            <div class="condition" ref='condition'>
-                <div class='condition-message'>
-                    <!-- <span v-for="(filter,index) in filters" :key="index">
-                        {{filter[0]}} : {{filter[1]}}
-                    </span> -->
+      <div class="condition" ref='condition'>
+        <div class='condition-message'>
 					<span v-for="(filter,index) in dataName" :key="index">
 						{{filter.itemName}} : {{condition[filter.itemCode]}}
-                    </span>
-					
-                    <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-                        <el-form-item label="条码：" > 
-                             <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
-                        </el-form-item>
-                    </el-form>
-                   
-                </div>
-            </div>
-            <h2 class="content-title tableData">
-                <span class='table-title'>条码表</span>
-                <span class='table-handle'>
-                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
-                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('fgbTable', $event)"></i>
-                </span>
-            </h2>
-            <div class="content-table" ref="fgbTable">
-                <el-table 
+          </span>
+          <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
+            <el-form-item label="条码：" > 
+              <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
+            </el-form-item>
+          </el-form>     
+        </div>
+      </div>
+      <h2 class="content-title tableData">
+        <span class='table-title'>条码表</span>
+        <span class='table-handle'>
+          <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(tableData, $event)"></i>
+          <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('fgbTable', $event)"></i>
+        </span>
+      </h2>
+      <div class="content-table" ref="fgbTable">
+        <el-table 
 				:data="datas" 
 				stripe 
 				class="table" 
@@ -43,27 +38,26 @@
 				style="width: 100%" 
 				ref="multipleTable" 
 				@expand-change="dataEdit"> 
-				<!--:height="tableData.height"-->
-                    <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
-                        <template slot-scope="props">
-                            <el-form label-position="left" inline class="demo-table-expand table-form" v-if="column.type === 'expand'">
-                                <el-form-item 
-                                :label="setName(index)" 
-                                v-for="(prop,index) in props.row" 
-                                :key="index"
-                                v-if="!!setName(index) && setName(index) !== '采集时间：' && setName(index) !=='条码：'">
-                                    <span :title="prop">{{ prop }}</span>
-                                </el-form-item>
-                            </el-form>
-                            <div v-else :class="[ 'cell-content']">
-                                {{ props.row[column.prop] }}
-                            </div>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </div>			
+          <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
+            <template slot-scope="props">
+              <el-form label-position="left" inline class="demo-table-expand table-form" v-if="column.type === 'expand'">
+                <el-form-item 
+                :label="setName(index)" 
+                v-for="(prop,index) in props.row" 
+                :key="index"
+                v-if="!!setName(index) && setName(index) !== '采集时间：' && setName(index) !=='条码：'">
+                    <span :title="prop">{{ prop }}</span>
+                </el-form-item>
+              </el-form>
+              <div v-else :class="[ 'cell-content']">
+                  {{ props.row[column.prop] }}
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>			
 		</div>
-	  </div>
+  </div>
 </template>
 
 <script>

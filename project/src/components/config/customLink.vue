@@ -28,7 +28,7 @@
 			<div class="item-wrap">
 				<img :src="icon" alt="增加模块" @click="newLink" style="cursor:pointer;" title="新增模块"/>
 			</div>
-			<el-dialog :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false">
+			<el-dialog width="60%" :title="dialogTitle" :visible.sync="dialogVisible" :close-on-click-modal="false">
 				<el-form :model="oCurrentData" label-width="80px" :rules="rules" ref="ruleForm">
 					<el-form-item label="名称" prop="name">
 						<el-input 
@@ -304,10 +304,11 @@ export default {
         .addClass('out')
     },
     // 显示提示信息。
-    showMessage (sError) {
+    showMessage (sError, type = 'info') {
       this.$message({
         message: sError || this.sErrorMessage,
-        duration: 3000
+        duration: 3000,
+        type: type
       })
     },
     // 添加链接。
@@ -396,11 +397,11 @@ export default {
           this.oCurrentData.id = oData.id
           // 新增模块。
           this.aoCustom.push(this.oCurrentData)
-          this.showMessage('新增成功。')
+          this.showMessage('新增成功。', 'success')
         },
         sErrorMessage => {
           this.sErrorMessage = sErrorMessage
-          this.showMessage('新增失败。')
+          this.showMessage('新增失败。', 'error')
         }
       )
     },
@@ -413,7 +414,7 @@ export default {
         'put',
         this.oCurrentData,
         oData => {
-          this.showMessage('修改成功。')
+          this.showMessage('修改成功。', 'success')
           // 修改数据
           this.aoCustom = this.aoCustom.map(o => {
             return o.id === this.oCurrentData.id ? this.oCurrentData : o
@@ -421,7 +422,7 @@ export default {
         },
         sErrorMessage => {
           this.sErrorMessage = sErrorMessage
-          this.showMessage('新增失败。')
+          this.showMessage('新增失败。', 'error')
         }
       )
     },
@@ -434,14 +435,14 @@ export default {
         'delete',
         null,
         oData => {
-          this.showMessage('删除成功。')
+          this.showMessage('删除成功。', 'success')
           this.aoCustom = this.aoCustom.filter(
             o => o.id !== this.oCurrentData.id
           )
         },
         sErrorMessage => {
           this.sErrorMessage = sErrorMessage
-          this.showMessage('删除失败。')
+          this.showMessage('删除失败。', 'error')
         }
       )
     }
@@ -572,6 +573,15 @@ export default {
 
   .el-dialog__body {
     padding-bottom: 0;
+    .el-form {
+      .el-form-item {
+        .el-form-item__label {
+          line-height: 11px;
+          box-sizing: border-box;
+          height: 30px;
+        }
+      }
+    }
   }
 
   .el-checkbox {
