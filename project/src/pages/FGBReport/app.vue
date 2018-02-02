@@ -71,6 +71,7 @@ import rasterizeHTML from 'rasterizehtml'
 
 const url = window.HOST + '/api/v1/fgb/by-equipment-time'
 const url2 = window.HOST + `/api/v1/fgb/by-dataid`
+const allData = window.HOST + `/api/v1/fgb/export-by-equipment-time`
 // const url = "static/fgb.json"
 // const url2 = "static/fgb2.json"
 
@@ -82,7 +83,7 @@ export default {
     return {
       excel: true,
       print: true,
-      loading: false,
+      loading: true,
       sErrorMessage: '',
       empty: '暂无数据。',
       styleObject: {
@@ -171,7 +172,12 @@ export default {
     },
     // 参数。
     oParams: function () {
-      return window.Rt.utils.getParams()
+      let obj = window.Rt.utils.getParams()
+      // 传过来的数据解码
+      Object.keys(obj).forEach(el => {
+        obj[el] = decodeURIComponent(obj[el])
+      })
+      return obj
     },
     // 是否支持断链修复。
     fgb () {
@@ -193,8 +199,10 @@ export default {
     },
     // 请求成功。
     requestSucess (oData) {
-      this.loading = false
       this.tableData.data = oData
+      this.$nextTick(() => {
+        this.loading = false
+      })
     },
     // 请求失败。
     requestFail (sErrorMessage) {
@@ -238,8 +246,49 @@ export default {
       if (!oData) {
         return
       }
-      // 下载表格。
-      window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData)
+
+      let {equipmentId, startTime, endTime} = this.oParams
+      let oQuery = {equipmentId, startTime, endTime}
+      console.log(oQuery)
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        allData,
+        'get',
+        oQuery,
+        (data) => {
+          this.setAllExcelData(data)
+          this.$nextTick(() => {
+            // 下载表格。
+            window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData)
+          })
+        },
+        this.requestFail,
+        this.requestError
+      )
+    },
+    // excel下载是表格内数据处理
+    setAllExcelData (data) {
+      this.expandedId = []
+      data.forEach((oData, index) => {
+        const Id = oData.dataId
+        const lists = oData.parameterList
+        lists.forEach(el => {
+          let newData = {
+            name: `${el.description}`,
+            prop: `${el.description}`
+          }
+          if (this.tableData.columns.every(el => {
+            return el['name'] !== newData['name'] && el['prop'] !== newData['prop']
+          })) {
+            this.tableData.columns.push(newData)
+          }
+          let row = this.tableData.data[index]
+          this.$set(row, `${el.description}`, `${el.value}${el.varUnit}`)
+          this.$set(this.tableData.data, index, row)
+        })
+        this.expandedId.push(Id)
+      })
     },
     // 表格打印。
     printHandle (refTable, event) {
@@ -360,7 +409,6 @@ export default {
     },
     /* 根据新获取的检验值，设置中文名和英文名对应关系 */
     dataEdit (row, expanded) {
-      debugger
       let Id = row.dataId
       if (!!expanded && !this.expandedId.some(el => el === Id)) {
         // 如果展开的话
@@ -380,7 +428,12 @@ export default {
                 name: `${el.description}`,
                 prop: `${el.description}`
               }
-              this.tableData.columns.push(newData)
+              if (this.tableData.columns.every(el => {
+                return el['name'] !== newData['name'] && el['prop'] !== newData['prop']
+              })) {
+                this.tableData.columns.push(newData)
+              }
+
               this.$set(row, `${el.description}`, `${el.value}${el.varUnit}`)
             })
             this.expandedId.push(Id)
