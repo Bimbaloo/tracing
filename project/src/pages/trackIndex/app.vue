@@ -199,7 +199,24 @@
 			(window.onbeforeunload = () => {
 				// 离开页面时，调用接口，清除进程。
 				this.closeProgressDialog()
-				this.setProgressEndHandle()
+				let oLoginInfo = this.$store.state.loginModule
+				
+				$.ajax({
+					url: this.cancelProgressUrl+this.progressId,
+					method: 'POST',
+					async: false,
+					crossDomain: true,
+					headers: {
+						Authorization: JSON.stringify({
+							"token": oLoginInfo.token,
+							"userId": Number(oLoginInfo.userId),
+							"username": oLoginInfo.username,
+							"nickname": oLoginInfo.nickname,
+							"progressId": oLoginInfo.progressId
+						})
+					}
+				})
+				
 			})
 		},
 		methods: {

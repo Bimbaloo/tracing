@@ -4,7 +4,7 @@
 		<div class="domDown"></div>
 		
 		<!-- header 部分-->
-		<v-header ref="headers" v-show="!bFullScreen" :back="'search.html'" :config="false"></v-header>
+		<v-header ref="headers" v-show="!bFullScreen" :back="'search.html'" :config="true"></v-header>
 		<div class="resume-wraps" v-loading="downLoading" element-loading-text="图片生成中">
 			<div class="resume-content-wrap" :class="{full:bFullScreen}">
 				<div class="clone"></div>
@@ -374,20 +374,6 @@
 				this.myLocalStorage = []
 			}
 
-			// 获取配置数据。
-			// this.$store.dispatch('getConfig').then(() => {
-			// 	// 设置是否创建BOM表和时间轴。
-			// 	let aoSubmodules = this.currentModule && this.currentModule.submodules
-
-			// 	if(aoSubmodules) {
-			// 		this.BOMConfig = aoSubmodules.find(o => o.key === "BOM")
-			// 		this.timelineConfig = aoSubmodules.find(o => o.key === "timeline")
-			// 	}
-
-			// 	if(!this.BOMConfig.switch) {
-			// 		this.sCurrentTab = "lines"
-			// 	}
-			// })
 		},
 		// 创建时处理。mounted
 		mounted() {
@@ -423,7 +409,8 @@
 		    }
 		    
 			// 默认查询。--- created()
-			this.getPageData();
+			this.$register.getVersion(this.$store, this.$ajax, this.getPageData)
+//			this.getPageData();
 		},
 		// 页面方法。
 		methods: {
