@@ -194,16 +194,16 @@
 									data: aSublings	//node.data.sublings
 								})
 
-								if(this.treeFullscreen) {
-									this.$store.commit({
-										type: "updateTreeFullscreen",
-										key: false
-									});
-
-									this.$emit('recoverSize')
-									
-									this.updateCanvas()
-								}
+//								if(this.treeFullscreen) {
+//									this.$store.commit({
+//										type: "updateTreeFullscreen",
+//										key: false
+//									});
+//
+//									this.$emit('recoverSize')
+//									
+//									this.updateCanvas()
+//								}
 
 								this.$store.commit({
 									type: "updateKey",

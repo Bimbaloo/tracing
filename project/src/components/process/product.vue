@@ -1852,15 +1852,17 @@ export default {
         	let aoAllDis = this.checked ? aoAll : aoFilter
         	
 			if(bExpand) {
-				// 删除属性
-				// 获取当前产出对应的投入数据。
-				let aIn = aoAllDis.filter(o => o.outputOpIdList && o.outputOpIdList.includes(sOpId))
+				// 新增属性
+				
+				// 从所有数据中获取当前产出对应的投入数据
+				let nIndex = aoAllDis.findIndex(o => o.operationId === sOpId)	// 产出所处与所有数据中的位置
+				let aIn = aoAllDis.filter((o, nIn) => nIn > nIndex && nIn <=(nIndex+nLen))
 				
 				delete aDis[nRowIndex].isExpand
 				
 				aDis.splice(nRowIndex+1, 0, ...aIn)
 			}else {
-				// 新增属性
+				// 删除属性
 				aDis[nRowIndex].isExpand = true
 				
 				aDis = aDis.filter( (o, nIn) => !(nIn > nRowIndex && nIn <= (nRowIndex+nLen)))
