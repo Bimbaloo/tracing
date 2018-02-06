@@ -222,15 +222,15 @@ export default {
   },
   mounted () {
     // 离开改页面处理(刷新、关闭页面等操作)
-    let self = this;
-    (window.onbeforeunload = () => {
+    let self = this
+    window.onbeforeunload = () => {
       if (self.edit || this.ModuleOrderListEdit) {
         // 提示需要保存。
         return false
       }
-    }),
+    }
       // 监听拖动的组件
-      this.$dragging.$on('dragged', ({ value }) => {})
+    this.$dragging.$on('dragged', ({ value }) => {})
     // 监听到拖动结束
     this.$dragging.$on('dragend', data => {})
   },

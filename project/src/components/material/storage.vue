@@ -578,7 +578,7 @@ export default {
     },
     sortData (param1, param2, sType) {
       // 默认按照从小到大排序。
-      if (sType == 'desc') {
+      if (sType === 'desc') {
         // 从大到小时。
         [param1, param2] = [param2, param1]
       }

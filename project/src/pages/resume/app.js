@@ -32,7 +32,7 @@ const store = new Vuex.Store({
   }
 })
 
-var vm = new Vue({
+window.vm = new Vue({
   el: '#app',
   store,
   render: h => h(App)
