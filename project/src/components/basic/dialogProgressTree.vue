@@ -16,8 +16,8 @@
 </template>
 
 <script>
-import tree from "components/tree/tree.vue";
-import fnP from "assets/js/public.js";
+import tree from 'components/tree/tree.vue'
+import fnP from 'assets/js/public.js'
 
 export default {
   props: {
@@ -30,83 +30,83 @@ export default {
     }
   },
   components: {
-    "v-tree": tree
+    'v-tree': tree
   },
-  data() {
+  data () {
     return {
-      getProgressUrl: HOST + "/api/v1/request/state/", // 获取进度
-      cancelProgressUrl: HOST + "/api/v1/request/kill/", // 取消进度
+      getProgressUrl: window.HOST + '/api/v1/request/state/', // 获取进度
+      cancelProgressUrl: window.HOST + '/api/v1/request/kill/', // 取消进度
       treeData: {},
       loading: false
-    };
+    }
   },
   computed: {
     // 版本信息数据。
-    isOpDbBeforeRefact() {
+    isOpDbBeforeRefact () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isOpDbBeforeRefact
-      );
+      )
     },
-    treeHeight() {
-      return document.querySelector(".router").clientHeight - 80;
+    treeHeight () {
+      return document.querySelector('.router').clientHeight - 80
     },
-    treeId() {
-      return "dialogTree" + this.progressId;
+    treeId () {
+      return 'dialogTree' + this.progressId
     }
   },
-  created() {
+  created () {
     // 显示时，开启定时器
-    this.setIntervalHandle();
+    this.setIntervalHandle()
   },
   methods: {
     // 关闭进程。
-    setProgressEndHandle() {
+    setProgressEndHandle () {
       // 调用接口。
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
         this.cancelProgressUrl + this.progressId,
-        "post",
+        'post',
         null
-      );
+      )
     },
     // 显示数据。
-    showTreeData() {
+    showTreeData () {
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
         this.getProgressUrl + this.progressId,
-        "post",
+        'post',
         null,
         data => {
           // 成功处理。更新loading加载文字
           this.treeData = fnP.getTreeData(
             data.traceGraphNodeDtoList,
-            "track",
+            'track',
             this.isOpDbBeforeRefact
-          );
+          )
 
-          this.loading = false;
+          this.loading = false
           setTimeout(() => {
             this.$nextTick(() => {
-              this.dialogVisible && this.showTreeData();
-            });
-          }, 3000);
+              this.dialogVisible && this.showTreeData()
+            })
+          }, 3000)
         },
         () => {
           // 加载失败后处理。
-          this.loading = true;
+          this.loading = true
         }
-      );
+      )
     },
     // 设置定时器：获取当前进度。
-    setIntervalHandle() {
-      this.loading = true;
-      this.showTreeData();
+    setIntervalHandle () {
+      this.loading = true
+      this.showTreeData()
     }
   }
-};
+}
 </script>
 
 <style lang="less" scoped>

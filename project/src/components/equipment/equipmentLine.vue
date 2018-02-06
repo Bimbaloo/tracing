@@ -725,7 +725,7 @@ export default {
       // console.log(this.event)
       let oNode = this.$refs.event
 
-      if (this.$refs.event instanceof Array) {
+      if (oNode instanceof Array) {
         oNode = oNode[0]
       }
 
@@ -807,7 +807,7 @@ export default {
       // console.log(this.repair)
       let oNode = this.$refs.repair
 
-      if (this.$refs.repair instanceof Array) {
+      if (oNode instanceof Array) {
         oNode = oNode[0]
       }
 
@@ -902,7 +902,7 @@ export default {
       // console.log(this.tool);
       let oNode = this.$refs.tool
 
-      if (this.$refs.tool instanceof Array) {
+      if (oNode instanceof Array) {
         oNode = oNode[0]
       }
 

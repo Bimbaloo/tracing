@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import $ from 'jquery'
+// import $ from 'jquery'
 // 获取、保存配置。
 const MONITOR_DATA_URL = window.HOST + '/api/v1/customized/equipment-analysis/video-monitor/config'
 

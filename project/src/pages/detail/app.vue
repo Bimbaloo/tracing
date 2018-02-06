@@ -171,8 +171,6 @@ export default {
         .filter(
           o => o.key !== 'suppress' && o.key !== 'link_repair' && o.key !== 'resume'
         )
-
-
       this.categories.forEach(o => {
         if (oData && oData.tab === o.key) {
           o.active = oData

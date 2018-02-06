@@ -203,7 +203,7 @@ export default {
     // 重绘图形。
     updateGoCharts () {
       if (this.tree) {
-        this.tree.model = this.$(go.GraphLinksModel, {
+        this.tree.model = this.$(window.go.GraphLinksModel, {
           linkFromPortIdProperty: 'fromPort',
           linkToPortIdProperty: 'toPort',
           nodeDataArray: this.nodesData,
@@ -235,11 +235,11 @@ export default {
       })
     },
     drawTree () {
-      let $ = this.$,
-        that = this
+      let $ = this.$
+      let that = this
 
-      this.tree = $(go.Diagram, 'nodeLine', {
-        contentAlignment: go.Spot.TopLeft, // initialContentAlignment	LeftCenter
+      this.tree = $(window.go.Diagram, 'nodeLine', {
+        contentAlignment: window.go.Spot.TopLeft, // initialContentAlignment LeftCenter
         allowMove: false,
         allowZoom: false,
         allowCopy: false,
@@ -257,21 +257,21 @@ export default {
       // legend
       this.tree.add(
         $(
-          go.Part,
+          window.go.Part,
           'Table',
-          { position: new go.Point(0, -8), selectable: false },
+          { position: new window.go.Point(0, -8), selectable: false },
           $(
-            go.Panel,
+            window.go.Panel,
             'Horizontal',
             {
               column: 0,
-              alignment: go.Spot.Left,
-              margin: new go.Margin(0, 10, 0, 0)
+              alignment: window.go.Spot.Left,
+              margin: new window.go.Margin(0, 10, 0, 0)
             },
-            $(go.TextBlock, '正常节点:', {
+            $(window.go.TextBlock, '正常节点:', {
               font: '700 13px Droid Serif, sans-serif'
             }),
-            $(go.Shape, 'Ellipse', {
+            $(window.go.Shape, 'Ellipse', {
               width: 12,
               height: 12,
               strokeWidth: 2,
@@ -281,17 +281,17 @@ export default {
             })
           ), // end column 0
           $(
-            go.Panel,
+            window.go.Panel,
             'Horizontal',
             {
               column: 1,
-              alignment: go.Spot.Left,
-              margin: new go.Margin(0, 10, 0, 0)
+              alignment: window.go.Spot.Left,
+              margin: new window.go.Margin(0, 10, 0, 0)
             },
-            $(go.TextBlock, '断链节点:', {
+            $(window.go.TextBlock, '断链节点:', {
               font: '700 13px Droid Serif, sans-serif'
             }),
-            $(go.Shape, 'Ellipse', {
+            $(window.go.Shape, 'Ellipse', {
               width: 12,
               height: 12,
               strokeWidth: 2,
@@ -301,17 +301,17 @@ export default {
             })
           ), // end column 1
           $(
-            go.Panel,
+            window.go.Panel,
             'Horizontal',
             {
               column: 2,
-              alignment: go.Spot.Left,
-              margin: new go.Margin(0, 10, 0, 0)
+              alignment: window.go.Spot.Left,
+              margin: new window.go.Margin(0, 10, 0, 0)
             },
-            $(go.TextBlock, '已修复节点:', {
+            $(window.go.TextBlock, '已修复节点:', {
               font: '700 13px Droid Serif, sans-serif'
             }),
-            $(go.Shape, 'Ellipse', {
+            $(window.go.Shape, 'Ellipse', {
               width: 12,
               height: 12,
               strokeWidth: 2,
@@ -321,17 +321,17 @@ export default {
             })
           ), // end column 2
           $(
-            go.Panel,
+            window.go.Panel,
             'Horizontal',
             {
               column: 3,
-              alignment: go.Spot.Left,
-              margin: new go.Margin(0, 10, 0, 0)
+              alignment: window.go.Spot.Left,
+              margin: new window.go.Margin(0, 10, 0, 0)
             },
-            $(go.TextBlock, '投入可修复节点:', {
+            $(window.go.TextBlock, '投入可修复节点:', {
               font: '700 13px Droid Serif, sans-serif'
             }),
-            $(go.Shape, 'TriangleUp', {
+            $(window.go.Shape, 'TriangleUp', {
               width: 12,
               height: 12,
               angle: -90,
@@ -340,7 +340,7 @@ export default {
               stroke: sNormal,
               margin: 4
             }),
-            $(go.Shape, 'TriangleUp', {
+            $(window.go.Shape, 'TriangleUp', {
               width: 12,
               height: 12,
               angle: -90,
@@ -349,7 +349,7 @@ export default {
               stroke: sBroke,
               margin: 4
             }),
-            $(go.Shape, 'TriangleUp', {
+            $(window.go.Shape, 'TriangleUp', {
               width: 12,
               height: 12,
               angle: -90,
@@ -360,17 +360,17 @@ export default {
             })
           ), // end column 3
           $(
-            go.Panel,
+            window.go.Panel,
             'Horizontal',
             {
               column: 4,
-              alignment: go.Spot.Left,
-              margin: new go.Margin(0, 10, 0, 0)
+              alignment: window.go.Spot.Left,
+              margin: new window.go.Margin(0, 10, 0, 0)
             },
-            $(go.TextBlock, '产出可修复节点:', {
+            $(window.go.TextBlock, '产出可修复节点:', {
               font: '700 13px Droid Serif, sans-serif'
             }),
-            $(go.Shape, 'TriangleUp', {
+            $(window.go.Shape, 'TriangleUp', {
               width: 12,
               height: 12,
               angle: 90,
@@ -379,7 +379,7 @@ export default {
               stroke: sNormal,
               margin: 4
             }),
-            $(go.Shape, 'TriangleUp', {
+            $(window.go.Shape, 'TriangleUp', {
               width: 12,
               height: 12,
               angle: 90,
@@ -388,7 +388,7 @@ export default {
               stroke: sBroke,
               margin: 4
             }),
-            $(go.Shape, 'TriangleUp', {
+            $(window.go.Shape, 'TriangleUp', {
               width: 12,
               height: 12,
               angle: 90,
@@ -399,13 +399,13 @@ export default {
             })
           ), // end column 4
           $(
-            go.Panel,
+            window.go.Panel,
             'Horizontal',
-            { column: 5, alignment: go.Spot.Left },
-            $(go.TextBlock, '可修复节点:', {
+            { column: 5, alignment: window.go.Spot.Left },
+            $(window.go.TextBlock, '可修复节点:', {
               font: '700 13px Droid Serif, sans-serif'
             }),
-            $(go.Shape, 'Diamond', {
+            $(window.go.Shape, 'Diamond', {
               width: 12,
               height: 12,
               strokeWidth: 2,
@@ -413,7 +413,7 @@ export default {
               stroke: sNormal,
               margin: 4
             }),
-            $(go.Shape, 'Diamond', {
+            $(window.go.Shape, 'Diamond', {
               width: 12,
               height: 12,
               strokeWidth: 2,
@@ -421,7 +421,7 @@ export default {
               stroke: sBroke,
               margin: 4
             }),
-            $(go.Shape, 'Diamond', {
+            $(window.go.Shape, 'Diamond', {
               width: 12,
               height: 12,
               strokeWidth: 2,
@@ -434,84 +434,84 @@ export default {
       )
 
       let tooltipTemplate = $(
-        go.Adornment,
+        window.go.Adornment,
         'Auto',
         {
           isShadowed: true
         },
-        $(go.Shape, 'Rectangle', {
+        $(window.go.Shape, 'Rectangle', {
           fill: 'white',
           stroke: '#dedede'
         }),
         $(
-          go.TextBlock,
+          window.go.TextBlock,
           {
             font: '12pt Helvetica, 微软雅黑, sans-serif',
             stroke: '#333333',
-            wrap: go.TextBlock.WrapFit,
-            desiredSize: new go.Size(1000, NaN),
-            alignment: go.Spot.Center,
+            wrap: window.go.TextBlock.WrapFit,
+            desiredSize: new window.go.Size(1000, NaN),
+            alignment: window.go.Spot.Center,
             margin: 4
           },
-          new go.Binding('text', '', this.showTooltip).ofObject()
+          new window.go.Binding('text', '', this.showTooltip).ofObject()
         )
       )
 
-      let fieldTemplate1 = $(
-        go.Panel,
-        'TableRow', // this Panel is a row in the containing Table
-        new go.Binding('portId', 'name'), // this Panel is a "port"
-        {
-          background: 'transparent', // so this port's background can be picked by the mouse
-          fromSpot: go.Spot.LeftRightSides, // links only go from the right side to the left side
-          toSpot: go.Spot.LeftRightSides,
-          fromLinkable: this.edit, // 编辑参数控制。
-          toLinkable: this.edit // 编辑参数控制。
-        },
-        {
-          // allow the user to select items -- the background color indicates whether "selected"
-          click: function (e, item) {
-            // assume "transparent" means not "selected", for items
-            let oldskips = item.diagram.skipsUndoManager
-            item.diagram.skipsUndoManager = true
-            if (item.background === 'transparent') {
-              item.background = 'dodgerblue'
-            } else {
-              item.background = 'transparent'
-            }
-            item.diagram.skipsUndoManager = oldskips
-          },
-          toolTip: tooltipTemplate
-        },
-        $(
-          go.Shape,
-          { width: 12, height: 12, column: 0, strokeWidth: 2, margin: 4 },
-          new go.Binding('figure', 'figure'),
-          new go.Binding('angle', 'angle'),
-          new go.Binding('fill', 'color'),
-          new go.Binding('stroke', 'borderColor')
-        ),
-        $(
-          go.TextBlock,
-          {
-            margin: new go.Margin(3, 2),
-            column: 1,
-            font: 'bold 14px sans-serif'
-          },
-          new go.Binding('text', 'name')
-        )
-      )
+      // let fieldTemplate1 = $(
+      //   window.go.Panel,
+      //   'TableRow', // this Panel is a row in the containing Table
+      //   new window.go.Binding('portId', 'name'), // this Panel is a "port"
+      //   {
+      //     background: 'transparent', // so this port's background can be picked by the mouse
+      //     fromSpot: window.go.Spot.LeftRightSides, // links only go from the right side to the left side
+      //     toSpot: window.go.Spot.LeftRightSides,
+      //     fromLinkable: this.edit, // 编辑参数控制。
+      //     toLinkable: this.edit // 编辑参数控制。
+      //   },
+      //   {
+      //     // allow the user to select items -- the background color indicates whether "selected"
+      //     click: function (e, item) {
+      //       // assume "transparent" means not "selected", for items
+      //       let oldskips = item.diagram.skipsUndoManager
+      //       item.diagram.skipsUndoManager = true
+      //       if (item.background === 'transparent') {
+      //         item.background = 'dodgerblue'
+      //       } else {
+      //         item.background = 'transparent'
+      //       }
+      //       item.diagram.skipsUndoManager = oldskips
+      //     },
+      //     toolTip: tooltipTemplate
+      //   },
+      //   $(
+      //     window.go.Shape,
+      //     { width: 12, height: 12, column: 0, strokeWidth: 2, margin: 4 },
+      //     new window.go.Binding('figure', 'figure'),
+      //     new window.go.Binding('angle', 'angle'),
+      //     new window.go.Binding('fill', 'color'),
+      //     new window.go.Binding('stroke', 'borderColor')
+      //   ),
+      //   $(
+      //     window.go.TextBlock,
+      //     {
+      //       margin: new window.go.Margin(3, 2),
+      //       column: 1,
+      //       font: 'bold 14px sans-serif'
+      //     },
+      //     new window.go.Binding('text', 'name')
+      //   )
+      // )
 
       let fieldTemplate = $(
-        go.Panel,
+        window.go.Panel,
         'TableRow', // this Panel is a row in the containing Table
-        new go.Binding('portId', 'name'), // this Panel is a "port"
-        new go.Binding('fromLinkable', 'link'),
-        new go.Binding('toLinkable', 'link'),
+        new window.go.Binding('portId', 'name'), // this Panel is a "port"
+        new window.go.Binding('fromLinkable', 'link'),
+        new window.go.Binding('toLinkable', 'link'),
         {
           background: 'transparent', // so this port's background can be picked by the mouse
-          fromSpot: go.Spot.LeftRightSides, // links only go from the right side to the left side
-          toSpot: go.Spot.LeftRightSides,
+          fromSpot: window.go.Spot.LeftRightSides, // links only go from the right side to the left side
+          toSpot: window.go.Spot.LeftRightSides,
           fromLinkable: false, // 编辑参数控制。
           toLinkable: false, // 编辑参数控制。
           name: 'tableRow'
@@ -521,14 +521,14 @@ export default {
           toolTip: tooltipTemplate
         },
         $(
-          go.Panel,
+          window.go.Panel,
           'Table',
-          //			                  { stretch: go.GraphObject.Fill},
-          { alignment: go.Spot.TopLeft },
-          $(go.RowColumnDefinition, { height: 30 }),
+          // { stretch: window.go.GraphObject.Fill},
+          { alignment: window.go.Spot.TopLeft },
+          $(window.go.RowColumnDefinition, { height: 30 }),
           // the table header
           $(
-            go.Shape,
+            window.go.Shape,
             {
               width: 12,
               height: 12,
@@ -537,55 +537,55 @@ export default {
               strokeWidth: 2,
               margin: 4
             },
-            new go.Binding('figure', 'figure'),
-            new go.Binding('angle', 'angle'),
-            new go.Binding('fill', 'color'),
-            new go.Binding('stroke', 'borderColor')
+            new window.go.Binding('figure', 'figure'),
+            new window.go.Binding('angle', 'angle'),
+            new window.go.Binding('fill', 'color'),
+            new window.go.Binding('stroke', 'borderColor')
           ),
           $(
-            go.TextBlock,
+            window.go.TextBlock,
             {
-              margin: new go.Margin(3, 2),
+              margin: new window.go.Margin(3, 2),
               width: 40,
               row: 0,
               column: 1,
               font: 'bold 14px sans-serif'
             },
-            new go.Binding('text', 'name')
+            new window.go.Binding('text', 'name')
           ),
           // the collapse/expand button
-          //			                  new go.Binding("desiredSize", "visible", function(v) { return new go.Size(NaN, NaN); }).ofObject("LIST"),
+          // new window.go.Binding("desiredSize", "visible", function(v) { return new window.go.Size(NaN, NaN); }).ofObject("LIST"),
           $(
             'PanelExpanderButton',
             'LIST', // the name of the element whose visibility this button toggles
-            { row: 0, column: 2, alignment: go.Spot.RightCenter }
+            { row: 0, column: 2, alignment: window.go.Spot.RightCenter }
           ),
           // the list of Panels, each showing an attribute
           $(
-            go.Panel,
+            window.go.Panel,
             'Vertical',
             {
               name: 'LIST',
               row: 1,
               columnSpan: 3,
               padding: 3,
-              alignment: go.Spot.TopLeft,
-              defaultAlignment: go.Spot.Left,
-              //			                          stretch: go.GraphObject.Vertical,
+              alignment: window.go.Spot.TopLeft,
+              defaultAlignment: window.go.Spot.Left,
+              // stretch: window.go.GraphObject.Vertical,
               visible: false
             },
             $(
-              go.TextBlock,
+              window.go.TextBlock,
               '',
               { font: 'bold 10px sans-serif' },
-              new go.Binding('text', '', this.showTooltip).ofObject()
+              new window.go.Binding('text', '', this.showTooltip).ofObject()
             )
           )
         )
       )
 
       this.tree.nodeTemplate = $(
-        go.Node,
+        window.go.Node,
         'Vertical',
         {
           movable: false,
@@ -594,114 +594,114 @@ export default {
           selectionObjectName: 'SCROLLER',
           resizable: false,
           resizeObjectName: 'SCROLLER',
-          portSpreading: go.Node.SpreadingNone
+          portSpreading: window.go.Node.SpreadingNone
         },
-        new go.Binding('location').makeTwoWay(),
+        new window.go.Binding('location').makeTwoWay(),
         {
           selectionAdornmentTemplate: $(
-            go.Adornment,
+            window.go.Adornment,
             'Auto',
-            $(go.Shape, 'RoundedRectangle', { fill: null, stroke: null }),
-            $(go.Placeholder)
+            $(window.go.Shape, 'RoundedRectangle', { fill: null, stroke: null }),
+            $(window.go.Placeholder)
           )
         },
         $(
-          go.Panel,
+          window.go.Panel,
           'Horizontal',
           {
             click: this.showProcessFilter // 显示工序过滤弹窗。
           },
           $(
-            go.TextBlock,
+            window.go.TextBlock,
             { font: 'bold 14px sans-serif' },
             {
-              //			                    click: this.showProcessFilter		// 显示工序过滤弹窗。
+              //  click: this.showProcessFilter  // 显示工序过滤弹窗。
             },
-            new go.Binding('text', 'name')
+            new window.go.Binding('text', 'name')
           ),
-          $(go.Shape, {
+          $(window.go.Shape, {
             toArrow: 'Standard',
             angle: 90,
-            margin: new go.Margin(0, 0, 0, 10)
+            margin: new window.go.Margin(0, 0, 0, 10)
           })
         ),
-        //			        $(go.TextBlock,
-        //			          { font: "bold 14px sans-serif" },
-        //			          {
-        //			          	click: this.showProcessFilter		// 显示工序过滤弹窗。
-        //			          },
-        //			          new go.Binding("text", "name")),
+          // $(window.go.TextBlock,
+          //   { font: "bold 14px sans-serif" },
+          //   {
+          //     click: this.showProcessFilter // 显示工序过滤弹窗。
+          //   },
+          //   new window.go.Binding("text", "name")),
         $(
-          go.Panel,
+          window.go.Panel,
           'Auto',
-          $(go.Shape, { fill: 'white', stroke: 'gray' }),
+          $(window.go.Shape, { fill: 'white', stroke: 'gray' }),
           $(
             'ScrollingTable',
             {
               name: 'SCROLLER',
-              //			              desiredSize: new go.Size(NaN, that.nodeHeight - 120),  // fixed width
-              stretch: go.GraphObject.Fill // but stretches vertically
+              //  desiredSize: new window.go.Size(NaN, that.nodeHeight - 120),  // fixed width
+              stretch: window.go.GraphObject.Fill // but stretches vertically
             },
-            new go.Binding('TABLE.itemArray', 'items'),
-            new go.Binding('desiredSize', 'size').makeTwoWay(),
-            new go.Binding('TABLE.height', 'height'),
+            new window.go.Binding('TABLE.itemArray', 'items'),
+            new window.go.Binding('desiredSize', 'size').makeTwoWay(),
+            new window.go.Binding('TABLE.height', 'height'),
             {
               'TABLE.itemTemplate': fieldTemplate,
               'TABLE.defaultColumnSeparatorStroke': 'gray',
               'TABLE.defaultColumnSeparatorStrokeWidth': 0.5,
               'TABLE.defaultRowSeparatorStroke': 'gray',
               'TABLE.defaultRowSeparatorStrokeWidth': 0.5,
-              'TABLE.defaultSeparatorPadding': new go.Margin(1, 3, 0, 3)
+              'TABLE.defaultSeparatorPadding': new window.go.Margin(1, 3, 0, 3)
             }
           ),
           // 没有数据时不显示下面的边框
-          new go.Binding('visible', '', function (a, b) {
+          new window.go.Binding('visible', '', function (a, b) {
             return !!a.data.items.length
           }).ofObject()
         )
       )
 
       this.tree.linkTemplate = $(
-        go.Link,
+        window.go.Link,
         {
           relinkableFrom: false,
           relinkableTo: false,
-          //		                  toShortLength: 4,
+          // toShortLength: 4,
           toolTip: $(
-            go.Adornment,
+            window.go.Adornment,
             'Auto',
             {
               isShadowed: true
             },
-            $(go.Shape, 'Rectangle', {
+            $(window.go.Shape, 'Rectangle', {
               fill: 'white',
               stroke: '#dedede'
             }),
             $(
-              go.TextBlock,
+              window.go.TextBlock,
               {
                 font: '12pt Helvetica, 微软雅黑, sans-serif'
               },
-              new go.Binding('text', '', function (a, b) {
+              new window.go.Binding('text', '', function (a, b) {
                 return a.data.fromPort + '>' + a.data.toPort
               }).ofObject()
             )
           )
         }, // let user reconnect links
         $(
-          go.Shape,
+          window.go.Shape,
           { strokeWidth: 1.5, stroke: sRecovered },
-          new go.Binding('stroke', 'color')
+          new window.go.Binding('stroke', 'color')
         ),
         $(
-          go.Shape,
+          window.go.Shape,
           { toArrow: 'OpenTriangle', stroke: sRecovered },
-          new go.Binding('fill', 'color'),
-          new go.Binding('stroke', 'color')
+          new window.go.Binding('fill', 'color'),
+          new window.go.Binding('stroke', 'color')
         )
       )
 
-      this.tree.model = $(go.GraphLinksModel, {
+      this.tree.model = $(window.go.GraphLinksModel, {
         linkFromPortIdProperty: 'fromPort',
         linkToPortIdProperty: 'toPort',
         nodeDataArray: that.nodesData,
@@ -713,10 +713,10 @@ export default {
     },
     // 显示tooltip
     showTooltip (item) {
-      let oData = item.data,
-        sKey = oData.name,
-        oTip = this.getTooltipContent(sKey),
-        str = ''
+      let oData = item.data
+      let sKey = oData.name
+      let oTip = this.getTooltipContent(sKey)
+      let str = ''
 
       for (let i in oTip) {
         let sName = i === 'in' ? '投入' : '产出'
@@ -1019,9 +1019,9 @@ export default {
           name: sName,
           seq: oo.seq,
           left: !nIn,
-            // location: new go.Point(nIn*350, 10),
+            // location: new window.go.Point(nIn*350, 10),
           items: [],
-          size: new go.Size(NaN, that.nodeHeight - 120),
+          size: new window.go.Size(NaN, that.nodeHeight - 120),
           height: that.nodeHeight - 150
         }
           // 改过multiSelect组件，则获取的数据会变化。
@@ -1064,9 +1064,10 @@ export default {
 
               aNowNode.push(sId)
             }
-          });
+          })
 
-          (oNode.location = new go.Point(nIndex * 350, 10)), nIndex++
+          oNode.location = new window.go.Point(nIndex * 350, 10)
+          nIndex++
           // 返回数据。
           aSeriesData.push(oNode)
         }
@@ -1109,7 +1110,7 @@ export default {
           break
         case '5':
           // 产出修复
-          var ss = that.getNodeType(that.getNodeInfoById(sNode)).type
+          // var ss = that.getNodeType(that.getNodeInfoById(sNode)).type
 
           bFlag = ss.includes('outCanDo') || ss.includes('canDo')
 

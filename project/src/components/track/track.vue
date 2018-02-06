@@ -72,17 +72,17 @@ export default {
         height: 200,
         selected: [],
         gridOptions: {
-// enableColResize: true,
-// enableSorting: true,
-// rowSelection: "multiple",
-// rowHeight: 40,
-// headerHeight: 40,
-// rowClass: 'row-style',
-// rowDeselection: true,
-// enableRangeSelection: true,
-// suppressRowClickSelection: true,
-// suppressLoadingOverlay: true,
-// overlayNoRowsTemplate: "暂无数据"
+          // enableColResize: true,
+          // enableSorting: true,
+          // rowSelection: "multiple",
+          // rowHeight: 40,
+          // headerHeight: 40,
+          // rowClass: 'row-style',
+          // rowDeselection: true,
+          // enableRangeSelection: true,
+          // suppressRowClickSelection: true,
+          // suppressLoadingOverlay: true,
+          // overlayNoRowsTemplate: "暂无数据"
         },
         columns: [],
         data: []
