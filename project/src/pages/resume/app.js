@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-green/index.css'
+import 'theme/index.css'
 import App from './app.vue'
 import axios from 'axios'
 // import $ from 'jquery'

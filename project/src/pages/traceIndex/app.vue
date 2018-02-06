@@ -184,11 +184,7 @@ export default {
         }
 
         // 格式化数据。
-        this.treeData = fnP.getTreeData(
-          this.rawData,
-          'trace',
-          this.isOpDbBeforeRefact
-        ) // this.parseTreeData();
+        this.treeData = fnP.getTreeData(this.rawData, 'trace', this.isOpDbBeforeRefact)// this.parseTreeData();
         this.catalogData = fnP.getCatalogData(this.rawData, 'trace')
       }
     },
