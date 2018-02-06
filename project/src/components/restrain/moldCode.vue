@@ -1,11 +1,23 @@
 <template>
-	<div class="router-content suspicious">
+	<div class="router-content suspicious moldCode" ref='moldCode'>
 		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained">遏制</el-button>
 		<div class="innner-content" :style="styleObject">
       <h2 class="title">模具记录</h2>
       <div class="moldInfo">
-				<span>模具名称：XXX</span><span>规格：XXX</span><span>模具额定寿命：XXX</span>
+				<span>模具名称：{{moldInfo.moldName}}</span><span>规格：{{moldInfo.moldCode}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
 			</div>
+      <div class="mold-tabke">
+        <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' >
+          <el-table-column :prop="column.prop" :label="column.name" :width="column.width" :align="column.align?column.align:'center'" header-align='center' v-for="column in tableData.columns" :key="column.prop" >
+            <template slot-scope="scope">
+              <div v-if="column.prop === 'select' && scope.row[column.prop] !== null">
+                <el-checkbox v-model="scope.row.value" @change="handleCheckChange(scope.row)"></el-checkbox>
+              </div>
+              <div class='td-cell' v-else>{{scope.row[column.prop]}}</div>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
 		</div>
 	</div>
 
@@ -13,7 +25,8 @@
 
 <script>
 import report from 'components/report/report.vue'
-
+import fnP from 'assets/js/public.js'
+const moldUrl = window.HOST + `/api/v1/suppress/get-mold-resume`
 export default {
   components: {
     'v-report': report
@@ -26,7 +39,70 @@ export default {
       styleObject: {
         'min-width': '1000px'
       },
-      equipmentName: ''
+      // 模具记录信息
+      moldInfo: {
+        moldCode: '',
+        moldName: '',
+        moldLife: ''
+      },
+      tableData: {
+        columns: [{
+          prop: 'select',
+          name: '选择',
+          width: '50'
+        },
+        {
+          prop: 'happenTime',
+          name: '时间',
+          width: '150'
+        },
+        {
+          prop: 'eventName',
+          name: '动作',
+          width: '100',
+          align: 'left'
+        },
+        {
+          prop: 'operator',
+          name: '操作人员',
+          align: 'left',
+          width: '100'
+        },
+        {
+          prop: 'quantity',
+          name: '产出数量',
+          width: '100'
+        },
+        {
+          prop: 'quantityAll',
+          name: '区间产出数量'
+        },
+        {
+          prop: 'percent',
+          name: '区间产出合格率'
+        },
+        {
+          prop: 'equipmentName',
+          name: '设备',
+          align: 'left',
+          width: '150'
+        },
+        {
+          prop: 'materialName',
+          name: '物料',
+          align: 'left',
+          width: '150'
+        },
+        {
+          prop: 'batchNo',
+          name: '批次',
+          align: 'left',
+          width: '80'
+        }
+        ],
+        data: []
+      },
+      tableHeight: 500 // 表格高度
     }
   },
   computed: {
@@ -38,21 +114,118 @@ export default {
     }
   },
   created () {
-    this.equipmentName = this.oQuery.equipmentName
-    // 组件创建完后获取数据，
-    // 此时 data 已经被 observed 了
-    // this.fetchData();
+    this.init()
+  },
+  mounted () {
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.setTableHeight)
+      this.setTableheight()
+    })
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
     $route: function () {
-      if (this.$route.meta.title === 'restrain') {
-        this.equipmentName = this.oQuery.equipmentName
-      }
+      this.init()
       this.isRestrained = true
     }
   },
   methods: {
+    // 根据添加渲染页面
+    init () {
+      let {endTime, moldCode, processCode, startTime} = fnP.parseQueryParam(this.oQuery)
+      const oCondition = {endTime, moldCode, processCode, startTime}
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        moldUrl,
+        'post',
+        oCondition,
+        this.requestSucess,
+        this.requestFail,
+        this.requestError
+      )
+    },
+    requestSucess (oData) {
+      let myData = {...oData}
+      let needArr = []
+
+      myData.moldDoOutList.forEach(element => {
+        element.firstDoOut.percent = (element.quantityAll - element.quantityNoGood) * 100 / element.quantityAll.toFixed(2)  // 合格率
+        element.firstDoOut.colspan = 1
+        element.firstDoOut.eventName = '第一次产出' // 事件名称
+        element.firstDoOut.quantityAll = element.quantityAll          // 总数
+        element.firstDoOut.equipmentName = element.equipmentName      // 设备名称
+        element.firstDoOut.materialName = element.materialName        // 物料名称
+        element.firstDoOut.batchNo = element.batchNo                  // 批次
+        element.firstDoOut.select = 'first'                           // 有勾选框
+        element.firstDoOut.value = false                              // 勾选框默认 false
+
+        needArr.push(element.firstDoOut)
+        if (element.lastDoOut === null || Object.keys(element.lastDoOut).length === 0) { // 最后一次生产不存在
+          if (element.noGoodDoOutList.length === 0) {       // 最后一次生产不存在 && 不良品不存在
+            element.firstDoOut.rowspan = 1
+          } else {                                           // 最后一次生产不存在 && 不良品存在
+            element.firstDoOut.rowspan = 1 + element.noGoodDoOutList.length
+            element.noGoodDoOutList.forEach(el => {
+              el.rowspan = el.colspan = 0
+              el.select = 'last'
+              el.value = false
+              el.eventName = el.qualityType
+            })
+            needArr.push(...element.noGoodDoOutList)
+          }
+        } else {                                           // 最后一次生产存在
+          element.lastDoOut.eventName = '最后一次产出'
+          if (element.lastDoOut !== null && element.noGoodDoOutList.length === 0) {       // 最后一次生产存在 && 不良品不存在
+            element.firstDoOut.rowspan = 1 + 1
+            needArr.push(element.lastDoOut)
+          } else {                                           // 最后一次生产存在 && 不良品存在
+            element.firstDoOut.rowspan = 1 + element.noGoodDoOutList.length + 1
+            element.noGoodDoOutList.forEach(el => {
+              el.rowspan = el.colspan = 0
+              el.select = 'last'
+              el.value = false
+              el.eventName = el.qualityType
+            })
+
+            needArr.push(...element.noGoodDoOutList)
+            needArr.push(element.lastDoOut)
+          }
+        }
+      })
+      needArr.forEach(el => {
+        if (el.select === undefined) {
+          el.select = null
+        }
+      })
+
+      myData.moldInfo.moldEventList.forEach(event => {
+        event.rowspan = event.colspan = 1
+        needArr.forEach((el, index) => {
+          if (event.happenTime < el.happenTime) {
+            needArr.splice(index, 0, event)
+          } else if (event.happenTime > needArr[needArr.length - 1].happenTime) {
+            needArr.push(event)
+          }
+        })
+      })
+      needArr.forEach((el, index) => {
+        el.index = index
+      })
+
+      this.tableData.data = needArr
+    },
+    // 请求失败。
+    requestFail (sErrorMessage) {
+      this.loading = false
+      console.log(sErrorMessage)
+    },
+    // 请求错误。
+    requestError (err) {
+      console.log(err)
+      this.loading = false
+      console.log('数据库查询出错。')
+    },
     // 可疑品列表。
     suppres () {
       const h = this.$createElement
@@ -137,12 +310,75 @@ export default {
     },
     removeWidth () {
       this.styleObject.minWidth = 0
+    },
+    // 合并单元格
+    objectSpanMethod ({ row, column, rowIndex, columnIndex }) {
+      if (columnIndex === 5 || columnIndex === 6 || columnIndex === 7 || columnIndex === 8 || columnIndex === 9) { // 第5-9列需要合并单元格
+        return {
+          rowspan: row.rowspan,
+          colspan: row.colspan
+        }
+      }
+    },
+    // 勾选
+    handleCheckChange (row) {
+      const select = row.select
+      const value = row.value
+      const index = row.index
+      for (let i in this.tableData.data) {
+        let el = this.tableData.data[i]
+        if (el.value === value && el.index !== index && el.select === select && value === true) {
+          el.value = !value
+          return 0
+        }
+      }
+    },
+    /* 获取元素实际高度(含margin) */
+    outerHeight (el) {
+      var height = el.offsetHeight
+      var style = el.currentStyle || getComputedStyle(el)
+
+      height += parseInt(style.marginTop) + parseInt(style.marginBottom)
+      return height
+    },
+    // 设置高度
+    setTableheight () {
+      this.tableHeight = 100
+      this.$nextTick(() => {
+        const allHeight = this.outerHeight(this.$refs.moldCode)
+        console.log(allHeight)
+        const titleHeight = this.outerHeight(document.querySelector('.title'))
+        const moldInfoHeight = this.outerHeight(document.querySelector('.moldInfo'))
+        this.tableHeight = allHeight - titleHeight - moldInfoHeight - 20
+      })
     }
   }
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
+.moldCode {
+  .btn-restrain {
+    position: fixed !important;
+    top: 104px;
+    right: 40px !important;
+  }
+  .innner-content {
+    .moldInfo {
+      margin: 0 0 15px 0;
+    }
+    .mold-tabke {
+      td {
+        .cell {
+          .td-cell {
+            padding: 0 10px;
+            box-sizing: box-border;
+          }
+        }
+      }
+    }
+  }
+}
 .el-message-box {
   .el-textarea__inner {
     border-radius: 0;
@@ -172,6 +408,7 @@ export default {
   }
 
   .moldInfo {
+    margin: 0 0 10px 0;
     span {
       display: inline-block;
       & + span {

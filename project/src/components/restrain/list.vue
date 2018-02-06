@@ -25,9 +25,9 @@
 import table from 'components/basic/table.vue'
 import report from 'components/report/report.vue'
 
-const URL = HOST + '/api/v1/suppress/list' // 遏制列表
-const verboseURL = HOST + '/api/v1/suppress/verbose' // 遏制详情
-const cancelURL = HOST + '/api/v1/suppress/cancel' //   取消遏制
+const URL = window.HOST + '/api/v1/suppress/list' // 遏制列表
+// const verboseURL = window.HOST + '/api/v1/suppress/verbose' // 遏制详情
+const cancelURL = window.HOST + '/api/v1/suppress/cancel' //   取消遏制
 
 export default {
   components: {

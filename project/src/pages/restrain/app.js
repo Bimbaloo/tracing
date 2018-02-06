@@ -157,7 +157,8 @@ const routes = [{
 }, // 模号查询
 {
   path: '/moldCode',
-  component: MoldCode
+  component: MoldCode,
+  title: 'moldCode'
 } // 模号查询
 ]
 
