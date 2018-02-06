@@ -1110,7 +1110,7 @@ var getCatalogData = function(aoRowData, sType) {
 		// 追踪
 		// 判断最后一个节点是否为物料节点，否则，创建一个虚拟的物料节点。-- 在最后创建，否则，会将其他节点加入
 		aoCopyData.forEach( o => {
-			if(!aoCopyData.some( o1 => o1.parents.split(",").includes(o.key)) && !isMaterialNode(o)) {
+			if(!aoCopyData.some( o1 => o1.parents.split(",").includes(o.key) && o1.key !== o.key) && !isMaterialNode(o)) {
 				// 当前节点没有子节点，并且不是物料节点
 				aLastNodeKeys.push(o.key)
 			}
