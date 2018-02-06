@@ -11,8 +11,8 @@
 					<span class="title-quantity">数量</span>
 				</div>
 				<div class="pop-list">
-					<div class="list-item" v-for="value in popData.link">
-						<div v-for="(item, index) in value">
+					<div class="list-item" v-for="value in popData.link" :key="value">
+						<div v-for="(item, index) in value" :key="index">
 							<span class="title-type">{{ index ? '→': '←' }}</span>
 							<span class="title-process">{{ item.processName }}</span>
 							<span class="title-equipment">{{ item.equipmentName }}</span>
@@ -31,8 +31,8 @@
 					<span class="title-quantity">数量</span>
 				</div>
 				<div class="pop-list">
-					<div class="list-item" v-for="value in popData.cancel">
-						<div v-for="(item, index) in value">
+					<div class="list-item" v-for="value in popData.cancel" :key="value">
+						<div v-for="(item, index) in value" :key="index">
 							<span class="title-type">{{ index ? '→': '←' }}</span>
 							<span class="title-process">{{ item.processName }}</span>
 							<span class="title-equipment">{{ item.equipmentName }}</span>
@@ -55,56 +55,56 @@
 </template>
 
 <script>
-	import Button from "components/basic/button.vue"
+	import Button from 'components/basic/button.vue'
 
 	export default {
-		props: {
-			popShow: Boolean,
-			popData: {
-				type: Object,
-				default: {
-					cancel: [],
-					link: []
-				}
-			}
-		},
-		// 组件。
-		components: {
-			"v-button": Button
-		},
-		data() {
-			return {
-				// 当前传入的值
-				sdes: "",
-				aCancel: [],
-				aLink: []
-			}
-		},
-		created() {},
-		// 计算属性。
-		computed: {},
-		watch: {
-			popShow() {
-				this.sdes = "";
-			}
-		},
-		// 方法。
-		methods: {
-			// 弹窗筛选确定-- 重置筛选值。
-			setFilter() {
-				// 设置弹窗状态。
-				this.$emit("hideSavePop", this.sdes);
-			},
-			// 关闭按钮。
-			handleClose() {
-				this.$emit("hideSavePop");
-			},
-			closeModal() {
-				this.$emit("hideSavePop");
-			}
-		}
-		
-	};
+	  props: {
+	    popShow: Boolean,
+	    popData: {
+	      type: Object,
+	      default: {
+	        cancel: [],
+	        link: []
+	      }
+	    }
+	  },
+    // 组件。
+	  components: {
+	    'v-button': Button
+	  },
+	  data () {
+	    return {
+      // 当前传入的值
+	      sdes: '',
+	      aCancel: [],
+	      aLink: []
+	    }
+	  },
+	  created () {},
+    // 计算属性。
+	  computed: {},
+	  watch: {
+	    popShow () {
+	      this.sdes = ''
+    }
+	  },
+    // 方法。
+	  methods: {
+    // 弹窗筛选确定-- 重置筛选值。
+	    setFilter () {
+    // 设置弹窗状态。
+	      this.$emit('hideSavePop', this.sdes)
+	    },
+    // 关闭按钮。
+	    handleClose () {
+	      this.$emit('hideSavePop')
+	    },
+	    closeModal () {
+	      this.$emit('hideSavePop')
+	    }
+	  }
+	
+	}
 </script>
 
 <style lang="less">

@@ -1,21 +1,18 @@
-
 /**
  * 选中节点事件。
  * @param {Object} oNode
  * @return {void}
  */
-function onNodeSelectionChange(oNode){
-}
+function onNodeSelectionChange (oNode) {}
 
 /**
- * 
+ *
  * @param {Object} e
  * @param {Object} node
  */
-function onClickCatalogNode(e, node) {
-	
-}
+// function onClickCatalogNode (e, node) {
 
+// }
 
 /**
  * 节点单击事件。
@@ -23,43 +20,42 @@ function onClickCatalogNode(e, node) {
  * @param {Object} node
  * @returns {void}
  */
-function onClickNode(e, node, oTree, oCatalog) {
-    oTree.nodes.each(obj => {
-		obj.background = null;
-    	obj.findObject("TB") && (obj.findObject("TB").stroke = "#333");
-    });
-	
-	let nodeInmenutree = null;
-	if(oCatalog) {
-		nodeInmenutree = oCatalog.findNodeForKey(node.data.key);
+function onClickNode (e, node, oTree, oCatalog) {
+  oTree.nodes.each(obj => {
+    obj.background = null
+    obj.findObject('TB') && (obj.findObject('TB').stroke = '#333')
+  })
 
-		oCatalog.nodes.each(obj => {
-			obj.isSelected = false;
-	    	obj.background = null;
-	    	obj.findObject("TB").stroke = "#fff";
-	    });
-	}
-    
-    if(node.isSelected){
-//  	goPage.pageHandler.getVerboseInfo(node);
-    	
-    	if(nodeInmenutree) {
-	    	nodeInmenutree.background = "white";
-	    	nodeInmenutree.isSelected = true;
-	    	nodeInmenutree.findObject("TB").stroke = "#333";    		
-    	}
+  let nodeInmenutree = null
+  if (oCatalog) {
+    nodeInmenutree = oCatalog.findNodeForKey(node.data.key)
 
-        node.background = "#40484a";
-        node.findObject("TB") && (node.findObject("TB").stroke = "#fff");
-    }else {    	
-		node.background = null;
-        
-        if(nodeInmenutree) {
-        	nodeInmenutree.isSelected = false;
-        }
+    oCatalog.nodes.each(obj => {
+      obj.isSelected = false
+      obj.background = null
+      obj.findObject('TB').stroke = '#fff'
+    })
+  }
+
+  if (node.isSelected) {
+    // goPage.pageHandler.getVerboseInfo(node);
+
+    if (nodeInmenutree) {
+      nodeInmenutree.background = 'white'
+      nodeInmenutree.isSelected = true
+      nodeInmenutree.findObject('TB').stroke = '#333'
     }
-}
 
+    node.background = '#40484a'
+    node.findObject('TB') && (node.findObject('TB').stroke = '#fff')
+  } else {
+    node.background = null
+
+    if (nodeInmenutree) {
+      nodeInmenutree.isSelected = false
+    }
+  }
+}
 
 /**
  * 节点右键点击事件。
@@ -67,11 +63,9 @@ function onClickNode(e, node, oTree, oCatalog) {
  * @param node
  * @returns void
  */
-function onContextClickNode(e, node) {
-//	console.log("rightclick");
+function onContextClickNode (e, node) {
+  // console.log("rightclick");
 }
-
-
 
 /**
  * 节点双击事件。
@@ -79,15 +73,14 @@ function onContextClickNode(e, node) {
  * @param node
  * @returns void
  */
-function onDoubleClickNode(e, node) {
-
-	if (node.wasTreeExpanded) {
-		node.wasTreeExpanded = false;
-		node.expandTree();
-	} else {
-		node.wasTreeExpanded = true;
-		node.collapseTree();
-	}
+function onDoubleClickNode (e, node) {
+  if (node.wasTreeExpanded) {
+    node.wasTreeExpanded = false
+    node.expandTree()
+  } else {
+    node.wasTreeExpanded = true
+    node.collapseTree()
+  }
 }
 
 /**
@@ -95,32 +88,35 @@ function onDoubleClickNode(e, node) {
  * @param {Object} data
  * @return {String}
  */
-function tooltipTextConverter(data) {
-	return data.name;
+function tooltipTextConverter (data) {
+  return data.name
 }
 
 /**
  * 双击背景放大缩小当前画布。
  * @returns {void}
  */
-function zoomDiagram(oTree, bFlag, treeId) {
-	if(bFlag) {
-		oTree.zoomToFit();		
-	}else {
-		let oDiagram = document.getElementById(treeId).querySelector("canvas"),
-			nHeight = oDiagram.clientHeight,
-			nWidth = oDiagram.clientWidth;
+function zoomDiagram (oTree, bFlag, treeId) {
+  if (bFlag) {
+    oTree.zoomToFit()
+  } else {
+    let oDiagram = document.getElementById(treeId).querySelector('canvas')
+    let nHeight = oDiagram.clientHeight
+    let nWidth = oDiagram.clientWidth
 
-    	oTree.zoomToRect({width:nWidth,height: nHeight}, go.Diagram.UniformToFill);
-	}
+    oTree.zoomToRect({
+      width: nWidth,
+      height: nHeight
+    }, window.go.Diagram.UniformToFill)
+  }
 }
 
 export {
-	onNodeSelectionChange, 
-//	onClickCatalogNode,
-	onClickNode, 
-	onContextClickNode, 
-	onDoubleClickNode, 
-	tooltipTextConverter, 
-	zoomDiagram
+  onNodeSelectionChange,
+  // onClickCatalogNode,
+  onClickNode,
+  onContextClickNode,
+  onDoubleClickNode,
+  tooltipTextConverter,
+  zoomDiagram
 }

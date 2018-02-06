@@ -34,7 +34,7 @@
 		</div>
 		
 		<!--<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>-->
-		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" size="tiny">
+		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" width='30%'>
             <el-form :model="form">
                 <el-form-item label="报告人：" :label-width="formLabelWidth">
                     <el-input v-model="form.name" auto-complete="off" :placeholder="this.$store.state.loginModule.nickname"></el-input>
@@ -53,684 +53,715 @@
 </template>
 
 <script>
-	import report from "components/report/report.vue"
-	import table from "components/basic/table.vue"
-	import html2canvas from 'html2canvas'
-	import rasterizeHTML from 'rasterizehtml'
-	import fnP from "assets/js/public.js"
+import report from 'components/report/report.vue'
+import table from 'components/basic/table.vue'
+import html2canvas from 'html2canvas'
+import rasterizeHTML from 'rasterizehtml'
+import fnP from 'assets/js/public.js'
 
-	// 数据名称接口。
-    const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
+// 数据名称接口。
+const TABLE_DATA_URL = window.HOST + '/api/v1/customized/items'
 
-	export default {
-		components: {
-			'v-report': report,
-			'v-table': table
-		},
-		data() {
-			return {
-				dialogFormVisible: false,
-                form: {
-					name: '',
-					printRemark: true
-                },
-                formLabelWidth: '120px',
+export default {
+  components: {
+    'v-report': report,
+    'v-table': table
+  },
+  data () {
+    return {
+      dialogFormVisible: false,
+      form: {
+        name: '',
+        printRemark: true
+      },
+      formLabelWidth: '120px',
 
-				printRemark: false, // 是否打印备注栏
-//				nickname: "",   	// 报告人
-				printReport: false, // 是否打印
-				active: {			// 条件列是否显示
-					message: false
-				},
-				dialogTableVisible: false,
-				radio: "all",
-				showData: {
-					columns: [],
-					data: []
-				},
-				// 追踪结果集。
-				url: HOST + "/api/v1/trace/down/start-points",
-				dataName:[],
-				loading: false,
-				error: "",
-				// 快速报告查询类型。若为溯源页面跳转而来，该类型不为空。
-				type: "",
-                selected: [],
-                gridData: {
-                    columns: [{
-                        prop: "equipmentName",
-                        name: "设备"
-                    },{
-                        prop: "happenTime",
-                        name: "加工时间"
-                    }],
-                    data: []
-                },
-            
-				styleObject: {
-					"min-width": "1000px"
-				},
-				result: {
-					whole: 0,
-					selected: 0,
-					filter: 0
-				},
-				filters: {},
-				filtersList: [],
-				//dialogState:false
-				equipmentTimes:[],
-				selectedArrs: []
-			}
-		},
-		computed: {
-			query: function() {
-				let url = location.search; //获取url中"?"符后的字串 
-				let oRequest = {}; 
-				if (url.indexOf("?") != -1) { 
-					let strs = url.substr(1).split("&"); 
-					
-					for(let i = 0; i < strs.length; i ++) { 
-						oRequest[strs[i].split("=")[0]]=decodeURIComponent(strs[i].split("=")[1]); 
-					} 
-				} 
-				return oRequest; 
-			},
-			nickname: function() {
-				return this.form.name || ((this.$store.state.loginModule.nickname !== null) ? this.$store.state.loginModule.nickname : "")
-			}
-		},
-		created() {
-			// 登录验证。
-			this.$register.login(this.$store);
+      printRemark: false, // 是否打印备注栏
+      // nickname: "", // 报告人
+      printReport: false, // 是否打印
+      active: {
+        // 条件列是否显示
+        message: false
+      },
+      dialogTableVisible: false,
+      radio: 'all',
+      showData: {
+        columns: [],
+        data: []
+      },
+      // 追踪结果集。
+      url: window.HOST + '/api/v1/trace/down/start-points',
+      dataName: [],
+      loading: false,
+      error: '',
+      // 快速报告查询类型。若为溯源页面跳转而来，该类型不为空。
+      type: '',
+      selected: [],
+      gridData: {
+        columns: [
+          {
+            prop: 'equipmentName',
+            name: '设备'
+          },
+          {
+            prop: 'happenTime',
+            name: '加工时间'
+          }
+        ],
+        data: []
+      },
 
-			// 组件创建完后获取数据，
-			// 此时 data 已经被 observed 了
-			let oConditions = sessionStorage.getItem("fastReport_" + this.query.tag);
-			
-			if(oConditions) {
-				oConditions = JSON.parse(oConditions);	
-				
-				if(!oConditions.type) {
-					// 通过起点集查询。
-					this.result.selected = (oConditions.selected && oConditions.selected.length) || 0;
-					this.result.whole = oConditions.length || 0;
-					this.result.filter = this.result.whole - this.result.selected;
-					
-					this.filters = oConditions.filters || [];
-					this.selected = oConditions.selected || [];
-				}else {
-					// 溯源页面跳转。
-					this.type = oConditions.type
-					this.filters = Object.assign({}, oConditions.keys)
-					this.selected = oConditions
-				}
+      styleObject: {
+        'min-width': '1000px'
+      },
+      result: {
+        whole: 0,
+        selected: 0,
+        filter: 0
+      },
+      filters: {},
+      filtersList: [],
+      // dialogState:false
+      equipmentTimes: [],
+      selectedArrs: []
+    }
+  },
+  computed: {
+    query: function () {
+      let url = location.search // 获取url中"?"符后的字串
+      let oRequest = {}
+      if (url.indexOf('?') !== -1) {
+        let strs = url.substr(1).split('&')
 
-			}
-			this.fetchDataName()  //获取名称
-		},
-		mounted() {
-			this.fetchStartPointsData();
-		},
-		methods: {
-			setFilters () {
-				
-				let oFilters = this.filters,
-					aoFilters = []
-				
-				for(let param in oFilters){
-					if(oFilters[param] === '' || param === '_tag'){
-						delete oFilters[param]
-					}else {
-						/* 为了将获取到的 barcode等转换为对应的中文 */
-						let aValue = this.setSpecialItem(param, oFilters[param])
-						aValue && aoFilters.push(aValue)				
-					}
-				}
-				this.filtersList = aoFilters 
-			},
-			// 获取对应的中文。
-			setSpecialItem (param, sValue) {
-				
-				if(param === "equipmentName") {
-					// 设备名称。
-					param = "equipmentCode"
-				}
+        for (let i = 0; i < strs.length; i++) {
+          oRequest[strs[i].split('=')[0]] = decodeURIComponent(
+            strs[i].split('=')[1]
+          )
+        }
+      }
+      return oRequest
+    },
+    nickname: function () {
+      return (
+        this.form.name ||
+        (this.$store.state.loginModule.nickname !== null
+          ? this.$store.state.loginModule.nickname
+          : '')
+      )
+    }
+  },
+  created () {
+    // 登录验证。
+    this.$register.login(this.$store)
 
-				let oItem = this.dataName.filter(o => o.itemCode === param)[0]
+    // 组件创建完后获取数据，
+    // 此时 data 已经被 observed 了
+    let oConditions = sessionStorage.getItem('fastReport_' + this.query.tag)
 
-				if(oItem) {
-					if(typeof sValue === "string") {
-						let oParam = {};
-						oParam[param] = sValue;
-						sValue = fnP.parseQueryParam(oParam, 1)[param]
-					}
+    if (oConditions) {
+      oConditions = JSON.parse(oConditions)
 
-					return [oItem.itemName, sValue]
-				}
-				
-			},
-			// 起点请求成功。
-			requestStartPointsSucess(oData) {
-				//console.log(oData)
-				this.gridData.data = oData;
-				
-				let myData = JSON.parse(JSON.stringify(this.gridData.data))
-				let needArr = []
-				let selectedArr = []
-				this.selected.forEach((o, index) => {
-					selectedArr.push(myData.find(e=> o.snapshotId === e.snapshotId))
-				})
-				this.selectedArrs = JSON.parse(JSON.stringify(selectedArr))
-				selectedArr.forEach((el,i)=>{
-					let obj = {
-						"name":"",
-						"time":[],
-						"barcode":[],
-					}
-					obj["name"] = el["equipmentName"]
-					obj["time"].push(el["opTime"])
-					obj["barcode"].push(el["barcode"])
-					needArr.push(obj)
-					for (let j = i+1 ; j < selectedArr.length; j++){
-						if (el["equipmentName"] === selectedArr[j]["equipmentName"]){
-							obj["time"].push(selectedArr[j]["opTime"])
-							obj["barcode"].push(selectedArr[j]["barcode"])
-							selectedArr.splice(j, 1)
-							j=j-1   
-						}
-					}
-				})
-				this.equipmentTimes = needArr
+      if (!oConditions.type) {
+        // 通过起点集查询。
+        this.result.selected =
+          (oConditions.selected && oConditions.selected.length) || 0
+        this.result.whole = oConditions.length || 0
+        this.result.filter = this.result.whole - this.result.selected
 
+        this.filters = oConditions.filters || []
+        this.selected = oConditions.selected || []
+      } else {
+        // 溯源页面跳转。
+        this.type = oConditions.type
+        this.filters = Object.assign({}, oConditions.keys)
+        this.selected = oConditions
+      }
+    }
+    this.fetchDataName() // 获取名称
+  },
+  mounted () {
+    this.fetchStartPointsData()
+  },
+  methods: {
+    setFilters () {
+      let oFilters = this.filters
+      let aoFilters = []
 
-				if(!oData.length) {
-					console.log('查无数据。');
-				}else {
-					this.gridData.data.forEach((o, index) => {
-						if(this.selected.length && this.selected.filter(item => o.snapshotId === item.snapshotId).length) {
-							// 标记为选中。
-							o.tag = "selected";
-						}else {
-							o.tag = "filtered";
-						}
-					});
-				}
-		
-				this.showData = {
-					columns: this.gridData.columns,
-					data: this.gridData.data
-				}
-				//this.dialogState = true	
-			},
-			// 请求失败。
-			requestFail(sErrorMessage) {
-				console.warn(sErrorMessage);
-			},
-			// 请求错误。
-			requestError(error) {
-              	// this.gridData.loading = false;
-				// this.error = "查无数据";
-				console.warn(error);
-				console.warn("查询出错。");
-			},
-			fetchStartPointsData () {
-				this.error = "";
-				this.gridData.data = [];
-				
-				if(this.type) {
-					return;
-				}
+      for (let param in oFilters) {
+        if (oFilters[param] === '' || param === '_tag') {
+          delete oFilters[param]
+        } else {
+          /* 为了将获取到的 barcode等转换为对应的中文 */
+          let aValue = this.setSpecialItem(param, oFilters[param])
+          aValue && aoFilters.push(aValue)
+        }
+      }
+      this.filtersList = aoFilters
+    },
+    // 获取对应的中文。
+    setSpecialItem (param, sValue) {
+      if (param === 'equipmentName') {
+        // 设备名称。
+        param = 'equipmentCode'
+      }
 
-				this.$register.sendRequest(this.$store, this.$ajax, this.url, "post", fnP.parseQueryParam(this.filters), this.requestStartPointsSucess, this.requestFail, this.requestError)
-			},
-			// 获取名称成功。
-			requestNameSucess(oData) {
-				// 获取对应的名称。
-				this.dataName = oData	
-				this.setFilters()
-			},
-			fetchDataName() {
-				this.$register.sendRequest(this.$store, this.$ajax, TABLE_DATA_URL, "get", null, this.requestNameSucess, this.requestFail, this.requestError)
-			},
-			setWidth() {
-				this.styleObject.minWidth = "1000px";
-			},
-			removeWidth() {
-				this.styleObject.minWidth = 0;
-			},
-			radioChange(value) {
-				if(value !== "all") {
-					this.showData.data = this.gridData.data.filter(o => o.tag == value);
-				}else {
-					this.showData.data = this.gridData.data;
-				}			
-			},
-			dialogVisible(value){
-				
-					this.dialogTableVisible = true;
-					this.radio = value
-					this.radioChange(value)
-				
-				
-			},
-			// 页面下载。
-            downloadHandle (refHtml, event) {
-				event.stopPropagation();
-                let oRef = this.$refs[refHtml];
-                if(!oRef) {
-                    return;
-                }
-                window.Rt.utils.downloadHtml(html2canvas, oRef, "快速报告");     
-			},
-			//
-			beforePrint(){
-				this.dialogFormVisible = true
-			},
-			// 打印页面。
-			printHandle(refHtml, event) {
-				let oTable = this.$refs[refHtml];
-				
-	            if (!this.printReport) {
-	                return;
-	            }
-	            
-	            // 修改报告人信息。
-	           	let nickname = this.form.name || ((this.$store.state.loginModule.nickname !== null) ? this.$store.state.loginModule.nickname : "")
-	             
-	            let sHtml = `
-	                <div class="report-wrapper">
-	                    <div class="report-container">
-	                    	<div class="tag report-time">
-								<span>报告人：${nickname}</span>
-								<span>报告时间：${new Date().Format("yyyy-MM-dd hh:mm:ss")}</span>
-							</div>
-							${oTable.innerHTML}
-							${this.form.printRemark ?
-			            		`<div class="readmine">
-								<h2 class="content-title">备注</h2>
-								<div class="condition-audit">		
-									<div class="tag">
-										<span>签名：</span>
-										<span>时间：</span>
-									</div>
-								</div>
-							</div>`: ''}
-	                    </div>
-	                    
-	                    <style>
-		                    body {
-								display: flex;
-								flex-direction: column;
-							}
-							
-							.report-wrapper {
-								padding: 20px;
-								flex: 1 1;
-							}
-		                    .report-container .table {
-		                    	display: block !important;
-		                    }
-	                    	.report-container {
-	                    		width: 100%;
-	                    		height: 100%;
-								background-color: #fff;
-								position: relative;
-								box-sizing: border-box;
-	                    	}
-	                    	
-	                    	.report-container .content-table {
-	                    		display: block !important;
-	                    	}
-	                    	.report-container .page-icon {
-	                    		display: none
-	                    	}
-	                    	.report-container .title {
-	                    		height: 24px;
-								font: normal 24px/1 "微软雅黑",arial,sans-serif;
-								color: #333;
-								text-align: center;
-								margin: 28px auto;
-	                    	}
-	                    	.report-container .content-title,
-	                    	.report-container .content-title .table-title{
-	                    		font-size: 16px;
-	                    		height: 16px;
-    							line-height: 16px;
-	                    	}
-	                    	.report-container .content-title {
-    							text-indent: 10px;
-	                    		border-left: 4px solid #42af8f;
-	                    	}
-	                    	.report-container .inner-title .table-title {
-	                    		font-size: 16px;
-	                    		color: #42AF8F;
-	                    	}
-	                    	.report-container >.tag {
-	                    		position: absolute;
-								font-size: 14px;
-								top: 60px;
-								right: 20px;
-	                    	}
-	                    	.report-container >.tag span {
-	                    		display:　inline-block;
-	                    	}
-	                    	.report-container >.tag span + span {
-	                    		margin-left: 30px
-	                    	}
-	                    	.report-container .condition-message {
-	                    		box-sizing: border-box;
-								padding-left: 10px;
-	                    	}
-	                    	.report-container .condition-message span {
-	                    		font-size: 14px;
-								margin-right: 30px
-	                    	}
-	                    	.report-container .condition-message .default-message {
-	                    		color: #999;
-								margin-right: 10px;
-	                    	}
-	                    	.report-container .condition-list {
-	                    		box-sizing: border-box;
-								padding-left: 10px;
-								cursor: pointer;
-	                    	}
-	                    	.report-container .condition-list span {
-	                    		font-size: 14px;
-								line-height: 40px;
-								color: #42AF8F
-	                    	}
-	                    	.report-container .condition-list .icon {
-	                    		font-size: 12px;
-								margin-bottom: 3px;
-	                    	}
-	                    	.report-container .condition-table {
-	                    		margin-top: 0;
-								box-sizing: border-box;
-								border: 1px solid #42AF8F;
-								padding: 10px;
-	                    	}
-	                    	.report-container .condition-table .materialBox {
-	                    		display: flex;
-								box-sizing: border-box;
-								padding-left: 10px;
-								color: #666;
-								margin-bottom: 20px;
-								font-size: 14px;
-	                    	}
-	                    	.report-container .condition-table .materialBox .material {
-								line-height: 20px;
-							}
-	                    	.report-container .condition-table .materialBox .time {
-	                    		display: flex;
-								flex: 1;
-								flex-wrap: wrap;
-								height: auto;
-	                    	}
-	                    	.report-container .condition-table .materialBox .time > span {
-	                    		margin-left: 10px; 
-								line-height: 20px;
-	                    	}
-	                    	.report-container .report .inner-title,
-	                    	.report-container .report .content-table.inner {
-							  display: block !important;
-							}
-	                    	.report-container .report .error {
-	                    		height: 60px;
-							    text-align: center;
-	                    	}
-	                    	.report-container .readmine .condition-audit {
-	                    		border: 2px solid #42AF8F;
-								padding: 20px 12px;
-								margin-top: 30px;
-								font-size: 14px;
-								height: 70px;
-								position: relative;
-	                    	}
-	                    	.report-container .readmine .condition-audit .tag {
-	                    		position: absolute;
-								right: 120px;
-								top: 48px;
-	                    	}
-	                    	.report-container .readmine .condition-audit .tag span {
-	                    		display: block;
-								line-height: 24px;
-	                    	}
-	                    	.report-container .readmine .condition-audit .tag span + span {
-	                    		margin-left: 0;
-	                    	}
-	                    	.report-container .el-table {
-								// 显示表格
-								display: block !important;
-								font-size: 14px
-	                    	}
-							.el-table .resize-triggers {
-								display: none;
-							}
-	                        .el-table td.is-center, .el-table th.is-center {
-	                            text-align: center;
-	                        }
-	                        .el-table thead th {
-	                            height: 36px;
-	                            background-color: #42af8f;
-	                        }
-	                        .el-table thead th .cell {
-	                            color: #fff;
-	                        }
-		                    .el-table__body-wrapper tr:nth-child(even) {
-		                        background-color: #fafafa;
-		                    }
-		                    .el-table__body-wrapper tr:nth-child(odd) {
-		                        background-color: #fff;
-		                    }
-	                        .el-table__body-wrapper td {
-	                        	white-space: normal;
-	    						word-break: break-all;
-	                        }
-	                        .el-table__body-wrapper .cell {
-	                            min-height: 30px;
-	                            line-height: 30px;
-	                            // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
-	                            //	border: 1px solid #e4efec;
-	                            box-sizing: border-box;
-	                        }
-	                        .el-table__body-wrapper .batch .cell > div {
-	                            color: #f90;
-	                        	font-weight: 600
-	                        }
-	                        .el-table__empty-block {
-	                            text-align: center;	
-	                        }
-	                    </style>
-	                </div>
-	            `;
-	
-	            window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml, {
-	            	width: document.body.clientWidth
-	            });
-	            this.printReport = false
-			},
-			//高度函数
-			outerHeight(el) {
-				var height = el.offsetHeight;
-				var style = getComputedStyle(el);
+      let oItem = this.dataName.filter(o => o.itemCode === param)[0]
 
-				height += parseInt(style.marginTop) + parseInt(style.marginBottom);
-				return height;
-				}
-			}
-	}
+      if (oItem) {
+        if (typeof sValue === 'string') {
+          let oParam = {}
+          oParam[param] = sValue
+          sValue = fnP.parseQueryParam(oParam, 1)[param]
+        }
+
+        return [oItem.itemName, sValue]
+      }
+    },
+    // 起点请求成功。
+    requestStartPointsSucess (oData) {
+      // console.log(oData)
+      this.gridData.data = oData
+
+      let myData = JSON.parse(JSON.stringify(this.gridData.data))
+      let needArr = []
+      let selectedArr = []
+      this.selected.forEach((o, index) => {
+        selectedArr.push(myData.find(e => o.snapshotId === e.snapshotId))
+      })
+      this.selectedArrs = JSON.parse(JSON.stringify(selectedArr))
+      selectedArr.forEach((el, i) => {
+        let obj = {
+          name: '',
+          time: [],
+          barcode: []
+        }
+        obj['name'] = el['equipmentName']
+        obj['time'].push(el['opTime'])
+        obj['barcode'].push(el['barcode'])
+        needArr.push(obj)
+        for (let j = i + 1; j < selectedArr.length; j++) {
+          if (el['equipmentName'] === selectedArr[j]['equipmentName']) {
+            obj['time'].push(selectedArr[j]['opTime'])
+            obj['barcode'].push(selectedArr[j]['barcode'])
+            selectedArr.splice(j, 1)
+            j = j - 1
+          }
+        }
+      })
+      this.equipmentTimes = needArr
+
+      if (!oData.length) {
+        console.log('查无数据。')
+      } else {
+        this.gridData.data.forEach((o, index) => {
+          if (
+            this.selected.length &&
+            this.selected.filter(item => o.snapshotId === item.snapshotId)
+              .length
+          ) {
+            // 标记为选中。
+            o.tag = 'selected'
+          } else {
+            o.tag = 'filtered'
+          }
+        })
+      }
+
+      this.showData = {
+        columns: this.gridData.columns,
+        data: this.gridData.data
+      }
+      // this.dialogState = true
+    },
+    // 请求失败。
+    requestFail (sErrorMessage) {
+      console.warn(sErrorMessage)
+    },
+    // 请求错误。
+    requestError (error) {
+      // this.gridData.loading = false;
+      // this.error = "查无数据";
+      console.warn(error)
+      console.warn('查询出错。')
+    },
+    fetchStartPointsData () {
+      this.error = ''
+      this.gridData.data = []
+
+      if (this.type) {
+        return
+      }
+
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        this.url,
+        'post',
+        fnP.parseQueryParam(this.filters),
+        this.requestStartPointsSucess,
+        this.requestFail,
+        this.requestError
+      )
+    },
+    // 获取名称成功。
+    requestNameSucess (oData) {
+      // 获取对应的名称。
+      this.dataName = oData
+      this.setFilters()
+    },
+    fetchDataName () {
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        TABLE_DATA_URL,
+        'get',
+        null,
+        this.requestNameSucess,
+        this.requestFail,
+        this.requestError
+      )
+    },
+    setWidth () {
+      this.styleObject.minWidth = '1000px'
+    },
+    removeWidth () {
+      this.styleObject.minWidth = 0
+    },
+    radioChange (value) {
+      if (value !== 'all') {
+        this.showData.data = this.gridData.data.filter(o => o.tag === value)
+      } else {
+        this.showData.data = this.gridData.data
+      }
+    },
+    dialogVisible (value) {
+      this.dialogTableVisible = true
+      this.radio = value
+      this.radioChange(value)
+    },
+    // 页面下载。
+    downloadHandle (refHtml, event) {
+      event.stopPropagation()
+      let oRef = this.$refs[refHtml]
+      if (!oRef) {
+        return
+      }
+      window.Rt.utils.downloadHtml(html2canvas, oRef, '快速报告')
+    },
+    //
+    beforePrint () {
+      this.dialogFormVisible = true
+    },
+    // 打印页面。
+    printHandle (refHtml, event) {
+      let oTable = this.$refs[refHtml]
+
+      if (!this.printReport) {
+        return
+      }
+
+      // 修改报告人信息。
+      let nickname =
+        this.form.name ||
+        (this.$store.state.loginModule.nickname !== null
+          ? this.$store.state.loginModule.nickname
+          : '')
+
+      let sHtml = `
+                <div class="report-wrapper">
+                  <div class="report-container">
+                    <div class="tag report-time">
+                      <span>报告人：${nickname}</span>
+                      <span>报告时间：${new Date().Format('yyyy-MM-dd hh:mm:ss')}</span>
+                    </div>
+                  ${oTable.innerHTML}
+                  ${
+                   this.form.printRemark
+                    ? `<div class="readmine">
+                    <h2 class="content-title">备注</h2>
+                    <div class="condition-audit">
+                    <div class="tag">
+                    <span>签名：</span>
+                    <span>时间：</span>
+                    </div>
+                  </div>
+                 </div>`
+                  : ''
+                  }
+                  </div>
+    
+                 <style>
+                  body {
+                   display: flex;
+                   flex-direction: column;
+                  }
+
+                  .report-wrapper {
+                   padding: 20px;
+                   flex: 1 1;
+                  }
+                  .report-container .table {
+                   display: block !important;
+                  }
+                  .report-container {
+                    width: 100%;
+                    height: 100%;
+                    background-color: #fff;
+                    position: relative;
+                    box-sizing: border-box;
+                  }
+
+                  .report-container .content-table {
+                     display: block !important;
+                  }
+                  .report-container .page-icon {
+                    display: none
+                  }
+                  .report-container .title {
+                    height: 24px;
+                    font: normal 24px/1 "微软雅黑",arial,sans-serif;
+                    color: #333;
+                    text-align: center;
+                    margin: 28px auto;
+                  }
+                  .report-container .content-title,
+                    .report-container .content-title .table-title{
+                      font-size: 16px;
+                      height: 16px;
+                      line-height: 16px;
+                    }
+                    .report-container .content-title {
+                      text-indent: 10px;
+                      border-left: 4px solid #42af8f;
+                    }
+                    .report-container .inner-title .table-title {
+                      font-size: 16px;
+                      color: #42AF8F;
+                    }
+                    .report-container >.tag {
+                      position: absolute;
+                      font-size: 14px;
+                      top: 60px;
+                      right: 20px;
+                    }
+                    .report-container >.tag span {
+                      display:inline-block;
+                    }
+                    .report-container >.tag span + span {
+                      margin-left: 30px
+                    }
+                    .report-container .condition-message {
+                      box-sizing: border-box;
+                      padding-left: 10px;
+                    }
+                    .report-container .condition-message span {
+                      font-size: 14px;
+                      margin-right: 30px
+                    }
+                    .report-container .condition-message .default-message {
+                      color: #999;
+                      margin-right: 10px;
+                    }
+                    .report-container .condition-list {
+                      box-sizing: border-box;
+                      padding-left: 10px;
+                      cursor: pointer;
+                    }
+                    .report-container .condition-list span {
+                      font-size: 14px;
+                      line-height: 40px;
+                      color: #42AF8F
+                    }
+                    .report-container .condition-list .icon {
+                      font-size: 12px;
+                      margin-bottom: 3px;
+                    }
+                    .report-container .condition-table {
+                      margin-top: 0;
+                      box-sizing: border-box;
+                      border: 1px solid #42AF8F;
+                      padding: 10px;
+                    }
+                    .report-container .condition-table .materialBox {
+                      display: flex;
+                      box-sizing: border-box;
+                      padding-left: 10px;
+                      color: #666;
+                      margin-bottom: 20px;
+                      font-size: 14px;
+                    }
+                    .report-container .condition-table .materialBox .material {
+                      line-height: 20px;
+                    }
+                    .report-container .condition-table .materialBox .time {
+                      display: flex;
+                      flex: 1;
+                      flex-wrap: wrap;
+                      height: auto;
+                    }
+                    .report-container .condition-table .materialBox .time > span {
+                      margin-left: 10px; 
+                      line-height: 20px;
+                    }
+                    .report-container .report .inner-title,
+                    .report-container .report .content-table.inner {
+                      display: block !important;
+                    }
+                    .report-container .report .error {
+                      height: 60px;
+                      text-align: center;
+                    }
+                    .report-container .readmine .condition-audit {
+                      border: 2px solid #42AF8F;
+                      padding: 20px 12px; 
+                      margin-top: 30px;
+                      font-size: 14px;
+                      height: 70px;
+                      position: relative;
+                    }
+                    .report-container .readmine .condition-audit .tag {
+                      position: absolute;
+                      right: 120px;
+                      top: 48px;
+                    }
+                    .report-container .readmine .condition-audit .tag span {
+                      display: block;
+                      line-height: 24px;
+                    }
+                    .report-container .readmine .condition-audit .tag span + span {
+                      margin-left: 0;
+                    }
+                    .report-container .el-table {
+                      // 显示表格
+                      display: block !important;
+                      font-size: 14px
+                    }
+                    .el-table .resize-triggers {
+                      display: none;
+                    }
+                    .el-table td.is-center, .el-table th.is-center {
+                      text-align: center;
+                    }
+                    .el-table thead th {
+                      height: 36px;
+                      background-color: #42af8f;
+                    }
+                    .el-table thead th .cell {
+                      color: #fff;
+                    }
+                    .el-table__body-wrapper tr:nth-child(even) {
+                      background-color: #fafafa;
+                    }
+                    .el-table__body-wrapper tr:nth-child(odd) {
+                      background-color: #fff;
+                    }
+                    .el-table__body-wrapper td {
+                      white-space: normal;
+                      word-break: break-all;
+                    }
+                    .el-table__body-wrapper .cell {
+                      min-height: 30px;
+                      line-height: 30px;
+                      // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+                      //border: 1px solid #e4efec;
+                      box-sizing: border-box;
+                    }
+                    .el-table__body-wrapper .batch .cell > div {
+                      color: #f90;
+                      font-weight: 600
+                    }
+                    .el-table__empty-block {
+                       text-align: center;
+                     }
+                  </style>
+                </div>
+              `
+
+      window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml, {
+        width: document.body.clientWidth
+      })
+      this.printReport = false
+    },
+    // 高度函数
+    outerHeight (el) {
+      var height = el.offsetHeight
+      var style = getComputedStyle(el)
+
+      height += parseInt(style.marginTop) + parseInt(style.marginBottom)
+      return height
+    }
+  }
+}
 </script>
 
 <style lang="less" >
-	body {
-		display: flex;
-		flex-direction: column;
-	}
-	
-	.report-wrapper {
-		padding: 20px;
-		flex: 1 1;
-	}
+body {
+  display: flex;
+  flex-direction: column;
+}
 
-	.report-container {
-		height: 100%;
-		border: 1px solid #ccc;
-		padding: 0 20px;
-		background-color: #fff;
-		position: relative;
-		box-sizing: border-box;
-		
-		.page-icon {
-			position: absolute;
-			top: 30px;
-			right: 20px;
+.report-wrapper {
+  padding: 20px;
+  flex: 1 1;
+}
 
-			.icon {
-				margin-left: 10px;
-				cursor: pointer;
-			}
-		}
+.report-container {
+  height: 100%;
+  border: 1px solid #ccc;
+  padding: 0 20px;
+  background-color: #fff;
+  position: relative;
+  box-sizing: border-box;
 
-		.title {
-			height: 24px;
-			font: normal 24px/1 "微软雅黑",arial,sans-serif;
-			color: #333;
-			/*font-family: "微软雅黑";*/
-			text-align: center;
-			/*font-weight: normal;*/
-			margin: 28px auto;
-		}
-		
-	}
-	.report-container {
-		.condition-message {
-			box-sizing: border-box;
-			padding-left: 10px;
-			span {
-				font-size: 14px;
-				margin-right: 30px
-			}
-			
-			.default-message {
-				color: #999;
-				margin-right: 10px;
-			}
-		}
-		.condition-list {
-			box-sizing: border-box;
-			padding-left: 10px;
-			cursor: pointer;
-			span {
-				font-size: 14px;
-				line-height: 40px;
-				color: #42AF8F
-			}
-			.icon {
-				font-size: 12px;
-				margin-bottom: 3px;
-			}
-		}
-		.condition-table {
-			margin-top: 0;
-			box-sizing: border-box;
-			border: 1px solid #42AF8F;
-			padding: 10px;
-			.materialBox {
-				display: flex;
-				box-sizing: border-box;
-				padding-left: 10px;
-				color: #666;
-				margin-bottom: 5px;
-				font-size: 14px;
-				&:last-child {
-					margin-bottom: 0;
-				}
-				.material {
-					line-height: 20px;
-				}
-				.time {
-					display: flex;
-					flex: 1;
-					flex-wrap: wrap;
-					max-height: 400px;
-					overflow-y: auto;
-					&>span {
-						margin-left: 10px; 
-						line-height: 20px;
-					}
-				}
-			}
-			
-		}
-	}
-	
-	.readmine {
-		.condition-audit {
-			border: 2px solid #42AF8F;
-			padding: 20px 12px;
-			margin-top: 30px;
-			font-size: 14px;
-			height: 70px;
-			position: relative;
-			.tag {
-				position: absolute;
-				right: 120px;
-				top: 48px;
-				span {
-					display: block;
-					line-height: 24px;
-					&+span {
-						margin-left: 0;
-					}
-				}
-			}
-		}
-	}
-	// .clone {
-	// 	position: absolute;
-	// 	left: 20px;
-	// 	right: 20px;
-	// 	top: 0;
-	// 	 bottom: 0;
-	// }
+  .page-icon {
+    position: absolute;
+    top: 30px;
+    right: 20px;
 
-	.el-dialog__headerbtn {
-		border: none;
-    	outline: none;
-    	background-color: transparent;
-	}
+    .icon {
+      margin-left: 10px;
+      cursor: pointer;
+    }
+  }
 
-	.error {
-		height: 60px;
-		line-height: 60x;
-		text-align: center;
-	}
-	.el-loading-mask {
-		z-index: 1000 ;
-	}
-	.el-dialog--tiny {
-		/*max-width: 420px;*/
-		width: 420px;
-	}
-	.el-dialog__body {
-		.el-form-item {
-			margin-bottom: 0; 
-		}
-		.el-input {
-			.el-input__inner{
-				height: 30px;
-				border-radius: 0;
-				width: 200px;
-				border-color: #ddd;
-			}
-		}
-	}
-	.el-dialog__footer {
-		text-align: center;
-		.dialog-footer {
-			.el-button {
-				border-radius: 0
-			}
-		}
-	}
+  .title {
+    height: 24px;
+    font: normal 24px/1 "微软雅黑", arial, sans-serif;
+    color: #333;
+    /*font-family: "微软雅黑";*/
+    text-align: center;
+    /*font-weight: normal;*/
+    margin: 28px auto;
+  }
+}
+.report-container {
+  .condition-message {
+    box-sizing: border-box;
+    padding-left: 10px;
+    span {
+      font-size: 14px;
+      margin-right: 30px;
+    }
+
+    .default-message {
+      color: #999;
+      margin-right: 10px;
+    }
+  }
+  .condition-list {
+    box-sizing: border-box;
+    padding-left: 10px;
+    cursor: pointer;
+    span {
+      font-size: 14px;
+      line-height: 40px;
+      color: #42af8f;
+    }
+    .icon {
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+  }
+  .condition-table {
+    margin-top: 0;
+    box-sizing: border-box;
+    border: 1px solid #42af8f;
+    padding: 10px;
+    .materialBox {
+      display: flex;
+      box-sizing: border-box;
+      padding-left: 10px;
+      color: #666;
+      margin-bottom: 5px;
+      font-size: 14px;
+      &:last-child {
+        margin-bottom: 0;
+      }
+      .material {
+        line-height: 20px;
+      }
+      .time {
+        display: flex;
+        flex: 1;
+        flex-wrap: wrap;
+        max-height: 400px;
+        overflow-y: auto;
+        & > span {
+          margin-left: 10px;
+          line-height: 20px;
+        }
+      }
+    }
+  }
+}
+
+.readmine {
+  .condition-audit {
+    border: 2px solid #42af8f;
+    padding: 20px 12px;
+    margin-top: 30px;
+    font-size: 14px;
+    height: 70px;
+    position: relative;
+    .tag {
+      position: absolute;
+      right: 120px;
+      top: 48px;
+      span {
+        display: block;
+        line-height: 24px;
+        & + span {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+}
+// .clone {
+// 	position: absolute;
+// 	left: 20px;
+// 	right: 20px;
+// 	top: 0;
+// 	 bottom: 0;
+// }
+
+.el-dialog__headerbtn {
+  border: none;
+  outline: none;
+  background-color: transparent;
+}
+
+.error {
+  height: 60px;
+  line-height: 60x;
+  text-align: center;
+}
+.el-loading-mask {
+  z-index: 1000;
+}
+.el-dialog--tiny {
+  /*max-width: 420px;*/
+  width: 420px;
+}
+.el-dialog__body {
+  .el-form-item {
+    margin-bottom: 0;
+  }
+  .el-input {
+    .el-input__inner {
+      height: 30px;
+      border-radius: 0;
+      width: 200px;
+      border-color: #ddd;
+    }
+  }
+}
+.el-dialog__footer {
+  text-align: center;
+  .dialog-footer {
+    .el-button {
+      border-radius: 0;
+    }
+  }
+}
 </style>

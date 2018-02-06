@@ -1,5 +1,5 @@
 <template>
-	<el-dialog size="small" class="dialog-barcode-wrap" title="条码查询" :visible.sync="dialogVisible" :close-on-click-modal="false" :before-close="handleClose">
+	<el-dialog class="dialog-barcode-wrap" title="条码查询" :visible.sync="dialogVisible" :close-on-click-modal="false" :before-close="handleClose">
 
 		<div class="dialog-content">
 			<div class="dialog-filter">
@@ -63,198 +63,197 @@
 </template>
 
 <script>
-	
-	const URL = HOST + '/api/v1/barcode/list';
-	
-	export default {
-		props: {
-			dialogVisible: {
-				default: true
-			}
-		},
-		data() {
-			return {
-				sBarcode: '',
-				loading: false,
-				error: null,
-				search: {
-					barcode: ''
-				},
-				data: {
-					barCode: '',
-					// 条码类型
-					barcodeTypeName: '',
-					// 物料编码
-					materialCode: '',
-					// 物料名称
-					materialName: '',
-					equipmentCode: '',
-					equipmentName: '',
-					// 加工时间
-					productDate: '',
-					// 批次
-					batchNo: '',
-					// 父级码
-					packet: '',
-					// 数量
-					subBarcodeNum: '',
-					// 类型
-					subBarcodeTypeName: '',
-					subBarcodeList: []
-				},
-				rules: {
-					barcode: [{required: true, message: '请输入条码', trigger: 'blur'}]
-				}
-			}
-		},
-		computed: {
-			lineHeight() {
-				let nLen = this.data.subBarcodeList.length,
-					nLineHeight = 0;
-				
-				let nHeight = nLen * 32,
-					nMax = 300
-				
-				nLineHeight = nHeight > nMax? nMax : nHeight
-				
-				return nLineHeight - 2
-			}
-		},
-		methods: {
-			// 查询条码
-			query(formName) {
-				
-				this.$refs[formName].validate( (valid) => {
-					if(valid) {
-						
-						// 通过条码查询。
-						this.loading = true;
-						this.error = null;
-						
-						this.$register.sendRequest(this.$store, this.$ajax, URL, "get", this.search, (oData) => {
-							this.loading = false;
-							this.data = oData;
-						}, (sErrorMessage) => {
-							this.loading = false;
-							this.error = sErrorMessage;
-						}, (err) => {
-							this.loading = false;
-							this.error = "查询错误";
-						})
-						
-					}else {
-						return false
-					}
-				})
-			},
-			handleClose() {
-				this.$emit('hideDialog')
-			}
-		}
-	}
-	
+const URL = window.HOST + '/api/v1/barcode/list'
+
+export default {
+  props: {
+    dialogVisible: {
+      default: true
+    }
+  },
+  data () {
+    return {
+      sBarcode: '',
+      loading: false,
+      error: null,
+      search: {
+        barcode: ''
+      },
+      data: {
+        barCode: '',
+        // 条码类型
+        barcodeTypeName: '',
+        // 物料编码
+        materialCode: '',
+        // 物料名称
+        materialName: '',
+        equipmentCode: '',
+        equipmentName: '',
+        // 加工时间
+        productDate: '',
+        // 批次
+        batchNo: '',
+        // 父级码
+        packet: '',
+        // 数量
+        subBarcodeNum: '',
+        // 类型
+        subBarcodeTypeName: '',
+        subBarcodeList: []
+      },
+      rules: {
+        barcode: [{ required: true, message: '请输入条码', trigger: 'blur' }]
+      }
+    }
+  },
+  computed: {
+    lineHeight () {
+      let nLen = this.data.subBarcodeList.length
+      let nLineHeight = 0
+
+      let nHeight = nLen * 32
+      let nMax = 300
+
+      nLineHeight = nHeight > nMax ? nMax : nHeight
+
+      return nLineHeight - 2
+    }
+  },
+  methods: {
+    // 查询条码
+    query (formName) {
+      this.$refs[formName].validate(valid => {
+        if (valid) {
+          // 通过条码查询。
+          this.loading = true
+          this.error = null
+
+          this.$register.sendRequest(
+            this.$store,
+            this.$ajax,
+            URL,
+            'get',
+            this.search,
+            oData => {
+              this.loading = false
+              this.data = oData
+            },
+            sErrorMessage => {
+              this.loading = false
+              this.error = sErrorMessage
+            },
+            err => {
+              this.loading = false
+              this.error = '查询错误'
+              console.log(err)
+            }
+          )
+        } else {
+          return false
+        }
+      })
+    },
+    handleClose () {
+      this.$emit('hideDialog')
+    }
+  }
+}
 </script>
 
 <style lang="less">
-	.dialog-barcode-wrap {
-		line-height: 20px;
-		
-		.el-dialog--small {
-			min-width: 500px;
-		}
-		
-		.dialog-content {
-			.error {
-				margin-top: 20px;
-	    		border: 2px solid #42AF8F;
-			    padding: 20px 12px;
-			    margin-bottom: 30px;
-			    font-size: 14px;
-			    color: red;
-	    	}
-	    	
-	    	.el-form-item {
-	    		display: inline-block;
-	    		margin-bottom: 0;
-	    	}
-			.dialog-main {
-				
-				.main-item {
-					margin-top: 20px;
-					
-					.item-title {
-						color: #42af8f;
-						border-left: solid 4px #42af8f; 
-						padding-left: 10px;
-					}
-					
-					.item-content {
-						.item-list {
-							margin: 10px 0 0 14px;
-							
-							.item-item {
-								width: 50%;
-								float: left;
-								line-height: 30px;
-								
-								/*overflow: hidden;
+.dialog-barcode-wrap {
+  line-height: 20px;
+
+  .el-dialog--small {
+    min-width: 500px;
+  }
+
+  .dialog-content {
+    .error {
+      margin-top: 20px;
+      border: 2px solid #42af8f;
+      padding: 20px 12px;
+      margin-bottom: 30px;
+      font-size: 14px;
+      color: red;
+    }
+
+    .el-form-item {
+      display: inline-block;
+      margin-bottom: 0;
+    }
+    .dialog-main {
+      .main-item {
+        margin-top: 20px;
+
+        .item-title {
+          color: #42af8f;
+          border-left: solid 4px #42af8f;
+          padding-left: 10px;
+        }
+
+        .item-content {
+          .item-list {
+            margin: 10px 0 0 14px;
+
+            .item-item {
+              width: 50%;
+              float: left;
+              line-height: 30px;
+
+              /*overflow: hidden;
 								text-overflow: ellipsis;
 								vertical-align: middle;
 								white-space: nowrap;*/
-								word-wrap: break-word;
-							}
-						
-						}
-						
-						.sub-list {
-							display: flex;
-							flex-direction: row;
-							
-							
-							.sub-title {
-								flex: 0 0 80px;
-								text-align: center;
-								border: 1px solid #CCCCCC;
-								border-right: 0;
-							}
-							.sub-items {
-								max-height: 300px;
-								overflow-y: auto;
-								
-								flex: 1;
-								li {
-									line-height: 30px;
-									padding-left: 20px;
-									border: 1px solid #CCCCCC;
-								}
-							}
-						}
-						
-						.table-wrap {
-							
-							max-height: 300px;
-							overflow: auto;
-							
-							table {
-								width: 100%;
-								
-								td {
-									border: 1px solid #CCCCCC;
-									line-height: 30px;
-									text-indent: 20px;
-									
-									&.firstColumn {
-										text-align: center;
-										text-indent: 0;
-									}
-								}
-							}
-						}
-						
-					}
-				}
-			}
-		}
-		
-	}
+              word-wrap: break-word;
+            }
+          }
+
+          .sub-list {
+            display: flex;
+            flex-direction: row;
+
+            .sub-title {
+              flex: 0 0 80px;
+              text-align: center;
+              border: 1px solid #cccccc;
+              border-right: 0;
+            }
+            .sub-items {
+              max-height: 300px;
+              overflow-y: auto;
+
+              flex: 1;
+              li {
+                line-height: 30px;
+                padding-left: 20px;
+                border: 1px solid #cccccc;
+              }
+            }
+          }
+
+          .table-wrap {
+            max-height: 300px;
+            overflow: auto;
+
+            table {
+              width: 100%;
+
+              td {
+                border: 1px solid #cccccc;
+                line-height: 30px;
+                text-indent: 20px;
+
+                &.firstColumn {
+                  text-align: center;
+                  text-indent: 0;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 </style>

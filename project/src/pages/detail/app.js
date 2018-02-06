@@ -3,7 +3,8 @@ import Vuex from 'vuex'
 import VueRouter from 'vue-router'
 
 import ElementUI from 'element-ui'
-import 'element-ui/lib/theme-green/index.css'
+// import 'element-ui/lib/theme-green/index.css'
+import 'theme/index.css'
 import App from './app.vue'
 import axios from 'axios'
 import 'babel-polyfill'
@@ -13,11 +14,24 @@ import 'assets/css/reset.css'
 import 'assets/css/common.less'
 import 'assets/js/global.js'
 
+// 引用登录模块。
+import loginFn from 'assets/js/loginFn.js'
+import {
+  loginModule
+} from 'assets/js/loginStore.js'
+// 引用工厂定制模块
+// import { customModule } from 'assets/js/customStore.js'
+import {
+  versionModule
+} from 'assets/js/versionStore.js'
+
 Vue.use(VueRouter)
 Vue.use(ElementUI)
 
 Vue.prototype.$ajax = axios
-Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, { params: oParams })
+Vue.prototype.$get = (sUrl, oParams) => axios.get(sUrl, {
+  params: oParams
+})
 Vue.prototype.$post = axios.post
 
 // import Stock from 'components/stock/stock.vue'
@@ -31,31 +45,37 @@ const Trace = r => require.ensure([], () => r(require('components/trace/trace.vu
 const Track = r => require.ensure([], () => r(require('components/track/track.vue')), 'group-datail')
 
 // 定义路由
-const routes = [{ 
-    path: '/stock/:key', 
-    component: Stock,
-    children: [{
-      path: '',
-      component: Storage,
-      meta: {
-      	title: 'storage'
-      }
-    },{
-      path: 'batch',
-      component: Batch,
-      meta: {
-      	title: 'batch'
-      }
-    },{
-      path: 'restrain',
-      component: Suspicious,
-      meta: {
-      	title: 'restrain'
-      }
-    }]
-  },
-  { path: '/trace_up/:key', component: Trace },
-  { path: '/trace_down/:key', component: Track }
+const routes = [{
+  path: '/stock/:key',
+  component: Stock,
+  children: [{
+    path: '',
+    component: Storage,
+    meta: {
+      title: 'storage'
+    }
+  }, {
+    path: 'batch',
+    component: Batch,
+    meta: {
+      title: 'batch'
+    }
+  }, {
+    path: 'restrain',
+    component: Suspicious,
+    meta: {
+      title: 'restrain'
+    }
+  }]
+},
+{
+  path: '/trace_up/:key',
+  component: Trace
+},
+{
+  path: '/trace_down/:key',
+  component: Track
+}
 ]
 
 // 创建 router 实例，然后传 `routes` 配置
@@ -64,12 +84,6 @@ const router = new VueRouter({
 })
 
 Vue.use(Vuex)
-// 引用登录模块。
-import loginFn from 'assets/js/loginFn.js'
-import { loginModule } from 'assets/js/loginStore.js'
-// 引用工厂定制模块
-// import { customModule } from 'assets/js/customStore.js'
-import { versionModule } from 'assets/js/versionStore.js'
 
 Vue.prototype.$register = loginFn
 
@@ -81,7 +95,7 @@ const store = new Vuex.Store({
   }
 })
 
-new Vue({
+window.vm = new Vue({
   el: '#app',
   router,
   store,

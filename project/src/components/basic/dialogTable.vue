@@ -11,7 +11,7 @@
                 :label="column.name"
                 :key="column.prop" 
                 :class-name="column.class">
-                    <template scope="props">
+                    <template slot-scope="props">
                         <div :class="{clicked: (props.row.barcodeTypeName == '2' && column.prop=='barcode')}">{{props.row[column.prop]}}</div>
                     </template>
             </el-table-column>
@@ -21,33 +21,30 @@
 </template>
 
 <script>
-    export default {
-        props: {
-            dialogData: Object,
-            //tableData: Object,
-            heights: {
-            	required: false,
-            	default: "100%"
-            }
-        },
-        data() {
-            return {
-            }
-        },
-        computed: {
-        	gridData: function() {
-        		return this.dialogData.data
-        	},
-
-            columns: function() {
-                return this.dialogData.columns
-            }
-
-        }
-       
+export default {
+  props: {
+    dialogData: Object,
+    // tableData: Object,
+    heights: {
+      required: false,
+      default: '100%'
     }
+  },
+  data () {
+    return {}
+  },
+  computed: {
+    gridData: function () {
+      return this.dialogData.data
+    },
+
+    columns: function () {
+      return this.dialogData.columns
+    }
+  }
+}
 </script>
 
 <style lang="less">
-   
+
 </style>

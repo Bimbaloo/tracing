@@ -4,9 +4,9 @@
 			<div class="list-edit" v-show="!ModuleOrderListEdit">
 				<span class="list-title">自定义排序</span>
 				<el-switch
-					on-text=""
-  					off-text=""
-					off-color="#bfcbd9" 
+					active-text=""
+  					inactive-text=""
+					inactive-color="#bfcbd9" 
 					v-model="ModuleOrderListEdit">
 				</el-switch>
 			</div>
@@ -93,26 +93,26 @@
 </template>
 
 <script>
-import "assets/css/common.less";
-import $ from "jquery";
-import Transfer from "components/config/newTrans.vue";
+import 'assets/css/common.less'
+// import $ from 'jquery'
+import Transfer from 'components/config/newTrans.vue'
 
 // 表格接口。
-const TABLE_DATA_URL = HOST + "/api/v1/customized/items";
+const TABLE_DATA_URL = window.HOST + '/api/v1/customized/items'
 
 // 自定义项列表接口。
-const MODULE_ITEM_URL = HOST + "/api/v1/customized/modules";
-//const MODULE_ITEM_URL = "static/modules.json";
+const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
+// const MODULE_ITEM_URL = "static/modules.json";
 
 // 排序接口
-const MODULE_ORDER =  HOST + `/api/v1/customized/modules/update-order`;
+const MODULE_ORDER = window.HOST + `/api/v1/customized/modules/update-order`
 
 export default {
-  name: "newquery",
+  name: 'newquery',
   components: {
-    "v-trans": Transfer
+    'v-trans': Transfer
   },
-  data() {
+  data () {
     return {
       // 所有字段对应的数据。
       aoTable: [],
@@ -128,13 +128,13 @@ export default {
           isEdit: false
         },
         trace_down: {
-          //追踪
+          // 追踪
           bEdit: false,
           value: {},
           isEdit: false
         },
         trace_up: {
-          //溯源
+          // 溯源
           bEdit: false,
           value: {},
           isEdit: false
@@ -145,13 +145,13 @@ export default {
           isEdit: false
         },
         suppress: {
-          //遏制
+          // 遏制
           bEdit: false,
           value: {},
           isEdit: false
         },
         link_repair: {
-          //链路修复
+          // 链路修复
           bEdit: false,
           value: {},
           isEdit: false
@@ -161,417 +161,431 @@ export default {
       showTransfer: false,
       isShow: null,
       // 当前编辑的模块。
-      sCurrentModule: "",
-      nModuleIndex: "",
-      nItemIndex: "",
+      sCurrentModule: '',
+      nModuleIndex: '',
+      nItemIndex: '',
       // 错误提示信息
-      sErrorMessage: "",
+      sErrorMessage: '',
       // 是否可编辑
       editable: true,
       oldModuleOrderList: []
-    };
+    }
   },
-  created() {
+  created () {
     this.$store.commit({
-      type: "updateEdit",
+      type: 'updateEdit',
       key: false
-    });
+    })
 
-	// 获取配置数据。
+    // 获取配置数据。
     this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
-    
   },
   computed: {
     // 是否编辑的状态。
-    edit() {
-      return this.$store.state.edit;
+    edit () {
+      return this.$store.state.edit
     },
     ModuleOrderListEdit: {
-      get() {
-        return this.$store.state.ModuleOrderListEdit;
+      get () {
+        return this.$store.state.ModuleOrderListEdit
       },
-      set(isBoolean) {
+      set (isBoolean) {
         this.$store.commit({
-          type: "updateModuleOrderListEdit",
+          type: 'updateModuleOrderListEdit',
           key: isBoolean
-        });
+        })
       }
     },
-    moduleOrderList() {
-      return this.getModuleOrderList();
+    moduleOrderList () {
+      return this.getModuleOrderList()
     },
     // 是否支持遏制。
-    supression() {
-      return this.$store.state.versionModule && this.$store.state.versionModule.supression
+    supression () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.supression
+      )
     },
     // 是否支持断链修复。
-    linkRepair() {
-      return this.$store.state.versionModule && this.$store.state.versionModule.linkRepair
+    linkRepair () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.linkRepair
+      )
     }
   },
   watch: {
     oBefore: {
-      handler: "changeState",
+      handler: 'changeState',
       deep: true
     }
   },
-  mounted() {
+  mounted () {
     // 离开改页面处理(刷新、关闭页面等操作)
-    let self = this;
-    (window.onbeforeunload = () => {
+    let self = this
+    window.onbeforeunload = () => {
       if (self.edit || this.ModuleOrderListEdit) {
         // 提示需要保存。
-        return false;
+        return false
       }
-    }),
+    }
       // 监听拖动的组件
-      this.$dragging.$on("dragged", ({ value }) => {});
+    this.$dragging.$on('dragged', ({ value }) => {})
     // 监听到拖动结束
-    this.$dragging.$on("dragend", data => {});
+    this.$dragging.$on('dragend', data => {})
   },
   methods: {
-  	// 是否显示item项。
-  	showItem(item) {
-  		let bShow = true
-  		
-  		switch(item.moduleCode) {
-  			// 遏制
-  			case "suppress":
-  				bShow = this.supression
-  				break;
-  			// 断链
-  			case "link_repair":
-  				bShow = this.linkRepair
-  				break
-  			default:
-  				break
-  		}
-  		
-  		return bShow
-  	},
-  	// 获取数据。
-  	fetchData() {
-  		this.$register.sendRequest(
-	      this.$store,
-	      this.$ajax,
-	      TABLE_DATA_URL,
-	      "get",
-	      null,
-	      oData => {
-					// 成功后的回调函数。
-					this.aoTable = oData
-	        // 调用接口数据。
-	        this.$nextTick(() => {
-	          this.$register.sendRequest(
-	            this.$store,
-	            this.$ajax,
-	            MODULE_ITEM_URL,
-	            "get",
-	            null,
-	            oResult => {
-	              oResult.sort((a, b) => a.moduleOrder > b.moduleOrder); // 排序
-	              oResult.forEach(el => {
-	                //模块是否可编辑
-	                if (el.editable === 1) {
-	                  this.oBefore[el.moduleCode].isEdit = true;
-	                }
-	              });
-	              this.category = [].concat.call(oResult);
-	              this.categoryCopy = [].concat.call(oResult);
-	              this.oldModuleOrderList = this.getModuleOrderList();
-	            },
-	            sErrorMessage => {
-	              // 提示信息。
-	              this.showMessage(sErrorMessage);
-	            }
-	          );
-	        });
-	      },
-	      sErrorMessage => {
-	        // 提示信息。
-	        this.showMessage(sErrorMessage);
-	      }
-	    );
-  	},
+    // 是否显示item项。
+    showItem (item) {
+      let bShow = true
+
+      switch (item.moduleCode) {
+        // 遏制
+        case 'suppress':
+          bShow = this.supression
+          break
+        // 断链
+        case 'link_repair':
+          bShow = this.linkRepair
+          break
+        default:
+          break
+      }
+
+      return bShow
+    },
+    // 获取数据。
+    fetchData () {
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        TABLE_DATA_URL,
+        'get',
+        null,
+        oData => {
+          // 成功后的回调函数。
+          this.aoTable = oData
+          // 调用接口数据。
+          this.$nextTick(() => {
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              MODULE_ITEM_URL,
+              'get',
+              null,
+              oResult => {
+                oResult.sort((a, b) => a.moduleOrder > b.moduleOrder) // 排序
+                oResult.forEach(el => {
+                  // 模块是否可编辑
+                  if (el.editable === 1) {
+                    this.oBefore[el.moduleCode].isEdit = true
+                  }
+                })
+                this.category = [].concat.call(oResult)
+                this.categoryCopy = [].concat.call(oResult)
+                this.oldModuleOrderList = this.getModuleOrderList()
+              },
+              sErrorMessage => {
+                // 提示信息。
+                this.showMessage(sErrorMessage)
+              }
+            )
+          })
+        },
+        sErrorMessage => {
+          // 提示信息。
+          this.showMessage(sErrorMessage)
+        }
+      )
+    },
     // 编辑状态。
-    changeState(oldValue, newValue) {
-      let isEdit = false;
+    changeState (oldValue, newValue) {
+      let isEdit = false
       for (let o in newValue) {
         if (newValue[o].bEdit) {
-          isEdit = true;
+          isEdit = true
         }
       }
       this.$store.commit({
-        type: "updateEdit",
+        type: 'updateEdit',
         key: isEdit
-      });
+      })
     },
     // 提示信息。
-    showMessage(sErrorMessage) {
+    showMessage (sErrorMessage) {
       this.$message({
         message: sErrorMessage,
         duration: 3000
-      });
+      })
     },
     // 表格数据处理。--- 获取表格中配置的条件的数据。
-    getAllFilter() {
-			let aData = [];
-			aData = this.aoTable.map(o => {
-					return {
-						key: o.itemCode,
-						label: o.itemName
-					};
-				});
-			if(this.getTransferData().title !== "物流码"){
-				aData = aData.filter(e=>e.key !== "traceCode")
-			}
-
+    getAllFilter () {
+      let aData = []
+      aData = this.aoTable.map(o => {
+        return {
+          key: o.itemCode,
+          label: o.itemName
+        }
+      })
+      if (this.getTransferData().title !== '物流码') {
+        aData = aData.filter(e => e.key !== 'traceCode')
+      }
 
       // 返回数据。
-      return aData;
+      return aData
     },
     // 表格数据处理，根据key值获取其名称。
-    getNameByKeyParam(sKey) {
-      let aFilterd = this.aoTable.filter(o => o.itemCode === sKey);
+    getNameByKeyParam (sKey) {
+      let aFilterd = this.aoTable.filter(o => o.itemCode === sKey)
 
       if (aFilterd && aFilterd.length) {
-        return aFilterd[0].itemName;
+        return aFilterd[0].itemName
       } else {
-        return "";
+        return ''
       }
     },
     // 显示模块项的编辑模式。
-    showEditState(sModule, nIndex) {
+    showEditState (sModule, nIndex) {
       // 设置模块为编辑模式，并保存当前模块中所有的筛选条件。
-      this.oBefore[sModule].bEdit = true;
+      this.oBefore[sModule].bEdit = true
       // 备份当前状态
-      let oData = this.category[nIndex];
-      this.oBefore[sModule].value = JSON.parse(JSON.stringify(oData));
+      let oData = this.category[nIndex]
+      this.oBefore[sModule].value = JSON.parse(JSON.stringify(oData))
     },
     // 取消模块项的编辑模式。
-    hideEditState(sModule, nIndex) {
+    hideEditState (sModule, nIndex) {
       // 设置模块为正常模式，重置当前模块中所有的筛选条件。
-      this.oBefore[sModule].bEdit = false;
-      //从保存的数据中恢复。
-      let oData = this.oBefore[sModule].value;
-      this.$set(this.category, nIndex, oData);
+      this.oBefore[sModule].bEdit = false
+      // 从保存的数据中恢复。
+      let oData = this.oBefore[sModule].value
+      this.$set(this.category, nIndex, oData)
     },
     // 保存当前模块的数据。
-    async saveModuleValue(sModule, index) {
+    async saveModuleValue (sModule, index) {
       // 参数。
-      let oResult = this.category[index - 1];
+      let oResult = this.category[index - 1]
 
       // 判断当前是否可以保存。
       if (!oResult.groups.length) {
         // 当前项为空，则提示。
-        this.showMessage("模块下至少有一个条件组合");
+        this.showMessage('模块下至少有一个条件组合')
       } else {
-        this.save(oResult);
+        this.save(oResult)
       }
     },
     // 某个module保存
-    save(oQuery) {
+    save (oQuery) {
       oQuery.groups.forEach((el, index) => {
-        el.groupOrder = index + 1;
-      });
+        el.groupOrder = index + 1
+      })
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
         MODULE_ITEM_URL,
-        "put",
+        'put',
         oQuery,
         () => {
-          this.oBefore[oQuery.moduleCode].bEdit = false;
-          this.showMessage("保存成功");
+          this.oBefore[oQuery.moduleCode].bEdit = false
+          this.showMessage('保存成功')
         },
         sErrorMessage => {
-          this.showMessage("保存失败");
-          console.log(sErrorMessage);
+          this.showMessage('保存失败')
+          console.log(sErrorMessage)
         },
         err => {
-          this.showMessage("保存失败");
-          console.log(err);
+          this.showMessage('保存失败')
+          console.log(err)
         }
-      );
+      )
     },
     // 获取transfer显示的值。
-    getTransferData() {
+    getTransferData () {
       let oData = {
         // 标题：
-        title: "",
+        title: '',
         // 选中key值。
         aChecked: []
-      };
+      }
 
       if (this.sCurrentModule && this.nItemIndex >= 0) {
-				// 当前是编辑，模式。--- 获取所需的值。
-        let oItem = this.category[this.nModuleIndex].groups[this.nItemIndex];
+        // 当前是编辑，模式。--- 获取所需的值。
+        let oItem = this.category[this.nModuleIndex].groups[this.nItemIndex]
         oData = {
           title: oItem.groupName,
-          aChecked: (function() {
-            let aData = [];
-            oItem.groupItems.forEach(function(o) {
-              aData.push(o.itemCode);
-            });
+          aChecked: (function () {
+            let aData = []
+            oItem.groupItems.forEach(function (o) {
+              aData.push(o.itemCode)
+            })
 
-            return aData;
+            return aData
           })()
-        };
+        }
       }
       // 返回数据。
-      return oData;
+      return oData
     },
     // 显示弹窗。
-    showModal(sModule, nParentIndex, nIndex) {
-      this.showTransfer = true;
+    showModal (sModule, nParentIndex, nIndex) {
+      this.showTransfer = true
       // 如果nIndex不存在，则表示是增加显示，否则为修改。---- 获取数据。
-      this.sCurrentModule = sModule;
-      this.nModuleIndex = nParentIndex;
-      this.nItemIndex = nIndex;
+      this.sCurrentModule = sModule
+      this.nModuleIndex = nParentIndex
+      this.nItemIndex = nIndex
     },
     // 隐藏弹窗。-- 返回的数据。
-    hidePopModal(oResult) {
+    hidePopModal (oResult) {
       // 弹窗隐藏。
-      this.showTransfer = false; // !this.showTransfer
-      this.sCurrentModule = "";
-      //debugger
+      this.showTransfer = false // !this.showTransfer
+      this.sCurrentModule = ''
+      // debugger
       if (oResult) {
         // 存在数据， 则更新或，增加项。
         let oValue = {
           groupName: oResult.title,
           groupOrder: 0,
           editable: 1,
-          groupItems: function() {
-            let aValue = [];
+          groupItems: function () {
+            let aValue = []
             aValue = oResult.aItem.map((o, index) => {
               let obj = this.aoTable.find(e => {
-                return e.itemCode === o;
-              });
+                return e.itemCode === o
+              })
               return {
                 itemCode: o,
                 itemName: obj[1],
                 itemOrder: index + 1,
                 visible: 1
-              };
-            });
-            return aValue;
+              }
+            })
+            return aValue
           }.bind(this)()
-        };
+        }
 
         // 判断当前是增加还是更新。
-        if (this.nItemIndex != undefined) {
+        if (this.nItemIndex !== undefined) {
           // 修改。
           this.$set(
             this.category[this.nModuleIndex].groups,
             this.nItemIndex,
             oValue
-          );
+          )
         } else {
-          this.category[this.nModuleIndex].groups.push(oValue);
+          this.category[this.nModuleIndex].groups.push(oValue)
         }
       }
     },
     // 删除模块中的项。 参数为索引中。
-    delItem(nParentIndex, nIndex) {
+    delItem (nParentIndex, nIndex) {
       // 显示数据删除。
-      this.category[nParentIndex].groups.splice(nIndex, 1);
+      this.category[nParentIndex].groups.splice(nIndex, 1)
     },
     // 移动前项。
-    changeOrder(sModule, nParentIndex, nPrev, nNext) {
+    changeOrder (sModule, nParentIndex, nPrev, nNext) {
       // 移动数据。
-      let oPrev = this.category[nParentIndex].groups[nPrev];
+      let oPrev = this.category[nParentIndex].groups[nPrev]
       this.$set(
         this.category[nParentIndex].groups,
         nPrev,
         this.category[nParentIndex].groups[nNext]
-      );
-      this.$set(this.category[nParentIndex].groups, nNext, oPrev);
+      )
+      this.$set(this.category[nParentIndex].groups, nNext, oPrev)
       // 这样互相交换，需鼠标移开才能看到效果。
       // [this.category[nParentIndex].groups[nPrev],this.category[nParentIndex].groups[nNext]] = [this.category[nParentIndex].groups[nNext],this.category[nParentIndex].groups[nPrev]]
-      console.log(this.category[nParentIndex]);
+      console.log(this.category[nParentIndex])
     },
     // 顺序改变保存
-    async saveEditQueryState() {
-    	this.$register.sendRequest(this.$store, this.$ajax, MODULE_ORDER, "post", this.moduleOrderList, (oData) => {
-			this.$store.commit({
-	          type: "updateModuleOrderListEdit",
-	          key: false
-	        });
-	        // 修改顺序。			
-			this.category.forEach( o => {
-				o.moduleOrder = this.moduleOrderList.moduleOrderList.filter(om => om.moduleCode == o.moduleCode)[0].moduleOrder
-			})
-	        this.categoryCopy = [].concat(this.category);
-	        this.$message({
-	          message: "保存成功",
-	          duration: 1000
-	        });
-      	}, (sErrorMessage)=>{
-			this.category = [].concat(this.categoryCopy);
-	        this.$message({
-	          message: `保存失败，请重试`,
-	          duration: 1000
-	        });        
-		})
-    	
-//    const stateChange = await this.sendResult().then(e => e.status);
-//    if (stateChange) {
-//      this.$store.commit({
-//        type: "updateModuleOrderListEdit",
-//        key: true
-//      });
-//      this.categoryCopy = [].concat(this.category);
-//      this.$message({
-//        message: stateChange,
-//        duration: 1000
-//      });
-//    } else {
-//      this.category = [].concat(this.categoryCopy);
-//      this.$message({
-//        message: `保存失败，请重试`,
-//        duration: 1000
-//      });
-//    }
+    async saveEditQueryState () {
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        MODULE_ORDER,
+        'post',
+        this.moduleOrderList,
+        oData => {
+          this.$store.commit({
+            type: 'updateModuleOrderListEdit',
+            key: false
+          })
+          // 修改顺序。
+          this.category.forEach(o => {
+            o.moduleOrder = this.moduleOrderList.moduleOrderList.filter(
+              om => om.moduleCode === o.moduleCode
+            )[0].moduleOrder
+          })
+          this.categoryCopy = [].concat(this.category)
+          this.$message({
+            message: '保存成功',
+            duration: 1000
+          })
+        },
+        sErrorMessage => {
+          this.category = [].concat(this.categoryCopy)
+          this.$message({
+            message: `保存失败，请重试`,
+            duration: 1000
+          })
+        }
+      )
+
+      //    const stateChange = await this.sendResult().then(e => e.status);
+      //    if (stateChange) {
+      //      this.$store.commit({
+      //        type: "updateModuleOrderListEdit",
+      //        key: true
+      //      });
+      //      this.categoryCopy = [].concat(this.category);
+      //      this.$message({
+      //        message: stateChange,
+      //        duration: 1000
+      //      });
+      //    } else {
+      //      this.category = [].concat(this.categoryCopy);
+      //      this.$message({
+      //        message: `保存失败，请重试`,
+      //        duration: 1000
+      //      });
+      //    }
     },
     // 发送改变顺序请求
-    sendResult() {
+    sendResult () {
       return new Promise((resolve, reject) => {
         this.$ajax
           .post(MODULE_ORDER, this.moduleOrderList)
           .then(e => {
-            return resolve(e);
+            return resolve(e)
           })
           .catch(err => {
-            return reject(err);
-          });
-      });
+            return reject(err)
+          })
+      })
     },
     // 顺序改变取消
-    hideEditQueryState(e) {
-      this.category = [].concat(this.categoryCopy); //从备份中还原
-      this.setModuleOrderList(false); //取消编辑状态
+    hideEditQueryState (e) {
+      this.category = [].concat(this.categoryCopy) // 从备份中还原
+      this.setModuleOrderList(false) // 取消编辑状态
     },
     // 获取顺序
-    getModuleOrderList() {
-      let arr = [];
+    getModuleOrderList () {
+      let arr = []
       this.category.forEach((el, index) => {
         arr.push({
           moduleCode: `${el.moduleCode}`,
           moduleOrder: index + 1
-        });
-      });
-      const obj = { moduleOrderList: arr };
-      return obj;
+        })
+      })
+      const obj = { moduleOrderList: arr }
+      return obj
     },
     // 编辑顺序
-    setModuleOrderList(isBoolean) {
+    setModuleOrderList (isBoolean) {
       this.$store.commit({
-        type: "updateModuleOrderListEdit",
+        type: 'updateModuleOrderListEdit',
         key: isBoolean
-      });
+      })
     }
   }
-};
+}
 </script>
 
 <style lang="less">

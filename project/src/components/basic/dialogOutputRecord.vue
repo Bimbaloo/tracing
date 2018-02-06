@@ -1,5 +1,5 @@
 <template>
-	<el-dialog size="large" class="dialog-wrap" title="产出记录" :visible.sync="dialogVisible" :close-on-click-modal="false" :before-close="handleClose">
+	<el-dialog width='80%' class="dialog-wrap" title="产出记录" :visible.sync="dialogVisible" :close-on-click-modal="false" :before-close="handleClose">
 		<!-- 新窗口打开按钮 -->
 		<!--<i class="open-icon icon icon-16 icon-openNew" @click="openNew"></i>-->
 		<v-output @hideDialog="handleClose" :page-size="false" :page-height="contentHeight"></v-output>
@@ -8,34 +8,34 @@
 
 <script>
 		
-	import OutputRecord from 'components/outputRecord/record.vue'
-	
-	export default {
-		props: {
-			dialogVisible: {
-				default: true
-			}
-		},
-		components: {
-			"v-output": OutputRecord
-		},
-		data() {
-			return {
-				contentHeight: 600
-			}
-		},
-		computed: {
-		},
-		mounted() {
-			this.contentHeight = document.querySelector('body').clientHeight * 0.8 - document.querySelector('.el-dialog__header').clientHeight - 60
-		},
-		methods: {
-			handleClose() {
-				this.$emit('hideDialog')
-			}
-		}
-	}
-	
+import OutputRecord from 'components/outputRecord/record.vue'
+
+export default {
+		  props: {
+		    dialogVisible: {
+		      default: true
+		    }
+		  },
+		  components: {
+		    'v-output': OutputRecord
+		  },
+		  data () {
+		    return {
+		      contentHeight: 600
+		    }
+		  },
+		  computed: {
+		  },
+		  mounted () {
+		    this.contentHeight = document.querySelector('body').clientHeight * 0.8 - document.querySelector('.el-dialog__header').clientHeight - 60
+		  },
+		  methods: {
+		    handleClose () {
+		      this.$emit('hideDialog')
+		    }
+		  }
+}
+
 </script>
 
 <style lang="less">

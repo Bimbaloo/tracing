@@ -1,110 +1,107 @@
 // 登录。
-const LOGIN_URL = HOST + "/api/v1/sso/get-login-info";
+// const LOGIN_URL = window.HOST + '/api/v1/sso/get-login-info'
 // 退出。
-const LOGOUT_URL = HOST + "/api/v1/sso/logout";
+const LOGOUT_URL = window.HOST + '/api/v1/sso/logout'
 // 版本信息。
-const VERSION_URL = HOST + '/api/v1/customized/features';
+const VERSION_URL = window.HOST + '/api/v1/customized/features'
 
 // 清除登录cookie。
-var clearLoginCookie = function() {
-	window.Rt.utils.cookie("token", null)
-	window.Rt.utils.cookie("userId", null)
-	window.Rt.utils.cookie("username", null)
-	window.Rt.utils.cookie("nickname", null)
-};
+var clearLoginCookie = function () {
+  window.Rt.utils.cookie('token', null)
+  window.Rt.utils.cookie('userId', null)
+  window.Rt.utils.cookie('username', null)
+  window.Rt.utils.cookie('nickname', null)
+}
 
 /**
  * 页面登录状态保存。
  * @param {Object} oStore 数据存储对象。
  * @return {void}
  */
-var login = function(oStore) {
-	if(!window.Rt.utils.cookie("token")) {
-		// 若cookie中无token。
-		let oParams = window.Rt.utils.getParams();
+var login = function (oStore) {
+  if (!window.Rt.utils.cookie('token')) {
+    // 若cookie中无token。
+    const oParams = window.Rt.utils.getParams()
 
-		if(oParams.token && oParams.userId && oParams.username && oParams.nickname) {
-			// 若地址中有token,设置cookie。
-			window.Rt.utils.cookie("token", oParams.token);
-			window.Rt.utils.cookie("userId", oParams.userId);
-			window.Rt.utils.cookie("username", oParams.username);
-			window.Rt.utils.cookie("nickname", oParams.nickname);
+    if (oParams.token && oParams.userId && oParams.username && oParams.nickname) {
+      // 若地址中有token,设置cookie。
+      window.Rt.utils.cookie('token', oParams.token)
+      window.Rt.utils.cookie('userId', oParams.userId)
+      window.Rt.utils.cookie('username', oParams.username)
+      window.Rt.utils.cookie('nickname', oParams.nickname)
 
-			// 更新数据。
-			oStore.commit({
-				type: "updateLoginInfo"
-			});            
-		}         
-	}
+      // 更新数据。
+      oStore.commit({
+        type: 'updateLoginInfo'
+      })
+    }
+  }
 }
 
 /**
  * 登录失败处理函数。
- * @param {String} sUrl 
+ * @param {String} sUrl
  * @return {void}
  */
-var loginFail = function(sUrl) {
-	// 清cookie。
-	clearLoginCookie();
-	
-	let sTag = window.Rt.utils.getParam("tag");
-	if(sTag) {
-		sTag = "?tag=" + sTag + "&";
-	}else {
-		sTag = "?"
-	}
-	
-	// 登录跳转。
-	location.href = sUrl + 
-	encodeURIComponent(location.origin + location.pathname + sTag + "token={token}&userId={userId}&username={username}&nickname={nickname}"+location.hash);
+var loginFail = function (sUrl) {
+  // 清cookie。
+  clearLoginCookie()
+
+  let sTag = window.Rt.utils.getParam('tag')
+  if (sTag) {
+    sTag = '?tag=' + sTag + '&'
+  } else {
+    sTag = '?'
+  }
+
+  // 登录跳转。
+  window.location.href = sUrl +
+  encodeURIComponent(window.location.origin + window.location.pathname + sTag + 'token={token}&userId={userId}&username={username}&nickname={nickname}' + window.location.hash)
 }
 
-var beforeRequest = function(oStore, oAxio) {
-	// 更新数据。
-	oStore.commit({
-		type: "updateLoginInfo"
-	});  
+var beforeRequest = function (oStore, oAxio) {
+  // 更新数据。
+  oStore.commit({
+    type: 'updateLoginInfo'
+  })
 
-	let oLoginInfo = oStore.state.loginModule;
+  const oLoginInfo = oStore.state.loginModule
 
-	// 设置请求头。
-	return oAxio.create({
-		headers: {
-			Authorization: JSON.stringify({
-				"token": oLoginInfo.token,
-				"userId": Number(oLoginInfo.userId),
-				"username": oLoginInfo.username,
-				"nickname": oLoginInfo.nickname,
-				"progressId": oLoginInfo.progressId
-			})
-		}
-	})
-
-
-};
+  // 设置请求头。
+  return oAxio.create({
+    headers: {
+      Authorization: JSON.stringify({
+        'token': oLoginInfo.token,
+        'userId': Number(oLoginInfo.userId),
+        'username': oLoginInfo.username,
+        'nickname': oLoginInfo.nickname,
+        'progressId': oLoginInfo.progressId
+      })
+    }
+  })
+}
 
 // 判断调用接口是否成功。
-var judgeLoaderHandler = function(param, fnSu, fnFail) {
-	let bRight = param.data.errorCode;
-	
-	// 判断是否调用成功。
-	if(!bRight) {
-		// 调用成功后的回调函数。
-		fnSu && fnSu();
-	}else {
-		if(bRight === 10) {
-			// 登录失败。
-			if(param.data.errorMsg.subCode === "1") {
-				// 清cookie，跳转到登录页面。
-				loginFail(param.data.errorMsg.subMsg);
-			}
+var judgeLoaderHandler = function (param, fnSu, fnFail) {
+  const bRight = param.data.errorCode
 
-		}else {
-			// 失败后的回调函。
-			fnFail && fnFail(param.data.errorMsg.message);
-		}
-	}
-};
+  // 判断是否调用成功。
+  if (!bRight) {
+    // 调用成功后的回调函数。
+    fnSu && fnSu()
+  } else {
+    if (bRight === 10) {
+      // 登录失败。
+      if (param.data.errorMsg.subCode === '1') {
+        // 清cookie，跳转到登录页面。
+        loginFail(param.data.errorMsg.subMsg)
+      }
+    } else {
+      // 失败后的回调函。
+      fnFail && fnFail(param.data.errorMsg.message)
+    }
+  }
+}
 
 /**
  * 接口请求。
@@ -119,134 +116,102 @@ var judgeLoaderHandler = function(param, fnSu, fnFail) {
  * @param {Function} fnBeforeLogin 登录失败，跳转到登录页面之前操作。
  * @return {void}
  */
-var sendRequest = function(oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, fnError, fnBeforeLogin) {
-	
-	let instance = beforeRequest(oStore, oAxio),
-		fnHandle = (res) => {
-			let oResult = res.data;
-			let bRight = oResult.errorCode;
+var sendRequest = function (oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, fnError, fnBeforeLogin) {
+  const instance = beforeRequest(oStore, oAxio)
+  const fnHandle = (res) => {
+    const oResult = res.data
+    const bRight = oResult.errorCode
+    if (!bRight) {
+      // 调用成功后的回调函数。
+      fnSu && fnSu(oResult.data)
+    } else {
+      if (bRight === 10) {
+        // 登录失败。
+        if (oResult.errorMsg.subCode === '1') {
+          // 调整到登录界面前的操作。
+          fnBeforeLogin && fnBeforeLogin()
 
-			if(!bRight) {
-				// 调用成功后的回调函数。
-				fnSu && fnSu(oResult.data);
-			}else {
-				if(bRight === 10) {
-					// 登录失败。
-					if(oResult.errorMsg.subCode === "1") {
-						// 调整到登录界面前的操作。
-						fnBeforeLogin && fnBeforeLogin();
-						
-						// 清cookie，跳转到登录页面。
-						loginFail(oResult.errorMsg.subMsg);
-					}
+          // 清cookie，跳转到登录页面。
+          loginFail(oResult.errorMsg.subMsg)
+        }
+      } else {
+        // 失败后的回调函。
+        fnFail && fnFail(oResult.errorMsg.message)
+      }
+    }
+  }
 
-				}else {
-					// 失败后的回调函。
-					fnFail && fnFail(oResult.errorMsg.message);
-				}
-			}
-		};
-
-	if(sType == "get") {
-		// 若为get类型。
-		instance.get(sUrl, {
-			params: oParams || {}
-		})
-		.then(fnHandle)
-		.catch((err) => {
-			fnError && fnError(err);
-		})		     
-	}else {
-		instance[sType](sUrl, oParams || {})
-		.then(fnHandle)
-		.catch((err) => {
-			fnError && fnError(err);
-		})	
-	}
-};
+  if (sType === 'get') {
+    // 若为get类型。
+    instance.get(sUrl, {
+      params: oParams || {}
+    })
+      .then(fnHandle)
+      .catch((err) => {
+        fnError && fnError(err)
+      })
+  } else {
+    instance[sType](sUrl, oParams || {})
+      .then(fnHandle)
+      .catch((err) => {
+        fnError && fnError(err)
+      })
+  }
+}
 
 // 退出。
 var logout = function (oStore, oAjax) {
-	beforeRequest(oStore, oAjax).post(LOGOUT_URL).then((res) => {
-		// 清cookie。
-		clearLoginCookie();
-		// 更新数据。
-		oStore.commit({
-			type: "updateLoginInfo"
-		});  
+  beforeRequest(oStore, oAjax).post(LOGOUT_URL).then((res) => {
+    // 清cookie。
+    clearLoginCookie()
+    // 更新数据。
+    oStore.commit({
+      type: 'updateLoginInfo'
+    })
 
-		// 跳转到search。
-		window.open("search.html", "_self");
-	})
-};
+    // 跳转到search。
+    window.open('search.html', '_self')
+  })
+}
 
 var getBeforeDispatchData = function (sDispatchType, oStore, oAxio, fnCallBack, sUrl) {
-	beforeRequest(oStore, oAxio).get(sUrl)
-		.then((res) => {
-			let oResult = res.data;
-			let bRight = oResult.errorCode;
+  beforeRequest(oStore, oAxio).get(sUrl).then((res) => {
+    const oResult = res.data
+    const bRight = oResult.errorCode
 
-			if(!bRight) {	
-				oStore.dispatch(sDispatchType, oResult.data)
-				// 调用成功后的回调函数。
-				fnCallBack && fnCallBack();
-			}else {
-				if(bRight === 10) {
-					// 登录失败。
-					if(oResult.errorMsg.subCode === "1") {
-						// 清cookie，跳转到登录页面。
-						loginFail(oResult.errorMsg.subMsg);
-					}
-
-				}else {
-					// 失败后的回调函。
-					fnCallBack && fnCallBack();
-				}
-			}
-		})
-		.catch((err) => {
-			fnCallBack && fnCallBack();
-		})	
+    if (!bRight) {
+      oStore.dispatch(sDispatchType, oResult.data)
+      // 调用成功后的回调函数。
+      fnCallBack && fnCallBack()
+    } else {
+      if (bRight === 10) {
+        // 登录失败。
+        if (oResult.errorMsg.subCode === '1') {
+          // 清cookie，跳转到登录页面。
+          loginFail(oResult.errorMsg.subMsg)
+        }
+      } else {
+        // 失败后的回调函。
+        fnCallBack && fnCallBack()
+      }
+    }
+  }).catch(() => {
+    fnCallBack && fnCallBack()
+  })
 }
 
 var getVersion = function (oStore, oAxio, fnCallBack) {
-	getBeforeDispatchData('getVersion', oStore, oAxio, fnCallBack, VERSION_URL)
-	// beforeRequest(oStore, oAxio).get(VERSION_URL)
-	// 	.then((res) => {
-	// 		let oResult = res.data;
-	// 		let bRight = oResult.errorCode;
-
-	// 		if(!bRight) {	
-	// 			oStore.dispatch('getVersion', oResult.data)
-	// 			// 调用成功后的回调函数。
-	// 			fnCallBack && fnCallBack();
-	// 		}else {
-	// 			if(bRight === 10) {
-	// 				// 登录失败。
-	// 				if(oResult.errorMsg.subCode === "1") {
-	// 					// 清cookie，跳转到登录页面。
-	// 					loginFail(oResult.errorMsg.subMsg);
-	// 				}
-
-	// 			}else {
-	// 				// 失败后的回调函。
-	// 				fnCallBack && fnCallBack();
-	// 			}
-	// 		}
-	// 	})
-	// 	.catch((err) => {
-	// 		fnCallBack && fnCallBack();
-	// 	})	
+  getBeforeDispatchData('getVersion', oStore, oAxio, fnCallBack, VERSION_URL)
 }
 
 export default {
-	login,
-	loginFail,
-	logout,
-	beforeRequest,
-	clearLoginCookie,
-	judgeLoaderHandler,
-	sendRequest,
-	getVersion,
-	getBeforeDispatchData
+  login,
+  loginFail,
+  logout,
+  beforeRequest,
+  clearLoginCookie,
+  judgeLoaderHandler,
+  sendRequest,
+  getVersion,
+  getBeforeDispatchData
 }

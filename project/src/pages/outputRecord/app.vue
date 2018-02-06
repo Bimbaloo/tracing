@@ -8,44 +8,41 @@
 </template>
 
 <script>
-	import header from 'components/header/header.vue'
-	import OutputRecord from 'components/outputRecord/record.vue'
-	
-	export default {
-		components: {
-			"v-header": header,
-			"v-output": OutputRecord
-		},
-		data() {
-			return {
-				contentHeight: 400	
-			}
-		},
-		created() {
-			// 获取配置数据。
-        	// this.$store.dispatch('getConfig')
-		},
-		mounted() {
-			this.contentHeight = this.$refs.content.clientHeight
-		},
-		methods: {}
-	}
-	
+import header from 'components/header/header.vue'
+import OutputRecord from 'components/outputRecord/record.vue'
+
+export default {
+  components: {
+    'v-header': header,
+    'v-output': OutputRecord
+  },
+  data () {
+    return {
+      contentHeight: 400
+    }
+  },
+  created () {
+    // 获取配置数据。
+    // this.$store.dispatch('getConfig')
+  },
+  mounted () {
+    this.contentHeight = this.$refs.content.clientHeight
+  },
+  methods: {}
+}
 </script>
 
 <style lang="less">
-	
-	#app {
-		height: 100%;
-		display: flex;
-		flex-direction: column;
-		
-		.content {
-			flex: 1;
-			margin: 20px;
-			padding: 20px;
-			background-color: #FFFFFF;
-		}
-	}
-	
+#app {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
+  .content {
+    flex: 1;
+    margin: 20px;
+    padding: 20px;
+    background-color: #ffffff;
+  }
+}
 </style>
