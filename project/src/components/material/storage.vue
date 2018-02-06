@@ -34,7 +34,7 @@
 				        :class-name="column.class"
 						:width="column.width"
 						:key="index">
-			  			<template scope="scope">
+			  			<template slot-scope="scope">
 			  				<div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
 			  					{{scope.row[column.prop]}}
 			  				</div>
