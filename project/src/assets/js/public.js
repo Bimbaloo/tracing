@@ -885,8 +885,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
         // 按类型分类（投入，产出，滞留）
         o.list.forEach(oType => {
           let sKey = oType.opType
-
-          if (sKey === '1') { // 投入
+          if (sKey === 1) { // 投入
             // 投入。
             if (!oFlag['touru']) {
               oFlag['touru'] = {
@@ -897,7 +896,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
             } else {
               oFlag['touru'].list.push(oType)
             }
-          } else if (sKey === '6') {
+          } else if (sKey === 6) {
             // 产出。
             if (!oFlag['chanchu']) {
               oFlag['chanchu'] = {
@@ -1046,7 +1045,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
 
 // 判断是否是正常物料
 var isMaterialNode = function (oData) {
-  if (oData.nodeType === '10003' || oData.nodeType === '10004') {
+  if (oData.nodeType === 10003 || oData.nodeType === 10004) {
     return true
   } else {
     return false
