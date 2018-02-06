@@ -1046,321 +1046,327 @@ var isMaterialNode = function (oData) {
 }
 
 // 第一个节点的parents值。
-const SPARENTKEY = '0'
+const SPARENTKEY = "0"
 
-var getCatalogData = function (aoRowData, sType) {
-  let aoCatalogData = []
-  let aoCopyData = JSON.parse(JSON.stringify(aoRowData))
-  let aResult = []
-  // 追踪中新增的物料节点key值。
-  let sNewMateiralNodekey = 'customerKey'
+var getCatalogData = function(aoRowData, sType) {	
+	let aoCatalogData = [],
+		aoCopyData = JSON.parse(JSON.stringify(aoRowData)),
+		aResult = [],
+		// 追踪中新增的物料节点key值。
+		sNewMateiralNodekey = "customerKey"
+	
+	// 追踪中，保存最后节点的key值。（除物料外）
+	let aLastNodeKeys = []
+	
+	// 修改节点的类型值。
+	aoCopyData.forEach(o => o.iconType = getNodeIconAndTemp(o.nodeType).icon)
+	
+	if(sType === "trace") {
+		// 溯源。
+		// 判断第一个节点是否为物料节点。 否则加一个虚构的物料节点。
+		let aoFirstNode = aoCopyData.filter( o => o.parents == SPARENTKEY)
+		
+		if(aoFirstNode.length && !isMaterialNode(aoFirstNode[0])) {
+			// 第一个节点不是物料。则增加一个虚拟节点。
+			aoCopyData.push({
+				code: "000",
+				name: "虚构物料节点",
+				key: SPARENTKEY,
+				parents: SPARENTKEY,
+				nodeType: 10003,
+				opType: 0,
+				iconType: "material",
+				isCustom: true
+			})
+		}
+		
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i];
+	
+			if(oData && isMaterialNode(oData) && oData.parents == SPARENTKEY) {
+				oData.parent = "";
+				aoCatalogData.push(oData);
+	
+				aoCopyData.splice(i, 1);
+				_findChildrenData(aoCopyData, oData.key, oData.key)
+			}
+		}
+	}else {
+		// 追踪
+		// 判断最后一个节点是否为物料节点，否则，创建一个虚拟的物料节点。-- 在最后创建，否则，会将其他节点加入
+		aoCopyData.forEach( o => {
+			if(!aoCopyData.some( o1 => o1.parents.split(",").includes(o.key) && o1.key !== o.key) && !isMaterialNode(o)) {
+				// 当前节点没有子节点，并且不是物料节点
+				aLastNodeKeys.push(o.key)
+			}
+		})
+		
+		// 创建一个物料节点，其parents为当前所有的key值。
+		if(aLastNodeKeys.length) {
+			// 第一个节点不是物料。则增加一个虚拟节点。
+			aoCopyData.unshift({
+				code: "000",
+				name: "虚构物料节点",
+				key: sNewMateiralNodekey,
+				parents: aLastNodeKeys.join(","),
+				nodeType: 10003,
+				opType: 0,
+				iconType: "material",
+				isCustom: true
+			})
+		}
+		
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i];
+	
+			if(oData && isMaterialNode(oData) && !aoCatalogData.some(o => o.key == oData.key)) {
+	            oData.parent = "";
+	  			aoCatalogData.push(oData);
+	
+	  			aoCopyData.splice(i, 1);
+	
+	  			_findParentsData(aoCopyData, oData.parents, oData.key)
+	        }
+		}
+	}
+	
+	// 物料的合并
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		let aKey = []
+		if(isMaterialNode(oData) && !_isExist(oData)) {
+			// 物料-找同名
+			aKey = _getKeysOfSameName(oData).key
+			aResult.push(Object.assign({}, oData, {
+				name: (aKey.length-1) ? oData.name + "("+ aKey.length +")": oData.name,
+				sublings: aKey
+			}))
+		}
+	}
 
-  // 追踪中，保存最后节点的key值。（除物料外）
-  let aLastNodeKeys = []
+	// 获取同名同物料下的工序。
+	for(let i = 0; i < aoCatalogData.length; i++) {
+		let oData = aoCatalogData[i];
+		if(!isMaterialNode(oData) && !_isExist(oData)) {
+			// 工序-找同名
+			let oValue = _getKeysOfSameName(oData)
+			aResult.push(Object.assign({}, oData, {
+				name: (oValue.key.length-1) ? oData.name + "("+ oValue.key.length +")": oData.name,
+				sublings: oValue.key,
+				parent: oValue.parent
+			}))
+		}
+	}
+	
+	// 返回数据。
+	return aResult;
+	
+	/**
+	 * 递归查找父节点。
+	 * @param {Array} aoCopyData
+	 * @param {String} sKey
+	 * @param {String} sParentKey
+	 * @return {void}
+	 */
+	function _findParentsData(aoCopyData, sKey, sParentKey) {
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i],
+				sNewKey = "",
+				oFlag = {};
 
-  // 修改节点的类型值。
-  aoCopyData.forEach(o => {
-    o.iconType = getNodeIconAndTemp(o.nodeType).icon
-  })
+			if(oData && sKey.split(",").includes(oData.key)) {
+				// 当前元素的父级。
+				if(isMaterialNode(oData)) {
+					oData.parent = "";
+					sNewKey = oData.key;
+	
+					oFlag = Object.assign({}, oData)
+					aoCopyData.splice(i, 1);
+					
+				} else if(sParentKey != sNewMateiralNodekey && (!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) || (aLastNodeKeys.length && sParentKey == sNewMateiralNodekey && !aoCatalogData.some( o => (o.linkKey || o.key) == oData.key) ) ) {
+					// 当不是自定义物料查询时的处理。
+//				} else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {	
+					// 存在最后节点不为物料的数据，且匹配改物料下的数据，且改数据没有被其他物料加载，则会创建该节点。
+					sNewKey = sParentKey;
+					// 判断该数据是否已加入到aoCatelogData中。
+					if(oData.parent !== undefined) {
+						// 复制该节点。
+						oFlag = Object.assign({}, oData, {
+							parent: sNewKey,
+							// 当前节点的源节点。
+							linkKey: oData.key,
+							// 自定义改节点的key值。
+							key: "new-" + _getLength(oData.key) + "-" + oData.key // 通过长度获取。
+						})
+					} else {
+						oData.parent = sParentKey;
+						oFlag = Object.assign({}, oData)
+					}
+	
+				}
+	
+				// 判断是否已经重复加入。--- key相同且parent相同。
+				if(!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key == oFlag.key && o.parent == oFlag.parent))) {
+					aoCatalogData.push(oFlag);
+	
+					if(oFlag.parents != SPARENTKEY) {
+						_findParentsData(aoCopyData, oFlag.parents, sNewKey)
+					}
+				}
+	
+			}
+		}
+	}
+	
+	/**
+	 * 递归查找子级节点。
+	 * @param {Array} aoCopyData
+	 * @param {String} sKey
+	 * @param {String} sParentKey
+	 * @return {void}
+	 */
+	function _findChildrenData(aoCopyData, sKey, sParentKey) {
+		for(let i = aoCopyData.length - 1; i >= 0; i--) {
+			let oData = aoCopyData[i],
+				sNewKey = "",
+				oFlag = {};
+	
+			if(oData && oData.parents.split(",").includes(sKey)) {
+				// 当前元素的父级。
+				if(isMaterialNode(oData)) {
+					oData.parent = "";
+					sNewKey = oData.key;
+	
+					oFlag = Object.assign({}, oData)
+					aoCopyData.splice(i, 1);
+					
+				} else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {
+					sNewKey = sParentKey;
+					// 判断该数据是否已加入到aoCatelogData中。
+					if(oData.parent !== undefined) {
+						// 复制该节点。
+						oFlag = Object.assign({}, oData, {
+							parent: sNewKey,
+							// 当前节点的源节点。
+							linkKey: oData.key,
+							// 自定义改节点的key值。
+							key: "new-" + _getLength(oData.key) + "-" + oData.key // 通过长度获取。
+						})
+					} else {
+						oData.parent = sParentKey;
+						oFlag = Object.assign({}, oData)
+					}
+	
+				}
+	
+				// 判断是否已经重复加入。--- key相同且parent相同。
+				if(!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key == oFlag.key && o.parent == oFlag.parent))) {
+					aoCatalogData.push(oFlag);
+	
+					_findChildrenData(aoCopyData, (oFlag.linkKey || oFlag.key), sNewKey)
+				}
+	
+			}
+		}
+	}
+	
+	
+	/**
+	 * 复制节点获取其key值。
+	 * @param {String} sKey
+	 * @return {String}
+	 */
+	function _getLength(sKey) {
+	    return aoCatalogData.filter( o => (o.linkKey || o.key) == sKey).length
+	  }
+	
+	/**
+	 * 通过名称获取相同的名称的数据的key中。
+	 * @param {Object} oFilter
+	 * @return {Array}
+	 */
+	function _getKeysOfSameName(oFilter) {
+		let oResult = {
+			key: [],
+			parent: ""
+		};
+		
+		for(let i = 0; i < aoCatalogData.length; i++) {
+			let oData = aoCatalogData[i];
 
-  if (sType === 'trace') {
-    // 溯源。
-    // 判断第一个节点是否为物料节点。 否则加一个虚构的物料节点。
-    let aoFirstNode = aoCopyData.filter(o => o.parents === SPARENTKEY)
-
-    if (aoFirstNode.length && !isMaterialNode(aoFirstNode[0])) {
-      // 第一个节点不是物料。则增加一个虚拟节点。
-      aoCopyData.push({
-        code: '000',
-        name: '虚构物料节点',
-        key: SPARENTKEY,
-        parents: SPARENTKEY,
-        nodeType: 10003,
-        opType: 0,
-        iconType: 'material',
-        isCustom: true
-      })
-    }
-
-    for (let i = aoCopyData.length - 1; i >= 0; i--) {
-      let oData = aoCopyData[i]
-
-      if (oData && isMaterialNode(oData) && oData.parents === SPARENTKEY) {
-        oData.parent = ''
-        aoCatalogData.push(oData)
-
-        aoCopyData.splice(i, 1)
-        _findChildrenData(aoCopyData, oData.key, oData.key)
-      }
-    }
-  } else {
-    // 追踪
-    // 判断最后一个节点是否为物料节点，否则，创建一个虚拟的物料节点。-- 在最后创建，否则，会将其他节点加入
-    aoCopyData.forEach(o => {
-      if (!aoCopyData.some(o1 => o1.parents.split(',').includes(o.key)) && !isMaterialNode(o)) {
-        // 当前节点没有子节点，并且不是物料节点
-        aLastNodeKeys.push(o.key)
-      }
-    })
-
-    // 创建一个物料节点，其parents为当前所有的key值。
-    if (aLastNodeKeys.length) {
-      // 第一个节点不是物料。则增加一个虚拟节点。
-      aoCopyData.unshift({
-        code: '000',
-        name: '虚构物料节点',
-        key: sNewMateiralNodekey,
-        parents: aLastNodeKeys.join(','),
-        nodeType: 10003,
-        opType: 0,
-        iconType: 'material',
-        isCustom: true
-      })
-    }
-
-    for (let i = aoCopyData.length - 1; i >= 0; i--) {
-      let oData = aoCopyData[i]
-
-      if (oData && isMaterialNode(oData) && !aoCatalogData.some(o => o.key === oData.key)) {
-        oData.parent = ''
-        aoCatalogData.push(oData)
-
-        aoCopyData.splice(i, 1)
-
-        _findParentsData(aoCopyData, oData.parents, oData.key)
-      }
-    }
-  }
-
-  // 物料的合并
-  for (let i = 0; i < aoCatalogData.length; i++) {
-    let oData = aoCatalogData[i]
-    let aKey = []
-    if (isMaterialNode(oData) && !_isExist(oData)) {
-      // 物料-找同名
-      aKey = _getKeysOfSameName(oData).key
-      aResult.push(Object.assign({}, oData, {
-        name: (aKey.length - 1) ? oData.name + '(' + aKey.length + ')' : oData.name,
-        sublings: aKey
-      }))
-    }
-  }
-
-  // 获取同名同物料下的工序。
-  for (let i = 0; i < aoCatalogData.length; i++) {
-    let oData = aoCatalogData[i]
-    if (!isMaterialNode(oData) && !_isExist(oData)) {
-      // 工序-找同名
-      let oValue = _getKeysOfSameName(oData)
-      aResult.push(Object.assign({}, oData, {
-        name: (oValue.key.length - 1) ? oData.name + '(' + oValue.key.length + ')' : oData.name,
-        sublings: oValue.key,
-        parent: oValue.parent
-      }))
-    }
-  }
-
-  // 返回数据。
-  return aResult
-
-  /**
-   * 递归查找父节点。
-   * @param {Array} aoCopyData
-   * @param {String} sKey
-   * @param {String} sParentKey
-   * @return {void}
-   */
-  function _findParentsData (aoCopyData, sKey, sParentKey) {
-    for (let i = aoCopyData.length - 1; i >= 0; i--) {
-      let oData = aoCopyData[i]
-      let sNewKey = ''
-      let oFlag = {}
-
-      if (oData && sKey.split(',').includes(oData.key)) {
-        // 当前元素的父级。
-        if (isMaterialNode(oData)) {
-          oData.parent = ''
-          sNewKey = oData.key
-
-          oFlag = Object.assign({}, oData)
-          aoCopyData.splice(i, 1)
-        } else if ((sParentKey !== sNewMateiralNodekey && (!aoCatalogData.some(o => (o.linkKey || o.key) === oData.key && o.parent === sParentKey))) || (aLastNodeKeys.length && sParentKey === sNewMateiralNodekey && !aoCatalogData.some(o => (o.linkKey || o.key) === oData.key))) {
-          // 当不是自定义物料查询时的处理。
-          // } else if(!aoCatalogData.some(o => (o.linkKey || o.key) == oData.key && o.parent == sParentKey)) {
-          // 存在最后节点不为物料的数据，且匹配改物料下的数据，且改数据没有被其他物料加载，则会创建该节点。
-          sNewKey = sParentKey
-          // 判断该数据是否已加入到aoCatelogData中。
-          if (oData.parent !== undefined) {
-            // 复制该节点。
-            oFlag = Object.assign({}, oData, {
-              parent: sNewKey,
-              // 当前节点的源节点。
-              linkKey: oData.key,
-              // 自定义改节点的key值。
-              key: 'new-' + _getLength(oData.key) + '-' + oData.key // 通过长度获取。
-            })
-          } else {
-            oData.parent = sParentKey
-            oFlag = Object.assign({}, oData)
-          }
-        }
-
-        // 判断是否已经重复加入。--- key相同且parent相同。
-        if (!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key === oFlag.key && o.parent === oFlag.parent))) {
-          aoCatalogData.push(oFlag)
-
-          if (oFlag.parents !== SPARENTKEY) {
-            _findParentsData(aoCopyData, oFlag.parents, sNewKey)
-          }
-        }
-      }
-    }
-  }
-
-  /**
-   * 递归查找子级节点。
-   * @param {Array} aoCopyData
-   * @param {String} sKey
-   * @param {String} sParentKey
-   * @return {void}
-   */
-  function _findChildrenData (aoCopyData, sKey, sParentKey) {
-    for (let i = aoCopyData.length - 1; i >= 0; i--) {
-      let oData = aoCopyData[i]
-      let sNewKey = ''
-      let oFlag = {}
-
-      if (oData && oData.parents.split(',').includes(sKey)) {
-        // 当前元素的父级。
-        if (isMaterialNode(oData)) {
-          oData.parent = ''
-          sNewKey = oData.key
-
-          oFlag = Object.assign({}, oData)
-          aoCopyData.splice(i, 1)
-        } else if (!aoCatalogData.some(o => (o.linkKey || o.key) === oData.key && o.parent === sParentKey)) {
-          sNewKey = sParentKey
-          // 判断该数据是否已加入到aoCatelogData中。
-          if (oData.parent !== undefined) {
-            // 复制该节点。
-            oFlag = Object.assign({}, oData, {
-              parent: sNewKey,
-              // 当前节点的源节点。
-              linkKey: oData.key,
-              // 自定义改节点的key值。
-              key: 'new-' + _getLength(oData.key) + '-' + oData.key // 通过长度获取。
-            })
-          } else {
-            oData.parent = sParentKey
-            oFlag = Object.assign({}, oData)
-          }
-        }
-
-        // 判断是否已经重复加入。--- key相同且parent相同。
-        if (!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key === oFlag.key && o.parent === oFlag.parent))) {
-          aoCatalogData.push(oFlag)
-
-          _findChildrenData(aoCopyData, (oFlag.linkKey || oFlag.key), sNewKey)
-        }
-      }
-    }
-  }
-
-  /**
-   * 复制节点获取其key值。
-   * @param {String} sKey
-   * @return {String}
-   */
-  function _getLength (sKey) {
-    return aoCatalogData.filter(o => (o.linkKey || o.key) === sKey).length
-  }
-
-  /**
-   * 通过名称获取相同的名称的数据的key中。
-   * @param {Object} oFilter
-   * @return {Array}
-   */
-  function _getKeysOfSameName (oFilter) {
-    let oResult = {
-      key: [],
-      parent: ''
-    }
-
-    for (let i = 0; i < aoCatalogData.length; i++) {
-      let oData = aoCatalogData[i]
-
-      if (isMaterialNode(oFilter)) {
-        // 物料-找同名
-        if (oData.name === oFilter.name) {
-          oResult.key.push({
-            key: oData.key,
-            parent: oData.parent
-          })
-        }
-      } else {
-        // 工序，找同parent
-        // 找到在aResulte中通存在的subling的值。
-        let oValue = _isSameLevel(oData, oFilter)
-        let sKey = oData.linkKey || oData.key
-
-        // 如果该节点时复制节点，判断其原节点是否存在，（存在-不加入。 不存在-加入）
-        if (oData.name === oFilter.name && oValue.bSame && !oResult.key.some(o => o.key === sKey)) {
-          oResult.key.push({
-            key: sKey,
-            parent: oData.parent
-          })
-          oResult.parent = oValue.parent
-        }
-      }
-    }
-
-    // 返回数据。
-    return oResult
-  }
-
-  /**
-   * 判断元素是否存在已存在。
-   * @param {Object} oData
-   */
-  function _isExist (oData) {
-    // return aResult.some( o => o.sublings.includes(oData.key) )
-    return aResult.some(o => {
-      // key值相同  且节点的parent属于一样的。 || 物料只需判断key值
-      return o.sublings.some(o1 => o1.key === (oData.linkKey || oData.key) && (isMaterialNode(oData) || _isExitCopy(o1, oData)))
-    })
-  }
-
-  function _isExitCopy (o1, o2) {
-    return aResult.some(o3 => {
-      return o3.sublings.some(o => o.key === o1.parent) && o3.sublings.some(o => o.key === o2.parent)
-    })
-  }
-
-  /**
-   * 判断工序是否是同一个合并后的父级。
-   */
-  function _isSameLevel (oData, oValue) {
-    let oR = {
-      // 是否属于合并和、后的同一个显示的物料节点
-      bSame: false,
-      // 该显示的物料节点的key值。
-      parent: ''
-    }
-
-    aResult.forEach(o => {
-      // if(!oR.bSame && o.sublings.includes(oData.parent) && o.sublings.includes(oValue.parent)) {
-      //  oR.bSame = true
-      //  oR.parent = o.key
-      // }
-
-      if (!oR.bSame && o.sublings.some(o1 => o1.key === oData.parent) && o.sublings.some(o1 => o1.key === oValue.parent)) {
-        oR.bSame = true
-        oR.parent = o.key
-      }
-    })
-
-    return oR
-  }
+			if(isMaterialNode(oFilter)) {
+				// 物料-找同名
+				if(oData.name === oFilter.name) {
+					oResult.key.push({
+						key:oData.key,
+						parent: oData.parent
+					})
+				}
+			}else {
+				// 工序，找同parent
+				// 找到在aResulte中通存在的subling的值。
+				let oValue = _isSameLevel(oData, oFilter)
+				let sKey = oData.linkKey || oData.key
+				
+				// 如果该节点时复制节点，判断其原节点是否存在，（存在-不加入。 不存在-加入）
+				if(oData.name === oFilter.name && oValue.bSame && !oResult.key.some(o => o.key == sKey)) {
+					
+					oResult.key.push({
+						key: sKey,
+						parent: oData.parent
+					})
+					oResult.parent = oValue.parent
+				}
+			}
+		}
+		
+		// 返回数据。
+		return oResult
+	}
+	
+	/**
+	 * 判断元素是否存在已存在。
+	 * @param {Object} oData
+	 */
+	function _isExist(oData) {
+//		return aResult.some( o => o.sublings.includes(oData.key) )
+		return aResult.some( o => {
+			// key值相同  且节点的parent属于一样的。 || 物料只需判断key值
+			return o.sublings.some( o1 => o1.key == (oData.linkKey || oData.key) && (isMaterialNode(oData) ||  _isExitCopy(o1, oData)) )
+		})
+	}
+	
+	function _isExitCopy(o1, o2) {
+		return aResult.some(o3 => {
+			return o3.sublings.some(o => o.key == o1.parent) && o3.sublings.some(o => o.key == o2.parent) 
+		})
+	}
+	
+	/**
+	 * 判断工序是否是同一个合并后的父级。
+	 */
+	function _isSameLevel(oData, oValue) {
+		let oR = {
+			// 是否属于合并和、后的同一个显示的物料节点
+			bSame: false,
+			// 该显示的物料节点的key值。
+			parent: ''
+		}
+		
+		aResult.forEach( o => {
+//			if(!oR.bSame && o.sublings.includes(oData.parent) && o.sublings.includes(oValue.parent)) {
+//				oR.bSame = true
+//				oR.parent = o.key
+//			}
+			
+			if(!oR.bSame && o.sublings.some(o1 => o1.key == oData.parent) && o.sublings.some(o1 => o1.key == oValue.parent)) {
+				oR.bSame = true
+				oR.parent = o.key
+			}
+		})
+		
+		return oR
+	}
 }
 
 // 获取追溯左侧导航数据。
