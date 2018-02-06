@@ -2427,6 +2427,14 @@ export default {
                   // 设置与起点相关。
                   oData.related = true
                   nTag++
+                } else if (
+                  key === "materialTransferList" ||
+                  key === "materialReturnList"
+                ) {
+                  // 若为结转或退料。
+                  // 设置与起点相关。
+                  oData.related = true
+                  nTag++
                 }
               }
 
