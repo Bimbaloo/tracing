@@ -117,7 +117,9 @@ export default {
   },
   mounted () {
     this.fetchData()
-    this.tableHeight = this.setHeight()
+    this.$nextTick(() => {
+      this.tableHeight = this.setHeight()
+    })
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
@@ -134,7 +136,9 @@ export default {
       ) {
         this.tag = to.query._tag
         this.fetchData()
-        this.tableHeight = this.setHeight()
+        this.$nextTick(() => {
+          this.tableHeight = this.setHeight()
+        })
       }
     },
     resizeY: function () {

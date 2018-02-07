@@ -13,7 +13,7 @@
                 {{ outstockData.error }}
             </div>
             <div v-else class="content-table" ref="outstockTable">
-            	<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading" :resize="tdResize"></v-table>            
+            	<v-table :table-data="outstockData" :heights="tableHeight" :loading="outstockData.loading" :resize="tdResize"></v-table>            
                 <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
             <h2 class="content-title tableData">
@@ -27,7 +27,7 @@
                 {{ instockData.error }}
             </div>
             <div v-else class="content-table" ref="instockTable">
-            	<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading" :resize="tdResize"></v-table>
+            	<v-table :table-data="instockData" :heights="tableHeight" :loading="instockData.loading" :resize="tdResize"></v-table>
             </div>
             <!-- 复制的内容 -->
             <!--<div v-show="false" ref="outstockTable">
@@ -41,7 +41,7 @@
 </template>
 
 <script>
-import $ from 'jquery'
+
 import table from 'components/basic/table.vue'
 import dialogTable from 'components/basic/dialogTable.vue'
 import XLSX from 'xlsx'
@@ -49,9 +49,6 @@ import Blob from 'blob'
 import FileSaver from 'file-saver'
 import rasterizeHTML from 'rasterizehtml'
 import fnP from 'assets/js/public.js'
-// import {host} from 'assets/js/configs.js'
-
-// var HOST = window.HOST ? window.HOST: host
 
 export default {
   components: {
@@ -68,11 +65,11 @@ export default {
       excel: true,
       print: true,
       tdResize: true,
+      tableHeight: 100,
       outstockData: {
         url: window.HOST + '/api/v1/outstock',
         loading: false,
         error: null,
-        height: '100%',
         filename: '出库',
         columns: [
           {
@@ -154,7 +151,6 @@ export default {
         url: window.HOST + '/api/v1/instock',
         loading: false,
         error: null,
-        height: '100%',
         columns: [
           {
             prop: 'barcode',
@@ -248,6 +244,10 @@ export default {
     // 组件创建完后获取数据，
     // 此时 data 已经被 observed 了
     this.fetchPage()
+    window.addEventListener('resize', this.setTableHeight)
+    this.$nextTick(() => {
+      this.setTableHeight()
+    })
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
@@ -289,21 +289,21 @@ export default {
       }
     },
     // 获取高度。
-    adjustHeight () {
-      let jRouter = $('.router-content')
-      let jTitle = jRouter.find('.content-title')
-      let jTable = jRouter.find('.content-table')
-      let nHeight = 0
+    // adjustHeight () {
+    //   let jRouter = $('.router-content')
+    //   let jTitle = jRouter.find('.content-title')
+    //   let jTable = jRouter.find('.content-table')
+    //   let nHeight = 0
 
-      nHeight = Math.floor(
-        (jRouter.height() -
-          jTitle.outerHeight(true) * jTitle.length -
-          (jTable.outerHeight(true) - jTable.height())) /
-          2
-      )
+    //   nHeight = Math.floor(
+    //     (jRouter.height() -
+    //       jTitle.outerHeight(true) * jTitle.length -
+    //       (jTable.outerHeight(true) - jTable.height())) /
+    //       2
+    //   )
 
-      return nHeight
-    },
+    //   return nHeight
+    // },
     // 查询。
     fetchPage () {
       this.fetchData(this.outstockData)
@@ -313,7 +313,7 @@ export default {
     fetchData (oData) {
       oData.error = null
       oData.data = []
-      oData.height = this.adjustHeight()
+      // oData.height = this.adjustHeight()
       oData.loading = true
 
       let sPath = oData.url
@@ -365,7 +365,7 @@ export default {
         sErrorMessage => {
           // 请求失败。
           oData.loading = false
-          this.styleError.maxHeight = this.adjustHeight() - 50 + 'px'
+          this.styleError.maxHeight = this.setTableHeight() - 50 + 'px'
           // 提示信息。
           console.log(sErrorMessage)
         },
@@ -376,7 +376,7 @@ export default {
           console.log(err)
 
           if (this.outstockData.error && this.instockData.error) {
-            this.styleError.maxHeight = this.adjustHeight() - 50 + 'px'
+            this.styleError.maxHeight = this.setTableHeight() - 50 + 'px'
           }
         }
       )
@@ -444,6 +444,20 @@ export default {
             `
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
+    },
+    // 设置高度
+    setTableHeight () {
+      this.tableHeight = 100
+      this.$nextTick(() => {  // 确保屏幕缩小时，不会因为内容撑开导致高度设置失败
+        const viewHeight = fnP.outerHeight(document.querySelector('.router-content'))
+        let titleHeight = 0
+        document.querySelectorAll('.tableData').forEach(el => {
+          titleHeight += fnP.outerHeight(el)
+        })
+        this.tableHeight = (viewHeight - titleHeight) / 2 - 10
+        const residue = (viewHeight - titleHeight) / 2  // 剩余高度，显示错误的高度
+        return residue
+      })
     }
   }
 }
