@@ -14,7 +14,7 @@
     element-loading-text="拼命加载中"
     style="width: 100%"
     ref="multipleTable">
-        <el-table-column 
+        <el-table-column
         v-for="column in columns"
         align="center"
         :fixed="bFixed && column.fixed?true:false"
@@ -24,7 +24,7 @@
         :prop="column.prop"
         :label="column.name"
         :sort-method="column.sortMethod"
-        :key="column.prop" 
+        :key="column.prop"
         :class-name="column.class"
         :formatter="column.formatter"
         :filters="column.filters"
@@ -34,9 +34,9 @@
         :data-filte="dataFilter"
         :selectable="checkSelectable"
         :reserve-selection="true">
-            <el-table-column  
+            <el-table-column
                 align="center"
-                v-if="!!column.lists"  
+                v-if="!!column.lists"
                 v-for='list in column.lists'
                 :sortable="list.sortable"
                 :type="list.type"
@@ -44,16 +44,16 @@
                 :prop="list.prop"
                 :label="list.itemName"
                 :sort-method="list.sortMethod"
-                :key="list.prop" 
+                :key="list.prop"
                 :class-name="list.class"
                 :formatter="list.formatter"
                 :filters="list.filters"
                 :filter-method="list.filterMethod"
                 :filter-placement="list.filterPlacement"
                 :width="list.width">
-            </el-table-column> 
+            </el-table-column>
         </el-table-column>
-        
+
     </el-table>
 </template>
 
