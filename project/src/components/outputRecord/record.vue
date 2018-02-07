@@ -1,11 +1,11 @@
 <template>
-	
+
 	<div class="output-main">
 		<i v-if="!pageSize" class="open-icon icon icon-16 icon-openNew" @click="openNewPage"></i>
 		<div class="output-filter" ref="outputFilter">
 			<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="right" label-width="70px">
-				<el-form-item :label="item.label" :prop="item.key" v-for="item in aFilter" :key="item.key"> 
-	            	<component :style="{width: pageSize?'400px':'auto'}" :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key" :all-data="multiAll" :all-data-label="multiAllLabel" :get-by-ajax="item.ajax" :list-data="item.value"></component> 
+				<el-form-item :label="item.label" :prop="item.key" v-for="item in aFilter" :key="item.key">
+	            	<component :style="{width: pageSize?'400px':'auto'}" :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key" :all-data="multiAll" :all-data-label="multiAllLabel" :get-by-ajax="item.ajax" :list-data="item.value"></component>
 		        </el-form-item>
 		        <el-form-item>
 					<v-button class="btn" text-data="查询" @query="submitForm('ruleForm')"></v-button>
@@ -26,7 +26,7 @@
 			</div>
 		</div>
 	</div>
-	
+
 </template>
 
 <script>

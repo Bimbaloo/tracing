@@ -1181,7 +1181,7 @@ export default {
     // 获取颜色。-- 异常节点颜色处理。
     getTextColor (o) {
       // 废品或容器清空或库存损益
-      if (o.nodeType === '111' || o.nodeType === '202' || o.nodeType === '10004') {
+      if (o.nodeType === 111 || o.nodeType === 202 || o.nodeType === 10004) {
         return ERROR_TEXT_COLOR
       } else {
         return NORMAL_TEXT_COLOR

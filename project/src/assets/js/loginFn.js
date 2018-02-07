@@ -92,7 +92,7 @@ var judgeLoaderHandler = function (param, fnSu, fnFail) {
   } else {
     if (bRight === 10) {
       // 登录失败。
-      if (param.data.errorMsg.subCode === '1') {
+      if (param.data.errorMsg.subCode === 1) {
         // 清cookie，跳转到登录页面。
         loginFail(param.data.errorMsg.subMsg)
       }
@@ -127,7 +127,7 @@ var sendRequest = function (oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, f
     } else {
       if (bRight === 10) {
         // 登录失败。
-        if (oResult.errorMsg.subCode === '1') {
+        if (oResult.errorMsg.subCode === 1) {
           // 调整到登录界面前的操作。
           fnBeforeLogin && fnBeforeLogin()
 
@@ -186,7 +186,7 @@ var getBeforeDispatchData = function (sDispatchType, oStore, oAxio, fnCallBack, 
     } else {
       if (bRight === 10) {
         // 登录失败。
-        if (oResult.errorMsg.subCode === '1') {
+        if (oResult.errorMsg.subCode === 1) {
           // 清cookie，跳转到登录页面。
           loginFail(oResult.errorMsg.subMsg)
         }
