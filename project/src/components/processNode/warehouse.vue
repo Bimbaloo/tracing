@@ -20,7 +20,12 @@
 					</span>
 				</div>
 				<div class="content-table" ref="rawTable"> 
-					<v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table>
+					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
+          <v-agtable
+            :table-data="materialData"
+            :heights="tableHeight"
+            :loading="loading"
+          ></v-agtable>
 				</div>
 			</div>
     	</div>      
@@ -29,6 +34,7 @@
 
 <script>
 import table from 'components/basic/table.vue'
+import agTable from 'components/basic/ag-table.vue'
 import XLSX from 'xlsx'
 import Blob from 'blob'
 import FileSaver from 'file-saver'
@@ -37,6 +43,10 @@ import rasterizeHTML from 'rasterizehtml'
 import { needTableDatas } from 'assets/js/public.js'
 
 export default {
+  components: {
+    'v-agtable': agTable,
+    'v-table': table
+  },
   data () {
     return {
       // 右下详情内容区域全屏标识。
@@ -57,7 +67,7 @@ export default {
         112: '库存调整'
       },
       materialData: {
-        filename: '',
+        // filename: '',
         columns: [],
         data: []
       },
@@ -65,244 +75,241 @@ export default {
         101: [
           {
             // 库存转储
-            prop: 'destBarcode',
-            name: '条码'
+            field: 'destBarcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'srcWarehouse',
-            name: '原仓库'
+            field: 'srcWarehouse',
+            headerName: '原仓库'
           },
           {
-            prop: 'srcReservoir',
-            name: '原库位',
-            width: '60px'
+            field: 'srcReservoir',
+            headerName: '原库位',
+            width: 80
           },
           {
-            prop: 'destWarehouse',
-            name: '新仓库'
+            field: 'destWarehouse',
+            headerName: '新仓库'
           },
           {
-            prop: 'destReservoir',
-            name: '新库位',
-            width: '60px'
+            field: 'destReservoir',
+            headerName: '新库位',
+            width: 80
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ],
         102: [
           {
             // 入库
-            prop: 'destBarcode',
-            name: '条码'
+            field: 'destBarcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'destWarehouse',
-            name: '仓库'
+            field: 'destWarehouse',
+            headerName: '仓库'
           },
           {
-            prop: 'destReservoir',
-            name: '库位',
-            width: '60px'
+            field: 'destReservoir',
+            headerName: '库位',
+            width: 80
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'vendorName',
-            name: '供应商'
+            field: 'vendorName',
+            headerName: '供应商'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ],
         103: [
           {
             // 出库
-            prop: 'traceCode',
-            name: '物流码'
+            field: 'traceCode',
+            headerName: '物流码'
           },
           {
-            prop: 'destBarcode',
-            name: '条码'
+            field: 'destBarcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'destWarehouse',
-            name: '仓库'
+            field: 'destWarehouse',
+            headerName: '仓库'
           },
           {
-            prop: 'destReservoir',
-            name: '库位',
-            width: '60px'
+            field: 'destReservoir',
+            headerName: '库位',
+            width: 80
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'customerName',
-            name: '客户'
+            field: 'customerName',
+            headerName: '客户'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ],
         111: [
           {
-            prop: 'destBarcode',
-            name: '条码'
+            field: 'destBarcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'destWarehouse',
-            name: '仓库'
+            field: 'destWarehouse',
+            headerName: '仓库'
           },
           {
-            prop: 'destReservoir',
-            name: '库位',
-            width: '60px'
+            field: 'destReservoir',
+            headerName: '库位',
+            width: 80
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ],
         112: [
           {
-            prop: 'srcBarcode',
-            name: '源条码'
+            field: 'srcBarcode',
+            headerName: '源条码'
           },
           {
-            prop: 'destBarcode',
-            name: '目标条码'
+            field: 'destBarcode',
+            headerName: '目标条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'destWarehouse',
-            name: '仓库'
+            field: 'destWarehouse',
+            headerName: '仓库'
           },
           {
-            prop: 'srcReservoir',
-            name: '源条码库位'
+            field: 'srcReservoir',
+            headerName: '源条码库位'
           },
           {
-            prop: 'destReservoir',
-            name: '目标条码库位',
-            width: '60px'
+            field: 'destReservoir',
+            headerName: '目标条码库位',
+            width: 80
           },
           {
-            prop: 'quantity',
-            name: '调整数量'
+            field: 'quantity',
+            headerName: '调整数量'
           },
           {
-            prop: 'srcQuantity',
-            name: '源条码调整后数量'
+            field: 'srcQuantity',
+            headerName: '源条码调整后数量'
           },
           {
-            prop: 'destQuantity',
-            name: '目标条码调整后数量'
+            field: 'destQuantity',
+            headerName: '目标条码调整后数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ]
       },
       tableHeight: 200
     }
-  },
-  components: {
-    'v-table': table
   },
   computed: {
     // 物料编码
@@ -352,9 +359,9 @@ export default {
   },
   created () {
     this.fetchData()
-  },
-  mounted () {
-    this.tableHeight = this.setHeight()
+    this.$nextTick(() => {
+      this.setHeight()
+    })
   },
   watch: {
     // "clickNum": "fetchData",
@@ -365,16 +372,16 @@ export default {
     },
     /* 视窗大小变化，重新设置table大小 */
     resizeY: function () {
-      this.tableHeight = this.setHeight()
+      this.setHeight()
     },
     /* 全屏大小时，重新设置table大小 */
     fullscreen: function () {
-      this.tableHeight = this.setHeight()
+      this.setHeight()
     },
     treeFullscreen: function () {
       if (!this.treeFullscreen) {
         this.$nextTick(() => {
-          this.tableHeight = this.setHeight()
+          this.setHeight()
         })
       }
     }
@@ -530,9 +537,12 @@ export default {
     },
     // 设置table的高度
     setHeight () {
-      let content = document.querySelector('.router-content')
-      let tableData = document.querySelector('.tableData')
-      return this.outerHeight(content) - this.outerHeight(tableData) - 40
+      this.tableHeight = 100
+      this.$nextTick(() => {
+        let content = document.querySelector('.router-content')
+        let tableData = document.querySelector('.tableData')
+        this.tableHeight = this.outerHeight(content) - this.outerHeight(tableData) - 40
+      })
     },
     // 详情全屏按钮点击事件
     fullScreenClick (isTrue) {

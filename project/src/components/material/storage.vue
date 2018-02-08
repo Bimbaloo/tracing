@@ -1,51 +1,50 @@
 <!--出入库-->
 <template>
-    <div class="router-content">
-        <div class="innner-content" >
-            <div class="content-message tableData">
-				<span class='table-title'>
-					<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
-				</span>
-				<span class='table-handle'>
-					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
-                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
-				</span>
-			</div>
-            <div class="content-table" ref="rawTable"> 
-				<div v-if="error" class="error">
-					{{ error }}
-				</div>
-				<el-table
-					v-else
-    				border
-            		v-loading="loading"
-            		element-loading-text="拼命加载中"
-            		class="raw-table"
-            		@cell-click="cellClick"
-            		:data="materialData.data"
-					:height="tableHeight">
-			  		<el-table-column
-			  			align="center"
-			  			:resizable="true"
-			  			v-for="(column,index) in materialData.columns"
-				        :prop="column.prop"
-				        v-if="!column.hide"
-				        :label="column.name"
-				        :class-name="column.class"
-						:width="column.width"
-						:key="index">
-			  			<template slot-scope="scope">
-			  				<div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
-			  					{{scope.row[column.prop]}}
-			  				</div>
-			  			</template>
-			  		</el-table-column>
-			  	</el-table>
-                <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->    
-            </div>
-
+  <div class="router-content">
+    <div class="innner-content" >
+      <div class="content-message tableData">
+        <span class='table-title'>
+          <span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+        </span>
+        <span class='table-handle'>
+          <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
+          <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
+        </span>
+      </div>
+      <div class="content-table" ref="rawTable"> 
+        <div v-if="error" class="error">
+          {{ error }}
         </div>
-    </div>      
+        <el-table
+          v-else
+          border
+          v-loading="loading"
+          element-loading-text="拼命加载中"
+          class="raw-table"
+          @cell-click="cellClick"
+          :data="materialData.data"
+          :height="tableHeight">
+          <el-table-column
+            align="center"
+            :resizable="true"
+            v-for="(column,index) in materialData.columns"
+            :prop="column.prop"
+            v-if="!column.hide"
+            :label="column.name"
+            :class-name="column.class"
+            :width="column.width"
+            :key="index">
+            <template slot-scope="scope">
+              <div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
+                {{scope.row[column.prop]}}
+              </div>
+            </template>
+          </el-table-column>
+        </el-table>
+        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->    
+      </div>
+    </div>
+  </div>      
 </template>
 
 <script>
@@ -117,7 +116,9 @@ export default {
   },
   mounted () {
     this.fetchData()
-    this.tableHeight = this.setHeight()
+    this.$nextTick(() => {
+      this.tableHeight = this.setHeight()
+    })
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
@@ -134,7 +135,9 @@ export default {
       ) {
         this.tag = to.query._tag
         this.fetchData()
-        this.tableHeight = this.setHeight()
+        this.$nextTick(() => {
+          this.tableHeight = this.setHeight()
+        })
       }
     },
     resizeY: function () {

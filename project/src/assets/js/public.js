@@ -1772,6 +1772,14 @@ const needTableDatas = (pathMapping, nodeType, allColumns) => {
   return tableData
 }
 
+const outerHeight = (el) => {
+  var height = el.offsetHeight
+  var style = el.currentStyle || window.getComputedStyle(el)
+
+  height += parseInt(style.marginTop) + parseInt(style.marginBottom)
+  return height
+}
+
 export default {
   parseData,
   parseTreeData,
@@ -1780,9 +1788,11 @@ export default {
   getCatalogData,
   getTrackCatalogData,
   SPARENTKEY,
-  getCatalogData1
+  getCatalogData1,
+  outerHeight
 }
 
 export {
-  needTableDatas
+  needTableDatas,
+  outerHeight
 }
