@@ -1,15 +1,15 @@
 <template>
-	<div class="dialog-progress-tree">		
+	<div class="dialog-progress-tree">
 		<div class="loader">
 	        <div class="loader-inner ball-pulse">
 	          	<span class="ball-text">追溯树生成中</span><div></div><div></div><div></div>
 	        </div>
 		</div>
-		<v-tree 
+		<v-tree
 			v-loading="loading"
 			element-loading-text="加载中..."
 			:tree-id="treeId"
-			:tree-data="treeData" 
+			:tree-data="treeData"
 			:is-dialog-tree="true"
 			:style="{height: treeHeight + 'px'}"></v-tree>
 	</div>
@@ -34,7 +34,7 @@ export default {
   },
   data () {
     return {
-      getProgressUrl: window.HOST + '/api/v1/request/state/', // 获取进度
+      getProgressUrl: window.HOST + '/api/v1/request/state/trace-down/', // 获取进度
       cancelProgressUrl: window.HOST + '/api/v1/request/kill/', // 取消进度
       treeData: {},
       loading: false
@@ -82,7 +82,7 @@ export default {
         data => {
           // 成功处理。更新loading加载文字
           this.treeData = fnP.getTreeData(
-            data.traceGraphNodeDtoList,
+            data.nodeDtoList,
             'track',
             this.isOpDbBeforeRefact
           )
