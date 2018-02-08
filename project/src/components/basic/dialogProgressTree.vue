@@ -103,7 +103,10 @@ export default {
     // 设置定时器：获取当前进度。
     setIntervalHandle () {
       this.loading = true
-      this.showTreeData()
+
+      setTimeout(() => {
+        this.showTreeData()
+      }, 2000)
     }
   }
 }
