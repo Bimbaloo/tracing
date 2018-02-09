@@ -1,222 +1,214 @@
 <template>
     <div class="router-content">
         <!-- 设备监控 -->
-	    <v-dialog 
-    		v-if="showCamera" 
+	    <v-dialog
+    		v-if="showCamera"
     		:dialog-visible="videoForm.visible"
-            :equipment-id="videoForm.equipmentId" 
-            :equipment-name="videoForm.equipmentName" 
-            :time="videoForm.time" 
+            :equipment-id="videoForm.equipmentId"
+            :equipment-name="videoForm.equipmentName"
+            :time="videoForm.time"
             :type="videoForm.type"
     		@hideDialog="hideVideoDialog">
 	    </v-dialog>
 	    <!-- 批次追踪详细信息 -->
-	    <el-dialog 
+	    <el-dialog
 	    	v-if="!bTrack"
-	    	title="汇总详情" 
+	    	title="汇总详情"
 	    	size="large"
 	    	class="outTrack-dialog-wrap"
-	    	:close-on-click-modal="false" 
+	    	:close-on-click-modal="false"
 	    	:visible.sync="outTrackConfig.visible">
-	    	
-            <v-table :table-data="outTrackConfig" :heights="outTrackConfig.height"></v-table>
-            
-            <div class="dialog-footer">
-                <el-button @click="outTrackConfig.visible = false">取 消</el-button>
-                <el-button type="primary" @click="outTrackDialogHandle">追 踪</el-button>
-            </div>
-        </el-dialog>
-        <div class="innner-content" :style="styleObject">
-            <div class="condition" ref='condition' v-if="isInChart">
-                <div class='condition-messsage'>
-                    <span v-for="(filter,index) in filters" :key="index">
-                        {{filter[0]}} : {{filter[1]}}
-                    </span>
-                    <br>
-                    <span>
-                        <el-checkbox v-model="checked">全部数据</el-checkbox>
-                    </span>
-                    <span style='margin-left:5px'>({{this.$route.query.shiftStartTime}}~{{this.$route.query.shiftEndTime}})</span>
-                </div>
-            </div>
-            <el-tabs element-loading-text="拼命加载中" v-model="activeTabName" class="search-tab" @tab-click="tabChange">
-                <el-tab-pane name="unitTable" label="关联表" v-if="showUnited">
-                    <h2 class="content-title uniteTitle">
-                        <span class='table-title'>投产关联</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(uniteItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('uniteTable', uniteItems, $event)"></i>
-                        </span>
-                    </h2>
-
-                    <div class="content-table" ref="uniteTable" v-if="show1">
-                        <!--<el-table class="table-main" :data="checked?uniteItems.dataAll:uniteItems.dataFilter" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template scope="props">
-                                    <div 
-                                    :class="['cell-content',{ltext: column.prop === 'barcode'}, {lchildText: props.row.hasInLen===undefined}]" 
-                                    v-if="column.prop === 'barcode'">
-                                        <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props, $event)"></i>
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop]}}</span>
-                                        <i 
-                                        v-if="showCamera" 
-                                        class="icon icon-12 icon-camera" 
-                                        title="视频监控"
-                                        @click="showVideoDialog(props.row)"></i>
-                                    </div>
-                                    <div class="cell-content" v-else>
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                        </el-table>-->
-                        
-                        <v-ag
-                        	:table-data="uniteItems"
-                        	:heights="uniteItems.height"
-                        	:loading="loading"
-                        ></v-ag>
-                        
-                    </div>
-
-					<h2 class="content-title inNotOutTitle">
-						<span class='table-title'>有投未产</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inNotOutItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('inNotOutTable', inNotOutItems, $event)"></i>
-                        </span>
-					</h2>
-					<div class="content-table" ref="inNotOutTable" v-if="show1">
-						<!--<el-table class="table-main" :data="checked?inNotOutItems.dataAll:inNotOutItems.dataFilter" :height="inNotOutItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in inNotOutItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template scope="props">
-                                    <div class="cell-content">
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                        </el-table>-->
-                        <v-ag
-                        	:table-data="inNotOutItems"
-                        	:heights="inNotOutItems.height"
-                        	:loading="loading"
-                        ></v-ag>
-					</div>
-					
-					
-                </el-tab-pane>
-                <el-tab-pane name="infoTable" label="明细表">
-                    <h2 class="content-title outTitle">
-                        <span class='table-title'>产出</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('outputTable',outItems, $event)"></i>
-                        </span>
-                    </h2>
-
-                    <div class="content-table" ref="outputTable" v-if="show2">
-                        <!--<el-table class="table-main" :data="checked?outItems.dataAll:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template scope="props">
-                                    <div class="cell-content" v-if="column.prop !== 'barcode'">
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                    <div class="cell-content" v-else>
-                                        <span :class="[ bTrack ? '' : 'barcode']" :title="[bTrack ? '' : '条码追踪']" @click="barcodeClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                        </el-table>-->
-                        <v-ag
-                        	:table-data="outItems"
-                        	:heights="outItems.height"
-                        	:loading="loading"
-                        ></v-ag>
-                    </div>
-
-                    <h2 class="content-title inTitle">
-                        <span class='table-title'>投入</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('inputTable', inItems,$event)"></i>
-                        </span>
-                    </h2>
-
-                    <div class="content-table" ref="inputTable" v-if="show2">
-                        <!--<el-table class="table-main" :data="checked?inItems.dataAll:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in inItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template scope="props">
-                                    <div class="cell-content">
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                        </el-table>-->
-                        <v-ag
-                        	:table-data="inItems"
-                        	:heights="inItems.height"
-                        	:loading="loading"
-                        ></v-ag>
-                    </div>
-
-                </el-tab-pane>
-                <el-tab-pane name="sumTable" label="汇总表">
-                	<!-- 没有使用ag-table 是表格列太少，ag-table会有空白。 如果有替换成ag-table， 使用v-ag组件且 修改打印函数 -->
-                    <h2 class="content-title outAllTitle">
-                        <span class='table-title'>产出汇总</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outAllItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputAllTable', $event)"></i>
-                        </span>
-                    </h2>
-                    <div class="content-table" ref="outputAllTable" v-if="show3">
-                        <el-table class="table-main" :data="checked?outAllItems.dataAll:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in outAllItems.columns1" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template slot-scope="props">
-                                    <div class="cell-content" v-if="column.prop !== 'batchNo'">
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                    <div class="cell-content" v-else>
-                                        <span :class="[ bTrack ? '' : 'batchNo']" :title="[bTrack ? '' : '批次追踪']" @click="batchClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <!--<v-ag
-                        	:table-data="outAllItems"
-                        	:heights="outAllItems.height"
-                        	:loading="loading"
-                        ></v-ag>-->
-                    </div>
-                    <h2 class="content-title inAllTitle">
-                        <span class='table-title'>投入汇总</span>
-                        <span class='table-handle'>
-                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inAllItems, $event)"></i>
-                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputAllTable', $event)"></i>
-                        </span>
-                    </h2>
-
-                    <div class="content-table" ref="inputAllTable" v-if="show3">
-                        <el-table class="table-main" :data="checked?inAllItems.dataAll:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
-                            <el-table-column v-for="(column,index) in inAllItems.columns1" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
-                                <template slot-scope="props">
-                                    <div class="cell-content">
-                                        <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
-                                    </div>
-                                </template>
-                            </el-table-column>
-                        </el-table>
-                        <!--<v-ag
-                        	:table-data="inAllItems"
-                        	:heights="inAllItems.height"
-                        	:loading="loading"
-                        ></v-ag>-->
-                    </div>
-
-                </el-tab-pane>
-            </el-tabs>
-
+        <v-table :table-data="outTrackConfig" :heights="outTrackConfig.height"></v-table>
+        <div class="dialog-footer">
+          <el-button @click="outTrackConfig.visible = false">取 消</el-button>
+          <el-button type="primary" @click="outTrackDialogHandle">追 踪</el-button>
         </div>
+      </el-dialog>
+      <div class="innner-content" :style="styleObject">
+        <div class="condition" ref='condition' v-if="isInChart">
+          <div class='condition-messsage'>
+            <span v-for="(filter,index) in filters" :key="index">
+              {{filter[0]}} : {{filter[1]}}
+            </span>
+            <br>
+            <span>
+              <el-checkbox v-model="checked">全部数据</el-checkbox>
+            </span>
+            <span style='margin-left:5px'>({{this.$route.query.shiftStartTime}}~{{this.$route.query.shiftEndTime}})</span>
+          </div>
+        </div>
+        <el-tabs element-loading-text="拼命加载中" v-model="activeTabName" class="search-tab product" @tab-click="tabChange">
+          <el-tab-pane name="unitTable" label="关联表" v-if="showUnited">
+            <h2 class="content-title uniteTitle">
+              <span class='table-title'>投产关联</span>
+              <span class='table-handle'>
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(uniteItems, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('uniteTable', uniteItems, $event)"></i>
+              </span>
+            </h2>
+
+            <div class="content-table" ref="uniteTable" v-if="show1">
+                    <!--<el-table class="table-main" :data="checked?uniteItems.dataAll:uniteItems.dataFilter" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                        <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                            <template scope="props">
+                                <div
+                                :class="['cell-content',{ltext: column.prop === 'barcode'}, {lchildText: props.row.hasInLen===undefined}]"
+                                v-if="column.prop === 'barcode'">
+                                    <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props, $event)"></i>
+                                    <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop]}}</span>
+                                    <i
+                                    v-if="showCamera"
+                                    class="icon icon-12 icon-camera"
+                                    title="视频监控"
+                                    @click="showVideoDialog(props.row)"></i>
+                                </div>
+                                <div class="cell-content" v-else>
+                                    <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                                </div>
+                            </template>
+                        </el-table-column>
+                    </el-table>-->
+              <v-ag
+                :table-data="uniteItems"
+                :heights="uniteItems.height"
+                :loading="loading"
+              ></v-ag>
+            </div>
+
+            <h2 class="content-title inNotOutTitle">
+              <span class='table-title'>有投未产</span>
+              <span class='table-handle'>
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inNotOutItems, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('inNotOutTable', inNotOutItems, $event)"></i>
+              </span>
+            </h2>
+            <div class="content-table" ref="inNotOutTable" v-if="show1">
+              <!--<el-table class="table-main" :data="checked?inNotOutItems.dataAll:inNotOutItems.dataFilter" :height="inNotOutItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                  <el-table-column v-for="(column,index) in inNotOutItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                      <template scope="props">
+                          <div class="cell-content">
+                              <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                          </div>
+                      </template>
+                  </el-table-column>
+              </el-table>-->
+              <v-ag
+                :table-data="inNotOutItems"
+                :heights="inNotOutItems.height"
+                :loading="loading"
+              ></v-ag>
+            </div>
+          </el-tab-pane>
+          <el-tab-pane name="infoTable" label="明细表">
+            <h2 class="content-title outTitle">
+              <span class='table-title'>产出</span>
+              <span class='table-handle'>
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outItems, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('outputTable',outItems, $event)"></i>
+              </span>
+            </h2>
+
+            <div class="content-table" ref="outputTable" v-if="show2">
+              <!--<el-table class="table-main" :data="checked?outItems.dataAll:outItems.dataFilter" :height="outItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                  <el-table-column v-for="(column,index) in outItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                      <template scope="props">
+                          <div class="cell-content" v-if="column.prop !== 'barcode'">
+                              <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                          </div>
+                          <div class="cell-content" v-else>
+                              <span :class="[ bTrack ? '' : 'barcode']" :title="[bTrack ? '' : '条码追踪']" @click="barcodeClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                          </div>
+                      </template>
+                  </el-table-column>
+              </el-table>-->
+              <v-ag
+                :table-data="outItems"
+                :heights="outItems.height"
+                :loading="loading"
+              ></v-ag>
+            </div>
+
+            <h2 class="content-title inTitle">
+              <span class='table-title'>投入</span>
+              <span class='table-handle'>
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inItems, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('inputTable', inItems,$event)"></i>
+              </span>
+            </h2>
+
+            <div class="content-table" ref="inputTable" v-if="show2">
+                <!--<el-table class="table-main" :data="checked?inItems.dataAll:inItems.dataFilter" :height="inItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                    <el-table-column v-for="(column,index) in inItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                        <template scope="props">
+                            <div class="cell-content">
+                                <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                            </div>
+                        </template>
+                    </el-table-column>
+                </el-table>-->
+              <v-ag
+                :table-data="inItems"
+                :heights="inItems.height"
+                :loading="loading"
+              ></v-ag>
+            </div>
+          </el-tab-pane>
+
+          <el-tab-pane name="sumTable" label="汇总表">
+              <!-- 没有使用ag-table 是表格列太少，ag-table会有空白。 如果有替换成ag-table， 使用v-ag组件且 修改打印函数 -->
+            <h2 class="content-title outAllTitle">
+              <span class='table-title'>产出汇总</span>
+              <span class='table-handle'>
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outAllItems, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outputAllTable', $event)"></i>
+              </span>
+            </h2>
+            <div class="content-table" ref="outputAllTable" v-if="show3">
+              <el-table class="table-main" :data="checked?outAllItems.dataAll:outAllItems.dataFilter" :height="outAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                <el-table-column v-for="(column,index) in outAllItems.columns1" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                  <template slot-scope="props">
+                    <div class="cell-content" v-if="column.prop !== 'batchNo'">
+                      <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                    </div>
+                    <div class="cell-content" v-else>
+                      <span :class="[ bTrack ? '' : 'batchNo']" :title="[bTrack ? '' : '批次追踪']" @click="batchClick(props.row)">{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                    </div>
+                  </template>
+                </el-table-column>
+              </el-table>
+              <!--<v-ag
+                :table-data="outAllItems"
+                :heights="outAllItems.height"
+                :loading="loading"
+              ></v-ag>-->
+            </div>
+            <h2 class="content-title inAllTitle">
+              <span class='table-title'>投入汇总</span>
+              <span class='table-handle'>
+                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(inAllItems, $event)"></i>
+                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inputAllTable', $event)"></i>
+              </span>
+            </h2>
+
+            <div class="content-table" ref="inputAllTable" v-if="show3">
+              <el-table class="table-main" :data="checked?inAllItems.dataAll:inAllItems.dataFilter" :height="inAllItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
+                <el-table-column v-for="(column,index) in inAllItems.columns1" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
+                  <template slot-scope="props">
+                    <div class="cell-content">
+                      <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop] }}</span>
+                    </div>
+                  </template>
+                </el-table-column>
+              </el-table>
+                <!--<v-ag
+                  :table-data="inAllItems"
+                  :heights="inAllItems.height"
+                  :loading="loading"
+                ></v-ag>-->
+            </div>
+          </el-tab-pane>
+        </el-tabs>
+      </div>
     </div>
 </template>
 
@@ -1271,6 +1263,12 @@ export default {
       this.inAllItems.data = this.checked
         ? this.inAllItems.dataAll
         : this.inAllItems.dataFilter
+
+        // 删除关联数据的展开属性
+      this.uniteItems.data = this.uniteItems.data.map(o => {
+        delete o.isExpand
+        return o
+      })
     },
     'inItems.data': function () {
       if (!this.inItems.data.length) {
@@ -1595,6 +1593,16 @@ export default {
             )
           }
         }
+        // 投产表中数据修改，产出对应的投入的个数改变了。
+        oAll['unite'].dataFilter = oAll['unite'].dataFilter.map(o => {
+            // 修改产出的hasInLen字段
+          if (o.hasInLen !== undefined) {
+                // 产出- 从过滤后的投入中获取个数
+            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputOpIdList.includes(o.operationId)).length
+          }
+
+          return o
+        })
       }
 
       // 获取汇总的数据。
@@ -2460,4 +2468,14 @@ body {
     }
   }
 }
+/deep/.product {
+  .el-tabs__header {
+    .el-tabs__nav-wrap {
+      &::after {
+        height: 0 !important;
+      }
+    }
+  }
+}
+
 </style>

@@ -14,10 +14,12 @@
             <!-- 新版本中没有同批次入库 -->
             <span class="path-item" @click="checkBatch" v-if="batchIf && isOpDbBeforeRefact">>同批出入库</span>
             <span class="path-item" v-if="restrainIf">>可疑品</span>
-        </div> 
+        </div>
+        <!-- 遏制数据不需要缓存 -->
         <keep-alive>
-	        <router-view></router-view>  
+	        <router-view v-if="$route.meta.keepAlive"></router-view>
         </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
 </template>
 

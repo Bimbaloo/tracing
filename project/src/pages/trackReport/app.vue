@@ -13,7 +13,7 @@
 					{{filter[0]}} : {{filter[1]}}
 				</span>
 				<span v-show="!this.filters.materialCode && selectedArrs[0]" class="default-message" >物料：{{selectedArrs[0] ? selectedArrs[0]["materialCode"] : ""}}</span>
-				<span v-show="!this.filters.opTypeName && selectedArrs[0]" class="default-message" >动作：{{selectedArrs[0] ? selectedArrs[0]["opTypeName"] : ""}}</span> 
+				<span v-show="!this.filters.opTypeName && selectedArrs[0]" class="default-message" >动作：{{selectedArrs[0] ? selectedArrs[0]["opTypeName"] : ""}}</span>
 			</div>
 			<div class='condition-list' @click="active.message = !active.message">
 				<span>查询明细
@@ -30,9 +30,9 @@
 					</div>
 				</div>
 			</div>
-			<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
+			<v-report :kill-progress="killProgress" :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
 		</div>
-		
+
 		<!--<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>-->
 		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" width='30%'>
             <el-form :model="form">
@@ -123,7 +123,8 @@ export default {
       filtersList: [],
       // dialogState:false
       equipmentTimes: [],
-      selectedArrs: []
+      selectedArrs: [],
+      killProgress: false
     }
   },
   computed: {
@@ -181,6 +182,10 @@ export default {
   },
   mounted () {
     this.fetchStartPointsData()
+
+    window.onbeforeunload = () => {
+      this.killProgress = true
+    }
   },
   methods: {
     setFilters () {
@@ -389,7 +394,7 @@ export default {
                   : ''
                   }
                   </div>
-    
+
                  <style>
                   body {
                    display: flex;
@@ -500,7 +505,7 @@ export default {
                       height: auto;
                     }
                     .report-container .condition-table .materialBox .time > span {
-                      margin-left: 10px; 
+                      margin-left: 10px;
                       line-height: 20px;
                     }
                     .report-container .report .inner-title,
@@ -513,7 +518,7 @@ export default {
                     }
                     .report-container .readmine .condition-audit {
                       border: 2px solid #42AF8F;
-                      padding: 20px 12px; 
+                      padding: 20px 12px;
                       margin-top: 30px;
                       font-size: 14px;
                       height: 70px;

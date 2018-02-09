@@ -6,6 +6,9 @@ import ElementUI from 'element-ui'
 // 引用登录模块。
 import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
+// 应用版本信息模块
+import { versionModule } from 'assets/js/versionStore.js'
+
 import 'theme/index.css'
 
 import App from './app.vue'
@@ -35,8 +38,8 @@ Vue.prototype.$register = loginFn
 // 定义统一状态。
 const store = new Vuex.Store({
   modules: {
-    loginModule
-    // customModule
+    loginModule,
+    versionModule
   },
   state: {
   },

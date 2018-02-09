@@ -4,7 +4,7 @@
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
 		<div class="content">
 			<!-- <el-col class="router" ref="router"> -->
-			<div :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
+			<div :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
 			</div>
 			<div class="router" ref="router">
@@ -15,7 +15,7 @@
 				<div id='changeWidth' class='changeWidth'></div>
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapseTree"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="expandTree"></i>
-				
+
 				<div class="router-container" ref="routerContainer">
 					<div @mouseenter="showTable" @mouseleave="unShowTable" v-if="false">
 						<i class="icon icon-20 icon-balance"></i>
@@ -36,7 +36,7 @@
 						</transition>
 					</div>
 					<i class="icon icon-20 icon-report" @click="onReport" title="快速报告" v-if="!fullscreen"></i>
-					
+
 					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
 					<div id='changeDiagram' :class="[{hide: treeFullscreen},{hide: fullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
@@ -79,8 +79,6 @@ export default {
       _pageY: null, // 鼠标的纵向位置
       changeHeight: 0, // 改变的高度
       // resizeUpdateY:0,     //监听父集div大小改变更新右边上半部(tree)
-
-      isHasLoading: true, // 是否需要加载。 页面调用时间短可不需
       // 页面加载中动画。
       fullscreenLoading: false, // 弹窗进度加载
       // 侧栏是否收缩。
@@ -267,9 +265,6 @@ export default {
     },
     // 关闭进度页面。
     closeProgressDialog () {
-      // 设置页面取消加载，且弹窗也不需加载
-      this.isHasLoading = false
-
       setTimeout(() => {
         this.fullscreenLoading = false
       }, 2000)
@@ -349,12 +344,7 @@ export default {
         this.requestError,
         this.requestToLogin
       )
-
-      setTimeout(() => {
-        if (this.isHasLoading) {
-          this.fullscreenLoading = true
-        }
-      }, 2000)
+      this.fullscreenLoading = true
     },
     parseTableData () {
       let aoData = this.rawData
@@ -713,7 +703,15 @@ body {
         // overflow: auto;
         position: relative;
         height: 50px;
-
+        .material-stock {
+          .suspicious {
+            position: static;
+            .btn-restrain {
+              right: 40px;
+              top: 10px;
+            }
+          }
+        }
         &.hide {
           display: none;
         }

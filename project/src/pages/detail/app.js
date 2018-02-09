@@ -52,19 +52,22 @@ const routes = [{
     path: '',
     component: Storage,
     meta: {
-      title: 'storage'
+      title: 'storage',
+      keepAlive: true
     }
   }, {
     path: 'batch',
     component: Batch,
     meta: {
-      title: 'batch'
+      title: 'batch',
+      keepAlive: true
     }
   }, {
     path: 'restrain',
     component: Suspicious,
     meta: {
-      title: 'restrain'
+      title: 'restrain',
+      keepAlive: false
     }
   }]
 },

@@ -1,4 +1,4 @@
-    
+
 <template>
 	<div>
 	    <div class="tooltip-info" @mouseenter="showList=true" @mouseleave="showList=true">
@@ -8,7 +8,7 @@
 	            <ul slot="content" class="info-list">
 	                <li @click="goSearchBarcode">条码查询</li>
 	                <li @click="goOutputRecord">产出记录</li>
-	            </ul>     
+	            </ul>
 	            <div class="user-name">小工具<i class="el-icon-arrow-down"></i></div>
 	        </el-tooltip>
 	        <div v-if="tool && (ssoLogin || (!ssoLogin && config))" class="division">|</div>
@@ -17,30 +17,30 @@
 		            <ul slot="content" class="info-list">
 		                <li @click="goToConfig" v-if="config">设置</li>
 		                <li @click="logout" v-if="userId">退出</li>
-		            </ul>     
+		            </ul>
 		            <div class="user-name" :style="{cursor: nickname?'default':'pointer'}" @click="login">{{nickname || "登录"}}<i class="el-icon-arrow-down"></i></div>
 		        </el-tooltip>
 		        <div v-else class="user-name" :style="{cursor: nickname?'default':'pointer'}" @click="login">{{nickname || "登录"}}</div>
 	        </div>
         	<div v-if="!ssoLogin && config" @click="goToConfig" class="user-name">设置</div>
 	    </div>
-	    
+
 	    <!-- 条码查询 -->
 	    <v-dialog
-            width='80%' 
-    		v-if="showBarcodeDialog" 
+            width='80%'
+    		v-if="showBarcodeDialog"
     		:dialog-visible="showBarcodeDialog"
     		@hideDialog="hideBarcodeDialog">
 	    </v-dialog>
-	    
+
 	    <!-- 产出记录 -->
-	    <v-output 
-    		v-if="showOutputRecordDialog" 
+	    <v-output
+    		v-if="showOutputRecordDialog"
     		:dialog-visible="showOutputRecordDialog"
     		@hideDialog="hideOutputRecordDialog">
 	    </v-output>
 	</div>
-    	
+
 </template>
 
 <script>
@@ -89,7 +89,7 @@ export default {
       return this.$store.state.loginModule.nickname
     },
     ssoLogin () {
-      return this.$store.state.versionModule.ssoLogin
+      return this.$store.state.versionModule && this.$store.state.versionModule.ssoLogin
     }
   },
   methods: {

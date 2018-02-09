@@ -12,7 +12,7 @@
 			</div>
 			<h2 class="title">可疑品列表</h2>
 			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
-			<v-report v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report> 
+			<v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report>
 		</div>
 	</div>
 
@@ -33,7 +33,8 @@ export default {
       styleObject: {
         'min-width': '1000px'
       },
-      equipmentName: ''
+      equipmentName: '',
+      killProgress: false
     }
   },
   computed: {
@@ -51,12 +52,13 @@ export default {
     // this.fetchData();
   },
   watch: {
-    // 如果路由有变化，会再次执行该方法
+    // 如果路由有变化，会再次执行该方法- 当前页面没有缓存，每次都是重新创建
     $route: function () {
       if (this.$route.meta.title === 'restrain') {
         this.equipmentName = this.oQuery.equipmentName
       }
       this.isRestrained = true
+      this.killProgress = false
     }
   },
   methods: {
@@ -131,6 +133,20 @@ export default {
     removeWidth () {
       this.styleObject.minWidth = 0
     }
+  },
+  // 遏制页面离开时，关闭进程(可疑品：查出库，物料)
+  beforeRouteLeave (to, from, next) {
+    this.killProgress = true
+    setTimeout(() => {
+      next()
+    }, 500)
+  },
+  // 遏制页面离开(遏制页面)
+  beforeRouteUpdate (to, from, next) {
+    this.killProgress = true
+    setTimeout(() => {
+      next()
+    }, 500)
   }
 }
 </script>

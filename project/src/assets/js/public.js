@@ -703,7 +703,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
         oData.sumList = _sumDataList(oData.detailInfosUnited, ['barcode', 'batchNo'], aDis, aSum)
 
         // 设置详细信息标题 -- 是否已设定（条码绑定）
-        if (oData.nodeType === '205' || oData.nodeType === '206') {
+        if (oData.nodeType === 205 || oData.nodeType === 206) {
           // 条码绑定
           // 设置详细信息标题 托码+物料名称
           oData.detailTitle = oData.detailInfosUnited.length ? ((oData.detailInfosUnited[0].srcBarcode ? (oData.detailInfosUnited[0].srcBarcode + '  ') : '') + oData.detailInfosUnited[0].materialName) : ''
@@ -885,6 +885,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
         // 按类型分类（投入，产出，滞留）
         o.list.forEach(oType => {
           let sKey = oType.opType
+
           if (sKey === 1) { // 投入
             // 投入。
             if (!oFlag['touru']) {
@@ -1771,6 +1772,14 @@ const needTableDatas = (pathMapping, nodeType, allColumns) => {
   return tableData
 }
 
+const outerHeight = (el) => {
+  var height = el.offsetHeight
+  var style = el.currentStyle || window.getComputedStyle(el)
+
+  height += parseInt(style.marginTop) + parseInt(style.marginBottom)
+  return height
+}
+
 export default {
   parseData,
   parseTreeData,
@@ -1779,9 +1788,11 @@ export default {
   getCatalogData,
   getTrackCatalogData,
   SPARENTKEY,
-  getCatalogData1
+  getCatalogData1,
+  outerHeight
 }
 
 export {
-  needTableDatas
+  needTableDatas,
+  outerHeight
 }

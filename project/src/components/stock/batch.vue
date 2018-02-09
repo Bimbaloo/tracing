@@ -15,7 +15,7 @@
 				{{ outstockData.error }}
 			</div>
 			<div v-else class="content-table" ref="outstockTable">
-				<v-table :table-data="outstockData" :heights="outstockData.height" :loading="outstockData.loading" :resize="tdResize"></v-table>
+				<v-table :table-data="outstockData" :heights="tableHeight" :loading="outstockData.loading" :resize="tdResize"></v-table>
 			</div>
 			<h2 class="content-title tableData">
 				<span class='table-title'>批次<span class="tag">{{batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;在库信息</span>
@@ -28,7 +28,7 @@
 				{{ instockData.error }}
 			</div>
 			<div v-else class="content-table" ref="instockTable">
-				<v-table :table-data="instockData" :heights="instockData.height" :loading="instockData.loading" :resize="tdResize"></v-table>
+				<v-table :table-data="instockData" :heights="tableHeight" :loading="instockData.loading" :resize="tdResize"></v-table>
 			</div>
 		</div>
 	</div>
@@ -36,15 +36,13 @@
 </template>
 
 <script>
-import $ from 'jquery'
+
 import table from 'components/basic/table.vue'
 import XLSX from 'xlsx'
 import Blob from 'blob'
 import FileSaver from 'file-saver'
 import rasterizeHTML from 'rasterizehtml'
-// import {host} from 'assets/js/configs.js'
-
-// var HOST = window.HOST ? window.HOST: host
+import fnP from 'assets/js/public.js'
 
 export default {
   components: {
@@ -59,13 +57,13 @@ export default {
       styleError: {
         'max-height': '200px'
       },
+      tableHeight: 100,
       batch: this.$route.query.batchNo,
       materialCode: this.$route.query.materialCode,
       outstockData: {
         url: window.HOST + '/api/v1/outstock/bybatch',
         loading: false,
         error: null,
-        height: '100%',
         filename: this.$route.query.batchNo + '出库',
         columns: [
           {
@@ -125,7 +123,6 @@ export default {
         url: window.HOST + '/api/v1/stock/bybatch',
         loading: false,
         error: null,
-        height: '100%',
         filename: this.$route.query.batchNo + '在库',
         columns: [
           {
@@ -186,6 +183,10 @@ export default {
     // 组件创建完后获取数据，
     // 此时 data 已经被 observed 了
     this.fetchPage()
+    window.addEventListener('resize', this.setTableHeight)
+    this.$nextTick(() => {
+      this.setTableHeight()
+    })
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
@@ -218,27 +219,11 @@ export default {
       this.fetchData(this.outstockData)
       this.fetchData(this.instockData)
     },
-    // 获取高度。
-    adjustHeight () {
-      let jRouter = $('.router-content')
-      let jTitle = jRouter.find('.content-title')
-      let jTable = jRouter.find('.content-table')
-      let nHeight = 0
 
-      nHeight = Math.floor(
-        (jRouter.height() -
-          jTitle.outerHeight(true) * jTitle.length -
-          (jTable.outerHeight(true) - jTable.height())) /
-          2
-      )
-
-      return nHeight
-    },
     // 获取参数。
     fetchData (oData) {
       oData.error = null
       oData.data = []
-      oData.height = this.adjustHeight()
       oData.loading = true
 
       let sPath = oData.url
@@ -257,7 +242,7 @@ export default {
         sErrorMessage => {
           // 请求失败。
           oData.loading = false
-          this.styleError.maxHeight = this.adjustHeight() - 50 + 'px'
+          this.styleError.maxHeight = this.setTableHeight() - 50 + 'px'
           // 提示信息。
           console.log(sErrorMessage)
         },
@@ -267,7 +252,7 @@ export default {
           console.log('接口查询出错。')
           console.log(err)
           if (this.outstockData.error && this.instockData.error) {
-            this.styleError.maxHeight = this.adjustHeight() - 50 + 'px'
+            this.styleError.maxHeight = this.setTableHeight() - 50 + 'px'
           }
         }
       )
@@ -347,6 +332,20 @@ export default {
             `
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
+    },
+    // 设置高度
+    setTableHeight () {
+      this.tableHeight = 100
+      this.$nextTick(() => {  // 确保屏幕缩小时，不会因为内容撑开导致高度设置失败
+        const viewHeight = fnP.outerHeight(document.querySelector('.router-content'))
+        let titleHeight = 0
+        document.querySelectorAll('.tableData').forEach(el => {
+          titleHeight += fnP.outerHeight(el)
+        })
+        this.tableHeight = (viewHeight - titleHeight) / 2 - 10
+        const residue = (viewHeight - titleHeight) / 2  // 剩余高度，显示错误的高度
+        return residue
+      })
     }
   }
 }

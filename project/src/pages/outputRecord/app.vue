@@ -43,6 +43,8 @@ export default {
     margin: 20px;
     padding: 20px;
     background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
   }
 }
 </style>

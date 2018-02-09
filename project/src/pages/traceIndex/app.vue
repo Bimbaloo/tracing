@@ -532,7 +532,15 @@ body {
         // overflow: auto;
         position: relative;
         height: 50px;
-
+        .material-stock {
+          .suspicious {
+            position: static;
+            .btn-restrain {
+              right: 40px;
+              top: 10px;
+            }
+          }
+        }
         &.hide {
           display: none;
         }
