@@ -152,7 +152,7 @@ export default {
 }
 
 .tooltip-info {
-  position: absolute;
+  position: fixed;
   right: 20px;
   top: 27px;
   height: 14px;

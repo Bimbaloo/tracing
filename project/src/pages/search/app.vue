@@ -526,7 +526,8 @@ body {
   background-color: #f2f2f2;
   display: table;
   background: url(../../assets/img/bg.jpg);
-  background-size: cover;
+  // background-size: cover;
+  min-height: 630px;
 }
 
 #app {
@@ -837,6 +838,87 @@ footer {
   }
 }
 
+@media screen and (max-height: 800px) {
+  footer {
+    bottom: 10px;
+  }
+  .el-select-dropdown__wrap {
+    max-height: 230px;
+  }
+  .search-tab {
+    max-height: 540px;
+    display: flex;
+    flex-direction: column;
+
+    &.el-tabs--border-card {
+      & > .el-tabs__header {
+        height: 40px;
+        .el-tabs__item {
+          height: 32px;
+          line-height: 32px;
+
+          &:hover {
+            color: #333;
+          }
+
+          &.is-active {
+            color: #42af8f;
+            border-top-color: #42af8f;
+          }
+        }
+      }
+
+      /deep/.el-form-item {
+        margin-bottom: 18px;
+
+        .el-form-item__label {
+          font-size: 14px;
+          padding: 6px 10px 6px 0;
+        }
+        .el-form-item__content,
+        .el-select {
+          line-height: 24px;
+          .el-input {
+            font-size: 14px;
+            .el-input__inner {
+              height: 24px !important; //color: #999
+            }
+            .el-input__prefix {
+              .el-icon-time {
+                line-height: 24px;
+              }
+            }
+            .el-input__suffix {
+              .el-input__suffix-inner {
+                .el-input__icon {
+                  line-height: 24px;            
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .el-tab-pane {
+    .panel {
+      .panel-content {
+        .panel-content-wrap {
+          padding: 0;
+          .el-form {
+            .form-conditions {
+              max-height: 350px;
+              overflow: auto;
+              .el-form-item {
+                padding: 0 28px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
 @media screen and (max-width: 1400px) {
   footer {
     bottom: 10px;
