@@ -7,6 +7,7 @@
     @selection-change="selectionChange"
     @cell-click="cellClick"
     class="table"
+    :span-method="arraySpanMethod"
     :row-key="tableData.data.prop"
     :height="heights"
     :max-height="maxHeight"
@@ -169,6 +170,11 @@ export default {
         )
       } else {
         return true
+      }
+    },
+    arraySpanMethod (params) {
+      if (this.tableData.spanMergeMethod) {
+        return this.tableData.spanMergeMethod(params)
       }
     }
   }

@@ -1,26 +1,11 @@
 <template>
-    <!-- <el-dialog
-        class="progress-dialog-table-wrap"
-        :visible.sync="dialogVisible"
-        :close-on-click-modal="false"
-        :show-close="false"
-        :close-on-press-escape="false"
-        fullscreen
-        center>
-        <div slot="title" class="loader">
-	        <div class="loader-inner ball-pulse">
-	          	<span class="ball-text">快速报告生成中</span><div></div><div></div><div></div>
-	        </div>
-		</div>
-        <v-table :table-data="oDialogTable" :loading="loading"></v-table>
-    </el-dialog> -->
     <div class="progress-dialog-table-wrap">
         <div class="loader">
 	        <div class="loader-inner ball-pulse">
 	          	<span class="ball-text">快速报告生成中</span><div></div><div></div><div></div>
 	        </div>
 		</div>
-        <v-table :table-data="oDialogTable" :loading="loading"></v-table>
+        <v-table :table-data="oDialogTable" :loading="tableLoading"></v-table>
     </div>
 </template>
 
@@ -41,8 +26,8 @@ export default {
   },
   data () {
     return {
-      loading: false,
-      getProgressUrl: window.HOST + '/api/v1/request/state/',
+      tableLoading: false,
+      getProgressUrl: window.HOST + '/api/v1/request/state/fast-report/',
       tableData: [],
       oDialogTable: {
         columns: [{
@@ -50,7 +35,25 @@ export default {
           name: '类型',
           formatter: function (row, column) {
               // 根据当前类型，显示标题
-            return ''
+            let str = ''
+            switch (row.type) {
+              case 'deliveredList':
+                str = '出库: 发货'
+                break
+              case 'inMakingList':
+                str = '在制: 加工中'
+                break
+              case 'inStockList':
+                str = '在库'
+                break
+              case 'outStockList':
+                str = '出库: 滞留中'
+                break
+              case 'remainList':
+                str = '在制: 滞留中'
+                break
+            }
+            return str
           }
         }, {
           prop: 'materialName',
@@ -60,7 +63,9 @@ export default {
           name: '名称(数量)'
         }],
         data: [],
-        spanMergeMethod: this.spanMergeMethod
+        spanMergeMethod: params => {
+          return this.spanMergeMethod(params)
+        }
       }
     }
   },
@@ -70,9 +75,13 @@ export default {
   },
   methods: {
     showDialogTable () {
-      // this.loading = true
-          // this.showData()
+      this.tableLoading = true
+
+      setTimeout(() => {
+        this.showData()
+      }, 2000)
     },
+    // 加载数据
     showData () {
       this.$register.sendRequest(
                 this.$store,
@@ -81,23 +90,59 @@ export default {
                 'post',
                 null,
                 data => {
-                  this.loading = false
+                  this.tableLoading = false
 
                   // 处理数据。
-
+                  this.oDialogTable.data = this.parseTableData(data)
                     // 重新加载
+                  setTimeout(() => {
+                    this.$nextTick(() => {
+                      document.querySelector('.progress-dialog-table-wrap') && this.showData()
+                    })
+                  }, 3000)
                 },
                 () => {
                     // 加载失败
-                  this.loading = true
+                  this.tableLoading = true
                 }
             )
     },
     // 单元格合并处理函数
-    spanMergeMethod () {},
+    spanMergeMethod ({row, column, rowIndex, columnIndex}) {
+      if (columnIndex === 0) {
+            // 第一列
+        if (!row.hide) {
+          return [row.rowspan, 1]
+        } else {
+          return [0, 0]
+        }
+      }
+    },
     // 数据处理函数
-    parseTableData () {
+    parseTableData (oData) {
+      let aoData = []
+        // 增加合并单元格字段
+      for (let obj in oData) {
+        let aoFlag = oData[obj]
 
+        aoFlag.forEach((o, nIndex) => {
+          aoData.push({
+            materialName: o.materialName,
+            type: obj,
+            info: (function () {
+              let aoStr = []
+              aoStr = o.simpleInfoList.map(c => {
+                return `${c.keyValue}(${c.quantity})`
+              })
+              return aoStr.join('、')
+            })(),
+            rowspan: !nIndex ? aoFlag.length : 1,   // 第一行合并
+            hide: !!nIndex  // 第一行显示
+          })
+        })
+      }
+
+      return aoData
     }
   }
 }
