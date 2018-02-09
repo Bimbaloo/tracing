@@ -2094,7 +2094,7 @@ export default {
       if (this.selectedEquipmentId) {
         let nIndex
         this.categories.some((o, index) => {
-          if (o.id === this.selectedEquipmentId) {
+          if (o.id.toString() === this.selectedEquipmentId.toString()) {
             nIndex = index
             return false
           }
