@@ -4,14 +4,14 @@
 	    <!-- 设备监控 -->
 	    <v-dialog
     		:dialog-visible="videoForm.visible"
-        :equipment-id="videoForm.equipmentId" 
-        :equipment-name="videoForm.equipmentName" 
-        :time="videoForm.time" 
+        :equipment-id="videoForm.equipmentId"
+        :equipment-name="videoForm.equipmentName"
+        :time="videoForm.time"
         :series="videoForm.series"
     		@hideDialog="hideVideoDialog">
-	    </v-dialog> 
+	    </v-dialog>
 	    <!-- 追踪条件配置。 -->
-	    <v-track-dialog 
+	    <v-track-dialog
     		v-if="trace && trackConfigForm.visible"
     		:equipment-list="equipments"
     		:dialog-visible="trackConfigForm.visible"
@@ -21,35 +21,35 @@
         <div v-if="sErrorMessage" class="error">{{sErrorMessage}}</div>
 		<div v-else class="analysis">
             <div id="equipments" :style="{height: panelHeight + 'px'}"></div>
-            <div class="illustration" 
+            <div class="illustration"
                 :title="showState?'隐藏设备状态':'显示设备状态'"
-                v-if="!loading" 
-                :style="{bottom: selectedEquipmentId?'40px':'16px'}" 
+                v-if="!loading"
+                :style="{bottom: selectedEquipmentId?'40px':'16px'}"
                 @click="toggleStateHandle">
                 <div v-for="state in states" :key="state.key" :style="{color: showState?'#333':'#ccc'}" ><i :class="['icon icon-16', `icon-${state.key}`, showState?'':'unselected']"></i>{{state.name}}</div>
             </div>
             <!--维度按钮-->
             <div class="legend" v-if="!loading">
-                <div 
-                    v-for="(obj,index) in dimension" 
+                <div
+                    v-for="(obj,index) in dimension"
                     :class="[obj.show ? `dimension dimension-${obj.key}` : 'dimension']"
-                    :key="index"            
-                    @mouseenter="obj.listShow=true" 
-                    @mouseleave="obj.listShow=false">                
-                    <span class="name" @click="legendClickHandle(obj)">{{obj.name}}</span>               
+                    :key="index"
+                    @mouseenter="obj.listShow=true"
+                    @mouseleave="obj.listShow=false">
+                    <span class="name" @click="legendClickHandle(obj)">{{obj.name}}</span>
                     <el-collapse-transition>
                         <div class="dimension-links" v-show="selectedEquipmentId && obj.listShow && obj.show" v-if="obj.list.length">
                             <div class="line">|</div>
                             <div class="circle"><span></span></div>
                             <ul>
-                                <li v-for="(item,index) in obj.list" @click="listButtonClick(item)" :key="index">{{item.name}}</li>                        
+                                <li v-for="(item,index) in obj.list" @click="listButtonClick(item)" :key="index">{{item.name}}</li>
                             </ul>
                         </div>
-                    </el-collapse-transition>                                    
+                    </el-collapse-transition>
                 </div>
-            </div>                    
+            </div>
             <div class="setting clear" v-if="!loading&&process">
-                <div class="start">	    
+                <div class="start">
                     <span v-if="startIf" @click="startIf=false">{{datetime.start}}</span>
                     <div v-else class="edit">
                         <v-datetime :form-data="datetime" key-data="start"></v-datetime>
@@ -76,39 +76,39 @@
             	<el-button 	@click="goRefresh" class="btn btn-plain" v-if="isDatetimeChange">查询</el-button>
                 <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
                 <el-button  @click="gotoTrackConfig" class="btn btn-plain" v-if="trace">追踪</el-button>
-            </div>	
+            </div>
             <!--提示面板数据-->
             <div class="tooltip-wrapper" :style="{width: chartWidth+'px', margin: grid[0] + 'px ' + grid[1] + 'px ' + grid[2] + 'px ' + grid[3] + 'px'}">
-                <div v-for="compareData in compareList" 
-                    :key="compareData.millisecond"              
+                <div v-for="compareData in compareList"
+                    :key="compareData.millisecond"
                     @mouseenter="tooltipPanelMouseenterHandle(compareData.millisecond)"
-                    v-if="compareData.list.some(item=>dimension.filter(o => o.key === item.dimension)[0].show)">                 
-                    <div 
-                    :class="['tooltip-panel', compareData.reverse ? 'left':'right']" 
+                    v-if="compareData.list.some(item=>dimension.filter(o => o.key === item.dimension)[0].show)">
+                    <div
+                    :class="['tooltip-panel', compareData.reverse ? 'left':'right']"
                     :style="{left:compareData.position*100+'%', top: panelTop+'px', zIndex: compareData.zIndex}">
                         <div class="tooltip-time">{{compareData.time}}</div>
                         <i class="btn-close icon icon-14 icon-close" title="关闭" @click="tooltipPanelClickHandle(compareData.millisecond)" ></i>
                         <i class="btn-reverse icon icon-14 icon-reverse" title="翻转" @click="reversePanelClickHandle(compareData)" ></i>
                         <div class="list-wrapper" :style="{maxHeight: chartHeight*0.8-20 + 'px'}">
-                            <div 
-                            class="tooltip-list" 
-                            v-for="(equipment,index) in compareData.list" 
+                            <div
+                            class="tooltip-list"
+                            v-for="(equipment,index) in compareData.list"
                             :key="index"
                             v-if="dimension.filter(o => o.key === equipment.dimension)[0].show">
-                                <div class="tooltip-title" 
+                                <div class="tooltip-title"
                                 :style="{color: equipment.color}">
                                 {{equipment.name}}&nbsp;&nbsp;
                                 {{equipment.series}}&nbsp;&nbsp;
                                 {{`${equipment.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
-                                <i 
+                                <i
                                   @click="showVideoDialog(equipment.id, equipment.name, compareData.time, equipment.series)"
-                                  v-if="camera && !!factoryCameraConfig[equipment.dimension]" 
-                                  class="icon icon-12 icon-camera" 
+                                  v-if="camera && !!factoryCameraConfig[equipment.dimension]"
+                                  class="icon icon-12 icon-camera"
                                   title="监控视频"></i>
                                 </div>
                                 <ul class="event-list">
                                     <li v-for="(event,index) in equipment.event"
-                                    :key="index" 
+                                    :key="index"
                                     v-if="equipment.dimension==='pool'?(!onlyShowRelatedData ||(onlyShowRelatedData && event.related)):true">
                                         <div :style="{color: equipment.color}">
                                             {{(onlyShowRelatedData && event.related)?event.relatedIndex:event.index}}.{{event.title}}&nbsp;&nbsp;
@@ -122,15 +122,15 @@
                                         </ul>
                                     </li>
                                 </ul>
-                                
+
                             </div>
                         </div>
                     </div>
                     <div class="line" :style="{left:compareData.left*100+'%', top: panelTop+'px', height: chartHeight-3 + 'px', zIndex: compareData.zIndex}"></div>
                 </div>
-            </div> 
-        </div>        		 
-    </div>      
+            </div>
+        </div>
+    </div>
 </template>
 
 <script>
@@ -600,18 +600,18 @@ export default {
     // 选中的设备名称。
     selectedEquipmentName () {
       return this.equipments.filter(
-        o => o.equipmentId === this.selectedEquipmentId
+        o => (o.equipmentId + '') === this.selectedEquipmentId
       )[0].equipmentName
     },
     // 产出id。
     doOutIdList () {
       return this.equipments.filter(
-        o => o.equipmentId === this.selectedEquipmentId
+        o => (o.equipmentId + '') === this.selectedEquipmentId
       )[0].poolOutId
     },
     operationIdList () {
       return this.equipments.filter(
-        o => o.equipmentId === this.selectedEquipmentId
+        o => (o.equipmentId + '') === this.selectedEquipmentId
       )[0].operationIdList
     },
     // 与起点相关的标记线。
