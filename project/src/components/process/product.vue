@@ -1263,6 +1263,12 @@ export default {
       this.inAllItems.data = this.checked
         ? this.inAllItems.dataAll
         : this.inAllItems.dataFilter
+
+        // 删除关联数据的展开属性
+      this.uniteItems.data = this.uniteItems.data.map(o => {
+        delete o.isExpand
+        return o
+      })
     },
     'inItems.data': function () {
       if (!this.inItems.data.length) {
