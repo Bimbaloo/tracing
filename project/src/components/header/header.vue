@@ -1,6 +1,6 @@
 <template>
     <header>
-        <img :src="logo" @click="goSearch"/>
+        <img :src="logo" @click="goSearch"/>&nbsp;&nbsp;—&nbsp;&nbsp;追溯分析平台
         <v-tooltip :config="config" :back="back" :tool="tool"></v-tooltip>
     </header>
     
@@ -55,7 +55,7 @@ header {
   /*padding-left: 40px;*/
   padding: 0 20px 0 40px;
   color: #fff;
-  font-size: 16px;
+  font-size: 18px;
   font-family: 微软雅黑;
   position: relative;
 
