@@ -1,6 +1,6 @@
 <template>
 	<div id="app" class="report-wrapper">
-		<div class="report-container">		
+		<div class="report-container">
 			<h1 class="title">遏制报告</h1>
 			<h2 class="content-title">查询条件</h2>
 			<!-- <div class="condition">
@@ -10,7 +10,7 @@
 			<div class='condition-table'>
         <span v-for="infor in information" :key="infor.value">{{infor.value}}：{{infor.key}}</span>
       </div>
-      <v-report :hasData="setWidth" :noData="removeWidth" :query="restrainQuery.handleID" type="restrainDetails"></v-report>
+      <v-report :kill-progress="killProgress" :hasData="setWidth" :noData="removeWidth" :query="restrainQuery.handleID" type="restrainDetails"></v-report>
 		</div>
   	</div>
 </template>
@@ -33,7 +33,8 @@ export default {
         'min-width': '1200px'
       },
       restrainQuery: null,
-      listInfor: {}
+      listInfor: {},
+      killProgress: false
     }
   },
   computed: {
@@ -120,6 +121,11 @@ export default {
     })
     this.restrainQuery = JSON.parse(sessionStorage.getItem('restrain'))
     this.getListhData()
+  },
+  mounted () {
+    window.onbeforeunload = () => {
+      this.killProgress = true
+    }
   },
   methods: {
     setWidth () {

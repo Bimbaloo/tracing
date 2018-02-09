@@ -1,22 +1,22 @@
 <template>
     <div class="router-content">
         <!-- 设备监控 -->
-	    <v-dialog 
-    		v-if="showCamera" 
+	    <v-dialog
+    		v-if="showCamera"
     		:dialog-visible="videoForm.visible"
-            :equipment-id="videoForm.equipmentId" 
-            :equipment-name="videoForm.equipmentName" 
-            :time="videoForm.time" 
+            :equipment-id="videoForm.equipmentId"
+            :equipment-name="videoForm.equipmentName"
+            :time="videoForm.time"
             :type="videoForm.type"
     		@hideDialog="hideVideoDialog">
 	    </v-dialog>
 	    <!-- 批次追踪详细信息 -->
-	    <el-dialog 
+	    <el-dialog
 	    	v-if="!bTrack"
-	    	title="汇总详情" 
+	    	title="汇总详情"
 	    	size="large"
 	    	class="outTrack-dialog-wrap"
-	    	:close-on-click-modal="false" 
+	    	:close-on-click-modal="false"
 	    	:visible.sync="outTrackConfig.visible">
         <v-table :table-data="outTrackConfig" :heights="outTrackConfig.height"></v-table>
         <div class="dialog-footer">
@@ -51,14 +51,14 @@
                     <!--<el-table class="table-main" :data="checked?uniteItems.dataAll:uniteItems.dataFilter" :height="uniteItems.height" stripe border style="width: 100%;" v-loading="loading" element-loading-text="拼命加载中" row-class-name="table-item">
                         <el-table-column v-for="(column,index) in uniteItems.columns" :key="index" :align="'center'" :fixed="column.fixed" :resizable="true" :label="column.name" :width="column.width">
                             <template scope="props">
-                                <div 
-                                :class="['cell-content',{ltext: column.prop === 'barcode'}, {lchildText: props.row.hasInLen===undefined}]" 
+                                <div
+                                :class="['cell-content',{ltext: column.prop === 'barcode'}, {lchildText: props.row.hasInLen===undefined}]"
                                 v-if="column.prop === 'barcode'">
                                     <i v-if="props.row.hasInLen" class="icon-down el-icon-arrow-down" @click="handleEdit(props.$index, props, $event)"></i>
                                     <span>{{ column.formatter?column.formatter(props.row):props.row[column.prop]}}</span>
-                                    <i 
-                                    v-if="showCamera" 
-                                    class="icon icon-12 icon-camera" 
+                                    <i
+                                    v-if="showCamera"
+                                    class="icon icon-12 icon-camera"
                                     title="视频监控"
                                     @click="showVideoDialog(props.row)"></i>
                                 </div>
@@ -67,12 +67,12 @@
                                 </div>
                             </template>
                         </el-table-column>
-                    </el-table>-->      
+                    </el-table>-->
               <v-ag
                 :table-data="uniteItems"
                 :heights="uniteItems.height"
                 :loading="loading"
-              ></v-ag>      
+              ></v-ag>
             </div>
 
             <h2 class="content-title inNotOutTitle">
@@ -1263,6 +1263,12 @@ export default {
       this.inAllItems.data = this.checked
         ? this.inAllItems.dataAll
         : this.inAllItems.dataFilter
+
+        // 删除关联数据的展开属性
+      this.uniteItems.data = this.uniteItems.data.map(o => {
+        delete o.isExpand
+        return o
+      })
     },
     'inItems.data': function () {
       if (!this.inItems.data.length) {
@@ -1587,6 +1593,16 @@ export default {
             )
           }
         }
+        // 投产表中数据修改，产出对应的投入的个数改变了。
+        oAll['unite'].dataFilter = oAll['unite'].dataFilter.map(o => {
+            // 修改产出的hasInLen字段
+          if (o.hasInLen !== undefined) {
+                // 产出- 从过滤后的投入中获取个数
+            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputOpIdList.includes(o.operationId)).length
+          }
+
+          return o
+        })
       }
 
       // 获取汇总的数据。

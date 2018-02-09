@@ -1,5 +1,10 @@
 <template>
 	<div class="report">
+		<v-dTable
+			v-if="loading"
+			:dialog-visible="loading"
+			:progress-id="progressId"
+		></v-dTable>
 		<div v-if="sErrorMessage" class="error">
 			{{ sErrorMessage }}
 		</div>
@@ -16,7 +21,7 @@
 				</h2>
 				<transition name="el-zoom-in-top">
 					<div class="content-table inner" ref="summaryTable">
-						<v-table v-show="active.summary" :table-data="reportData.summary" :loading="loading"></v-table>
+						<v-table v-show="active.summary" :table-data="reportData.summary"></v-table>
 					</div>
 				</transition>
 			</div>
@@ -32,7 +37,7 @@
 				</h2>
 				<transition name="el-zoom-in-top">
 					<div class="content-table inner" ref="inStocksTable">
-						<v-table v-show="active.inStocks" :table-data="reportData.inStocks" :loading="loading"></v-table>
+						<v-table v-show="active.inStocks" :table-data="reportData.inStocks"></v-table>
 					</div>
 				</transition>
 			</div>
@@ -51,7 +56,7 @@
 						</span>
 					</h2>
 					<div class="content-table second-table" ref="inMakingTable" key="2" v-if="reportData.inMaking.show">
-						<v-table v-show="active.inMakings" key="2" :table-data="reportData.inMaking" :loading="loading"></v-table>
+						<v-table v-show="active.inMakings" key="2" :table-data="reportData.inMaking"></v-table>
 					</div>
 					<h2 v-show="active.inMakings" key="3" class="inner-title" v-if="reportData.remain.show">
 						<span class='table-title'>滞留中</span>
@@ -61,7 +66,7 @@
 						</span>
 					</h2>
 					<div class="content-table second-table" ref="remainTable" key="4" v-if="reportData.remain.show">
-						<v-table v-show="active.inMakings" :table-data="reportData.remain" :loading="loading"></v-table>
+						<v-table v-show="active.inMakings" :table-data="reportData.remain"></v-table>
 					</div>
 				</transition-group>
 			</div>
@@ -80,7 +85,7 @@
 						</span>
 					</h2>
 					<div class="content-table inner second-table" key="6" ref="outStocksTable" v-if="reportData.outStocks.show">
-						<v-table v-show="active.outStocks" :table-data="reportData.outStocks" :loading="loading"></v-table>
+						<v-table v-show="active.outStocks" :table-data="reportData.outStocks"></v-table>
 					</div>
 					<h2 v-show="active.outStocks" key="7" class="inner-title" v-if="reportData.delivered.show">
 						<span class='table-title'>已发货</span>
@@ -90,7 +95,7 @@
 						</span>
 					</h2>
 					<div class="content-table inner second-table" key="8" ref="deliveredTable" v-if="reportData.delivered.show">
-						<v-table v-show="active.outStocks" :table-data="reportData.delivered" :loading="loading"></v-table>
+						<v-table v-show="active.outStocks" :table-data="reportData.delivered"></v-table>
 					</div>
 				</transition-group>
 			</div>
@@ -106,7 +111,7 @@
 				</h2>
 				<transition name="el-zoom-in-top">
 					<div class="content-table inner" ref="lossTable">
-						<v-table v-show="active.loss" :table-data="reportData.loss" :loading="loading"></v-table>
+						<v-table v-show="active.loss" :table-data="reportData.loss"></v-table>
 					</div>
 				</transition>
 			</div>
@@ -121,10 +126,13 @@ import Blob from 'blob'
 import FileSaver from 'file-saver'
 // import html2canvas from 'html2canvas'
 import rasterizeHTML from 'rasterizehtml'
+import progressTable from 'components/basic/dialogProgressTable.vue'
+import $ from 'jquery'
 
 export default {
   components: {
-    'v-table': table
+    'v-table': table,
+    'v-dTable': progressTable
   },
   props: {
     type: String,
@@ -135,7 +143,8 @@ export default {
       default: function () {
         return ['summary']
       }
-    }
+    },
+    killProgress: Boolean
   },
   data () {
     return {
@@ -641,12 +650,23 @@ export default {
           ],
           data: []
         }
-      }
+      },
+      progressId: new Date().getTime().toString().substr(-5),
+      cancelProgressUrl: window.HOST + '/api/v1/request/kill/'
     }
   },
   watch: {
+// 遏制页面：新建遏制中监听
     $route: function () {
+// 页面重新查询时，设置新进程
+      this.progressId = new Date().getTime().toString().substr(-5)
+      this.loading = false
       this.fetchData()
+    },
+    killProgress () {
+      if (this.killProgress) {
+        this.setProgressEndHandle()
+      }
     }
   },
   created () {
@@ -663,15 +683,42 @@ export default {
       this.setSequence()
     })
   },
-
   methods: {
     // 排序函数。
     setSortFun (oA, oB, paramName) {
       return oA[paramName] - oB[paramName] > 0
     },
+// 关闭进度进程
+    closeProgressDialog () {
+      setTimeout(() => {
+        this.loading = false
+      }, 2000)
+    },
+// 关闭进程
+    setProgressEndHandle () {
+      this.closeProgressDialog()
+      let oLoginInfo = this.$store.state.loginModule
+
+      $.ajax({
+        url: this.cancelProgressUrl + this.progressId,
+        method: 'POST',
+        async: false,
+        crossDomain: true,
+        headers: {
+          Authorization: JSON.stringify({
+            token: oLoginInfo.token,
+            userId: Number(oLoginInfo.userId),
+            username: oLoginInfo.username,
+            nickname: oLoginInfo.nickname,
+            progressId: oLoginInfo.progressId
+          })
+        }
+      })
+    },
     // 请求成功。
     requestSucess (oResult) {
-      this.loading = false
+      // this.loading = false
+      this.closeProgressDialog()
 
       let bSetWidth = false
 
@@ -730,7 +777,8 @@ export default {
     },
     // 请求失败。
     requestFail (sErrorMessage) {
-      this.loading = false
+      // this.loading = false
+      this.closeProgressDialog()
 
       this.sErrorMessage = sErrorMessage
       // this.showMessage();
@@ -741,14 +789,19 @@ export default {
     },
     // 请求错误。
     requestError (err) {
-      this.loading = false
+      // this.loading = false
+      this.closeProgressDialog()
+
       this.sErrorMessage = err
       this.$emit('noData')
       console.log('查询出错。')
     },
     fetchData () {
+// 进入页面时设置页面的进程标记(created,watch)
+      window.Rt.utils.cookie('progressId', this.progressId)
+
       this.sErrorMessage = ''
-      this.loading = true
+      // this.loading = true
 
       let sUrl = ''
 
@@ -808,6 +861,9 @@ export default {
         this.requestFail,
         this.requestError
       )
+
+// 调用进程
+      this.loading = true
     },
     // 设置过滤。
     setFilters (oData) {
@@ -981,7 +1037,7 @@ export default {
               height: auto;
             }
             .condition-table .materialBox .time > span {
-              margin-left: 10px; 
+              margin-left: 10px;
               line-height: 20px;
             }
             .el-table td.is-center, .el-table th.is-center {
@@ -1029,6 +1085,8 @@ export default {
 
 <style lang="less">
 .report {
+	position: relative;
+
   .content-title {
     .icon-excel,
     .icon-print {
@@ -1092,7 +1150,7 @@ export default {
   .table-handle {
     margin-right: 5px;
     i {
-      margin: 5px;
+      margin: 12px 5px 5px;
     }
   }
   .table-table {

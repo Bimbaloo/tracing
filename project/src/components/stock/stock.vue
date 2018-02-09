@@ -11,10 +11,12 @@
             	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
             	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
             </div>
-        </div> 
+        </div>
+        <!-- 遏制数据不需缓存 -->
         <keep-alive>
-		    <router-view></router-view>
+		    <router-view v-if="$route.meta.keepAlive"></router-view>
         </keep-alive>
+        <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
 </template>
 
