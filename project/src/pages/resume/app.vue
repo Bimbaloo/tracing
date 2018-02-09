@@ -2,7 +2,7 @@
 	<div id="app">
 		<a href="" id="downloadImage" v-show="false"></a>
 		<div class="domDown"></div>
-		
+
 		<!-- header 部分-->
 		<v-header ref="headers" v-show="!bFullScreen" :back="'search.html'" :config="true"></v-header>
 		<div class="resume-wraps" v-loading="downLoading" element-loading-text="图片生成中">
@@ -18,22 +18,22 @@
 							<v-button text-data="查询" @query="submitForm('ruleForm')"></v-button>
 						</el-form-item>
 					</el-form>
-					
+
 					<div v-show="!bFullScreen" class="line"></div>
 					<div class="resume-main" :class="{showDiff:sCurrentTab === 'lines' }">
 						<div class="resume-handler" v-show="!bCarousel">
 							<div class="resume-tabs">
-								<v-button 
+								<v-button
 								v-if="!!BOMConfig.switch"
-								:text-data="BOMConfig.name" 
-								tab-data="tables" 
-								:type-data="sBomType"  
+								:text-data="BOMConfig.name"
+								tab-data="tables"
+								:type-data="sBomType"
 								@query="changeTab('tables')"></v-button>
-								<v-button 
+								<v-button
 								v-if="!!timelineConfig.switch"
-								:text-data="timelineConfig.name" 
-								tab-data="lines"  
-								:type-data="sTimeLineType" 
+								:text-data="timelineConfig.name"
+								tab-data="lines"
+								:type-data="sTimeLineType"
 								@query="changeTab('lines')"></v-button>
 							</div>
 							<div class="resume-icons">
@@ -43,24 +43,24 @@
 							</div>
 						</div>
 						<!-- 表格 -->
-						<div 
+						<div
 						v-if="!!BOMConfig.switch"
-						v-show="sCurrentTab === 'tables'" 
-						class="resume-table" 
+						v-show="sCurrentTab === 'tables'"
+						class="resume-table"
 						ref="table">
 							<div class="table-title" v-show="bShowTitle">
 								<span class="title-text">{{ oTitle.materialName }} 产品履历</span>
 								<span class="title-subText">条码: {{ oTitle.barcode }}</span>
 								<span class="title-subText">批次: {{ oTitle.batchNo }}</span>
 							</div>
-							
+
 							<div v-if="oTab.error" :style="{height:oTab.tableHeight+'px'}" class="error">
 								{{ oTab.error }}
 							</div>
 							<el-table
 								v-else
-								class="table-main" 
-								:data="aParsedData" 
+								class="table-main"
+								:data="aParsedData"
 								:height = "oTab.tableHeight"
 								stripe
 								border
@@ -88,26 +88,26 @@
 								</el-table-column>
 							</el-table>
 						</div>
-						
+
 						<!-- 时间轴 -->
-						<div 
+						<div
 							v-if="!!timelineConfig.switch"
 							v-loading="oTab.loading"
 							element-loading-text="拼命加载中"
-							v-show="sCurrentTab === 'lines'" 
-							class="resume-timeLine" 
-							:style="{height: oTab.timelineHeight +'px'}" 
+							v-show="sCurrentTab === 'lines'"
+							class="resume-timeLine"
+							:style="{height: oTab.timelineHeight +'px'}"
 							ref="timeLine">
-							
+
 							<div v-if="oTab.error" class="error">
 								{{ oTab.error }}
 							</div>
 							<div v-else class="time-line-content">
-								<div 
+								<div
 									class="time-line-wrap"
 									v-for="(timeItem, index) in aoTimeLineData"
 									:key="index">
-									
+
 									<div class="line-item">
 										<span class="item-date">{{ timeItem.date }}</span>
 										<div class="item-node" :class="{bigSize:!index}"><v-node :class="{bigSize:!index}" color-type="blue"></v-node></div>
@@ -132,7 +132,7 @@
 							</div>
 						</div>
 					</div>
-					
+
 				</div>
 			</div>
 		</div>
@@ -847,7 +847,7 @@ export default {
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>在
                     <span class="tips">${o.equipmentName || '-'}</span> 设备上
-                    将条码 <span class="tips">${o.barcode || '-'}</span> 
+                    将条码 <span class="tips">${o.barcode || '-'}</span>
                     ${o.batchNo ? `,批次 <span class="tips">${o.batchNo}</span> ` : ''}
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     <span class="tips">${o.opTypeName}</span>
@@ -861,7 +861,7 @@ export default {
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>在
                     <span class="tips">${o.equipmentName || '-'}</span> 设备上
-                    将条码 <span class="tips">${o.barcode || '-'}</span> 
+                    将条码 <span class="tips">${o.barcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     ,工单号<span class="tip">${o.srcDoCode}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
@@ -877,7 +877,7 @@ export default {
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>在
                     <span class="tips">${o.equipmentName || '-'}</span> 设备上
-                    将条码 <span class="tips">${o.srcBarcode || '-'}</span> 
+                    将条码 <span class="tips">${o.srcBarcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     <span class="tips">${o.opTypeName}</span>
@@ -897,7 +897,7 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>
-                    将条码 <span class="tips">${o.srcBarcode || '-'}</span> 
+                    将条码 <span class="tips">${o.srcBarcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     <span class="tips">${o.opTypeName}</span>
@@ -916,7 +916,7 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>
-                    将条码 <span class="tips">${o.srcBarcode || '-'}</span> 
+                    将条码 <span class="tips">${o.srcBarcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     ${o.quantity}件
@@ -929,7 +929,7 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>
-                    将条码 <span class="tips">${o.srcBarcode || '-'}</span> 
+                    将条码 <span class="tips">${o.srcBarcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     ${o.quantity}件
@@ -941,7 +941,7 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>
-                    将条码 <span class="tips">${o.barcode || '-'}</span> 
+                    将条码 <span class="tips">${o.barcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的容器添加物料<span class="tips">${o.materialName || '-'}</span>,
                     ${o.quantity}件
@@ -953,7 +953,7 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>
-                    修改条码 <span class="tips">${o.barcode || '-'}</span> 
+                    修改条码 <span class="tips">${o.barcode || '-'}</span>
                     的生效时间为 <span class="tips">${o.effectiveTime || '-'}</span>,
                     失效时间为<span class="tips">${o.expiryTime || '-'}</span>
                   </div>`
@@ -970,8 +970,8 @@ export default {
                     的物料<span class="tips">${o.materialName || '-'}</span>
                     ${o.quantity}件,
                     <span class="tips">${o.stockTypeName}</span>到
-                    <span class="tips">${o.warehouse}</span>仓库
-                    <span class="tips">${o.reservoir}</span>库位
+                    <span class="tips">${o.warehouse || '-'}</span>仓库
+                    <span class="tips">${o.reservoir || '-'}</span>库位
                   </div>`
 
           break
@@ -980,8 +980,8 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>将
-                    <span class="tips">${o.warehouse}</span>仓库
-                    <span class="tips">${o.reservoir}</span>库位
+                    <span class="tips">${o.warehouse || '-'}</span>仓库
+                    <span class="tips">${o.reservoir || '-'}</span>库位
                     条码 <span class="tips">${o.barcode || '-'}</span>,
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     的<span class="tips">${o.materialName || '-'}</span>物料
@@ -996,14 +996,14 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>将
-                    <span class="tips">${o.srcWarehouse}</span>仓库
-                    <span class="tips">${o.srcReservoir}</span>库位
+                    <span class="tips">${o.srcWarehouse || '-'}</span>仓库
+                    <span class="tips">${o.srcReservoir || '-'}</span>库位
                     条码 <span class="tips">${o.barcode || '-'}</span>,
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     的<span class="tips">${o.materialName || '-'}</span>物料
                     ${o.quantity}件,转储到
-                    <span class="tips">${o.warehouse}</span>仓库
-                    <span class="tips">${o.reservoir}</span>库位
+                    <span class="tips">${o.warehouse || '-'}</span>仓库
+                    <span class="tips">${o.reservoir || '-'}</span>库位
                   </div>`
 
           break
@@ -1012,8 +1012,8 @@ export default {
           sDom = `<div class="item-type">${o.opTypeName}:</div>
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>将
-                    <span class="tips">${o.srcWarehouse}</span>仓库
-                    <span class="tips">${o.srcReservoir}</span>库位
+                    <span class="tips">${o.srcWarehouse || '-'}</span>仓库
+                    <span class="tips">${o.srcReservoir || '-'}</span>库位
                     条码 <span class="tips">${o.srcBarcode || '-'}</span>,
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     的<span class="tips">${o.materialName || '-'}</span>物料
@@ -1475,7 +1475,7 @@ export default {
   }
 }
 </script>
-    					
+
 <style lang="less">
 @green: #42af8f; /*主题色*/
 /* 时间轴颜色 */

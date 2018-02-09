@@ -1593,12 +1593,15 @@ export default {
             )
           }
         }
+
         // 投产表中数据修改，产出对应的投入的个数改变了。
-        oAll['unite'].dataFilter = oAll['unite'].dataFilter.map(o => {
+        oAll['unite'].dataFilter = oAll['unite'].dataFilter.map(o1 => {
+          let o = Object.assign({}, o1)
+
             // 修改产出的hasInLen字段
-          if (o.hasInLen !== undefined) {
+          if (o1.hasInLen !== undefined) {
                 // 产出- 从过滤后的投入中获取个数
-            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputOpIdList.includes(o.operationId)).length
+            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputOpIdList.includes(o1.operationId)).length
           }
 
           return o
