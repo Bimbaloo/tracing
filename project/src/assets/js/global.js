@@ -95,8 +95,8 @@
      * # }
      * @return {void}
      */
-    exportJson2Excel: function (XLSX, Blob, FileSaver, oTableData) {
-      let aoTableJson = this.parseTableData(oTableData)
+    exportJson2Excel: function (XLSX, Blob, FileSaver, oTableData, type) {
+      let aoTableJson = this.parseTableData(oTableData, type)
 
       if (!aoTableJson.length) {
         return
@@ -138,8 +138,8 @@
      * # }
      * @return {void}
      */
-    exportMergeTable2Excel: function (XLSX, Blob, FileSaver, oTableData, oElement) {
-      let aoTableJson = this.parseTableData(oTableData)
+    exportMergeTable2Excel: function (XLSX, Blob, FileSaver, oTableData, oElement, type) {
+      let aoTableJson = this.parseTableData(oTableData, type)
 
       if (!aoTableJson.length) {
         return
@@ -172,8 +172,8 @@
      * @param{Object} oTableData
      * @return{Array}
      */
-    parseTableData: function (oTableData) {
-      let oData = Object.assign({}, oTableData)
+    parseTableData: function (oTableData, type) {
+      let oData = Object.assign({}, type === 'ag-table' ? this.changeTableToAgTable(oTableData) : oTableData)
 
       let aoTableJson = []
 
@@ -209,12 +209,11 @@
                   break
               }
             } else if (col.formatter) {
-              sValue = col.formatter(o)
+              sValue = type === 'ag-table' ? col.formatter({data: o}) : col.formatter(o)
             } else {
               sValue = o[col.prop]
             }
             oNewData[col.name] = sValue
-            // oNewData[col.name] = o[col.prop]==undefined ? (col.type==='number' ? 0 : '') :(col.formatter ? col.formatter(o) : o[col.prop]);
           })
 
           aoTableJson.push(oNewData)
@@ -231,6 +230,20 @@
       }
 
       return aoTableJson
+    },
+    // 修改ag-table-> table的格式
+    changeTableToAgTable (oTableData) {
+        // 修改columns
+      if (oTableData.columns && oTableData.columns.length) {
+        oTableData.columns = oTableData.columns.map(o => {
+          return Object.assign({}, o, {
+            prop: o.field,
+            name: o.headerName,
+            formatter: o.valueFormatter
+          })
+        })
+      }
+      return oTableData
     },
     /**
      * 导出Table为excel。依赖xlsx、blob、file-saver。

@@ -7,7 +7,7 @@
         </div>
         <div class="router-path">
             <span class="path-item">{{routerName}}</span>
-        </div> 
+        </div>
 		<div class="router-content">
 			<div class="innner-content" >
 				<div class="content-message tableData">
@@ -16,19 +16,25 @@
 					</span>
 					<span class='table-handle'>
 						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
-						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
+						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('rawTable', materialData, $event)"></i>
 					</span>
 				</div>
-				<div class="content-table" ref="rawTable"> 
-					<v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table>
-				</div>
+				<div class="content-table" ref="rawTable">
+					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
+                    <v-agtable
+                      :table-data="materialData"
+                      :heights="tableHeight"
+                      :loading="loading"
+                    ></v-agtable>
+                </div>
 			</div>
-    	</div>      
+    	</div>
     </div>
 </template>
 
 <script>
 import table from 'components/basic/table.vue'
+import agTable from 'components/basic/ag-table.vue'
 import XLSX from 'xlsx'
 import Blob from 'blob'
 import FileSaver from 'file-saver'
@@ -64,172 +70,172 @@ export default {
         205: [
           {
             // 条码绑定
-            prop: 'opType',
-            name: '动作类型',
-            formatter: function (row) {
-              return row.opType === '205' ? '绑定' : '解绑'
+            field: 'opType',
+            headerName: '动作类型',
+            valueFormatter: function (params) {
+              return params.data.opType === 205 ? '绑定' : '解绑'
             }
           },
           {
-            prop: 'barcode',
-            name: '子条码',
+            field: 'barcode',
+            headerName: '子条码',
             width: 200
           },
           {
-            prop: 'parentBarcode',
-            name: '父条码'
+            field: 'parentBarcode',
+            headerName: '父条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间',
+            field: 'operationTime',
+            headerName: '时间',
             width: 200
           }
         ],
         206: [
           {
             // 条码解绑
-            prop: 'opType',
-            name: '动作类型',
-            formatter: function (row) {
-              return row.opType === '205' ? '绑定' : '解绑'
+            field: 'opType',
+            headerName: '动作类型',
+            valueFormatter: function (params) {
+              return params.data.opType === 205 ? '绑定' : '解绑'
             }
           },
           {
-            prop: 'barcode',
-            name: '子条码',
+            field: 'barcode',
+            headerName: '子条码',
             width: 200
           },
           {
-            prop: 'parentBarcode',
-            name: '父条码'
+            field: 'parentBarcode',
+            headerName: '父条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间',
+            field: 'operationTime',
+            headerName: '时间',
             width: 200
           }
         ],
         202: [
           {
             // 容器清空
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'effectiveTime',
-            name: '生效时间',
+            field: 'effectiveTime',
+            headerName: '生效时间',
             width: 200
           },
           {
-            prop: 'expiryTime',
-            name: '失效时间',
+            field: 'expiryTime',
+            headerName: '失效时间',
             width: 200
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间',
+            field: 'operationTime',
+            headerName: '时间',
             width: 200
           }
         ],
         203: [
           {
             // 补料
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'effectiveTime',
-            name: '生效时间',
+            field: 'effectiveTime',
+            headerName: '生效时间',
             width: 200
           },
           {
-            prop: 'expiryTime',
-            name: '失效时间',
+            field: 'expiryTime',
+            headerName: '失效时间',
             width: 200
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间',
+            field: 'operationTime',
+            headerName: '时间',
             width: 120
           }
         ]
@@ -238,7 +244,8 @@ export default {
     }
   },
   components: {
-    'v-table': table
+    'v-table': table,
+    'v-agtable': agTable
   },
   computed: {
     // 物料编码
@@ -384,13 +391,14 @@ export default {
     },
     // 表格导出。
     exportExcelHandle (sTable, oTableData, event) {
-      window.Rt.utils.exportMergeTable2Excel(
-        XLSX,
-        Blob,
-        FileSaver,
-        oTableData,
-        this.$refs[sTable]
-      )
+      // window.Rt.utils.exportMergeTable2Excel(
+      //   XLSX,
+      //   Blob,
+      //   FileSaver,
+      //   oTableData,
+      //   this.$refs[sTable]
+      // )
+      window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oTableData, 'ag-table')
     },
     // 表格打印。
     printHandle (refTable, event) {
@@ -455,7 +463,89 @@ export default {
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
     },
+    // ag-table打印
+    printAgTableHandle (refTable, oData, event) {
+      let oTable = this.$refs[refTable]
 
+      if (!oTable) {
+        return false
+      }
+
+      let nWidth = document.body.clientWidth
+
+      let sHeaderHtml = '<thead><tr>'
+
+      oData.columns.forEach(o => {
+        sHeaderHtml += `<th class="is-center"><div class="cell">${o.headerName}</div></th>`
+      })
+
+      sHeaderHtml += '</tr></thead>'
+
+      // 表格内容
+      let sBodyHtml = '<tbody>'
+      oData.data.forEach(oRow => {
+        sBodyHtml += `<tr class="el-table__row table-item">`
+
+        oData.columns.forEach(oCol => {
+          sBodyHtml += `<td class="is-center"><div class="cell"><div class="cell-content">${oCol.valueFormatter ? oCol.valueFormatter({data: oRow}) : oRow[oCol.field]}</div></div></td>`
+        })
+        sBodyHtml += '</tr>'
+      })
+      sBodyHtml += '</tbody>'
+
+      // 不存在数据时
+      let sEmpty = ''
+
+      if (!oData.data.length) {
+        sEmpty = `<div class="el-table__empty-block" width=${nWidth}><span class="el-table__empty-text">暂无数据</span></div>`
+      }
+
+      let sHtml = `
+                <div class="table el-table">
+                    <table cellspacing="0" cellpadding="0" border="0" width=${nWidth}>
+                        ${sHeaderHtml}
+                        ${sBodyHtml}
+                    </table>
+                    ${sEmpty}
+                </div>
+                <style>
+                    .el-table td.is-center, .el-table th.is-center {
+                        text-align: center;
+                    }
+                    .el-table td.is-left, .el-table th.is-left {
+                        text-align: left;
+                    }
+                    .table thead th {
+                        height: 36px;
+                        background-color: #42af8f;
+                    }
+                    .table thead th .cell {
+                        color: #fff;
+                    }
+                    .table tbody tr:nth-child(even) {
+                        background-color: #fafafa;
+                    }
+                    .table tbody tr:nth-child(odd) {
+                        background-color: #fff;
+                    }
+                    .table tbody td {
+                        white-space: normal;
+                        word-break: break-all;
+                    }
+                    .table tbody .cell {
+                        min-height: 30px;
+                        line-height: 30px;
+                        // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+                        //border: 1px solid #e4efec;
+                        box-sizing: border-box;
+                    }
+                    .el-table__empty-block {
+                        text-align: center;
+                    }
+                </style>
+            `
+      window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
+    },
     /* 获取元素实际高度(含margin) */
     outerHeight (el) {
       var height = el.offsetHeight
