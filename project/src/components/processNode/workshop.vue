@@ -7,7 +7,7 @@
         </div>
         <div class="router-path">
             <span class="path-item">{{routerName}}</span>
-        </div> 
+        </div>
 		<div class="router-content">
 			<div class="innner-content" >
 				<div class="content-message tableData">
@@ -16,19 +16,25 @@
 					</span>
 					<span class='table-handle'>
 						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
-						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
+						<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle('rawTable', materialData, $event)"></i>
 					</span>
 				</div>
-				<div class="content-table" ref="rawTable"> 
-					<v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table>
-				</div>
+				<div class="content-table" ref="rawTable">
+					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
+                    <v-agtable
+                      :table-data="materialData"
+                      :heights="tableHeight"
+                      :loading="loading"
+                    ></v-agtable>
+                </div>
 			</div>
-    	</div>      
+    	</div>
     </div>
 </template>
 
 <script>
 import table from 'components/basic/table.vue'
+import agTable from 'components/basic/ag-table.vue'
 import XLSX from 'xlsx'
 import Blob from 'blob'
 import FileSaver from 'file-saver'
@@ -70,288 +76,288 @@ export default {
       allColumns: {
         2: [
           {
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'srcDoCode',
-            name: '源工单'
+            field: 'srcDoCode',
+            headerName: '源工单'
           },
           {
-            prop: 'destDoCode',
-            name: '目标工单'
+            field: 'destDoCode',
+            headerName: '目标工单'
           },
           {
-            prop: 'equipmentName',
-            name: '设备名称'
+            field: 'equipmentName',
+            headerName: '设备名称'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ],
         7: [
           {
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'srcDoCode',
-            name: '源工单'
+            field: 'srcDoCode',
+            headerName: '源工单'
           },
           {
-            prop: 'destDoCode',
-            name: '目标工单'
+            field: 'destDoCode',
+            headerName: '目标工单'
           },
           {
-            prop: 'equipmentName',
-            name: '设备名称'
+            field: 'equipmentName',
+            headerName: '设备名称'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ],
         8: [
           {
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'doCode',
-            name: '工单'
+            field: 'doCode',
+            headerName: '工单'
           },
           {
-            prop: 'equipmentName',
-            name: '设备'
+            field: 'equipmentName',
+            headerName: '设备'
           },
           {
-            prop: 'failReason',
-            name: '退料原因'
+            field: 'failReason',
+            headerName: '退料原因'
           },
           {
-            prop: 'personName',
-            name: '操作人'
+            field: 'personName',
+            headerName: '操作人'
           },
           {
-            prop: 'happenTime',
-            name: '时间'
+            field: 'happenTime',
+            headerName: '时间'
           }
         ],
         11: [
           {
-            prop: 'srcBarcode',
-            name: '源条码'
+            field: 'srcBarcode',
+            headerName: '源条码'
           },
           {
-            prop: 'destBarcode',
-            name: '目标条码'
+            field: 'destBarcode',
+            headerName: '目标条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '调整数量'
+            field: 'quantity',
+            headerName: '调整数量'
           },
           {
-            prop: 'srcQuantity',
-            name: '源条码调整后数量'
+            field: 'srcQuantity',
+            headerName: '源条码调整后数量'
           },
           {
-            prop: 'destQuantity',
-            name: '目标条码调整后数量'
+            field: 'destQuantity',
+            headerName: '目标条码调整后数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ],
         14: [
           {
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'srcWarehouse',
-            name: '仓库'
+            field: 'srcWarehouse',
+            headerName: '仓库'
           },
           {
-            prop: 'destWarehouse',
-            name: '库位'
+            field: 'destWarehouse',
+            headerName: '库位'
           },
           {
-            prop: 'destReservoir',
-            name: '数量'
+            field: 'destReservoir',
+            headerName: '数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'vendorName',
-            name: '时间'
+            field: 'vendorName',
+            headerName: '时间'
           }
         ],
         15: [
           {
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'srcWarehouse',
-            name: '仓库'
+            field: 'srcWarehouse',
+            headerName: '仓库'
           },
           {
-            prop: 'destWarehouse',
-            name: '库位'
+            field: 'destWarehouse',
+            headerName: '库位'
           },
           {
-            prop: 'destReservoir',
-            name: '数量'
+            field: 'destReservoir',
+            headerName: '数量'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'vendorName',
-            name: '时间'
+            field: 'vendorName',
+            headerName: '时间'
           }
         ],
         10002: [
           {
-            prop: 'barcode',
-            name: '条码'
+            field: 'barcode',
+            headerName: '条码'
           },
           {
-            prop: 'batchNo',
-            name: '批次'
+            field: 'batchNo',
+            headerName: '批次'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
+            field: 'materialName',
+            headerName: '物料名称'
           },
           {
-            prop: 'materialCode',
-            name: '物料编码'
+            field: 'materialCode',
+            headerName: '物料编码'
           },
           {
-            prop: 'quantity',
-            name: '数量'
+            field: 'quantity',
+            headerName: '数量'
           },
           {
-            prop: 'srcDoCode',
-            name: '源工单'
+            field: 'srcDoCode',
+            headerName: '源工单'
           },
           {
-            prop: 'destDoCode',
-            name: '目标工单'
+            field: 'destDoCode',
+            headerName: '目标工单'
           },
           {
-            prop: 'equipmentName',
-            name: '设备名称'
+            field: 'equipmentName',
+            headerName: '设备名称'
           },
           {
-            prop: 'operatorName',
-            name: '操作人'
+            field: 'operatorName',
+            headerName: '操作人'
           },
           {
-            prop: 'operationTime',
-            name: '时间'
+            field: 'operationTime',
+            headerName: '时间'
           }
         ]
       },
@@ -359,7 +365,8 @@ export default {
     }
   },
   components: {
-    'v-table': table
+    'v-table': table,
+    'v-agtable': agTable
   },
   computed: {
     // 物料编码
@@ -552,13 +559,14 @@ export default {
     },
     // 表格导出。
     exportExcelHandle (sTable, oTableData, event) {
-      window.Rt.utils.exportMergeTable2Excel(
-        XLSX,
-        Blob,
-        FileSaver,
-        oTableData,
-        this.$refs[sTable]
-      )
+      // window.Rt.utils.exportMergeTable2Excel(
+      //   XLSX,
+      //   Blob,
+      //   FileSaver,
+      //   oTableData,
+      //   this.$refs[sTable]
+      // )
+      window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oTableData, 'ag-table')
     },
     // 表格打印。
     printHandle (refTable, event) {
@@ -623,7 +631,89 @@ export default {
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
     },
+    // ag-table打印
+    printAgTableHandle (refTable, oData, event) {
+      let oTable = this.$refs[refTable]
 
+      if (!oTable) {
+        return false
+      }
+
+      let nWidth = document.body.clientWidth
+
+      let sHeaderHtml = '<thead><tr>'
+
+      oData.columns.forEach(o => {
+        sHeaderHtml += `<th class="is-center"><div class="cell">${o.headerName}</div></th>`
+      })
+
+      sHeaderHtml += '</tr></thead>'
+
+      // 表格内容
+      let sBodyHtml = '<tbody>'
+      oData.data.forEach(oRow => {
+        sBodyHtml += `<tr class="el-table__row table-item">`
+
+        oData.columns.forEach(oCol => {
+          sBodyHtml += `<td class="is-center"><div class="cell"><div class="cell-content">${oCol.valueFormatter ? oCol.valueFormatter({data: oRow}) : oRow[oCol.field]}</div></div></td>`
+        })
+        sBodyHtml += '</tr>'
+      })
+      sBodyHtml += '</tbody>'
+
+      // 不存在数据时
+      let sEmpty = ''
+
+      if (!oData.data.length) {
+        sEmpty = `<div class="el-table__empty-block" width=${nWidth}><span class="el-table__empty-text">暂无数据</span></div>`
+      }
+
+      let sHtml = `
+                <div class="table el-table">
+                    <table cellspacing="0" cellpadding="0" border="0" width=${nWidth}>
+                        ${sHeaderHtml}
+                        ${sBodyHtml}
+                    </table>
+                    ${sEmpty}
+                </div>
+                <style>
+                    .el-table td.is-center, .el-table th.is-center {
+                        text-align: center;
+                    }
+                    .el-table td.is-left, .el-table th.is-left {
+                        text-align: left;
+                    }
+                    .table thead th {
+                        height: 36px;
+                        background-color: #42af8f;
+                    }
+                    .table thead th .cell {
+                        color: #fff;
+                    }
+                    .table tbody tr:nth-child(even) {
+                        background-color: #fafafa;
+                    }
+                    .table tbody tr:nth-child(odd) {
+                        background-color: #fff;
+                    }
+                    .table tbody td {
+                        white-space: normal;
+                        word-break: break-all;
+                    }
+                    .table tbody .cell {
+                        min-height: 30px;
+                        line-height: 30px;
+                        // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+                        //border: 1px solid #e4efec;
+                        box-sizing: border-box;
+                    }
+                    .el-table__empty-block {
+                        text-align: center;
+                    }
+                </style>
+            `
+      window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
+    },
     /* 获取元素实际高度(含margin) */
     outerHeight (el) {
       var height = el.offsetHeight
