@@ -1,4 +1,4 @@
-<!--设备分析路由-->
+<!--设备分析路由--><!--投产表/设备分析-->
 <template>
     <div class="material-stock" ref="stock">
         <div class="view-icon" v-if="!bRestrain">

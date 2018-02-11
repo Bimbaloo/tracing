@@ -1,26 +1,25 @@
 <template>
 	<el-dialog class="transfer-dialog" title="条件组合" :visible.sync="dialogVisable" :close-on-click-modal="false" :before-close="closeModal">
-        <el-form label-position="left" label-width="60px" :model="ruleForm" :rules="rules" ref="ruleForm">
-        	<el-form-item label="名称" prop="name">
-			    <el-input v-model="titleName" placeholder="请输入条件组合名称"></el-input>
-					<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
-			</el-form-item>
+    <el-form label-position="left" label-width="60px" :model="ruleForm" :rules="rules" ref="ruleForm">
+      <el-form-item label="名称" prop="name">
+      <el-input v-model="titleName" placeholder="请输入条件组合名称"></el-input>
+      <input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
+    </el-form-item>
 			
-			<el-form-item prop="value">
-				<el-transfer
-		                v-model="aCheckedParam"
-		                :titles="['所有条件', '选择条件']"
-		                :button-texts="['', '']"
-		                :format="{
-		                  noChecked: '0/${total}',
-		                  hasChecked: '${checked}/${total}'
-		                }"
-		                @change="handleChange"
-		                :data="transferData">
-		        </el-transfer>
-			</el-form-item>
-        </el-form>
-        
+    <el-form-item prop="value">
+      <el-transfer
+        v-model="aCheckedParam"
+        :titles="['所有条件', '选择条件']"
+        :button-texts="['', '']"
+        :format="{
+          noChecked: '0/${total}',
+          hasChecked: '${checked}/${total}'
+        }"
+        @change="handleChange"
+        :data="transferData">
+      </el-transfer>
+    </el-form-item>
+  </el-form>
         <!--<el-transfer
                 v-model="aCheckedParam"
                 :titles="['所有条件', '选择条件']"
@@ -31,13 +30,12 @@
                 }"
                 @change="handleChange"
                 :data="transferData">
-        </el-transfer>-->
-        
-        <div slot="footer" class="dialog-footer">
-            <el-button @click="closeModal" size="small">取 消</el-button>
-            <el-button type="primary" @click="okModal('ruleForm')" size="small">确 定</el-button>
-        </div>
-    </el-dialog>
+        </el-transfer>--> 
+    <div slot="footer" class="dialog-footer">
+        <el-button @click="closeModal" size="small">取 消</el-button>
+        <el-button type="primary" @click="okModal('ruleForm')" size="small">确 定</el-button>
+    </div>
+  </el-dialog>
 </template>
 
 <script>
@@ -214,7 +212,7 @@ export default {
 <style lang="less">
 .transfer-dialog {
   .el-dialog {
-    width: 860px;
+    width: 900px;
 
     .el-form {
       margin: 0 30px;

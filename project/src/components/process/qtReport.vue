@@ -1,3 +1,4 @@
+<!--质检-->
 <template>
     <div class="router-content">
         <div class="innner-content" :style="styleObject">
@@ -16,7 +17,7 @@
                 </span>
             </h2>
             <div class="content-table" ref="qtTable">
-                <v-table :table-data="tableData" :heights="tableData.height" :loading="loading" :resize="tdResize"></v-table>
+                <v-table :table-data="tableData" :heights="tableHeight" :loading="loading" :resize="tdResize"></v-table>
             </div>
 
         </div>
@@ -138,7 +139,7 @@ export default {
         height: 1,
         data: []
       },
-
+      tableHeight: 1,
       routerContent: 0
     }
   },
@@ -158,7 +159,9 @@ export default {
   },
   mounted () {
     this.routerContent = document.querySelectorAll('.el-tabs')[0].offsetHeight // 获取初始高度
-    this.tableData.height = this.adjustHeight()
+    this.$nextTick(() => {
+      this.tableHeight = this.adjustHeight()
+    })
   },
   updated () {},
   watch: {
@@ -392,7 +395,9 @@ export default {
         this.routerContent = document.querySelectorAll(
           '.el-tabs'
         )[0].offsetHeight // 获取初始高度
-        this.tableData.height = this.adjustHeight()
+        this.$nextTick(() => {
+          this.tableHeight = this.adjustHeight()
+        })
       }
     },
     /* 设置title */

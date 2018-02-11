@@ -704,11 +704,23 @@ body {
         position: relative;
         height: 50px;
         .material-stock {
-          .suspicious {
+          &>.suspicious {
             position: static;
-            .btn-restrain {
+            &>.btn-restrain {
               right: 40px;
               top: 10px;
+            }
+          }
+          .el-tabs {
+            .el-tabs__content {
+              .el-tab-pane {
+                .suspicious {
+                  .btn-restrain {
+                    right: 0px;
+                    top: 70px;
+                  }
+                }
+              }
             }
           }
         }

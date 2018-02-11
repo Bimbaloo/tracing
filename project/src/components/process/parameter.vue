@@ -1,3 +1,4 @@
+<!--工艺参数-->
 <template>
     <div class="router-content" id="parameter">
         <div class="inner-content" :style="styleObject">
