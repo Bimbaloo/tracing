@@ -347,8 +347,8 @@ export default {
         bCreated: false,
         loading: false,
         error: '',
-        tableHeight: '',
-        timelineHeight: ''
+        tableHeight: 500,
+        timelineHeight: 500
       },
       // 规则。
       rules: {
@@ -509,7 +509,9 @@ export default {
     // 获取数据。
     getPageData () {
       // 设置内容的高度。
-      this.getHeight()
+      this.$nextTick(() => {
+        this.getHeight()
+      })
       // 获取数据。-- 根据当前显示的tab创建数据。
       this.oTab.loading = true
       // 设置barcode。
@@ -851,7 +853,7 @@ export default {
                     ${o.batchNo ? `,批次 <span class="tips">${o.batchNo}</span> ` : ''}
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     <span class="tips">${o.opTypeName}</span>
-                    ${o.quantity}件
+                    ${o.quantity || '-'}件
                   </div>`
 
           break
@@ -863,11 +865,11 @@ export default {
                     <span class="tips">${o.equipmentName || '-'}</span> 设备上
                     将条码 <span class="tips">${o.barcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
-                    ,工单号<span class="tip">${o.srcDoCode}</span>
+                    ,工单号<span class="tip">${o.srcDoCode || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     <span class="tips">${o.opTypeName}</span>
-                    ${o.quantity}件
-                    到工单号<span class="tips">${o.doCode}</span>
+                    ${o.quantity || '-'}件
+                    到工单号<span class="tips">${o.doCode || '-'}</span>
                   </div>`
 
           break
@@ -881,10 +883,10 @@ export default {
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     <span class="tips">${o.opTypeName}</span>
-                    ${o.quantity}件
+                    ${o.quantity || '-'}件
                     ${
                       o.srcBarcode !== o.barcode
-                      ? ` 到新条码<span class="tips">${o.barcode}</span> `
+                      ? ` 到新条码<span class="tips">${o.barcode || '-'}</span> `
                       : ''
                     }
                   </div>`
@@ -904,7 +906,7 @@ export default {
                     ${o.quantity}件
                     ${
                       o.srcBarcode !== o.barcode
-                      ? ` 到新条码<span class="tips">${o.barcode}</span> `
+                      ? ` 到新条码<span class="tips">${o.barcode || '-'}</span> `
                       : ''
                     }
                   </div>`
@@ -919,8 +921,8 @@ export default {
                     将条码 <span class="tips">${o.srcBarcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
-                    ${o.quantity}件
-                    绑定到容器条码<span class="tips">${o.barcode}</span>
+                    ${o.quantity || '-'}件
+                    绑定到容器条码<span class="tips">${o.barcode || '-'}</span>
                   </div>`
 
           break
@@ -932,8 +934,8 @@ export default {
                     将条码 <span class="tips">${o.srcBarcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
-                    ${o.quantity}件
-                    与容器条码<span class="tips">${o.barcode}</span>解绑
+                    ${o.quantity || '-'}件
+                    与容器条码<span class="tips">${o.barcode || '-'}</span>解绑
                   </div>`
           break
         // 补料
@@ -944,7 +946,7 @@ export default {
                     将条码 <span class="tips">${o.barcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的容器添加物料<span class="tips">${o.materialName || '-'}</span>,
-                    ${o.quantity}件
+                    ${o.quantity || '-'}件
                   </div>`
 
           break
@@ -968,8 +970,8 @@ export default {
                     条码 <span class="tips">${o.barcode || '-'}</span>,
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     的物料<span class="tips">${o.materialName || '-'}</span>
-                    ${o.quantity}件,
-                    <span class="tips">${o.stockTypeName}</span>到
+                    ${o.quantity || '-'}件,
+                    <span class="tips">${o.stockTypeName || '-'}</span>到
                     <span class="tips">${o.warehouse || '-'}</span>仓库
                     <span class="tips">${o.reservoir || '-'}</span>库位
                   </div>`
@@ -985,9 +987,9 @@ export default {
                     条码 <span class="tips">${o.barcode || '-'}</span>,
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     的<span class="tips">${o.materialName || '-'}</span>物料
-                    ${o.quantity}件,
-                    <span class="tips">${o.stockTypeName}</span>
-                    给联系人<span class="tips">${o.contactName}</span>
+                    ${o.quantity || '-'}件,
+                    <span class="tips">${o.stockTypeName || '-'}</span>
+                    给联系人<span class="tips">${o.contactName || '-'}</span>
                   </div>`
 
           break
@@ -1001,7 +1003,7 @@ export default {
                     条码 <span class="tips">${o.barcode || '-'}</span>,
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     的<span class="tips">${o.materialName || '-'}</span>物料
-                    ${o.quantity}件,转储到
+                    ${o.quantity || '-'}件,转储到
                     <span class="tips">${o.warehouse || '-'}</span>仓库
                     <span class="tips">${o.reservoir || '-'}</span>库位
                   </div>`
@@ -1017,8 +1019,8 @@ export default {
                     条码 <span class="tips">${o.srcBarcode || '-'}</span>,
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     的<span class="tips">${o.materialName || '-'}</span>物料
-                    ${o.quantity}件,调整到新条码
-                    <span class="tips">${o.barcode}</span>
+                    ${o.quantity || '-'}件,调整到新条码
+                    <span class="tips">${o.barcode || '-'}</span>
                   </div>`
 
           break
@@ -1030,9 +1032,9 @@ export default {
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     ,在<span class="tips">${o.equipmentName || '-'}</span>上产出
                     的<span class="tips">${o.materialName || '-'}</span>物料
-                    ${o.quantity}件进行
-                    <span class="tips">${o.opTypeName}</span>
-                    ,结果为<span class="tips">${o.checkResult}</span>
+                    ${o.quantity || '-'}件进行
+                    <span class="tips">${o.opTypeName || '-'}</span>
+                    ,结果为<span class="tips">${o.checkResult || '-'}</span>
                   </div>`
 
           break
@@ -1044,8 +1046,8 @@ export default {
                     批次<span class="tips">${o.batchNo || '-'}</span>
                     ,在<span class="tips">${o.equipmentName || '-'}</span>上产出
                     的<span class="tips">${o.materialName || '-'}</span>物料进行
-                    <span class="tips">${o.opTypeName}</span>
-                    ,结果为<span class="tips">${o.checkResult}</span>
+                    <span class="tips">${o.opTypeName || '-'}</span>
+                    ,结果为<span class="tips">${o.checkResult || '-'}</span>
                   </div>`
 
           break
