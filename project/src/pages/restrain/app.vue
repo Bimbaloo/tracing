@@ -33,7 +33,7 @@
 import header from 'components/header/header.vue'
 import panel from 'components/panel/panel.vue'
 import dialog from 'components/basic/dialogBarcode.vue'
-// import fnP from 'assets/js/public.js'
+import fnP from 'assets/js/public.js'
 import categoriesArr from 'assets/js/restrain.js'
 
 const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
@@ -147,8 +147,13 @@ export default {
     },
     // 设置tab数据。
     setCategories (oData, oResult) {
-      this.categories = categoriesArr
-
+      // this.categories = categoriesArr
+      this.categories = fnP
+        .parseData(oResult)
+        .filter(
+          o => o.key === 'suppress'
+        )
+      this.categories.push(categoriesArr[1])
       this.categories.forEach(o => {
         if (oData && oData.tab === o.key) {
           o.active = oData
@@ -442,7 +447,7 @@ body {
           right: 20px;
         }
         .suspicious {
-          .btn-restrain {  
+          .btn-restrain {
             width: 0;
             height: 0;
             display: none;
@@ -493,13 +498,13 @@ body {
 	.dialog-barcode-wrap,
 	.dialog-wrap {
 		.el-dialog {
-			.el-dialog__body {    
+			.el-dialog__body {
 				padding: 30px 20px;
 				color: rgb(72, 106, 101);
 				font-size: 14px;
 			}
 		}
-	} 
+	}
 }
 
 .panel-title {
@@ -567,7 +572,7 @@ body {
   // .form-button {
   //   margin-top: 80px;
 	// }
-	
+
 }
 </style>
 
