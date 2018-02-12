@@ -27,11 +27,11 @@ export default {
   },
   data () {
     return {
-      isRestrained: true,
+      isRestrained: window.location.hash.includes('/suppress/1'),
       doDescription: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
       styleObject: {
-        'min-width': '1000px'
+        'max-width': '1000px'
       },
       equipmentName: '',
       killProgress: false
@@ -57,7 +57,7 @@ export default {
       if (this.$route.meta.title === 'restrain') {
         this.equipmentName = this.oQuery.equipmentName
       }
-      this.isRestrained = true
+      this.isRestrained = window.location.hash.includes('/suppress/1')
       this.killProgress = false
     }
   },
@@ -128,7 +128,7 @@ export default {
       })
     },
     setWidth () {
-      this.styleObject.minWidth = '1000px'
+      this.styleObject.maxWidth = '1000px'
     },
     removeWidth () {
       this.styleObject.minWidth = 0

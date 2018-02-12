@@ -37,7 +37,7 @@ export default {
       doDescription: '',
       url: window.HOST + '/api/v1/suppress/do-by-mold', // 根据模号
       styleObject: {
-        'min-width': '1000px'
+        'max-width': '1000px'
       },
       // 模具记录信息
       moldInfo: {
@@ -306,7 +306,7 @@ export default {
       })
     },
     setWidth () {
-      this.styleObject.minWidth = '1000px'
+      this.styleObject.maxWidth = '1000px'
     },
     removeWidth () {
       this.styleObject.minWidth = 0
