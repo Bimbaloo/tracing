@@ -89,17 +89,12 @@ var judgeLoaderHandler = function (param, fnSu, fnFail) {
   if (!bRight) {
     // 调用成功后的回调函数。
     fnSu && fnSu()
+  } else if (bRight === 10) {
+    // 清cookie，跳转到登录页面。
+    loginFail(param.data.errorMsg.subMsg)
   } else {
-    if (bRight === 10) {
-      // 登录失败。
-      if (param.data.errorMsg.subCode === 1) {
-        // 清cookie，跳转到登录页面。
-        loginFail(param.data.errorMsg.subMsg)
-      }
-    } else {
-      // 失败后的回调函。
-      fnFail && fnFail(param.data.errorMsg.message)
-    }
+    // 失败后的回调函。
+    fnFail && fnFail(param.data.errorMsg.message)
   }
 }
 
@@ -124,20 +119,15 @@ var sendRequest = function (oStore, oAxio, sUrl, sType, oParams, fnSu, fnFail, f
     if (!bRight) {
       // 调用成功后的回调函数。
       fnSu && fnSu(oResult.data)
-    } else {
-      if (bRight === 10) {
-        // 登录失败。
-        if (oResult.errorMsg.subCode === 1) {
-          // 调整到登录界面前的操作。
-          fnBeforeLogin && fnBeforeLogin()
+    } else if (bRight === 10) {
+      // 调整到登录界面前的操作。
+      fnBeforeLogin && fnBeforeLogin()
 
-          // 清cookie，跳转到登录页面。
-          loginFail(oResult.errorMsg.subMsg)
-        }
-      } else {
-        // 失败后的回调函。
-        fnFail && fnFail(oResult.errorMsg.message)
-      }
+      // 清cookie，跳转到登录页面。
+      loginFail(oResult.errorMsg.subMsg)
+    } else {
+      // 失败后的回调函。
+      fnFail && fnFail(oResult.errorMsg.message)
     }
   }
 
@@ -183,17 +173,12 @@ var getBeforeDispatchData = function (sDispatchType, oStore, oAxio, fnCallBack, 
       oStore.dispatch(sDispatchType, oResult.data)
       // 调用成功后的回调函数。
       fnCallBack && fnCallBack()
+    } else if (bRight === 10) {
+      // 清cookie，跳转到登录页面。
+      loginFail(oResult.errorMsg.subMsg)
     } else {
-      if (bRight === 10) {
-        // 登录失败。
-        if (oResult.errorMsg.subCode === 1) {
-          // 清cookie，跳转到登录页面。
-          loginFail(oResult.errorMsg.subMsg)
-        }
-      } else {
-        // 失败后的回调函。
-        fnCallBack && fnCallBack()
-      }
+      // 失败后的回调函。
+      fnCallBack && fnCallBack()
     }
   }).catch(() => {
     fnCallBack && fnCallBack()
