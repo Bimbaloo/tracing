@@ -1750,8 +1750,8 @@
   .el-select-dropdown .el-scrollbar.is-empty .el-select-dropdown__list {
     padding: 0; }
   .el-select-dropdown .popper__arrow {
-    -webkit-transform: translateX(-400%);
-    transform: translateX(-400%); }
+    -webkit-transform: translateX(0); /*-400%*/
+    transform: translateX(0); } /*-400%*/
   .el-select-dropdown.is-arrow-fixed .popper__arrow {
     -webkit-transform: translateX(-200%);
     transform: translateX(-200%); }
@@ -11972,8 +11972,8 @@
   .el-select-dropdown .el-scrollbar.is-empty .el-select-dropdown__list {
     padding: 0; }
   .el-select-dropdown .popper__arrow {
-    -webkit-transform: translateX(-400%);
-    transform: translateX(-400%); }
+    -webkit-transform: translateX(0); /*-400%*/
+    transform: translateX(0); } /*-400%*/
   .el-select-dropdown.is-arrow-fixed .popper__arrow {
     -webkit-transform: translateX(-200%);
     transform: translateX(-200%); }
@@ -19713,8 +19713,8 @@
   .el-picker-panel__link-btn {
     vertical-align: middle; }
   .el-picker-panel .popper__arrow {
-    -webkit-transform: translateX(-400%);
-    transform: translateX(-400%); }
+    -webkit-transform: translateX(0); /*-400%*/
+    transform: translateX(0); } /*-400%*/
 
 .el-picker-panel *[slot=sidebar],
 .el-picker-panel__sidebar {
@@ -20318,8 +20318,8 @@
       font-weight: 800;
       color: #42af8f; }
   .el-time-panel .popper__arrow {
-    -webkit-transform: translateX(-400%);
-    transform: translateX(-400%); }
+    -webkit-transform: translateX(0); /*-400%*/
+    transform: translateX(0); } /*-400%*/
 
 /* BEM support Func
  -------------------------- */
@@ -22644,8 +22644,8 @@
   .el-picker-panel__link-btn {
     vertical-align: middle; }
   .el-picker-panel .popper__arrow {
-    -webkit-transform: translateX(-400%);
-    transform: translateX(-400%); }
+    -webkit-transform: translateX(0); /*-400%*/
+    transform: translateX(0); } /*-400%*/
 
 .el-picker-panel *[slot=sidebar],
 .el-picker-panel__sidebar {
@@ -24399,8 +24399,8 @@
       font-weight: 800;
       color: #42af8f; }
   .el-time-panel .popper__arrow {
-    -webkit-transform: translateX(-400%);
-    transform: translateX(-400%); }
+    -webkit-transform: translateX(0); /*-400%*/
+    transform: translateX(0); } /*-400%*/
 
 /* BEM support Func
  -------------------------- */
@@ -40873,8 +40873,8 @@
   -webkit-box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
   box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1); }
   .el-cascader-menus .popper__arrow {
-    -webkit-transform: translateX(-400%);
-    transform: translateX(-400%); }
+    -webkit-transform: translateX(0); /*-400%*/
+    transform: translateX(0); } /*-400%*/
 
 .el-cascader-menu {
   display: inline-block;

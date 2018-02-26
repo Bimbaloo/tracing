@@ -81,7 +81,7 @@ export default {
   // props: ['formData', 'placeholderData', 'keyData', 'listData'],
   props: {
     formData: Object,
-    placeHolderData: String,
+    placeholderData: String,
     keyData: String,
     listData: Array,
     // 是否通过ajax调用。
