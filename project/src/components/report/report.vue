@@ -158,7 +158,8 @@ export default {
         batch: '/api/v1/trace/report/by-equipment-batch',
         time: '/api/v1/trace/report/by-equipment-time',
         restrainBatch: '/api/v1/trace/report/by-batch',
-        restrainDetails: '/api/v1/suppress/verbose'
+        restrainDetails: '/api/v1/suppress/verbose',
+        mold: `/api/v1/trace/report/by-mold`  // 根据模具信息查询快速报告
       },
       active: {
         summary: true,
@@ -658,7 +659,7 @@ export default {
   watch: {
 // 遏制页面：新建遏制中监听
     $route: function () {
-// 页面重新查询时，设置新进程
+      // 页面重新查询时，设置新进程
       this.progressId = new Date().getTime().toString().substr(-5)
       this.loading = false
       this.fetchData()
@@ -797,7 +798,7 @@ export default {
       console.log('查询出错。')
     },
     fetchData () {
-// 进入页面时设置页面的进程标记(created,watch)
+      // 进入页面时设置页面的进程标记(created,watch)
       window.Rt.utils.cookie('progressId', this.progressId)
 
       this.sErrorMessage = ''
@@ -811,7 +812,6 @@ export default {
       }
 
       let oParam = null
-
       if (this.type === 'trace') {
         this.showTables.forEach(e => {
           this.active[e] = true
@@ -837,6 +837,12 @@ export default {
         this.$ajax.defaults.headers.post['Content-Type'] =
           'application/json;charset=UTF-8'
         // debugger
+      } else if (this.type === 'mold') {
+        // 根据模具信息查询快速报告
+        sUrl = this.oUrl[this.type]
+        oParam = this.query
+        this.$ajax.defaults.headers.post['Content-Type'] =
+          'application/json;charset=UTF-8'
       } else {
         // 若为遏制报告。
         oParam = this.$route.query
