@@ -64,6 +64,7 @@ export default {
       aFilter: [
         {
           key: 'processCode', // processCodeList
+          paramKey: 'processCodeList',
           type: 'multiSelect',
           label: '工序',
           placeholder: '请选择工序',
@@ -71,6 +72,7 @@ export default {
         },
         {
           key: 'materialCode', // materialCodeList
+          paramKey: 'materialCodeList',
           type: 'multiSelect',
           label: '物料',
           placeholder: '请选择物料',
@@ -78,6 +80,7 @@ export default {
         },
         {
           key: 'equipmentCode', // equipmentCodeList
+          paramKey: 'equipmentCodeList',
           type: 'multiSelect',
           label: '设备',
           placeholder: '请选择设备',
@@ -352,7 +355,19 @@ export default {
       })
     },
     getQueryParam () {
-      let oParam = fnP.parseQueryParam(this.ruleForm)
+    	// 修改接口产出获取的参数名。
+    	let oParam = Object.assign({}, this.ruleForm)
+    	
+    	for(let sParam in oParam) {
+    		let aoMatch = this.aFilter.filter(o => o.key === sParam)
+    		
+    		if(aoMatch.length && aoMatch[0].paramKey) {
+    			oParam[aoMatch[0].paramKey] = oParam[sParam]
+    			delete oParam[sParam]
+    		}
+    	}
+    	
+      oParam = fnP.parseQueryParam(oParam)
 
       // 处理全部。
       for (let sParam in oParam) {

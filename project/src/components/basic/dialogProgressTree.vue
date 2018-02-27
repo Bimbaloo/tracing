@@ -90,7 +90,7 @@ export default {
           this.loading = false
           setTimeout(() => {
             this.$nextTick(() => {
-              this.dialogVisible && this.showTreeData()
+              document.querySelector('.dialog-progress-tree') && this.showTreeData()
             })
           }, 3000)
         },
