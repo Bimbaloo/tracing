@@ -16447,9 +16447,9 @@
       border-top-color: #c0c4cc;
       bottom: 7px; }
   .el-table .ascending .sort-caret.ascending {
-    border-bottom-color: #42af8f; }
+    border-bottom-color: #486a65; }
   .el-table .descending .sort-caret.descending {
-    border-top-color: #42af8f; }
+    border-top-color: #486a65; }
   .el-table .hidden-columns {
     visibility: hidden;
     position: absolute;
