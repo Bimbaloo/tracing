@@ -31,7 +31,7 @@ export default {
       doDescription: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
       styleObject: {
-        'max-width': '1000px'
+        'min-width': '1000px'
       },
       equipmentName: '',
       killProgress: false
@@ -128,7 +128,7 @@ export default {
       })
     },
     setWidth () {
-      this.styleObject.maxWidth = '1000px'
+      this.styleObject.minWidth = '1000px'
     },
     removeWidth () {
       this.styleObject.minWidth = 0
