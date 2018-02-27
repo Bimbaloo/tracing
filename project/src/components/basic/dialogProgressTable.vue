@@ -2,7 +2,7 @@
     <div class="progress-dialog-table-wrap">
         <div class="loader">
 	        <div class="loader-inner ball-pulse">
-	          	<span class="ball-text">快速报告生成中</span><div></div><div></div><div></div>
+	          	<span class="ball-text">列表生成中</span><div></div><div></div><div></div>
 	        </div>
 		</div>
         <v-table :table-data="oDialogTable" :loading="tableLoading"></v-table>
