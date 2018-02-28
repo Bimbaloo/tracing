@@ -16,6 +16,7 @@
           {{ error }}
         </div>
         <el-table
+          ref="table"
           v-else
           border
           v-loading="loading"
@@ -117,7 +118,7 @@ export default {
   mounted () {
     this.fetchData()
     this.$nextTick(() => {
-      this.tableHeight = this.setHeight()
+      this.setHeight()
     })
   },
   watch: {
@@ -136,22 +137,20 @@ export default {
         this.tag = to.query._tag
         this.fetchData()
         this.$nextTick(() => {
-          this.tableHeight = this.setHeight()
+          this.setHeight()
         })
       }
     },
     resizeY: function () {
-      this.tableHeight = this.setHeight()
+      this.setHeight()
     },
     /* 全屏大小时，重新设置table大小 */
     fullscreen: function () {
-      this.tableHeight = this.setHeight()
+      this.setHeight()
     },
     treeFullscreen: function () {
       if (!this.treeFullscreen) {
-        this.$nextTick(() => {
-          this.tableHeight = this.setHeight()
-        })
+        this.setHeight()
       }
     }
   },
@@ -614,9 +613,16 @@ export default {
     },
     // 设置table的高度
     setHeight () {
+      // Array.from(document.querySelectorAll('table')).forEach(o => {
+      //   o.style.width = '100%'
+      // })
       let content = document.querySelector('.router-content')
       let tableData = document.querySelector('.tableData')
-      return this.outerHeight(content) - this.outerHeight(tableData) - 40
+      this.tableHeight = this.outerHeight(content) - this.outerHeight(tableData) - 40
+
+      this.$nextTick(() => {
+        this.$refs.table.doLayout()
+      })
     }
   }
 }

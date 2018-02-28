@@ -118,7 +118,15 @@ export default {
       // this.redrawTree();
     },
     flexBasis: 'updateCanvas',
-    resize: 'updateCanvas'
+    resize: 'updateCanvas',
+    fullscreen: function () {
+      if (!this.fullscreen) {
+        this.updateCanvas()
+      }
+    },
+    treeFullscreen: function () {
+      this.updateCanvas()
+    }
   },
   computed: {
     resize () {
@@ -145,6 +153,10 @@ export default {
     // 树的数据全屏。
     treeFullscreen () {
       return this.$store.state.treeFullscreen
+    },
+    // 表格全屏。
+    fullscreen: function () {
+      return this.$store && this.$store.state.fullscreen
     },
     // 高亮的数据。
     highted () {
