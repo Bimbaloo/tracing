@@ -1,5 +1,5 @@
 <template>
-    <el-select v-if="keyData==='materialCodeList'"
+    <el-select v-if="keyData==='materialCode'"
     	v-model="formData[keyData]" 
     	:placeholder="hint" 
     	:disabled="disabled" 
@@ -45,22 +45,24 @@
 <script>
 const oAjax = {
   // 物料。
-  materialCodeList: {
+  materialCode: {
     url: window.HOST + '/api/v1/basicinfo/materials',
     code: 'material'
   },
   // 设备。
-  equipmentCodeList: {
+  equipmentCode: {
     url: window.HOST + '/api/v1/basicinfo/equipments',
     code: 'equipment'
   },
   // 工序
-  processCodeList: {
+  processCode: {
     url: window.HOST + '/api/v1/basicinfo/processes',
     code: 'process'
   }
 }
-const sSessionSelectStorageKey = 'outputSelectStorageKey'
+
+const sSessionSelectStorageKey = window.HOST + 'selectStorageKey'
+// const sSessionSelectStorageKey = 'outputSelectStorageKey'
 
 export default {
   props: {
@@ -166,7 +168,7 @@ export default {
             this.list = oStorage[sKey]
 
             // 如果是物料，则获取部分数据。
-            if (sKey === 'materialCodeList') {
+            if (sKey === 'materialCode') { // materialCodeList
               // 物料只取其中一部分。
               this.options = this.list.filter((o, index) => {
                 return index < nLen
@@ -199,18 +201,18 @@ export default {
                   }
                 })
 
-                if (sKey === 'materialCodeList') {
+                if (sKey === 'materialCode') { // materialCodeList
                   // 物料只取其中一部分。并保存起来。当搜索时恢复
                   this.options = this.list.filter((o, index) => {
                     return index < nLen
                   })
                   // 增加全部。
-                  this.addAll()
+                  // this.addAll()
                   this.oInit = this.options
                 } else {
                   // 默认为所有。
                   this.options = this.list
-                  this.addAll()
+                  // this.addAll()
                 }
                 oStorage[sKey] = this.list
                 // 保存数据。
@@ -218,6 +220,7 @@ export default {
                   sSessionSelectStorageKey,
                   JSON.stringify(oStorage)
                 )
+                this.addAll()
               },
               sErrorMessage => {
                 // 请求失败。
@@ -243,7 +246,7 @@ export default {
     },
     // 外部查询。
     remoteMethod (query) {
-      if (this.keyData === 'materialCodeList' && this.getByAjax) {
+      if (this.keyData === 'materialCode' && this.getByAjax) { // materialCodeList
         // 物料数据，则通过搜索。
         let sQuery = (query || '').trim()
 
