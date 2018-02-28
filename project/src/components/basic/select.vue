@@ -74,8 +74,6 @@ const oAjax = {
     code: 'shift'
   }
 }
-// 修改数据缓存session名称；否则当在同一个浏览器下切换不同业务库时，加载数据有缓存
-const sSessionSelectStorageKey = window.HOST + 'selectStorageKey'
 
 export default {
   // props: ['formData', 'placeholderData', 'keyData', 'listData'],
@@ -139,15 +137,14 @@ export default {
 
         // 判断是否存在。如果存在
         let sKey = this.key
-        let sStorage = sessionStorage.getItem(sSessionSelectStorageKey)
-        let oStorage = sStorage ? JSON.parse(sStorage) : {}
+        let oStorage = this.$store.state.optionsModule
         let nLen = this.nMax
 
         // 数据存在。
         if (oStorage && oStorage[sKey]) {
           this.loading = false
 
-          this.list = oStorage[sKey]
+          this.list = JSON.parse(oStorage[sKey])
 
           // 如果是物料，则获取部分数据。
           if (sKey === 'materialCode') {
@@ -191,10 +188,10 @@ export default {
               }
               oStorage[sKey] = this.list
               // 保存数据。
-              sessionStorage.setItem(
-                sSessionSelectStorageKey,
-                JSON.stringify(oStorage)
-              )
+              this.$store.commit('setOptionsData', {
+                key: sKey,
+                value: JSON.stringify(this.list)
+              })
             },
             sErrorMessage => {
               // 请求失败。
@@ -204,10 +201,10 @@ export default {
               this.oInit = []
               oStorage[sKey] = []
               // 保存数据。
-              sessionStorage.setItem(
-                sSessionSelectStorageKey,
-                JSON.stringify(oStorage)
-              )
+              this.$store.commit('setOptionsData', {
+                key: sKey,
+                value: JSON.stringify([])
+              })
             }
           )
         }
