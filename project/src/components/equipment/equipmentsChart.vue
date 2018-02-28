@@ -55,7 +55,7 @@
               <v-datetime :form-data="datetime" key-data="start"></v-datetime>
               <span class="edit-icon">
                 <i class="el-icon-circle-check" @click="saveStart"></i>
-                <i class="el-icon-circle-cross" @click="cancelStart"></i>
+                <i class="el-icon-circle-close" @click="cancelStart"></i>
               </span>
               <div class="edit-error" v-if="!startValidate">{{ startValidateMessage }}</div>
             </div>
@@ -66,7 +66,7 @@
               <v-datetime :form-data="datetime" key-data="end"></v-datetime>
               <span class="edit-icon">
                 <i class="el-icon-circle-check" @click="saveEnd"></i>
-                <i class="el-icon-circle-cross" @click="cancelEnd"></i>
+                <i class="el-icon-circle-close" @click="cancelEnd"></i>
               </span>
               <div class="edit-error" v-if="!endValidate">{{ endValidateMessage }}</div>
             </div>
@@ -3356,12 +3356,20 @@ export default {
         .edit-error {
           color: red;
         }
+
+        .el-input__inner {
+          height: 20px;
+          border-radius: 0;
+          font-size: 12px;
+        }
+        .el-input__prefix {
+            top: -5px;
+        }
+        .el-input__suffix {
+            top: -4px;
+        }
       }
-      .el-input__inner {
-        height: 20px;
-        border-radius: 0;
-        font-size: 12px;
-      }
+
     }
   }
 }

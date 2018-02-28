@@ -1,7 +1,7 @@
 <template>
 	<el-dialog class="dialog-track-wrap" title="追踪配置" width='30%' :visible.sync="dialogVisible" :close-on-click-modal="false" :before-close="closeForm">
     	<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-position="right">
-    		
+
     		<el-form-item label="设备" prop="equipmentId">
     			<v-select :get-by-ajax="false" :list-data="equipmentsList" :form-data="ruleForm" placeholder-data="请选择设备" key-data="equipmentId"></v-select>
     		</el-form-item>
@@ -11,7 +11,7 @@
     		<el-form-item label="结束时间" prop="endTime">
     			<v-dateTime :form-data="ruleForm" placeholder-data="请选择结束时间" key-data="endTime"></v-dateTime>
     		</el-form-item>
-    		
+
     		<el-form-item class="button-item">
 			    <v-button text-data="取消" @query="closeForm"></v-button>
 				<v-button text-data="追踪" @query="submitForm('ruleForm')"></v-button>
@@ -170,12 +170,17 @@ export default {
     width: 500px;
 
     .el-dialog__body {
-      padding: 20px 20px 0;
+      padding: 20px 20px;
 
       .el-form-item {
+      	margin-bottom: 18px;
+		
         .el-form-item__content {
           margin-left: 80px;
         }
+		.el-input {
+			width: auto;
+		}
       }
       .button-item {
         text-align: center;
