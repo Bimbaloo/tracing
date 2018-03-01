@@ -7,11 +7,11 @@
                         {{filter[0]}} : {{filter[1]}}
                     </span>
                     <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-                        <el-form-item label="条码：" > 
+                        <el-form-item label="条码：" >
                              <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
                         </el-form-item>
                     </el-form>
-                   
+
                 </div>
             </div>
             <h2 class="content-title tableData">
@@ -30,9 +30,9 @@
                                     <span>{{ setName(index) }}：</span>
                                     <span>{{ prop }}</span>
                                 </el-form-item> -->
-                                <el-form-item 
-                                :label="setName(index)" 
-                                v-for="(prop,index) in props.row" 
+                                <el-form-item
+                                :label="setName(index)"
+                                v-for="(prop,index) in props.row"
                                 :key="index"
                                 v-if="!!setName(index) && setName(index) !== '采集时间：' && setName(index) !=='条码：'">
                                     <span :title="prop">{{ prop }}</span>
@@ -103,7 +103,8 @@ export default {
           {
             type: 'expand',
             width: '100',
-            show: true // 是否在表头显示
+            show: true, // 是否在表头显示
+            isNotShowInExcel: true
           },
           {
             name: '条码',
