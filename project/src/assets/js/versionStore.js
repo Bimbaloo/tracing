@@ -18,7 +18,7 @@ export const versionModule = {
     // 是否需要登录
     ssoLogin: false,
     // 是否开启摄像头功能。
-    isVideoMonitorEnabled: true
+    isVideoMonitorEnabled: false
   },
   mutations: {
     updateVersionData (state, payload) {
