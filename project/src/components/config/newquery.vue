@@ -6,7 +6,7 @@
 				<el-switch
 					active-text=""
   					inactive-text=""
-					inactive-color="#bfcbd9" 
+					inactive-color="#bfcbd9"
 					v-model="ModuleOrderListEdit">
 				</el-switch>
 			</div>
@@ -19,11 +19,11 @@
 			</div>
 			<div class="list-main" v-show="ModuleOrderListEdit">
 				<div class="list-message">
-					<span>系统将根据拖动的顺排列</span>
+					<span>系统将根据拖动的顺序排序</span>
 					<span>拖动</span>
 				</div>
 				<ul class="list-container">
-					<li class="query-list" 
+					<li class="query-list"
 						v-for="item in category"
 						v-if="showItem(item)"
 						v-dragging="{ list: category, item: item, group: 'category' }"
@@ -35,7 +35,7 @@
 			</div>
 		</div>
 		<div class="query-items">
-			<div class="query-item" 
+			<div class="query-item"
 				v-for="(item,index) in category"
 				v-if="showItem(item)"
 				:item-id = "index"
@@ -63,12 +63,12 @@
 						<span class="name-item">{{ listItem.groupName }}</span>
 						<div class="name-icon" :class="{'item-show-transition':oBefore[item.moduleCode].bEdit && isShow==index*10+indexList}">
 							<!-- 上移。 -->
-							<i v-if="indexList" 
+							<i v-if="indexList"
 								@click.stop="changeOrder(item.moduleCode,index,indexList-1,indexList)"
 								class="icon el-icon-arrow-up"></i>
 							<!-- 下移。 -->
-							<i v-if="indexList != item.groups.length-1" 
-								@click.stop="changeOrder(item.moduleCode,index,indexList,indexList+1)" 
+							<i v-if="indexList != item.groups.length-1"
+								@click.stop="changeOrder(item.moduleCode,index,indexList,indexList+1)"
 								class="icon el-icon-arrow-down"></i>
 							<!-- 修改。 -->
 							<i @click.stop="showModal(item.moduleCode,index,indexList)" v-if="listItem.groupName !== '物流码' && listItem.groupName !== '条码' && listItem.groupName !== '物料' && listItem.groupName !== '设备'" class="icon el-icon-edit"></i>
