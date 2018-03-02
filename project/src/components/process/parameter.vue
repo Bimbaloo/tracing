@@ -20,7 +20,7 @@
                     <el-tab-pane label="条码表" name="table" v-if="barcodeTableData.show" class="table">
                         <div class="barcode-input">
                             <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-                                <el-form-item label="条码：" > 
+                                <el-form-item label="条码：" >
                                     <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
                                 </el-form-item>
                             </el-form>
@@ -30,41 +30,41 @@
                             </span>
                         </div>
                         <div class="content-table" ref="barcodeTable">
-                            <el-table 
-                            :data="datas" 
-                            stripe 
-                            class="table" 
-                            :row-key="barcodeTableData.data.barcode" 
-                            v-loading="barcodeTableData.loading" 
-                            element-loading-text="拼命加载中" 
-                            style="width: 100%" 
-                            ref="multipleTable" 
-                            @expand-change="expandRow" 
+                            <el-table
+                            :data="datas"
+                            stripe
+                            class="table"
+                            :row-key="barcodeTableData.data.barcode"
+                            v-loading="barcodeTableData.loading"
+                            element-loading-text="拼命加载中"
+                            style="width: 100%"
+                            ref="multipleTable"
+                            @expand-change="expandRow"
                             :height="barcodeTableData.height">
-                                <el-table-column 
-                                v-if="!!column.show" 
-                                v-for="column in columns" 
-                                align="center" 
-                                :type="column.type" 
-                                :prop="column.prop" 
-                                :label="column.name" 
-                                :key="column.prop" 
-                                :class-name="column.class" 
+                                <el-table-column
+                                v-if="!!column.show"
+                                v-for="column in columns"
+                                align="center"
+                                :type="column.type"
+                                :prop="column.prop"
+                                :label="column.name"
+                                :key="column.prop"
+                                :class-name="column.class"
                                 :width="column.width">
                                     <template slot-scope="props">
-                                        <el-form 
-                                        label-position="left" 
-                                         
-                                        class="demo-table-expand expand-form" 
-                                        v-if="column.type === 'expand'">                             
+                                        <el-form
+                                        label-position="left"
+
+                                        class="demo-table-expand expand-form"
+                                        v-if="column.type === 'expand'">
                                             <div v-if="props.row.list.length">
-                                                <el-form-item                  
-                                                :label="`${prop.description}${prop.varUnit}`" 
-                                                v-for="prop in props.row.list" 
+                                                <el-form-item
+                                                :label="`${prop.description}${prop.varUnit}`"
+                                                v-for="prop in props.row.list"
                                                 :key="prop.varStdId">
                                                     <span v-for="(item,index) in prop.params" :key="index">&nbsp;{{ item.value}}({{item.pickTime}})&nbsp;</span>
                                                 </el-form-item>
-                                            </div>                                            
+                                            </div>
                                             <div v-else>{{detailTip}}</div>
                                         </el-form>
                                         <div v-else :class="[ 'cell-content']">
@@ -87,15 +87,15 @@
                                     inactive-text="表格"
                                     active-value="表格"
                                     inactive-value="图形"
-                                    v-for="(option,index) in options" 
+                                    v-for="(option,index) in options"
                                     v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
                                     :key="index"
                                     @change = "switchChange(chartData.value)">
                                 </el-switch>
-                                <div class="content-echarts" 
-                                v-for="(option,index) in options" 
+                                <div class="content-echarts"
+                                v-for="(option,index) in options"
                                 :key="index"
-                                v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename" 
+                                v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
                                 v-show="chartData.value === '图形'">
                                     <div class="charts" :id="`charts`+index"></div>
                                 </div>
@@ -115,7 +115,7 @@
                                     </div>
                                 </div>
                             </el-tab-pane>
-                        </el-tabs>             
+                        </el-tabs>
                     </el-tab-pane>
                 </el-tabs>
             </div>
@@ -205,7 +205,8 @@ export default {
           {
             type: 'expand',
             width: '100',
-            show: true // 是否在表头显示
+            show: true, // 是否在表头显示
+            isNotShowInExcel: true
           },
           {
             name: '条码',
@@ -937,8 +938,11 @@ export default {
     },
     // 表格打印。
     printHandle (refTable, event) {
-      let oTable = this.$refs[refTable][0]
+      let oTable = this.$refs[refTable]
 
+      if (oTable instanceof Array) {
+        oTable = oTable[0]
+      }
       if (!oTable) {
         return
       }
