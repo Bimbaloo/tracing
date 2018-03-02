@@ -21,11 +21,11 @@
 				</div>
 				<div class="content-table" ref="rawTable">
 					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
-                      <v-agtable
-                        :table-data="materialData"
-                        :heights="tableHeight"
-                        :loading="loading"
-                      ></v-agtable>
+          <v-agtable
+            :table-data="materialData"
+            :heights="tableHeight"
+            :loading="loading"
+          ></v-agtable>
 				</div>
 			</div>
     	</div>
@@ -64,7 +64,8 @@ export default {
         102: '入库',
         103: '出库',
         111: '库存损益',
-        112: '库存调整'
+        112: '库存调整',
+        11113: '到货登记'
       },
       materialData: {
         // filename: '',
@@ -297,6 +298,73 @@ export default {
           {
             field: 'destQuantity',
             headerName: '目标条码调整后数量'
+          },
+          {
+            field: 'operatorName',
+            headerName: '操作人'
+          },
+          {
+            field: 'operationTime',
+            headerName: '时间'
+          }
+        ],
+        // 到货登记。
+        1113: [
+          {
+            field: 'registration',
+            headerName: '登记单号'
+          },
+          {
+            field: 'barcode',
+            headerName: '条码'
+          },
+          {
+            field: 'batchNo',
+            headerName: '到货批次'
+          },
+          {
+            field: 'rawBatchNo',
+            headerName: '原料批次'
+          },
+          {
+            field: 'materialName',
+            headerName: '物料名称'
+          },
+          {
+            field: 'materialCode',
+            headerName: '物料编码'
+          },
+          {
+            field: 'materialSpec',
+            headerName: '物料规格'
+          },
+          {
+            field: 'materialUnit',
+            headerName: '单位'
+          },
+          {
+            field: 'quantity',
+            headerName: '数量'
+          },
+          {
+            field: 'destWarehouse',
+            headerName: '仓库'
+          },
+          {
+            field: 'destReservoir',
+            headerName: '库位'
+          },
+          {
+            field: 'vendorName',
+            headerName: '供应商'
+          },
+          {
+            field: 'arrivalOrder',
+            headerName: '到货单号'
+          },
+          {
+            field: 'purchaseOrder',
+            headerName: '采购单号'
           },
           {
             field: 'operatorName',

@@ -1,4 +1,4 @@
-<!--物料节点路由-->
+<!--检验节点路由-->
 <template>
     <div class="material-stock" ref="stock">
         <div class="view-icon">
@@ -10,9 +10,7 @@
             <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
         </div>
         <div class="router-path">
-            <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":`物料明细${isWasteMaterial ? '(废品)':''}` }}</span>
-            <!-- 新版本中没有同批次入库 -->
-            <span class="path-item" @click="checkBatch" v-if="batchIf && isOpDbBeforeRefact">>同批出入库</span>
+            <span class="path-item" @click="checkStock">检验明细</span>
             <span class="path-item" v-if="restrainIf">>可疑品</span>
         </div>
         <!-- 遏制数据不需要缓存 -->
@@ -45,13 +43,6 @@ export default {
     fullscreen () {
       return this.$store.state.fullscreen
     },
-    // 版本信息数据。
-    isOpDbBeforeRefact () {
-      return (
-        this.$store.state.versionModule &&
-        this.$store.state.versionModule.isOpDbBeforeRefact
-      )
-    },
     // 是否支持遏制。
     supression () {
       return (
@@ -61,10 +52,6 @@ export default {
     },
     nodeType () {
       return this.$store && this.$store.state.nodeType
-    },
-    // 新版本物料判断是否为废品。
-    isWasteMaterial () {
-      return this.nodeType === 10004
     }
   },
   created () {
@@ -72,21 +59,13 @@ export default {
   },
   watch: {},
   methods: {
-    // 查出库
+    // 明细
     checkStock (event) {
       if (event.target.parentNode.lastElementChild === event.target) {
         // 若为最后一个节点，则不可点击。
         return false
       }
       this.$router.replace({ path: `/stock`, query: this.material })
-    },
-    // 同批出入库
-    checkBatch (event) {
-      if (event.target.parentNode.lastElementChild === event.target) {
-        // 若为最后一个节点，则不可点击。
-        return false
-      }
-      this.$router.replace({ path: `/stock/batch`, query: this.batch })
     },
     // 可疑品
     showSuspiciousList () {
@@ -152,16 +131,8 @@ export default {
             sSerializion = sSerializion.substring(1)
             // 遏制成功，打开到遏制报告。
             window.open('/restrain/report.html?' + sSerializion)
-
-                //     }
-                // })
-                // .catch((err) => {
-                //     done();
-                //     instance.confirmButtonLoading = false;
-                // });
           } else {
             done()
-            // instance.$slots.default[0].elm.children[0].value = "";
           }
         }
       }).then(action => {
@@ -172,20 +143,9 @@ export default {
             this.$message.error('提交失败！')
           }
         }
-        // self.description = "";
       })
     },
     setRouteQuery () {
-      //              let aHref = location.href.split("?")[0].split("/"),
-      //                  sType = aHref[aHref.length-1];
-      //
-      //              if(sType == "batch") {
-      //                  this.batch = this.$route.query;
-      //              }else if(sType == "restrain") {
-      //                  this.restrain = this.$route.query;
-      //              }else {
-      //                  this.material = this.$route.query;
-      //              }
       let aHref = this.$route.path.split('/')
       let sType = aHref[aHref.length - 1]
       let oQuery = fnP.parseQueryParam(this.$route.query)
