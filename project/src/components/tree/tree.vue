@@ -327,10 +327,16 @@ export default {
 			  if (node.nodeType === 10003 || node.nodeType === 10004) {
 			    return node.totalNum
 			  } else if (node.nodeType === 10001) {
-			    return `${node.processingNum}/${node.remainNum}/${node.totalNum}`
-			  } else {
+				  if (node.isShowRemain) {
+					  return `${node.processingNum}/${node.remainNum}/${node.totalNum}`
+				  } else {
+					   return `${node.processingNum}/${node.totalNum}`
+				  }
+			  } else if (node.isShowRemain) {
 			    return `${node.remainNum}/${node.totalNum}`
-			  }
+  			  } else {
+				 return `${node.totalNum}`
+  	 		  }
 		  }))
           )
         ),

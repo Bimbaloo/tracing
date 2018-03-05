@@ -75,7 +75,7 @@ var parseData = function (aoGet) {
 }
 
 // 转换树数据。
-var parseTreeData = function (oTreeData) {
+var parseTreeData = function (oTreeData, sPageType, bIsOld) {
   // 转换后的数据
   let oCopyTreeData = JSON.parse(JSON.stringify(oTreeData))
   let {nodeList, linkList} = oCopyTreeData
@@ -87,6 +87,10 @@ var parseTreeData = function (oTreeData) {
     let oNodeType = getNodeIconAndTemp(o.nodeType)
       // 设置icon类型和detailType
     o.iconType = oNodeType.icon
+
+    // 判断是否需要显示滞留数
+    o.isShowRemain = !bIsOld && sPageType === 'track'
+
     // 判断是否为组。
     if (o.groupCode && !o.group) {
       // 新增组数据。
@@ -259,10 +263,8 @@ var getNodeIconAndTemp = function (sType) {
  * @param {Boolean} bIsOld 是否为老版本。  true-老版本  false-新版本
  */
 var getTreeData = function (oRowData, sPageType, bIsOld) {
-  let aoData = parseTreeData(oRowData)
+  let aoData = parseTreeData(oRowData, sPageType, bIsOld)
   let {nodeList: aoDiagramData, linkList: aoDiagramLinkData} = aoData
-
-  let isNoRemain = (bIsOld || sPageType === 'trace')
 
   aoDiagramLinkData = aoDiagramLinkData.map(o => {
     o.fromPort = 'FROM'
