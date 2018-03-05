@@ -82,7 +82,7 @@ export default {
         data => {
           // 成功处理。更新loading加载文字
           this.treeData = fnP.getTreeData(
-            data.nodeDtoList,
+            data.data,
             'track',
             this.isOpDbBeforeRefact
           )
