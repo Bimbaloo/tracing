@@ -330,7 +330,7 @@ export default {
 				  if (node.isShowRemain) {
 					  return `${node.processingNum}/${node.remainNum}/${node.totalNum}`
 				  } else {
-					   return `${node.processingNum}/${node.totalNum}`
+					   return `${node.totalNum}`
 				  }
 			  } else if (node.isShowRemain) {
 			    return `${node.remainNum}/${node.totalNum}`
