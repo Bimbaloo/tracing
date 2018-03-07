@@ -372,7 +372,7 @@ export default {
           {
             headerName: '模号',
             field: 'moldCode',
-            width: 120
+            width: 80
           },
           {
             headerName: '班次',
@@ -390,7 +390,7 @@ export default {
             width: 200
           },
           {
-            headerName: '产出',
+            headerName: '产出扣减数',
             field: OUT_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -398,7 +398,7 @@ export default {
             }
           },
           {
-            headerName: '结转',
+            headerName: '结转扣减数',
             field: CARRY_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -406,7 +406,7 @@ export default {
             }
           },
           {
-            headerName: '退料',
+            headerName: '退料扣减数',
             field: RETURN_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -453,7 +453,7 @@ export default {
           {
             name: '模号',
             prop: 'moldCode',
-            width: '120'
+            width: '80'
           },
           {
             name: '班次',
@@ -471,7 +471,7 @@ export default {
             width: '200'
           },
           {
-            name: '产出',
+            name: '产出扣减数',
             prop: OUT_FIELD,
             width: '120',
             // 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
@@ -481,7 +481,7 @@ export default {
             }
           },
           {
-            name: '结转',
+            name: '结转扣减数',
             prop: CARRY_FIELD,
             width: '120',
             // 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
@@ -491,7 +491,7 @@ export default {
             }
           },
           {
-            name: '退料',
+            name: '退料扣减数',
             prop: RETURN_FIELD,
             width: '120',
             // 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
@@ -611,7 +611,7 @@ export default {
           {
             name: '模号',
             prop: 'moldCode',
-            width: ''
+            width: '80'
           },
           {
             name: '质量',
@@ -681,6 +681,11 @@ export default {
           {
             headerName: '数量',
             field: 'quantity',
+            width: 80
+          },
+          {
+            headerName: 'BOM扣减数',
+            field: 'BOMQuantity',
             width: 120
           },
           {
@@ -691,7 +696,7 @@ export default {
           {
             headerName: '模号',
             field: 'moldCode',
-            width: 120
+            width: 80
           },
           {
             headerName: '质量',
@@ -750,6 +755,11 @@ export default {
           {
             name: '数量',
             prop: 'quantity',
+            width: '80'
+          },
+          {
+            name: 'BOM数量',
+            prop: 'BOMQuantity',
             width: '120'
           },
           {
@@ -760,7 +770,7 @@ export default {
           {
             name: '模号',
             prop: 'moldCode',
-            width: '120'
+            width: '80'
           },
           {
             name: '质量',
@@ -837,7 +847,7 @@ export default {
           {
             headerName: '模号',
             field: 'moldCode',
-            width: 120
+            width: 80
           },
           {
             headerName: '班次',
@@ -855,7 +865,7 @@ export default {
             width: 200
           },
           {
-            headerName: '结转',
+            headerName: '结转扣减数',
             field: CARRY_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -863,7 +873,7 @@ export default {
             }
           },
           {
-            headerName: '退料',
+            headerName: '退料扣减数',
             field: RETURN_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -910,7 +920,7 @@ export default {
           {
             name: '模号',
             prop: 'moldCode',
-            width: '120'
+            width: '80'
           },
           {
             name: '班次',
@@ -928,7 +938,7 @@ export default {
             width: '200'
           },
           {
-            name: '结转',
+            name: '结转扣减数',
             prop: CARRY_FIELD,
             width: '120',
             // 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
@@ -938,7 +948,7 @@ export default {
             }
           },
           {
-            name: '退料',
+            name: '退料扣减数',
             prop: RETURN_FIELD,
             width: '120',
             // 自定义类型。 改字段可能为undefined。 当导出或打印时显示0，而不是''
@@ -976,7 +986,7 @@ export default {
             width: 100
           },
           {
-            headerName: '产出',
+            headerName: '产出扣减数',
             field: OUT_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -984,7 +994,7 @@ export default {
             }
           },
           {
-            headerName: '结转',
+            headerName: '结转扣减数',
             field: CARRY_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -992,7 +1002,7 @@ export default {
             }
           },
           {
-            headerName: '退料',
+            headerName: '退料扣减数',
             field: RETURN_FIELD,
             width: 120,
             valueFormatter: function (params) {
@@ -1022,7 +1032,7 @@ export default {
             width: '100'
           },
           {
-            name: '产出',
+            name: '产出扣减数',
             prop: OUT_FIELD,
             width: '120',
             formatter: function (row, column) {
@@ -1030,7 +1040,7 @@ export default {
             }
           },
           {
-            name: '结转',
+            name: '结转扣减数',
             prop: CARRY_FIELD,
             width: '120',
             formatter: function (row, column) {
@@ -1038,7 +1048,7 @@ export default {
             }
           },
           {
-            name: '退料',
+            name: '退料扣减数',
             prop: RETURN_FIELD,
             width: '120',
             formatter: function (row, column) {
@@ -1100,7 +1110,7 @@ export default {
           {
             headerName: '模号',
             field: 'moldCode',
-            width: 120
+            width: 80
           }
         ],
         columns1: [
@@ -1151,7 +1161,7 @@ export default {
           {
             name: '模号',
             prop: 'moldCode',
-            width: '120'
+            width: '80'
           }
         ],
         height: 1,
@@ -1924,11 +1934,11 @@ export default {
           // 关联表的特殊处理。
           let nPLeft =
             refTable === 'uniteTable' && oCol.prop === 'barcode'
-              ? oRow.hasInLen === undefined ? 50 : 15
+              ? oRow.hasInLen == null ? 50 : 15
               : 0
 
           sBodyHtml += `<td class="${sAlign}"><div class="cell"><div class="cell-content" style="padding-left: ${nPLeft}px">${
-            oRow[oCol.prop] === undefined
+            oRow[oCol.prop] == null
               ? oCol.type === 'number' ? 0 : ''
               : oCol.formatter ? oCol.formatter(oRow) : oRow[oCol.prop]
           }</div></div></td>`
