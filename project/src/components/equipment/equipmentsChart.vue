@@ -3027,6 +3027,20 @@ export default {
 <style lang="less">
 @import "../../assets/css/base.less";
 
+.el-date-editor--datetime.el-input--prefix {
+  .el-input__inner {
+    padding-left: 10px;
+    padding-right: 10px;
+  }
+  .el-input--prefix {
+    left: 0;
+  }
+  .el-input__suffix {
+    right: 0;
+  }
+}
+
+
 .name-color(@color) {
   .name {
     border-color: @color;
