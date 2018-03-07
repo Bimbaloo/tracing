@@ -109,7 +109,7 @@ export default {
       let oForm = this.ruleForm
       let oKeys = this.keys
         // 溯源及追踪的参数。
-      let aParams = ['barcode', 'materialCode', 'equipmentCode', 'doCode']
+      let aParams = ['barcode', 'materialCode', 'equipmentCode', 'doCode', 'personCode'] // 增加人员可追溯项。
         // 验证条码
       let validateBarcode = (rule, value, callback) => {
         if (!value.trim()) {
