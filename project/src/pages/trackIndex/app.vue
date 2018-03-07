@@ -277,13 +277,13 @@ export default {
     requestSucess (oData) {
       this.closeProgressDialog()
 
-      if (!oData.nodeDtoList.length) {
+      if (!oData.data.nodeList.length) {
         console.log('查无数据。')
         this.showMessage()
       } else {
         this.$store.commit({
           type: 'updateData',
-          data: oData.nodeDtoList // fnP.parseTreeData(data)
+          data: oData.data // fnP.parseTreeData(data)
         })
 
         // 显示提示信息。解决内存泄漏问题
@@ -736,7 +736,7 @@ body {
   position: absolute;
   cursor: pointer;
   z-index: 100;
-  right: 200px;
+  right: 160px;
   top: 10px;
 }
 .table-line {

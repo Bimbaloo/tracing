@@ -1,4 +1,4 @@
-<!--物料明细-->
+<!--出入库-->
 <template>
   <div class="router-content">
     <div class="innner-content" >
@@ -11,7 +11,7 @@
           <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
         </span>
       </div>
-      <div class="content-table" ref="rawTable"> 
+      <div class="content-table" ref="rawTable">
         <div v-if="error" class="error">
           {{ error }}
         </div>
@@ -42,10 +42,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->    
+        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->
       </div>
     </div>
-  </div>      
+  </div>
 </template>
 
 <script>
@@ -360,7 +360,7 @@ export default {
 
       let sKey = this.$route.query && this.$route.query.key
         // 提取选中的物料节点数据。
-      let oNode = this.rawData.filter(o => o.key === sKey)[0] || {}
+      let oNode = this.rawData.nodeList.filter(o => o.key === sKey)[0] || {}
 
       this.node = {
         code: oNode.code || '',
