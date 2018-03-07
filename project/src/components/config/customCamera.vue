@@ -40,7 +40,8 @@ export default {
       sErrorMessage: '',
       form: {
         url: ''
-      }
+      },
+      oldForm: {}
     }
   },
   computed: {
@@ -179,6 +180,7 @@ export default {
       oData.dimensions_config.forEach(o => {
         this.form[o.name] = o.enabled
       })
+      this.oldForm = JSON.parse(JSON.stringify(this.form))
     }, (sErrorMessage) => {
       this.sErrorMessage = sErrorMessage
       this.showMessage('error')
@@ -221,6 +223,7 @@ export default {
           this.$register.sendRequest(this.$store, this.$ajax, MONITOR_DATA_URL, 'post', oPostData, (oData) => {
           // 保存工厂定制数据。
             this.showMessage('success', '保存成功！')
+            this.oldForm = JSON.parse(JSON.stringify(this.form))
           }, (sErrorMessage) => {
             this.sErrorMessage = sErrorMessage
             this.showMessage('error')
@@ -231,7 +234,8 @@ export default {
     // 取消。
     resetForm () {
       this.edit = false
-      this.$refs.form.resetFields()
+      this.form = JSON.parse(JSON.stringify(this.oldForm))
+      // this.$refs.form.resetFields()
     }
   }
 }
@@ -320,6 +324,9 @@ export default {
   }
   /deep/ .el-form-item__content {
     height: 56px;
+    line-height: 56px;
+  }
+  /deep/ .el-form-item__label {
     line-height: 56px;
   }
 }

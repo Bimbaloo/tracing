@@ -75,13 +75,22 @@ var parseData = function (aoGet) {
 }
 
 // 转换树数据。
-var parseTreeData = function (aTreeData) {
+var parseTreeData = function (oTreeData, sPageType, bIsOld) {
   // 转换后的数据
-  let aPrev = JSON.parse(JSON.stringify(aTreeData))
-  let nGroupIndex = aPrev.length
+  let oCopyTreeData = JSON.parse(JSON.stringify(oTreeData))
+  let {nodeList, linkList} = oCopyTreeData
+  let nGroupIndex = nodeList.length
 
   // 修改数据，添加group的数据，并将子工序增加group字段。
-  aPrev.forEach(o => {
+  nodeList.forEach(o => {
+      // 修改节点的类型。
+    let oNodeType = getNodeIconAndTemp(o.nodeType)
+      // 设置icon类型和detailType
+    o.iconType = oNodeType.icon
+
+    // 判断是否需要显示滞留数
+    o.isShowRemain = !bIsOld && sPageType === 'track'
+
     // 判断是否为组。
     if (o.groupCode && !o.group) {
       // 新增组数据。
@@ -103,66 +112,32 @@ var parseTreeData = function (aTreeData) {
       o.group = oGroup.key
       let aSub = _getSubGroupNode(o)
 
-      // 修改数据的组后面数据的parents值。获取最有一个数据的key值，将以改key为parents的数据替换。
+      // 修改连线中to为第一个节点的key值； 修改from为最优一个节点的key值
       if (aSub.length) {
-        // 设置parents。
-        _setNewParent(aSub[aSub.length - 1].key, oGroup.key)
+        _updateLineKey([{type: 'to', key: aSub[0].key, newKey: oGroup.key}, {type: 'from', key: aSub[aSub.length - 1].key, newKey: oGroup.key}])
+          // 设置group的显示值，为最后一道工序的数据
       }
 
       // 将新增的group组数据放入数组中。
-      aPrev.push(oGroup)
-    }
-  })
-
-  // 循环修改。group的parents为其第一个组的parents值。--- 没有和前一个方法合并，是为了处理不是按顺序的数据。
-  aPrev.forEach((o, index) => {
-    // 处理组。
-    if (o.isGroup) {
-      let aChild = _getGroupChild(o.key)
-      if (aChild.length) {
-        o.parents = aChild[0].parents
-        aChild[0].parents = ''
-      }
+      nodeList.push(oGroup)
     }
   })
 
   // 返回数据。
-  return aPrev
+  return oCopyTreeData
 
   /**
-   *  修改其parents值。
-   * @param {String} sParent
-   * @param {String} sNewParent
-   * @return {void}
-   */
-  function _setNewParent (sParent, sNewParent) {
-    // 循环获取修改。
-    aPrev.forEach(o => {
-      let aParent = o.parents.split(',')
-      let nIndex = aParent.indexOf(sParent)
-
-      if (nIndex > -1) {
-        // 修改并替换。
-        aParent.splice(nIndex, 1)
-        aParent.push(sNewParent)
-
-        o.parents = aParent.join(',')
-      }
+  * 修改节点[{type:'to',key:1,newKey:3},{type:'from',key:2,newKey:3}]
+  */
+  function _updateLineKey (aoUpdated) {
+    aoUpdated.forEach(o => {
+          // 所有线的数据中匹配
+      linkList.forEach(oLink => {
+        if (oLink[o.type] === o.key) {
+          oLink[o.type] = o.newKey
+        }
+      })
     })
-  }
-
-  /**
-   * 获取组的子工序。
-   * @param {String}
-   */
-  function _getGroupChild (sGroupKey) {
-    let aSub = []
-
-    // 获取组下的子工序，并排序。
-    aSub = aPrev.filter(o => o.group === sGroupKey).sort((o1, o2) => o1.key - o2.key > 0 ? 1 : -1)
-
-    // 返回组的工序。
-    return aSub
   }
 
   /**
@@ -201,9 +176,9 @@ var parseTreeData = function (aTreeData) {
       }
 
       function _get (oLevel) {
-        return aPrev.filter(o => {
+        return nodeList.filter(o => {
           // 当前数据父级包含且属于同一个组。
-          return o.groupCode === oLevel.groupCode && o.parents.split(',').includes(oLevel.key)
+          return o.groupCode === oLevel.groupCode && linkList.some(oLink => oLink.from === oLevel.key && oLink.to === o.key)
         })
       }
     }
@@ -213,141 +188,61 @@ var parseTreeData = function (aTreeData) {
 // 获取节点图标及显示模板
 var getNodeIconAndTemp = function (sType) {
   let oIcon = {
-    icon: '',
-    temp: '',
-    TempMerge: ''
+    icon: ''
   }
 
   switch (sType) {
     // 库存转储
     case 101:
-      oIcon.temp = 'warehouseDumpTemp'
-      oIcon.icon = 'warehouse'
-      oIcon.TempMerge = 'warehouseDump'
-      break
-      // 库存调整
+    // 库存调整
     case 112:
-      oIcon.temp = 'warehouseAdjustTemp'
-      oIcon.icon = 'warehouse'
-      oIcon.TempMerge = 'warehouseAdjust'
-      break
-      // 入库
+     // 入库
     case 102:
-      oIcon.temp = 'warehouseTemp'
-      oIcon.icon = 'warehouse'
-      oIcon.TempMerge = 'warehouse'
-      break
-      // 出库
+    // 出库
     case 103:
-      oIcon.temp = 'warehouseTemp'
-      oIcon.icon = 'warehouse'
-      oIcon.TempMerge = 'warehouse'
-      break
-      // 库存损益
+    // 库存损益
     case 111:
-      oIcon.temp = 'warehouseTemp'
       oIcon.icon = 'warehouse'
-      oIcon.TempMerge = 'warehouse'
       break
-      // 自动入库
-      // case 116:
-      // oIcon.icon = "warehouse"
-      // 自动出库
-      // case 117:
-      // oIcon.icon = "warehouse"
-      // 投料
     case 1:
-      oIcon.icon = 'process'
-      oIcon.TempMerge = 'process'
-      oIcon.temp = 'processTemp'
-      break
-      // 产出
+    // 产出
     case 6:
-      oIcon.icon = 'process'
-      oIcon.TempMerge = 'process'
-      oIcon.temp = 'processTemp'
-      break
-      // 工序-- 工序显示一个模板。
+    // 工序-- 工序显示一个模板。
     case 10001:
       oIcon.icon = 'process'
-      oIcon.TempMerge = 'process'
-      oIcon.temp = 'processTemp'
       break
       // 结转转入
     case 2:
-      oIcon.icon = 'workshop'
-      oIcon.temp = 'workshopCarryoverTemp'
-      oIcon.TempMerge = 'workshopCarryover'
-      break
-      // 结转转出
+    // 结转转出
     case 7:
-      oIcon.icon = 'workshop'
-      oIcon.temp = 'workshopCarryoverTemp'
-      oIcon.TempMerge = 'workshopCarryover'
-      break
       // 结转
     case 10002:
-      oIcon.icon = 'workshop'
-      oIcon.temp = 'workshopCarryoverTemp'
-      oIcon.TempMerge = 'workshopCarryover'
-      break
-      // 退料
+    // 退料
     case 8:
-      oIcon.temp = 'workshopReturnMateiralTemp'
-      oIcon.icon = 'workshop'
-      oIcon.TempMerge = 'workshopReturnMateiral'
-      break
-      // 车间调整
+    // 车间调整
     case 11:
-      oIcon.temp = 'workshopTemp'
       oIcon.icon = 'workshop'
-      oIcon.TempMerge = 'workshop'
       break
       // 返工入站
     case 14:
-      oIcon.temp = 'reworkTemp'
-      oIcon.icon = 'rework'
-      oIcon.TempMerge = 'rework'
-      break
-      // 返工出站
+    // 返工出站
     case 15:
-      oIcon.temp = 'reworkTemp'
       oIcon.icon = 'rework'
-      oIcon.TempMerge = 'rework'
       break
       // 条码绑定： 绑定，解绑
     case 205:
     case 206:
-      oIcon.temp = 'barcodeManageTemp'
-      oIcon.icon = 'barcodeManage'
-      oIcon.TempMerge = 'barcodeManage'
-      break
-      // 补料
+    // 补料
     case 203:
-      oIcon.temp = 'barcodeManageTemp'
-      oIcon.icon = 'barcodeManage'
-      oIcon.TempMerge = 'barcodeManage'
-      break
-      // 容器清空
+    // 容器清空
     case 202:
-      oIcon.temp = 'barcodeManageTemp'
       oIcon.icon = 'barcodeManage'
-      oIcon.TempMerge = 'barcodeManage'
       break
-      // 修改失效时间
-      // case 204:
-      // oIcon.icon = "barcodeManage"
       // 正常物料
     case 10003:
-      oIcon.temp = 'materialTemp'
-      oIcon.icon = 'material'
-      oIcon.TempMerge = 'material'
-      break
-      // 废品
+    // 废品
     case 10004:
-      oIcon.temp = 'materialTemp'
       oIcon.icon = 'material'
-      oIcon.TempMerge = 'material'
       break
     default:
       break
@@ -368,679 +263,25 @@ var getNodeIconAndTemp = function (sType) {
  * @param {Boolean} bIsOld 是否为老版本。  true-老版本  false-新版本
  */
 var getTreeData = function (oRowData, sPageType, bIsOld) {
-  let aoData = parseTreeData(oRowData)
-  let aoDiagramData = []
-  let aoDiagramLinkData = []
+  let aoData = parseTreeData(oRowData, sPageType, bIsOld)
+  let {nodeList: aoDiagramData, linkList: aoDiagramLinkData} = aoData
 
-  let isNoRemain = (bIsOld || sPageType === 'trace')
+  aoDiagramLinkData = aoDiagramLinkData.map(o => {
+    o.fromPort = 'FROM'
+    o.toPort = 'TO'
 
-  // 循环处理数据。
-  aoData.forEach(oData => {
-    oData.category = 'simple'
-    // detailInfos按destSnapshotId去重处理。只有计算主图详情的数据才需要去重，传入后面的数据不需去重
-    // oData.detailInfosUnited = window.Rt.utils.uniqueObject(oData.detailInfos, "destSnapshotId")
-    oData.detailInfosUnited = oData.detailInfos
-
-    // 根据节点类型，会哦在那个数据。 -- 增加sumList及明细模板字段 图形字段
-    let oNodeType = getNodeIconAndTemp(oData.nodeType)
-
-    let aDis = []
-    let aSum = []
-
-    // 设置icon类型和detailType
-    oData.iconType = oNodeType.icon
-    oData.detailType = oNodeType.temp
-
-    // 根据节点的名称处理。
-    switch (oNodeType.TempMerge) {
-      /* 仓库操作 */
-      // 库存转储
-      case 'warehouseDump':
-        // 设置详细信息。-- 仓库及库位
-        aDis = isNoRemain ? ['batchNo', 'quantity', 'srcWarehouse', 'srcWarehouseLocation', 'destWarehouse', 'destWarehouseLocation'] : ['batchNo', 'quantity', 'remainQuantity', 'srcWarehouse', 'srcWarehouseLocation', 'destWarehouse', 'destWarehouseLocation']
-        aSum = isNoRemain ? ['quantity'] : ['quantity', 'remainQuantity']
-
-        oData.sumList = _sumDataList(oData.detailInfosUnited, ['batchNo'], aDis, aSum)
-        // 设置详细信息标题
-        oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ''
-        // 设置表头。
-        oData.headerList = [{
-          name: '批次',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.batchNo || '').length
-          }
-        }, {
-          name: (isNoRemain ? '总数' : '滞留数/总数'),
-          minLen: (isNoRemain ? 2 : 6),
-          formatter: function (o) {
-            return isNoRemain ? (o.quantity + '').length : (o.remainQuantity + '/' + o.quantity).length
-          }
-        }, {
-          name: '仓库库位',
-          minLen: 4,
-          formatter: function (o) {
-            return Math.max(((o.srcWarehouse || '') + (o.srcWarehouseLocation || '')).length, ((o.destWarehouse || '') + (o.destWarehouseLocation || '')).length) + 3 // 设置为目标:
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-        // 库存调整
-      case 'warehouseAdjust':
-        // 设置详细信息标题
-        oData.detailTitle = `${oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ''}(${oData.detailInfosUnited.length ? (oData.detailInfosUnited[0].destWarehouse || '') : ''})`
-        oData.sumList = _sumWorkShopData(oData, isNoRemain)
-        // 设置表头。
-        oData.headerList = [{
-          name: '源条码',
-          minLen: 3,
-          formatter: function (o) {
-            return (o.srcBarcode || '').length
-          }
-        }, {
-          name: '调整数',
-          minLen: 3,
-          formatter: function (o) {
-            return (o.adjustQuantity + '').length
-          }
-        }, {
-          name: '目标条码',
-          minLen: 4,
-          type: 1,
-          formatter: function (o) {
-            return (o.barcode || '').length
-          }
-        }, {
-          name: (isNoRemain ? '调整数' : '滞留数/调整数'),
-          minLen: (isNoRemain ? 3 : 7),
-          type: 1,
-          formatter: function (o) {
-            return isNoRemain ? (o.adjustQuantity + '').length : (o.remainQuantity + '/' + o.adjustQuantity).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-
-        // 入库
-        // 出库
-        // 库存损益
-      case 'warehouse':
-
-        aDis = isNoRemain ? ['batchNo', 'destWarehouse', 'destWarehouseLocation', 'quantity'] : ['batchNo', 'destWarehouse', 'destWarehouseLocation', 'quantity', 'remainQuantity']
-        aSum = isNoRemain ? ['quantity'] : ['quantity', 'remainQuantity']
-
-        oData.sumList = _sumDataList(oData.detailInfosUnited, ['batchNo', 'destWarehouse', 'destWarehouseLocation'], aDis, aSum)
-        // 设置详细信息标题
-        oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ''
-        // 设置表头。
-        oData.headerList = [{
-          name: '批次',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.batchNo || '').length
-          }
-        }, {
-          name: (isNoRemain ? '总数' : '滞留数/总数'),
-          minLen: (isNoRemain ? 2 : 6),
-          formatter: function (o) {
-            return isNoRemain ? (o.quantity + '').length : (o.remainQuantity + '/' + o.quantity).length
-          }
-        }, {
-          name: '仓库库位',
-          minLen: 4,
-          formatter: function (o) {
-            return ((o.destWarehouse || '') + (o.destWarehouseLocation || '')).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-
-        // 车间操作-工序
-      case 'process':
-        // 如果是工序组时。
-        if (oData.isGroup) {
-          // 若为group
-          let oLastGroupItem = aoData.filter(o => oData.key === o.group).sort((a, b) => a.key < b.key)[0]
-          if (oLastGroupItem) {
-            // 取最后一道工序的产出。-- 最后一道工序中的数据去重
-            let oCopy = Object.assign({}, oLastGroupItem)
-            // oCopy.detailInfosUnited = window.Rt.utils.uniqueObject(oCopy.detailInfos, "destSnapshotId")
-            oCopy.detailInfosUnited = oCopy.detailInfos
-
-            oData = Object.assign({}, oData, _sumProcessData(oCopy))
-          }
-        } else {
-          oData = Object.assign({}, oData, _sumProcessData(oData))
-        }
-
-        // 设置表头。
-        oData.headerList = [{
-          name: '设备',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.equipmentName || '').length
-          }
-        }, {
-          name: '类型',
-          minLen: 2,
-          type: 1,
-          formatter: function (o) {
-            return o.type.length
-          }
-        }, {
-          name: '物料',
-          type: 2,
-          minLen: 2,
-          maxLen: 15,
-          formatter: function (o) {
-            return (o.materialName || '').length
-          }
-        }, {
-          name: '批次',
-          minLen: 2,
-          type: 2,
-          formatter: function (o) {
-            return (o.batchNo || '').length
-          }
-        }, {
-          name: (isNoRemain ? '总数' : '滞留数/总数'),
-          minLen: (isNoRemain ? 2 : 6),
-          type: 2,
-          formatter: function (o) {
-            return isNoRemain ? (o.quantity + '').length : (o.remainQuantity + '/' + o.quantity).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-        // 结转
-      case 'workshopCarryover':
-
-        aDis = isNoRemain ? ['materialName', 'quantity'] : ['materialName', 'quantity', 'remainQuantity']
-        aSum = isNoRemain ? ['quantity'] : ['quantity', 'remainQuantity']
-
-        oData.sumList = _sumDataList(oData.detailInfosUnited, ['materialCode'], aDis, aSum)
-
-        let oFirst = oData.detailInfosUnited.length ? oData.detailInfosUnited[0] : {}
-        oData.detailTitle = `源:${oFirst.srcDoCode || ''} 目标:${oFirst.doCode || ''}`
-
-        oData.headerList = [{
-          name: '物料',
-          minLen: 2,
-          maxLen: 15,
-          formatter: function (o) {
-            return (o.materialName || '').length
-          }
-        }, {
-          name: (isNoRemain ? '总数' : '滞留数/总数'),
-          minLen: (isNoRemain ? 2 : 6),
-          formatter: function (o) {
-            return isNoRemain ? (o.quantity + '').length : (o.remainQuantity + '/' + o.quantity).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-        // 退料
-      case 'workshopReturnMateiral':
-        aDis = isNoRemain ? ['materialName', 'quantity'] : ['materialName', 'quantity', 'remainQuantity']
-        aSum = isNoRemain ? ['quantity'] : ['quantity', 'remainQuantity']
-
-        oData.sumList = _sumDataList(oData.detailInfosUnited, ['materialCode'], aDis, aSum)
-        // 工单
-        oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].doCode : ''
-
-        oData.headerList = [{
-          name: '物料',
-          minLen: 2,
-          maxLen: 15,
-          formatter: function (o) {
-            return (o.materialName || '').length
-          }
-        }, {
-          name: (isNoRemain ? '总数' : '滞留数/总数'),
-          minLen: (isNoRemain ? 2 : 6),
-          formatter: function (o) {
-            return isNoRemain ? (o.quantity + '').length : (o.remainQuantity + '/' + o.quantity).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-        // 车间调整
-      case 'workshop':
-        oData.sumList = _sumWorkShopData(oData, isNoRemain)
-        oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ''
-
-        // 设置表头。
-        oData.headerList = [{
-          name: '源条码',
-          minLen: 3,
-          formatter: function (o) {
-            return (o.srcBarcode || '').length
-          }
-        }, {
-          name: '调整数',
-          minLen: 3,
-          formatter: function (o) {
-            return (o.adjustQuantity + '').length
-          }
-        }, {
-          name: '目标条码',
-          type: 1,
-          minLen: 4,
-          formatter: function (o) {
-            return (o.barcode || '').length
-          }
-        }, {
-          name: (isNoRemain ? '调整数' : '滞留数/调整数'),
-          type: 1,
-          minLen: (isNoRemain ? 3 : 7),
-          formatter: function (o) {
-            return isNoRemain ? (o.adjustQuantity + '').length : (o.remainQuantity + '/' + o.adjustQuantity).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-        // 返工入站 返工出站
-      case 'rework':
-        aDis = isNoRemain ? ['batchNo', 'qualityTypeName', 'quantity'] : ['batchNo', 'qualityTypeName', 'quantity', 'remainQuantity']
-        aSum = isNoRemain ? ['quantity'] : ['quantity', 'remainQuantity']
-
-        oData.sumList = _sumDataList(oData.detailInfosUnited, ['batchNo', 'qualityTypeName'], aDis, aSum)
-        // 设置详细信息标题
-        oData.detailTitle = oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : ''
-
-        // 设置表头。
-        oData.headerList = [{
-          name: '批次',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.batchNo || '').length
-          }
-        }, {
-          name: (isNoRemain ? '总数' : '滞留数/总数'),
-          minLen: (isNoRemain ? 2 : 6),
-          formatter: function (o) {
-            return isNoRemain ? (o.quantity + '').length : (o.remainQuantity + '/' + o.quantity).length
-          }
-        }, {
-          name: '质量',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.qualityTypeName || '').length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-
-        // 条码绑定 补料 容器清空
-      case 'barcodeManage':
-        aDis = isNoRemain ? ['barcode', 'batchNo', 'quantity'] : ['barcode', 'batchNo', 'quantity', 'remainQuantity']
-        aSum = isNoRemain ? ['quantity'] : ['quantity', 'remainQuantity']
-
-        oData.sumList = _sumDataList(oData.detailInfosUnited, ['barcode', 'batchNo'], aDis, aSum)
-
-        // 设置详细信息标题 -- 是否已设定（条码绑定）
-        if (oData.nodeType === 205 || oData.nodeType === 206) {
-          // 条码绑定
-          // 设置详细信息标题 托码+物料名称
-          oData.detailTitle = oData.detailInfosUnited.length ? ((oData.detailInfosUnited[0].srcBarcode ? (oData.detailInfosUnited[0].srcBarcode + '  ') : '') + oData.detailInfosUnited[0].materialName) : ''
-        } else {
-          // 补料 容器清空
-          oData.detailTitle = oData.detailTitle ? oData.detailTitle : (oData.detailInfosUnited.length ? oData.detailInfosUnited[0].materialName : '')
-        }
-
-        // 设置表头。
-        oData.headerList = [{
-          name: '条码',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.barcode || '').length
-          }
-        }, {
-          name: '批次',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.batchNo || '').length
-          }
-        }, {
-          name: (isNoRemain ? '总数' : '滞留数/总数'),
-          minLen: (isNoRemain ? 2 : 6),
-          formatter: function (o) {
-            return isNoRemain ? (o.quantity + '').length : (o.remainQuantity + '/' + o.quantity).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-
-        // 正常物料 废品
-      case 'material':
-        oData.sumList = _sumDataList(oData.detailInfosUnited, ['batchNo'], ['batchNo', 'quantity'], ['quantity'])
-        // 设置详细信息标题
-        oData.detailTitle = ''
-
-        // 设置表头。
-        oData.headerList = [{
-          name: '批次',
-          minLen: 2,
-          formatter: function (o) {
-            return (o.batchNo || '').length
-          }
-        }, {
-          name: '总数',
-          minLen: 2,
-          formatter: function (o) {
-            return ('' + o.quantity).length
-          }
-        }]
-
-        // 设置数据显示的宽度。
-        _setTemplateColumnWidth(oData.sumList, oData.headerList)
-
-        break
-      default:
-        break
+    // 修改数据的小数位数。
+    if (Number(o.num) === parseInt(o.num)) {
+      o.num = parseInt(o.num)
+    } else {
+      o.num = Number(o.num).toFixed(2)
     }
 
-    aoDiagramData.push(oData)
-    let aoParents = oData.parents.split(',')
-    aoParents.forEach(sParent => {
-      aoDiagramLinkData.push({
-        from: sParent,
-        to: oData.key,
-        fromPort: 'FROM',
-        toPort: 'TO'
-      })
-    })
+    return o
   })
-
   return {
     node: aoDiagramData,
     link: aoDiagramLinkData
-  }
-
-  /**
-   * 获取显示的最短长度名称。
-   * @param {String} sName
-   * @param {Number} limited
-   * @return {String}
-   */
-  // function _getShortedNum (sName, limited = 30) {
-  //   if (sName.length < limited) {
-  //     return sName
-  //   } else {
-  //     return sName.substr(0, limited) + '...'
-  //   }
-  // }
-
-  /**
-   * 合并数据处理函数。合并的数量的值。
-   * @param {Array} 处理的数据。
-   * @param {Array} 合并的字段-- 分类
-   * @param {Array} 展示的字段。
-   * @param {Array} 汇总的字段
-   * @return {Object} 返回数据。
-   */
-  function _sumDataList (aoList, aGroup, aDis, aSum) {
-    let oFlag = {}
-
-    aoList && aoList.forEach(o => {
-      // 需合并的参数值。
-      let sKey = ''
-
-      aGroup.forEach(sGroup => {
-        sKey += o[sGroup] + '+'
-      })
-
-      if (!oFlag[sKey]) {
-        // 设置展示的值。
-        oFlag[sKey] = {}
-
-        // 展示的数据，如果为null 如果需要汇总则为0，否则为空
-        aDis.forEach(sDis => {
-          oFlag[sKey][sDis] = (o[sDis] || (aSum.includes(sDis) ? 0 : ''))
-        })
-      } else {
-        // 存在，在汇总数据。
-        // 默认为quantity
-        if (aSum && aSum.length) {
-          aSum.forEach(sSum => {
-            oFlag[sKey][sSum] += (o[sSum] || 0)
-          })
-        } else {
-          oFlag[sKey].quantity += (o.quantity || 0)
-        }
-      }
-    })
-
-    // 返回数据。
-    return window.Rt.utils.getObjectValues(oFlag)
-  }
-
-  /**
-   * 工序节点数据处理。
-   * @param {Object}
-   * @return {}
-   */
-  function _sumProcessData (oData) {
-    // 返回的数据。
-    let oReturn = {
-      // 工序使用一个模板
-      // detailType: "",
-      detailTitle: '',
-      sumList: []
-    }
-    // let aOutputMaterial = new Set()
-    // let aInputMaterial = new Set()
-    // let bIsSame = false
-
-    if (oData.detailInfosUnited.length) {
-      // 按设备进行分类。
-      let oFlag = {}
-      oData.detailInfosUnited.forEach(o => {
-        // 需合并的参数值。
-        let sKey = o.equipmentId
-
-        if (!oFlag[sKey]) {
-          oFlag[sKey] = {
-            equipmentName: o.equipmentName,
-            list: [o]
-          }
-        } else {
-          oFlag[sKey].list.push(o)
-        }
-      })
-
-      oReturn.sumList = window.Rt.utils.getObjectValues(oFlag)
-
-      oReturn.sumList.forEach(o => {
-        // 类型参数。
-        oFlag = {}
-
-        // 按类型分类（投入，产出，滞留）
-        o.list.forEach(oType => {
-          let sKey = oType.opType
-
-          if (sKey === 1) { // 投入
-            // 投入。
-            if (!oFlag['touru']) {
-              oFlag['touru'] = {
-                type: '投入',
-                list: [oType],
-                order: 1
-              }
-            } else {
-              oFlag['touru'].list.push(oType)
-            }
-          } else if (sKey === 6) {
-            // 产出。
-            if (!oFlag['chanchu']) {
-              oFlag['chanchu'] = {
-                type: '产出',
-                list: [oType],
-                order: 2
-              }
-            } else {
-              oFlag['chanchu'].list.push(oType)
-            }
-          }
-        })
-
-        let aType = window.Rt.utils.getObjectValues(oFlag)
-
-        // 按照投入、产出、滞留顺序。
-        aType.sort((ot1, ot2) => ot1.order - ot2.order > 0 ? 1 : -1)
-
-        // 各个分类中按批次合并。（投料不同时，投入按物料批次合并）
-        aType.forEach(o1 => {
-          // 按批次合并。
-          let aMerge = ['batchNo', 'materialCode']
-          let aDis = ['batchNo', 'quantity', 'remainQuantity', 'materialName']
-          let aSum = ['quantity', 'remainQuantity']
-
-          // trace 和 track展示不同。
-          if (bIsOld || sPageType === 'trace') {
-            aDis = ['batchNo', 'quantity', 'materialName']
-            aSum = ['quantity']
-          }
-
-          o1.list = _sumDataList(o1.list, aMerge, aDis, aSum)
-        })
-
-        // 重新设置类型数据。
-        o.list = aType
-      })
-    }
-
-    // 设置详细信息标题
-    return oReturn
-  }
-
-  /**
-   * 合并车间调整数据。-- 调整数取destAdjustQuantity 滞留数取 remainQuantity
-   * @param {Object}
-   * @param {Boolean} 不显示滞留数
-   * @return {}
-   */
-  function _sumWorkShopData (oData, isNotShowRemain) {
-    let oFlag = {}
-
-    let aDis = isNotShowRemain ? ['barcode', 'adjustQuantity'] : ['barcode', 'adjustQuantity', 'remainQuantity']
-    let aSum = isNotShowRemain ? ['adjustQuantity'] : ['adjustQuantity', 'remainQuantity']
-
-    // 先按源条码合并。- 原条码的调整数量，为所有的目标条码和。
-    oData.detailInfosUnited.forEach(o => {
-      let sKey = o.srcBarcode
-
-      if (!oFlag[sKey]) {
-        oFlag[sKey] = {
-          srcBarcode: sKey,
-          // 加入目标条码及调整数量。
-          list: []
-        }
-      }
-
-      let oDis = {}
-      aDis.forEach(sDis => {
-        oDis[sDis] = o[sDis]
-      })
-      oFlag[sKey].list.push(oDis)
-    })
-
-    // 合并目标条码数据。
-    for (let sParam in oFlag) {
-      let aList = oFlag[sParam].list
-      oFlag[sParam].list = _sumDataList(aList, ['barcode'], aDis, aSum)
-      oFlag[sParam].adjustQuantity = oFlag[sParam].list.map(o => o.adjustQuantity).reduce(function (nPrev, nNext) {
-        return nPrev + nNext
-      }, 0)
-    }
-
-    return window.Rt.utils.getObjectValues(oFlag)
-  }
-
-  /**
-   * 设置内容的宽度。
-   * @param {Array} aoSum
-   * @param {Array} aoHeader
-   */
-  function _setTemplateColumnWidth (aoSum, aoHeader) {
-    // 循环表头数据。
-    aoHeader.forEach((o, i) => {
-      let aData = []
-      // 是否为特殊处理的标识。-- sumList中有list列 调整 工序
-      let sType = o.type
-      let nMaxLen = o.maxLen || 100 // 默认为英文字符
-      let nMinLen = o.minLen || 0
-
-      // 获取得到最大长度
-      aoSum.forEach(oSum => {
-        if (!sType) {
-          // 直接获取数据
-          aData.push(o.formatter(oSum) || 0)
-        } else if (sType === 1) {
-          // 从list中获取数据。
-          oSum.list.forEach(oLevel => aData.push(o.formatter(oLevel) || 0))
-        } else if (sType === 2) {
-          // 从list.list中获取数据。
-          oSum.list.forEach(oLevel => {
-            oLevel.list.forEach(oL => aData.push(o.formatter(oL) || 0))
-          })
-        }
-      })
-
-      let nWidth = Math.max.apply(null, aData)
-
-      nWidth = nWidth < nMinLen ? nMinLen : nWidth
-      nWidth = nWidth > nMaxLen ? nMaxLen : nWidth
-      nWidth = nWidth * 13
-
-      // 设置当前列宽度
-      o.width = nWidth
-
-      // 设置所有数据中的长度 [{column0:,column1:},{...}]
-      aoSum.forEach(oSum => {
-        // 每条数据设置每列的宽度
-        if (!sType) {
-          oSum['column' + i] = nWidth
-        } else if (sType === 1) {
-          oSum.list.forEach(oLevel => {
-            oLevel['column' + i] = nWidth
-          })
-        } else if (sType === 2) {
-          oSum.list.forEach(oLevel => {
-            oLevel.list.forEach(oL => {
-              oL['column' + i] = nWidth
-            })
-          })
-        }
-      })
-    })
   }
 }
 
@@ -1056,9 +297,9 @@ var isMaterialNode = function (oData) {
 // 第一个节点的parents值。
 const SPARENTKEY = '0'
 
-var getCatalogData = function (aoRowData, sType) {
+var getCatalogData = function (oRowData, sType) {
   let aoCatalogData = []
-  let aoCopyData = JSON.parse(JSON.stringify(aoRowData))
+  let aoCopyData = JSON.parse(JSON.stringify(oRowData.nodeList))
   let aResult = []
     // 追踪中新增的物料节点key值。
   let sNewMateiralNodekey = 'customerKey'
@@ -1369,171 +610,6 @@ var getCatalogData = function (aoRowData, sType) {
   }
 }
 
-// 获取追溯左侧导航数据。
-var getCatalogData1 = function (aoRowData) {
-  let aoCatalogData = []
-  let aoCopyData = JSON.parse(JSON.stringify(aoRowData))
-  let aResult = []
-
-  // 修改节点的类型值。
-  aoCopyData.forEach(o => {
-    o.iconType = getNodeIconAndTemp(o.nodeType).icon
-  })
-
-  for (let i = aoCopyData.length - 1; i >= 0; i--) {
-    let oData = aoCopyData[i]
-
-    if (oData && oData.parents === SPARENTKEY) {
-      oData.parent = ''
-      aoCatalogData.push(oData)
-
-      aoCopyData.splice(i, 1)
-      _findChildrenData(aoCopyData, oData.key, oData.key)
-    }
-  }
-
-  // 物料的合并
-  // for(let i = aoCatalogData.length - 1; i >= 0; i--) {
-  for (let i = 0; i < aoCatalogData.length; i++) {
-    let oData = aoCatalogData[i]
-    let aKey = []
-    if (isMaterialNode(oData) && !_isExist(oData)) {
-      // 物料-找同名
-      aKey = _getKeysOfSameName(oData).key
-      aResult.push(Object.assign({}, oData, {
-        name: (aKey.length - 1) ? oData.name + '(' + aKey.length + ')' : oData.name,
-        sublings: aKey
-      }))
-    }
-  }
-
-  // 获取同名同物料下的工序。
-  // for(let i = aoCatalogData.length - 1; i >= 0; i--) {
-  for (let i = 0; i < aoCatalogData.length; i++) {
-    let oData = aoCatalogData[i]
-    if (!(isMaterialNode(oData)) && !_isExist(oData)) {
-      // 工序-找同名
-      let oValue = _getKeysOfSameName(oData)
-      aResult.push(Object.assign({}, oData, {
-        name: (oValue.key.length - 1) ? oData.name + '(' + oValue.key.length + ')' : oData.name,
-        sublings: oValue.key,
-        parent: oValue.parent
-      }))
-    }
-  }
-
-  // 返回数据。
-  return aResult
-
-  /**
-   * 递归查找子节点。
-   * @param {Array} aoCopyData
-   * @param {String} sKey
-   * @param {String} sParentKey
-   * @return {void}
-   */
-  function _findChildrenData (aoCopyData, sKey, sParentKey) {
-    for (let i = aoCopyData.length - 1; i >= 0; i--) {
-      let oData = aoCopyData[i]
-      let sNewKey = ''
-
-      if (oData && oData.parents.split(',').includes(sKey)) {
-        // 当前元素的子级。
-        if (isMaterialNode(oData)) {
-          oData.parent = ''
-          sNewKey = oData.key
-        } else {
-          sNewKey = sParentKey
-          oData.parent = sParentKey
-        }
-
-        aoCopyData.splice(i, 1)
-        aoCatalogData.push(oData)
-
-        if (aoCopyData.length) {
-          _findChildrenData(aoCopyData, oData.key, sNewKey)
-        }
-      }
-    }
-  }
-
-  /**
-   * 通过名称获取相同的名称的数据的key中。
-   * @param {Object} oFilter
-   * @return {Array}
-   */
-  function _getKeysOfSameName (oFilter) {
-    let oResult = {
-      key: [],
-      parent: ''
-    }
-
-    // for(let i = aoCatalogData.length - 1; i >= 0; i--) {
-    for (let i = 0; i < aoCatalogData.length; i++) {
-      let oData = aoCatalogData[i]
-
-      if (isMaterialNode(oFilter)) {
-        // 物料-找同名
-        if (oData.name === oFilter.name) {
-          oResult.key.push({
-            key: oData.key,
-            parent: oData.parent
-          })
-        }
-      } else {
-        // 工序，找同parent
-        // 找到在aResulte中通存在的subling的值。
-        let oValue = _isSameLevel(oData, oFilter)
-        if (oData.name === oFilter.name && oValue.bSame) {
-          oResult.key.push({
-            key: oData.key,
-            parent: oData.parent
-          })
-          oResult.parent = oValue.parent
-        }
-      }
-    }
-
-    // 返回数据。
-    return oResult
-  }
-
-  /**
-   * 判断元素是否存在已存在。
-   * @param {Object} oData
-   */
-  function _isExist (oData) {
-    // return aResult.some( o => o.sublings.includes(oData.key) )
-    return aResult.some(o => {
-      return o.sublings.some(o1 => o1.key === oData.key)
-    })
-  }
-
-  /**
-   * 判断工序是否是同一个合并后的父级。
-   */
-  function _isSameLevel (oData, oValue) {
-    let oR = {
-      bSame: false,
-      parent: ''
-    }
-
-    aResult.forEach(o => {
-      // if(!oR.bSame && o.sublings.includes(oData.parent) && o.sublings.includes(oValue.parent)) {
-      //   oR.bSame = true
-      //   oR.parent = o.key
-      // }
-
-      if (!oR.bSame && o.sublings.some(o1 => o1.key === oData.parent) && o.sublings.some(o1 => o1.key === oValue.parent)) {
-        oR.bSame = true
-        oR.parent = o.key
-      }
-    })
-
-    return oR
-  }
-}
-
 // 处理追踪中树
 var getTrackCatalogData = function (aoRowData) {
   let aoCatalogData = []
@@ -1788,7 +864,6 @@ export default {
   getCatalogData,
   getTrackCatalogData,
   SPARENTKEY,
-  getCatalogData1,
   outerHeight
 }
 

@@ -11,7 +11,7 @@
           <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('rawTable', $event)"></i>
         </span>
       </div>
-      <div class="content-table" ref="rawTable">
+      <div class="content-table" ref="rawTable"> 
         <div v-if="error" class="error">
           {{ error }}
         </div>
@@ -42,10 +42,10 @@
             </template>
           </el-table-column>
         </el-table>
-        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->
+        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->    
       </div>
     </div>
-  </div>
+  </div>      
 </template>
 
 <script>
@@ -78,7 +78,7 @@ export default {
       error: '',
       // sErrorMessage: "",
       materialData: {
-        filename: '仓储表',
+        filename: '质检表',
         columns: [],
         data: []
       },
@@ -97,13 +97,6 @@ export default {
     },
     treeFullscreen: function () {
       return this.$store && this.$store.state.treeFullscreen
-    },
-    // 版本信息数据。
-    isOpDbBeforeRefact () {
-      return (
-        this.$store.state.versionModule &&
-        this.$store.state.versionModule.isOpDbBeforeRefact
-      )
     },
     // 当前传入的值。
     detailInfos () {
@@ -128,10 +121,10 @@ export default {
       let fromTitle = from.meta.title
 
       // 如果从tree上直接点击，需要更新数据. tag不同
-      // 仓储信息: 从可疑品(restrain)或同批次入库(batch)中进入，则不会重新请求 .tag是一样的
+      // 质检信息: 从可疑品(restrain)进入，则不会重新请求 .tag是一样的
       if (
-        toTitle === 'storage' &&
-        (fromTitle === 'storage' ||
+        toTitle === 'quality' &&
+        (fromTitle === 'quality' ||
           (to.query._tag !== undefined && this.tag !== to.query._tag))
       ) {
         this.tag = to.query._tag
@@ -157,102 +150,73 @@ export default {
   methods: {
     // 获取业务库的表格显示列。
     getTableColumns () {
-      return this.isOpDbBeforeRefact
-        ? [
-          {
-            prop: 'index',
-            name: '序号',
-            width: '50px',
-            merge: true
-          },
-          {
-            prop: 'barcode',
-            name: '条码',
-            merge: true
-          },
-          {
-            prop: 'batchNo',
-            name: '批次',
-            class: 'batch',
-            width: 200,
-            click: this.batchClick
-          },
-          {
-            prop: 'materialName',
-            name: '物料名称'
-          },
-          {
-            prop: 'materialCode',
-            name: '物料编码'
-          },
-          {
-            prop: 'quantity',
-            name: '数量',
-            width: '50px'
-          },
-          {
-            prop: 'warehouse',
-            name: '仓库'
-          },
-          {
-            prop: 'reservoir',
-            name: '库位'
-          },
-          {
-            prop: 'opType',
-            name: '出入库',
-            width: '60px'
-          },
-          {
-            prop: 'createTime',
-            name: '处理时间',
-            width: 200
-          },
-          {
-            prop: 'personName',
-            name: '操作人',
-            width: '60px'
-          },
-          {
-            prop: 'vendorName',
-            name: '供应商/客户'
-          }
-        ]
-        : [
-          {
-            prop: 'index',
-            name: '序号',
-            width: '50px',
-            merge: true
-          },
-          {
-            prop: 'batchNo',
-            name: '批次',
-            class: 'batch',
-            click: this.batchClick,
-            merge: true
-          },
-          {
-            prop: 'barcode',
-            name: '条码'
-          },
-          {
-            prop: 'materialName',
-            name: '物料名称'
-          },
-          {
-            prop: 'materialCode',
-            name: '物料编码'
-          },
-          {
-            prop: 'quantity',
-            name: '数量'
-          },
-          {
-            prop: 'remainQuantity',
-            name: '滞留数'
-          }
-        ]
+      return [
+        {
+          prop: 'index',
+          name: '序号',
+          width: '50'
+        },
+        {
+          prop: 'srcbarcode',
+          name: '来源条码'
+        },
+        {
+          prop: 'quantity',
+          name: '数量',
+          width: '50'
+        },
+        {
+          prop: 'materialName',
+          name: '物料名称'
+        },
+        {
+          prop: 'materialCode',
+          name: '物料编码'
+        },
+        {
+          prop: 'batchNo',
+          name: '批次',
+          class: 'batch',
+          width: '200',
+          click: this.batchClick
+        },
+        {
+          prop: 'sample',
+          name: '样本数',
+          width: '50'
+        },
+        {
+          prop: 'destbarcode',
+          name: '取样框条码'
+        },
+        {
+          prop: 'warehouse',
+          name: '仓库'
+        },
+        {
+          prop: 'reservoir',
+          name: '库位'
+        },
+        {
+          prop: 'opType',
+          name: '出入库',
+          width: '60px'
+        },
+        {
+          prop: 'createTime',
+          name: '处理时间',
+          width: 200
+        },
+        {
+          prop: 'personName',
+          name: '操作人',
+          width: '60px'
+        },
+        {
+          prop: 'vendorName',
+          name: '供应商/客户'
+        }
+      ]
     },
     // 判断调用接口是否成功。
     judgeLoaderHandler (param, fnSu, fnFail) {
@@ -360,7 +324,7 @@ export default {
 
       let sKey = this.$route.query && this.$route.query.key
         // 提取选中的物料节点数据。
-      let oNode = this.rawData.nodeList.filter(o => o.key === sKey)[0] || {}
+      let oNode = this.rawData.filter(o => o.key === sKey)[0] || {}
 
       this.node = {
         code: oNode.code || '',

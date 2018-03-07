@@ -355,18 +355,15 @@ export default {
       })
     },
     getQueryParam () {
-    	// 修改接口产出获取的参数名。
-    	let oParam = Object.assign({}, this.ruleForm)
-    	
-    	for(let sParam in oParam) {
-    		let aoMatch = this.aFilter.filter(o => o.key === sParam)
-    		
-    		if(aoMatch.length && aoMatch[0].paramKey) {
-    			oParam[aoMatch[0].paramKey] = oParam[sParam]
-    			delete oParam[sParam]
-    		}
-    	}
-    	
+      // 修改接口产出获取的参数名。
+      let oParam = Object.assign({}, this.ruleForm)
+      for (let sParam in oParam) {
+        let aoMatch = this.aFilter.filter(o => o.key === sParam)
+        if (aoMatch.length && aoMatch[0].paramKey) {
+          oParam[aoMatch[0].paramKey] = oParam[sParam]
+          delete oParam[sParam]
+        }
+      }
       oParam = fnP.parseQueryParam(oParam)
 
       // 处理全部。

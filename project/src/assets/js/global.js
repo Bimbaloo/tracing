@@ -175,6 +175,11 @@
     parseTableData: function (oTableData, type) {
       let oData = Object.assign({}, type === 'ag-table' ? this.changeTableToAgTable(oTableData) : oTableData)
 
+      // 过滤导出excel不显示
+      if (oData.columns && oData.columns.length) {
+        oData.columns = oData.columns.filter(o => !o.isNotShowInExcel)
+      }
+
       let aoTableJson = []
 
       if (oTableData instanceof Array) {

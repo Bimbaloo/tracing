@@ -4,7 +4,7 @@
 		<!-- <el-row :gutter="0" class="content"  v-loading.fullscreen.lock="fullscreenLoading"> -->
 		<div class="content" v-loading.fullscreen.lock="fullscreenLoading" element-loading-text="拼命加载中">
 			<!-- <el-col  @click="goToInit" :xs="9" :sm="7" :md="6" :lg="4" :class="[{ collapsed: collapse }, 'nav']"> -->
-			<div :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">	
+			<div :style="{ flexBasis: reversedMessage+'px'}" :class="[{ collapsed: collapse }, 'nav']">
 				<v-catalog @init="treeDataInit" :catalog-data="catalogData"></v-catalog>
 			</div>
 			<!-- <div :xs="collapse?24:15" :sm="collapse?24:17" :md="collapse?24:18" :lg="collapse?24:20" class="router" ref="router"> -->
@@ -166,13 +166,13 @@ export default {
     requestSucess (oData) {
       this.fullscreenLoading = false
 
-      if (!oData.nodeDtoList.length) {
+      if (!oData.data.nodeList.length) {
         console.log('查无数据。')
         this.showMessage()
       } else {
         this.$store.commit({
           type: 'updateData',
-          data: oData.nodeDtoList // fnP.parseTreeData(data)
+          data: oData.data // fnP.parseTreeData(data)
         })
 
         // 显示提示信息。

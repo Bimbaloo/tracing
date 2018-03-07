@@ -127,14 +127,6 @@ export default {
     }
   },
   computed: {
-    // 工厂配置数据。
-    // configData() {
-    //   return this.$store.state.customModule.config
-    // },
-    // 配置图标。
-    // logo() {
-    //   return this.configData && this.configData.logo
-    // },
     liData () {
       return this.switchData(this.myLocalStorage)
     },
@@ -152,14 +144,6 @@ export default {
         this.$store.state.versionModule.linkRepair
       )
     }
-    // 工厂配置数据。
-    // configData() {
-    //   return this.$store.state.customModule.config
-    // },
-    // 配置模块。
-    // modulesConfig() {
-    //   return this.configData.modules
-    // }
   },
   created () {
     let history = localStorage.getItem('history')
@@ -233,30 +217,6 @@ export default {
           return unSuport.indexOf(o.key) < 0
         })
       }
-
-      // .filter(o => {
-      //   let oItem = this.modulesConfig.find(item => {
-      //     return o.key === item.key
-      //   });
-      //   if(oItem) {
-      //     return !!oItem.switch
-      //   }else {
-      //     return true
-      //   }
-      // })
-      // .map(o => {
-      //   let oItem = this.modulesConfig.find(item => {
-      //     return o.key === item.key
-      //   });
-      //   if(oItem) {
-      //     o.select = oItem.select
-      //     o.name = oItem.name
-      //   }
-      //   return o
-      // })
-      // 设置激活的tab。
-      // let oSelect = this.categories.find(o => !!o.select)
-      // this.activeKey = (oSelect && oSelect.key) || this.categories[0].key
 
       this.categories.forEach(o => {
         o.active = {
