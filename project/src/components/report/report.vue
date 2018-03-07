@@ -947,21 +947,21 @@ export default {
         return
       }
 
-      let sQuery = oTable.offsetParent.querySelector('.condition-message')
+      let sQuery = document.querySelector('.condition-message')
         ? `
             <div class="condition-message">${
-              oTable.offsetParent.querySelector('.condition-message').innerHTML
+              document.querySelector('.condition-message').innerHTML
             }</div>
             <div class="condition-list">${
-              oTable.offsetParent.querySelector('.condition-list').innerHTML
+              document.querySelector('.condition-list').innerHTML
             }</div>
             <div class="content-table condition-table">${
-              oTable.offsetParent.querySelector('.condition-table').innerHTML
+              document.querySelector('.condition-table').innerHTML
             }</div>
           `
         : `
             <div class="condition">${
-              oTable.offsetParent.querySelector('.condition').innerHTML
+              document.querySelector('.condition').innerHTML
             }</div>
           `
 

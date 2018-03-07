@@ -1,5 +1,5 @@
 <template>
-	<ag-grid 
+	<ag-grid
 		v-loading="loading"
 		element-loading-text="拼命加载中"
     	class="ag-table ag-fresh"

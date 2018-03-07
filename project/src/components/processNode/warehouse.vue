@@ -22,6 +22,7 @@
 				<div class="content-table" ref="rawTable">
 					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
           <v-agtable
+              ref="agTable"
             :table-data="materialData"
             :heights="tableHeight"
             :loading="loading"
@@ -427,9 +428,9 @@ export default {
   },
   created () {
     this.fetchData()
-    this.$nextTick(() => {
-      this.setHeight()
-    })
+  },
+  mounted () {
+    this.tableHeight = this.setHeight()
   },
   watch: {
     // "clickNum": "fetchData",
@@ -440,16 +441,17 @@ export default {
     },
     /* 视窗大小变化，重新设置table大小 */
     resizeY: function () {
-      this.setHeight()
+      this.tableHeight = this.setHeight()
     },
     /* 全屏大小时，重新设置table大小 */
     fullscreen: function () {
-      this.setHeight()
+      this.tableHeight = this.setHeight()
     },
     treeFullscreen: function () {
       if (!this.treeFullscreen) {
         this.$nextTick(() => {
-          this.setHeight()
+          this.tableHeight = this.setHeight()
+          this.$refs.agTable.option.api.doLayout()
         })
       }
     }
@@ -688,12 +690,9 @@ export default {
     },
     // 设置table的高度
     setHeight () {
-      this.tableHeight = 100
-      this.$nextTick(() => {
-        let content = document.querySelector('.router-content')
-        let tableData = document.querySelector('.tableData')
-        this.tableHeight = this.outerHeight(content) - this.outerHeight(tableData) - 40
-      })
+      let content = document.querySelector('.router-content')
+      let tableData = document.querySelector('.tableData')
+      return this.outerHeight(content) - this.outerHeight(tableData) - 40
     },
     // 详情全屏按钮点击事件
     fullScreenClick (isTrue) {

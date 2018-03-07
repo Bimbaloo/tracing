@@ -260,6 +260,16 @@ export default {
       } else if (sToType === 'product') {
         // 从其他页面跳到投产表
         this.aoRoute.pop()
+      } else if (sFromType === 'parameter') {
+        // 从工艺参数跳到其他页面。
+        this.aoRoute.push({
+          name: this.operations[sToType],
+          path: sToRoute,
+          query: this.oQuery[sToType]
+        })
+      } else if (sToType === 'parameter') {
+        // 从其他页面跳到工艺参数
+        this.aoRoute.pop()
       }
     },
     showRestrain () {

@@ -165,7 +165,7 @@ export default {
         this.$store,
         this.$ajax,
         moldUrl,
-        'get',
+        'post',
         oCondition,
         this.requestSucess,
         this.requestFail,

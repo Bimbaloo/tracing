@@ -16,110 +16,129 @@
                 <div v-if="!barcodeTableData.show && !chartShow" class="error">
                     {{ empty }}
                 </div>
-                <el-tabs v-else v-model="activeName" @tab-click="tabChange">
-                    <el-tab-pane label="条码表" name="table" v-if="barcodeTableData.show" class="table">
-                        <div class="barcode-input">
-                            <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-                                <el-form-item label="条码：" >
-                                    <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
-                                </el-form-item>
-                            </el-form>
-                            <span class='table-handle'>
-                                <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(barcodeTableData, $event)"></i>
-                                <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('barcodeTable', $event)"></i>
-                            </span>
-                        </div>
-                        <div class="content-table" ref="barcodeTable">
-                            <el-table
-                            :data="datas"
-                            stripe
-                            class="table"
-                            :row-key="barcodeTableData.data.barcode"
-                            v-loading="barcodeTableData.loading"
-                            element-loading-text="拼命加载中"
-                            style="width: 100%"
-                            ref="multipleTable"
-                            @expand-change="expandRow"
-                            :height="barcodeTableData.height">
-                                <el-table-column
-                                v-if="!!column.show"
-                                v-for="column in columns"
-                                align="center"
-                                :type="column.type"
-                                :prop="column.prop"
-                                :label="column.name"
-                                :key="column.prop"
-                                :class-name="column.class"
-                                :width="column.width">
-                                    <template slot-scope="props">
-                                        <el-form
-                                        label-position="left"
-
-                                        class="demo-table-expand expand-form"
-                                        v-if="column.type === 'expand'">
-                                            <div v-if="props.row.list.length">
-                                                <el-form-item
-                                                :label="`${prop.description}${prop.varUnit}`"
-                                                v-for="prop in props.row.list"
-                                                :key="prop.varStdId">
-                                                    <span v-for="(item,index) in prop.params" :key="index">&nbsp;{{ item.value}}({{item.pickTime}})&nbsp;</span>
-                                                </el-form-item>
-                                            </div>
-                                            <div v-else>{{detailTip}}</div>
-                                        </el-form>
-                                        <div v-else :class="[ 'cell-content']">
-                                            {{ props.row[column.prop] }}
-                                        </div>
-                                    </template>
-                                </el-table-column>
-                            </el-table>
-                        </div>
-                    </el-tab-pane>
-                    <el-tab-pane label="曲线图" name="chart" v-if="chartShow" class="chart">
-                        <el-tabs v-loading="loading" v-model="activeChart" @tab-click="chartTabChange">
-                            <el-tab-pane :label="chartData.filename" :name="`chart${index}`" v-for="(chartData,index) in tableDatas" :key="index">
-                                <!-- 没有图表时，不显示图表开关 -->
-                                <el-switch
-                                    v-model="chartData.value"
-                                    active-color="#42af8f"
-                                    inactive-color="#42af8f"
-                                    active-text="图表"
-                                    inactive-text="表格"
-                                    active-value="表格"
-                                    inactive-value="图形"
-                                    v-for="(option,index) in options"
-                                    v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
-                                    :key="index"
-                                    @change = "switchChange(chartData.value)">
-                                </el-switch>
-                                <div class="content-echarts"
-                                v-for="(option,index) in options"
-                                :key="index"
-                                v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
-                                v-show="chartData.value === '图形'">
-                                    <div class="charts" :id="`charts`+index"></div>
-                                </div>
-                                <div class="content-tables" v-if="chartData.value === '表格' && index == tabPaneNum">
-                                    <h2 class="content-title tableData">
-                                        <span class='table-title'>
-                                            <span>检验参数：{{chartData.varStdId}}</span>&nbsp;&nbsp;
-                                            <span>单位：{{chartData.unit}}</span>
-                                        </span>
-                                        <span class='table-handle'>
-                                            <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(chartData, $event)"></i>
-                                            <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
-                                        </span>
-                                    </h2>
-                                    <div class="content-table" :ref="`tableData${index}`">
-                                        <v-table :table-data="chartData" :heights="chartTableHeight" :resize="tdResize"></v-table>
-                                    </div>
-                                </div>
-                            </el-tab-pane>
-                        </el-tabs>
-                    </el-tab-pane>
-                </el-tabs>
+                <el-switch
+                  v-else
+                  style="display: block"
+                  v-model="activeName"
+                  active-value="table"
+                  inactive-value="charts"
+                  active-color="#409eff"
+                  inactive-color="#409eff"
+                  active-text="条码表"
+                  inactive-text="曲线图"
+                  @change = "tabChange">
+                </el-switch>
+                <div v-if="activeName === `table`" class="table">
+                  <div class="barcode-input">
+                      <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
+                          <el-form-item label="条码：" > 
+                              <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
+                          </el-form-item>
+                      </el-form>
+                      <span class='table-handle'>
+                          <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(barcodeTableData, $event)"></i>
+                          <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('barcodeTable', $event)"></i>
+                      </span>
+                  </div>
+                  <div class="content-table" ref="barcodeTable">
+                      <el-table 
+                      :data="datas" 
+                      stripe 
+                      class="table" 
+                      :row-key="barcodeTableData.data.barcode" 
+                      v-loading="barcodeTableData.loading" 
+                      element-loading-text="拼命加载中" 
+                      style="width: 100%" 
+                      ref="multipleTable" 
+                      @expand-change="expandRow" 
+                      :height="barcodeTableData.height">
+                          <el-table-column 
+                          v-if="!!column.show" 
+                          v-for="column in columns" 
+                          align="center" 
+                          :type="column.type" 
+                          :prop="column.prop" 
+                          :label="column.name" 
+                          :key="column.prop" 
+                          :class-name="column.class" 
+                          :width="column.width">
+                              <template slot-scope="props">
+                                  <el-form 
+                                  label-position="left" 
+                                  class="demo-table-expand expand-form" 
+                                  v-if="column.type === 'expand'">                             
+                                    <div v-if="props.row.list.length">
+                                        <el-form-item                  
+                                        :label="`${prop.description}${prop.varUnit}`" 
+                                        v-for="prop in props.row.list" 
+                                        :key="prop.varStdId">
+                                            <span v-for="(item,index) in prop.params" :key="index">&nbsp;{{ item.value}}({{item.pickTime}})&nbsp;</span>
+                                        </el-form-item>
+                                    </div>                                            
+                                    <div v-else>{{detailTip}}</div>
+                                  </el-form>
+                                  <div v-else :class="[ 'cell-content']">
+                                      {{ props.row[column.prop] }}
+                                  </div>
+                              </template>
+                          </el-table-column>
+                      </el-table>
+                  </div>
+                </div>
+                <div v-if="activeName === `charts`" class="chart">
+                  <el-tabs v-loading="loading" v-model="activeChart" @tab-click="chartTabChange">
+                      <el-tab-pane :label="chartData.filename" :name="`chart${index}`" v-for="(chartData,index) in tableDatas" :key="index">
+                          <!-- 没有图表时，不显示图表开关 -->
+                          <el-switch
+                              v-model="chartData.value"
+                              active-color="#42af8f"
+                              inactive-color="#42af8f"
+                              active-text="图表"
+                              inactive-text="表格"
+                              active-value="表格"
+                              inactive-value="图形"
+                              v-for="(option,indexs) in options" 
+                              v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
+                              :key="indexs+50"
+                              @change = "switchChange(chartData.value)">
+                          </el-switch>
+                          <div class="content-echarts" 
+                            v-for="option in options" 
+                            :key="option.index"
+                            v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename" 
+                            v-show="chartData.value === '图形'">
+                            <div class="charts" :id="`charts${index}`"></div>
+                          </div>
+                          <div class="content-tables" v-show="chartData.value === '表格' && index == tabPaneNum">
+                              <h2 class="content-title tableData">
+                                  <span class='table-title'>
+                                      <span>检验参数：{{chartData.varStdId}}</span>&nbsp;&nbsp;
+                                      <span>单位：{{chartData.unit}}</span>
+                                  </span>
+                                  <span class='table-handle'>
+                                      <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(chartData, $event)"></i>
+                                      <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
+                                  </span>
+                              </h2>
+                              <div class="content-table" :ref="`tableData${index}`">
+                                  <!-- <v-table :table-data="chartData" :heights="chartTableHeight" :resize="tdResize"></v-table> -->
+                                  <el-table :data="chartData.data" :height="chartTableHeight" border class="table" ref="multipleTable">
+                                      <el-table-column v-for='column in chartData.columns' :key="column.prop" :prop="column.prop" :label="column.name" :width="column.width" align='center'> 
+                                        <template slot-scope="scope" >
+                                          <el-checkbox @change="chooseTime(scope.row.checked,chartData.data, scope.$index)" v-model="scope.row.checked" v-if="column.name === '采集时间'">{{scope.row[column.prop]}}</el-checkbox>
+                                          <div class="cell" v-else>{{scope.row[column.prop]}}</div>
+                                        </template>
+                                      </el-table-column>
+                                  </el-table>
+                              </div>
+                          </div>
+                          <div class="btn-box">
+                            <el-button class="btn btn-plain" @click="showSuspiciousList">可疑品</el-button>
+                          </div>
+                      </el-tab-pane>
+                  </el-tabs>
+                </div>             
             </div>
-
         </div>
     </div>
 </template>
@@ -132,17 +151,15 @@ import FileSaver from 'file-saver'
 import table from 'components/basic/table.vue'
 import rasterizeHTML from 'rasterizehtml'
 
-// const url = HOST + "/api/v1/processparameter/by-equipment-time";
-// const url = "http://192.168.20.102:8088/api/v1/processparameter/by-equipment-time";
-// const url = "static/echarts.json"
 // 条码表接口
-const BARCODE_TABLE_DATA =
-  window.HOST + '/api/v1/processparameter/barcode-list'
+const BARCODE_TABLE_DATA = window.HOST + '/api/v1/processparameter/barcode-list'
+// const BARCODE_TABLE_DATA = 'static/parameterVue/BARCODE_TABLE_DATA.json'
 // 曲线图接口
 const CHART_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time'
+// const CHART_DATA = 'static/parameterVue/CHART_DATA.json'
 // 条码详情接口
-const BARCODE_DETAIL_DATA =
-  window.HOST + '/api/v1/processparameter/by-equipment-time-barcode'
+const BARCODE_DETAIL_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time-barcode'
+// const BARCODE_DETAIL_DATA = 'static/parameterVue/BARCODE_DETAIL_DATA.json'
 
 export default {
   components: {
@@ -152,9 +169,10 @@ export default {
     return {
       // 条码筛选。
       barcode: '',
+
       // 条码详情无数据提示。
       detailTip: '',
-      activeName: 'table',
+      activeName: 'charts',
       // 当前图形tab。
       activeChart: 'chart0',
       excel: true,
@@ -194,12 +212,12 @@ export default {
       routerContent: 0,
       flexbase: 200,
       tableDatas: [],
-      chartFetched: false,
+      chartFetched: false, // 曲线表是否获取过数据
+      tableFetched: false, // 条码表是否获取过数据
       chartTableHeight: 400,
       /* 条码表 */
       barcodeTableData: {
         loading: false,
-        show: true,
         filename: '条码表',
         columns: [
           {
@@ -214,18 +232,13 @@ export default {
             show: true
           },
           {
-            name: '开始时间',
+            name: '最小采集时间',
             prop: 'minPickTime',
             show: true
           },
           {
-            name: '结束时间',
+            name: '最大采集时间',
             prop: 'maxPickTime',
-            show: true
-          },
-          {
-            name: '记录数',
-            prop: 'total',
             show: true
           }
         ],
@@ -235,7 +248,8 @@ export default {
       ruleForm: {
         input: ''
       },
-      tabPaneNum: 0
+      tabPaneNum: 0,
+      code: 0
     }
   },
   created () {
@@ -266,6 +280,17 @@ export default {
       } else {
         return this.updateRow(this.ruleForm.input)
       }
+    },
+    /* 当前tabs下的echart */
+    nowEchart () {
+      let oEchart = this.myEcharts.filter(o => o.index === this.tabPaneNum)[0]
+      return oEchart.echart
+    },
+    setWidth () {
+      this.styleObject.minWidth = '1000px'
+    },
+    removeWidth () {
+      this.styleObject.minWidth = 0
     }
   },
   mounted () {
@@ -285,6 +310,7 @@ export default {
       // 当是工艺参数时，更新数据
       if (to.meta.title === 'parameter') {
         // 初始化数据。
+        console.log('watch $route')
         this.initData()
         this.fetchData()
       }
@@ -314,11 +340,11 @@ export default {
       this.activeName = 'table'
       this.tabPaneNum = 0
       this.activeChart = 'chart0'
-      this.chartShow = true
       this.myEcharts = []
     },
     // 获取数据。
     fetchData () {
+      this.code = this.$route.query.code
       Object.keys(this.$route.query).forEach(el => {
         if (el === 'equipmentId' || el === 'startTime' || el === 'endTime') {
           // equipmentIdList//equipmentList
@@ -365,6 +391,7 @@ export default {
     // 获取条码表数据。
     fetchBarcodeTableData () {
       this.barcodeTableData.loading = true
+      this.tableFetched = true
       this.detailTip = ''
       this.$register.sendRequest(
         this.$store,
@@ -440,60 +467,50 @@ export default {
     },
     // 请求成功。
     requestSucess (oData) {
+      this.loading = false
       if (!oData.length) {
         // 如果查询结果为空
         this.error = true
         this.chartShow = false
         // 数据不存在时，直接返回。
-        return
+        return 0
       } else {
         this.error = false
-      }
-      let optionArr = []
-      let tableDataArr = []
-      this.loading = false
-
-      let optionsData = oData // 获取到的data
-      optionsData.map((data, index) => {
-        if (data.valueType === 1) {
-          optionArr.push(this.initOption(data, index))
-          tableDataArr.push(this.setTableData(data, index))
-          return optionArr
-        } else {
+        let optionArr = []
+        let tableDataArr = []
+        let optionsData = oData // 获取到的data
+        optionsData.map((data, index) => {
+          if (data.valueType === 1) {
+            optionArr.push(this.initOption(data, index))
+            tableDataArr.push(this.setTableData(data, index))
+            return optionArr
+          } else {
           /* 没有图就加入一个空的对象 */
-          optionArr.push({ option: null })
+            optionArr.push({ option: null })
           /* 做成表格 */
-          tableDataArr.push(this.setTableData(data, index))
-          return tableDataArr
-        }
-      })
-      tableDataArr.forEach(e => {
-        let value = optionArr.some(el => {
-          return el.optionModal && el.optionModal.series[0].name === e.filename
+            tableDataArr.push(this.setTableData(data, index))
+            return tableDataArr
+          }
         })
+        tableDataArr.forEach(e => {
+          let value = optionArr.some(el => {
+            return el.optionModal && el.optionModal.series[0].name === e.filename
+          })
 
-        if (!value) {
-          e.value = '表格'
-        }
-      })
-      this.options = optionArr // 将处理后的 option 放入 options 中
-      this.tableDatas = tableDataArr // 将处理后的 tableData 放入 tableData 中
-      this.$nextTick(() => {
-        // let tabPanes = document.querySelectorAll(".chart .el-tab-pane")
-        // tabPanes.forEach(el=>el.style.display = "")
-        // this.options.forEach((el, index) => {
-        //     this.initEcharts(el, index)
-        // })
-        // tabPanes.forEach((el,i)=>{
-        //     if(i !== 0){
-        //         el.style.display = "none"
-        //     }
-        // })
-        if (this.options[0].index === 0) {
+          if (!value) {
+            e.value = '表格'
+          }
+        })
+        this.options = optionArr // 将处理后的 option 放入 options 中
+        this.tableDatas = tableDataArr // 将处理后的 tableData 放入 tableData 中
+        this.$nextTick(() => {
+          if (this.options[0].index === 0) {
           // 如果第一个tabs有图表，则渲染
-          this.initEcharts(this.options[0].optionModal, 0)
-        }
-      })
+            this.initEcharts(this.options[0].optionModal, 0)
+            this.setChartEvent()
+          }
+        })
+      }
     },
     // 请求失败。
     requestFail (sErrorMessage) {
@@ -514,11 +531,17 @@ export default {
     },
     // 选中修改。
     tabChange (oTab) {
-      if (oTab.name === 'chart') {
-        // 若为曲线图。
-        if (!this.chartFetched) {
-          // 若未获取数据。
+      if (oTab === 'charts') {      // 若为曲线图。
+        this.barcodeTableData.show = true
+        this.chartShow = false
+        if (!this.chartFetched) {   // 若曲线图未获取数据。
           this.fetchChartData()
+        }
+      } else {                      // 若为条码表。
+        this.barcodeTableData.show = false
+        this.chartShow = true
+        if (!this.tableFetched) {   // 若条码表未获取数据。
+          this.fetchBarcodeTableData()
         }
       }
     },
@@ -621,12 +644,10 @@ export default {
         30 - // 条码表/曲线图tab
         57 - // 曲线图参数tab
         35 - // 表格标题
-        20 // 表格margin-bottom
-      // this.viewHeight
-      //                   -88
-      //                   -48
-      //                   -66   // tabs-head的高
-      //                   -90   // table上面的标题
+        10 - // 表格margin-bottom
+        // 30 - // 遏制按钮的高度
+        10
+
       return chartTableHeight
     },
     // 设置条码表高度。
@@ -675,6 +696,7 @@ export default {
         arr.value = el.value
         arr.pickTime = el.pickTime
         arr.barcode = el.barcode || ''
+        arr.checked = false
         return arr
       })
 
@@ -683,6 +705,7 @@ export default {
     /* 处理每个option */
     initOption (data, index) {
       /* 定义option模板 */
+      let barcode = data.list[0].barcode
       let optionModal = {
         title: {
           // text: 'XX 参数图表',
@@ -694,7 +717,35 @@ export default {
           left: 4
         },
         tooltip: {
-          trigger: 'axis'
+          trigger: 'axis',
+          formatter: function (params) {
+            if (barcode === null) {
+              return `
+                ${params[0].name}
+                <br/>
+                <div>
+                    ${params[0].marker}
+                    ${params[0].seriesName}：
+                    ${params[0].value}
+                </div>
+              `
+            } else {
+              return `
+                ${params[0].name}
+                <br/>
+                <div>
+                    ${params[0].marker}
+                    条码：
+                    ${barcode}
+                </div>
+                <div>
+                    ${params[0].marker}
+                    ${params[0].seriesName}：
+                    ${params[0].value}
+                </div>
+              `
+            }
+          }
         },
         legend: {
           data: ['XX参数']
@@ -710,6 +761,16 @@ export default {
           },
           right: 2
         },
+        dataZoom: [
+          {
+            type: 'slider',
+            xAxisIndex: 0,
+            start: 0,
+            end: 100,
+            filterMode: 'empty'
+          }
+
+        ],
         xAxis: {
           type: 'category',
           boundaryGap: false,
@@ -723,6 +784,9 @@ export default {
             show: false
           },
           axisLabel: {
+            formatter: function (val, index) {
+              return new Date(val).Format()
+            },
             textStyle: {
               color: '#333'
             }
@@ -919,9 +983,30 @@ export default {
     updateEcharts () {
       // 图形存在时，则做resize处理。
       let oEchart = this.myEcharts.filter(o => o.index === this.tabPaneNum)[0]
-
       oEchart && oEchart.echart.resize()
-      //          this.myEcharts[this.tabPaneNum].resize()
+    },
+    // 设置图表事件。
+    setChartEvent () {
+      this.nowEchart.on('datazoom', this.getChartTime)
+    },
+    /* 监听dataZoom 事件,获取时间 */
+    getChartTime () {
+      // console.log(this.nowEchart.getOption())
+      // console.log(this.nowEchart.getOption().dataZoom[0])
+
+      let oData = this.nowEchart.getOption().xAxis[0].data               // 横坐标的所有值
+      const min = Date.parse(new Date(oData[0]))                         // 最小时间
+      const max = Date.parse(new Date(oData[oData.length - 1]))          // 最大时间
+      const difValue = max - min                                         // 起始时间的差 绝对值
+
+      const minPer = this.nowEchart.getOption().dataZoom[0].start / 100  // 当前开始时间  占总时间百分比
+      const maxPer = this.nowEchart.getOption().dataZoom[0].end / 100    // 当前结束时间  占总时间百分比
+
+      const newStratTime = new Date(minPer * difValue + min).Format()    // 选中的开始时间
+      const newEndTime = new Date(maxPer * difValue + min).Format()      // 选中的结束时间
+      console.log(`开始时间:${newStratTime}`)
+      console.log(`结束时间:${newEndTime}`)
+      return {newStratTime, newEndTime}
     },
     /* 监听窗口大小 更新echarts的大小 */
     addEvent () {
@@ -1010,6 +1095,7 @@ export default {
         if (!this.options[index].rendered) {
           this.$nextTick(() => {
             this.initEcharts(this.options[index].optionModal, index)
+            this.setChartEvent()
           })
         } else {
           this.$nextTick(() => {
@@ -1023,6 +1109,57 @@ export default {
       if (value === `图形`) {
         this.$nextTick(() => {
           this.updateEcharts()
+        })
+      }
+    },
+    // 表格内选择时间
+    chooseTime (value, objArr, index) {
+      let arr = objArr.filter((el, index) => {
+        if (el.checked) {
+          el.index = index
+          return el
+        }
+      })
+      if (arr.length > 2) {
+        if (arr[0].index !== index) {
+          objArr[arr[0].index].checked = false
+        } else {
+          objArr[arr[1].index].checked = false
+        }
+      }
+    },
+    // 显示可疑品列表
+    showSuspiciousList () {
+      const value = this.tableDatas[this.tabPaneNum].value
+      let oQuery = {
+        equipmentName: this.condition.equipmentName,  // 设备名称
+        shiftStartTime: this.condition.startTime,     // 开始时间
+        shiftEndTime: this.condition.endTime,         // 结束时间
+        equipmentId: this.oQuery.equipmentId,         // 设备ID
+        code: this.code
+      }
+      if (value === '表格') {
+        let oData = this.tableDatas[this.tabPaneNum].data
+        let arr = oData.filter(el => {
+          return el.checked
+        })
+        if (arr.length !== 2) {
+          this.$message({
+            showClose: true,
+            message: '请选择起始时间',
+            type: 'error'
+          })
+        } else {
+          this.$router.replace({
+            path: '/process/restrain',
+            query: Object.assign({}, {startTime: arr[0].pickTime, endTime: arr[1].pickTime}, oQuery)
+          })
+        }
+      } else {
+        let oDate = this.getChartTime()
+        this.$router.replace({
+          path: '/process/restrain',
+          query: Object.assign({}, {startTime: oDate.newStratTime, endTime: oDate.newEndTime}, oQuery)
         })
       }
     }
@@ -1165,7 +1302,7 @@ export default {
   }
   .content-tables {
     margin-top: 0;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     .tableData {
       font-size: 14px;
       text-indent: 0;
@@ -1185,6 +1322,10 @@ export default {
         }
       }
     }
+  }
+  .btn-box {
+    display: flex;
+    justify-content: center;
   }
 }
 

@@ -10,8 +10,8 @@
     "standard": "standard --fix"
   },
   "dependencies": {
-    "ag-grid": "^13.1.2",
-    "ag-grid-vue": "^13.1.0",
+    "ag-grid": "^16.0.1",
+    "ag-grid-vue": "^16.0.0",
     "awe-dnd": "github:hilongjw/vue-dragging",
     "axios": "^0.17.1",
     "babel-polyfill": "^6.26.0",
