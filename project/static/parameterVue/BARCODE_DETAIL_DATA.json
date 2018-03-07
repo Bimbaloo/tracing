@@ -1,0 +1,65 @@
+{
+  "errorCode": 0,
+  "errorMsg": "",
+  "data": [{
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:01:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:03:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:05:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:07:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:09:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:11:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:13:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:15:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:17:36",
+    "value": "0.0"
+  }, {
+    "varStdId": 1,
+    "description": "电量值1",
+    "varUnit": "",
+    "pickTime": "2017-07-29 19:19:36",
+    "value": "29.1"
+  }]
+}
