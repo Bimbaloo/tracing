@@ -61,9 +61,6 @@ const oAjax = {
   }
 }
 
-const sSessionSelectStorageKey = window.HOST + 'selectStorageKey'
-// const sSessionSelectStorageKey = 'outputSelectStorageKey'
-
 export default {
   props: {
     formData: Object,
@@ -104,24 +101,8 @@ export default {
     }
   },
   computed: {
-    // options: function() {
-    // let aResult = JSON.parse(JSON.stringify(this.listData || []));
-    // 将全部按钮加入。
-    // Result.unshift({
-    // abel: "全部",
-    // value: this.allData
-    // })
-    // 返回数据。
-    // return aResult;
-    // }
   },
   created () {
-    // 如果不是通过ajax获取数据。
-    // if(!this.getByAjax) {
-    // this.options = JSON.parse(JSON.stringify(this.listData || []));
-    // 将全部按钮加入。
-    // this.addAll();
-    // }
   },
   methods: {
     handleChange (value) {
@@ -157,15 +138,14 @@ export default {
 
           // 判断是否存在。如果存在
           let sKey = this.keyData
-          let sStorage = sessionStorage.getItem(sSessionSelectStorageKey)
-          let oStorage = sStorage ? JSON.parse(sStorage) : {}
+          let oStorage = this.$store.state.optionsModule
           let nLen = this.nMax
 
           // 数据存在。
           if (oStorage && oStorage[sKey]) {
             this.loading = false
 
-            this.list = oStorage[sKey]
+            this.list = JSON.parse(oStorage[sKey])
 
             // 如果是物料，则获取部分数据。
             if (sKey === 'materialCode') { // materialCodeList
@@ -216,10 +196,10 @@ export default {
                 }
                 oStorage[sKey] = this.list
                 // 保存数据。
-                sessionStorage.setItem(
-                  sSessionSelectStorageKey,
-                  JSON.stringify(oStorage)
-                )
+                this.$store.commit('setOptionsData', {
+                  key: sKey,
+                  value: JSON.stringify(this.list)
+                })
                 this.addAll()
               },
               sErrorMessage => {
@@ -230,10 +210,10 @@ export default {
                 this.oInit = []
                 oStorage[sKey] = []
                 // 保存数据。
-                sessionStorage.setItem(
-                  sSessionSelectStorageKey,
-                  JSON.stringify(oStorage)
-                )
+                this.$store.commit('setOptionsData', {
+                  key: sKey,
+                  value: JSON.stringify([])
+                })
               }
             )
           }

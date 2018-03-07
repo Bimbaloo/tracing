@@ -21,12 +21,12 @@
 				</div>
 				<div class="content-table" ref="rawTable">
 					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
-                    <v-agtable
-                      :table-data="materialData"
-                      :heights="tableHeight"
-                      :loading="loading"
-                    ></v-agtable>
-                </div>
+          <v-agtable
+            :table-data="materialData"
+            :heights="tableHeight"
+            :loading="loading"
+          ></v-agtable>
+        </div>
 			</div>
     	</div>
     </div>

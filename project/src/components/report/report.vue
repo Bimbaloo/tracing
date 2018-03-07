@@ -20,7 +20,7 @@
 					</span>
 				</h2>
 				<transition name="el-zoom-in-top">
-					<div class="content-table inner" ref="summaryTable">
+					<div class="content-table" ref="summaryTable">
 						<v-table v-show="active.summary" :table-data="reportData.summary"></v-table>
 					</div>
 				</transition>
@@ -36,7 +36,7 @@
 					</span>
 				</h2>
 				<transition name="el-zoom-in-top">
-					<div class="content-table inner" ref="inStocksTable">
+					<div class="content-table" ref="inStocksTable">
 						<v-table v-show="active.inStocks" :table-data="reportData.inStocks"></v-table>
 					</div>
 				</transition>
@@ -55,8 +55,8 @@
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('inMakingTable', $event, '在制明细-加工中')"></i>
 						</span>
 					</h2>
-					<div class="content-table second-table" ref="inMakingTable" key="2" v-if="reportData.inMaking.show">
-						<v-table v-show="active.inMakings" key="2" :table-data="reportData.inMaking"></v-table>
+					<div class="content-table" ref="inMakingTable" key="2" v-if="reportData.inMaking.show">
+						<v-table v-show="active.inMakings" :table-data="reportData.inMaking"></v-table>
 					</div>
 					<h2 v-show="active.inMakings" key="3" class="inner-title" v-if="reportData.remain.show">
 						<span class='table-title'>滞留中</span>
@@ -65,7 +65,7 @@
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('remainTable', $event, '在制明细-滞留中')"></i>
 						</span>
 					</h2>
-					<div class="content-table second-table" ref="remainTable" key="4" v-if="reportData.remain.show">
+					<div class="content-table" ref="remainTable" key="4" v-if="reportData.remain.show">
 						<v-table v-show="active.inMakings" :table-data="reportData.remain"></v-table>
 					</div>
 				</transition-group>
@@ -84,7 +84,7 @@
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outStocksTable', $event, '出库明细-滞留中')"></i>
 						</span>
 					</h2>
-					<div class="content-table inner second-table" key="6" ref="outStocksTable" v-if="reportData.outStocks.show">
+					<div class="content-table" key="6" ref="outStocksTable" v-if="reportData.outStocks.show">
 						<v-table v-show="active.outStocks" :table-data="reportData.outStocks"></v-table>
 					</div>
 					<h2 v-show="active.outStocks" key="7" class="inner-title" v-if="reportData.delivered.show">
@@ -94,7 +94,7 @@
 							<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('deliveredTable', $event, '出库明细-已发货')"></i>
 						</span>
 					</h2>
-					<div class="content-table inner second-table" key="8" ref="deliveredTable" v-if="reportData.delivered.show">
+					<div class="content-table" key="8" ref="deliveredTable" v-if="reportData.delivered.show">
 						<v-table v-show="active.outStocks" :table-data="reportData.delivered"></v-table>
 					</div>
 				</transition-group>
@@ -110,7 +110,7 @@
 					</span>
 				</h2>
 				<transition name="el-zoom-in-top">
-					<div class="content-table inner" ref="lossTable">
+					<div class="content-table" ref="lossTable">
 						<v-table v-show="active.loss" :table-data="reportData.loss"></v-table>
 					</div>
 				</transition>
@@ -1146,27 +1146,33 @@ export default {
 </style>
 
 <style lang="less" scoped>
-.content-title,
-.inner-title {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  margin-top: 10px;
-  margin-bottom: 0;
-  .table-handle {
-    margin-right: 5px;
-    i {
-      margin: 12px 5px 5px;
+  .content-table {
+    margin-top: 0;
+  }
+  .content-title,
+  .inner-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    margin-bottom: 0px;
+    .table-handle {
+      margin-right: 5px;
+      i {
+        margin: 12px 5px 5px;
+      }
+    }
+    .table-table {
+      i {
+        margin: 5px;
+      }
     }
   }
-  .table-table {
-    i {
-      margin: 5px;
-    }
+  .content-title {
+    margin-bottom: 10px;
   }
-}
-.second-table {
-  margin-top: 0px;
-  // margin-bottom: 0px;
-}
+  // .second-table {
+  //   margin-top: 0px;
+  //   margin-bottom: 0px;
+  // }
 </style>

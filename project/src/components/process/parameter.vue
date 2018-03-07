@@ -223,7 +223,8 @@ export default {
           {
             type: 'expand',
             width: '100',
-            show: true // 是否在表头显示
+            show: true, // 是否在表头显示
+            isNotShowInExcel: true
           },
           {
             name: '条码',
@@ -1020,8 +1021,11 @@ export default {
     },
     // 表格打印。
     printHandle (refTable, event) {
-      let oTable = this.$refs[refTable][0]
+      let oTable = this.$refs[refTable]
 
+      if (oTable instanceof Array) {
+        oTable = oTable[0]
+      }
       if (!oTable) {
         return
       }

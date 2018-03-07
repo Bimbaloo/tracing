@@ -8,7 +8,8 @@ import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
 // 应用版本信息模块
 import { versionModule } from 'assets/js/versionStore.js'
-
+// 引入选项设置模块。
+import { optionsModule } from 'assets/js/optionsStore.js'
 import 'theme/index.css'
 
 import App from './app.vue'
@@ -30,16 +31,14 @@ Vue.prototype.$post = axios.post
 
 Vue.use(Vuex)
 
-// 引用工厂定制模块
-// import { customModule } from 'assets/js/customStore.js'
-
 Vue.prototype.$register = loginFn
 
 // 定义统一状态。
 const store = new Vuex.Store({
   modules: {
     loginModule,
-    versionModule
+    versionModule,
+    optionsModule
   },
   state: {
   },
