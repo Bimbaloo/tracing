@@ -34,7 +34,7 @@
 		</div>
 
 		<!--<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>-->
-		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" width='30%'>
+		<el-dialog title="打印选项" :visible.sync="dialogFormVisible" @close="printHandle('fastreport')" width='400px'>
             <el-form :model="form">
                 <el-form-item label="报告人：" :label-width="formLabelWidth">
                     <el-input v-model="form.name" auto-complete="off" :placeholder="this.$store.state.loginModule.nickname"></el-input>

@@ -22,6 +22,7 @@
 				<div class="content-table" ref="rawTable">
 					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
           <v-agtable
+              ref="agTable"
             :table-data="materialData"
             :heights="tableHeight"
             :loading="loading"
@@ -474,6 +475,7 @@ export default {
       if (!this.treeFullscreen) {
         this.$nextTick(() => {
           this.tableHeight = this.setHeight()
+          this.$refs.agTable.option.api.doLayout()
         })
       }
     }

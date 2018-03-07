@@ -237,7 +237,7 @@ export default {
       return this.$(
         window.go.Node,
         'Horizontal',
-        { selectionObjectName: 'SELECTION', toolTip: this.tooltipTemplate}, // added this property!
+        { selectionObjectName: 'SELECTION'}, // added this property!
         {
           selectionAdorned: !this.isDialogTree,
           selectionChanged: onNodeSelectionChange, // this.nodeSelectionChangeHandle,
@@ -255,6 +255,7 @@ export default {
           this.$(
             window.go.Panel,
             'Auto',
+			{toolTip: this.tooltipTemplate},
             this.$(
               window.go.Shape,
               'Rectangle',
@@ -337,7 +338,43 @@ export default {
   			  } else {
 				 return `${node.totalNum}`
   	 		  }
-		  }))
+		  })),
+		  {
+			  toolTip: this.$(go.Adornment, 'Auto',
+			  this.$(
+	  			window.go.Shape,
+	  			'Rectangle',
+	  			  {
+	  			    fill: 'white',
+	  			    stroke: '#dedede'
+	  			  }
+	  			),
+	  		this.$(
+	  			window.go.TextBlock,
+	  			  {
+	  			    font: '12pt Helvetica, 微软雅黑, sans-serif',
+	  			    stroke: '#333333',
+	  			    wrap: window.go.TextBlock.WrapFit,
+	  			    alignment: window.go.Spot.Center,
+	  			    margin: 5
+	  			  },
+				  new window.go.Binding('text', '', function (node) {
+  				  if (node.nodeType === 10003 || node.nodeType === 10004) {
+  				    return '总数'
+  				  } else if (node.nodeType === 10001) {
+  					  if (node.isShowRemain) {
+  						  return '加工中/产出滞留/产出总数'
+  					  } else {
+  						   return '总数'
+  					  }
+  				  } else if (node.isShowRemain) {
+  				    return '滞留/总数'
+  	  			  } else {
+  					 return '总数'
+  	  	 		  }
+  			  })
+	  		))
+		  }
           )
         ),
         { selectionAdornmentTemplate: this.selectionAdornmentTemplate }
@@ -433,88 +470,6 @@ export default {
 		  })
 	  )
       )
-    },
-    simpleGroupTemplate1 () {
-      return this.$(
-        window.go.Group,
-        'Horizontal',
-        { selectionObjectName: 'SELECTION' }, // added this property!
-        {
-          // define the group's internal layout
-          selectionAdorned: false,
-          selectionChanged: onNodeSelectionChange,
-          layout: this.$(window.go.TreeLayout, { layerSpacing: 20, nodeSpacing: 10 }),
-          // the group begins unexpanded;
-          // upon expansion, a Diagram Listener will generate contents for the group
-          isSubGraphExpanded: false,
-          // when a group is expanded, if it contains no parts, generate a subGraph inside of it
-          // subGraphExpandedChanged: (group) => {
-          //   if(group.memberParts.count === 0) {
-          //  }
-          // },
-          click: this.groupNodeClickHandle,
-          cursor: 'pointer'
-        },
-        this.$(
-          window.go.Panel,
-          'Auto',
-          this.$(window.go.Shape, 'Rectangle', {
-            name: 'SELECTION',
-            fill: null,
-            stroke: 'gray',
-            strokeWidth: 2
-          }),
-          this.$(
-            window.go.Panel,
-            'Vertical',
-            {
-              defaultAlignment: window.go.Spot.Left,
-              margin: 4
-            },
-            this.$(
-              window.go.Panel,
-              'Horizontal',
-              {
-                defaultAlignment: window.go.Spot.Top
-              },
-              // the SubGraphExpanderButton is a panel that functions as a button to expand or collapse the subGraph
-              this.$('SubGraphExpanderButton', {
-                name: 'processExpanderButton',
-                width: 0,
-                height: 0,
-                cursor: 'pointer',
-                'ButtonBorder.fill': null, // "#fcbb3a",
-                'ButtonBorder.stroke': null,
-                _buttonFillOver: null, // "#f9a216",
-                _buttonStrokeOver: null
-              }),
-              this.$(
-                window.go.TextBlock,
-                {
-                  font: 'bold 12pt Helvetica, 微软雅黑, sans-serif',
-                  margin: 4,
-                  stroke: '#169bd5'
-                },
-                new window.go.Binding('text', 'name')
-              ) // key
-            ),
-            // create a placeholder to represent the area where the contents of the group are
-            this.$(window.go.Placeholder, {
-              padding: new window.go.Margin(0, 10)
-            })
-          ) // end Vertical Panel
-        ),
-        this.$('TreeExpanderButton', {
-          width: 12,
-          height: 12,
-          cursor: 'pointer',
-          'ButtonBorder.fill': '#ccc',
-          'ButtonBorder.stroke': null,
-          _buttonFillOver: '#b8b8b8',
-          _buttonStrokeOver: null,
-          click: this.treeExpanderButtonClickHandle
-        })
-      ) // end Group
     },
     linkTemplate () {
       return this.$(
@@ -985,7 +940,7 @@ export default {
         allowVerticalScroll: true,
         autoScale: this.isDialogTree ? window.go.Diagram.Uniform : window.go.Diagram.None,
         layout: this.$(window.go.LayeredDigraphLayout, {
-          layerSpacing: 50,
+          layerSpacing: 40,
           columnSpacing: 25
         }),
         doubleClick: this.diagramDblClickHandle
