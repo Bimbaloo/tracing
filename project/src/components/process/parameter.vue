@@ -152,14 +152,14 @@ import table from 'components/basic/table.vue'
 import rasterizeHTML from 'rasterizehtml'
 
 // 条码表接口
-// const BARCODE_TABLE_DATA = window.HOST + '/api/v1/processparameter/barcode-list'
-const BARCODE_TABLE_DATA = 'static/parameterVue/BARCODE_TABLE_DATA.json'
+const BARCODE_TABLE_DATA = window.HOST + '/api/v1/processparameter/barcode-list'
+// const BARCODE_TABLE_DATA = 'static/parameterVue/BARCODE_TABLE_DATA.json'
 // 曲线图接口
-// const CHART_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time'
-const CHART_DATA = 'static/parameterVue/CHART_DATA.json'
+const CHART_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time'
+// const CHART_DATA = 'static/parameterVue/CHART_DATA.json'
 // 条码详情接口
-// const BARCODE_DETAIL_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time-barcode'
-const BARCODE_DETAIL_DATA = 'static/parameterVue/BARCODE_DETAIL_DATA.json'
+const BARCODE_DETAIL_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time-barcode'
+// const BARCODE_DETAIL_DATA = 'static/parameterVue/BARCODE_DETAIL_DATA.json'
 
 export default {
   components: {
@@ -248,7 +248,8 @@ export default {
       ruleForm: {
         input: ''
       },
-      tabPaneNum: 0
+      tabPaneNum: 0,
+      code: 0
     }
   },
   created () {
@@ -343,6 +344,7 @@ export default {
     },
     // 获取数据。
     fetchData () {
+      this.code = this.$route.query.code
       Object.keys(this.$route.query).forEach(el => {
         if (el === 'equipmentId' || el === 'startTime' || el === 'endTime') {
           // equipmentIdList//equipmentList
@@ -1129,18 +1131,35 @@ export default {
     // 显示可疑品列表
     showSuspiciousList () {
       const value = this.tableDatas[this.tabPaneNum].value
+      let oQuery = {
+        equipmentName: this.condition.equipmentName,  // 设备名称
+        shiftStartTime: this.condition.startTime,     // 开始时间
+        shiftEndTime: this.condition.endTime,         // 结束时间
+        equipmentId: this.oQuery.equipmentId,         // 设备ID
+        code: this.code
+      }
       if (value === '表格') {
-
+        let oData = this.tableDatas[this.tabPaneNum].data
+        let arr = oData.filter(el => {
+          return el.checked
+        })
+        if (arr.length !== 2) {
+          this.$message({
+            showClose: true,
+            message: '请选择起始时间',
+            type: 'error'
+          })
+        } else {
+          this.$router.replace({
+            path: '/process/restrain',
+            query: Object.assign({}, {startTime: arr[0].pickTime, endTime: arr[1].pickTime}, oQuery)
+          })
+        }
       } else {
         let oDate = this.getChartTime()
         this.$router.replace({
           path: '/process/restrain',
-          query: {
-            equipmentId: this.oQuery.equipmentId,
-            shiftStartTime: oDate.newStratTime, // this.datetime.start,
-            shiftEndTime: oDate.newEndTime, // this.datetime.end,
-            code: this.process
-          }
+          query: Object.assign({}, {startTime: oDate.newStratTime, endTime: oDate.newEndTime}, oQuery)
         })
       }
     }
