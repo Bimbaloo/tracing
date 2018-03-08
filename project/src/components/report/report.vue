@@ -687,7 +687,7 @@ export default {
   methods: {
     // 排序函数。
     setSortFun (oA, oB, paramName) {
-      return oA[paramName] - oB[paramName] > 0
+      return oA[paramName] - oB[paramName]
     },
 // 关闭进度进程
     closeProgressDialog () {
