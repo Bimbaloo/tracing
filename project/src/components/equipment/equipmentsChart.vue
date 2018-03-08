@@ -100,7 +100,7 @@
                   {{`${equipment.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
                   <i
                     @click="showVideoDialog(equipment.id, equipment.name, compareData.time, equipment.series)"
-                    v-if="camera && !!factoryCameraConfig[equipment.dimension]"
+                    v-if="camera && !!factoryCameraConfig.dimensions.indexOf(equipment.dimension) > -1"
                     class="icon icon-12 icon-camera"
                     title="监控视频"></i>
                   </div>
@@ -573,11 +573,12 @@ export default {
     },
     // 视频监控工厂定制。
     factoryCameraConfig () {
-      let oData = {}
-      this.$store.state.factoryModule.factoryCameraConfig.dimensions_config.forEach(o => {
-        oData[o.name] = o.enabled
-      })
-      return oData
+      // let oData = {}
+      // this.$store.state.factoryModule.factoryCameraConfig.dimensions_config.forEach(o => {
+      //   oData[o.name] = o.enabled
+      // })
+      // return oData
+      return this.$store.state.factoryModule.factoryCameraConfig
     },
     // 追踪或溯源或遏制的配置项。
     // currentModule() {

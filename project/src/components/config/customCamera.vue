@@ -8,13 +8,44 @@
 				<span class="item-name">{{ item.name }}</span>
 			</div>
 		</div>
-		<el-form ref="form" :model="form" label-width="80px" label-position="left" class="form" :rules="rules">
+		<el-form ref="form" :model="form" label-width="120px" label-position="left" class="form" :rules="rules">
 			<el-form-item label="视频地址" prop="url">
 				<el-input v-model="form.url" placeholder="请输入视频地址以http://或https://开头" :disabled="!edit" style="width:60%;"></el-input>
 			</el-form-item>
-			<el-form-item :label="item.name" :prop="item.value" v-for="item in aoDimension" v-if="item.show" :key="item.value">
-				<el-switch v-model="form[item.value]" :disabled="!edit"></el-switch>
+      <el-form-item label="视频地址参数" prop="parameters">
+        <el-checkbox-group v-model="form.parameters">
+          <el-checkbox 
+          :disabled="!edit"
+          v-for="oParameter in aoParameter" 
+          :label="oParameter.value" 
+          :key="oParameter.value">{{oParameter.name}}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item label="接口地址" prop="interface">
+				<el-input v-model="form.interface" placeholder="请输入获取监控点的接口地址以http://或https://开头" :disabled="!edit" style="width:60%;"></el-input>
 			</el-form-item>
+      <el-form-item label="接口地址参数" prop="interfaceParameters">
+        <el-checkbox-group v-model="form.interfaceParameters">
+          <el-checkbox 
+          :disabled="!edit"
+          v-for="oParameter in aoInterfaceParameter" 
+          :label="oParameter.value" 
+          :key="oParameter.value">{{oParameter.name}}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+      <el-form-item label="维度" prop="dimensions">
+        <el-checkbox-group v-model="form.dimensions">
+          <el-checkbox 
+          :disabled="!edit"
+          v-for="oDimension in aoDimension" 
+          :label="oDimension.value" 
+          :key="oDimension.value">{{oDimension.name}}</el-checkbox>
+        </el-checkbox-group>
+      </el-form-item>
+			<!-- <el-form-item :label="item.name" :prop="item.value" v-for="item in aoDimension" v-if="item.show" :key="item.value">
+				<el-switch v-model="form[item.value]" :disabled="!edit"></el-switch>
+			</el-form-item> -->
+      
 			<div class="tip">注：维度开关，开启即设置该维度事件可查询关联设备视频监控。</div>
 			<el-form-item>
 				<el-button type="primary" @click="edit=true" v-if="!edit" class="btn-plain">设置</el-button>
@@ -39,9 +70,29 @@ export default {
       // 提示信息。
       sErrorMessage: '',
       form: {
-        url: ''
+        url: '',
+        parameters: ['cameraId', 'startDate', 'endDate'],
+        interface: '',
+        interfaceParameters: ['equipmentId'],
+        dimensions: []
       },
-      oldForm: {}
+      oldForm: {},
+      // 参数
+      aoParameter: [{
+        name: '监控点(cameraId)',
+        value: 'cameraId'
+      }, {
+        name: '开始时间(startDate)',
+        value: 'startDate'
+      }, {
+        name: '结束时间(endDate)',
+        value: 'endDate'
+      }],
+      // 接口参数。
+      aoInterfaceParameter: [{
+        name: '设备id(equipmentId)',
+        value: 'equipmentId'
+      }]
     }
   },
   computed: {
@@ -139,7 +190,7 @@ export default {
     }
   },
   created () {
-    this.initForm()
+    // this.initForm()
     // 获取模块数据 GET_DATA_URL
     this.$register.sendRequest(this.$store, this.$ajax, MONITOR_DATA_URL, 'get', null, (oData) => {
       // 保存工厂定制数据。
@@ -177,9 +228,13 @@ export default {
       //   ]
       // }
       this.form.url = oData.url
-      oData.dimensions_config.forEach(o => {
-        this.form[o.name] = o.enabled
-      })
+      this.form.parameters = oData.parameters || []
+      this.form.interface = oData.interface || ''
+      this.form.interfaceParameters = oData.interfaceParameters || []
+      this.form.dimensions = oData.dimensions || []
+      // oData.dimensions_config.forEach(o => {
+      //   this.form[o.name] = o.enabled
+      // })
       this.oldForm = JSON.parse(JSON.stringify(this.form))
     }, (sErrorMessage) => {
       this.sErrorMessage = sErrorMessage
@@ -208,19 +263,19 @@ export default {
           // 验证成功。
           this.edit = false
           // 保存模块数据。
-          let oPostData = {
-            url: this.form.url,
-            dimensions_config: []
-          }
+          // let oPostData = {
+          //   url: this.form.url,
+          //   dimensions_config: []
+          // }
 
-          this.aoDimension.forEach(o => {
-            oPostData.dimensions_config.push({
-              name: o.value,
-              enabled: !!this.form[o.value]
-            })
-          })
+          // this.aoDimension.forEach(o => {
+          //   oPostData.dimensions_config.push({
+          //     name: o.value,
+          //     enabled: !!this.form[o.value]
+          //   })
+          // })
 
-          this.$register.sendRequest(this.$store, this.$ajax, MONITOR_DATA_URL, 'post', oPostData, (oData) => {
+          this.$register.sendRequest(this.$store, this.$ajax, MONITOR_DATA_URL, 'post', this.form, (oData) => {
           // 保存工厂定制数据。
             this.showMessage('success', '保存成功！')
             this.oldForm = JSON.parse(JSON.stringify(this.form))

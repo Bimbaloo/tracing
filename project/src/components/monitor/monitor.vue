@@ -37,13 +37,17 @@ import $ from 'jquery'
 import axios from 'axios'
 
 // 获取监控点接口地址。
-const CAMERA_POINT_URL = window.MI_HOST + '/api/commandCenter/camera/getCameraList'
+// const CAMERA_POINT_URL = window.MI_HOST + '/api/commandCenter/camera/getCameraList'
 // 向前推10s。
 const PRE_TIME = 10
 // 向后推10s。
 const FORWARD_TIME = 10
 // 视频最大播放时长，单位分钟。
 const MAX_VIDEO_TIME = 60
+// 视频地址传参可选。
+const URL_PARAMETERS = ['cameraId', 'startDate', 'endDate']
+// 获取视频监控点传参可选。
+const INTERFACE_PARAMETERS = ['equipmentId']
 
 export default {
   props: {
@@ -79,9 +83,25 @@ export default {
     }
   },
   computed: {
+    // 视频监控相关数据。
+    factoryCameraConfig () {
+      return this.$store.state.factoryModule.factoryCameraConfig
+    },
     // 监控地址。
     url () {
-      return this.$store.state.factoryModule.factoryCameraConfig.url
+      return this.factoryCameraConfig.url
+    },
+    // 地址参数。
+    parameters () {
+      return this.factoryCameraConfig.parameters || []
+    },
+    // 接口地址。
+    interfaceUrl () {
+      return this.factoryCameraConfig.interface
+    },
+    // 地址参数。
+    interfaceParameters () {
+      return this.factoryCameraConfig.interfaceParameters || []
     },
     // 投产时间。
     poolTime () {
@@ -257,11 +277,23 @@ export default {
               !this.isEqual(this.forwardForm, this.monitorForm))
           ) {
             // 若条件发生改变。
-            this.$refs.video.src = `${this.url}?cameraId=${
-              this.monitorForm.cameraId
-            }&startDate=${encodeURIComponent(
-              this.monitorForm.startDate
-            )}&endDate=${encodeURIComponent(this.monitorForm.endDate)}`
+            let sUrl = this.url
+            let aParams = []
+            if (this.parameters.length) {
+              URL_PARAMETERS.forEach(sParameter => {
+                if (this.parameters.indexOf(sParameter) > -1) {
+                  if (sParameter === 'startDate' || sParameter === 'endDate') {
+                    aParams.push(`${sParameter}=${encodeURIComponent(this.monitorForm[sParameter])}`)
+                  } else {
+                    aParams.push(`${sParameter}=${this.monitorForm[sParameter]}`)
+                  }
+                }
+              })
+              if (aParams.length) {
+                sUrl += '?' + aParams.join('&')
+              }
+            }
+            this.$refs.video.src = sUrl
           }
         } else {
           console.log('error submit!')
@@ -287,7 +319,19 @@ export default {
     },
     // 获取监控点。
     getCameraPoints () {
-      axios.get(`${CAMERA_POINT_URL}?equipmentId=${this.equipmentId}`)
+      let sUrl = this.interfaceUrl
+      let aParams = []
+      if (this.interfaceParameters.length) {
+        INTERFACE_PARAMETERS.forEach(sParameter => {
+          if (this.parameters.indexOf(sParameter) > -1) {
+            aParams.push(`${sParameter}=${this[sParameter]}`)
+          }
+        })
+        if (aParams.length) {
+          sUrl += '?' + aParams.join('&')
+        }
+      }
+      axios.get(sUrl)
         .then((oAjaxData) => {
           if (oAjaxData.status === 200) {
             if (oAjaxData.data.c === 1) {

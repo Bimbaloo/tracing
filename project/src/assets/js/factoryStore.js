@@ -8,7 +8,11 @@ export const factoryModule = {
     factoryCustomItemList: [],
     factoryCameraConfig: {
       url: '',
-      dimensions_config: []
+      parameters: [],
+      interface: '',
+      interfaceParameters: [],
+      dimensions: []
+      // dimensions_config: []
     }
   },
   mutations: {
@@ -22,7 +26,7 @@ export const factoryModule = {
       state.cameraFetched = payload.flag
     },
     updateCameraData (state, payload) {
-      state.factoryCameraConfig = payload.config || { url: '', dimensions_config: [] }
+      state.factoryCameraConfig = payload.config
     }
   },
   actions: {
