@@ -92,8 +92,11 @@ export default {
                 data => {
                   this.tableLoading = false
 
-                  // 处理数据。
-                  this.oDialogTable.data = this.parseTableData(data)
+                  // 处理数据。最后一次返回结果为null，所以数据不处理
+                  if (data !== null) {
+                    this.oDialogTable.data = this.parseTableData(data)
+                  }
+
                     // 重新加载
                   setTimeout(() => {
                     this.$nextTick(() => {
