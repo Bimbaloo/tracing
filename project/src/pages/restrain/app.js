@@ -43,7 +43,11 @@ Vue.prototype.$echarts = echarts
 
 const list = r => require.ensure([], () => r(require('components/restrain/list.vue')), 'group-detail')
 const Suspicious = r => require.ensure([], () => r(require('components/restrain/suspicious.vue')), 'group-detail')
-const MoldCode = r => require.ensure([], () => r(require('components/restrain/moldCode.vue')), 'group-detail')
+const MoldCode = r => require.ensure([], () => r(require('components/restrain/moldCode.vue')), 'group-detail')  // 根据模号遏制
+const qualityControl = r => require.ensure([], () => r(require('components/restrain/qualityControl.vue')), 'group-detail')    // 根据质检单遏制
+const workOrders = r => require.ensure([], () => r(require('components/restrain/workOrders.vue')), 'group-detail')    // 根据工单遏制
+const equipment = r => require.ensure([], () => r(require('components/restrain/equipment.vue')), 'group-detail')    // 根据设备+时间遏制
+const batchNo = r => require.ensure([], () => r(require('components/restrain/batchNo.vue')), 'group-detail')    // 根据物料+批次遏制
 const Chart = r => require.ensure([], () => r(require('components/restrain/chart.vue')), 'group-detail')
 const Detail = r => require.ensure([], () => r(require('components/process/detail.vue')), 'group-detail')
 
@@ -59,107 +63,144 @@ const SpotReport = r => require.ensure([], () => r(require('components/process/s
 const Parameter = r => require.ensure([], () => r(require('components/process/parameter.vue')), 'group-detail') // 工艺参数
 
 // 定义路由
-const routes = [{
-  path: '/suppressList/:key',
-  component: list
-}, // 遏制列表
-{
-  path: '/suppress/1/',
-  component: Suspicious, // 可疑品列表
-  meta: {
-    title: 'restrain'
-  }
-},
-{ // 设备查询
-  path: '/suppress/2/',
-  redirect: '/process'
-},
-{ // 设备查询
-  path: '/process',
-  component: Process,
-  children: [{
-    path: '',
-    component: Chart, // List
-    meta: {
-      title: 'chart'
-    }
-  }, {
-    path: 'detail',
-    component: Detail,
-    meta: {
-      title: 'detail'
-    }
-  }, {
-    path: 'product',
-    component: Product,
-    meta: {
-      title: 'product'
-    }
-  }, { // 质检
-    path: 'qtReport',
-    component: QtReport,
-    meta: {
-      title: 'qtReport'
-    }
-  }, { // 送检
-    path: 'qcReport',
-    component: QcReport,
-    meta: {
-      title: 'qcReport'
-    }
-  }, { // fgb
-    path: 'fgbReport',
-    component: FgbReport,
-    meta: {
-      title: 'fgbReport'
-    }
-  }, { // 工具
-    path: 'tool',
-    component: Tool,
-    meta: {
-      title: 'tool'
-    }
-  }, { // 事件
-    path: 'event',
-    component: Event,
-    meta: {
-      title: 'event'
-    }
-  }, { // 维修记录
-    path: 'repair',
-    component: Repair,
-    meta: {
-      title: 'repair'
-    }
-  }, { // 点检记录
-    path: 'spotReport',
-    component: SpotReport,
-    meta: {
-      title: 'spotReport'
-    }
-  }, { // 工艺参数
-    path: 'parameter',
-    component: Parameter,
-    meta: {
-      title: 'parameter'
-    }
-  }, { // 遏制
-    path: 'restrain',
-    component: Suspicious,
+const routes = [
+  {
+    path: '/suppressList/:key',
+    component: list
+  }, // 遏制列表
+  {
+    path: '/suppress/1/',
+    component: Suspicious, // 可疑品列表
     meta: {
       title: 'restrain'
     }
-  }]
-},
-{
-  path: '/suppress/3',
-  redirect: '/moldCode'
-}, // 模号查询
-{
-  path: '/moldCode',
-  component: MoldCode,
-  title: 'moldCode'
-} // 模号查询
+  },
+  { // 设备查询
+    path: '/suppress/2/',
+    redirect: '/process'
+  },
+  { // 设备查询
+    path: '/process',
+    component: Process,
+    children: [{
+      path: '',
+      component: Chart, // List
+      meta: {
+        title: 'chart'
+      }
+    }, {
+      path: 'detail',
+      component: Detail,
+      meta: {
+        title: 'detail'
+      }
+    }, {
+      path: 'product',
+      component: Product,
+      meta: {
+        title: 'product'
+      }
+    }, { // 质检
+      path: 'qtReport',
+      component: QtReport,
+      meta: {
+        title: 'qtReport'
+      }
+    }, { // 送检
+      path: 'qcReport',
+      component: QcReport,
+      meta: {
+        title: 'qcReport'
+      }
+    }, { // fgb
+      path: 'fgbReport',
+      component: FgbReport,
+      meta: {
+        title: 'fgbReport'
+      }
+    }, { // 工具
+      path: 'tool',
+      component: Tool,
+      meta: {
+        title: 'tool'
+      }
+    }, { // 事件
+      path: 'event',
+      component: Event,
+      meta: {
+        title: 'event'
+      }
+    }, { // 维修记录
+      path: 'repair',
+      component: Repair,
+      meta: {
+        title: 'repair'
+      }
+    }, { // 点检记录
+      path: 'spotReport',
+      component: SpotReport,
+      meta: {
+        title: 'spotReport'
+      }
+    }, { // 工艺参数
+      path: 'parameter',
+      component: Parameter,
+      meta: {
+        title: 'parameter'
+      }
+    }, { // 遏制
+      path: 'restrain',
+      component: Suspicious,
+      meta: {
+        title: 'restrain'
+      }
+    }]
+  },
+  {// 模号查询
+    path: '/suppress/3',
+    redirect: '/moldCode'
+  },
+  {// 模号查询--重定向到正确位置
+    path: '/moldCode',
+    component: MoldCode,
+    title: 'moldCode'
+  },
+  { // 根据质检单查询
+    path: '/suppress/4',
+    redirect: '/qualityControl'
+  },
+  {// 模号查询--重定向到正确位置--质检单查询
+    path: '/qualityControl',
+    component: qualityControl,
+    title: 'qualityControl'
+  },
+  { // 根据工单查询
+    path: '/suppress/5',
+    redirect: '/workOrders'
+  },
+  {// 模号查询--重定向到正确位置--工单查询
+    path: '/workOrders',
+    component: workOrders,
+    title: 'workOrders'
+  },
+  { // 根据设备+时间查询
+    path: '/suppress/6',
+    redirect: '/equipment'
+  },
+  {// 模号查询--重定向到正确位置--工单查询
+    path: '/equipment',
+    component: equipment,
+    title: 'equipment'
+  },
+  { // 根据设备+时间查询
+    path: '/suppress/7',
+    redirect: '/batchNo'
+  },
+  {// 模号查询--重定向到正确位置--工单查询
+    path: '/batchNo',
+    component: batchNo,
+    title: 'batchNo'
+  }
 ]
 
 // 创建 router 实例，然后传 `routes` 配置

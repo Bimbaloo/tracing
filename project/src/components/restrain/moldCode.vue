@@ -11,7 +11,7 @@
       <div class="moldInfo">
 				<span>模具名称：{{moldInfo.moldName}}</span><span>规格：{{moldInfo.moldCode}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
 			</div>
-      <div class="mold-tabke">
+      <div class="mold-table">
         <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-if="isRestrained">
           <el-table-column :prop="column.prop" :label="column.name" :width="column.width" :align="column.align?column.align:'center'" header-align='center' v-for="column in tableData.columns" :key="column.prop" >
             <template slot-scope="scope">
@@ -63,61 +63,62 @@ export default {
         'startTime': ''
       },
       tableData: {
-        columns: [{
-          prop: 'select',
-          name: '选择',
-          width: '50'
-        },
-        {
-          prop: 'happenTime',
-          name: '时间',
-          width: '200'
-        },
-        {
-          prop: 'eventName',
-          name: '动作',
-          width: '100',
-          align: 'left'
-        },
-        {
-          prop: 'operator',
-          name: '操作人员',
-          align: 'left',
-          width: '100'
-        },
-        {
-          prop: 'quantity',
-          name: '产出数量',
-          width: '100'
-        },
-        {
-          prop: 'quantityAll',
-          name: '区间产出数量',
-          width: '100'
-        },
-        {
-          prop: 'percent',
-          name: '区间产出合格率',
-          width: '100'
-        },
-        {
-          prop: 'equipmentName',
-          name: '设备',
-          align: 'left',
-          minWidth: '150'
-        },
-        {
-          prop: 'materialName',
-          name: '物料',
-          align: 'left',
-          minWidth: '150'
-        },
-        {
-          prop: 'batchNo',
-          name: '批次',
-          align: 'left',
-          minWidth: '100'
-        }
+        columns: [
+          {
+            prop: 'select',
+            name: '选择',
+            width: '50'
+          },
+          {
+            prop: 'happenTime',
+            name: '时间',
+            width: '200'
+          },
+          {
+            prop: 'eventName',
+            name: '动作',
+            width: '100',
+            align: 'left'
+          },
+          {
+            prop: 'operator',
+            name: '操作人员',
+            align: 'left',
+            width: '100'
+          },
+          {
+            prop: 'quantity',
+            name: '产出数量',
+            width: '100'
+          },
+          {
+            prop: 'quantityAll',
+            name: '区间产出数量',
+            width: '100'
+          },
+          {
+            prop: 'percent',
+            name: '区间产出合格率',
+            width: '100'
+          },
+          {
+            prop: 'equipmentName',
+            name: '设备',
+            align: 'left',
+            minWidth: '150'
+          },
+          {
+            prop: 'materialName',
+            name: '物料',
+            align: 'left',
+            minWidth: '150'
+          },
+          {
+            prop: 'batchNo',
+            name: '批次',
+            align: 'left',
+            minWidth: '100'
+          }
         ],
         data: []
       },
@@ -338,7 +339,7 @@ export default {
                 instance.confirmButtonLoading = false
                 this.$message.success('遏制成功')
                 let restrain = {
-                  ...this.$route.query,
+                  ...this.moldQuery,
                   ...{
                     handleID: handle,
                     description: this.doDescription,
@@ -447,7 +448,7 @@ export default {
     .moldInfo {
       margin: 0 0 15px 0;
     }
-    /deep/.mold-tabke {
+    /deep/.mold-table {
       .el-table {
         .el-table__header-wrapper {
           .el-table__header {

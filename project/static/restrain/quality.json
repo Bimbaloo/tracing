@@ -1,0 +1,37 @@
+{
+  "errorCode" : 0, 
+  "errorMsg" : "",
+  "data" : 
+    [
+      {
+        "happenTime" : "查看详情",
+        "type" : "物料：xxxxxxxx     批次：xxxxxxxx",
+        "report": "2016-03-31 14:28:33",
+        "equipmentName" : "测试遏制功能",
+        "sourceCode" : "1029:徐晓锐",            
+        "materialName": "2016-03-31 14:28:33",
+        "batchNo" : "测试遏制功能",
+        "quantity" : "1029:徐晓锐",
+        "result" : "1029",
+        "handling": "1",
+        "person": "1",
+        "items": "1",
+        "surveyReport": "1"
+      },
+      {
+        "happenTime" : "查看详情",
+        "type" : "物料：xxxxxxxx     批次：xxxxxxxx",
+        "report": "2016-03-31 14:28:33",
+        "equipmentName" : "测试遏制功能",
+        "sourceCode" : "1029:徐晓锐",            
+        "materialName": "2016-03-31 14:28:33",
+        "batchNo" : "测试遏制功能",
+        "quantity" : "1029:徐晓锐",
+        "result" : "1029",
+        "handling": "2",
+        "person": "2",
+        "items": "2",
+        "surveyReport": "2"
+      }
+    ]
+}

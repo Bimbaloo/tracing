@@ -63,6 +63,61 @@ const categories = [{
       'type': 'datetime',
       'placeholder': '请输入结束时间'
     }]
+  }, {
+    'groupOrder': '4',
+    'title': '质检单',
+    'key': '4',
+    'items': [{
+      'name': '质检单',
+      'key': 'batchNo',
+      'type': 'input',
+      'placeholder': '请输入质检单'
+    }]
+  }, {
+    'groupOrder': '5',
+    'title': '工单',
+    'key': '5',
+    'items': [{
+      'name': '工单',
+      'key': 'batchNo',
+      'type': 'input',
+      'placeholder': '请输入工单'
+    }]
+  }, {
+    'groupOrder': '6',
+    'title': '设备',
+    'key': '6',
+    'items': [{
+      'name': '设备',
+      'key': 'equipmentCode',
+      'type': 'select',
+      'placeholder': '请选择设备'
+    }, {
+      'name': '开始时间',
+      'key': 'startTime',
+      'type': 'datetime',
+      'placeholder': '请输入开始时间'
+    }, {
+      'name': '结束时间',
+      'key': 'endTime',
+      'type': 'datetime',
+      'placeholder': '请输入结束时间'
+    }]
+  }, {
+    'groupOrder': '7',
+    'title': '质检批次',
+    'key': '7',
+    'items': [{
+      'name': '物料',
+      'key': 'materialCode',
+      'type': 'select',
+      'placeholder': '请选择物料'
+    }, {
+      'name': '批次',
+      'key': 'batchNo',
+      'type': 'input',
+      'placeholder': '请输入批次'
+    }]
   }],
   'active': {
     'radio': '1',

@@ -1,0 +1,71 @@
+{
+  "errorCode" : 0, 
+  "errorMsg" : "",
+  "data" : 
+    [
+      {
+        "happenTime" : "查看详情",
+        "ID" : 1,
+        "type" : "物料：xxxxxxxx     批次：xxxxxxxx",
+        "equipmentName" : "测试遏制功能",
+        "sourceCode" : "1029:徐晓锐",            
+        "materialName": "设备A",
+        "materialCode": "001",
+        "batchNo" : "测试遏制功能",
+        "quantity" : "1029:徐晓锐",
+        "result" : "1029",
+        "handling": "1",
+        "person": "1",
+        "items": "1",
+        "surveyReport": "1"
+      },
+      {
+        "happenTime" : "查看详情",
+        "ID" : 2,
+        "type" : "物料：xxxxxxxx     批次：xxxxxxxx",
+        "equipmentName" : "测试遏制功能",
+        "sourceCode" : "1029:徐晓锐",            
+        "materialName": "设备B",
+        "materialCode": "002",        
+        "batchNo" : "测试遏制功能",
+        "quantity" : "1029:徐晓锐",
+        "result" : "1029",
+        "handling": "2",
+        "person": "2",
+        "items": "2",
+        "surveyReport": "2"
+      },
+      {
+        "happenTime" : "查看详情",
+        "ID" : 3,
+        "type" : "物料：xxxxxxxx     批次：xxxxxxxx",
+        "equipmentName" : "测试遏制功能",
+        "sourceCode" : "1029:徐晓锐",            
+        "materialName": "设备B",
+        "materialCode": "002",        
+        "batchNo" : "测试遏制功能",
+        "quantity" : "1029:徐晓锐",
+        "result" : "1029",
+        "handling": "3",
+        "person": "3",
+        "items": "3",
+        "surveyReport": "3"
+      },
+      {
+        "happenTime" : "查看详情",
+        "ID" : 4,
+        "type" : "物料：xxxxxxxx     批次：xxxxxxxx",
+        "equipmentName" : "测试遏制功能",
+        "sourceCode" : "1029:徐晓锐",            
+        "materialName": "设备B",
+        "materialCode": "002",        
+        "batchNo" : "测试遏制功能",
+        "quantity" : "1029:徐晓锐",
+        "result" : "1029",
+        "handling": "4",
+        "person": "4",
+        "items": "4",
+        "surveyReport": "4"
+      }
+    ]
+}
