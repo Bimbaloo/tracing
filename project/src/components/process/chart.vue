@@ -5,14 +5,14 @@
             <!-- <h2 class="content-title">
             	工序&nbsp;—&nbsp;{{processName}}
             </h2>			 -->
-			<v-equipment v-if="bShowEq" 
+			<v-equipment v-if="bShowEq"
 				:equipments-id="equipments"
-				:process="processKey"  
+				:process="processKey"
 				:datetime="datetime">
 			</v-equipment>
 			<div v-else class="empty">{{empty}}</div>
-		</div>		
-  </div>      
+		</div>
+  </div>
 </template>
 
 <script>
