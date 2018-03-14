@@ -265,7 +265,7 @@ export default {
         }
       }
       let validateStart = (rule, value, callback) => {
-        let sTime = value.trim()
+        let sTime = value ? value.trim() : ''
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let nNow = +new Date()
 
@@ -284,7 +284,7 @@ export default {
       // 结束时间。
       let validateTime = (rule, value, callback) => {
         let sStart = oForm.startTime
-        let sTime = value.trim()
+        let sTime = value ? value.trim() : ''
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let bIsStartFormat = window.Rt.utils.isDateTime(sStart)
         let nNow = +new Date()
@@ -368,7 +368,7 @@ export default {
 
       // 处理全部。
       for (let sParam in oParam) {
-        if (oParam[sParam].includes(this.multiAll)) {
+        if (oParam[sParam] !== null && oParam[sParam].includes(this.multiAll)) {
           // 全部时，传[]
           oParam[sParam] = []
         }
