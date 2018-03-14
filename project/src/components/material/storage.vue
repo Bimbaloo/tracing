@@ -168,9 +168,7 @@ export default {
           {
             prop: 'barcode',
             name: '条码',
-            class: 'batch',
-            merge: true,
-            click: this.barcodeClick
+            merge: true
           },
           {
             prop: 'batchNo',
@@ -251,10 +249,6 @@ export default {
           {
             prop: 'quantity',
             name: '数量'
-          },
-          {
-            prop: 'remainQuantity',
-            name: '滞留数'
           }
         ]
     },
@@ -413,11 +407,11 @@ export default {
         // 新业务版本。
 
         // 判断是否为溯源，不显示滞留数列。
-        if (this.bTrace) {
-          this.materialData.columns = this.materialData.columns.filter(
-            o => o.prop !== 'remainQuantity'
-          )
-        }
+        // if (this.bTrace) {
+        //   this.materialData.columns = this.materialData.columns.filter(
+        //     o => o.prop !== 'remainQuantity'
+        //   )
+        // }
 
         this.requestSucess(JSON.parse(JSON.stringify(this.detailInfos)))
       }
