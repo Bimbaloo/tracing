@@ -368,7 +368,9 @@ export default {
         (!!historyList && searchTitle) ||
         (!!historyList &&
           historyList.oData.tab !== 'trace' &&
-          historyList.oData.tab !== 'track')
+          historyList.oData.tab !== 'track' &&
+          searchTitle
+        )
       ) {
         historyList.oData.radio = searchObj.key
         this.activeKey = historyList.oData.tab
