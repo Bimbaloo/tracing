@@ -168,7 +168,9 @@ export default {
           {
             prop: 'barcode',
             name: '条码',
-            merge: true
+            class: 'batch',
+            merge: true,
+            click: this.barcodeClick
           },
           {
             prop: 'batchNo',
@@ -234,7 +236,9 @@ export default {
           },
           {
             prop: 'barcode',
-            name: '条码'
+            name: '条码',
+            class: 'batch',
+            click: this.barcodeClick
           },
           {
             prop: 'materialName',
@@ -280,12 +284,25 @@ export default {
     batchClick (row) {
       if (row.batchNo) {
         // 批次存在可点击  新版本跳转到可疑品。
-        let sPath = this.isOpDbBeforeRefact
-          ? '/stock/batch'
-          : '/stock/restrain'
+        // let sPath = this.isOpDbBeforeRefact
+        //   ? '/stock/batch'
+        //   : '/stock/restrain'
+
+        let sPath = '/stock/restrain'
         this.$router.replace({
           path: sPath,
           query: { materialCode: row.materialCode, batchNo: row.batchNo }
+        })
+      }
+    },
+    // 点击条码
+    barcodeClick (row) {
+      if (row.barcode) {
+            // 条码点击，新版本跳转到可疑品
+        let sPath = '/stock/restrain'
+        this.$router.replace({
+          path: sPath,
+          query: { materialCode: row.materialCode, batchNo: row.batchNo, barcode: row.barcode }
         })
       }
     },
