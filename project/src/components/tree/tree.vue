@@ -1,7 +1,7 @@
 <template>
 	<div class="diagram" ref="diagram">
 		<div class="icons" v-if="!isDialogTree">
-			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
+			<i class="icon icon-20 icon-exportImg" @click="onSaveImgHandler" title="生成图片"></i>
 			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
 			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
@@ -1084,8 +1084,38 @@ export default {
 
       this.tree.commitTransaction('highlight')
     },
+	// 下载图片-- svg
+    onSaveImgHandler () {
+      function myCallback (blob) {
+        var url = window.URL.createObjectURL(blob)
+        var filename = '追溯主图.svg'
 
-    onSvaeImgHandler (event) {
+        var a = document.createElement('a')
+        a.style = 'display: none'
+        a.href = url
+        a.download = filename
+
+    // IE 11
+        if (window.navigator.msSaveBlob !== undefined) {
+          window.navigator.msSaveBlob(blob, filename)
+          return
+        }
+
+        document.body.appendChild(a)
+        requestAnimationFrame(function () {
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+        })
+      }
+
+	  var svg = this.tree.makeSvg({ scale: 1, background: 'white' })
+	  var svgstr = new XMLSerializer().serializeToString(svg)
+	  var blob = new Blob([svgstr], { type: 'image/svg+xml' })
+	  myCallback(blob)
+    },
+	// 浏览器缩放时，下载背景不全
+    onSaveImgHandler1 (event) {
       let oImage = this.tree.makeImage({
         scale: 1,
         maxSize: new window.go.Size(Infinity, Infinity),
