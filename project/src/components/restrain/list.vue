@@ -300,7 +300,6 @@ export default {
                 instance.confirmButtonLoading = false
                 this.$message.success('取消遏制成功')
                 self.doDescription = ''
-                debugger
                 this.isDetails = false
                 this.getListhData(this.restrainList)
                 done()

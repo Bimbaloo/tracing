@@ -1,7 +1,7 @@
 <template>
 	<div id="app" class="report-wrapper">
 		<div class="report-container">
-			<h1 class="title">遏制报告</h1>
+			<h1 class="title">遏制清单</h1>
 			<h2 class="content-title">查询条件</h2>
 			<!-- <div class="condition">
 				<div class="condition-line"><span>遏制人：{{nickname}}</span><span>遏制时间：{{restrainQuery.suppressTime}}</span><span>遏制描述：{{params.description}}</span></div>

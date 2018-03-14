@@ -60,7 +60,8 @@ export default {
         'endTime': '',
         'moldCode': '',
         'processCode': '',
-        'startTime': ''
+        'startTime': '',
+        'equipmentId': ''
       },
       tableData: {
         columns: [
@@ -131,6 +132,16 @@ export default {
     },
     oQuery () {
       return this.$route.query
+    },
+    // 以选项
+    selected () {
+      let arr = []
+      this.tableData.data.forEach((el, $index) => {
+        if (el.value) {
+          arr.push({el, $index})
+        }
+      })
+      return arr
     }
   },
   created () {
@@ -154,6 +165,7 @@ export default {
     // 如果路由有变化，会再次执行该方法
     $route: function () {
       this.init()
+      this.needRestrain = true
       this.isRestrained = true
     }
   },
@@ -175,6 +187,9 @@ export default {
     },
     requestSucess (oData) {
       let myData = {...oData}
+      /* 获取模具信息 */
+      let {moldCode, moldName, moldLife} = myData.moldInfo
+      this.moldInfo = {moldCode, moldName, moldLife}
       let needArr = []
 
       myData.moldDoOutList.forEach(element => {
@@ -190,6 +205,7 @@ export default {
         element.firstDoOut.equipmentName = element.equipmentName      // 设备名称
         element.firstDoOut.materialName = element.materialName        // 物料名称
         element.firstDoOut.batchNo = element.batchNo                  // 批次
+        element.firstDoOut.equipmentId = element.equipmentId          // 设备ID
         element.firstDoOut.select = 'first'                           // 有勾选框
         element.firstDoOut.value = false                              // 勾选框默认 false
 
@@ -213,6 +229,7 @@ export default {
             element.lastDoOut.eventName = '最后一次产出'  // 事件名称
           }
           element.lastDoOut.select = 'last'                           // 有勾选框
+          element.lastDoOut.equipmentId = element.equipmentId         // 设备ID
           if (element.lastDoOut !== null && element.noGoodDoOutList.length === 0) {       // 最后一次生产存在 && 不良品不存在
             element.firstDoOut.rowspan = 1 + 1
             needArr.push(element.lastDoOut)
@@ -266,32 +283,42 @@ export default {
     },
     // 显示可疑品列表
     showSuspiciousList () {
-      let startTime = ''
-      let endTime = ''
-      this.tableData.data.forEach(el => {
-        if (el.select === 'first' && el.value === true) {
-          startTime = el.happenTime
-        } else if (el.select === 'last' && el.value === true) {
-          endTime = el.happenTime
-        }
-      })
-      if (startTime > endTime) {
-        this.$message({
-          showClose: true,
-          message: '开始时间不能大于结束时间，请重新选择。',
-          type: 'error'
-        })
-      } else {
-        this.moldQuery.startTime = startTime
-        this.moldQuery.endTime = endTime
-        this.needRestrain = false
-        this.isRestrained = false
-        // this.moldQuery = {
-        //   'endTime': '2018-01-26 00:00:00',
-        //   'moldCode': 'ABCD',
-        //   'processCode': '190',
-        //   'startTime': '2018-01-15 00:00:00'
-        // }
+      const length = this.selected.length
+      switch (length) {
+        case 0:     // 没有选中条件
+          this.$message({
+            showClose: true,
+            message: '请选择可疑品范围',
+            type: 'error'
+          })
+          break
+        case 1:     // 选中了一条
+          this.moldQuery.startTime = this.selected[0].el.happenTime
+          this.moldQuery.equipmentId = this.selected[0].el.equipmentId
+          this.needRestrain = false
+          this.isRestrained = false
+          break
+        case 2:     // 选中了领条
+          if (this.selected[0].el.select === 'first' && this.selected[0].el.equipmentId === this.selected[1].el.equipmentId) {  // 以选项中开始时间大于结束时间 && 设备ID相同
+            this.moldQuery.startTime = this.selected[0].el.happenTime
+            this.moldQuery.endTime = this.selected[1].el.happenTime
+            this.moldQuery.equipmentId = this.selected[0].el.equipmentId
+            this.needRestrain = false
+            this.isRestrained = false
+          } else if (this.selected[0].el.equipmentId !== this.selected[1].el.equipmentId) {  // 以选项中设备ID不同
+            this.$message({
+              showClose: true,
+              message: '请选择相同设备',
+              type: 'error'
+            })
+          } else {
+            this.$message({
+              showClose: true,
+              message: '开始时间不能小于结束时间',
+              type: 'error'
+            })
+          }
+          break
       }
     },
     // 遏制。
@@ -327,9 +354,9 @@ export default {
             instance.confirmButtonText = '遏制中...'
             let oConditions = Object.assign(
               { doDescription: self.doDescription },
-              this.$route.query
+              this.moldQuery
             )
-
+            console.log(oConditions)
             this.$post(this.url, oConditions)
               .then(oData => {
                 console.log(oData)
@@ -390,6 +417,7 @@ export default {
     },
     // 勾选
     handleCheckChange (row) {
+      console.log(row)
       const select = row.select
       const value = row.value
       const index = row.index
@@ -415,7 +443,6 @@ export default {
         this.tableHeight = 100
         this.$nextTick(() => {
           const allHeight = this.outerHeight(this.$refs.moldCode)
-          // console.log(allHeight)
           const titleHeight = this.outerHeight(document.querySelector('.content-title'))
           const moldInfoHeight = this.outerHeight(document.querySelector('.moldInfo'))
           this.tableHeight = allHeight - titleHeight - moldInfoHeight - 20
