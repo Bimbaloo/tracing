@@ -159,6 +159,7 @@ export default {
         time: '/api/v1/trace/report/by-equipment-time',
         restrainBatch: '/api/v1/trace/report/by-batch',
         restrainDetails: '/api/v1/suppress/verbose',
+        restrainBarcode: '/api/v1/trace/report/by-batch-barcode',
         mold: `/api/v1/trace/report/by-mold`  // 根据模具信息查询快速报告
       },
       active: {
@@ -850,11 +851,15 @@ export default {
           // 若根据设备查询。
           sUrl = this.oUrl['time']
           delete oParam.equipmentName
-        } else {
-          // 根据物料查询。
-          oParam.materialCode = oParam.materialCode.split(':')[0]
-          sUrl = this.oUrl['restrainBatch']
-        }
+	  } else if ('barcode' in oParam) {
+		  // 根据批次，条码查询。
+		  oParam.materialCode = oParam.materialCode.split(':')[0]
+		  sUrl = this.oUrl['restrainBarcode']
+	  } else {
+		  // 根据物料查询。
+		  oParam.materialCode = oParam.materialCode.split(':')[0]
+		  sUrl = this.oUrl['restrainBatch']
+	  }
       }
 
       this.$register.sendRequest(

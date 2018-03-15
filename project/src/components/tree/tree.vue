@@ -1,7 +1,7 @@
 <template>
 	<div class="diagram" ref="diagram">
 		<div class="icons" v-if="!isDialogTree">
-			<i class="icon icon-20 icon-exportImg" @click="onSvaeImgHandler" title="生成图片"></i>
+			<i class="icon icon-20 icon-exportImg" @click="onSaveImgHandler" title="生成图片"></i>
 			<i class="icon icon-20 icon-print" @click="onPrintImgHandler" title="打印图片"></i>
 			<i class="icon icon-20 icon-fullScreen" v-if="!treeFullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
@@ -326,17 +326,17 @@ export default {
               },
 			new window.go.Binding('text', '', function (node) {
 			  if (node.nodeType === 10003 || node.nodeType === 10004) {
-			    return node.totalNum
+			    return node.totalNum < 0 ? '-' : node.totalNum
 			  } else if (node.nodeType === 10001) {
 				  if (node.isShowRemain) {
-					  return `${node.processingNum}/${node.remainNum}/${node.totalNum}`
+					  return `${node.processingNum < 0 ? '-' : node.processingNum}/${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
 				  } else {
-					   return `${node.totalNum}`
+					   return node.totalNum < 0 ? '-' : node.totalNum
 				  }
 			  } else if (node.isShowRemain) {
-			    return `${node.remainNum}/${node.totalNum}`
+			    return `${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
   			  } else {
-				 return `${node.totalNum}`
+				 return node.totalNum < 0 ? '-' : node.totalNum
   	 		  }
 		  })),
 		  {
@@ -978,7 +978,7 @@ export default {
       if (this.treeData.node) {
         // 如果存在显示的key值，则定位到显示的数据，否则定位到第一个数据。
         let aoData = this.treeData.node.filter(
-          o => this.key ? o.key === this.key : o.parents.split(',').includes('0')
+          o => this.key ? o.key === this.key : o.parentKeys.includes(0)
         )
         if (aoData.length) {
           let node = this.tree.findNodeForKey(aoData[0].key)
@@ -1084,13 +1084,38 @@ export default {
 
       this.tree.commitTransaction('highlight')
     },
+	// 下载图片-- svg
+    onSaveImgHandler () {
+      function myCallback (blob) {
+        var url = window.URL.createObjectURL(blob)
+        var filename = '追溯主图.svg'
 
-    /**
-     * 生成图片。
-     * @param {Object} event
-     * @return {void}
-     */
-    onSvaeImgHandler (event) {
+        var a = document.createElement('a')
+        a.style = 'display: none'
+        a.href = url
+        a.download = filename
+
+    // IE 11
+        if (window.navigator.msSaveBlob !== undefined) {
+          window.navigator.msSaveBlob(blob, filename)
+          return
+        }
+
+        document.body.appendChild(a)
+        requestAnimationFrame(function () {
+          a.click()
+          window.URL.revokeObjectURL(url)
+          document.body.removeChild(a)
+        })
+      }
+
+	  var svg = this.tree.makeSvg({ scale: 1, background: 'white' })
+	  var svgstr = new XMLSerializer().serializeToString(svg)
+	  var blob = new Blob([svgstr], { type: 'image/svg+xml' })
+	  myCallback(blob)
+    },
+	// 浏览器缩放时，下载背景不全
+    onSaveImgHandler1 (event) {
       let oImage = this.tree.makeImage({
         scale: 1,
         maxSize: new window.go.Size(Infinity, Infinity),

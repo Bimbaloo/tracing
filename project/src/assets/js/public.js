@@ -98,7 +98,8 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
         code: o.groupCode,
         name: o.groupName,
         key: 'group' + (++nGroupIndex),
-        parents: '',
+        parentKeys: [],
+        // parents: '',
         nodeType: 10001, // 节点类型-工序
         opType: 10001, // 动作类型-工序
         isGroup: true,
@@ -295,7 +296,7 @@ var isMaterialNode = function (oData) {
 }
 
 // 第一个节点的parents值。
-const SPARENTKEY = '0'
+const SPARENTKEY = 0
 
 var getCatalogData = function (oRowData, sType) {
   let aoCatalogData = []
@@ -313,7 +314,8 @@ var getCatalogData = function (oRowData, sType) {
   if (sType === 'trace') {
     // 溯源。
     // 判断第一个节点是否为物料节点。 否则加一个虚构的物料节点。
-    let aoFirstNode = aoCopyData.filter(o => o.parents === SPARENTKEY)
+    // let aoFirstNode = aoCopyData.filter(o => o.parents === SPARENTKEY)
+    let aoFirstNode = aoCopyData.filter(o => isFirstNode(o))
 
     if (aoFirstNode.length && !isMaterialNode(aoFirstNode[0])) {
       // 第一个节点不是物料。则增加一个虚拟节点。
@@ -321,7 +323,8 @@ var getCatalogData = function (oRowData, sType) {
         code: '000',
         name: '虚构物料节点',
         key: SPARENTKEY,
-        parents: SPARENTKEY,
+        // parents: SPARENTKEY,
+        parentKeys: [SPARENTKEY],
         nodeType: 10003,
         opType: 0,
         iconType: 'material',
@@ -332,7 +335,7 @@ var getCatalogData = function (oRowData, sType) {
     for (let i = aoCopyData.length - 1; i >= 0; i--) {
       let oData = aoCopyData[i]
 
-      if (oData && isMaterialNode(oData) && oData.parents === SPARENTKEY) {
+      if (oData && isMaterialNode(oData) && isFirstNode(oData)) { // oData.parents === SPARENTKEY
         oData.parent = ''
         aoCatalogData.push(oData)
 
@@ -344,7 +347,7 @@ var getCatalogData = function (oRowData, sType) {
     // 追踪
     // 判断最后一个节点是否为物料节点，否则，创建一个虚拟的物料节点。-- 在最后创建，否则，会将其他节点加入
     aoCopyData.forEach(o => {
-      if (!aoCopyData.some(o1 => o1.parents.split(',').includes(o.key) && o1.key !== o.key) && !isMaterialNode(o)) {
+      if (!aoCopyData.some(o1 => o1.parentKeys.includes(o.key) && o1.key !== o.key) && !isMaterialNode(o)) { // o1.parents.split(',').includes(o.key)
         // 当前节点没有子节点，并且不是物料节点
         aLastNodeKeys.push(o.key)
       }
@@ -357,7 +360,8 @@ var getCatalogData = function (oRowData, sType) {
         code: '000',
         name: '虚构物料节点',
         key: sNewMateiralNodekey,
-        parents: aLastNodeKeys.join(','),
+        // parents: aLastNodeKeys.join(','),
+        parentKeys: aLastNodeKeys,
         nodeType: 10003,
         opType: 0,
         iconType: 'material',
@@ -374,7 +378,7 @@ var getCatalogData = function (oRowData, sType) {
 
         aoCopyData.splice(i, 1)
 
-        _findParentsData(aoCopyData, oData.parents, oData.key)
+        _findParentsData(aoCopyData, oData.parentKeys, oData.key)// oData.parents
       }
     }
   }
@@ -411,6 +415,17 @@ var getCatalogData = function (oRowData, sType) {
   return aResult
 
   /**
+  * 是否为第一个节点
+  */
+  function isFirstNode (oNode) {
+    if (oNode.parentKeys && oNode.parentKeys.length === 1 && oNode.parentKeys[0] === 0) {
+      return true
+    } else {
+      return false
+    }
+  }
+
+  /**
    * 递归查找父节点。
    * @param {Array} aoCopyData
    * @param {String} sKey
@@ -423,7 +438,7 @@ var getCatalogData = function (oRowData, sType) {
       let sNewKey = ''
       let oFlag = {}
 
-      if (oData && sKey.split(',').includes(oData.key)) {
+      if (oData && sKey.includes(oData.key)) {
         // 当前元素的父级。
         if (isMaterialNode(oData)) {
           oData.parent = ''
@@ -456,8 +471,8 @@ var getCatalogData = function (oRowData, sType) {
         if (!window.Rt.utils.isEmptyObject(oFlag) && !(aoCatalogData.some(o => o.key === oFlag.key && o.parent === oFlag.parent))) {
           aoCatalogData.push(oFlag)
 
-          if (oFlag.parents !== SPARENTKEY) {
-            _findParentsData(aoCopyData, oFlag.parents, sNewKey)
+          if (!isFirstNode(oFlag)) { // oFlag.parents !== SPARENTKEY
+            _findParentsData(aoCopyData, oFlag.parentKeys, sNewKey)
           }
         }
       }
@@ -477,7 +492,7 @@ var getCatalogData = function (oRowData, sType) {
       let sNewKey = ''
       let oFlag = {}
 
-      if (oData && oData.parents.split(',').includes(sKey)) {
+      if (oData && oData.parentKeys.includes(sKey)) {
         // 当前元素的父级。
         if (isMaterialNode(oData)) {
           oData.parent = ''

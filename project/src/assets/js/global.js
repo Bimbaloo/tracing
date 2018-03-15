@@ -68,6 +68,21 @@
     },
 
     /**
+    * 获取entries值。
+    * @param {Object} oParam
+    * @return {Array}
+    */
+    getObjectEntries: function (oParam) {
+      let aEntries = []
+
+      for (let sParam in oParam) {
+        aEntries.push([sParam, oParam[sParam]])
+      }
+
+      return aEntries
+    },
+
+    /**
      * 判断对象是否为空对象。
      * @param {Object} e
      * @return {Boolean}
