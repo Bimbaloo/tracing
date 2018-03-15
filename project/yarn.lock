@@ -44,13 +44,13 @@ adler-32@~1.1.0:
     exit-on-epipe "~1.0.1"
     printj "~1.1.0"
 
-ag-grid-vue@^13.1.0:
-  version "13.3.0"
-  resolved "http://registry.npm.taobao.org/ag-grid-vue/download/ag-grid-vue-13.3.0.tgz#b0d3df37b8f02098f9ae01fa19beec11a3040c6e"
+ag-grid-vue@^16.0.0:
+  version "16.0.0"
+  resolved "http://registry.npm.taobao.org/ag-grid-vue/download/ag-grid-vue-16.0.0.tgz#4e45bacbf94f6a6e2a090d58e4dd067254f85d24"
 
-ag-grid@^13.1.2:
-  version "13.3.1"
-  resolved "http://registry.npm.taobao.org/ag-grid/download/ag-grid-13.3.1.tgz#9478401b5b6da9ce7d890ac15dfcd95721ae3de7"
+ag-grid@^16.0.1:
+  version "16.0.1"
+  resolved "http://registry.npm.taobao.org/ag-grid/download/ag-grid-16.0.1.tgz#f9b5562fff6c70b38a20ffb1708800006c902c1a"
 
 ajv-keywords@^1.0.0:
   version "1.5.1"
@@ -2353,9 +2353,9 @@ element-theme@^2.0.1:
     ora "^0.3.0"
     run-sequence "^1.2.2"
 
-element-ui@^2.1.0:
-  version "2.1.0"
-  resolved "http://registry.npm.taobao.org/element-ui/download/element-ui-2.1.0.tgz#eec860e3d3b131e61c2974a3e2b19a689d040f14"
+element-ui@^2.2.2:
+  version "2.2.2"
+  resolved "http://registry.npm.taobao.org/element-ui/download/element-ui-2.2.2.tgz#40935d55e2eb007e6a5d2e766fc4bcc2266eb571"
   dependencies:
     async-validator "~1.8.1"
     babel-helper-vue-jsx-merge-props "^2.0.0"
@@ -7856,9 +7856,9 @@ vue-template-es2015-compiler@^1.6.0:
   version "1.6.0"
   resolved "http://registry.npm.taobao.org/vue-template-es2015-compiler/download/vue-template-es2015-compiler-1.6.0.tgz#dc42697133302ce3017524356a6c61b7b69b4a18"
 
-vue@^2.5.13:
-  version "2.5.13"
-  resolved "http://registry.npm.taobao.org/vue/download/vue-2.5.13.tgz#95bd31e20efcf7a7f39239c9aa6787ce8cf578e1"
+vue@^2.5.16:
+  version "2.5.16"
+  resolved "http://registry.npm.taobao.org/vue/download/vue-2.5.16.tgz#07edb75e8412aaeed871ebafa99f4672584a0085"
 
 vuex@^3.0.1:
   version "3.0.1"
