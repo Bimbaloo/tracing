@@ -132,7 +132,8 @@ const config = {
     ])
   ],
   devServer: {
-    host: '127.0.0.1', // 0.0.0.0 为了使项目可以ip访问  https://doc.webpack-china.org/configuration/dev-server/#devserver-host
+    // host: '0.0.0.0', // 0.0.0.0 为了使项目可以ip访问  https://doc.webpack-china.org/configuration/dev-server/#devserver-host
+    host: '127.0.0.1',
     port: 8020,
     // historyApiFallback: false,
     historyApiFallback: {

@@ -3,10 +3,6 @@
 		<div class="report-container">
 			<h1 class="title">遏制清单</h1>
 			<h2 class="content-title">查询条件</h2>
-			<!-- <div class="condition">
-				<div class="condition-line"><span>遏制人：{{nickname}}</span><span>遏制时间：{{restrainQuery.suppressTime}}</span><span>遏制描述：{{params.description}}</span></div>
-				<div class="condition-line"><span>物料编码：{{params.materialCode}}</span><span>批次：{{params.batchNo}}</span></div>
-			</div> -->
 			<div class='condition-table'>
         <span v-for="infor in information" :key="infor.value">{{infor.value}}：{{infor.key}}</span>
       </div>
@@ -18,11 +14,6 @@
 <script>
 import report from 'components/report/report.vue'
 const URL = window.HOST + '/api/v1/suppress/list' // 遏制列表
-// const oCondition = {
-//   endTime: null,
-//   personName: null,
-//   startTime: null
-// }
 export default {
   components: {
     'v-report': report
@@ -32,7 +23,7 @@ export default {
       styleObject: {
         'min-width': '1200px'
       },
-      restrainQuery: null,
+      restrainQuery: '',
       listInfor: {},
       killProgress: false
     }
@@ -119,7 +110,14 @@ export default {
         this.$message.error('暂无权限。')
       }
     })
-    this.restrainQuery = JSON.parse(sessionStorage.getItem('restrain'))
+    let emptyQuery = {  // 空模板
+      'batchNo': '',
+      'description': '',
+      'handleID': '',
+      'materialCode': '',
+      'suppressTime': ''
+    }
+    this.restrainQuery = JSON.parse(sessionStorage.getItem('restrain')) || emptyQuery
     this.getListhData()
   },
   mounted () {
@@ -135,8 +133,12 @@ export default {
       this.styleObject.minWidth = 0
     },
     // 获取遏制列表信息
-    getListhData (oCondition) {
-      // debugger
+    getListhData () {
+      const oCondition = {
+        endTime: '',
+        personName: '',
+        startTime: ''
+      }
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
@@ -150,9 +152,13 @@ export default {
     },
     // 获取遏制列表信息 - 请求成功。
     requestSucess (oData) {
-      this.listInfor = oData.find(el => {
-        return el.handle === this.restrainQuery.handleID
-      })
+      if (this.restrainQuery) {
+        this.listInfor = oData.find(el => {
+          return el.handle === this.restrainQuery.handleID
+        })
+      } else {
+        this.listInfor = {}
+      }
     },
     // 请求失败。
     requestFail (sErrorMessage) {
