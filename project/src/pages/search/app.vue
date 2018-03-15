@@ -477,7 +477,7 @@ export default {
     },
     // 可疑品列表查询
     linkSuppressList () {
-      location.assign(`/restrain.html?${(+new Date()).toString().substr(-5)}#/suppressList/1?personCode=&startTime=&endTime=&_tag=` + (+new Date()).toString().substr(-5))
+      location.assign(`/restrain.html?tag=${(+new Date()).toString().substr(-5)}#/suppressList/1?personCode=&startTime=&endTime=&_tag=` + (+new Date()).toString().substr(-5))
     }
   }
 }
