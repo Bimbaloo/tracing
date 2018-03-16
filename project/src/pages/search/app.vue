@@ -20,6 +20,7 @@
           :handle-submit="handleSubmit"></v-panel>
         </el-tab-pane>
       </el-tabs>
+      <div class="link-suppress-list" @click="linkSuppressList">遏制列表</div>
     </div>
     <footer>
       <img class="version" :src="version" />
@@ -368,7 +369,9 @@ export default {
         (!!historyList && searchTitle) ||
         (!!historyList &&
           historyList.oData.tab !== 'trace' &&
-          historyList.oData.tab !== 'track')
+          historyList.oData.tab !== 'track' &&
+          searchTitle
+        )
       ) {
         historyList.oData.radio = searchObj.key
         this.activeKey = historyList.oData.tab
@@ -471,6 +474,10 @@ export default {
             message: '已取消删除'
           })
         })
+    },
+    // 可疑品列表查询
+    linkSuppressList () {
+      location.assign(`/restrain.html?tag=${(+new Date()).toString().substr(-5)}#/suppressList/1?personCode=&startTime=&endTime=&_tag=` + (+new Date()).toString().substr(-5))
     }
   }
 }
@@ -595,6 +602,14 @@ footer {
   width: 1080px;
   margin: 0 auto;
   z-index: 1;
+  .link-suppress-list {
+    position: absolute;
+    bottom: 30px;
+    right: 40px;
+    color: #42af8f;
+    cursor: pointer;
+    font-size: 14px;
+  }
 }
 
 .search-barcode {
