@@ -390,6 +390,32 @@
     },
 
     /**
+     *  将页面中的图片下载。 rasterizeHTML
+     *  @param {Element} sHtml 需打印的内容
+     *  @param {Object} option
+     *  @return {void}
+     */
+    rasterizeImgHTML: function (rasterizeHTML, sHtml, option, filename) {
+      let canvas = document.createElement('canvas')
+
+      rasterizeHTML.drawHTML(sHtml, canvas, option || {}).then(function (res) {
+        let sImg = res.image.src
+        let oLink = document.createElement('a')
+
+        oLink.style.display = 'none'
+        oLink.setAttribute('href', sImg)
+        oLink.setAttribute('download', filename || 'page')
+
+        document.body.appendChild(oLink)
+        requestAnimationFrame(function () {
+          oLink.click()
+          window.URL.revokeObjectURL(sImg)
+          document.body.removeChild(oLink)
+        })
+      })
+    },
+
+    /**
      * 页面转化为图片并下载。依赖html2Canvas。
      * @param {Element} element
      * @param {Object} option

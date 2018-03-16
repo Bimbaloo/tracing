@@ -5,7 +5,7 @@
 			<!--h2 class="title">遏制详情</h2-->
 			<!-- <h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2> -->
 			<div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
-				<span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span><span v-if="oQuery.barcode">条码: {{oQuery.barcode}}</span>
+				<span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span>
 			</div>
 			<div class="condition" v-if="'equipmentId' in oQuery">
 				<span>设备名称：{{equipmentName}}</span><span>开始时间：{{oQuery.startTime}}</span><span>结束时间：{{oQuery.endTime}}</span>
