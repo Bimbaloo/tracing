@@ -8,9 +8,9 @@
         <div class="panel-content"
         	:style="{height: sPanelHeight+'px'}">
             <!--<v-form :tab="category.key" :active="category.active" :label-width="labelWidth" :keys="keys" :items="items" :handle-submit="handleSubmit"></v-form>-->
-	        <div class="panel-content-wrap" v-for="(item,index) in category.list" 
-	          :key="index" v-if="category.active.radio == item.key">
-	        		<v-form 
+	        <div class="panel-content-wrap" v-for="(item,index) in category.list"
+	          :key="index" v-show="category.active.radio == item.key">
+	        		<v-form
 	        			:tab="category.key"
 	        			:sub-tab="item.key"
 	        			:active="category.active"
@@ -18,14 +18,14 @@
 	        			:handle-submit="handleSubmit"
 	        			:keys="keys"
 	        			:form-height="sPanelHeight"
-	        			:items="item.items" 
+	        			:items="item.items"
                 :title="item.title">
 	        		</v-form>
 	        	</div>
         </div>
-        
+
     </div>
-    
+
 </template>
 <script>
 import form from 'components/form/form.vue'
