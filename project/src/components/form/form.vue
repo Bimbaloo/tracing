@@ -1,8 +1,8 @@
 <template>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="labelWidth" @keyup.enter.native="submitForm('ruleForm')" >
 		<div class='form-conditions' :style="{maxHeight: conditionHeight}">
-			<el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']"> 
-        <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key" :tab="tab" :sub-tab="subTab"></component> 
+			<el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']">
+        <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key" :tab="tab" :sub-tab="subTab"></component>
 				<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->
       </el-form-item>
 		</div>
@@ -327,6 +327,7 @@ export default {
           materialCode: [{ validator: validateParam, trigger: 'change' }],
           equipmentCode: [{ validator: validateParam, trigger: 'change' }],
           doCode: [{ validator: validateParam, trigger: 'change' }],
+          personCode: [{validator: validateParam, trigger: 'change'}],
           startTime: [{ validator: validateStart, trigger: 'change' }],
           // 结束时间。
           endTime: [{ validator: validateTime, trigger: 'change' }]
@@ -337,6 +338,7 @@ export default {
           materialCode: [{ validator: validateParam, trigger: 'change' }],
           equipmentCode: [{ validator: validateParam, trigger: 'change' }],
           doCode: [{ validator: validateParam, trigger: 'change' }],
+          personCode: [{validator: validateParam, trigger: 'change'}],
           startTime: [{ validator: validateStart, trigger: 'change' }],
           // 结束时间。
           endTime: [{ validator: validateTime, trigger: 'change' }]

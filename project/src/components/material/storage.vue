@@ -234,9 +234,7 @@ export default {
           },
           {
             prop: 'barcode',
-            name: '条码',
-            class: 'batch',
-            click: this.barcodeClick
+            name: '条码'
           },
           {
             prop: 'materialName',
@@ -296,7 +294,7 @@ export default {
         let sPath = '/stock/restrain'
         this.$router.replace({
           path: sPath,
-          query: { materialCode: row.materialCode, batchNo: row.batchNo, barcode: row.barcode }
+          query: { barcode: row.barcode }
         })
       }
     },
