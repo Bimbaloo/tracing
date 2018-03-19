@@ -542,7 +542,7 @@ export default {
 			  font: 'bold 10pt sans-serif'
 		  },
 		  new window.go.Binding('text', 'num'),
-			new window.go.Binding('visible', '', link => link.num >= 0)
+			new window.go.Binding('visible', '', this.isToMaterialNode)
 	  )
       )
     }
@@ -1288,7 +1288,21 @@ export default {
       } else {
         return str
       }
-    }
+    },
+		// 是否下道工序为物料，
+		isToMaterialNode(node) {
+			let nodes = this.data.node
+			let key = node.to
+
+			let aoIs = nodes.filter(o => o.key === key)
+
+			if(aoIs.length && (aoIs[0].nodeType === 10003 || aoIs[0].nodeType === 10004)) {
+				return false
+			}else {
+				return true
+			}
+
+		}
   }
 }
 </script>
