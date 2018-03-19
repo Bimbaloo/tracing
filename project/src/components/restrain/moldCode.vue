@@ -1,7 +1,7 @@
 <template>
 	<div class="router-content suspicious moldCode" ref='moldCode'>
 		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain">遏制</el-button>
-		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain">可疑品</el-button>
+		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain && !isOpDbBeforeRefact">可疑品</el-button>
 		<div class="innner-content" >
       <!-- <h2 class="title">模具记录</h2> -->
       <h2 class="content-title path-title" >
@@ -23,7 +23,7 @@
             </template>
           </el-table-column>
         </el-table>
-        <v-report v-if="!needRestrain" :hasData="setWidth" :noData="removeWidth" type='mold' :query='moldQuery'></v-report>        
+        <v-report v-if="!needRestrain" :hasData="setWidth" :noData="removeWidth" type='mold' :query='moldQuery'></v-report>
       </div>
 		</div>
 	</div>
@@ -128,6 +128,13 @@ export default {
     }
   },
   computed: {
+		// 版本信息数据。
+    isOpDbBeforeRefact () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isOpDbBeforeRefact
+      )
+    },
     isrestrainHtml () {
       return window.location.pathname.includes('restrain')
     },
@@ -510,8 +517,8 @@ export default {
           }
         }
       }
-      
-        
+
+
       td {
         .cell {
           .td-cell {

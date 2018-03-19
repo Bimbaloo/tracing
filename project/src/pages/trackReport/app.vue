@@ -6,7 +6,7 @@
 				<i class="icon icon-20 icon-download" title="下载" @click="downloadHandle('fastreport', $event)"></i>
             	<i class="icon icon-20 icon-print" title="打印" @click="beforePrint('fastreport', $event)"></i>
 			</div>
-			<h1 class="title">快速报告</h1>
+			<h1 class="title">可疑品清单</h1>
 			<h2 class="content-title">查询条件</h2>
 			<div class='condition-message'>
 				<span v-for="(filter,index) in filtersList" :key="index">
@@ -351,7 +351,7 @@ export default {
       if (!oRef) {
         return
       }
-      window.Rt.utils.downloadHtml(html2canvas, oRef, '快速报告')
+      window.Rt.utils.downloadHtml(html2canvas, oRef, '可疑品清单')
     },
     //
     beforePrint () {

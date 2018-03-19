@@ -1,9 +1,9 @@
 <template>
 	<div class="post track">
     	<h2 class="content-title">查询结果集</h2>
-    	<div class="btn-wrapper">	
+    	<div class="btn-wrapper">
     		<el-button class="btn btn-plain" @click="onTrack">追踪</el-button>
-    		<el-button class="btn btn-plain" @click="onReport">快速报告</el-button>
+    		<el-button class="btn btn-plain" @click="onReport" v-if="!isOpDbBeforeRefact">可疑品清单</el-button>
     	</div>
         <div class="router-content" ref="routerContent">
 	        <div class="innner-content">
@@ -19,10 +19,10 @@
 						</h2>
 						<transition name="el-zoom-in-top">
 							<div class="content-table inner" ref="summaryTable">
-								<v-table 
+								<v-table
 									v-show="active.summary"
 									:max-height="gridData.height"
-									:table-data="summaryData" 
+									:table-data="summaryData"
 									:loading="gridData.loading">
 								</v-table>
 							</div>
@@ -45,9 +45,9 @@
 							</div>
 						</transition>
 	            	</div>
-	            </div>     
-	       </div>   
-    	</div> 
+	            </div>
+	       </div>
+    	</div>
     </div>
 </template>
 
@@ -119,6 +119,15 @@ export default {
     // 此时 data 已经被 observed 了
     this.fetchPage()
   },
+	computed: {
+		// 版本信息数据。
+    isOpDbBeforeRefact () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isOpDbBeforeRefact
+      )
+    }
+	},
   watch: {
     // 如果路由有变化，会再次执行该方法
     $route: 'fetchPage',

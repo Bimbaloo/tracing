@@ -74,7 +74,7 @@
         </div>
         <div class="buttons" v-show="selectedEquipmentId&&!loading">
           <el-button 	@click="goRefresh" class="btn btn-plain" v-if="isDatetimeChange">查询</el-button>
-          <el-button  @click="showSuspiciousList" class="btn btn-plain" >可疑品</el-button>
+          <el-button  @click="showSuspiciousList" class="btn btn-plain" v-if="!isOpDbBeforeRefact">可疑品</el-button>
           <el-button  @click="gotoTrackConfig" class="btn btn-plain" v-if="trace">追踪</el-button>
         </div>
         <!--提示面板数据-->
@@ -579,6 +579,13 @@ export default {
       // })
       // return oData
       return this.$store.state.factoryModule.factoryCameraConfig
+    },
+    // 版本控制。
+    isOpDbBeforeRefact() {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isOpDbBeforeRefact
+      )
     },
     // 追踪或溯源或遏制的配置项。
     // currentModule() {
