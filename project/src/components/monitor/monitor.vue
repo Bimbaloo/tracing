@@ -6,17 +6,17 @@
                 <el-radio v-for="(item, index) in cameraPoints" :key="item" :label="item">{{index+1}}</el-radio>
             </el-radio-group>
         </el-form-item>
-        <el-form-item label="监控时间：" required class="parameter">
+        <el-form-item label="监控时间：" required class="parameter" label-width="20%" style="width:80%">
             <el-col :span="11">
-                <el-form-item prop="startDate">
-                    <el-date-picker type="datetime" @change.native="dateChange('startDate', $event)" @change="startClick" placeholder="选择开始时间" v-model="monitorForm.startDate" style="width: 100%;"></el-date-picker>
-                </el-form-item>     
+              <el-form-item prop="startDate" size="mini">
+                <el-date-picker  type="datetime" @change.native="dateChange('startDate', $event)" @change="startClick" placeholder="选择开始时间" v-model="monitorForm.startDate" style="width: 100%;"></el-date-picker>
+              </el-form-item>
             </el-col>
             <el-col class="split" :span="2">-</el-col>
             <el-col :span="11">
-                <el-form-item prop="endDate">
-                    <el-date-picker type="datetime" @change.native="dateChange('endDate', $event)" @change="endClick" placeholder="选择结束时间" v-model="monitorForm.endDate" style="width: 100%;"></el-date-picker>
-                </el-form-item> 
+              <el-form-item prop="endDate" size="mini">
+                <el-date-picker type="datetime" @change.native="dateChange('endDate', $event)" @change="endClick" placeholder="选择结束时间" v-model="monitorForm.endDate" style="width: 100%;"></el-date-picker>
+              </el-form-item>
             </el-col>
         </el-form-item>
         <el-form-item v-if="cameraPoints.length">
@@ -28,7 +28,7 @@
     <div class="camera" :style="{height: cameraHeight + 'px'}">
         <iframe v-if="cameraPoints.length" ref="video"></iframe>
         <div v-else class="error">暂无监控视频。</div>
-    </div> 
+    </div>
   </div>
 </template>
 
@@ -120,6 +120,12 @@ export default {
       // 验证开始时间。
       let validateStartTime = (rule, value, callback) => {
         let sEnd = this.monitorForm.endDate
+        if(value instanceof Date){
+          value = value.Format()
+        }
+        if(sEnd instanceof Date) {
+          sEnd = sEnd.Format()
+        }
         let sTime = value.trim()
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let bIsEndFormat = window.Rt.utils.isDateTime(sEnd)
@@ -261,10 +267,10 @@ export default {
       if (this.poolTime) {
         this.monitorForm.startDate = new Date(
           +new Date(this.poolTime) - PRE_TIME * 1000
-        ).Format()
+        )
         this.monitorForm.endDate = new Date(
           +new Date(this.poolTime) + FORWARD_TIME * 1000
-        ).Format()
+        )
       }
     },
     // 提交。
