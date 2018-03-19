@@ -319,26 +319,67 @@ export default {
           ),
           this.$(
             window.go.Panel,
-            'Auto',
-            this.$(window.go.TextBlock,
-              {
-                font: 'bold 10pt sans-serif'
-              },
-			new window.go.Binding('text', '', function (node) {
-			  if (node.nodeType === 10003 || node.nodeType === 10004) {
-			    return node.totalNum < 0 ? '-' : node.totalNum
-			  } else if (node.nodeType === 10001) {
-				  if (node.isShowRemain) {
-					  return `${node.processingNum < 0 ? '-' : node.processingNum}/${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
-				  } else {
-					   return node.totalNum < 0 ? '-' : node.totalNum
-				  }
-			  } else if (node.isShowRemain) {
-			    return `${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
-  			  } else {
-				 return node.totalNum < 0 ? '-' : node.totalNum
-  	 		  }
-		  })),
+            'Horizontal',
+						// 加工中
+						this.$(window.go.TextBlock,
+						{
+							font: 'bold 10pt sans-serif',
+							stroke: NORMAL_TEXT_COLOR
+						},
+					 new window.go.Binding('visible', '', node => node.nodeType === 10001 && node.isShowRemain),
+					 new window.go.Binding('text', '', node => `${node.processingNum < 0 ? '-' : node.processingNum}`)
+				 ),
+				 this.$(window.go.TextBlock, '/',
+				 	{
+						font: 'bold 10pt sans-serif',
+						stroke: NORMAL_TEXT_COLOR
+					},
+					new window.go.Binding('visible', '', node => node.nodeType === 10001 && node.isShowRemain)
+				),
+				// 滞留数
+				this.$(window.go.TextBlock,
+				{
+					font: 'bold 10pt sans-serif',
+					stroke: NORMAL_TEXT_COLOR
+				},
+			 new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004)),
+			 new window.go.Binding('text', '', node => `${node.remainNum < 0 ? '-' : node.remainNum}`),
+			 new window.go.Binding('stroke', '', node => node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR)
+		 ),
+		 this.$(window.go.TextBlock, '/',
+			{
+				font: 'bold 10pt sans-serif',
+				stroke: NORMAL_TEXT_COLOR
+			},
+			new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004))
+		),
+			// 总数
+			this.$(window.go.TextBlock,
+			{
+				font: 'bold 10pt sans-serif',
+				stroke: NORMAL_TEXT_COLOR
+			},
+		 new window.go.Binding('text', '', node => `${node.totalNum < 0 ? '-' : node.totalNum}`)
+	 ),
+      //       this.$(window.go.TextBlock,
+      //         {
+      //           font: 'bold 10pt sans-serif'
+      //         },
+			// new window.go.Binding('text', '', function (node) {
+			//   if (node.nodeType === 10003 || node.nodeType === 10004) {
+			//     return node.totalNum < 0 ? '-' : node.totalNum
+			//   } else if (node.nodeType === 10001) {
+			// 	  if (node.isShowRemain) {
+			// 		  return `${node.processingNum < 0 ? '-' : node.processingNum}/${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
+			// 	  } else {
+			// 		   return node.totalNum < 0 ? '-' : node.totalNum
+			// 	  }
+			//   } else if (node.isShowRemain) {
+			//     return `${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
+  		// 	  } else {
+			// 	 return node.totalNum < 0 ? '-' : node.totalNum
+  	 	// 	  }
+		  // })),
 		  {
 			  toolTip: this.$(go.Adornment, 'Auto',
 			  this.$(

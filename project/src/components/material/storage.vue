@@ -629,7 +629,7 @@ export default {
       this.tableHeight = this.outerHeight(content) - this.outerHeight(tableData) - 40
 
       this.$nextTick(() => {
-        this.$refs.table.doLayout()
+        this.$refs.table && this.$refs.table.doLayout()
       })
     }
   }
