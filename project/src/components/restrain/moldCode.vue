@@ -33,6 +33,7 @@
 <script>
 import report from 'components/report/report.vue'
 import fnP from 'assets/js/public.js'
+import _ from 'lodash'
 const moldUrl = window.HOST + `/api/v1/suppress/get-mold-resume`
 // const moldUrl = `http://rap2api.taobao.org/app/mock/5395/POST/post-mold-resume`  // 模拟
 // const moldUrl = `static/mold.json`  // 模拟
@@ -193,7 +194,7 @@ export default {
       let needArr = []
 
       myData.moldDoOutList.forEach(element => {
-        element.firstDoOut.percent = (element.quantityAll - element.quantityNoGood) * 100 / element.quantityAll.toFixed(2) + '%'  // 合格率
+        element.firstDoOut.percent = ((element.quantityAll - element.quantityNoGood) * 100 / element.quantityAll).toFixed(2) + '%'  // 合格率
         element.firstDoOut.colspan = 1
         if (element.firstDoOut.qualityType !== '合格') {
           element.firstDoOut.eventName = `第一次产出（${element.firstDoOut.qualityType}）`  // 事件名称
@@ -251,16 +252,19 @@ export default {
           el.select = null
         }
       })
+      let needArrCopy = JSON.parse(JSON.stringify(needArr))
       myData.moldInfo.moldEventList.forEach(event => {
         event.rowspan = event.colspan = 1
         event.select = null
         event.value = false         // 模事件不显示勾选框
         event.qualityType = '合格'  // 模事件不改变行内信息颜色
-        needArr.forEach((el, index) => {
+        _.forEach(needArrCopy, (el, index) => {
           if (event.happenTime < el.happenTime) {
             needArr.splice(index, 0, event)
-          } else if (event.happenTime > needArr[needArr.length - 1].happenTime) {
+            return false
+          } else if (event.happenTime > needArrCopy[needArrCopy.length - 1].happenTime) {
             needArr.push(event)
+            return false
           }
         })
       })
@@ -293,10 +297,20 @@ export default {
           })
           break
         case 1:     // 选中了一条
-          this.moldQuery.startTime = this.selected[0].el.happenTime
-          this.moldQuery.equipmentId = this.selected[0].el.equipmentId
-          this.needRestrain = false
-          this.isRestrained = false
+          if (this.selected[0].el.select === 'first') {
+            this.moldQuery.startTime = this.selected[0].el.happenTime
+            this.moldQuery.endTime = new Date().Format()   // 将当期时间当做结束时间
+            this.moldQuery.equipmentId = this.selected[0].el.equipmentId
+            this.needRestrain = false
+            this.isRestrained = false
+          } else {  // 如果选中的是`最后一次`产出的话
+            this.$message({
+              showClose: true,
+              message: '请选择开始时间',
+              type: 'error'
+            })
+          }
+
           break
         case 2:     // 选中了领条
           if (this.selected[0].el.select === 'first' && this.selected[0].el.equipmentId === this.selected[1].el.equipmentId) {  // 以选项中开始时间大于结束时间 && 设备ID相同
@@ -505,7 +519,7 @@ export default {
             box-sizing: box-border;
           }
           .ng {
-            color: #e60012
+            color: #eb0920
           }
         }
       }
