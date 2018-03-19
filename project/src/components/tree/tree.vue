@@ -534,13 +534,15 @@ export default {
             strokeWidth: 3
           }
 	  ),
+		// 提示处理，下道工序为物料时，不显示，默认数字为负
 	  this.$(
 		  window.go.TextBlock,
 		  {
 			  background: '#ffffff',
 			  font: 'bold 10pt sans-serif'
 		  },
-		  new window.go.Binding('text', 'num')
+		  new window.go.Binding('text', 'num'),
+			new window.go.Binding('visible', '', link => link.num >= 0)
 	  )
       )
     }
