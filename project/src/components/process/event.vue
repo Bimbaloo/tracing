@@ -215,9 +215,12 @@
       requestSuccess (oData) {
         this.loading = false
         this.tableData.data = oData
-
+        console.log(oData)
         let eTypeColumnConfig = _.find(this.tableData.columns, one => one.prop === 'eTypeName')
-        eTypeColumnConfig.filters = _.filter(_.uniq(_.map(oData, 'eTypeName'), one => !!one))
+        eTypeColumnConfig.filters = _.map(_.filter(_.uniq(_.map(oData, 'eTypeName'), one => !!one)), one => {
+          return {text:one, value:one}
+        })
+        console.log(this.tableData.columns)
         this.setTbaleHeight()
       },
       requestFail (sErrorMessage) {
