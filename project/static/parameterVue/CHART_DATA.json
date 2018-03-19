@@ -5,12 +5,12 @@
     "varStdId": 1,
     "description": "电量值1",
     "varUnit": null,
-    "maxValue": 0.000000,
+    "maxValue": 1.000000,
     "minValue": 0.000000,
-    "valueType": 1,
+    "valueType": 0,
     "list": [{
       "pickTime": "2017-07-29 19:01:36",
-      "value": "0.0",
+      "value": "2.0",
       "barcode": "0741665CK151119313"
     }, {
       "pickTime": "2017-07-29 19:03:36",

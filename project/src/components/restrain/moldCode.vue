@@ -128,7 +128,7 @@ export default {
     }
   },
   computed: {
-		// 版本信息数据。
+    // 版本信息数据。
     isOpDbBeforeRefact () {
       return (
         this.$store.state.versionModule &&
