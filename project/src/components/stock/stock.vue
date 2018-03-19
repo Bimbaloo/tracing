@@ -8,7 +8,7 @@
 	            <span class="path-item" v-if="restrainIf">>可疑品</span>
         	</div>
             <div class="path-btn">
-            	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
+            	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf && !isOpDbBeforeRefact">可疑品</el-button>
             	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
             </div>
         </div>
@@ -43,6 +43,13 @@ export default {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.supression
+      )
+    },
+    // 版本信息数据。
+    isOpDbBeforeRefact () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isOpDbBeforeRefact
       )
     }
   },

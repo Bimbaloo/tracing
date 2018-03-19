@@ -1,7 +1,11 @@
 <template>
 	<div class="router-content suspicious">
-		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained">遏制</el-button>
-		<div class="innner-content" :style="styleObject">
+		<div class="error" v-if="isOpDbBeforeRefact">
+			暂时不支持遏制
+		</div>
+		<div v-else>
+			<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained">遏制</el-button>
+			<div class="innner-content" :style="styleObject">
 			<!--h2 class="title">遏制详情</h2-->
 			<!-- <h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2> -->
 			<div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
@@ -13,6 +17,7 @@
 			<h2 class="title">可疑品列表</h2>
 			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
 			<v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report>
+		</div>
 		</div>
 	</div>
 
@@ -38,6 +43,13 @@ export default {
     }
   },
   computed: {
+		// 版本信息数据。
+    isOpDbBeforeRefact () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isOpDbBeforeRefact
+      )
+    },
     isrestrainHtml () {
       return window.location.pathname.includes('restrain')
     },
@@ -159,6 +171,13 @@ export default {
 </script>
 
 <style lang="less">
+.error {
+	border: 2px solid #42af8f;
+  padding: 20px 12px;
+  margin: 20px;
+  font-size: 14px;
+  color: red;
+}
 .el-message-box {
   .el-textarea__inner {
     border-radius: 0;

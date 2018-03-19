@@ -276,11 +276,10 @@ export default {
     batchClick (row) {
       if (row.batchNo) {
         // 批次存在可点击  新版本跳转到可疑品。
-        // let sPath = this.isOpDbBeforeRefact
-        //   ? '/stock/batch'
-        //   : '/stock/restrain'
+        let sPath = this.isOpDbBeforeRefact
+          ? '/stock/batch'
+          : '/stock/restrain'
 
-        let sPath = '/stock/restrain'
         this.$router.replace({
           path: sPath,
           query: { materialCode: row.materialCode, batchNo: row.batchNo }

@@ -15,6 +15,8 @@ import 'assets/js/global.js'// 引用登录模块。
 
 import loginFn from 'assets/js/loginFn.js'
 import {loginModule} from 'assets/js/loginStore.js'
+// 应用版本信息模块
+import { versionModule } from 'assets/js/versionStore.js'
 
 Vue.use(ElementUI)
 
@@ -28,7 +30,8 @@ Vue.prototype.$register = loginFn
 
 const store = new Vuex.Store({
   modules: {
-    loginModule
+    loginModule,
+    versionModule
   }
 })
 
