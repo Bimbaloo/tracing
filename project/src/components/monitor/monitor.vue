@@ -8,13 +8,13 @@
         </el-form-item>
         <el-form-item label="监控时间：" required class="parameter" label-width="20%" style="width:80%">
             <el-col :span="11">
-              <el-form-item prop="startDate" size="mini">
+              <el-form-item prop="startDate" >
                 <el-date-picker  type="datetime" @change.native="dateChange('startDate', $event)" @change="startClick" placeholder="选择开始时间" v-model="monitorForm.startDate" style="width: 100%;"></el-date-picker>
               </el-form-item>
             </el-col>
             <el-col class="split" :span="2">-</el-col>
             <el-col :span="11">
-              <el-form-item prop="endDate" size="mini">
+              <el-form-item prop="endDate" >
                 <el-date-picker type="datetime" @change.native="dateChange('endDate', $event)" @change="endClick" placeholder="选择结束时间" v-model="monitorForm.endDate" style="width: 100%;"></el-date-picker>
               </el-form-item>
             </el-col>
@@ -117,8 +117,17 @@ export default {
     },
     // 验证规则。
     rules () {
+      // 用flag变量防止循环调用
+      let flag = 0
       // 验证开始时间。
       let validateStartTime = (rule, value, callback) => {
+        flag ++
+        if(flag%3 !== 0){
+          this.$refs.monitorForm.validateField('endDate')
+        } else {
+          flag = 0
+          return
+        }
         let sEnd = this.monitorForm.endDate
         if(value instanceof Date){
           value = value.Format()
@@ -161,7 +170,20 @@ export default {
       }
         // 验证结束时间。
       let validateEndTime = (rule, value, callback) => {
+        flag ++
+        if(flag%3 !== 0){
+          this.$refs.monitorForm.validateField('startDate')
+        } else {
+          flag = 0
+          return
+        }
         let sStart = this.monitorForm.startDate
+        if(value instanceof Date){
+          value = value.Format()
+        }
+        if(sStart instanceof Date) {
+          sStart = sStart.Format()
+        }
         let sTime = value.trim()
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let bIsStartFormat = window.Rt.utils.isDateTime(sStart)

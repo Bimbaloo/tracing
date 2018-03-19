@@ -18,7 +18,6 @@ const extractLESS = new ExtractTextPlugin({
   filename: 'assets/css/[name].css',
   allChunks: true
 })
-
 const entries = {}
 const chunks = []
 glob.sync('./src/pages/**/app.js').forEach(path => {
