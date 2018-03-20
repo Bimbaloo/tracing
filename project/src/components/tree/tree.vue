@@ -541,6 +541,26 @@ export default {
             strokeWidth: 3
           }
 	  ),
+		this.$(
+			window.go.Shape,
+			{
+				fromArrow: 'BackwardOpenTriangle',
+				stroke: '#999',
+				strokeWidth: 2,
+				fill: null
+			},
+			new window.go.Binding('visible', '', () => this.pageType === 'trace')
+		),
+		this.$(
+			window.go.Shape,
+			{
+				toArrow: 'OpenTriangle',
+				stroke: '#999',
+				strokeWidth: 2,
+				fill: null
+			},
+			new window.go.Binding('visible', '', () => this.pageType === 'track')
+		),
 	  this.$(
 		  window.go.TextBlock,
 		  {
