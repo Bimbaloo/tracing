@@ -962,11 +962,15 @@ export default {
     // 时间编辑框的：开始或结束时间是否被改变。
     isDatetimeChange () {
       // 是否显示查询按钮（开始或结束时间被编辑，则会显示）
-      let { start, end, initStart, initEnd } = this.datetime
+      let { start, end, initStart, initEnd, beforeSavedStart, beforeSavedEnd } = this.datetime
 
       // 开始时间或结束时间只要变动就显示。 不再处于编辑状态才显示
+      // 其中initStart initEnd为初次进入的时间值，不会发生改变。 记录是否变化可从beforeSavedStart中比较 beforeStart只是在单个时间轴中的变量
+      let beforeSaveStart = beforeSavedStart || initStart
+      let beforeSaveEnd = beforeSavedEnd || initEnd
+
       return (
-        (this.startIf && start !== initStart) || (this.endIf && end !== initEnd)
+        (this.startIf && start !== beforeSaveStart) || (this.endIf && end !== beforeSaveEnd)
       )
     }
   },
@@ -2575,18 +2579,20 @@ export default {
       return aoData
     },
     /**
-     * 时间格式判断。开： 开,结, <; 结： 结,开,>
+     * 时间格式判断。开： 开,结, <, 最小时间（要减一天）; 结： 结,开,>, 最大时间（要加一天）
      * @param {String} 当前需判断的时间值。
      * @param {String} 比较的时间。
      * @param {String} 比较类型 > 或 <
+     *@param {String} 最大|最小时间 -1天
      */
-    validateTime (dateValue, comValue, sType) {
+    validateTime (dateValue, comValue, sType, sLimited) {
       let oReturn = {
         validate: false, // 验证是否正确
         message: '' // 错误信息
       }
 
       let nNow = +new Date()
+      let nDay = 1*24*60*60*1000
 
       if (dateValue === undefined || dateValue === '') {
         oReturn.message = '请输入时间'
@@ -2600,14 +2606,18 @@ export default {
           // 结束时间。
           if (+new Date(comValue) > +new Date(dateValue)) {
             oReturn.message = '结束时间必须大于开始时间'
-          } else {
-            oReturn.validate = true
+          } else if(+new Date(dateValue) > (+new Date(sLimited) + nDay)) {
+            oReturn.message = '结束时间不能超过' + new Date(+new Date(sLimited) + nDay).Format()
+          }else {
+              oReturn.validate = true
           }
         } else {
           // 开始时间。
           if (+new Date(dateValue) > +new Date(comValue)) {
             oReturn.message = '开始时间必须小于结束时间'
-          } else {
+          } else if(+new Date(dateValue) < (+new Date(sLimited) - nDay)){
+            oReturn.message = '开始时间不能小于' + new Date(+new Date(sLimited) - nDay).Format()
+          }else {
             oReturn.validate = true
           }
         }
@@ -2623,7 +2633,8 @@ export default {
         this.endIf
           ? this.datetime.end
           : this.datetime.beforeEnd || this.datetime.initEnd,
-        '<'
+        '<',
+        this.datetime.initStart
       )
 
       if (oReturn.validate) {
@@ -2655,7 +2666,8 @@ export default {
         this.startIf
           ? this.datetime.start
           : this.datetime.beforeStart || this.datetime.initStart,
-        '>'
+        '>',
+        this.datetime.initEnd
       )
 
       if (oReturn.validate) {
@@ -2685,9 +2697,9 @@ export default {
         // 时间还有在编辑。
         this.$message('请确定时间全部修改完成。')
       } else if (this.endValidate && this.startValidate) {
-        // 更新当前显示时间。
-        this.datetime.realStart = this.datetime.initStart = this.datetime.beforeStart = this.datetime.start
-        this.datetime.realEnd = this.datetime.initEnd = this.datetime.beforeEnd = this.datetime.end
+        // 更新当前显示时间。---不更新initStart initEnd --beforeSavedStart beforeSavedEnd确定后修改的值，对应于显示时间查询
+        this.datetime.realStart = this.datetime.beforeSavedStart = this.datetime.beforeStart = this.datetime.start
+        this.datetime.realEnd = this.datetime.beforeSavedEnd = this.datetime.beforeEnd = this.datetime.end
 
         // 更新数据。
         this.refreshData()

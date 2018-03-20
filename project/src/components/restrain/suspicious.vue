@@ -1,6 +1,6 @@
 <template>
 	<div class="router-content suspicious">
-		<div class="error" v-if="isOpDbBeforeRefact">
+		<div class="error" v-if="isOpDbBeforeRefact" style="margin:20px;">
 			暂时不支持遏制
 		</div>
 		<div v-else>
@@ -174,7 +174,6 @@ export default {
 .error {
 	border: 2px solid #42af8f;
   padding: 20px 12px;
-  margin: 20px;
   font-size: 14px;
   color: red;
 }
