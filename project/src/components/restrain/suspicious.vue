@@ -32,9 +32,10 @@ export default {
   },
   data () {
     return {
-      isRestrained: window.location.hash.includes('/suppress/1'),
+      isRestrained: window.location.hash.includes('/suppress/1') || window.location.hash.includes('/process/restrain'),
       doDescription: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
+      equipmentUrl: window.HOST + '//api/v1/suppress/do-by-equipment', // 根据设备+时间
       styleObject: {
         'min-width': '1000px'
       },
@@ -105,12 +106,23 @@ export default {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '遏制中...'
-            let oConditions = Object.assign(
-              { doDescription: self.doDescription },
-              this.$route.query
-            )
-
-            this.$post(this.url, oConditions)
+            let oConditions = {}
+            let oUrl = ''
+            if (window.location.hash.includes('/process/restrain')) {  // 如果是通过设备分析遏制
+              oUrl = this.equipmentUrl
+              let { startTime, endTime, equipmentId } = this.$route.query
+              oConditions = Object.assign(
+                { startTime, endTime, equipmentId },
+                { doDescription: self.doDescription }
+              )
+            } else {
+              oUrl = this.url
+              oConditions = Object.assign(
+                { doDescription: self.doDescription },
+                this.$route.query
+              )
+            }
+            this.$post(oUrl, oConditions)
             .then((oData) => {
               console.log(oData)
               if (oData.data.errorCode === 1) { // 接口出错
