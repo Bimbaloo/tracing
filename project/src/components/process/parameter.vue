@@ -28,10 +28,10 @@
                   inactive-text="曲线图"
                   @change = "tabChange">
                 </el-switch>
-                <div v-if="activeName === `table`" class="table">
+                <div v-show="activeName === `table`" class="table" >
                   <div class="barcode-input">
                       <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-                          <el-form-item label="条码：" > 
+                          <el-form-item label="条码：" style="width: 400px"> 
                               <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
                           </el-form-item>
                       </el-form>
@@ -71,8 +71,9 @@
                                         <el-form-item                  
                                         :label="`${prop.description}${prop.varUnit}`" 
                                         v-for="prop in props.row.list" 
-                                        :key="prop.varStdId">
-                                            <span v-for="(item,index) in prop.params" :key="index">&nbsp;{{ item.value}}({{item.pickTime}})&nbsp;</span>
+                                        :key="prop.varStdId"
+                                        class="expand-lable">
+                                            <span class="expand-span" v-for="(item,index) in prop.params" :key="index" :style="{ color: item.isWarn}">{{item.value}}({{item.pickTime}})</span>
                                         </el-form-item>
                                     </div>                                            
                                     <div v-else>{{detailTip}}</div>
@@ -85,9 +86,10 @@
                       </el-table>
                   </div>
                 </div>
-                <div v-if="activeName === `charts`" class="chart">
-                  <el-tabs v-loading="loading" v-model="activeChart" @tab-click="chartTabChange">
-                      <el-tab-pane :label="chartData.filename" :name="`chart${index}`" v-for="(chartData,index) in tableDatas" :key="index">
+                <div v-show="activeName === `charts`" class="chart" v-loading="loading" element-loading-text="拼命加载中">
+                  <el-tabs  v-model="activeChart" @tab-click="chartTabChange">
+                      <el-tab-pane :name="`chart${index}`" v-for="(chartData,index) in tableDatas" :key="index">
+                        <span slot="label" :style="{ color: chartData.isWarn }"> {{chartData.filename}}</span>
                           <!-- 没有图表时，不显示图表开关 -->
                           <el-switch
                               v-model="chartData.value"
@@ -126,7 +128,7 @@
                                       <el-table-column v-for='column in chartData.columns' :key="column.prop" :prop="column.prop" :label="column.name" :width="column.width" align='center'> 
                                         <template slot-scope="scope" >
                                           <el-checkbox @change="chooseTime(scope.row.checked,chartData.data, scope.$index)" v-model="scope.row.checked" v-if="column.name === '采集时间'">{{scope.row[column.prop]}}</el-checkbox>
-                                          <div class="cell" v-else>{{scope.row[column.prop]}}</div>
+                                          <div v-else :class="[{ 'isWarn': column.name === '检测值' && scope.row['isWarn'] }, 'cell']" >{{scope.row[column.prop]}}</div>                                          
                                         </template>
                                       </el-table-column>
                                   </el-table>
@@ -150,6 +152,7 @@ import FileSaver from 'file-saver'
 // import html2canvas from 'html2canvas'
 import table from 'components/basic/table.vue'
 import rasterizeHTML from 'rasterizehtml'
+import _ from 'lodash'
 
 // 条码表接口
 const BARCODE_TABLE_DATA = window.HOST + '/api/v1/processparameter/barcode-list'
@@ -169,7 +172,6 @@ export default {
     return {
       // 条码筛选。
       barcode: '',
-
       // 条码详情无数据提示。
       detailTip: '',
       activeName: 'charts',
@@ -189,8 +191,8 @@ export default {
       condition: {}, // 显示的查询条件
       oQuery: {}, // 查询条件。
       filters: {},
+      // 条件对应中文名
       dataName: [
-        // 条件对应中文名
         {
           itemCode: 'equipmentName',
           itemName: '设备'
@@ -206,9 +208,8 @@ export default {
       ],
       /* echarts的配置文件 */
       options: [],
-      /** */
+      /* 实际的echarts实例 */
       myEcharts: [],
-      //  viewHeight:0
       routerContent: 0,
       flexbase: 200,
       tableDatas: [],
@@ -356,13 +357,6 @@ export default {
       })
       this.filters = this.getFilters()
 
-      /* 测试数据 */
-      // this.oQuery = {
-      //     "equipmentId": "216",
-      //     "startTime": "2017-07-01 02:00:00",
-      //     "endTime": "2017-07-01 04:00:00"
-      // }
-
       if (this.activeName === 'table') {
         // 条码表。
         this.fetchBarcodeTableData()
@@ -373,7 +367,9 @@ export default {
     },
     // 获取曲线图数据。
     fetchChartData () {
-      this.loading = true
+      this.$nextTick(() => {
+        this.loading = true
+      })
       this.chartFetched = true
       /* 设置显示信息和查询条件 */
 
@@ -465,7 +461,7 @@ export default {
       return b
       /* 为了将获取到的 barcode等转换为对应的中文 */
     },
-    // 请求成功。
+    // 请求成功 --获取曲线图数据。
     requestSucess (oData) {
       this.loading = false
       if (!oData.length) {
@@ -478,7 +474,19 @@ export default {
         this.error = false
         let optionArr = []
         let tableDataArr = []
+        oData.forEach(element => {
+          element.isWarn = '#606266'
+          _.forEach((element.list), (el) => {
+            if (element.maxValue === element.minValue) {
+              return false
+            } else if (parseInt(el.value) > parseInt(element.maxValue) || parseInt(el.value) < parseInt(element.minValue)) {
+              element.isWarn = 'red'
+              return false
+            }
+          })
+        })
         let optionsData = oData // 获取到的data
+        // debugger
         optionsData.map((data, index) => {
           if (data.valueType === 1) {
             optionArr.push(this.initOption(data, index))
@@ -581,9 +589,11 @@ export default {
                   item => item.varStdId === o.varStdId
                 )[0]
                 if (oFilter) {
+                 // debugger
                   oFilter.params.push({
                     pickTime: new Date(o.pickTime).Format('hh:mm:ss'),
-                    value: o.value
+                    value: o.value,
+                    isWarn: parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue) ? 'red' : '#606266'
                   })
                 } else {
                   rowData.list.push({
@@ -593,7 +603,8 @@ export default {
                     params: [
                       {
                         pickTime: new Date(o.pickTime).Format('hh:mm:ss'),
-                        value: o.value
+                        value: o.value,
+                        isWarn: parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue) ? 'red' : '#606266'
                       }
                     ]
                   })
@@ -646,7 +657,7 @@ export default {
         35 - // 表格标题
         10 - // 表格margin-bottom
         // 30 - // 遏制按钮的高度
-        10
+        20
 
       return chartTableHeight
     },
@@ -663,6 +674,7 @@ export default {
     /* 处理每个tableData */
     setTableData (data, index) {
       let tableData = {
+        isWarn: data.isWarn,
         filename: '名称',
         unit: '',
         description: '',
@@ -691,12 +703,20 @@ export default {
       tableData.varStdId = data.varStdId
       tableData.unit = data.varUnit
       tableData.filename = data.description
+      const maxValue = data.maxValue  // 最大值
+      const minValue = data.minValue  // 最小值
+      let isWarn = false              // 不存在上下限就不存在 `警告`
+      if (maxValue !== minValue) {    // 存在上下限
+        isWarn = true
+      }
       tableData.data = data.list.map(el => {
         let arr = {}
         arr.value = el.value
         arr.pickTime = el.pickTime
         arr.barcode = el.barcode || ''
         arr.checked = false
+        // 上下限存在且数值不在范围内
+        arr.isWarn = isWarn && (parseInt(el.value) > parseInt(maxValue) || parseInt(el.value) < parseInt(minValue))
         return arr
       })
 
@@ -1330,9 +1350,31 @@ export default {
 }
 
 #parameter .table {
+  .isWarn {
+    color: red
+  }
+  .el-table__expanded-cell {
+    padding: 5px 10px 5px 50px;
+  }
   .expand-form {
     .el-form-item {
       margin: 5px 10px;
+    }
+    .expand-lable {
+      display: flex;
+      .el-form-item__label {
+        flex-basis: 70px;
+      }
+      .el-form-item__content {
+          .expand-span {
+            margin:  0 10px;
+          }
+        }
+      .el-form-item__content {
+        flex: 1;
+        display: flex;
+        flex-wrap: wrap;
+      }
     }
   }
 }

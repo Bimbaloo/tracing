@@ -13,7 +13,7 @@
 				<i class="el-icon-d-arrow-left btn-collapse" v-if="!collapse" @click="collapseTree"></i>
 				<i class="el-icon-d-arrow-right btn-collapse" v-if="collapse" @click="expandTree"></i>
 				<div class="router-container" ref="routerContainer">
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
+					<v-tree :tree-data="treeData" page-type="trace" :class="{hide: fullscreen}" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
 					<div id='changeDiagram' :class="[{hide: treeFullscreen},{hide: fullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>

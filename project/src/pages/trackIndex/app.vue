@@ -37,7 +37,7 @@
 					</div>
 					<i class="icon icon-20 icon-report" @click="onReport" title="可疑品清单" v-if="!fullscreen && !isOpDbBeforeRefact"></i>
 
-					<v-tree :tree-data="treeData" :class="{hide: fullscreen}" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
+					<v-tree :tree-data="treeData" page-type="track" :class="{hide: fullscreen}" :style="{ flexBasis: _treeHeight+'px',flexGrow:_treeFullscreen}" @recoverSize="recoverTree"></v-tree>
 					<div id='changeDiagram' :class="[{hide: treeFullscreen},{hide: fullscreen},'changeDiagram']"></div>
 					<div class="view" ref="view" :class="{hide: treeFullscreen}">
 						<router-view></router-view>
