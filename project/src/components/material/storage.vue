@@ -662,6 +662,7 @@ export default {
         vertical-align: middle;
         border: 1px solid #dfece9;
         box-sizing: border-box;
+        padding: 0;
       }
 
       th {

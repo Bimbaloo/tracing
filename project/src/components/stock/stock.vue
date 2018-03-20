@@ -9,12 +9,12 @@
         	</div>
             <div class="path-btn">
             	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf && !isOpDbBeforeRefact">可疑品</el-button>
-            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
+            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained">遏制</el-button>
             </div>
         </div>
         <!-- 遏制数据不需缓存 -->
         <keep-alive>
-		    <router-view v-if="$route.meta.keepAlive"></router-view>
+		      <router-view v-if="$route.meta.keepAlive"></router-view>
         </keep-alive>
         <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
@@ -34,7 +34,8 @@ export default {
       restrainIf: false,
       // btnShowRestrain: false, // 临时屏蔽遏制
       description: '',
-      url: '/trace/v1/materialbatchsuppress'
+      url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
+      isRestrained: true
     }
   },
   computed: {
@@ -91,7 +92,6 @@ export default {
     // 遏制
     showRestrain () {
       const h = this.$createElement
-      let bSucess = false
       let self = this
       this.$msgbox({
         title: '提示',
@@ -105,11 +105,11 @@ export default {
             message: true
           },
           domProps: {
-            value: self.description
+            value: self.doDescription
           },
           on: {
             blur: function (event) {
-              self.description = event.target.value
+              self.doDescription = event.target.value
             }
           }
         }),
@@ -119,42 +119,46 @@ export default {
         beforeClose: (action, instance, done) => {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
-            instance.confirmButtonText = '执行中...'
-
+            instance.confirmButtonText = '遏制中...'
             let oConditions = Object.assign(
-              { description: self.description },
+              { doDescription: self.doDescription },
               this.$route.query
             )
 
-            // this.$post(this.url, oConditions)
-            // .then((res) => {
-            done()
-            instance.confirmButtonLoading = false
-            // if(!res.errorCode) {
-            bSucess = true
-            // 隐藏遏制按钮。
-            self.restrainIf = false
-            let sSerializion = ''
-            for (let p in oConditions) {
-              sSerializion += `&${p}=${oConditions[p]}`
-            }
-            sSerializion = sSerializion.substring(1)
-            // 遏制成功，打开到遏制报告。
-            window.open('/restrainReport.html?' + sSerializion)
+            this.$post(this.url, oConditions)
+            .then((oData) => {
+              console.log(oData)
+              if (oData.data.errorCode === 1) { // 接口出错
+                this.$message.error('接口出错')
+                console.log(oData.data.errorMsg.message)
+                self.doDescription = ''
+                done()
+              } else if (oData.data.errorCode === 0) {
+                this.isRestrained = false
+                const handle = oData.data.data.handle
+                sessionStorage.setItem('handleID', handle)
+                instance.confirmButtonLoading = false
+                this.$message.success('遏制成功')
+                let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
+                self.doDescription = ''
+                sessionStorage.setItem('restrain', JSON.stringify(restrain))
+                window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+
+                done()
+              }
+            })
+            .catch(err => {
+              instance.confirmButtonLoading = false
+              this.$message.error('遏制失败')
+              self.doDescription = ''
+              console.log(err)
+              done()
+            })
           } else {
+            self.doDescription = ''
             done()
-            // instance.$slots.default[0].elm.children[0].value = "";
           }
         }
-      }).then(action => {
-        if (action === 'confirm') {
-          if (bSucess) {
-            this.$message.success('提交成功！')
-          } else {
-            this.$message.error('提交失败！')
-          }
-        }
-        // self.description = "";
       })
     },
     setRouteQuery () {

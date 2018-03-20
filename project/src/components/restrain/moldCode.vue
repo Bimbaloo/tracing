@@ -197,91 +197,99 @@ export default {
     },
     requestSucess (oData) {
       let myData = {...oData}
-      /* 获取模具信息 */
-      let {moldCode, moldName, moldLife} = myData.moldInfo
-      this.moldInfo = {moldCode, moldName, moldLife}
-      let needArr = []
+      if (myData.moldDoOutList.length === 0 && myData.moldInfo === null) {
+        this.$message({
+          showClose: true,
+          message: '查询结果为空，请选择合适的查询条件',
+          type: 'error'
+        })
+      } else {
+        /* 获取模具信息 */
+        let {moldCode, moldName, moldLife} = myData.moldInfo
+        this.moldInfo = {moldCode, moldName, moldLife}
+        let needArr = []
 
-      myData.moldDoOutList.forEach(element => {
-        element.firstDoOut.percent = ((element.quantityAll - element.quantityNoGood) * 100 / element.quantityAll).toFixed(2) + '%'  // 合格率
-        element.firstDoOut.colspan = 1
-        if (element.firstDoOut.qualityType !== '合格') {
-          element.firstDoOut.eventName = `第一次产出（${element.firstDoOut.qualityType}）`  // 事件名称
-        } else {
-          element.firstDoOut.eventName = `第一次产出`  // 事件名称
-        }
-
-        element.firstDoOut.quantityAll = element.quantityAll          // 总数
-        element.firstDoOut.equipmentName = element.equipmentName      // 设备名称
-        element.firstDoOut.materialName = element.materialName        // 物料名称
-        element.firstDoOut.batchNo = element.batchNo                  // 批次
-        element.firstDoOut.equipmentId = element.equipmentId          // 设备ID
-        element.firstDoOut.select = 'first'                           // 有勾选框
-        element.firstDoOut.value = false                              // 勾选框默认 false
-
-        needArr.push(element.firstDoOut)
-        if (element.lastDoOut === null || Object.keys(element.lastDoOut).length === 0) { // 最后一次生产不存在
-          if (element.noGoodDoOutList.length === 0) {       // 最后一次生产不存在 && 不良品不存在
-            element.firstDoOut.rowspan = 1
-          } else {                                           // 最后一次生产不存在 && 不良品存在
-            element.firstDoOut.rowspan = 1 + element.noGoodDoOutList.length
-            element.noGoodDoOutList.forEach(el => {
-              el.rowspan = el.colspan = 0
-              el.value = false
-              el.eventName = el.qualityType
-            })
-            needArr.push(...element.noGoodDoOutList)
-          }
-        } else {                                           // 最后一次生产存在
-          if (element.lastDoOut.qualityType !== '合格') {
-            element.lastDoOut.eventName = `最后一次产出（${element.lastDoOut.qualityType}）`  // 事件名称
+        myData.moldDoOutList.forEach(element => {
+          element.firstDoOut.percent = ((element.quantityAll - element.quantityNoGood) * 100 / element.quantityAll).toFixed(2) + '%'  // 合格率
+          element.firstDoOut.colspan = 1
+          if (element.firstDoOut.qualityType !== '合格') {
+            element.firstDoOut.eventName = `第一次产出（${element.firstDoOut.qualityType}）`  // 事件名称
           } else {
-            element.lastDoOut.eventName = '最后一次产出'  // 事件名称
+            element.firstDoOut.eventName = `第一次产出`  // 事件名称
           }
-          element.lastDoOut.select = 'last'                           // 有勾选框
-          element.lastDoOut.equipmentId = element.equipmentId         // 设备ID
-          if (element.lastDoOut !== null && element.noGoodDoOutList.length === 0) {       // 最后一次生产存在 && 不良品不存在
-            element.firstDoOut.rowspan = 1 + 1
-            needArr.push(element.lastDoOut)
-          } else {                                           // 最后一次生产存在 && 不良品存在
-            element.firstDoOut.rowspan = 1 + element.noGoodDoOutList.length + 1
-            element.noGoodDoOutList.forEach(el => {
-              el.rowspan = el.colspan = 0
-              el.value = false
-              el.eventName = el.qualityType
-            })
 
-            needArr.push(...element.noGoodDoOutList)
-            needArr.push(element.lastDoOut)
-          }
-        }
-      })
-      needArr.forEach(el => {
-        if (el.select === undefined) {
-          el.select = null
-        }
-      })
-      let needArrCopy = JSON.parse(JSON.stringify(needArr))
-      myData.moldInfo.moldEventList.forEach(event => {
-        event.rowspan = event.colspan = 1
-        event.select = null
-        event.value = false         // 模事件不显示勾选框
-        event.qualityType = '合格'  // 模事件不改变行内信息颜色
-        _.forEach(needArrCopy, (el, index) => {
-          if (event.happenTime < el.happenTime) {
-            needArr.splice(index, 0, event)
-            return false
-          } else if (event.happenTime > needArrCopy[needArrCopy.length - 1].happenTime) {
-            needArr.push(event)
-            return false
+          element.firstDoOut.quantityAll = element.quantityAll          // 总数
+          element.firstDoOut.equipmentName = element.equipmentName      // 设备名称
+          element.firstDoOut.materialName = element.materialName        // 物料名称
+          element.firstDoOut.batchNo = element.batchNo                  // 批次
+          element.firstDoOut.equipmentId = element.equipmentId          // 设备ID
+          element.firstDoOut.select = 'first'                           // 有勾选框
+          element.firstDoOut.value = false                              // 勾选框默认 false
+
+          needArr.push(element.firstDoOut)
+          if (element.lastDoOut === null || Object.keys(element.lastDoOut).length === 0) { // 最后一次生产不存在
+            if (element.noGoodDoOutList.length === 0) {       // 最后一次生产不存在 && 不良品不存在
+              element.firstDoOut.rowspan = 1
+            } else {                                           // 最后一次生产不存在 && 不良品存在
+              element.firstDoOut.rowspan = 1 + element.noGoodDoOutList.length
+              element.noGoodDoOutList.forEach(el => {
+                el.rowspan = el.colspan = 0
+                el.value = false
+                el.eventName = el.qualityType
+              })
+              needArr.push(...element.noGoodDoOutList)
+            }
+          } else {                                           // 最后一次生产存在
+            if (element.lastDoOut.qualityType !== '合格') {
+              element.lastDoOut.eventName = `最后一次产出（${element.lastDoOut.qualityType}）`  // 事件名称
+            } else {
+              element.lastDoOut.eventName = '最后一次产出'  // 事件名称
+            }
+            element.lastDoOut.select = 'last'                           // 有勾选框
+            element.lastDoOut.equipmentId = element.equipmentId         // 设备ID
+            if (element.lastDoOut !== null && element.noGoodDoOutList.length === 0) {       // 最后一次生产存在 && 不良品不存在
+              element.firstDoOut.rowspan = 1 + 1
+              needArr.push(element.lastDoOut)
+            } else {                                           // 最后一次生产存在 && 不良品存在
+              element.firstDoOut.rowspan = 1 + element.noGoodDoOutList.length + 1
+              element.noGoodDoOutList.forEach(el => {
+                el.rowspan = el.colspan = 0
+                el.value = false
+                el.eventName = el.qualityType
+              })
+
+              needArr.push(...element.noGoodDoOutList)
+              needArr.push(element.lastDoOut)
+            }
           }
         })
-      })
-      needArr.forEach((el, index) => {
-        el.index = index
-      })
+        needArr.forEach(el => {
+          if (el.select === undefined) {
+            el.select = null
+          }
+        })
+        let needArrCopy = JSON.parse(JSON.stringify(needArr))
+        myData.moldInfo.moldEventList.forEach(event => {
+          event.rowspan = event.colspan = 1
+          event.select = null
+          event.value = false         // 模事件不显示勾选框
+          event.qualityType = '合格'  // 模事件不改变行内信息颜色
+          _.forEach(needArrCopy, (el, index) => {
+            if (event.happenTime < el.happenTime) {
+              needArr.splice(index, 0, event)
+              return false
+            } else if (event.happenTime > needArrCopy[needArrCopy.length - 1].happenTime) {
+              needArr.push(event)
+              return false
+            }
+          })
+        })
+        needArr.forEach((el, index) => {
+          el.index = index
+        })
 
-      this.tableData.data = needArr
+        this.tableData.data = needArr
+      }
       this.loading = false
     },
     // 请求失败。

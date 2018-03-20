@@ -322,7 +322,7 @@ export default {
 }
 </script>
 
-<style scoped lang="less">
+<style scoped lang="less" scoped>
 .router-content {
   height: 100%;
 
@@ -331,9 +331,14 @@ export default {
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    padding: 0 20px;
+    // padding: 0 20px;
     box-sizing: border-box;
 
+    .path-btn {
+      .btn-restrain {
+        right: 20px;
+      }
+    }
     .content-table {
       flex: 1;
     }

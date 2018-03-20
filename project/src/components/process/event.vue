@@ -33,9 +33,8 @@
   // import html2canvas from 'html2canvas'
   import table from 'components/basic/table.vue'
   import rasterizeHTML from 'rasterizehtml'
-
-  const url = window.HOST + '/api/v1/eventrecord/by-equipment-time'
   import _ from 'lodash'
+  const url = window.HOST + '/api/v1/eventrecord/by-equipment-time'
 
   // const url = `http://rapapi.org/mockjsdata/24404/eventrecord/by-equipment-time?`;
   export default {
@@ -218,7 +217,7 @@
         console.log(oData)
         let eTypeColumnConfig = _.find(this.tableData.columns, one => one.prop === 'eTypeName')
         eTypeColumnConfig.filters = _.map(_.filter(_.uniq(_.map(oData, 'eTypeName'), one => !!one)), one => {
-          return {text:one, value:one}
+          return {text: one, value: one}
         })
         console.log(this.tableData.columns)
         this.setTbaleHeight()
@@ -404,6 +403,15 @@
 </style>
 
 <style lang="less" scoped>
+.router-content {
+  .innner-content {
+    .condition {
+      border: 2px solid #42af8f;
+      padding: 20px 12px;
+      margin-bottom: 20px;
+    }
+  }
+}
   .tableData {
     display: flex;
     justify-content: space-between;

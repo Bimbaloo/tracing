@@ -14,7 +14,7 @@
             </div>
             <div v-else class="content-table" ref="outstockTable">
             	<v-table :table-data="outstockData" :heights="tableHeight" :loading="outstockData.loading" :resize="tdResize"></v-table>            
-                <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
+              <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
             </div>
             <h2 class="content-title tableData">
                 <span class='table-title'>入库信息</span>

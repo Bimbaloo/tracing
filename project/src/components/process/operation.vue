@@ -443,6 +443,15 @@ export default {
 </style>
 
 <style lang="less">
+.router-content {
+  .innner-content {
+    .condition {
+      border: 2px solid #42af8f;
+      padding: 20px 12px;
+      margin-bottom: 20px;
+    }
+  }
+}
 .material-stock {
   & > .el-tabs {
     height: 100%;

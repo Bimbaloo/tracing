@@ -170,7 +170,7 @@ export default {
 }
 </script>
 
-<style lang="less">
+<style lang="less" scoped>
 .error {
 	border: 2px solid #42af8f;
   padding: 20px 12px;
@@ -201,7 +201,7 @@ export default {
 
   .btn-restrain {
     position: absolute;
-    right: 20px;
+    right: 0px;
     //	top: 45px;
   }
 

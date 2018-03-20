@@ -4,11 +4,10 @@
 		<!--<el-button  @click="showSuspiciousList"  :class="[{ 'nobtn': btnShow }, 'btn' , 'btn-plain' , 'btn-restrain']" >可疑品</el-button>-->
 		<div class="innner-content">
 			<h2 class="content-title tableData">
-				
 				<span class='table-title'>批次<span class="tag">{{ batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;出库信息</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(outstockData, $event)"></i>
-                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
+          <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('outstockTable', $event)"></i>	
 				</span>
 			</h2>
 			<div v-if="outstockData.error" class="error" :style="styleError">
@@ -21,7 +20,7 @@
 				<span class='table-title'>批次<span class="tag">{{batch}}</span>&nbsp;物料<span class="tag">{{materialCode}}</span>&nbsp;在库信息</span>
 				<span class='table-handle'>
 					<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(instockData, $event)"></i>
-                	<i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
+          <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('instockTable', $event)"></i>
 				</span>
 			</h2>
 			<div v-if="instockData.error" class="error" :style="styleError">

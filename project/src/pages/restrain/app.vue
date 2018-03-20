@@ -436,9 +436,10 @@ body {
       height: 100%;
 			overflow: auto;
       display: flex;
+      padding: 0 20px;
       .suspicious {
         .innner-content {
-          padding: 0 20px;
+          // padding: 0 20px;
           box-sizing: border-box;
         }
       }

@@ -315,8 +315,8 @@ export default {
       tdResize: true, // 是否允许拖动table大小
       condition: {}, // 显示的查询条件
       filters: {},
+      // 条件对应中文名
       dataName: [
-        // 条件对应中文名
         {
           itemCode: 'equipmentName',
           itemName: '设备'
@@ -1764,6 +1764,7 @@ export default {
       })
 
       if (!oQuery.operationIdList) {
+        debugger
         oQuery.operationIdList = this.detailInfos.map(o => {
           return {
             opId: o.opId,
@@ -2450,13 +2451,18 @@ body {
 </style>
 
 <style lang="less" scoped>
-.condition {
-  padding-top: 4px;
-  padding-bottom: 4px;
-  .condition-messsage {
-    line-height: 23px;
+.router-content {
+  .innner-content {
+    .condition {
+      padding-top: 4px;
+      padding-bottom: 4px;
+      .condition-messsage {
+        line-height: 23px;
+      }
+    }
   }
 }
+
 .outTitle,
 .inTitle,
 .uniteTitle,

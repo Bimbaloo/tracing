@@ -75,163 +75,164 @@ const Track = r => require.ensure([], () => r(require('components/track/track.vu
 
 Vue.use(VueRouter)
 // 定义路由
-const routes = [{ // 仓库操作
-  path: '/warehouse',
-  component: Warehouse,
-  meta: {
-    title: 'warehouse',
-    keepAlive: false
+const routes = [
+  { // 仓库操作
+    path: '/warehouse',
+    component: Warehouse,
+    meta: {
+      title: 'warehouse',
+      keepAlive: false
+    }
+  }, { // 车间操作
+    path: '/workshop',
+    component: Workshop,
+    meta: {
+      title: 'workshop',
+      keepAlive: false
+    }
+  }, { // 条码管理
+    path: '/barcodeManage',
+    component: BarcodeManage,
+    meta: {
+      title: 'barcodeManage',
+      keepAlive: false
+    }
+  }, { // 物料
+    path: '/stock',
+    component: Stock,
+    children: [{
+      path: '',
+      component: Storage,
+      meta: {
+        title: 'storage',
+        keepAlive: true
+      }
+    }, {
+      path: 'batch',
+      component: Batch,
+      meta: {
+        title: 'batch',
+        keepAlive: true
+      }
+    }, {
+      path: 'restrain',
+      component: Suspicious,
+      meta: {
+        title: 'restrain',
+        keepAlive: false
+      }
+    }]
+  }, { // 工序
+    path: '/process',
+    component: Process,
+    children: [{
+      path: 'chart',
+      component: Chart,
+      meta: {
+        title: 'chart',
+        keepAlive: true
+      }
+    }, {
+      path: 'detail',
+      component: Detail,
+      meta: {
+        title: 'detail',
+        keepAlive: false
+      }
+    }, { // 投产表
+      path: 'product',
+      component: Product,
+      meta: {
+        title: 'product',
+        keepAlive: true
+      }
+    }, { // 退料
+      path: 'storesReturned',
+      component: StoresReturned,
+      meta: {
+        title: 'storesReturned',
+        keepAlive: false
+      }
+    }, { // 结转
+      path: 'transfer',
+      component: Transfer,
+      meta: {
+        title: 'transfer',
+        keepAlive: false
+      }
+    }, { // 质检
+      path: 'qtReport',
+      component: QtReport,
+      meta: {
+        title: 'qtReport',
+        keepAlive: false
+      }
+    }, { // 送检
+      path: 'qcReport',
+      component: QcReport,
+      meta: {
+        title: 'qcReport',
+        keepAlive: false
+      }
+    }, { // fgb
+      path: 'fgbReport',
+      component: FgbReport,
+      meta: {
+        title: 'fgbReport',
+        keepAlive: false
+      }
+    }, { // 工具
+      path: 'tool',
+      component: Tool,
+      meta: {
+        title: 'tool',
+        keepAlive: false
+      }
+    }, { // 事件
+      path: 'event',
+      component: Event,
+      meta: {
+        title: 'event',
+        keepAlive: false
+      }
+    }, { // 维修记录
+      path: 'repair',
+      component: Repair,
+      meta: {
+        title: 'repair',
+        keepAlive: false
+      }
+    }, { // 点检记录
+      path: 'spotReport',
+      component: SpotReport,
+      meta: {
+        title: 'spotReport',
+        keepAlive: false
+      }
+    }, { // 工艺参数
+      path: 'parameter',
+      component: Parameter,
+      meta: {
+        title: 'parameter',
+        keepAlive: false
+      }
+    }, { // 遏制
+      path: 'restrain',
+      component: Suspicious,
+      meta: {
+        title: 'restrain',
+        keepAlive: false
+      }
+    }]
+  },
+  {
+    path: '/trace_up',
+    component: Trace
+  },
+  {
+    path: '/trace_down',
+    component: Track
   }
-}, { // 车间操作
-  path: '/workshop',
-  component: Workshop,
-  meta: {
-    title: 'workshop',
-    keepAlive: false
-  }
-}, { // 条码管理
-  path: '/barcodeManage',
-  component: BarcodeManage,
-  meta: {
-    title: 'barcodeManage',
-    keepAlive: false
-  }
-}, { // 物料
-  path: '/stock',
-  component: Stock,
-  children: [{
-    path: '',
-    component: Storage,
-    meta: {
-      title: 'storage',
-      keepAlive: true
-    }
-  }, {
-    path: 'batch',
-    component: Batch,
-    meta: {
-      title: 'batch',
-      keepAlive: true
-    }
-  }, {
-    path: 'restrain',
-    component: Suspicious,
-    meta: {
-      title: 'restrain',
-      keepAlive: false
-    }
-  }]
-}, { // 工序
-  path: '/process',
-  component: Process,
-  children: [{
-    path: 'chart',
-    component: Chart,
-    meta: {
-      title: 'chart',
-      keepAlive: true
-    }
-  }, {
-    path: 'detail',
-    component: Detail,
-    meta: {
-      title: 'detail',
-      keepAlive: false
-    }
-  }, { // 投产表
-    path: 'product',
-    component: Product,
-    meta: {
-      title: 'product',
-      keepAlive: true
-    }
-  }, { // 退料
-    path: 'storesReturned',
-    component: StoresReturned,
-    meta: {
-      title: 'storesReturned',
-      keepAlive: false
-    }
-  }, { // 结转
-    path: 'transfer',
-    component: Transfer,
-    meta: {
-      title: 'transfer',
-      keepAlive: false
-    }
-  }, { // 质检
-    path: 'qtReport',
-    component: QtReport,
-    meta: {
-      title: 'qtReport',
-      keepAlive: false
-    }
-  }, { // 送检
-    path: 'qcReport',
-    component: QcReport,
-    meta: {
-      title: 'qcReport',
-      keepAlive: false
-    }
-  }, { // fgb
-    path: 'fgbReport',
-    component: FgbReport,
-    meta: {
-      title: 'fgbReport',
-      keepAlive: false
-    }
-  }, { // 工具
-    path: 'tool',
-    component: Tool,
-    meta: {
-      title: 'tool',
-      keepAlive: false
-    }
-  }, { // 事件
-    path: 'event',
-    component: Event,
-    meta: {
-      title: 'event',
-      keepAlive: false
-    }
-  }, { // 维修记录
-    path: 'repair',
-    component: Repair,
-    meta: {
-      title: 'repair',
-      keepAlive: false
-    }
-  }, { // 点检记录
-    path: 'spotReport',
-    component: SpotReport,
-    meta: {
-      title: 'spotReport',
-      keepAlive: false
-    }
-  }, { // 工艺参数
-    path: 'parameter',
-    component: Parameter,
-    meta: {
-      title: 'parameter',
-      keepAlive: false
-    }
-  }, { // 遏制
-    path: 'restrain',
-    component: Suspicious,
-    meta: {
-      title: 'restrain',
-      keepAlive: false
-    }
-  }]
-},
-{
-  path: '/trace_up',
-  component: Trace
-},
-{
-  path: '/trace_down',
-  component: Track
-}
 ]
 
 // 创建 router 实例，然后传 `routes` 配置

@@ -798,7 +798,6 @@ export default {
       console.log('查询出错。')
     },
     fetchData () {
-      debugger
       // 进入页面时设置页面的进程标记(created,watch)
       window.Rt.utils.cookie('progressId', this.progressId)
 

@@ -5,12 +5,14 @@
         	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-show="supression && restrainIf">遏制</el-button>
         </div>
         <div class="router-path">
-            <router-link 
-                class="path-item" 
-                v-for="(oRoute,index) in aoRoute" 
-                :key="index" 
-                :to="{path: oRoute.path, query: oRoute.query}" 
-                replace><span v-if="index">></span>{{oRoute.name}}</router-link>
+          <router-link 
+          class="path-item" 
+          v-for="(oRoute,index) in aoRoute" 
+          :key="index" 
+          :to="{path: oRoute.path, query: oRoute.query}" 
+          replace>
+            <span v-if="index">></span>{{oRoute.name}}
+          </router-link>
         </div>
 	    <router-view></router-view>  
     </div>

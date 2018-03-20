@@ -1274,6 +1274,11 @@ export default {
   flex-direction: column;
   height: 100%;
 
+  .condition {
+      border: 2px solid #42af8f;
+      padding: 20px 12px;
+      margin-bottom: 20px;
+    }
   .content-title {
     margin-top: 0;
     height: 20px;

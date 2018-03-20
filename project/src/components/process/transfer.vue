@@ -419,6 +419,15 @@ export default {
 </style>
 
 <style lang="less" scoped>
+.router-content {
+  .innner-content {
+    .condition {
+      border: 2px solid #42af8f;
+      padding: 20px 12px;
+      margin-bottom: 20px;
+    }
+  }
+}
 .condition {
   padding-top: 4px;
   padding-bottom: 4px;
