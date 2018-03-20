@@ -1,5 +1,5 @@
 <template>
-	<div class="router-content suspicious moldCode" ref='moldCode'>
+	<div class="router-content suspicious moldCode" ref='moldCode' v-loading="loading" element-loading-text="拼命加载中">
 		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain">遏制</el-button>
 		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain && !isOpDbBeforeRefact">可疑品</el-button>
 		<div class="innner-content" >
@@ -12,7 +12,7 @@
 				<span>模具名称：{{moldInfo.moldName}}</span><span>规格：{{moldInfo.moldCode}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
 			</div>
       <div class="mold-table">
-        <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-if="isRestrained">
+        <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-show="isRestrained">
           <el-table-column :prop="column.prop" :label="column.name" :width="column.width" :align="column.align?column.align:'center'" header-align='center' v-for="column in tableData.columns" :key="column.prop" >
             <template slot-scope="scope">
               <div v-if="column.prop === 'select' && scope.row[column.prop] !== null">
@@ -43,6 +43,7 @@ export default {
   },
   data () {
     return {
+      loading: true,
       isRestrained: true,
       needRestrain: true,
       doDescription: '',
@@ -180,6 +181,7 @@ export default {
   methods: {
     // 根据添加渲染页面
     init () {
+      this.loading = true
       let {endTime, moldCode, processCode, startTime} = this.moldQuery = fnP.parseQueryParam(this.oQuery)
       const oCondition = {endTime, moldCode, processCode, startTime}
       this.$register.sendRequest(
@@ -280,6 +282,7 @@ export default {
       })
 
       this.tableData.data = needArr
+      this.loading = false
     },
     // 请求失败。
     requestFail (sErrorMessage) {

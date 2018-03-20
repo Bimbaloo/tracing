@@ -490,6 +490,7 @@ body {
       }
 
       .tip {
+        width: 100%;
         height: 100%;
         background: url("../../assets/img/tip.png") no-repeat center center;
       }
