@@ -581,7 +581,7 @@ export default {
       return this.$store.state.factoryModule.factoryCameraConfig
     },
     // 版本控制。
-    isOpDbBeforeRefact() {
+    isOpDbBeforeRefact () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isOpDbBeforeRefact
@@ -2592,7 +2592,7 @@ export default {
       }
 
       let nNow = +new Date()
-      let nDay = 1*24*60*60*1000
+      let nDay = 1 * 24 * 60 * 60 * 1000
 
       if (dateValue === undefined || dateValue === '') {
         oReturn.message = '请输入时间'
@@ -2606,18 +2606,18 @@ export default {
           // 结束时间。
           if (+new Date(comValue) > +new Date(dateValue)) {
             oReturn.message = '结束时间必须大于开始时间'
-          } else if(+new Date(dateValue) > (+new Date(sLimited) + nDay)) {
+          } else if (+new Date(dateValue) > (+new Date(sLimited) + nDay)) {
             oReturn.message = '结束时间不能超过' + new Date(+new Date(sLimited) + nDay).Format()
-          }else {
-              oReturn.validate = true
+          } else {
+            oReturn.validate = true
           }
         } else {
           // 开始时间。
           if (+new Date(dateValue) > +new Date(comValue)) {
             oReturn.message = '开始时间必须小于结束时间'
-          } else if(+new Date(dateValue) < (+new Date(sLimited) - nDay)){
+          } else if (+new Date(dateValue) < (+new Date(sLimited) - nDay)) {
             oReturn.message = '开始时间不能小于' + new Date(+new Date(sLimited) - nDay).Format()
-          }else {
+          } else {
             oReturn.validate = true
           }
         }
