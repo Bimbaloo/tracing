@@ -6,7 +6,7 @@
 			<div class='condition-table'>
         <span v-for="infor in information" :key="infor.value">{{infor.value}}：{{infor.key}}</span>
       </div>
-      <v-report :kill-progress="killProgress" :hasData="setWidth" :noData="removeWidth" :query="restrainQuery.handleID" type="restrainDetails"></v-report>
+      <v-report :kill-progress="killProgress" :query="restrainQuery.handleID" type="restrainDetails"></v-report>
 		</div>
   	</div>
 </template>
@@ -20,9 +20,9 @@ export default {
   },
   data () {
     return {
-      styleObject: {
-        'min-width': '1200px'
-      },
+      // styleObject: {
+      //   'min-width': '1200px'
+      // },
       restrainQuery: '',
       listInfor: {},
       killProgress: false
@@ -126,12 +126,12 @@ export default {
     }
   },
   methods: {
-    setWidth () {
-      this.styleObject.minWidth = '1200px'
-    },
-    removeWidth () {
-      this.styleObject.minWidth = 0
-    },
+    // setWidth () {
+    //   this.styleObject.minWidth = '1200px'
+    // },
+    // removeWidth () {
+    //   this.styleObject.minWidth = 0
+    // },
     // 获取遏制列表信息
     getListhData () {
       const oCondition = {

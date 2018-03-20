@@ -22,7 +22,7 @@
 				<div class="content-table" ref="rawTable">
 					<!-- <v-table :table-data="materialData" :loading="loading"  :resize="true" :heights="tableHeight"></v-table> -->
           <v-agtable
-              ref="agTable"
+            ref="agTable"
             :table-data="materialData"
             :heights="tableHeight"
             :loading="loading"
@@ -472,21 +472,6 @@ export default {
         this.requestError
       )
     },
-    // 判断调用接口是否成功。
-    judgeLoaderHandler (param, fnSu, fnFail) {
-      let bRight = param.data.errorCode
-      // 判断是否调用成功。
-      if (!bRight) {
-        // 调用成功后的回调函数。
-        fnSu && fnSu(param.data.data)
-      } else {
-        // 提示信息。
-        this.error = '查无数据'
-        console.warn(param.data.errorMsg.message)
-        // 失败后的回调函。
-        fnFail && fnFail()
-      }
-    },
     // 请求成功。
     requestSucess (oData) {
       // 更新 materialData
@@ -495,6 +480,14 @@ export default {
         this.nodeType,
         this.allColumns
       )
+
+      if (this.nodeType === 103) {
+        // 若为出库
+        if (!oData.stockOperationDetailList.some(o => o.traceCode)) {
+          // 若物流码列为空，则隐藏该列。
+          oTableData.columns = oTableData.columns.filter(o => o.field !== 'traceCode')
+        }
+      }
       oTableData.data = [].concat(oData.stockOperationDetailList)
       this.materialData = oTableData
       this.loading = false

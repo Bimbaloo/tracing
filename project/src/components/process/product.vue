@@ -21,8 +21,8 @@
 	    	:visible.sync="outTrackConfig.visible">
         <v-table :table-data="outTrackConfig" :heights="outTrackConfig.height"></v-table>
         <div class="dialog-footer">
-          <el-button @click="outTrackConfig.visible = false">取 消</el-button>
-          <el-button type="primary" @click="outTrackDialogHandle">追 踪</el-button>
+          <el-button @click="outTrackConfig.visible = false" size="mini">取 消</el-button>
+          <el-button type="primary" @click="outTrackDialogHandle" size="mini">追 踪</el-button>
         </div>
       </el-dialog>
       <div class="innner-content" :style="styleObject">

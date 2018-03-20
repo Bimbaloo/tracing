@@ -30,7 +30,7 @@
 					</div>
 				</div>
 			</div>
-			<v-report :kill-progress="killProgress" :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace"></v-report>
+			<v-report :kill-progress="killProgress" :query="selected" type="trace"></v-report>
 		</div>
 
 		<!--<v-report :hasData="setWidth" :noData="removeWidth" :query="selected" type="trace" :showTables='["summary","inStocks","outStocks","inMakings"]'></v-report>-->
