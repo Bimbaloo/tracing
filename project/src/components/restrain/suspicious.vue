@@ -4,8 +4,8 @@
 			暂时不支持遏制
 		</div>
 		<div v-else>
-			<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained">遏制</el-button>
-			<div class="innner-content" :style="styleObject">
+			<el-button class="btn btn-plain btn-restrain" @click="suppress" v-show="isRestrained">遏制</el-button>
+			<div class="inner-content">
 			<!--h2 class="title">遏制详情</h2-->
 			<!-- <h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2> -->
 			<div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
@@ -16,7 +16,7 @@
 			</div>
 			<h2 class="title">可疑品列表</h2>
 			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
-			<v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'" :hasData="setWidth" :noData="removeWidth" ></v-report>
+			<v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'"></v-report>
 		</div>
 		</div>
 	</div>
@@ -43,7 +43,7 @@ export default {
     }
   },
   computed: {
-		// 版本信息数据。
+    // 版本信息数据。
     isOpDbBeforeRefact () {
       return (
         this.$store.state.versionModule &&
@@ -75,7 +75,7 @@ export default {
   },
   methods: {
     // 可疑品列表。
-    suppres () {
+    suppress () {
       const h = this.$createElement
       let self = this
       this.$msgbox({
@@ -145,13 +145,13 @@ export default {
           }
         }
       })
-    },
-    setWidth () {
-      this.styleObject.minWidth = '1000px'
-    },
-    removeWidth () {
-      this.styleObject.minWidth = 0
     }
+    // setWidth () {
+    //   this.styleObject.minWidth = '1000px'
+    // },
+    // removeWidth () {
+    //   this.styleObject.minWidth = 0
+    // }
   },
   // 遏制页面离开时，关闭进程(可疑品：查出库，物料)
   beforeRouteLeave (to, from, next) {

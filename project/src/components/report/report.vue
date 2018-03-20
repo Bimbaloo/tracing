@@ -753,7 +753,7 @@ export default {
         if (oResult[p].length && !bSetWidth) {
           bSetWidth = true
           // 设置最小宽度。
-          this.$emit('hasData')
+          // this.$emit('hasData')
         }
 
         if (p === 'summary') {
@@ -771,7 +771,7 @@ export default {
       }
 
       if (!bSetWidth) {
-        this.$emit('noData')
+        // this.$emit('noData')
         // this.error = "查无数据。"
         console.log('查无数据。')
       }
@@ -798,6 +798,7 @@ export default {
       console.log('查询出错。')
     },
     fetchData () {
+      debugger
       // 进入页面时设置页面的进程标记(created,watch)
       window.Rt.utils.cookie('progressId', this.progressId)
 
@@ -836,7 +837,6 @@ export default {
         sUrl = this.oUrl[this.type]
         this.$ajax.defaults.headers.post['Content-Type'] =
           'application/json;charset=UTF-8'
-        // debugger
       } else if (this.type === 'mold') {
         // 根据模具信息查询快速报告
         sUrl = this.oUrl[this.type]
@@ -851,10 +851,10 @@ export default {
           sUrl = this.oUrl['time']
           delete oParam.equipmentName
         } else {
-			  // 根据物料查询。
-			  oParam.materialCode = oParam.materialCode.split(':')[0]
-			  sUrl = this.oUrl['restrainBatch']
-		  }
+          // 根据物料查询。
+          oParam.materialCode = oParam.materialCode.split(':')[0]
+          sUrl = this.oUrl['restrainBatch']
+        }
       }
 
       this.$register.sendRequest(
