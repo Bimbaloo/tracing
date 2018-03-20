@@ -3047,18 +3047,19 @@ export default {
 <style lang="less">
 @import "../../assets/css/base.less";
 
-.el-date-editor--datetime.el-input--prefix {
-  .el-input__inner {
-    padding-left: 10px;
-    padding-right: 10px;
-  }
-  .el-input--prefix {
-    left: 0;
-  }
-  .el-input__suffix {
-    right: 0;
-  }
-}
+// 加上这个样式之后时间选择器前面的icon会被遮住.需要跟踪一下去掉后会不会有其他问题.
+/*.el-date-editor--datetime.el-input--prefix {*/
+  /*.el-input__inner {*/
+    /*padding-left: 10px;*/
+    /*padding-right: 10px;*/
+  /*}*/
+  /*.el-input--prefix {*/
+    /*left: 0;*/
+  /*}*/
+  /*.el-input__suffix {*/
+    /*right: 0;*/
+  /*}*/
+/*}*/
 
 
 .name-color(@color) {
