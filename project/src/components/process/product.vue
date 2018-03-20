@@ -1764,7 +1764,7 @@ export default {
       })
 
       if (!oQuery.operationIdList) {
-        debugger
+        // debugger
         oQuery.operationIdList = this.detailInfos.map(o => {
           return {
             opId: o.opId,
