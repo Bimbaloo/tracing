@@ -194,39 +194,10 @@ export default {
     // 获取模块数据 GET_DATA_URL
     this.$register.sendRequest(this.$store, this.$ajax, MONITOR_DATA_URL, 'get', null, (oData) => {
       // 保存工厂定制数据。
-      // oData = {
+
+      //   api_url: 'http:// 192.168.118.220:801/api/commandCenter/camera/getCameraList',
       //   url: 'http://192.168.118.220:801/page/commandCenter/camera-iframe-flv.html',
-      //   'dimensions_config': [
-      //     {
-      //       'name': 'quality',
-      //       'enabled': true
-      //     },
-      //     {
-      //       'name': 'pool',
-      //       'enabled': true
-      //     },
-      //     {
-      //       'name': 'work',
-      //       'enabled': true
-      //     },
-      //     {
-      //       'name': 'event',
-      //       'enabled': true
-      //     },
-      //     {
-      //       'name': 'tool',
-      //       'enabled': true
-      //     },
-      //     {
-      //       'name': 'repair',
-      //       'enabled': true
-      //     },
-      //     {
-      //       'name': 'parameter',
-      //       'enabled': true
-      //     }
-      //   ]
-      // }
+
       this.form.url = oData.url
       this.form.parameters = oData.parameters || []
       this.form.interface = oData.interface || ''
