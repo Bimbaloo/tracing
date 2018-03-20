@@ -49,7 +49,12 @@ export default {
     isDialogTree: {
       required: false,
       default: false
-    }
+    },
+		// 页面类型 track | trace
+		pageType: {
+			required: false,
+			default: 'track'
+		}
   },
   data () {
     return {
@@ -400,9 +405,11 @@ export default {
 	  			    margin: 5
 	  			  },
 				  new window.go.Binding('text', '', function (node) {
-  				  if (node.nodeType === 10003 || node.nodeType === 10004) {
+  				  if (node.nodeType === 10003) {
   				    return '总数'
-  				  } else if (node.nodeType === 10001) {
+  				  }else if(node.nodeType === 10004) {
+							 return '废品总数'
+						} else if (node.nodeType === 10001) {
   					  if (node.isShowRemain) {
   						  return '加工中/产出滞留/产出总数'
   					  } else {
@@ -534,7 +541,6 @@ export default {
             strokeWidth: 3
           }
 	  ),
-		// 提示处理，下道工序为物料时，不显示，默认数字为负
 	  this.$(
 		  window.go.TextBlock,
 		  {
@@ -543,7 +549,21 @@ export default {
 		  },
 		  new window.go.Binding('text', 'num'),
 			new window.go.Binding('visible', '', this.isToMaterialNode)
-	  )
+	  ),{
+			toolTip: this.$(go.Adornment, 'Auto',
+			this.$(
+				window.go.TextBlock,
+					{
+						font: '12pt Helvetica, 微软雅黑, sans-serif',
+						stroke: '#333333',
+						wrap: window.go.TextBlock.WrapFit,
+						alignment: window.go.Spot.Center,
+						margin: 5
+					},
+					new window.go.Binding('text', '', this.linkLineTooltipText)
+			)
+		)
+		}
       )
     }
   },
@@ -1292,7 +1312,7 @@ export default {
 		// 是否下道工序为物料，
 		isToMaterialNode(node) {
 			let nodes = this.data.node
-			let key = node.to
+			let key = this.pageType === 'track' ? node.to : node.from
 
 			let aoIs = nodes.filter(o => o.key === key)
 
@@ -1300,6 +1320,25 @@ export default {
 				return false
 			}else {
 				return true
+			}
+
+		},
+		// 显示连线上数量的提示文字-追踪：下道动作的name 溯源：上道动作name。 工序显示投料
+		linkLineTooltipText (node) {
+			let nodes = this.data.node
+			let key = this.pageType === 'track' ? node.to : node.from
+
+			let aoIs = nodes.filter(o => o.key === key)
+			let isShow = this.isToMaterialNode(node)
+
+			if(isShow) {
+				if(aoIs[0].nodeType === 10001) {
+					return '投料'
+				}else {
+					return aoIs[0].name
+				}
+			}else {
+				return ''
 			}
 
 		}
