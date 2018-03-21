@@ -228,6 +228,7 @@ import agTable from 'components/basic/ag-table.vue'
 const CAMERA = 0
 // const url = "http://192.168.220.182:8088/api/v1/trace/operation-detail/inout/by-id";
 const url = window.HOST + '/api/v1/trace/operation-detail/inout/by-id'
+const restrainUrl = window.HOST + '/api/v1/trace/operation-detail/inout/by-equipment'
 
 // 产出，退料，结转字段。
 const OUT_FIELD = 'outQuantity'
@@ -1762,27 +1763,45 @@ export default {
           this.condition[el] = this.$route.query[el]
         }
       })
-
-      if (!oQuery.operationIdList) {
-        // debugger
-        oQuery.operationIdList = this.detailInfos.map(o => {
-          return {
-            opId: o.opId,
-            opType: o.opType
-          }
-        })
-      }
       this.filters = this.getFilters()
-      this.$register.sendRequest(
-        this.$store,
-        this.$ajax,
-        url,
-        'post',
-        oQuery,
-        this.requestSucess,
-        this.requestFail,
-        this.requestError
-      )
+      if (window.location.pathname === '/restrain.html') {
+        let oQuery = {
+          'endTime': this.$route.query.shiftEndTime,
+          'equipmentId': this.$route.query.equipmentId,
+          'startTime': this.$route.query.shiftStartTime
+        }
+
+        this.$register.sendRequest(
+          this.$store,
+          this.$ajax,
+          restrainUrl,
+          'post',
+          oQuery,
+          this.requestSucess,
+          this.requestFail,
+          this.requestError
+        )
+      } else {
+        if (!oQuery.operationIdList) {
+        // debugger
+          oQuery.operationIdList = this.detailInfos.map(o => {
+            return {
+              opId: o.opId,
+              opType: o.opType
+            }
+          })
+        }
+        this.$register.sendRequest(
+          this.$store,
+          this.$ajax,
+          url,
+          'post',
+          oQuery,
+          this.requestSucess,
+          this.requestFail,
+          this.requestError
+        )
+      }
     },
     // 批次追踪时获取汇总明细信息。
     getOutDetailListByRow (row) {

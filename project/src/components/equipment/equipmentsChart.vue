@@ -383,7 +383,8 @@ export default {
                 'startTime',
                 'endTime',
                 'shiftStartTime',
-                'shiftEndTime'
+                'shiftEndTime',
+                'equipmentId'
               ]
               // ["equipmentName", "equipmentId", "startTime", "endTime", "shiftStartTime", "shiftEndTime", "processCode"]
             },
