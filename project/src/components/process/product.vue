@@ -758,7 +758,7 @@ export default {
             width: '80'
           },
           {
-            name: 'BOM数量',
+            name: 'BOM扣减数',
             prop: 'BOMQuantity',
             width: '120'
           },
@@ -1334,7 +1334,7 @@ export default {
 
       // 版本信息中显示的列。
       if (this.isOpDbBeforeRefact) {
-        aoHide = aoHide.concat([OUT_FIELD, RETURN_FIELD, CARRY_FIELD])
+        aoHide = aoHide.concat([OUT_FIELD, RETURN_FIELD, CARRY_FIELD, 'BOMQuantity'])
       }
 
       // 设备分析中显示的列。
