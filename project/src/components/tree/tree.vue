@@ -1336,7 +1336,9 @@ export default {
 
 			let aoIs = nodes.filter(o => o.key === key)
 
-			if(aoIs.length && (aoIs[0].nodeType === 10003 || aoIs[0].nodeType === 10004)) {
+			if(this.isOpDbBeforeRefact) {
+				return false
+			}else if(aoIs.length && (aoIs[0].nodeType === 10003 || aoIs[0].nodeType === 10004)) {
 				return false
 			}else {
 				return true
