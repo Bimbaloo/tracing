@@ -2,7 +2,7 @@
     <div id="app">
         <v-header :config="false" :back="false" :tool="false"></v-header>
         <div class="wrap">
-            <v-video :equipment-id="equipmentId" :equipment-name="equipmentName" :time="time" :series="series" v-if="camera&&factoryCameraFecthed"></v-video>
+            <v-video :equipment-id="equipmentId" :equipment-name="equipmentName" :time="time" :startDate="startDate" :endDate="endDate" :series="series" v-if="camera&&factoryCameraFecthed"></v-video>
         </div>
     </div>
 </template>
@@ -38,6 +38,12 @@ export default {
     },
     time () {
       return this.oParams.time || ''
+    },
+    startDate () {
+      return this.oParams.startDate || ''
+    },
+    endDate () {
+      return this.oParams.endDate || ''
     },
     series () {
       return this.oParams.series || ''
