@@ -1547,21 +1547,22 @@ export default {
       let bRelated = !!aData[5]
 
       // 添加标记线。
-      this.markLine.push({ xAxis: nTime }) //, related: bRelated, dimension: value[4]});
-
-      this.compareList = this.compareList.map(o => {
-        o.zIndex = TOOLTIP_Z_INDEX
-        return o
-      })
-      // 添加对比数据。
-      this.compareList.push(
-        this.transformTooltipDataToCompareData(
-          nTime,
-          bRelated,
-          aData[4],
-          TOOLTIP_Z_INDEX + 1
+      if (!this.markLine.find(o => o.xAxis === nTime)) {
+        this.markLine.push({ xAxis: nTime }) //, related: bRelated, dimension: value[4]});
+        this.compareList = this.compareList.map(o => {
+          o.zIndex = TOOLTIP_Z_INDEX
+          return o
+        })
+        // 添加对比数据。
+        this.compareList.push(
+          this.transformTooltipDataToCompareData(
+            nTime,
+            bRelated,
+            aData[4],
+            TOOLTIP_Z_INDEX + 1
+          )
         )
-      )
+      }
     },
     // echarts 点击事件。
     chartClickHandle (params) {
@@ -3284,7 +3285,7 @@ export default {
       line-height: 14px;
       position: absolute;
       // top: 60px;
-      width: 220px;
+      width: 222px;
       box-sizing: border-box;
       // z-index: 100;
       color: #000; //#fff;
