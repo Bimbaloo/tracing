@@ -1,13 +1,13 @@
 <template>
     <el-date-picker
-      v-model="formData[keyData]" 
+      v-model="formData[keyData]"
       :type="dateType"
-      :placeholder="hint" 
+      :placeholder="hint"
       :disabled="disabled"
       style="width: 100%;"
       @change.native = "dateChange"
       @change = "dateClick"
-      value-format="yyyy-MM-dd hh:mm:ss">
+      value-format="yyyy-MM-dd HH:mm:ss">
     </el-date-picker>
 </template>
 
