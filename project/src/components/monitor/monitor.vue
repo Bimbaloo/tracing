@@ -59,7 +59,16 @@ export default {
       type: [String, Number],
       default: ''
     },
+    /* time和 [startDate,endDate] 有且只有一个 */
     time: {
+      type: String,
+      default: ''
+    },
+    startDate: {
+      type: String,
+      default: ''
+    },
+    endDate: {
       type: String,
       default: ''
     },
@@ -121,18 +130,18 @@ export default {
       let flag = 0
       // 验证开始时间。
       let validateStartTime = (rule, value, callback) => {
-        flag ++
-        if(flag%3 !== 0){
+        flag++
+        if (flag % 3 !== 0) {
           this.$refs.monitorForm.validateField('endDate')
         } else {
           flag = 0
           return
         }
         let sEnd = this.monitorForm.endDate
-        if(value instanceof Date){
+        if (value instanceof Date) {
           value = value.Format()
         }
-        if(sEnd instanceof Date) {
+        if (sEnd instanceof Date) {
           sEnd = sEnd.Format()
         }
         let sTime = value.trim()
@@ -170,18 +179,18 @@ export default {
       }
         // 验证结束时间。
       let validateEndTime = (rule, value, callback) => {
-        flag ++
-        if(flag%3 !== 0){
+        flag++
+        if (flag % 3 !== 0) {
           this.$refs.monitorForm.validateField('startDate')
         } else {
           flag = 0
           return
         }
         let sStart = this.monitorForm.startDate
-        if(value instanceof Date){
+        if (value instanceof Date) {
           value = value.Format()
         }
-        if(sStart instanceof Date) {
+        if (sStart instanceof Date) {
           sStart = sStart.Format()
         }
         let sTime = value.trim()
@@ -230,7 +239,12 @@ export default {
   },
   created () {
     // 设置监控时间。
-    this.setTime()
+    if (this.startDate !== '' && this.endDate !== '') {
+      this.monitorForm.startDate = this.startDate
+      this.monitorForm.endDate = this.endDate
+    } else {
+      this.setTime()
+    }
     // 获取监控点。
     this.getCameraPoints()
   },

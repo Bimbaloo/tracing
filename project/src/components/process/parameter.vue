@@ -1,6 +1,16 @@
 <!--工艺参数-->
 <template>
     <div class="router-content" id="parameter">
+      <!-- 设备监控 -->
+	    <v-dialog
+    		v-if="showCamera"
+    		:dialog-visible="videoForm.visible"
+            :equipment-id="videoForm.equipmentId"
+            :equipment-name="videoForm.equipmentName"
+            :startDate="videoForm.startDate"
+            :endDate="videoForm.endDate"
+    		@hideDialog="hideVideoDialog">
+	    </v-dialog>
         <div class="inner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
@@ -136,6 +146,7 @@
                           </div>
                           <div class="btn-box">
                             <el-button class="btn btn-plain" @click="showSuspiciousList">可疑品</el-button>
+                            <el-button v-if="showCamera" class="btn btn-plain" @click="showVideoDialog">视频查看</el-button>
                           </div>
                       </el-tab-pane>
                   </el-tabs>
@@ -153,6 +164,7 @@ import FileSaver from 'file-saver'
 import table from 'components/basic/table.vue'
 import rasterizeHTML from 'rasterizehtml'
 import _ from 'lodash'
+import VideoDialog from 'components/monitor/dialog.vue'
 
 // 条码表接口
 const BARCODE_TABLE_DATA = window.HOST + '/api/v1/processparameter/barcode-list'
@@ -163,9 +175,12 @@ const CHART_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time'
 // 条码详情接口
 const BARCODE_DETAIL_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time-barcode'
 // const BARCODE_DETAIL_DATA = 'static/parameterVue/BARCODE_DETAIL_DATA.json'
+// 是否开启视频监控。
+const CAMERA = 0
 
 export default {
   components: {
+    'v-dialog': VideoDialog,
     'v-table': table
   },
   data () {
@@ -250,7 +265,16 @@ export default {
         input: ''
       },
       tabPaneNum: 0,
-      code: 0
+      code: 0,
+      // 是否开启视频监控。
+      showCamera: !!CAMERA,
+      videoForm: {
+        visible: false,
+        equipmentId: '',
+        equipmentName: '',
+        startDate: '',
+        endDate: ''
+      }
     }
   },
   created () {
@@ -367,9 +391,8 @@ export default {
     },
     // 获取曲线图数据。
     fetchChartData () {
-      this.$nextTick(() => {
-        this.loading = true
-      })
+      this.loading = true
+
       this.chartFetched = true
       /* 设置显示信息和查询条件 */
 
@@ -1181,6 +1204,38 @@ export default {
           path: '/process/restrain',
           query: Object.assign({}, {startTime: oDate.newStratTime, endTime: oDate.newEndTime}, oQuery)
         })
+      }
+    },
+    // 隐藏监控视频。
+    hideVideoDialog () {
+      this.videoForm.visible = false
+    },
+    // 打开监控视频。
+    showVideoDialog () {
+      const value = this.tableDatas[this.tabPaneNum].value
+      let myVideoForm = {
+        visible: true,
+        equipmentId: this.oQuery.equipmentId,         // 设备ID
+        equipmentName: this.condition.equipmentName,  // 设备名称
+        shiftStartTime: this.condition.startTime     // 开始时间
+      }
+      if (value === '表格') {
+        let oData = this.tableDatas[this.tabPaneNum].data
+        let arr = oData.filter(el => {
+          return el.checked
+        })
+        if (arr.length !== 2) {
+          this.$message({
+            showClose: true,
+            message: '请选择起始时间',
+            type: 'error'
+          })
+        } else {
+          this.videoForm = Object.assign({}, {startDate: arr[0].pickTime, endDate: arr[1].pickTime}, myVideoForm)
+        }
+      } else {
+        let oDate = this.getChartTime()
+        this.videoForm = Object.assign({}, {startDate: oDate.newStratTime, endDate: oDate.newEndTime}, myVideoForm)
       }
     }
   }
