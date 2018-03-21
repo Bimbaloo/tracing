@@ -5,7 +5,7 @@
 	          	<span class="ball-text">列表生成中</span><div></div><div></div><div></div>
 	        </div>
 		</div>
-        <v-table :table-data="oDialogTable" :loading="tableLoading"></v-table>
+        <v-table empty-text=" " :table-data="oDialogTable" :loading="tableLoading"></v-table>
     </div>
 </template>
 

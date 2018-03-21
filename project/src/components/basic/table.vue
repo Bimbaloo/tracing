@@ -13,6 +13,7 @@
     :max-height="maxHeight"
     v-loading="loading"
     element-loading-text="拼命加载中"
+    :empty-text="emptyText"
     style="width: 100%"
     ref="multipleTable">
         <el-table-column
@@ -83,6 +84,10 @@ export default {
       required: false,
       type: Boolean,
       default: false
+    },
+    emptyText: {
+      required: false,
+      default: '暂无数据'
     }
   },
   data () {
