@@ -347,7 +347,7 @@ export default {
 					font: 'bold 10pt sans-serif',
 					stroke: NORMAL_TEXT_COLOR
 				},
-			 new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004)),
+			 new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202)),
 			 new window.go.Binding('text', '', node => `${node.remainNum < 0 ? '-' : node.remainNum}`),
 			 new window.go.Binding('stroke', '', node => node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR)
 		 ),
@@ -356,7 +356,7 @@ export default {
 				font: 'bold 10pt sans-serif',
 				stroke: NORMAL_TEXT_COLOR
 			},
-			new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004))
+			new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202))
 		),
 			// 总数
 			this.$(window.go.TextBlock,
@@ -405,7 +405,7 @@ export default {
 	  			    margin: 5
 	  			  },
 				  new window.go.Binding('text', '', function (node) {
-  				  if (node.nodeType === 10003) {
+  				  if (node.nodeType === 10003 || node.nodeType === 202) {
   				    return '总数'
   				  }else if(node.nodeType === 10004) {
 							 return '废品总数'
