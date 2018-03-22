@@ -268,7 +268,7 @@ const store = new Vuex.Store({
     // 存入 nodeType
     nodeType: null,
     // 存入 detailInfos
-    detailInfos: [],
+    detailInfos: {},
     // 点击次数
     clickNum: 0,
     // 记录tab改变

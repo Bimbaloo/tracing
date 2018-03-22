@@ -1784,12 +1784,14 @@ export default {
       } else {
         if (!oQuery.operationIdList) {
         // debugger
-          oQuery.operationIdList = this.detailInfos.map(o => {
-            return {
-              opId: o.opId,
-              opType: o.opType
-            }
-          })
+          // oQuery.operationIdList = this.detailInfos.map(o => {
+          //   return {
+          //     opId: o.opId,
+          //     opType: o.opType
+          //   }
+          // })
+
+          oQuery.operationIdList = this.detailInfos.opIdList
         }
         this.$register.sendRequest(
           this.$store,

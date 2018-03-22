@@ -237,14 +237,6 @@ export default {
             name: '条码'
           },
           {
-            prop: 'materialName',
-            name: '物料名称'
-          },
-          {
-            prop: 'materialCode',
-            name: '物料编码'
-          },
-          {
             prop: 'quantity',
             name: '数量'
           }
@@ -282,7 +274,7 @@ export default {
 
         this.$router.replace({
           path: sPath,
-          query: { materialCode: row.materialCode, batchNo: row.batchNo }
+          query: { materialCode: this.node.code, batchNo: row.batchNo }
         })
       }
     },
@@ -373,7 +365,7 @@ export default {
       this.node = {
         code: oNode.code || '',
         name: oNode.name || '',
-        materialInfoList: oNode.detailInfos.map(o => {
+        materialInfoList: oNode.detailInfo.materialInfoList.map(o => {
           return {
             batchNo: o.batchNo,
             barcode: o.barcode
@@ -410,7 +402,7 @@ export default {
         //   )
         // }
 
-        this.requestSucess(JSON.parse(JSON.stringify(this.detailInfos)))
+        this.requestSucess(JSON.parse(JSON.stringify(this.detailInfos.materialInfoList || [])))
       }
     },
     // 表格单元格数据合并处理。

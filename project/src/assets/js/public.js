@@ -106,7 +106,7 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
         groupCode: null,
         groupName: null,
         groupSeq: null,
-        detailInfos: []
+        detailInfo: {}
       }
 
       // 找到该组下的所有子节点，设置该组中子工序的group值。

@@ -12,7 +12,7 @@
 			<div class="innner-content" >
 				<div class="content-message tableData">
 					<span class='table-title'>
-						<span>物料编码：{{materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{materialName}}</span>
+						<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
 					</span>
 					<span class='table-handle'>
 						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
@@ -53,6 +53,8 @@ export default {
       styleObject: {
         'min-width': '1000px'
       },
+      // 物料节点信息
+      node: {},
       loading: true,
       error: '',
       pathMapping: {
@@ -370,14 +372,6 @@ export default {
     'v-agtable': agTable
   },
   computed: {
-    // 物料编码
-    materialCode () {
-      return this.$store.state.detailInfos[0].materialCode
-    },
-    // 物料名称
-    materialName () {
-      return this.$store.state.detailInfos[0].materialName
-    },
     // 上下移动轴
     resizeY () {
       return this.$store && this.$store.state.resizeY
@@ -397,35 +391,43 @@ export default {
     nodeType () {
       return this.$store.state.nodeType
     },
+    nodeKey() {
+      return this.$store.state.key
+    },
     // 点击次数
     clickNum () {
       return this.$store.state.clickNum
     },
+    rawData() {
+      return this.$store.state.rawData
+    },
     // op_id 传给后端的参数
     operationIdList () {
-      let operationIdList = []
-      if (
-        this.nodeType === 2 ||
-        this.nodeType === 7 ||
-        this.nodeType === 10002 ||
-        this.nodeType === 11
-      ) {
-        // 结转.. || 车间调整
-        this.detailInfos.forEach(el => {
-          operationIdList.push(el.opId)
-        })
-      } else {
-        // 投产
-        this.detailInfos.forEach(el => {
-          let obj = {
-            opId: el.opId,
-            opType: el.opType
-          }
-          operationIdList.push(obj)
-        })
-      }
+      // let operationIdList = []
+      // if (
+      //   this.nodeType === 2 ||
+      //   this.nodeType === 7 ||
+      //   this.nodeType === 10002 ||
+      //   this.nodeType === 11
+      // ) {
+      //   // 结转.. || 车间调整
+      //   this.detailInfos.forEach(el => {
+      //     operationIdList.push(el.opId)
+      //   })
+      // } else {
+      //   // 投产
+      //   this.detailInfos.forEach(el => {
+      //     let obj = {
+      //       opId: el.opId,
+      //       opType: el.opType
+      //     }
+      //     operationIdList.push(obj)
+      //   })
+      // }
+      //
+      // return operationIdList
 
-      return operationIdList
+      return this.detailInfos.opIdList
     },
     // 显示的名称
     routerName () {
@@ -484,6 +486,13 @@ export default {
     // 发起请求
     fetchData () {
       this.loading = true
+
+      let oNode = this.rawData.nodeList.filter(o => o.key === this.nodeKey)[0] || {}
+      this.node = {
+        code: oNode.code || '',
+        name: oNode.name || ''
+      }
+
       let oQuery = { operationIdList: this.operationIdList }
 
       this.$register.sendRequest(

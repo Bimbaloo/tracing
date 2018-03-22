@@ -1,13 +1,13 @@
 <template>
-    <!-- <div class="progress-dialog-table-wrap">
+    <div class="progress-dialog-table-wrap">
         <div class="loader">
 	        <div class="loader-inner ball-pulse">
 	          	<span class="ball-text">列表生成中</span><div></div><div></div><div></div>
 	        </div>
 		</div>
         <v-table empty-text=" " :table-data="oDialogTable" :loading="tableLoading"></v-table>
-    </div> -->
-    <el-dialog
+    </div>
+    <!-- <el-dialog
         class="progress-dialog-table-wrap"
         :visible.sync="dialogVisible"
         :close-on-click-modal="false"
@@ -22,7 +22,7 @@
 	        </div>
 		</div>
         <v-table empty-text=" " heights="60vh" :table-data="oDialogTable" :loading="tableLoading"></v-table>
-    </el-dialog>
+    </el-dialog> -->
 </template>
 
 <script>
@@ -175,7 +175,7 @@ export default {
         z-index: 1001;
         width: 100%;
         height: 100%;
-        // background-color: #fff;
+        background-color: #fff;
 
         .loader {
           text-align: center;

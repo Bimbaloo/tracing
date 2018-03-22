@@ -166,7 +166,7 @@ export default {
 
             let aRoot = []
             let aSublings = []
-						let detailInfos = node.data.detailInfos
+						let detailInfos = node.data.detailInfo
 
             node.data.sublings.forEach(o => {
               let sKey = node.data.isMaterialNode ? o.key : o.parent

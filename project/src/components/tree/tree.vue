@@ -675,7 +675,7 @@ export default {
 
       // 点击节点信息展示。
       let nodeType = node.data.nodeType // 被点击节点的 nodeType
-			let detailInfos = node.data.detailInfos
+			let detailInfos = node.data.detailInfo
 
       if (
         nodeType === 101 ||
