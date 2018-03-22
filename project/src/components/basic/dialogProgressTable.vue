@@ -1,12 +1,28 @@
 <template>
-    <div class="progress-dialog-table-wrap">
+    <!-- <div class="progress-dialog-table-wrap">
         <div class="loader">
 	        <div class="loader-inner ball-pulse">
 	          	<span class="ball-text">列表生成中</span><div></div><div></div><div></div>
 	        </div>
 		</div>
         <v-table empty-text=" " :table-data="oDialogTable" :loading="tableLoading"></v-table>
-    </div>
+    </div> -->
+    <el-dialog
+        class="progress-dialog-table-wrap"
+        :visible.sync="dialogVisible"
+        :close-on-click-modal="false"
+        :show-close="false"
+        :close-on-press-escape="false"
+        :append-to-body="true"
+        width="80%"
+        center>
+        <div slot="title" class="loader">
+	        <div class="loader-inner ball-pulse">
+	          	<span class="ball-text">列表生成中</span><div></div><div></div><div></div>
+	        </div>
+		</div>
+        <v-table empty-text=" " heights="60vh" :table-data="oDialogTable" :loading="tableLoading"></v-table>
+    </el-dialog>
 </template>
 
 <script>
@@ -93,7 +109,7 @@ export default {
                   this.tableLoading = false
 
                   // 处理数据。最后一次返回结果为null，所以数据不处理
-                  if (data !== null) {
+                  if (data !== undefined) {
                     this.oDialogTable.data = this.parseTableData(data)
                   }
 
@@ -159,11 +175,18 @@ export default {
         z-index: 1001;
         width: 100%;
         height: 100%;
-        background-color: #fff;
+        // background-color: #fff;
 
         .loader {
           text-align: center;
           padding: 10px 0;
+        }
+
+        .el-dialog__header {
+          padding-top: 15px;
+        }
+        .el-dialog__body {
+          padding-top: 0px;
         }
     }
     @-webkit-keyframes scale {
@@ -204,7 +227,7 @@ export default {
 
     .ball-pulse .ball-text {
       color: #42af8f;
-      font-size: 16px;
+      font-size: 20px;
     }
 
     .ball-pulse > div:nth-child(0) {
