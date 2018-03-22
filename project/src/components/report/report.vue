@@ -866,7 +866,8 @@ export default {
         this.requestFail,
         this.requestError
       )
-
+  	window.Rt.utils.cookie('progressId', null)
+		
 // 调用进程
       this.loading = true
     },
