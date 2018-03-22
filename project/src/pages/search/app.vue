@@ -20,7 +20,7 @@
           :handle-submit="handleSubmit"></v-panel>
         </el-tab-pane>
       </el-tabs>
-      <div class="link-suppress-list" @click="linkSuppressList">遏制列表</div>
+      <div class="link-suppress-list" v-if="supression" @click="linkSuppressList">遏制列表</div>
     </div>
     <footer>
       <img class="version" :src="version" />
@@ -477,7 +477,7 @@ export default {
     },
     // 可疑品列表查询
     linkSuppressList () {
-      location.assign(`/restrain.html?tag=${(+new Date()).toString().substr(-5)}#/suppressList/1?personCode=&startTime=&endTime=&_tag=` + (+new Date()).toString().substr(-5))
+      location.assign(`restrain.html?tag=${(+new Date()).toString().substr(-5)}#/suppressList/1?personCode=&startTime=&endTime=&_tag=` + (+new Date()).toString().substr(-5))
     }
   }
 }
