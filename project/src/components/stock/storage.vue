@@ -13,8 +13,8 @@
                 {{ outstockData.error }}
             </div>
             <div v-else class="content-table" ref="outstockTable">
-            	<v-table :table-data="outstockData" :heights="tableHeight" :loading="outstockData.loading" :resize="tdResize"></v-table>            
-              <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>        
+            	<v-table :table-data="outstockData" :heights="tableHeight" :loading="outstockData.loading" :resize="tdResize"></v-table>
+              <v-dialogTable :dialog-data="dialogData" :heights="dialogData.height"  v-on:dialogVisibleChange="visibleChange"></v-dialogTable>
             </div>
             <h2 class="content-title tableData">
                 <span class='table-title'>入库信息</span>
@@ -37,7 +37,7 @@
             	<v-table :b-fixed="false" :table-data="instockData" :loading="instockData.loading"></v-table>
             </div>-->
         </div>
-    </div>      
+    </div>
 </template>
 
 <script>
@@ -151,6 +151,7 @@ export default {
         url: window.HOST + '/api/v1/instock',
         loading: false,
         error: null,
+        filename: '入库',
         columns: [
           {
             prop: 'barcode',
