@@ -166,6 +166,7 @@ export default {
 
             let aRoot = []
             let aSublings = []
+						let detailInfos = node.data.detailInfos
 
             node.data.sublings.forEach(o => {
               let sKey = node.data.isMaterialNode ? o.key : o.parent
@@ -224,13 +225,13 @@ export default {
               })
               this.$store.commit('updateDetailInfos', {
                 // 将detailInfos保存到vuex
-                detailInfos: node.data.detailInfos
+                detailInfos: detailInfos
               })
               this.$store.commit('updateNum')
               this.$router.replace({
                 path: '/warehouse',
                 query: {
-                  detailInfos: node.data.detailInfos,
+                  detailInfos: detailInfos,
                   nodeType: node.data.nodeType,
                   _tag: new Date()
                     .getTime()
@@ -254,14 +255,14 @@ export default {
               })
               this.$store.commit('updateDetailInfos', {
                 // 将detailInfos保存到vuex
-                detailInfos: node.data.detailInfos
+                detailInfos: detailInfos
               })
               this.$store.commit('updateNum')
 
               this.$router.replace({
                 path: '/workshop',
                 query: {
-                  detailInfos: node.data.detailInfos,
+                  detailInfos: detailInfos,
                   key: node.data.nodeType,
                   _tag: new Date()
                     .getTime()
@@ -282,13 +283,13 @@ export default {
               })
               this.$store.commit('updateDetailInfos', {
                 // 将detailInfos保存到vuex
-                detailInfos: node.data.detailInfos
+                detailInfos: detailInfos
               })
               this.$store.commit('updateNum')
               this.$router.replace({
                 path: '/barcodeManage',
                 query: {
-                  detailInfos: node.data.detailInfos,
+                  detailInfos: detailInfos,
                   key: node.data.nodeType,
                   _tag: new Date()
                     .getTime()
@@ -306,7 +307,7 @@ export default {
               })
               this.$store.commit('updateDetailInfos', {
                 // 将detailInfos保存到vuex
-                detailInfos: node.data.detailInfos
+                detailInfos: detailInfos
               })
               this.$router.replace({
                 path: '/stock',
@@ -326,13 +327,13 @@ export default {
               })
               this.$store.commit('updateDetailInfos', {
                 // 将detailInfos保存到vuex
-                detailInfos: node.data.detailInfos
+                detailInfos: detailInfos
               })
 
               this.$router.replace({
                 path: '/process',
                 query: {
-                  detailInfos: node.data.detailInfos,
+                  detailInfos: detailInfos,
                   key: node.data.nodeType,
                   code: node.data.code,
                   // "name": node.data.name,
