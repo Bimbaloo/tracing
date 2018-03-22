@@ -675,6 +675,8 @@ export default {
 
       // 点击节点信息展示。
       let nodeType = node.data.nodeType // 被点击节点的 nodeType
+			let detailInfos = node.data.detailInfos
+
       if (
         nodeType === 101 ||
         nodeType === 102 ||
@@ -689,7 +691,7 @@ export default {
         })
         this.$store.commit('updateDetailInfos', {
           // 将detailInfos保存到vuex
-          detailInfos: node.data.detailInfos
+          detailInfos: detailInfos
         })
         this.$store.commit('updateNum')
         this.$router.replace({
@@ -719,7 +721,7 @@ export default {
         })
         this.$store.commit('updateDetailInfos', {
           // 将detailInfos保存到vuex
-          detailInfos: node.data.detailInfos
+          detailInfos: detailInfos
         })
         this.$store.commit('updateNum')
 
@@ -747,7 +749,7 @@ export default {
         })
         this.$store.commit('updateDetailInfos', {
           // 将detailInfos保存到vuex
-          detailInfos: node.data.detailInfos
+          detailInfos: detailInfos
         })
         this.$store.commit('updateNum')
         this.$router.replace({
@@ -771,7 +773,7 @@ export default {
         })
         this.$store.commit('updateDetailInfos', {
           // 将detailInfos保存到vuex
-          detailInfos: node.data.detailInfos
+          detailInfos: detailInfos
         })
         this.$router.replace({
           path: '/stock',
@@ -791,7 +793,7 @@ export default {
         })
         this.$store.commit('updateDetailInfos', {
           // 将detailInfos保存到vuex
-          detailInfos: node.data.detailInfos
+          detailInfos: detailInfos
         })
 
         this.$router.replace({
