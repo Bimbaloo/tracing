@@ -41,7 +41,7 @@
                 <div v-show="activeName === `table`" class="table" >
                   <div class="barcode-input">
                       <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-                          <el-form-item label="条码：" style="width: 400px"> 
+                          <el-form-item label="条码：" style="width: 400px">
                               <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
                           </el-form-item>
                       </el-form>
@@ -51,41 +51,41 @@
                       </span>
                   </div>
                   <div class="content-table" ref="barcodeTable">
-                      <el-table 
-                      :data="datas" 
-                      stripe 
-                      class="table" 
-                      :row-key="barcodeTableData.data.barcode" 
-                      v-loading="barcodeTableData.loading" 
-                      element-loading-text="拼命加载中" 
-                      style="width: 100%" 
-                      ref="multipleTable" 
-                      @expand-change="expandRow" 
+                      <el-table
+                      :data="datas"
+                      stripe
+                      class="table"
+                      :row-key="barcodeTableData.data.barcode"
+                      v-loading="barcodeTableData.loading"
+                      element-loading-text="拼命加载中"
+                      style="width: 100%"
+                      ref="multipleTable"
+                      @expand-change="expandRow"
                       :height="barcodeTableData.height">
-                          <el-table-column 
-                          v-if="!!column.show" 
-                          v-for="column in columns" 
-                          align="center" 
-                          :type="column.type" 
-                          :prop="column.prop" 
-                          :label="column.name" 
-                          :key="column.prop" 
-                          :class-name="column.class" 
+                          <el-table-column
+                          v-if="!!column.show"
+                          v-for="column in columns"
+                          align="center"
+                          :type="column.type"
+                          :prop="column.prop"
+                          :label="column.name"
+                          :key="column.prop"
+                          :class-name="column.class"
                           :width="column.width">
                               <template slot-scope="props">
-                                  <el-form 
-                                  label-position="left" 
-                                  class="demo-table-expand expand-form" 
-                                  v-if="column.type === 'expand'">                             
+                                  <el-form
+                                  label-position="left"
+                                  class="demo-table-expand expand-form"
+                                  v-if="column.type === 'expand'">
                                     <div v-if="props.row.list.length">
-                                        <el-form-item                  
-                                        :label="`${prop.description}${prop.varUnit}`" 
-                                        v-for="prop in props.row.list" 
+                                        <el-form-item
+                                        :label="`${prop.description}${prop.varUnit}`"
+                                        v-for="prop in props.row.list"
                                         :key="prop.varStdId"
                                         class="expand-lable">
                                             <span class="expand-span" v-for="(item,index) in prop.params" :key="index" :style="{ color: item.isWarn}">{{item.value}}({{item.pickTime}})</span>
                                         </el-form-item>
-                                    </div>                                            
+                                    </div>
                                     <div v-else>{{detailTip}}</div>
                                   </el-form>
                                   <div v-else :class="[ 'cell-content']">
@@ -109,15 +109,15 @@
                               inactive-text="表格"
                               active-value="表格"
                               inactive-value="图形"
-                              v-for="(option,indexs) in options" 
+                              v-for="(option,indexs) in options"
                               v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
                               :key="indexs+50"
                               @change = "switchChange(chartData.value)">
                           </el-switch>
-                          <div class="content-echarts" 
-                            v-for="option in options" 
+                          <div class="content-echarts"
+                            v-for="option in options"
                             :key="option.index"
-                            v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename" 
+                            v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename"
                             v-show="chartData.value === '图形'">
                             <div class="charts" :id="`charts${index}`"></div>
                           </div>
@@ -135,10 +135,10 @@
                               <div class="content-table" :ref="`tableData${index}`">
                                   <!-- <v-table :table-data="chartData" :heights="chartTableHeight" :resize="tdResize"></v-table> -->
                                   <el-table :data="chartData.data" :height="chartTableHeight" border class="table" ref="multipleTable">
-                                      <el-table-column v-for='column in chartData.columns' :key="column.prop" :prop="column.prop" :label="column.name" :width="column.width" align='center'> 
+                                      <el-table-column v-for='column in chartData.columns' :key="column.prop" :prop="column.prop" :label="column.name" :width="column.width" align='center'>
                                         <template slot-scope="scope" >
                                           <el-checkbox @change="chooseTime(scope.row.checked,chartData.data, scope.$index)" v-model="scope.row.checked" v-if="column.name === '采集时间'">{{scope.row[column.prop]}}</el-checkbox>
-                                          <div v-else :class="[{ 'isWarn': column.name === '检测值' && scope.row['isWarn'] }, 'cell']" >{{scope.row[column.prop]}}</div>                                          
+                                          <div v-else :class="[{ 'isWarn': column.name === '检测值' && scope.row['isWarn'] }, 'cell']" >{{scope.row[column.prop]}}</div>
                                         </template>
                                       </el-table-column>
                                   </el-table>
@@ -150,7 +150,7 @@
                           </div>
                       </el-tab-pane>
                   </el-tabs>
-                </div>             
+                </div>
             </div>
         </div>
     </div>
@@ -471,7 +471,7 @@ export default {
         }
       }
       /* 为了将获取到的 barcode等转换为对应的中文 */
-      let b = Object.entries(filters)
+      let b = window.Rt.utils.getObjectEntries(filters)//Object.entries(filters)
       let a = this.dataName
 
       b.forEach(o =>

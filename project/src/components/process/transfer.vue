@@ -1,6 +1,6 @@
 <!-- 结转 -->
 <template>
-    <div class="router-content">  
+    <div class="router-content">
         <div class="innner-content" :style="styleObject">
             <div class="condition" ref='condition'>
                 <div class='condition-messsage'>
@@ -182,7 +182,7 @@ export default {
         }
       }
       /* 为了将获取到的 barcode等转换为对应的中文 */
-      let b = Object.entries(filters)
+      let b = window.Rt.utils.getObjectEntries(filters)//Object.entries(filters)
       let a = this.dataName
 
       b.forEach(o =>

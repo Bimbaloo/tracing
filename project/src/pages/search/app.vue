@@ -5,18 +5,18 @@
     </header>
     <v-tooltip :config="true" :back="false"></v-tooltip>
     <div class="search-tab-content">
-      <el-tabs  element-loading-text="拼命加载中" 
-      v-model="activeKey" 
-      type="border-card" 
+      <el-tabs  element-loading-text="拼命加载中"
+      v-model="activeKey"
+      type="border-card"
       class="search-tab">
-        <el-tab-pane 
-        :key="category.key" 
-        v-for="category in categories" 
-        :label="category.title" 
+        <el-tab-pane
+        :key="category.key"
+        v-for="category in categories"
+        :label="category.title"
         :name="category.key">
-          <v-panel 
-          :category="category" 
-          :label-width="labelWidth" 
+          <v-panel
+          :category="category"
+          :label-width="labelWidth"
           :handle-submit="handleSubmit"></v-panel>
         </el-tab-pane>
       </el-tabs>
@@ -26,10 +26,10 @@
       <img class="version" :src="version" />
       <span class="version-info">版本: {{ v }}</span>
     </footer>
-    <div 
-    :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]" 
-    :style="{zIndex: historyZindex}" 
-    @mouseover="historyZindex = 2" 
+    <div
+    :class="['history-box',{ 'min-history-box': !showHistory },{ 'max-history-box': showHistory }]"
+    :style="{zIndex: historyZindex}"
+    @mouseover="historyZindex = 2"
     @mouseleave="historyZindex = 0" >
       <i class="el-icon-arrow-left" @click="showHistory = !showHistory" v-show="showHistory"></i>
       <i class="el-icon-arrow-right" @click="showHistory = !showHistory" v-show="!showHistory"></i>
@@ -51,8 +51,8 @@
               <li class="ecorded-module">{{data.oData.tab}}</li>
               <li class='records'>
                 <ul class="detail-record-box">
-                  <li class="detail-record" 
-                  v-for="(li,index) in data.oData.keys" 
+                  <li class="detail-record"
+                  v-for="(li,index) in data.oData.keys"
                   :key="index"
                   v-if="li[1]">{{li[0]}}：{{li[1]}}</li>
                 </ul>
@@ -266,13 +266,13 @@ export default {
         }
         a['date'] = el.dateTime.split(' ')[0]
         el.time = el.dateTime.split(' ')[1]
-        el.oData.keys = Object.entries(el.oData.keys)
+        el.oData.keys = window.Rt.utils.getObjectEntries(el.oData.keys)//Object.entries(el.oData.keys)
         a['data'].push(el)
         newData.push(a)
         for (let j = i + 1; j < oData.length; j++) {
           if (a['date'] === oData[j].dateTime.split(' ')[0]) {
             oData[j].time = oData[j].dateTime.split(' ')[1]
-            oData[j].oData.keys = Object.entries(oData[j].oData.keys)
+            oData[j].oData.keys = window.Rt.utils.getObjectEntries(oData[j].oData.keys)//Object.entries(oData[j].oData.keys)
             a['data'].push(oData[j])
             oData.splice(j, 1)
             j = j - 1
@@ -866,7 +866,7 @@ footer {
             .el-input__suffix {
               .el-input__suffix-inner {
                 .el-input__icon {
-                  line-height: 24px;            
+                  line-height: 24px;
                 }
               }
             }
@@ -947,7 +947,7 @@ footer {
             .el-input__suffix {
               .el-input__suffix-inner {
                 .el-input__icon {
-                  line-height: 24px;            
+                  line-height: 24px;
                 }
               }
             }
