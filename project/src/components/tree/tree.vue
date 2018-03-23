@@ -325,13 +325,13 @@ export default {
           this.$(
             window.go.Panel,
             'Horizontal',
-						// 加工中
+						// 加工中数
 						this.$(window.go.TextBlock,
 						{
 							font: 'bold 10pt sans-serif',
 							stroke: NORMAL_TEXT_COLOR
 						},
-					 new window.go.Binding('visible', '', node => node.nodeType === 10001 && node.isShowRemain),
+					 new window.go.Binding('visible', '', node => !node.groupCode && node.nodeType === 10001 && node.isShowRemain),
 					 new window.go.Binding('text', '', node => `${node.processingNum < 0 ? '-' : node.processingNum}`)
 				 ),
 				 this.$(window.go.TextBlock, '/',
@@ -339,7 +339,7 @@ export default {
 						font: 'bold 10pt sans-serif',
 						stroke: NORMAL_TEXT_COLOR
 					},
-					new window.go.Binding('visible', '', node => node.nodeType === 10001 && node.isShowRemain)
+					new window.go.Binding('visible', '', node => !node.groupCode && node.nodeType === 10001 && node.isShowRemain)
 				),
 				// 滞留数
 				this.$(window.go.TextBlock,
@@ -347,7 +347,7 @@ export default {
 					font: 'bold 10pt sans-serif',
 					stroke: NORMAL_TEXT_COLOR
 				},
-			 new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202)),
+			 new window.go.Binding('visible', '', node => !node.groupCode && node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202)),
 			 new window.go.Binding('text', '', node => `${node.remainNum < 0 ? '-' : node.remainNum}`),
 			 new window.go.Binding('stroke', '', node => node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR)
 		 ),
@@ -356,7 +356,7 @@ export default {
 				font: 'bold 10pt sans-serif',
 				stroke: NORMAL_TEXT_COLOR
 			},
-			new window.go.Binding('visible', '', node => node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202))
+			new window.go.Binding('visible', '', node => !node.groupCode && node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202))
 		),
 			// 总数
 			this.$(window.go.TextBlock,
@@ -364,6 +364,7 @@ export default {
 				font: 'bold 10pt sans-serif',
 				stroke: NORMAL_TEXT_COLOR
 			},
+			new window.go.Binding('visible', '', node => !node.groupCode),
 		 new window.go.Binding('text', '', node => `${node.totalNum < 0 ? '-' : node.totalNum}`)
 	 ),
       //       this.$(window.go.TextBlock,
@@ -411,7 +412,7 @@ export default {
 							 return '废品总数'
 						} else if (node.nodeType === 10001) {
   					  if (node.isShowRemain) {
-  						  return '加工中/产出滞留/产出总数'
+  						  return '加工数/产出滞留/产出总数'
   					  } else {
   						   return '总数'
   					  }
@@ -448,6 +449,7 @@ export default {
           this.$(
             window.go.Panel,
             'Auto',
+						{toolTip: this.tooltipTemplate},
             this.$(window.go.Shape, 'Rectangle', {
               fill: null,
               stroke: 'gray',
@@ -511,12 +513,76 @@ export default {
 	  ),
 	  this.$(
 		window.go.Panel,
-		'Auto',
-		this.$(window.go.TextBlock, '',
+		'Horizontal',
+		// 加工中数
+		this.$(window.go.TextBlock,
 		  {
-    		font: 'bold 10pt sans-serif'
-		  })
-	  )
+    		font: 'bold 10pt sans-serif',
+				stroke: NORMAL_TEXT_COLOR
+		  },
+			new window.go.Binding('visible', '', node => node.isShowRemain),
+			new window.go.Binding('text', '', node => `${node.processingNum < 0 ? '-' : node.processingNum}`)
+		),
+		this.$(window.go.TextBlock, '/',
+				 	{
+						font: 'bold 10pt sans-serif',
+						stroke: NORMAL_TEXT_COLOR
+					},
+					new window.go.Binding('visible', '', node => node.isShowRemain)
+				),
+		// 滞留数
+		this.$(window.go.TextBlock,
+				{
+					font: 'bold 10pt sans-serif',
+					stroke: NORMAL_TEXT_COLOR
+				},
+			 new window.go.Binding('visible', '', node => node.isShowRemain),
+			 new window.go.Binding('text', '', node => `${node.remainNum < 0 ? '-' : node.remainNum}`),
+			 new window.go.Binding('stroke', '', node => node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR)
+		 ),
+		 this.$(window.go.TextBlock, '/',
+			{
+				font: 'bold 10pt sans-serif',
+				stroke: NORMAL_TEXT_COLOR
+			},
+			new window.go.Binding('visible', '', node => node.isShowRemain)
+		),
+		// 总数
+		this.$(window.go.TextBlock,
+		{
+			font: 'bold 10pt sans-serif',
+			stroke: NORMAL_TEXT_COLOR
+		},
+	 new window.go.Binding('text', '', node => `${node.totalNum < 0 ? '-' : node.totalNum}`)
+ ), {
+	 toolTip: this.$(window.go.Adornment, 'Auto',
+	 	this.$(
+			window.go.Shape,
+			'Rectangle',
+			  {
+			    fill: 'white',
+			    stroke: '#dedede'
+			  }
+			),
+			this.$(
+				window.go.TextBlock,
+				{
+					font: '12pt Helvetica, 微软雅黑, sans-serif',
+			    stroke: '#333333',
+			    wrap: window.go.TextBlock.WrapFit,
+			    alignment: window.go.Spot.Center,
+			    margin: 5
+				},
+				new window.go.Binding('text', '', function(node) {
+					if(node.isShowRemain) {
+						return '加工数/产出滞留/产出总数'
+					}else {
+						return '总数'
+					}
+				})
+			)
+ 		)
+ 	})
       )
     },
     linkTemplate () {

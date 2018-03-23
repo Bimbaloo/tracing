@@ -106,7 +106,11 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
         groupCode: null,
         groupName: null,
         groupSeq: null,
-        detailInfo: {}
+        detailInfo: {},
+        isShowRemain: o.isShowRemain,
+        processingNum: -9999,
+        remainNum: -9999,
+        totalNum: -9999
       }
 
       // 找到该组下的所有子节点，设置该组中子工序的group值。
@@ -116,7 +120,20 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
       // 修改连线中to为第一个节点的key值； 修改from为最优一个节点的key值
       if (aSub.length) {
         _updateLineKey([{type: 'to', key: aSub[0].key, newKey: oGroup.key}, {type: 'from', key: aSub[aSub.length - 1].key, newKey: oGroup.key}])
-          // 设置group的显示值，为最后一道工序的数据
+          // 设置group的显示值，为所有工序的和. 加工树/滞留数/产出总数
+          aSub.forEach((oSub => {
+            if(oGroup.isShowRemain) {
+              if(oSub.processingNum >= 0 ) {
+                oGroup.processingNum = oGroup.processingNum < 0 ? oSub.processingNum : (oGroup.processingNum + oSub.processingNum)
+              }
+              if(oSub.remainNum >= 0 ) {
+                oGroup.remainNum = oGroup.remainNum < 0 ? oSub.remainNum : (oGroup.remainNum + oGroup.remainNum)
+              }
+            }
+            if(oSub.totalNum >= 0 ) {
+              oGroup.totalNum = oGroup.totalNum < 0 ? oSub.totalNum : (oGroup.totalNum + oGroup.totalNum)
+            }
+          }))
       }
 
       // 将新增的group组数据放入数组中。
