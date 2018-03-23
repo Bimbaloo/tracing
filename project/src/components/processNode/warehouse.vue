@@ -12,7 +12,7 @@
 			<div class="innner-content" >
 				<div class="content-message tableData">
 					<span class='table-title'>
-						<span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+						<!-- <span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span> -->
 					</span>
 					<span class='table-handle'>
 						<i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
@@ -461,10 +461,10 @@ export default {
     // 发起请求
     fetchData () {
       this.loading = true
-      
+
       let oNode = this.rawData.nodeList.filter(o => o.key === this.nodeKey)[0] || {}
       this.node = {
-        code: oNode.code || '',
+        code: oNode.materialCode || '',
         name: oNode.name || ''
       }
 
