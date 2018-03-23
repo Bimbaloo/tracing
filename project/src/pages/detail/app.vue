@@ -203,8 +203,8 @@ export default {
       let aInfo = aHref[1].split('/')
 
       // 设置tab和radio
-      oData.tab = aInfo[aInfo.length - 2]
-      oData.radio = aInfo[aInfo.length - 1]
+      oData.tab = aInfo[1]// aInfo[aInfo.length - 2]
+      oData.radio = aInfo[2]// aInfo[aInfo.length - 1]
 
       // 设置keys。
       aParams.forEach(o => {
