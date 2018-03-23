@@ -85,21 +85,24 @@ export default {
       let end = oQuery.shiftEndTime
 
       if (!start || !end) {
-        this.equipments.forEach((equipment, index) => {
-          let sTemp = equipment.shiftStartTime
-          let eTemp = equipment.shiftEndTime
-          if (!index) {
-            start = sTemp
-            end = eTemp
-          } else {
-            if (start > sTemp) {
-              start = sTemp
-            }
-            if (end < eTemp) {
-              end = eTemp
-            }
-          }
-        })
+        // this.equipments.forEach((equipment, index) => {
+        //   let sTemp = equipment.shiftStartTime
+        //   let eTemp = equipment.shiftEndTime
+        //   if (!index) {
+        //     start = sTemp
+        //     end = eTemp
+        //   } else {
+        //     if (start > sTemp) {
+        //       start = sTemp
+        //     }
+        //     if (end < eTemp) {
+        //       end = eTemp
+        //     }
+        //   }
+        // })
+
+        start = this.detailInfos.shiftStartTime
+        end = this.detailInfos.shiftEndTime
       }
 
       if (start && start === end) {
@@ -123,90 +126,16 @@ export default {
      */
     setEquipmentList () {
       this.equipments = []
-
-      // let aoData = this.rawData,
-      // oNode = null;
-      // // 提取选中的工序节点数据。
-      // let aoFilter = this.rawData.filter(o => o.key == this.processKey);
-      // if(aoFilter.length) {
-      // oNode = aoFilter[0];
-      // }
-
-      // this.node = oNode || {};
-
-      let oEquipments = {}
-
-      // this.node.processInfoList && this.node.processInfoList.forEach(o => {
-      this.detailInfos.forEach(o => {
-        if (!oEquipments[o.equipmentId]) {
-          oEquipments[o.equipmentId] = []
-        }
-
-        oEquipments[o.equipmentId].push(o)
-      })
-
-      for (let p in oEquipments) {
-        let sStart = ''
-        let sEnd = ''
-
-        // oEquipments[p].sort((a, b) => a.shiftStartTime > b.shiftStartTime);
-        oEquipments[p].sort((a, b) => {
-          //  从小到大排序。
-          if (a.shiftStartTime > b.shiftStartTime) {
-            return 1
-          }
-          if (a.shiftStartTime < b.shiftStartTime) {
-            return -1
-          }
-          // a 必须等于 b
-          return 0
-        })
-        // 最早班次开始时间。
-        sStart = oEquipments[p][0].shiftStartTime
-        // oEquipments[p].sort((a, b) => a.shiftEndTime < b.shiftEndTime);
-        oEquipments[p].sort((a, b) => {
-          //  从大到小排序。
-          if (a.shiftEndTime > b.shiftEndTime) {
-            return -1
-          }
-          if (a.shiftEndTime < b.shiftEndTime) {
-            return 1
-          }
-          // a 必须等于 b
-          return 0
-        })
-
-        // 最晚班次结束时间。
-        sEnd = oEquipments[p][0].shiftEndTime
-
-        // let aoPoolInId = [], //aoPoolInTime
-        // aoPoolOutId = []; //aoPoolOutTime
-
-        // oEquipments[p].forEach(o => {
-        // aoPoolInId = aoPoolInId.concat(o.doInIdList)//inHappenTimeList
-        // aoPoolOutId = aoPoolOutId.concat(o.doOutIdList)//outHappenTimeList
-        // })
-
-        // 去重。
-        // aoPoolInId = [...new Set(aoPoolInId)]
-        // aoPoolOutId = [...new Set(aoPoolOutId)]
-
-        let aoOperationIdList = oEquipments[p].map(o => {
-          return {
-            opId: o.opId,
-            opType: o.opType
-          }
-        })
+      let oMap = this.detailInfos.equipmentOpIdMap
+      Object.keys(oMap).forEach((sId) => {
         this.equipments.push({
-          equipmentId: oEquipments[p][0].equipmentId,
-          equipmentName: oEquipments[p][0].equipmentName,
-          shiftStartTime: sStart,
-          shiftEndTime: sEnd,
-          // poolInId: aoPoolInId,
-          // poolOutId: aoPoolOutId
-          operationIdList: aoOperationIdList
+          equipmentId: sId,
+          equipmentName: '',
+          shiftStartTime: this.detailInfos.shiftStartTime,
+          shiftEndTime: this.detailInfos.shiftEndTime,
+          operationIdList: oMap[sId]
         })
-      }
+      })
     }
   }
 }

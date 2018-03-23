@@ -1589,13 +1589,11 @@ export default {
           .dataZoom.filter(
             o => o.type === 'slider' && o.yAxisIndex.length === 1
           )[0]
-        // console.log(oYAxis)
         let nStart = oYAxis.startValue
         let nEnd = oYAxis.endValue
 
         let aoMarkPoint = this.option.series.filter(o => o.name === '加工')[0]
           .markPoint.data
-        // console.log(aoMarkPoint)
         let aoData = aoMarkPoint.map(o => {
           if (o.coord[1] >= nStart && o.coord[1] <= nEnd) {
             // 若在y轴缩放范围内。
@@ -1914,7 +1912,6 @@ export default {
     // 初始化图形数据。
     initChartData (aoData) {
       let nLength = aoData.length - 1
-
       aoData.forEach((o, index) => {
         if (index === nLength) {
           // 默认选中第一台设备。
@@ -2139,7 +2136,7 @@ export default {
     // 获取数组顺序。
     getIndex (arr, key, value) {
       for (let i = 0, l = arr.length; i < l; i++) {
-        if (arr[i][key] === value) {
+        if (+arr[i][key] === +value) {
           return i
         }
       }
@@ -2388,7 +2385,6 @@ export default {
         for (let key in singleData) {
           // 事件列表。
           let aoList = singleData[key]
-
           aoList.forEach((o, n) => {
             // 拼接scatter数据。[x, y, value, tooltip-data]
             let oData = this.getToolTipData(key, o)
@@ -2406,7 +2402,7 @@ export default {
                 // 若为投产，非遏制。
                 if (
                   (key === 'poolInList' || key === 'poolOutList') &&
-                  item.operationIdList.find(item => item.opId === o.opId)
+                  item.operationIdList.find(sOpId => sOpId === o.opId)
                 ) {
                   // 若为属于起点的投入或产出。
                   if (!oFilter[5]) {
@@ -2445,7 +2441,7 @@ export default {
               if (sDimension === 'pool' && !this.bRestrain) {
                 if (
                   (key === 'poolInList' || key === 'poolOutList') &&
-                  item.operationIdList.find(item => item.opId === o.opId)
+                  item.operationIdList.find(sOpId => sOpId === o.opId)
                 ) {
                   // 若为属于起点的投入或产出。
                   // 设置标记点。
