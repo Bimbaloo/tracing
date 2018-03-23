@@ -1783,16 +1783,13 @@ export default {
         )
       } else {
         if (!oQuery.operationIdList) {
-        // debugger
-          // oQuery.operationIdList = this.detailInfos.map(o => {
-          //   return {
-          //     opId: o.opId,
-          //     opType: o.opType
-          //   }
-          // })
+          oQuery.operationIdList = []
 
-          oQuery.operationIdList = this.detailInfos.opIdList
+          for(let i in this.detailInfos.equipmentOpIdMap) {
+            oQuery.operationIdList = oQuery.operationIdList.concat(this.detailInfos.equipmentOpIdMap[i])
+          }
         }
+        
         this.$register.sendRequest(
           this.$store,
           this.$ajax,
