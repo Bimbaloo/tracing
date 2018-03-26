@@ -63,8 +63,17 @@ const categories = [{
       'type': 'datetime',
       'placeholder': '请输入结束时间'
     }]
-  }, {
-    'groupOrder': '4',
+  }],
+  'active': {
+    'radio': '1',
+    'keys': {}
+  }
+}, {
+  'url': 'restrain',
+  'key': 'qtSuppress',
+  'title': '质检遏制',
+  'list': [{
+    'groupOrder': '1',
     'title': '质检单',
     'key': '4',
     'items': [{
@@ -74,7 +83,7 @@ const categories = [{
       'placeholder': '请输入质检单'
     }]
   }, {
-    'groupOrder': '5',
+    'groupOrder': '2',
     'title': '工单',
     'key': '5',
     'items': [{
@@ -84,7 +93,7 @@ const categories = [{
       'placeholder': '请输入工单'
     }]
   }, {
-    'groupOrder': '6',
+    'groupOrder': '3',
     'title': '设备',
     'key': '6',
     'items': [{
@@ -104,7 +113,7 @@ const categories = [{
       'placeholder': '请输入结束时间'
     }]
   }, {
-    'groupOrder': '7',
+    'groupOrder': '4',
     'title': '质检批次',
     'key': '7',
     'items': [{

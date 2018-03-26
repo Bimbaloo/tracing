@@ -37,6 +37,7 @@ import fnP from 'assets/js/public.js'
 import categoriesArr from 'assets/js/restrain.js'
 
 const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
+// const MODULE_ITEM_URL = './static/modules.json'
 
 export default {
   components: {
@@ -151,9 +152,9 @@ export default {
       this.categories = fnP
         .parseData(oResult)
         .filter(
-          o => o.key === 'suppress'
+          o => o.key === 'suppress' || o.key === 'qtSuppress'
         )
-      this.categories.push(categoriesArr[1])
+      this.categories.push(categoriesArr[categoriesArr.length - 1])
       this.categories.forEach(o => {
         if (oData && oData.tab === o.key) {
           o.active = oData
@@ -545,6 +546,7 @@ body {
 
       .el-tabs__nav {
         width: 100%;
+        display: flex
       }
 
       .el-tabs__item {
@@ -557,8 +559,11 @@ body {
         border-top: 4px solid transparent;
         border-bottom: 4px solid transparent;
         color: #666;
-        width: 50%;
-				margin: 0;
+        flex-grow: 1;
+        // width: 50%;
+        margin: 0;
+        padding-left: 0;
+        padding-right: 0; 
         &:hover {
           color: #333;
         }

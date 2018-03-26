@@ -165,8 +165,16 @@ const routes = [
     component: MoldCode,
     title: 'moldCode'
   },
+  {
+    path: '/suppress/4/',
+    component: Suspicious, // 可疑品列表
+    meta: {
+      title: 'restrain',
+      type: 'suspiciouByBarcode'
+    }
+  },
   { // 根据质检单查询
-    path: '/suppress/4',
+    path: '/qtSuppress/1',
     redirect: '/qualityControl'
   },
   {// 模号查询--重定向到正确位置--质检单查询
@@ -175,7 +183,7 @@ const routes = [
     title: 'qualityControl'
   },
   { // 根据工单查询
-    path: '/suppress/5',
+    path: '/qtSuppress/2',
     redirect: '/workOrders'
   },
   {// 模号查询--重定向到正确位置--工单查询
@@ -184,19 +192,19 @@ const routes = [
     title: 'workOrders'
   },
   { // 根据设备+时间查询
-    path: '/suppress/6',
+    path: '/qtSuppress/3',
     redirect: '/equipment'
   },
-  {// 模号查询--重定向到正确位置--工单查询
+  {// 模号查询--重定向到正确位置--根据质检批次
     path: '/equipment',
     component: equipment,
     title: 'equipment'
   },
-  { // 根据设备+时间查询
-    path: '/suppress/7',
+  { // 根据质检批次
+    path: '/qtSuppress/4',
     redirect: '/batchNo'
   },
-  {// 模号查询--重定向到正确位置--工单查询
+  {// 根据质检批次--重定向到正确位置--根据质检批次
     path: '/batchNo',
     component: batchNo,
     title: 'batchNo'

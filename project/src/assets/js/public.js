@@ -8,8 +8,10 @@ var parseData = function (aoGet) {
     'trace_up': 'detail',
     // 追踪。
     'trace_down': 'detail',
-    // 遏制。
+    // 一般遏制。
     'suppress': 'restrain',
+    // 一般遏制。
+    'qtSuppress': 'restrain',
     // 履历。
     'resume': 'resume',
     // 断链。
@@ -121,19 +123,19 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
       if (aSub.length) {
         _updateLineKey([{type: 'to', key: aSub[0].key, newKey: oGroup.key}, {type: 'from', key: aSub[aSub.length - 1].key, newKey: oGroup.key}])
           // 设置group的显示值，为所有工序的和. 加工树/滞留数/产出总数
-          aSub.forEach((oSub => {
-            if(oGroup.isShowRemain) {
-              if(oSub.processingNum >= 0 ) {
-                oGroup.processingNum = oGroup.processingNum < 0 ? oSub.processingNum : (oGroup.processingNum + oSub.processingNum)
-              }
-              if(oSub.remainNum >= 0 ) {
-                oGroup.remainNum = oGroup.remainNum < 0 ? oSub.remainNum : (oGroup.remainNum + oGroup.remainNum)
-              }
+        aSub.forEach(oSub => {
+          if (oGroup.isShowRemain) {
+            if (oSub.processingNum >= 0) {
+              oGroup.processingNum = oGroup.processingNum < 0 ? oSub.processingNum : (oGroup.processingNum + oSub.processingNum)
             }
-            if(oSub.totalNum >= 0 ) {
-              oGroup.totalNum = oGroup.totalNum < 0 ? oSub.totalNum : (oGroup.totalNum + oGroup.totalNum)
+            if (oSub.remainNum >= 0) {
+              oGroup.remainNum = oGroup.remainNum < 0 ? oSub.remainNum : (oGroup.remainNum + oGroup.remainNum)
             }
-          }))
+          }
+          if (oSub.totalNum >= 0) {
+            oGroup.totalNum = oGroup.totalNum < 0 ? oSub.totalNum : (oGroup.totalNum + oGroup.totalNum)
+          }
+        })
       }
 
       // 将新增的group组数据放入数组中。

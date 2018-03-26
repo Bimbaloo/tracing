@@ -75,7 +75,7 @@ import fnP from 'assets/js/public.js'
 import { bus } from 'assets/js/bus.js'
 
 const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
-// const MODULE_ITEM_URL = "./static/modules.json";
+// const MODULE_ITEM_URL = './static/modules.json'
 // 数据名称接口。
 const TABLE_DATA_URL = window.HOST + '/api/v1/customized/items'
 
@@ -117,6 +117,10 @@ export default {
         {
           itemCode: 'suppress',
           itemName: '遏制'
+        },
+        {
+          itemCode: 'qtSuppress',
+          itemName: '质检遏制'
         },
         {
           itemCode: 'link_repair',
@@ -266,13 +270,13 @@ export default {
         }
         a['date'] = el.dateTime.split(' ')[0]
         el.time = el.dateTime.split(' ')[1]
-        el.oData.keys = window.Rt.utils.getObjectEntries(el.oData.keys)//Object.entries(el.oData.keys)
+        el.oData.keys = window.Rt.utils.getObjectEntries(el.oData.keys)// Object.entries(el.oData.keys)
         a['data'].push(el)
         newData.push(a)
         for (let j = i + 1; j < oData.length; j++) {
           if (a['date'] === oData[j].dateTime.split(' ')[0]) {
             oData[j].time = oData[j].dateTime.split(' ')[1]
-            oData[j].oData.keys = window.Rt.utils.getObjectEntries(oData[j].oData.keys)//Object.entries(oData[j].oData.keys)
+            oData[j].oData.keys = window.Rt.utils.getObjectEntries(oData[j].oData.keys)// Object.entries(oData[j].oData.keys)
             a['data'].push(oData[j])
             oData.splice(j, 1)
             j = j - 1

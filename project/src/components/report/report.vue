@@ -159,6 +159,7 @@ export default {
         time: '/api/v1/trace/report/by-equipment-time',
         restrainBatch: '/api/v1/trace/report/by-batch',
         restrainDetails: '/api/v1/suppress/verbose',
+        suspiciouByBarcode: '/api/v1/trace/report/by-barcode', // 根据条码遏制
         mold: `/api/v1/trace/report/by-mold`  // 根据模具信息查询快速报告
       },
       active: {
@@ -810,7 +811,7 @@ export default {
       for (let param in this.reportData) {
         this.reportData[param].data = []
       }
-
+      // debugger
       let oParam = null
       if (this.type === 'trace') {
         this.showTables.forEach(e => {
@@ -842,6 +843,12 @@ export default {
         oParam = this.query
         this.$ajax.defaults.headers.post['Content-Type'] =
           'application/json;charset=UTF-8'
+      } else if (this.type === 'suspiciouByBarcode') {
+        // 根据条码信息查询快速报告  --遏制那边
+        sUrl = this.oUrl[this.type]
+        oParam = {
+          'barcode': this.$route.query.barcode
+        }
       } else {
         // 若为遏制报告。
         oParam = this.$route.query

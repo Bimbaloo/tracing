@@ -362,6 +362,21 @@ export default {
           // 结束时间。
           endTime: [{ validator: validateSuppressEndTime, trigger: 'change' }]
         },
+        // （质检）遏制
+        qtSuppress: {
+          materialCode: [
+            { validator: validateMaterialcode, trigger: 'change' }
+          ],
+          batchNo: [{ validator: validateBatch, trigger: 'change' }],
+          equipmentCode: [
+            { validator: validatEquipmentCode, trigger: 'change' }
+          ],
+          processCode: [{ validator: validatProcessCode, trigger: 'change' }],
+          moldCode: [{ validator: validatMoldCode, trigger: 'change' }],
+          startTime: [{ validator: validateStartTime, trigger: 'change' }],
+          // 结束时间。
+          endTime: [{ validator: validateSuppressEndTime, trigger: 'change' }]
+        },
         // 遏制列表
         suppressList: {
           personCode: [{ validator: validateNull, trigger: 'change' }],

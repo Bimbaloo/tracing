@@ -16,7 +16,7 @@
 			</div>
 			<h2 class="title">可疑品列表</h2>
 			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
-			<v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'"></v-report>
+			<v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'" :type='type'></v-report>
 		</div>
 		</div>
 	</div>
@@ -32,7 +32,7 @@ export default {
   },
   data () {
     return {
-      isRestrained: window.location.hash.includes('/suppress/1') || window.location.hash.includes('/process/restrain'),
+      isRestrained: window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4') || window.location.hash.includes('/process/restrain'),
       doDescription: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
       equipmentUrl: window.HOST + '//api/v1/suppress/do-by-equipment', // 根据设备+时间
@@ -56,6 +56,9 @@ export default {
     },
     oQuery () {
       return this.$route.query
+    },
+    type () {
+      return this.$route.meta.type || null
     }
   },
   created () {
