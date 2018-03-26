@@ -14,10 +14,10 @@
 						{{filter.itemName}} : {{condition[filter.itemCode]}}
           </span>
           <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
-            <el-form-item label="条码：" > 
+            <el-form-item label="条码：" >
               <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
             </el-form-item>
-          </el-form>     
+          </el-form>
         </div>
       </div>
       <h2 class="content-title tableData">
@@ -28,23 +28,23 @@
         </span>
       </h2>
       <div class="content-table" ref="fgbTable">
-        <el-table 
-				:data="datas" 
-				stripe 
-				class="table" 
-				:row-key="tableData.data.prop" 
-				v-loading="loading" 
-				element-loading-text="拼命加载中" 
-				style="width: 100%" 
+        <el-table
+				:data="datas"
+				stripe
+				class="table"
+				:row-key="tableData.data.prop"
+				v-loading="loading"
+				element-loading-text="拼命加载中"
+				style="width: 100%"
 				ref="multipleTable"
-        :height='tableHeight' 
-				@expand-change="dataEdit"> 
+        :height='tableHeight'
+				@expand-change="dataEdit">
           <el-table-column v-if="!!column.show" v-for="column in columns" align="center" :type="column.type" :prop="column.prop" :label="column.name" :key="column.prop" :class-name="column.class" :width="column.width">
             <template slot-scope="props">
               <el-form label-position="left" inline class="demo-table-expand table-form" v-if="column.type === 'expand'">
-                <el-form-item 
-                :label="setName(index)" 
-                v-for="(prop,index) in props.row" 
+                <el-form-item
+                :label="setName(index)"
+                v-for="(prop,index) in props.row"
                 :key="index"
                 v-if="!!setName(index) && setName(index) !== '采集时间：' && setName(index) !=='条码：'">
                     <span :title="prop">{{ prop }}</span>
@@ -56,7 +56,7 @@
             </template>
           </el-table-column>
         </el-table>
-      </div>			
+      </div>
 		</div>
   </div>
 </template>
@@ -484,8 +484,9 @@ export default {
     // 打印页面。
     printPage (refHtml, event) {
       let oTable = this.$refs[refHtml]
+			oTable.querySelector('.el-input__inner').setAttribute('value', this.ruleForm.input)
 
-      let sHtml = `
+			let sHtml = `
                 <div class="report-wrapper">
                     <div class="report-container">
                         ${oTable.innerHTML}
@@ -547,7 +548,7 @@ export default {
                             font-size: 14px;
                             margin-right: 30px
                         }
-                        .report-container .condition-message .el-form-item .el-form-item__label, 
+                        .report-container .condition-message .el-form-item .el-form-item__label,
                         .report-container .condition-message .el-form-item .el-form-item__content {
                             display: inline-block;
                         }
@@ -643,6 +644,7 @@ export default {
                         .el-input__inner {
                             border-radius: 0;
                             height: 30px;
+														line-height: 30px;
                         }
                         .el-form-input {
                             display: inline-block;
@@ -766,6 +768,7 @@ body {
 .el-input__inner {
   border-radius: 0;
   height: 30px;
+	line-height: 30px;
 }
 @media screen and (max-width: 1400px) {
   .el-table__expanded-cell {
