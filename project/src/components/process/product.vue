@@ -685,8 +685,8 @@ export default {
             width: 80
           },
           {
-            headerName: 'BOM扣减数',
-            field: 'BOMQuantity',
+            headerName: '扣减数',
+            field: 'realQuantity',
             width: 120
           },
           {
@@ -759,8 +759,8 @@ export default {
             width: '80'
           },
           {
-            name: 'BOM扣减数',
-            prop: 'BOMQuantity',
+            name: '扣减数',
+            prop: 'realQuantity',
             width: '120'
           },
           {
@@ -1335,7 +1335,7 @@ export default {
 
       // 版本信息中显示的列。
       if (this.isOpDbBeforeRefact) {
-        aoHide = aoHide.concat([OUT_FIELD, RETURN_FIELD, CARRY_FIELD, 'BOMQuantity'])
+        aoHide = aoHide.concat([OUT_FIELD, RETURN_FIELD, CARRY_FIELD, 'realQuantity'])
       }
 
       // 设备分析中显示的列。
@@ -1544,7 +1544,7 @@ export default {
         })
 
         // 判断该数据是否有产出。-- 没有产出则将数据放入有投未产中
-        if (!(o.outputOpIdList && o.outputOpIdList.length)) {
+        if (!(o.outputInfoList && o.outputInfoList.length)) { // outputOpIdList
           // 将数据加入到有投未产中。
           oAll['inNotOut'].dataAll.push(o)
         }
@@ -1570,7 +1570,17 @@ export default {
         }
 
         // 获取该产出对应的投入信息。
-        let aIn = aoInData.filter(oIn => oIn.outputOpIdList.includes(sOperId))
+        let aIn = []
+        aoInData.forEach(oIn => {
+          let oOut = oIn.outputInfoList.find(item => item.opId === sOperId)
+          if (oOut) {
+            // 若存在对应产出。
+            let oCopy = JSON.parse(JSON.stringify(oIn))
+            oCopy.realQuantity = oOut.srcDeductionQuantity
+            aIn.push(oCopy)
+          }
+        })
+        // let aIn = aoInData.filter(oIn => oIn.outputOpIdList.includes(sOperId))
 
         if (aIn.length) {
           // 有投入数据--对应icon的显示
@@ -1612,8 +1622,9 @@ export default {
 
             // 修改产出的hasInLen字段
           if (o1.hasInLen !== undefined) {
-                // 产出- 从过滤后的投入中获取个数
-            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputOpIdList.includes(o1.operationId)).length
+            // 产出- 从过滤后的投入中获取个数
+            // o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputOpIdList.includes(o1.operationId)).length
+            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputInfoList.find(o2 => o.opId === o1.operationId)).length
           }
 
           return o
@@ -1785,11 +1796,11 @@ export default {
         if (!oQuery.operationIdList) {
           oQuery.operationIdList = []
 
-          for(let i in this.detailInfos.equipmentOpIdMap) {
+          for (let i in this.detailInfos.equipmentOpIdMap) {
             oQuery.operationIdList = oQuery.operationIdList.concat(this.detailInfos.equipmentOpIdMap[i])
           }
         }
-        
+
         this.$register.sendRequest(
           this.$store,
           this.$ajax,
