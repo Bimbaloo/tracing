@@ -4,7 +4,7 @@
     <div class="innner-content" >
       <div class="content-message tableData">
         <span class='table-title'>
-          <span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+          <span>物料编码：{{node.materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.materialName}}</span>
         </span>
         <span class='table-handle'>
           <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
@@ -237,6 +237,14 @@ export default {
             name: '条码'
           },
           {
+            prop: 'materialName',
+            name: '物料名称'
+          },
+          {
+            prop: 'materialCode',
+            name: '物料编码'
+          },
+          {
             prop: 'quantity',
             name: '数量'
           }
@@ -274,7 +282,7 @@ export default {
 
         this.$router.replace({
           path: sPath,
-          query: { materialCode: this.node.code, batchNo: row.batchNo }
+          query: { materialCode: this.node.materialCode, batchNo: row.batchNo }
         })
       }
     },
@@ -363,8 +371,8 @@ export default {
       let oNode = this.rawData.nodeList.filter(o => o.key === sKey)[0] || {}
 
       this.node = {
-        code: oNode.code || '',
-        name: oNode.name || '',
+        materialCode: oNode.code || '',
+        materialName: oNode.name || '',
         materialInfoList: oNode.detailInfo.materialInfoList.map(o => {
           return {
             batchNo: o.batchNo,
@@ -385,7 +393,7 @@ export default {
           this.url,
           'post',
           {
-            materialCode: this.node.code,
+            materialCode: this.node.materialCode,
             materialInfoList: this.node.materialInfoList
           },
           this.requestSucess,
@@ -419,6 +427,9 @@ export default {
       let nIndex = 1
 
       aoData.forEach((o, index) => {
+        o.materialCode = this.node.materialCode
+        o.materialName = this.node.materialName
+        
         if (oBatchNo[o.batchNo]) {
           oBatchNo[o.batchNo]++
           aoData[nRow].rowspan = oBatchNo[o.batchNo]
