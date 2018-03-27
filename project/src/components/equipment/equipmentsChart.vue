@@ -606,9 +606,10 @@ export default {
     },
     // 选中的设备名称。
     selectedEquipmentName () {
+      let equipmentName = this.categories.filter(o => o.id === this.selectedEquipmentId)[0].value.split("+")[0];
       return this.equipments.filter(
         o => (o.equipmentId + '') === this.selectedEquipmentId + ''
-      )[0].equipmentName
+      )[0].equipmentName || equipmentName
     },
     // 产出id。
     doOutIdList () {
