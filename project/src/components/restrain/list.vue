@@ -27,7 +27,7 @@
       <v-report v-if="isDetails" :hasData="setWidth" :noData="removeWidth" :query="handleId" type="restrainDetails"></v-report>
 		</div>
 	</div>
-	
+
 </template>
 
 
@@ -266,7 +266,11 @@ export default {
     },
     // 查看遏制报告
     viewReport (oDate) {
-      console.log(oDate)
+			let tag = new Date().getTime().toString().substr(-5)
+
+			sessionStorage.setItem('restrainReports_' + tag, JSON.stringify(oDate.row))
+
+			window.open('restrainReports.html?tag=' + tag)
     },
     setWidth () {
       this.styleObject.minWidth = '1000px'
