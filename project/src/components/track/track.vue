@@ -287,7 +287,6 @@ export default {
     },
     // 获取高度。
     adjustHeight () {
-      let nHeight = 0
 			this.tableHeight = 200
 			this.$nextTick(() => {
 				this.tableHeight = this.$refs.routerContent.clientHeight -
