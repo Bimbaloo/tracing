@@ -243,6 +243,7 @@ export default {
         el.handle = '查看详情'
         el.index = index
       })
+      this.tableDate.data = []
       this.tableDate.data.push(...oData)
       this.isDetails = false
     },
@@ -266,11 +267,11 @@ export default {
     },
     // 查看遏制报告
     viewReport (oDate) {
-			let tag = new Date().getTime().toString().substr(-5)
+      let tag = new Date().getTime().toString().substr(-5)
 
-			sessionStorage.setItem('restrainReports_' + tag, JSON.stringify(oDate.row))
+      sessionStorage.setItem('restrainReports_' + tag, JSON.stringify(oDate.row))
 
-			window.open('restrainReports.html?tag=' + tag)
+      window.open('restrainReports.html?tag=' + tag)
     },
     setWidth () {
       this.styleObject.minWidth = '1000px'
