@@ -129,11 +129,11 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
               oGroup.processingNum = oGroup.processingNum < 0 ? oSub.processingNum : (oGroup.processingNum + oSub.processingNum)
             }
             if (oSub.remainNum >= 0) {
-              oGroup.remainNum = oGroup.remainNum < 0 ? oSub.remainNum : (oGroup.remainNum + oGroup.remainNum)
+              oGroup.remainNum = oGroup.remainNum < 0 ? oSub.remainNum : (oGroup.remainNum + oSub.remainNum)
             }
           }
           if (oSub.totalNum >= 0) {
-            oGroup.totalNum = oGroup.totalNum < 0 ? oSub.totalNum : (oGroup.totalNum + oGroup.totalNum)
+            oGroup.totalNum = oGroup.totalNum < 0 ? oSub.totalNum : (oGroup.totalNum + oSub.totalNum)
           }
         })
       }

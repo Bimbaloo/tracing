@@ -16,10 +16,10 @@
 						</h2>
 						<transition name="el-zoom-in-top">
 							<div class="content-table inner" ref="summaryTable">
-								<v-table 
+								<v-table
 									v-show="active.summary"
-									:max-height="gridData.height"
-									:table-data="summaryData" 
+									:max-height="tableHeight"
+									:table-data="summaryData"
 									:loading="gridData.loading">
 								</v-table>
 							</div>
@@ -36,15 +36,15 @@
 				            	<v-agtable
 				            		v-show="active.started"
 							    	:table-data="gridData"
-							    	:heights="gridData.height"
+							    	:heights="tableHeight"
 							    	:loading="gridData.loading"
 							    ></v-agtable>
 							</div>
 						</transition>
 	            	</div>
-	            </div>   
-	       </div>   
-    	</div> 
+	            </div>
+	       </div>
+    	</div>
     </div>
 </template>
 
@@ -62,11 +62,11 @@ export default {
     return {
       tdResize: true, // 是否允许拖动table大小
       dataFilter: true, // 是否启用过滤功能
+      tableHeight: 200,
       gridData: {
         url: window.HOST + '/api/v1/trace/up/start-points',
         loading: false,
         error: null,
-        height: '200',
         selected: [],
         gridOptions: {
 // enableColResize: true,
@@ -115,6 +115,10 @@ export default {
     // 组件创建完后获取数据，
     // 此时 data 已经被 observed 了
     this.fetchPage()
+    window.addEventListener('resize', this.adjustHeight)
+    this.$nextTick(() => {
+      this.adjustHeight()
+    })
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
@@ -270,14 +274,12 @@ export default {
     },
     // 获取高度。
     adjustHeight () {
-      let nHeight = 0
-
-      nHeight =
-        this.$refs.routerContent.clientHeight -
-        this.outerHeight(document.querySelector('.content-title')) * 2 -
-        20
-
-      return nHeight
+      this.tableHeight = 200
+			this.$nextTick(() => {
+				this.tableHeight = this.$refs.routerContent.clientHeight -
+									        this.outerHeight(document.querySelector('.content-title')) * 2 -
+									        20
+			})
     },
     // 根据时间排序。
     sortByTime (a, b) {
@@ -290,7 +292,6 @@ export default {
     fetchData (oData) {
       oData.error = null
       oData.data = []
-      oData.height = this.adjustHeight()
       oData.loading = true
 
       let sPath = oData.url
