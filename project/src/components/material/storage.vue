@@ -28,15 +28,14 @@
           <el-table-column
             align="center"
             :resizable="true"
-            v-for="(column,index) in materialData.columns"
+            v-for="(column,index) in columns"
             :prop="column.prop"
-            v-if="!column.hide"
             :label="column.name"
             :class-name="column.class"
             :width="column.width"
             :key="index">
             <template slot-scope="scope">
-              <div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
+              <div :class="[{merges: column.merge}, {'batch': scope.row['barcodeType'] === MATERIALCODE && column.prop === 'barcode'}]" :value="scope.row.hide?0:scope.row.rowspan||1">
                 {{scope.row[column.prop]}}
               </div>
             </template>
@@ -108,6 +107,14 @@ export default {
     // 当前传入的值。
     detailInfos () {
       return this.$store && this.$store.state.detailInfos
+    },
+    // materialData.columns
+    columns () {
+      return this.materialData.columns.filter(el => !el.hide)
+    },
+    // 12代表原料码
+    MATERIALCODE () {
+      return 12
     }
   },
   created () {
@@ -168,6 +175,7 @@ export default {
           {
             prop: 'barcode',
             name: '条码',
+            click: this.batchClick,
             merge: true
           },
           {
@@ -234,7 +242,8 @@ export default {
           },
           {
             prop: 'barcode',
-            name: '条码'
+            name: '条码',
+            click: this.batchClick
           },
           {
             prop: 'materialName',
@@ -270,11 +279,11 @@ export default {
       let oColumn = this.materialData.columns.filter(
         o => o.prop === column.property
       )[0]
-      oColumn.click && oColumn.click(row)
+      oColumn.click && oColumn.click(row, column)
     },
     // 点击批次
-    batchClick (row) {
-      if (row.batchNo) {
+    batchClick (row, column) {
+      if (column.property === 'batchNo' && row.batchNo) {
         // 批次存在可点击  新版本跳转到可疑品。
         let sPath = this.isOpDbBeforeRefact
           ? '/stock/batch'
@@ -283,6 +292,14 @@ export default {
         this.$router.replace({
           path: sPath,
           query: { materialCode: this.node.materialCode, batchNo: row.batchNo }
+        })
+        // 点击的是条码且该条码为原料码
+      } else if (column.property === 'barcode' && row.barcodeType === this.MATERIALCODE) {
+        let sPath = '/stock/restrain'
+        window.sessionStorage.setItem('type', 'suspiciouByBarcode')
+        this.$router.replace({
+          path: sPath,
+          query: { barcode: row.barcode }
         })
       }
     },
@@ -429,7 +446,7 @@ export default {
       aoData.forEach((o, index) => {
         o.materialCode = this.node.materialCode
         o.materialName = this.node.materialName
-        
+
         if (oBatchNo[o.batchNo]) {
           oBatchNo[o.batchNo]++
           aoData[nRow].rowspan = oBatchNo[o.batchNo]
@@ -692,10 +709,16 @@ export default {
           .cell {
             cursor: pointer;
             color: #f90;
-
             & > div {
               font-weight: 600;
             }
+          }
+        }
+        .cell {
+          .batch {
+            cursor: pointer;
+            color: #f90;
+            font-weight: 600;
           }
         }
       }
