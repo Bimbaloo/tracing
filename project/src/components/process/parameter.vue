@@ -471,7 +471,7 @@ export default {
         }
       }
       /* 为了将获取到的 barcode等转换为对应的中文 */
-      let b = window.Rt.utils.getObjectEntries(filters)//Object.entries(filters)
+      let b = window.Rt.utils.getObjectEntries(filters)// Object.entries(filters)
       let a = this.dataName
 
       b.forEach(o =>
@@ -611,12 +611,17 @@ export default {
                 let oFilter = rowData.list.filter(
                   item => item.varStdId === o.varStdId
                 )[0]
+                let standard = false  // 标准是否存在
+                if (o.maxValue === o.minValue && o.minValue === 0) { // 如果上下限都等于0 则代表没有上下限规则
+                  standard = false
+                } else {
+                  standard = true
+                }
                 if (oFilter) {
-                 // debugger
                   oFilter.params.push({
                     pickTime: new Date(o.pickTime).Format('hh:mm:ss'),
                     value: o.value,
-                    isWarn: parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue) ? 'red' : '#606266'
+                    isWarn: (parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue)) && standard ? 'red' : '#606266'
                   })
                 } else {
                   rowData.list.push({
@@ -627,7 +632,7 @@ export default {
                       {
                         pickTime: new Date(o.pickTime).Format('hh:mm:ss'),
                         value: o.value,
-                        isWarn: parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue) ? 'red' : '#606266'
+                        isWarn: (parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue)) && standard ? 'red' : '#606266'
                       }
                     ]
                   })
