@@ -434,7 +434,7 @@ export default {
       var jUpload = $event.parentElement,
           nIndex = Number(jUpload.getAttribute('data-index'));
 
-      fileList[fileList.length-1].url = '/' + response
+      fileList[fileList.length-1].url = response
           // 修改地址。
       this.pageData.analysis[nIndex].imgs = fileList
     },
