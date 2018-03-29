@@ -175,8 +175,6 @@ const CHART_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time'
 // 条码详情接口
 const BARCODE_DETAIL_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time-barcode'
 // const BARCODE_DETAIL_DATA = 'static/parameterVue/BARCODE_DETAIL_DATA.json'
-// 是否开启视频监控。
-const CAMERA = 0
 
 export default {
   components: {
@@ -266,8 +264,6 @@ export default {
       },
       tabPaneNum: 0,
       code: 0,
-      // 是否开启视频监控。
-      showCamera: !!CAMERA,
       videoForm: {
         visible: false,
         equipmentId: '',
@@ -316,6 +312,10 @@ export default {
     },
     removeWidth () {
       this.styleObject.minWidth = 0
+    },
+    // 是否开启视频监控
+    showCamera () {
+      return this.$store.state.factoryModule.cameraFetched
     }
   },
   mounted () {
@@ -567,6 +567,10 @@ export default {
         this.chartShow = false
         if (!this.chartFetched) {   // 若曲线图未获取数据。
           this.fetchChartData()
+        } else {
+          this.$nextTick(() => {
+            this.nowEchart.resize()
+          })
         }
       } else {                      // 若为条码表。
         this.barcodeTableData.show = false
