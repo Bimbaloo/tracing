@@ -300,7 +300,7 @@ export default {
           'track',
           this.isOpDbBeforeRefact
         ) // this.parseTreeData();
-        this.catalogData = fnP.getCatalogData(this.rawData, 'track') // fnP.getTrackCatalogData(this.rawData)
+        this.catalogData = fnP.getCatalogData(this.rawData, 'track', this.isOpDbBeforeRefact) // fnP.getTrackCatalogData(this.rawData)
 
         // 展开左侧导航树
         this.$nextTick(() => {

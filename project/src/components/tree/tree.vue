@@ -1408,7 +1408,10 @@ export default {
 				return false
 			}else if(aoIs.length && (aoIs[0].nodeType === 10003 || aoIs[0].nodeType === 10004)) {
 				return false
-			}else {
+			}else if(nodes.groupCode && aoIs[0].groupCode){
+				// 组直接的工序节点不显示
+				return false
+			}else{
 				return true
 			}
 
