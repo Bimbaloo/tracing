@@ -100,7 +100,7 @@
                   {{`${equipment.dimension==='pool'?(onlyShowRelatedData?equipment.relatedQuantity:equipment.quantity):equipment.quantity}条记录`}}
                   <i
                     @click="showVideoDialog(equipment.id, equipment.name, compareData.time, equipment.series)"
-                    v-if="camera && !!factoryCameraConfig.dimensions.indexOf(equipment.dimension) > -1"
+                    v-if="camera && factoryCameraConfig.dimensions.indexOf(equipment.dimension) > -1"
                     class="icon icon-12 icon-camera"
                     title="监控视频"></i>
                   </div>
@@ -534,8 +534,8 @@ export default {
   },
   computed: {
     // 是否开启视频监控。
-    camera () {
-      return (
+    camera () { debugger
+      return ( 
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isVideoMonitorEnabled
       )
