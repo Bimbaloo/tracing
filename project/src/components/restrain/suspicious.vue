@@ -35,7 +35,7 @@ export default {
       isRestrained: window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4') || window.location.hash.includes('/process/restrain'),
       doDescription: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
-      equipmentUrl: window.HOST + '//api/v1/suppress/do-by-equipment', // 根据设备+时间
+      equipmentUrl: window.HOST + '/api/v1/suppress/do-by-equipment', // 根据设备+时间
       styleObject: {
         'min-width': '1000px'
       },
@@ -58,7 +58,7 @@ export default {
       return this.$route.query
     },
     type () {
-      return this.$route.meta.type || null
+      return this.$route.meta.type || window.sessionStorage.getItem('type') || null
     }
   },
   created () {

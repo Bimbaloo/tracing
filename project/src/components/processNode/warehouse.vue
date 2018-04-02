@@ -87,7 +87,7 @@ export default {
             headerName: '批次'
           },
           {
-            field: 'srcWarehouse',
+            field: 'srcWarehouseName',
             headerName: '原仓库'
           },
           {
@@ -96,7 +96,7 @@ export default {
             width: 80
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '新仓库'
           },
           {
@@ -144,7 +144,7 @@ export default {
             headerName: '物料编码'
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '仓库'
           },
           {
@@ -192,7 +192,7 @@ export default {
             headerName: '物料编码'
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '仓库'
           },
           {
@@ -227,7 +227,7 @@ export default {
             headerName: '批次'
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '仓库'
           },
           {
@@ -278,7 +278,7 @@ export default {
             headerName: '物料编码'
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '仓库'
           },
           {
@@ -350,7 +350,7 @@ export default {
             headerName: '数量'
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '仓库'
           },
           {

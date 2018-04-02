@@ -181,7 +181,6 @@ export default {
       dialogFormVisible: false,
       isDownload: false,
       filters: {},
-      reportId: null,
       dialogConfigForm: {
         describe: {
           name: '问题描述',
@@ -380,7 +379,6 @@ export default {
     requestSucess (oData) {
       if(oData !== undefined) {
         // 设置数据。
-        this.reportId = oData.id
         this.pageData = JSON.parse(oData.suppressContent)
       }
     },
@@ -434,7 +432,7 @@ export default {
       var jUpload = $event.parentElement,
           nIndex = Number(jUpload.getAttribute('data-index'));
 
-      fileList[fileList.length-1].url = '/' + response
+      fileList[fileList.length-1].url = response
           // 修改地址。
       this.pageData.analysis[nIndex].imgs = fileList
     },
@@ -469,7 +467,6 @@ export default {
               'put',
               {
                 handle: this.filters.handleId,
-                id: this.reportId,
                 suppressContent: JSON.stringify(this.pageData)
               },
               () => {

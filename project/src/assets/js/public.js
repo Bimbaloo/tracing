@@ -80,8 +80,24 @@ var parseData = function (aoGet) {
 var parseTreeData = function (oTreeData, sPageType, bIsOld) {
   // 转换后的数据
   let oCopyTreeData = JSON.parse(JSON.stringify(oTreeData))
-  let {nodeList, linkList} = oCopyTreeData
+  let {nodeList, linkList, productionLineInfo} = oCopyTreeData
   let nGroupIndex = nodeList.length
+
+  // productionLineInfo = {
+  //   "135": [{
+  //     processCode: '140',
+  //     processName: 'FGB检验',
+  //     equipmentIdList: [12, 13]
+  //   }, {
+  //     processCode: '120',
+  //     processName: 'FGB检验2',
+  //     equipmentIdList: [12, 13]
+  //   }, {
+  //     processCode: '136',
+  //     processName: '机加工上料',
+  //     equipmentIdList: [12, 13]
+  //   }]
+  // }
 
   // 修改数据，添加group的数据，并将子工序增加group字段。
   nodeList.forEach(o => {
@@ -119,8 +135,93 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
       o.group = oGroup.key
       let aSub = _getSubGroupNode(o)
 
-      // 修改连线中to为第一个节点的key值； 修改from为最优一个节点的key值
+      // 获取该group新插入的数据
+      let aAddToGroup = productionLineInfo[o.groupCode]
+
+      if (aAddToGroup && aAddToGroup.length && aAddToGroup.length !== aSub.length) {
+        // 存在且有插入的节点。
+        aAddToGroup = aAddToGroup.map((oa, nIn) => {
+          // 判断当前oa是否存在aSub中，不存在则加入。
+          let oFind = aSub.find(os => os.code === oa.processCode)
+
+          if (!oFind) {
+            // 不存在
+            return {
+              code: oa.processCode,
+              name: oa.processName,
+              key: 'groupAdd' + (++nGroupIndex),
+              nodeType: 10001, // 节点类型-工序
+              opType: 10001, // 动作类型-工序
+              group: oGroup.key,
+              groupCode: oGroup.code,
+              groupName: oGroup.name,
+              iconType: o.iconType,
+              detailInfo: {
+                equipmentOpIdMap: (() => {
+                  let oMap = {}
+                  oa.equipmentIdList.forEach(sId => {
+                    oMap[sId] = []
+                  })
+                  return oMap
+                })(),
+                materialInfoList: [],
+                opIdList: [],
+                shiftEndTime: sPageType === 'track' ? aSub[aSub.length - 1].detailInfo.shiftEndTime : aSub[0].detailInfo.shiftEndTime,
+                shiftStartTime: sPageType === 'track' ? aSub[0].detailInfo.shiftStartTime : aSub[aSub.length - 1].detailInfo.shiftStartTime
+              },
+              isShowRemain: o.isShowRemain,
+              processingNum: -9999,
+              remainNum: -9999,
+              totalNum: -9999
+            }
+          } else {
+            return Object.assign({}, oFind)
+          }
+        })
+
+        // 修改parentKeys
+        aAddToGroup.forEach((oa, nIn) => {
+          nIn === 0 ? oa.parentKeys = aSub[0].parentKeys : oa.parentKeys = [aAddToGroup[nIn - 1].key]
+
+          // 将点加入到数据中，并创建连线
+
+          if (!aSub.find(os => os.key === oa.key)) {
+            nodeList.push(oa)
+          } else {
+            nodeList.find(os => os.key === oa.key).parentKeys = oa.parentKeys
+          }
+
+          if (nIn !== aAddToGroup.length - 1) {
+            _addLine(oa.key, aAddToGroup[nIn + 1].key)
+          }
+        })
+
+        if (aAddToGroup[aAddToGroup.length - 1].key !== aSub[aSub.length - 1].key) {
+          // 替换修改其他节点parentKeys
+          let sOldKey = aSub[aSub.length - 1].key
+          let sNewKey = aAddToGroup[aAddToGroup.length - 1].key
+
+          nodeList.forEach(on => {
+            if (on.parentKeys.includes(sOldKey) && !aAddToGroup.some(oa => oa.key === on.key)) {
+              on.parentKeys = on.parentKeys.filter(s => s !== sOldKey)
+              on.parentKeys.push(sNewKey)
+            }
+          })
+        }
+
+        // 断开aSub中的连线
+        aSub.forEach((os, nIn) => {
+          if (nIn !== aSub.length - 1) {
+            _removeLine(os.key, aSub[nIn + 1].key)
+          }
+        })
+      }
+
+      // 节点之间增加连线。
+      // console.log(aAddToGroup)
+
       if (aSub.length) {
+        // 修改连线中to为第一个节点的key值； 修改from为最优一个节点的key值
         _updateLineKey([{type: 'to', key: aSub[0].key, newKey: oGroup.key}, {type: 'from', key: aSub[aSub.length - 1].key, newKey: oGroup.key}])
           // 设置group的显示值，为所有工序的和. 加工树/滞留数/产出总数
         aSub.forEach(oSub => {
@@ -144,7 +245,10 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
   })
 
   // 返回数据。
-  return oCopyTreeData
+  return {
+    nodeList,
+    linkList
+  }
 
   /**
   * 修改节点[{type:'to',key:1,newKey:3},{type:'from',key:2,newKey:3}]
@@ -153,11 +257,32 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
     aoUpdated.forEach(o => {
           // 所有线的数据中匹配
       linkList.forEach(oLink => {
-        if (oLink[o.type] === o.key) {
+        // 修改group组的线，只是处理存在以前的线
+        if (oLink[o.type] === o.key && !oLink.isAddNew) {
           oLink[o.type] = o.newKey
         }
       })
     })
+  }
+
+  /**
+  * 新增连线
+  */
+  function _addLine (fromKey, toKey) {
+    linkList.push({
+      from: fromKey,
+      to: toKey,
+      fromPort: 'FROM',
+      toPort: 'TO',
+      isAddNew: true
+    })
+  }
+
+  /**
+  * 断开连线
+  */
+  function _removeLine (fromKey, toKey) {
+    linkList = linkList.filter(ol => !(ol.from === fromKey && ol.to === toKey))
   }
 
   /**
@@ -317,9 +442,9 @@ var isMaterialNode = function (oData) {
 // 第一个节点的parents值。
 const SPARENTKEY = 0
 
-var getCatalogData = function (oRowData, sType) {
+var getCatalogData = function (oRowData, sType, bIsOld) {
   let aoCatalogData = []
-  let aoCopyData = JSON.parse(JSON.stringify(oRowData.nodeList))
+  let aoCopyData = JSON.parse(JSON.stringify(parseTreeData(oRowData, sType, bIsOld).nodeList))
   let aResult = []
     // 追踪中新增的物料节点key值。
   let sNewMateiralNodekey = 'customerKey'
@@ -327,8 +452,9 @@ var getCatalogData = function (oRowData, sType) {
   // 追踪中，保存最后节点的key值。（除物料外）
   let aLastNodeKeys = []
 
+  aoCopyData = aoCopyData.filter(o => !o.isGroup)
   // 修改节点的类型值。
-  aoCopyData.forEach(o => { o.iconType = getNodeIconAndTemp(o.nodeType).icon })
+  // aoCopyData.forEach(o => { o.iconType = getNodeIconAndTemp(o.nodeType).icon })
 
   if (sType === 'trace') {
     // 溯源。

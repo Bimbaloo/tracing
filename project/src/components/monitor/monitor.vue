@@ -144,7 +144,7 @@ export default {
         if (sEnd instanceof Date) {
           sEnd = sEnd.Format()
         }
-        let sTime = value.trim()
+        let sTime = value && value.trim() || null
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let bIsEndFormat = window.Rt.utils.isDateTime(sEnd)
         let nNow = +new Date()
@@ -193,7 +193,7 @@ export default {
         if (sStart instanceof Date) {
           sStart = sStart.Format()
         }
-        let sTime = value.trim()
+        let sTime = value && value.trim() || null
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let bIsStartFormat = window.Rt.utils.isDateTime(sStart)
         let nNow = +new Date()

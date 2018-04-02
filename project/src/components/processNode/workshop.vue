@@ -263,11 +263,11 @@ export default {
             headerName: '物料编码'
           },
           {
-            field: 'srcWarehouse',
+            field: 'srcWarehouseName',
             headerName: '仓库'
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '库位'
           },
           {
@@ -301,11 +301,11 @@ export default {
             headerName: '物料编码'
           },
           {
-            field: 'srcWarehouse',
+            field: 'srcWarehouseName',
             headerName: '仓库'
           },
           {
-            field: 'destWarehouse',
+            field: 'destWarehouseName',
             headerName: '库位'
           },
           {
