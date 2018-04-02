@@ -296,6 +296,7 @@ export default {
       // 结束时间格式判断。
       endValidate: true,
       endValidateMessage: '',
+      isDatetimeChange: false,
       // 设备对应的维度数据。
       equipmentData: {},
       // 图形。
@@ -605,9 +606,10 @@ export default {
     },
     // 选中的设备名称。
     selectedEquipmentName () {
+      let equipmentName = this.categories.filter(o => o.id === this.selectedEquipmentId)[0].value.split("+")[0];
       return this.equipments.filter(
         o => (o.equipmentId + '') === this.selectedEquipmentId + ''
-      )[0].equipmentName
+      )[0].equipmentName || equipmentName
     },
     // 产出id。
     doOutIdList () {
@@ -961,7 +963,7 @@ export default {
       return oData
     },
     // 时间编辑框的：开始或结束时间是否被改变。
-    isDatetimeChange () {
+    isDatetimeChange1 () {
       // 是否显示查询按钮（开始或结束时间被编辑，则会显示）
       let { start, end, initStart, initEnd, beforeSavedStart, beforeSavedEnd } = this.datetime
 
@@ -970,9 +972,7 @@ export default {
       let beforeSaveStart = beforeSavedStart || initStart
       let beforeSaveEnd = beforeSavedEnd || initEnd
 
-      return (
-        (this.startIf && start !== beforeSaveStart) || (this.endIf && end !== beforeSaveEnd)
-      )
+      return (this.startIf && start !== beforeSaveStart) || (this.endIf && end !== beforeSaveEnd)
     }
   },
   created () {
@@ -2642,6 +2642,8 @@ export default {
         this.startValidate = true
         this.datetime.beforeStart = this.datetime.start
         this.startIf = true
+
+        this.setIsDateTimeChange()
       } else {
         this.startValidate = false
         this.startValidateMessage = oReturn.message
@@ -2655,6 +2657,8 @@ export default {
         : this.datetime.initStart
       this.startIf = true
       this.startValidate = true
+
+      this.setIsDateTimeChange()
     },
     // 保存结束时间。
     saveEnd () {
@@ -2675,6 +2679,8 @@ export default {
         this.endValidate = true
         this.datetime.beforeEnd = this.datetime.end
         this.endIf = true
+
+        this.setIsDateTimeChange()
       } else {
         this.endValidate = false
         this.endValidateMessage = oReturn.message
@@ -2688,6 +2694,20 @@ export default {
         : this.datetime.initEnd
       this.endIf = true
       this.endValidate = true
+
+      this.setIsDateTimeChange()
+    },
+    // 时间是否改变
+    setIsDateTimeChange() {
+      // 是否显示查询按钮（开始或结束时间被编辑，则会显示）
+      let { start, end, initStart, initEnd, beforeSavedStart, beforeSavedEnd } = this.datetime
+
+      // 开始时间或结束时间只要变动就显示。 不再处于编辑状态才显示
+      // 其中initStart initEnd为初次进入的时间值，不会发生改变。 记录是否变化可从beforeSavedStart中比较 beforeStart只是在单个时间轴中的变量
+      let beforeSaveStart = beforeSavedStart || initStart
+      let beforeSaveEnd = beforeSavedEnd || initEnd
+
+      this.isDatetimeChange = (this.startIf && start !== beforeSaveStart) || (this.endIf && end !== beforeSaveEnd)
     },
     // 时间更新，页面刷新操作。
     goRefresh () {
@@ -2699,6 +2719,7 @@ export default {
         this.datetime.realStart = this.datetime.beforeSavedStart = this.datetime.beforeStart = this.datetime.start
         this.datetime.realEnd = this.datetime.beforeSavedEnd = this.datetime.beforeEnd = this.datetime.end
 
+        this.setIsDateTimeChange()
         // 更新数据。
         this.refreshData()
       } else {

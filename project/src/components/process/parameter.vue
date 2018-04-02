@@ -175,8 +175,6 @@ const CHART_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time'
 // 条码详情接口
 const BARCODE_DETAIL_DATA = window.HOST + '/api/v1/processparameter/by-equipment-time-barcode'
 // const BARCODE_DETAIL_DATA = 'static/parameterVue/BARCODE_DETAIL_DATA.json'
-// 是否开启视频监控。
-const CAMERA = 0
 
 export default {
   components: {
@@ -266,8 +264,6 @@ export default {
       },
       tabPaneNum: 0,
       code: 0,
-      // 是否开启视频监控。
-      showCamera: !!CAMERA,
       videoForm: {
         visible: false,
         equipmentId: '',
@@ -316,6 +312,10 @@ export default {
     },
     removeWidth () {
       this.styleObject.minWidth = 0
+    },
+    // 是否开启视频监控
+    showCamera () {
+      return this.$store.state.factoryModule.cameraFetched
     }
   },
   mounted () {
@@ -471,7 +471,7 @@ export default {
         }
       }
       /* 为了将获取到的 barcode等转换为对应的中文 */
-      let b = window.Rt.utils.getObjectEntries(filters)//Object.entries(filters)
+      let b = window.Rt.utils.getObjectEntries(filters)// Object.entries(filters)
       let a = this.dataName
 
       b.forEach(o =>
@@ -567,6 +567,10 @@ export default {
         this.chartShow = false
         if (!this.chartFetched) {   // 若曲线图未获取数据。
           this.fetchChartData()
+        } else {
+          this.$nextTick(() => {
+            this.nowEchart.resize()
+          })
         }
       } else {                      // 若为条码表。
         this.barcodeTableData.show = false
@@ -611,12 +615,17 @@ export default {
                 let oFilter = rowData.list.filter(
                   item => item.varStdId === o.varStdId
                 )[0]
+                let standard = false  // 标准是否存在
+                if (o.maxValue === o.minValue && o.minValue === 0) { // 如果上下限都等于0 则代表没有上下限规则
+                  standard = false
+                } else {
+                  standard = true
+                }
                 if (oFilter) {
-                 // debugger
                   oFilter.params.push({
                     pickTime: new Date(o.pickTime).Format('hh:mm:ss'),
                     value: o.value,
-                    isWarn: parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue) ? 'red' : '#606266'
+                    isWarn: (parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue)) && standard ? 'red' : '#606266'
                   })
                 } else {
                   rowData.list.push({
@@ -627,7 +636,7 @@ export default {
                       {
                         pickTime: new Date(o.pickTime).Format('hh:mm:ss'),
                         value: o.value,
-                        isWarn: parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue) ? 'red' : '#606266'
+                        isWarn: (parseInt(o.value) > parseInt(o.maxValue) || parseInt(o.value) < parseInt(o.minValue)) && standard ? 'red' : '#606266'
                       }
                     ]
                   })

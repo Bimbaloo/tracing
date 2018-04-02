@@ -13,11 +13,21 @@
       <div class='condition-table' v-show="isDetails">
         <span v-for="infor in information" :key="infor.value">{{infor.value}}：{{infor.key}}</span>
       </div>
-			<v-table v-show="!isDetails"  :heights="tableDate.height" :table-data="tableDate" :loading="loading" :resize="resize" class="raw-table"></v-table>
+			<!-- <v-table v-show="!isDetails"  :heights="tableDate.height" :table-data="tableDate" :loading="loading" :resize="resize" class="raw-table"></v-table> -->
+      <el-table v-show="!isDetails" :height="tableHeight" :loading="loading" :resize="resize"  :data="tableDate.data" border style="width: 100%">
+        <el-table-column type="index" label="序号" width="50" align='center'></el-table-column>
+        <el-table-column v-for="col in columns" :sortable='col.sortable' :key="col.prop" :prop="col.prop" :label="col.name" :width="col.width" align='center'></el-table-column>
+        <el-table-column label="操作" width="200" align='center'>
+          <template slot-scope="scope">
+            <el-button @click="viewDetails(scope)" type="text" size="small">遏制清单</el-button>
+            <el-button @click="viewReport(scope)" type="text" size="small">遏制报告</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
       <v-report v-if="isDetails" :hasData="setWidth" :noData="removeWidth" :query="handleId" type="restrainDetails"></v-report>
 		</div>
 	</div>
-	
+
 </template>
 
 
@@ -45,7 +55,7 @@ export default {
           {
             type: 'index',
             name: '序号',
-            width: '50'
+            width: 50
           },
           {
             prop: 'doDescription',
@@ -55,36 +65,39 @@ export default {
             prop: 'doTime',
             name: '遏制时间',
             sortable: true,
-            width: 200
+            width: 180
           },
           {
             prop: 'cancelTime',
             name: '取消遏制时间',
             sortable: true,
-            width: 200
+            width: 180
           },
           {
             prop: 'doOperator',
-            name: '开始遏制人员'
+            name: '开始遏制人员',
+            width: 120
           },
           {
             prop: 'cancelDescription',
-            name: '结束遏制详情'
+            name: '结束遏制详情',
+            width: 120
           },
           {
             prop: 'cancelOperator',
-            name: '结束遏制人员'
+            name: '结束遏制人员',
+            width: 120
           },
           {
             prop: 'stateName',
             name: '遏制状态',
-            sortable: true
+            sortable: true,
+            width: 100
           },
           {
             prop: 'handle',
             name: '操作',
-            cellClick: this.viewDetails,
-            class: 'batch'
+            width: 200
           }
         ],
         data: [],
@@ -182,6 +195,14 @@ export default {
       } else {
         return false
       }
+    },
+    /* 表格列 */
+    columns () {
+      return this.tableDate.columns.filter(el => !!el.prop && el.prop !== 'handle')
+    },
+    /* 表格高度 */
+    tableHeight () {
+      return this.tableDate.height
     }
   },
   watch: {
@@ -189,6 +210,9 @@ export default {
     $route: function () {
       this.getCondition()
       this.getListhData(this.restrainList)
+      this.$nextTick(() => {
+        this.setTableHeight()
+      })
     }
   },
   methods: {
@@ -219,7 +243,8 @@ export default {
         el.handle = '查看详情'
         el.index = index
       })
-      this.tableDate.data = oData
+      this.tableDate.data = []
+      this.tableDate.data.push(...oData)
       this.isDetails = false
     },
     // 请求失败。
@@ -234,11 +259,19 @@ export default {
       console.log('数据库查询出错。')
     },
 
-    // 查看详情
+    // 查看遏制清单
     viewDetails (oDate) {
-      this.index = oDate.index
-      this.handleId = oDate.handleId
+      this.index = oDate.$index
+      this.handleId = oDate.row.handleId
       this.isDetails = true
+    },
+    // 查看遏制报告
+    viewReport (oDate) {
+      let tag = new Date().getTime().toString().substr(-5)
+
+      sessionStorage.setItem('restrainReports_' + tag, JSON.stringify(oDate.row))
+
+      window.open('restrainReports.html?tag=' + tag)
     },
     setWidth () {
       this.styleObject.minWidth = '1000px'
@@ -256,7 +289,7 @@ export default {
     },
     /* 设置高度 */
     setTableHeight () {
-      this.tableDate.height = this.outerHeight(this.$refs.suspiciousList) - 110
+      this.tableDate.height = this.outerHeight(this.$refs.suspiciousList) - 130
     },
     /* 取消遏制 */
     cancelSuppres () {
@@ -374,47 +407,6 @@ export default {
     .report {
       .report-content {
         padding: 0 !important;
-      }
-    }
-    /deep/ .raw-table {
-      width: 100%;
-      border-collapse: collapse;
-      border-spacing: 0;
-
-      th,
-      td {
-        text-align: center;
-        vertical-align: middle;
-        border: 1px solid #dfece9;
-        box-sizing: border-box;
-      }
-
-      th {
-        height: 36px;
-        background-color: #42af8f;
-        color: #fff;
-        font-weight: bold;
-
-        & > div {
-          font-weight: 600;
-        }
-      }
-
-      td {
-        height: 30px;
-      }
-
-      .el-table__body-wrapper {
-        .batch {
-          .cell {
-            cursor: pointer;
-            color: #f90;
-
-            & > div {
-              font-weight: 600;
-            }
-          }
-        }
       }
     }
   }

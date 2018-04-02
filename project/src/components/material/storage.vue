@@ -4,7 +4,7 @@
     <div class="innner-content" >
       <div class="content-message tableData">
         <span class='table-title'>
-          <span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+          <span>物料编码：{{node.materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.materialName}}</span>
         </span>
         <span class='table-handle'>
           <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
@@ -28,15 +28,14 @@
           <el-table-column
             align="center"
             :resizable="true"
-            v-for="(column,index) in materialData.columns"
+            v-for="(column,index) in columns"
             :prop="column.prop"
-            v-if="!column.hide"
             :label="column.name"
             :class-name="column.class"
             :width="column.width"
             :key="index">
             <template slot-scope="scope">
-              <div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
+              <div :class="[{merges: column.merge}, {'batch': scope.row['barcodeType'] === MATERIALCODE && column.prop === 'barcode'}]" :value="scope.row.hide?0:scope.row.rowspan||1">
                 {{scope.row[column.prop]}}
               </div>
             </template>
@@ -108,6 +107,14 @@ export default {
     // 当前传入的值。
     detailInfos () {
       return this.$store && this.$store.state.detailInfos
+    },
+    // materialData.columns
+    columns () {
+      return this.materialData.columns.filter(el => !el.hide)
+    },
+    // 12代表原料码
+    MATERIALCODE () {
+      return 12
     }
   },
   created () {
@@ -168,6 +175,7 @@ export default {
           {
             prop: 'barcode',
             name: '条码',
+            click: this.batchClick,
             merge: true
           },
           {
@@ -234,7 +242,16 @@ export default {
           },
           {
             prop: 'barcode',
-            name: '条码'
+            name: '条码',
+            click: this.batchClick
+          },
+          {
+            prop: 'materialName',
+            name: '物料名称'
+          },
+          {
+            prop: 'materialCode',
+            name: '物料编码'
           },
           {
             prop: 'quantity',
@@ -262,11 +279,11 @@ export default {
       let oColumn = this.materialData.columns.filter(
         o => o.prop === column.property
       )[0]
-      oColumn.click && oColumn.click(row)
+      oColumn.click && oColumn.click(row, column)
     },
     // 点击批次
-    batchClick (row) {
-      if (row.batchNo) {
+    batchClick (row, column) {
+      if (column.property === 'batchNo' && row.batchNo) {
         // 批次存在可点击  新版本跳转到可疑品。
         let sPath = this.isOpDbBeforeRefact
           ? '/stock/batch'
@@ -274,7 +291,15 @@ export default {
 
         this.$router.replace({
           path: sPath,
-          query: { materialCode: this.node.code, batchNo: row.batchNo }
+          query: { materialCode: this.node.materialCode, batchNo: row.batchNo }
+        })
+        // 点击的是条码且该条码为原料码
+      } else if (column.property === 'barcode' && row.barcodeType === this.MATERIALCODE) {
+        let sPath = '/stock/restrain'
+        window.sessionStorage.setItem('type', 'suspiciouByBarcode')
+        this.$router.replace({
+          path: sPath,
+          query: { barcode: row.barcode }
         })
       }
     },
@@ -363,8 +388,8 @@ export default {
       let oNode = this.rawData.nodeList.filter(o => o.key === sKey)[0] || {}
 
       this.node = {
-        code: oNode.code || '',
-        name: oNode.name || '',
+        materialCode: oNode.code || '',
+        materialName: oNode.name || '',
         materialInfoList: oNode.detailInfo.materialInfoList.map(o => {
           return {
             batchNo: o.batchNo,
@@ -385,7 +410,7 @@ export default {
           this.url,
           'post',
           {
-            materialCode: this.node.code,
+            materialCode: this.node.materialCode,
             materialInfoList: this.node.materialInfoList
           },
           this.requestSucess,
@@ -419,6 +444,9 @@ export default {
       let nIndex = 1
 
       aoData.forEach((o, index) => {
+        o.materialCode = this.node.materialCode
+        o.materialName = this.node.materialName
+
         if (oBatchNo[o.batchNo]) {
           oBatchNo[o.batchNo]++
           aoData[nRow].rowspan = oBatchNo[o.batchNo]
@@ -681,10 +709,16 @@ export default {
           .cell {
             cursor: pointer;
             color: #f90;
-
             & > div {
               font-weight: 600;
             }
+          }
+        }
+        .cell {
+          .batch {
+            cursor: pointer;
+            color: #f90;
+            font-weight: 600;
           }
         }
       }

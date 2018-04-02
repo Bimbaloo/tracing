@@ -1404,11 +1404,17 @@ export default {
 
 			let aoIs = nodes.filter(o => o.key === key)
 
+			let oFrom = nodes.find(o => o.key === node.from)
+			let oTo = nodes.find(o => o.key === node.to)
+
 			if(this.isOpDbBeforeRefact) {
 				return false
 			}else if(aoIs.length && (aoIs[0].nodeType === 10003 || aoIs[0].nodeType === 10004)) {
 				return false
-			}else {
+			}else if(oFrom.groupCode && oTo.groupCode && isNaN(node.num)){
+				// 组直接的工序节点不显示-- 插入的节点之间的连线（其中没有num数据）
+				return false
+			}else{
 				return true
 			}
 

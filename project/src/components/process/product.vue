@@ -1709,11 +1709,12 @@ export default {
     // 请求失败。
     requestFail (sErrorMessage) {
       this.loading = false
-    //   let outDatas = []
-    //   let inDatas = []
-    //   let uniteDatas = []
-    //   let outAllDatas = []
-    //   let inAllDatas = []
+      this.uniteItems.data = this.uniteItems.dataAll = this.uniteItems.dataFilter = []
+      this.inNotOutItems.data = this.inNotOutItems.dataAll = this.inNotOutItems.dataFilter = []
+      this.outItems.data = this.outItems.dataAll = this.outItems.dataFilter = []
+      this.inItems.data = this.inItems.dataAll = this.inItems.dataFilter = []
+      this.outAllItems.data = this.outAllItems.dataAll = this.outAllItems.dataFilter = []
+      this.inAllItems.data = this.inAllItems.dataAll = this.inAllItems.dataFilter = []
 
       this.setTableHeight()
       // 提示信息。
@@ -1723,6 +1724,14 @@ export default {
     requestError (err) {
       this.loading = false
       this.styleObject.minWidth = 0
+
+      this.uniteItems.data = this.uniteItems.dataAll = this.uniteItems.dataFilter = []
+      this.inNotOutItems.data = this.inNotOutItems.dataAll = this.inNotOutItems.dataFilter = []
+      this.outItems.data = this.outItems.dataAll = this.outItems.dataFilter = []
+      this.inItems.data = this.inItems.dataAll = this.inItems.dataFilter = []
+      this.outAllItems.data = this.outAllItems.dataAll = this.outAllItems.dataFilter = []
+      this.inAllItems.data = this.inAllItems.dataAll = this.inAllItems.dataFilter = []
+
       this.setTableHeight()
       console.log(err)
       console.log('数据库查询出错。')
