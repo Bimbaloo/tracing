@@ -1,4 +1,4 @@
-<!--出入库-->
+<!---->
 <template>
   <div class="router-content">
     <div class="innner-content" >
@@ -15,7 +15,12 @@
         <div v-if="error" class="error">
           {{ error }}
         </div>
-        <el-table
+        <!-- <el-table
+          v-else-if=""
+        >
+
+        </el-table> -->
+        <!-- <el-table
           ref="table"
           v-else
           border
@@ -36,13 +41,13 @@
             :width="column.width"
             :key="index">
             <template slot-scope="scope">
-              <div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">
+              <div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
                 {{scope.row[column.prop]}}
               </div>
             </template>
           </el-table-column>
-        </el-table>
-        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->
+        </el-table> -->
+        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->  
       </div>
     </div>
   </div>
@@ -150,57 +155,59 @@ export default {
   methods: {
     // 获取业务库的表格显示列。
     getTableColumns () {
+      let wareHouse = [{
+            prop: 'reservoir',
+            name: '库位'
+          },{
+            prop:'warehouse',
+            name:'仓库'
+          }],
+          workShop = [{
+            prop:'',
+            name:'工序'
+          },{
+            prop:'doCode',
+            name:'工单'
+          },{
+            prop:'',
+            name:'设备'
+          }];
       return [
         {
           prop: 'index',
-          name: '序号',
+          name: '质检单id',
           width: '50'
         },
         {
           prop: 'srcbarcode',
-          name: '来源条码'
-        },
-        {
-          prop: 'quantity',
-          name: '数量',
-          width: '50'
+          name: '来源条码',
+          click: this.barCodeClick
         },
         {
           prop: 'materialName',
           name: '物料名称'
         },
         {
-          prop: 'materialCode',
-          name: '物料编码'
-        },
-        {
           prop: 'batchNo',
           name: '批次',
           class: 'batch',
-          width: '200',
           click: this.batchClick
         },
         {
-          prop: 'sample',
-          name: '样本数',
-          width: '50'
+          prop: 'sumNum',
+          name: '数量'
+        },
+        {
+          prop:"sampleNum",
+          name:"样本数"
         },
         {
           prop: 'destbarcode',
           name: '取样框条码'
         },
         {
-          prop: 'warehouse',
-          name: '仓库'
-        },
-        {
-          prop: 'reservoir',
-          name: '库位'
-        },
-        {
-          prop: 'opType',
-          name: '出入库',
-          width: '60px'
+          prop: '',
+          name: '取样时间'
         },
         {
           prop: 'createTime',
@@ -217,6 +224,10 @@ export default {
           name: '供应商/客户'
         }
       ]
+    },
+    //判断检验是仓库还是车间  0:仓库  1:车间
+    isQbMethodId(){
+      return 0
     },
     // 判断调用接口是否成功。
     judgeLoaderHandler (param, fnSu, fnFail) {
