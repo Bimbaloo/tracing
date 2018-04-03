@@ -125,37 +125,46 @@ export default {
                 this.$route.query
               )
             }
-            this.$post(oUrl, oConditions)
-            .then((oData) => {
-              console.log(oData)
-              if (oData.data.errorCode === 1) { // 接口出错
-                this.$message.error('接口出错')
-                console.log(oData.data.errorMsg.message)
-                self.doDescription = ''
-                done()
-              } else if (oData.data.errorCode === 0) {
-                this.isRestrained = false
-                const handle = oData.data.data.handle
-                sessionStorage.setItem('handleID', handle)
-                instance.confirmButtonLoading = false
-                this.$message.success('遏制成功')
-                let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
-                self.doDescription = ''
-                sessionStorage.setItem('restrain', JSON.stringify(restrain))
-                window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
 
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              oUrl,
+              'post',
+              oConditions,
+              oData => {
+                console.log(oData)
+                if (oData.data.errorCode === 1) { // 接口出错
+                  this.$message.error('接口出错')
+                  console.log(oData.data.errorMsg.message)
+                  // self.doDescription = ''
+                  done()
+                } else if (oData.data.errorCode === 0) {
+                  this.isRestrained = false
+                  const handle = oData.data.data.handle
+                  sessionStorage.setItem('handleID', handle)
+                  instance.confirmButtonLoading = false
+                  this.$message.success('遏制成功')
+                  let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
+                  // self.doDescription = ''
+                  sessionStorage.setItem('restrain', JSON.stringify(restrain))
+                  window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+
+                  done()
+                }
+              },
+              // 失败
+              (err) => {
+                instance.confirmButtonLoading = false
+                this.$message.error('遏制失败')
+                // self.doDescription = ''
+                console.log(err)
                 done()
-              }
-            })
-            .catch(err => {
-              instance.confirmButtonLoading = false
-              this.$message.error('遏制失败')
-              self.doDescription = ''
-              console.log(err)
-              done()
-            })
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
+            // self.doDescription = ''
             done()
           }
         }
