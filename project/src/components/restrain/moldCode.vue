@@ -9,7 +9,7 @@
         <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表。</span>
       </h2>
       <div class="moldInfo">
-				<span>模具名称：{{moldInfo.moldName}}</span><span>规格：{{moldInfo.moldCode}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
+				<span>模具名称：{{moldInfo.moldName}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
 			</div>
       <div class="mold-table">
         <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-show="isRestrained">
