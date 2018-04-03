@@ -346,7 +346,7 @@ export default {
           } else {
             this.$message({
               showClose: true,
-              message: '开始时间不能小于结束时间',
+              message: '结束时间不能小于开始时间',
               type: 'error'
             })
           }
