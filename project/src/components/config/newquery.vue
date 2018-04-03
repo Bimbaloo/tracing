@@ -1,83 +1,86 @@
 <template>
     <div class="content-query content-inner">
-		<div :class="['query-lists-container',{ 'no-border': !ModuleOrderListEdit }]">
-			<div class="list-edit" v-show="!ModuleOrderListEdit">
-				<span class="list-title">自定义排序</span>
-				<el-switch
-					active-text=""
-  					inactive-text=""
-					inactive-color="#bfcbd9"
-					v-model="ModuleOrderListEdit">
-				</el-switch>
-			</div>
-			<div class="list-header" v-show="ModuleOrderListEdit">
-				<span class="list-title">自定义排序</span>
-				<span class="list-edit">
-					<i class="icon el-icon-circle-close"  @click.stop="hideEditQueryState()" title="取消"></i>
-					<i class="icon el-icon-circle-check"  @click.stop="saveEditQueryState('保存')" title="保存"></i>
-				</span>
-			</div>
-			<div class="list-main" v-show="ModuleOrderListEdit">
-				<div class="list-message">
-					<span>系统将根据拖动的顺序排序</span>
-					<span>拖动</span>
-				</div>
-				<ul class="list-container">
-					<li class="query-list"
-						v-for="item in category"
-						v-if="showItem(item)"
-						v-dragging="{ list: category, item: item, group: 'category' }"
-						:key="item.moduleCode">
-						<span class="name-list">{{item.moduleName}}</span>
-						<i class="icon icon-14 icon-move"></i>
-					</li>
-				</ul>
-			</div>
-		</div>
-		<div class="query-items">
-			<div class="query-item"
-				v-for="(item,index) in category"
-				v-if="showItem(item)"
-				:item-id = "index"
-				:key = "item.moduleCode">
-				<div class="query-header">
-					<span class="header-title"> {{ item.moduleName }} </span>
-					<div class="header-icon">
-						<!-- 编辑。 -->
-						<i @click.stop="showEditState(item.moduleCode,index)" title="编辑" v-show="!oBefore[item.moduleCode].bEdit" v-if="oBefore[item.moduleCode].isEdit" class="icon el-icon-edit"></i>
-						<!-- 取消。 -->
-						<i @click.stop="hideEditState(item.moduleCode,index)" title="取消" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-exit"></i>
-						<!-- 保存。 -->
-						<i @click.stop="saveModuleValue(item.moduleCode,item.moduleOrder)" title="保存" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-save"></i>
-						<!-- 增加。 -->
-						<i @click.stop="showModal(item.moduleCode,index)" title="增加" v-show="oBefore[item.moduleCode].bEdit" class="icon el-icon-plus"></i>
-					</div>
-				</div>
-				<div class="content-item">
-					<li class="item-module"
-						v-for="(listItem,indexList) in item.groups"
-						:data-id = "indexList"
-						:key = "indexList"
-						@mouseover="isShow=index*10+indexList"
-						@mouseleave="isShow=null">
-						<span class="name-item">{{ listItem.groupName }}</span>
-						<div class="name-icon" :class="{'item-show-transition':oBefore[item.moduleCode].bEdit && isShow==index*10+indexList}">
-							<!-- 上移。 -->
-							<i v-if="indexList"
-								@click.stop="changeOrder(item.moduleCode,index,indexList-1,indexList)"
-								class="icon el-icon-arrow-up"></i>
-							<!-- 下移。 -->
-							<i v-if="indexList != item.groups.length-1"
-								@click.stop="changeOrder(item.moduleCode,index,indexList,indexList+1)"
-								class="icon el-icon-arrow-down"></i>
-							<!-- 修改。 -->
-							<i @click.stop="showModal(item.moduleCode,index,indexList)" v-if="listItem.groupName !== '物流码' && listItem.groupName !== '条码' && listItem.groupName !== '物料' && listItem.groupName !== '设备'" class="icon el-icon-edit"></i>
-							<!-- 删除。 -->
-							<i @click.stop="delItem(index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-delete"></i>
-						</div>
-					</li>
-				</div>
-			</div>
+      <div class="query-list-wrap">
+          <div :class="['query-lists-container',{ 'no-border': !ModuleOrderListEdit }]">
+            <div class="list-edit" v-show="!ModuleOrderListEdit">
+                <span class="list-title">自定义排序</span>
+                <el-switch
+                active-text=""
+                inactive-text=""
+                inactive-color="#bfcbd9"
+                v-model="ModuleOrderListEdit">
+              </el-switch>
+            </div>
+            <div class="list-header" v-show="ModuleOrderListEdit">
+              <span class="list-title">自定义排序</span>
+              <span class="list-edit">
+                <i class="icon el-icon-circle-close"  @click.stop="hideEditQueryState()" title="取消"></i>
+                <i class="icon el-icon-circle-check"  @click.stop="saveEditQueryState('保存')" title="保存"></i>
+              </span>
+            </div>
+            <div class="list-main" v-show="ModuleOrderListEdit">
+              <div class="list-message">
+                <span>系统将根据拖动的顺序排序</span>
+                <span>拖动</span>
+              </div>
+              <ul class="list-container">
+                <li class="query-list"
+                v-for="item in category"
+                v-if="showItem(item)"
+                v-dragging="{ list: category, item: item, group: 'category' }"
+                :key="item.moduleCode">
+                <span class="name-list">{{item.moduleName}}</span>
+                <i class="icon icon-14 icon-move"></i>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+  		<div class="query-items">
+  			<div class="query-item"
+  				v-for="(item,index) in category"
+  				v-if="showItem(item)"
+  				:item-id = "index"
+  				:key = "item.moduleCode">
+  				<div class="query-header">
+  					<span class="header-title"> {{ item.moduleName }} </span>
+  					<div class="header-icon">
+  						<!-- 编辑。 -->
+  						<i @click.stop="showEditState(item.moduleCode,index)" title="编辑" v-show="!oBefore[item.moduleCode].bEdit" v-if="oBefore[item.moduleCode].isEdit" class="icon el-icon-edit"></i>
+  						<!-- 取消。 -->
+  						<i @click.stop="hideEditState(item.moduleCode,index)" title="取消" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-exit"></i>
+  						<!-- 保存。 -->
+  						<i @click.stop="saveModuleValue(item.moduleCode,item.moduleOrder)" title="保存" v-show="oBefore[item.moduleCode].bEdit" class="icon icon-20 icon-save"></i>
+  						<!-- 增加。 -->
+  						<i @click.stop="showModal(item.moduleCode,index)" title="增加" v-show="oBefore[item.moduleCode].bEdit" class="icon el-icon-plus"></i>
+  					</div>
+  				</div>
+  				<div class="content-item">
+  					<li class="item-module"
+  						v-for="(listItem,indexList) in item.groups"
+  						:data-id = "indexList"
+  						:key = "indexList"
+  						@mouseover="isShow=index*10+indexList"
+  						@mouseleave="isShow=null">
+  						<span class="name-item">{{ listItem.groupName }}</span>
+  						<div class="name-icon" :class="{'item-show-transition':oBefore[item.moduleCode].bEdit && isShow==index*10+indexList}">
+  							<!-- 上移。 -->
+  							<i v-if="indexList"
+  								@click.stop="changeOrder(item.moduleCode,index,indexList-1,indexList)"
+  								class="icon el-icon-arrow-up"></i>
+  							<!-- 下移。 -->
+  							<i v-if="indexList != item.groups.length-1"
+  								@click.stop="changeOrder(item.moduleCode,index,indexList,indexList+1)"
+  								class="icon el-icon-arrow-down"></i>
+  							<!-- 修改。 -->
+  							<i @click.stop="showModal(item.moduleCode,index,indexList)" v-if="listItem.groupName !== '物流码' && listItem.groupName !== '条码' && listItem.groupName !== '物料' && listItem.groupName !== '设备'" class="icon el-icon-edit"></i>
+  							<!-- 删除。 -->
+  							<i @click.stop="delItem(index,indexList)" v-if="listItem.groupName != '物流码'" class="icon el-icon-delete"></i>
+  						</div>
+  					</li>
+  				</div>
+  			</div>
     	</div>
     	<v-trans
     		:v-if="showTransfer"
@@ -595,7 +598,12 @@ export default {
 .content-query {
   display: flex;
   flex-direction: column;
-  position: relative;
+  // position: relative;
+  .query-list-wrap {
+    position: relative;
+    height: 50px;
+    background-color: #ffffff;
+  }
   .query-lists-container {
     position: absolute;
     width: 240px;
@@ -708,7 +716,7 @@ export default {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    padding: 30px 50px 20px 50px;
+    padding: 0px 50px 20px 50px;
     overflow: auto;
     .query-item {
       width: 400px;
