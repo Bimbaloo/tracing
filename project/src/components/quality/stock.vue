@@ -115,12 +115,8 @@ export default {
               { description: self.description },
               this.$route.query
             )
-
-            // this.$post(this.url, oConditions)
-            // .then((res) => {
             done()
             instance.confirmButtonLoading = false
-            // if(!res.errorCode) {
             bSucess = true
             // 隐藏遏制按钮。
             self.restrainIf = false

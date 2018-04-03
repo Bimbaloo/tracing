@@ -328,24 +328,33 @@ export default {
               description: self.doDescription,
               handle: handleId
             }
-            this.$post(cancelURL, oConditions)
-              .then(oData => {
+
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              cancelURL,
+              'post',
+              oConditions,
+              oData => {
+                // 请求成功。
                 instance.confirmButtonLoading = false
                 this.$message.success('取消遏制成功')
-                self.doDescription = ''
+                // self.doDescription = ''
                 this.isDetails = false
                 this.getListhData(this.restrainList)
                 done()
-              })
-              .catch(err => {
+              },
+              err => {
                 instance.confirmButtonLoading = false
                 this.$message.error('取消遏制失败')
-                self.doDescription = ''
+                // self.doDescription = ''
                 console.log(err)
                 done()
-              })
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
+            // self.doDescription = ''
             done()
           }
         }

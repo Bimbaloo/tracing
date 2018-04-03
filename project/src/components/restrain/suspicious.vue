@@ -169,6 +169,10 @@ export default {
           }
         }
       })
+    },
+    // 请求错误。
+    requestError (err) {
+      console.log(err)
     }
     // setWidth () {
     //   this.styleObject.minWidth = '1000px'

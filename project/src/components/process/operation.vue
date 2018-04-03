@@ -308,12 +308,8 @@ export default {
               { description: self.description },
               this.$route.query
             )
-
-            // this.$post(this.url, oConditions)
-            // .then((res) => {
             done()
             instance.confirmButtonLoading = false
-            // if(!res.errorCode) {
             bSucess = true
             // 隐藏遏制按钮。
             self.restrainIf = false
@@ -324,16 +320,8 @@ export default {
             sSerializion = sSerializion.substring(1)
             // 遏制成功，打开到遏制报告。
             window.open('/restrain/report.html?' + sSerializion)
-
-            // }
-            // })
-            // .catch((err) => {
-            // done();
-            // instance.confirmButtonLoading = false;
-            // });
           } else {
             done()
-            // instance.$slots.default[0].elm.children[0].value = "";
           }
         }
       }).then(action => {

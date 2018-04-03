@@ -217,8 +217,13 @@ export default {
               this.$route.query
             )
 
-            this.$post(this.url, oConditions)
-              .then(oData => {
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              this.url,
+              'post',
+              oConditions,
+              oData => {
                 console.log(oData)
                 this.isRestrained = false
                 const handle = oData.data.data.handle
@@ -233,7 +238,7 @@ export default {
                     suppressTime: new Date().Format('yyyy-MM-dd hh:mm:ss')
                   }
                 }
-                self.doDescription = ''
+                // self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
                 window.open(
                   '/restrainReport.html?' +
@@ -245,16 +250,18 @@ export default {
                 )
 
                 done()
-              })
-              .catch(err => {
+              },
+              err => {
                 instance.confirmButtonLoading = false
                 this.$message.error('遏制失败')
-                self.doDescription = ''
+                // self.doDescription = ''
                 console.log(err)
                 done()
-              })
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
+            // self.doDescription = ''
             done()
           }
         }
