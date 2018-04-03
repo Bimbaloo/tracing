@@ -20,7 +20,7 @@
         <el-table-column label="操作" width="200" align='center'>
           <template slot-scope="scope">
             <el-button @click="viewDetails(scope)" type="text" size="small">遏制清单</el-button>
-            <el-button @click="viewReport(scope)" type="text" size="small">遏制报告</el-button>
+            <el-button @click="viewReport(scope)" :type="scope.row.reportId ? 'primary': 'text'" size="small">{{ `${scope.row.reportId ? '查看' : '创建'}遏制报告` }}</el-button>
           </template>
         </el-table-column>
       </el-table>

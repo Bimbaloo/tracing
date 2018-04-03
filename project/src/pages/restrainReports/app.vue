@@ -621,7 +621,7 @@ export default {
         }
         .report-container .report-question-analysis .upload-demo .el-upload-list {
           display: inline-block;
-          vertical-align: top;
+          // vertical-align: top;
           padding: 0;
         }
         .report-container .report-question-analysis .upload-demo .el-upload-list li {
