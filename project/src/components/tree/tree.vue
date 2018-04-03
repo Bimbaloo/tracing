@@ -412,7 +412,7 @@ export default {
 							 return '废品总数'
 						} else if (node.nodeType === 10001) {
   					  if (node.isShowRemain) {
-  						  return '加工数/产出滞留/产出总数'
+  						  return '加工中/产出滞留/产出总数'
   					  } else {
   						   return '总数'
   					  }
@@ -575,7 +575,7 @@ export default {
 				},
 				new window.go.Binding('text', '', function(node) {
 					if(node.isShowRemain) {
-						return '加工数/产出滞留/产出总数'
+						return '加工中/产出滞留/产出总数'
 					}else {
 						return '总数'
 					}
