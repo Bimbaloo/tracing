@@ -17,6 +17,7 @@
 						<transition name="el-zoom-in-top">
 							<div class="content-table inner" ref="summaryTable">
 								<v-table
+                  ref="table"
 									v-show="active.summary"
 									:max-height="tableHeight"
 									:table-data="summaryData"
@@ -122,7 +123,13 @@ export default {
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
-    $route: 'fetchPage',
+    $route: function() {
+      this.active = {
+				summary: false,
+				started: true
+			}
+      this.fetchPage()
+    },
     'gridData.selected': function (params) {
       let aoColumns = this.getColumns()
 
@@ -133,7 +140,15 @@ export default {
       }
 
       this.gridData.columns = aoColumns
-    }
+    },
+    'active.summary': function(isShow) {
+			if(isShow) {
+				this.$nextTick(() => {
+					let oTable = this.$refs.table.$children[0]
+					oTable && oTable.doLayout()
+				})
+			}
+		}
   },
   methods: {
     // 获取显示列
