@@ -229,7 +229,11 @@ export default {
      *  恢复数据。
      */
     treeDataInit () {
+<<<<<<< HEAD
 			let oParsedData = fnP.parseTreeData(this.rawData, 'track', this.isOpDbBeforeRefact)
+=======
+      let oParsedData = fnP.parseTreeData(this.rawData, 'track', this.isOpDbBeforeRefact)
+>>>>>>> dev
       this.treeData = fnP.getTreeData(
         oParsedData,
         'track',
@@ -296,7 +300,11 @@ export default {
         }
 
         // 格式化数据。
+<<<<<<< HEAD
 				let oParsedData = fnP.parseTreeData(this.rawData, 'track', this.isOpDbBeforeRefact)
+=======
+        let oParsedData = fnP.parseTreeData(this.rawData, 'track', this.isOpDbBeforeRefact)
+>>>>>>> dev
         this.treeData = fnP.getTreeData(
           oParsedData,
           'track',

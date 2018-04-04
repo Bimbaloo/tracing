@@ -149,7 +149,11 @@ export default {
      *  恢复数据。
      */
     treeDataInit () {
+<<<<<<< HEAD
 			let oParsedData = fnP.parseTreeData(this.rawData, 'trace', this.isOpDbBeforeRefact)
+=======
+      let oParsedData = fnP.parseTreeData(this.rawData, 'trace', this.isOpDbBeforeRefact)
+>>>>>>> dev
       this.treeData = fnP.getTreeData(
         oParsedData,
         'trace',
@@ -185,7 +189,11 @@ export default {
         }
 
         // 格式化数据。
+<<<<<<< HEAD
 				let oParsedData = fnP.parseTreeData(this.rawData, 'trace', this.isOpDbBeforeRefact)
+=======
+        let oParsedData = fnP.parseTreeData(this.rawData, 'trace', this.isOpDbBeforeRefact)
+>>>>>>> dev
         this.treeData = fnP.getTreeData(oParsedData, 'trace', this.isOpDbBeforeRefact)// this.parseTreeData();
         this.catalogData = fnP.getCatalogData(oParsedData, 'trace', this.isOpDbBeforeRefact)
       }

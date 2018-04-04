@@ -606,7 +606,7 @@ export default {
     },
     // 选中的设备名称。
     selectedEquipmentName () {
-      let equipmentName = this.categories.filter(o => o.id === this.selectedEquipmentId)[0].value.split("+")[0];
+      let equipmentName = this.categories.filter(o => o.id === this.selectedEquipmentId)[0].value.split('+')[0]
       return this.equipments.filter(
         o => (o.equipmentId + '') === this.selectedEquipmentId + ''
       )[0].equipmentName || equipmentName
@@ -1302,7 +1302,11 @@ export default {
       this.panelHeight =
         jContent.height() -
         (jSetting.outerHeight(true) || 0) -
+<<<<<<< HEAD
         (!this.trace && this.isOpDbBeforeRefact ? CHART_MARGIN_BOTTOM : (jButtons.outerHeight(true) || 0) ) // 老业务库追踪
+=======
+        (!this.trace && this.isOpDbBeforeRefact ? CHART_MARGIN_BOTTOM : (jButtons.outerHeight(true) || 0)) // 老业务库追踪
+>>>>>>> dev
       $('#equipments').height(this.panelHeight || 100)
     },
     // 获取当前数据列表。
@@ -2698,7 +2702,7 @@ export default {
       this.setIsDateTimeChange()
     },
     // 时间是否改变
-    setIsDateTimeChange() {
+    setIsDateTimeChange () {
       // 是否显示查询按钮（开始或结束时间被编辑，则会显示）
       let { start, end, initStart, initEnd, beforeSavedStart, beforeSavedEnd } = this.datetime
 

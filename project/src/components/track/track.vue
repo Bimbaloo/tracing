@@ -66,7 +66,7 @@ export default {
     return {
       tdResize: true, // 是否允许拖动table大小
       dataFilter: true, // 是否启用过滤功能
-			tableHeight: 200,
+      tableHeight: 200,
       gridData: {
         url: window.HOST + '/api/v1/trace/down/start-points',
         loading: false,
@@ -119,22 +119,23 @@ export default {
     // 组件创建完后获取数据，
     // 此时 data 已经被 observed 了
     this.fetchPage()
-		window.addEventListener('resize', this.adjustHeight)
+    window.addEventListener('resize', this.adjustHeight)
     this.$nextTick(() => {
       this.adjustHeight()
     })
   },
-	computed: {
-		// 版本信息数据。
+  computed: {
+    // 版本信息数据。
     isOpDbBeforeRefact () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isOpDbBeforeRefact
       )
     }
-	},
+  },
   watch: {
     // 如果路由有变化，会再次执行该方法
+<<<<<<< HEAD
     $route: function() {
 			this.active = {
 				summary: false,
@@ -142,6 +143,15 @@ export default {
 			}
 			this.fetchPage()
 		},
+=======
+    $route: function () {
+      this.active = {
+        summary: false,
+        started: true
+      }
+      this.fetchPage()
+    },
+>>>>>>> dev
     'gridData.selected': function (params) {
       // 有选中的行时，表头全选checkbox会显示
       let aoColumns = this.getColumns()
@@ -154,6 +164,7 @@ export default {
 
       this.gridData.columns = aoColumns
     },
+<<<<<<< HEAD
 		'active.summary': function(isShow) {
 			if(isShow) {
 				this.$nextTick(() => {
@@ -162,6 +173,16 @@ export default {
 				})
 			}
 		}
+=======
+    'active.summary': function (isShow) {
+      if (isShow) {
+        this.$nextTick(() => {
+          let oTable = this.$refs.table.$children[0]
+          oTable && oTable.doLayout()
+        })
+      }
+    }
+>>>>>>> dev
   },
   methods: {
     // 获取显示列
@@ -302,12 +323,12 @@ export default {
     },
     // 获取高度。
     adjustHeight () {
-			this.tableHeight = 200
-			this.$nextTick(() => {
-				this.tableHeight = this.$refs.routerContent.clientHeight -
-									        this.outerHeight(document.querySelector('.content-title')) * 2 -
-									        20
-			})
+      this.tableHeight = 200
+      this.$nextTick(() => {
+        this.tableHeight = this.$refs.routerContent.clientHeight -
+                          this.outerHeight(document.querySelector('.content-title')) * 2 -
+                          20
+      })
     },
     // 根据时间排序。
     sortByTime (a, b) {

@@ -123,11 +123,19 @@ export default {
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
+<<<<<<< HEAD
     $route: function() {
       this.active = {
 				summary: false,
 				started: true
 			}
+=======
+    $route: function () {
+      this.active = {
+        summary: false,
+        started: true
+      }
+>>>>>>> dev
       this.fetchPage()
     },
     'gridData.selected': function (params) {
@@ -141,6 +149,7 @@ export default {
 
       this.gridData.columns = aoColumns
     },
+<<<<<<< HEAD
     'active.summary': function(isShow) {
 			if(isShow) {
 				this.$nextTick(() => {
@@ -149,6 +158,16 @@ export default {
 				})
 			}
 		}
+=======
+    'active.summary': function (isShow) {
+      if (isShow) {
+        this.$nextTick(() => {
+          let oTable = this.$refs.table.$children[0]
+          oTable && oTable.doLayout()
+        })
+      }
+    }
+>>>>>>> dev
   },
   methods: {
     // 获取显示列
@@ -290,11 +309,11 @@ export default {
     // 获取高度。
     adjustHeight () {
       this.tableHeight = 200
-			this.$nextTick(() => {
-				this.tableHeight = this.$refs.routerContent.clientHeight -
-									        this.outerHeight(document.querySelector('.content-title')) * 2 -
-									        20
-			})
+      this.$nextTick(() => {
+        this.tableHeight = this.$refs.routerContent.clientHeight -
+                          this.outerHeight(document.querySelector('.content-title')) * 2 -
+                          20
+      })
     },
     // 根据时间排序。
     sortByTime (a, b) {
