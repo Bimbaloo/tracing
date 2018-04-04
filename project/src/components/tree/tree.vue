@@ -245,7 +245,9 @@ export default {
           click: this.treeNodeClickHandle,
           doubleClick: onDoubleClickNode,
           contextClick: onContextClickNode,
-          alignment: window.go.Spot.Center
+          alignment: window.go.Spot.Center,
+					portId: 'FROMTOP',
+					fromSpot: window.go.Spot.Left
         }, // this event handler is defined below
         new window.go.Binding(
           'location',
