@@ -445,8 +445,11 @@ export default {
         .el-form-item__content {
           line-height: 30px;
           white-space: nowrap;
+					.el-select {
+						width: 250px !important;
+					}
           .el-input {
-            width: 200px !important;
+            width: 250px !important;
           }
         }
         &:last-child {

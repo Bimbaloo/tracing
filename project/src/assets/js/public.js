@@ -408,8 +408,8 @@ var getNodeIconAndTemp = function (sType) {
  * @param {Boolean} bIsOld 是否为老版本。  true-老版本  false-新版本
  */
 var getTreeData = function (oRowData, sPageType, bIsOld) {
-  let aoData = parseTreeData(oRowData, sPageType, bIsOld)
-  let {nodeList: aoDiagramData, linkList: aoDiagramLinkData} = aoData
+  // let aoData = parseTreeData(oRowData, sPageType, bIsOld)
+  let {nodeList: aoDiagramData, linkList: aoDiagramLinkData} = oRowData
 
   aoDiagramLinkData = aoDiagramLinkData.map(o => {
     o.fromPort = 'FROM'
@@ -444,7 +444,7 @@ const SPARENTKEY = 0
 
 var getCatalogData = function (oRowData, sType, bIsOld) {
   let aoCatalogData = []
-  let aoCopyData = JSON.parse(JSON.stringify(parseTreeData(oRowData, sType, bIsOld).nodeList))
+  let aoCopyData = oRowData.nodeList // JSON.parse(JSON.stringify(parseTreeData(oRowData, sType, bIsOld).nodeList))
   let aResult = []
     // 追踪中新增的物料节点key值。
   let sNewMateiralNodekey = 'customerKey'

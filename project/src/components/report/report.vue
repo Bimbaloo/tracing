@@ -926,10 +926,10 @@ export default {
     setSequence () {
       if (this.type === 'trace') {
         // 若为快速报告，改变显示顺序：汇总-出库-在制-在库
-        this.$refs.content.insertBefore(
-          this.$refs.outStocks,
-          this.$refs.inMakings
-        )
+        // this.$refs.content.insertBefore(
+        //   this.$refs.outStocks,
+        //   this.$refs.inMakings
+        // )
         this.$refs.content.append(this.$refs.inStocks)
         this.$refs.content.append(this.$refs.loss)
       }

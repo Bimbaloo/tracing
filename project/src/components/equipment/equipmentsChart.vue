@@ -142,7 +142,7 @@ import $ from 'jquery'
 // 设备状态。
 const CHART_STATE_NAME = '状态'
 // 图形下margin。
-// const CHART_MARGIN_BOTTOM = 40
+const CHART_MARGIN_BOTTOM = 40
 // tooltip距离鼠标的水平位置。
 const TOOLTIP_X_DISTANCE = 10
 // tooltip距离鼠标的水平位置。
@@ -534,8 +534,8 @@ export default {
   },
   computed: {
     // 是否开启视频监控。
-    camera () { debugger
-      return ( 
+    camera () {
+      return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isVideoMonitorEnabled
       )
@@ -1302,7 +1302,7 @@ export default {
       this.panelHeight =
         jContent.height() -
         (jSetting.outerHeight(true) || 0) -
-        (jButtons.outerHeight(true) || 0) // CHART_MARGIN_BOTTOM;
+        (!this.trace && this.isOpDbBeforeRefact ? CHART_MARGIN_BOTTOM : (jButtons.outerHeight(true) || 0) ) // 老业务库追踪
       $('#equipments').height(this.panelHeight || 100)
     },
     // 获取当前数据列表。
