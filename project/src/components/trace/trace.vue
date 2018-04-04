@@ -123,19 +123,11 @@ export default {
   },
   watch: {
     // 如果路由有变化，会再次执行该方法
-<<<<<<< HEAD
-    $route: function() {
-      this.active = {
-				summary: false,
-				started: true
-			}
-=======
     $route: function () {
       this.active = {
         summary: false,
         started: true
       }
->>>>>>> dev
       this.fetchPage()
     },
     'gridData.selected': function (params) {
@@ -149,16 +141,6 @@ export default {
 
       this.gridData.columns = aoColumns
     },
-<<<<<<< HEAD
-    'active.summary': function(isShow) {
-			if(isShow) {
-				this.$nextTick(() => {
-					let oTable = this.$refs.table.$children[0]
-					oTable && oTable.doLayout()
-				})
-			}
-		}
-=======
     'active.summary': function (isShow) {
       if (isShow) {
         this.$nextTick(() => {
@@ -167,7 +149,6 @@ export default {
         })
       }
     }
->>>>>>> dev
   },
   methods: {
     // 获取显示列
