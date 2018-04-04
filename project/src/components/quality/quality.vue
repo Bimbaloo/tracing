@@ -155,23 +155,24 @@ export default {
   methods: {
     // 获取业务库的表格显示列。
     getTableColumns () {
-      let wareHouse = [{
-            prop: 'reservoir',
-            name: '库位'
-          },{
-            prop:'warehouse',
-            name:'仓库'
-          }],
-          workShop = [{
-            prop:'',
-            name:'工序'
-          },{
-            prop:'doCode',
-            name:'工单'
-          },{
-            prop:'',
-            name:'设备'
-          }];
+      // 这一段好像没用
+      // let wareHouse = [{
+      //     prop: 'reservoir',
+      //     name: '库位'
+      //   }, {
+      //     prop: 'warehouse',
+      //     name: '仓库'
+      //   }],
+      //   workShop = [{
+      //     prop: '',
+      //     name: '工序'
+      //   }, {
+      //     prop: 'doCode',
+      //     name: '工单'
+      //   }, {
+      //     prop: '',
+      //     name: '设备'
+      //   }]
       return [
         {
           prop: 'index',
@@ -198,8 +199,8 @@ export default {
           name: '数量'
         },
         {
-          prop:"sampleNum",
-          name:"样本数"
+          prop: 'sampleNum',
+          name: '样本数'
         },
         {
           prop: 'destbarcode',
@@ -225,8 +226,8 @@ export default {
         }
       ]
     },
-    //判断检验是仓库还是车间  0:仓库  1:车间
-    isQbMethodId(){
+    // 判断检验是仓库还是车间  0:仓库  1:车间
+    isQbMethodId () {
       return 0
     },
     // 判断调用接口是否成功。

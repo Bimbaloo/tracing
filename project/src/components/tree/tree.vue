@@ -30,10 +30,10 @@ import {
 
 // 注释背景颜色。
 const COMMENT_BGCOLOR = 'rgba(66,175,143,0.2)' // "rgba(44,52,60,0.7)";//
-const COMMENT_TEXTCOLOR = '#333'
+// const COMMENT_TEXTCOLOR = '#333'
 const HIGHLIGHT_BG_COLOR = '#f5efdc' // "#42af8f";//"#6DAB80";
 const NORMAL_TEXT_COLOR = '#333' // "#333";
-const TABLE_COLOR = '#42af8f'
+// const TABLE_COLOR = '#42af8f'
 const ERROR_TEXT_COLOR = 'red'
 const MATERIAL_NODE_WIDTH = 100
 
@@ -50,11 +50,11 @@ export default {
       required: false,
       default: false
     },
-		// 页面类型 track | trace
-		pageType: {
-			required: false,
-			default: 'track'
-		}
+    // 页面类型 track | trace
+    pageType: {
+      required: false,
+      default: 'track'
+    }
   },
   data () {
     return {
@@ -150,34 +150,30 @@ export default {
         this.$store.state.versionModule.isOpDbBeforeRefact
       )
     },
-	// tooltip样式
+    // tooltip样式
     tooltipTemplate () {
       return this.$(
-		  window.go.Adornment,
-		  'Auto',
+        window.go.Adornment,
+        'Auto',
         {
           isShadowed: true
         },
-		this.$(
-			window.go.Shape,
-			'Rectangle',
-			  {
-			    fill: 'white',
-			    stroke: '#dedede'
-			  }
-			),
-		this.$(
-			window.go.TextBlock,
-			  {
-			    font: '12pt Helvetica, 微软雅黑, sans-serif',
-			    stroke: '#333333',
-			    wrap: window.go.TextBlock.WrapFit,
-			    alignment: window.go.Spot.Center,
-			    margin: 5
-			  },
-			new window.go.Binding('text', 'name')
-		)
-		)
+        this.$(window.go.Shape, 'Rectangle', {
+          fill: 'white',
+          stroke: '#dedede'
+        }),
+        this.$(
+          window.go.TextBlock,
+          {
+            font: '12pt Helvetica, 微软雅黑, sans-serif',
+            stroke: '#333333',
+            wrap: window.go.TextBlock.WrapFit,
+            alignment: window.go.Spot.Center,
+            margin: 5
+          },
+          new window.go.Binding('text', 'name')
+        )
+      )
     },
     // 选中样式。
     selectionAdornmentTemplate () {
@@ -228,11 +224,11 @@ export default {
             margin: 5
           },
           new window.go.Binding('stroke', '', this.getTextColor),
-		  new window.go.Binding('maxSize', '', function (node) {
-			  if (node.nodeType === 10003 || node.nodeType === 10004) {
-				  return new window.go.Size(MATERIAL_NODE_WIDTH, NaN)
-			  }
-		  }),
+          new window.go.Binding('maxSize', '', function (node) {
+            if (node.nodeType === 10003 || node.nodeType === 10004) {
+              return new window.go.Size(MATERIAL_NODE_WIDTH, NaN)
+            }
+          }),
           new window.go.Binding('text', '', this.setMaterialLineLength)
         )
       )
@@ -242,7 +238,7 @@ export default {
       return this.$(
         window.go.Node,
         'Horizontal',
-        { selectionObjectName: 'SELECTION'}, // added this property!
+        { selectionObjectName: 'SELECTION' }, // added this property!
         {
           selectionAdorned: !this.isDialogTree,
           selectionChanged: onNodeSelectionChange, // this.nodeSelectionChangeHandle,
@@ -251,16 +247,18 @@ export default {
           contextClick: onContextClickNode,
           alignment: window.go.Spot.Center
         }, // this event handler is defined below
-        new window.go.Binding('location', 'loc', window.go.Point.parse).makeTwoWay(
-          window.go.Point.stringify
-        ),
-		this.$(
+        new window.go.Binding(
+          'location',
+          'loc',
+          window.go.Point.parse
+        ).makeTwoWay(window.go.Point.stringify),
+        this.$(
           window.go.Panel,
           'Vertical',
           this.$(
             window.go.Panel,
             'Auto',
-			{toolTip: this.tooltipTemplate},
+            { toolTip: this.tooltipTemplate },
             this.$(
               window.go.Shape,
               'Rectangle',
@@ -301,11 +299,11 @@ export default {
                   // textValidation:onEditName
                 },
                 new window.go.Binding('stroke', '', this.getTextColor),
-				new window.go.Binding('maxSize', '', function (node) {
-			 	if (node.nodeType === 10003 || node.nodeType === 10004) {
-	 			    return new window.go.Size(MATERIAL_NODE_WIDTH, NaN)
-	 			  }
-	 		  }),
+                new window.go.Binding('maxSize', '', function (node) {
+                  if (node.nodeType === 10003 || node.nodeType === 10004) {
+                    return new window.go.Size(MATERIAL_NODE_WIDTH, NaN)
+                  }
+                }),
                 new window.go.Binding('text', '', this.setMaterialLineLength) // .makeTwoWay() //
               ),
               this.$('TreeExpanderButton', {
@@ -325,105 +323,164 @@ export default {
           this.$(
             window.go.Panel,
             'Horizontal',
-						// 加工中数
-						this.$(window.go.TextBlock,
-						{
-							font: 'bold 10pt sans-serif',
-							stroke: NORMAL_TEXT_COLOR
-						},
-					 new window.go.Binding('visible', '', node => !node.groupCode && node.nodeType === 10001 && node.isShowRemain),
-					 new window.go.Binding('text', '', node => `${node.processingNum < 0 ? '-' : node.processingNum}`)
-				 ),
-				 this.$(window.go.TextBlock, '/',
-				 	{
-						font: 'bold 10pt sans-serif',
-						stroke: NORMAL_TEXT_COLOR
-					},
-					new window.go.Binding('visible', '', node => !node.groupCode && node.nodeType === 10001 && node.isShowRemain)
-				),
-				// 滞留数
-				this.$(window.go.TextBlock,
-				{
-					font: 'bold 10pt sans-serif',
-					stroke: NORMAL_TEXT_COLOR
-				},
-			 new window.go.Binding('visible', '', node => !node.groupCode && node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202)),
-			 new window.go.Binding('text', '', node => `${node.remainNum < 0 ? '-' : node.remainNum}`),
-			 new window.go.Binding('stroke', '', node => node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR)
-		 ),
-		 this.$(window.go.TextBlock, '/',
-			{
-				font: 'bold 10pt sans-serif',
-				stroke: NORMAL_TEXT_COLOR
-			},
-			new window.go.Binding('visible', '', node => !node.groupCode && node.isShowRemain && !(node.nodeType === 10003 || node.nodeType === 10004 || node.nodeType === 202))
-		),
-			// 总数
-			this.$(window.go.TextBlock,
-			{
-				font: 'bold 10pt sans-serif',
-				stroke: NORMAL_TEXT_COLOR
-			},
-			new window.go.Binding('visible', '', node => !node.groupCode),
-		 new window.go.Binding('text', '', node => `${node.totalNum < 0 ? '-' : node.totalNum}`)
-	 ),
-      //       this.$(window.go.TextBlock,
-      //         {
-      //           font: 'bold 10pt sans-serif'
-      //         },
-			// new window.go.Binding('text', '', function (node) {
-			//   if (node.nodeType === 10003 || node.nodeType === 10004) {
-			//     return node.totalNum < 0 ? '-' : node.totalNum
-			//   } else if (node.nodeType === 10001) {
-			// 	  if (node.isShowRemain) {
-			// 		  return `${node.processingNum < 0 ? '-' : node.processingNum}/${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
-			// 	  } else {
-			// 		   return node.totalNum < 0 ? '-' : node.totalNum
-			// 	  }
-			//   } else if (node.isShowRemain) {
-			//     return `${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
-  		// 	  } else {
-			// 	 return node.totalNum < 0 ? '-' : node.totalNum
-  	 	// 	  }
-		  // })),
-		  {
-			  toolTip: this.$(go.Adornment, 'Auto',
-			  this.$(
-	  			window.go.Shape,
-	  			'Rectangle',
-	  			  {
-	  			    fill: 'white',
-	  			    stroke: '#dedede'
-	  			  }
-	  			),
-	  		this.$(
-	  			window.go.TextBlock,
-	  			  {
-	  			    font: '12pt Helvetica, 微软雅黑, sans-serif',
-	  			    stroke: '#333333',
-	  			    wrap: window.go.TextBlock.WrapFit,
-	  			    alignment: window.go.Spot.Center,
-	  			    margin: 5
-	  			  },
-				  new window.go.Binding('text', '', function (node) {
-  				  if (node.nodeType === 10003 || node.nodeType === 202) {
-  				    return '总数'
-  				  }else if(node.nodeType === 10004) {
-							 return '废品总数'
-						} else if (node.nodeType === 10001) {
-  					  if (node.isShowRemain) {
-  						  return '加工中/产出滞留/产出总数'
-  					  } else {
-  						   return '总数'
-  					  }
-  				  } else if (node.isShowRemain) {
-  				    return '滞留/总数'
-  	  			  } else {
-  					 return '总数'
-  	  	 		  }
-  			  })
-	  		))
-		  }
+            // 加工中数
+            this.$(
+              window.go.TextBlock,
+              {
+                font: 'bold 10pt sans-serif',
+                stroke: NORMAL_TEXT_COLOR
+              },
+              new window.go.Binding(
+                'visible',
+                '',
+                node =>
+                  !node.groupCode &&
+                  node.nodeType === 10001 &&
+                  node.isShowRemain
+              ),
+              new window.go.Binding(
+                'text',
+                '',
+                node => `${node.processingNum < 0 ? '-' : node.processingNum}`
+              )
+            ),
+            this.$(
+              window.go.TextBlock,
+              '/',
+              {
+                font: 'bold 10pt sans-serif',
+                stroke: NORMAL_TEXT_COLOR
+              },
+              new window.go.Binding(
+                'visible',
+                '',
+                node =>
+                  !node.groupCode &&
+                  node.nodeType === 10001 &&
+                  node.isShowRemain
+              )
+            ),
+            // 滞留数
+            this.$(
+              window.go.TextBlock,
+              {
+                font: 'bold 10pt sans-serif',
+                stroke: NORMAL_TEXT_COLOR
+              },
+              new window.go.Binding(
+                'visible',
+                '',
+                node =>
+                  !node.groupCode &&
+                  node.isShowRemain &&
+                  !(
+                    node.nodeType === 10003 ||
+                    node.nodeType === 10004 ||
+                    node.nodeType === 202
+                  )
+              ),
+              new window.go.Binding(
+                'text',
+                '',
+                node => `${node.remainNum < 0 ? '-' : node.remainNum}`
+              ),
+              new window.go.Binding(
+                'stroke',
+                '',
+                node =>
+                  node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR
+              )
+            ),
+            this.$(
+              window.go.TextBlock,
+              '/',
+              {
+                font: 'bold 10pt sans-serif',
+                stroke: NORMAL_TEXT_COLOR
+              },
+              new window.go.Binding(
+                'visible',
+                '',
+                node =>
+                  !node.groupCode &&
+                  node.isShowRemain &&
+                  !(
+                    node.nodeType === 10003 ||
+                    node.nodeType === 10004 ||
+                    node.nodeType === 202
+                  )
+              )
+            ),
+            // 总数
+            this.$(
+              window.go.TextBlock,
+              {
+                font: 'bold 10pt sans-serif',
+                stroke: NORMAL_TEXT_COLOR
+              },
+              new window.go.Binding('visible', '', node => !node.groupCode),
+              new window.go.Binding(
+                'text',
+                '',
+                node => `${node.totalNum < 0 ? '-' : node.totalNum}`
+              )
+            ),
+            //       this.$(window.go.TextBlock,
+            //         {
+            //           font: 'bold 10pt sans-serif'
+            //         },
+            // new window.go.Binding('text', '', function (node) {
+            //   if (node.nodeType === 10003 || node.nodeType === 10004) {
+            //     return node.totalNum < 0 ? '-' : node.totalNum
+            //   } else if (node.nodeType === 10001) {
+            //   if (node.isShowRemain) {
+            //     return `${node.processingNum < 0 ? '-' : node.processingNum}/${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
+            //   } else {
+            //       return node.totalNum < 0 ? '-' : node.totalNum
+            //   }
+            // } else if (node.isShowRemain) {
+            //   return `${node.remainNum < 0 ? '-' : node.remainNum}/${node.totalNum < 0 ? '-' : node.totalNum}`
+            //   } else {
+            //   return node.totalNum < 0 ? '-' : node.totalNum
+            //   }
+            // })),
+            {
+              toolTip: this.$(
+               window.go.Adornment,
+                'Auto',
+                this.$(window.go.Shape, 'Rectangle', {
+                  fill: 'white',
+                  stroke: '#dedede'
+                }),
+                this.$(
+                  window.go.TextBlock,
+                  {
+                    font: '12pt Helvetica, 微软雅黑, sans-serif',
+                    stroke: '#333333',
+                    wrap: window.go.TextBlock.WrapFit,
+                    alignment: window.go.Spot.Center,
+                    margin: 5
+                  },
+                  new window.go.Binding('text', '', function (node) {
+                    if (node.nodeType === 10003 || node.nodeType === 202) {
+                      return '总数'
+                    } else if (node.nodeType === 10004) {
+                      return '废品总数'
+                    } else if (node.nodeType === 10001) {
+                      if (node.isShowRemain) {
+                        return '加工中/产出滞留/产出总数'
+                      } else {
+                        return '总数'
+                      }
+                    } else if (node.isShowRemain) {
+                      return '滞留/总数'
+                    } else {
+                      return '总数'
+                    }
+                  })
+                )
+              )
+            }
           )
         ),
         { selectionAdornmentTemplate: this.selectionAdornmentTemplate }
@@ -436,7 +493,10 @@ export default {
         {
           // define the group's internal layout
           selectionAdorned: false,
-          layout: this.$(window.go.TreeLayout, { layerSpacing: 20, nodeSpacing: 10 }),
+          layout: this.$(window.go.TreeLayout, {
+            layerSpacing: 20,
+            nodeSpacing: 10
+          }),
           // the group begins unexpanded;
           // upon expansion, a Diagram Listener will generate contents for the group
           isSubGraphExpanded: false,
@@ -449,7 +509,7 @@ export default {
           this.$(
             window.go.Panel,
             'Auto',
-						{toolTip: this.tooltipTemplate},
+            { toolTip: this.tooltipTemplate },
             this.$(window.go.Shape, 'Rectangle', {
               fill: null,
               stroke: 'gray',
@@ -510,86 +570,112 @@ export default {
             _buttonStrokeOver: null,
             click: this.treeExpanderButtonClickHandle
           })
-	  ),
-	  this.$(
-		window.go.Panel,
-		'Horizontal',
-		// 加工中数
-		this.$(window.go.TextBlock,
-		  {
-    		font: 'bold 10pt sans-serif',
-				stroke: NORMAL_TEXT_COLOR
-		  },
-			new window.go.Binding('visible', '', node => node.isShowRemain),
-			new window.go.Binding('text', '', node => `${node.processingNum < 0 ? '-' : node.processingNum}`)
-		),
-		this.$(window.go.TextBlock, '/',
-				 	{
-						font: 'bold 10pt sans-serif',
-						stroke: NORMAL_TEXT_COLOR
-					},
-					new window.go.Binding('visible', '', node => node.isShowRemain)
-				),
-		// 滞留数
-		this.$(window.go.TextBlock,
-				{
-					font: 'bold 10pt sans-serif',
-					stroke: NORMAL_TEXT_COLOR
-				},
-			 new window.go.Binding('visible', '', node => node.isShowRemain),
-			 new window.go.Binding('text', '', node => `${node.remainNum < 0 ? '-' : node.remainNum}`),
-			 new window.go.Binding('stroke', '', node => node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR)
-		 ),
-		 this.$(window.go.TextBlock, '/',
-			{
-				font: 'bold 10pt sans-serif',
-				stroke: NORMAL_TEXT_COLOR
-			},
-			new window.go.Binding('visible', '', node => node.isShowRemain)
-		),
-		// 总数
-		this.$(window.go.TextBlock,
-		{
-			font: 'bold 10pt sans-serif',
-			stroke: NORMAL_TEXT_COLOR
-		},
-	 new window.go.Binding('text', '', node => `${node.totalNum < 0 ? '-' : node.totalNum}`)
- ), {
-	 toolTip: this.$(window.go.Adornment, 'Auto',
-	 	this.$(
-			window.go.Shape,
-			'Rectangle',
-			  {
-			    fill: 'white',
-			    stroke: '#dedede'
-			  }
-			),
-			this.$(
-				window.go.TextBlock,
-				{
-					font: '12pt Helvetica, 微软雅黑, sans-serif',
-			    stroke: '#333333',
-			    wrap: window.go.TextBlock.WrapFit,
-			    alignment: window.go.Spot.Center,
-			    margin: 5
-				},
-				new window.go.Binding('text', '', function(node) {
-					if(node.isShowRemain) {
-						return '加工中/产出滞留/产出总数'
-					}else {
-						return '总数'
-					}
-				})
-			)
- 		)
- 	})
+        ),
+        this.$(
+          window.go.Panel,
+          'Horizontal',
+          // 加工中数
+          this.$(
+            window.go.TextBlock,
+            {
+              font: 'bold 10pt sans-serif',
+              stroke: NORMAL_TEXT_COLOR
+            },
+            new window.go.Binding('visible', '', node => node.isShowRemain),
+            new window.go.Binding(
+              'text',
+              '',
+              node => `${node.processingNum < 0 ? '-' : node.processingNum}`
+            )
+          ),
+          this.$(
+            window.go.TextBlock,
+            '/',
+            {
+              font: 'bold 10pt sans-serif',
+              stroke: NORMAL_TEXT_COLOR
+            },
+            new window.go.Binding('visible', '', node => node.isShowRemain)
+          ),
+          // 滞留数
+          this.$(
+            window.go.TextBlock,
+            {
+              font: 'bold 10pt sans-serif',
+              stroke: NORMAL_TEXT_COLOR
+            },
+            new window.go.Binding('visible', '', node => node.isShowRemain),
+            new window.go.Binding(
+              'text',
+              '',
+              node => `${node.remainNum < 0 ? '-' : node.remainNum}`
+            ),
+            new window.go.Binding(
+              'stroke',
+              '',
+              node =>
+                node.remainNum !== 0 ? ERROR_TEXT_COLOR : NORMAL_TEXT_COLOR
+            )
+          ),
+          this.$(
+            window.go.TextBlock,
+            '/',
+            {
+              font: 'bold 10pt sans-serif',
+              stroke: NORMAL_TEXT_COLOR
+            },
+            new window.go.Binding('visible', '', node => node.isShowRemain)
+          ),
+          // 总数
+          this.$(
+            window.go.TextBlock,
+            {
+              font: 'bold 10pt sans-serif',
+              stroke: NORMAL_TEXT_COLOR
+            },
+            new window.go.Binding(
+              'text',
+              '',
+              node => `${node.totalNum < 0 ? '-' : node.totalNum}`
+            )
+          ),
+          {
+            toolTip: this.$(
+              window.go.Adornment,
+              'Auto',
+              this.$(window.go.Shape, 'Rectangle', {
+                fill: 'white',
+                stroke: '#dedede'
+              }),
+              this.$(
+                window.go.TextBlock,
+                {
+                  font: '12pt Helvetica, 微软雅黑, sans-serif',
+                  stroke: '#333333',
+                  wrap: window.go.TextBlock.WrapFit,
+                  alignment: window.go.Spot.Center,
+                  margin: 5
+                },
+                new window.go.Binding('text', '', function (node) {
+                  if (node.isShowRemain) {
+                    return '加工中/产出滞留/产出总数'
+                  } else {
+                    return '总数'
+                  }
+                })
+              )
+            )
+          }
+        )
       )
     },
     linkTemplate () {
       return this.$(
         window.go.Link, // the whole link panel
         {
-          routing: this.isDialogTree ? window.go.Link.Orthogonal : window.go.Link.AvoidsNodes
+          routing: this.isDialogTree
+            ? window.go.Link.Orthogonal
+            : window.go.Link.AvoidsNodes
         },
         new window.go.Binding('points').makeTwoWay(),
         {
@@ -606,50 +692,53 @@ export default {
             stroke: '#999',
             strokeWidth: 3
           }
-	  ),
-		this.$(
-			window.go.Shape,
-			{
-				fromArrow: 'BackwardOpenTriangle',
-				stroke: '#999',
-				strokeWidth: 2,
-				fill: null
-			},
-			new window.go.Binding('visible', '', () => this.pageType === 'trace')
-		),
-		this.$(
-			window.go.Shape,
-			{
-				toArrow: 'OpenTriangle',
-				stroke: '#999',
-				strokeWidth: 2,
-				fill: null
-			},
-			new window.go.Binding('visible', '', () => this.pageType === 'track')
-		),
-	  this.$(
-		  window.go.TextBlock,
-		  {
-			  background: '#ffffff',
-			  font: 'bold 10pt sans-serif'
-		  },
-		  new window.go.Binding('text', 'num'),
-			new window.go.Binding('visible', '', this.isToMaterialNode)
-	  ),{
-			toolTip: this.$(go.Adornment, 'Auto',
-			this.$(
-				window.go.TextBlock,
-					{
-						font: '12pt Helvetica, 微软雅黑, sans-serif',
-						stroke: '#333333',
-						wrap: window.go.TextBlock.WrapFit,
-						alignment: window.go.Spot.Center,
-						margin: 5
-					},
-					new window.go.Binding('text', '', this.linkLineTooltipText)
-			)
-		)
-		}
+        ),
+        this.$(
+          window.go.Shape,
+          {
+            fromArrow: 'BackwardOpenTriangle',
+            stroke: '#999',
+            strokeWidth: 2,
+            fill: null
+          },
+          new window.go.Binding('visible', '', () => this.pageType === 'trace')
+        ),
+        this.$(
+          window.go.Shape,
+          {
+            toArrow: 'OpenTriangle',
+            stroke: '#999',
+            strokeWidth: 2,
+            fill: null
+          },
+          new window.go.Binding('visible', '', () => this.pageType === 'track')
+        ),
+        this.$(
+          window.go.TextBlock,
+          {
+            background: '#ffffff',
+            font: 'bold 10pt sans-serif'
+          },
+          new window.go.Binding('text', 'num'),
+          new window.go.Binding('visible', '', this.isToMaterialNode)
+        ),
+        {
+          toolTip: this.$(
+           window.go.Adornment,
+            'Auto',
+            this.$(
+              window.go.TextBlock,
+              {
+                font: '12pt Helvetica, 微软雅黑, sans-serif',
+                stroke: '#333333',
+                wrap: window.go.TextBlock.WrapFit,
+                alignment: window.go.Spot.Center,
+                margin: 5
+              },
+              new window.go.Binding('text', '', this.linkLineTooltipText)
+            )
+          )
+        }
       )
     }
   },
@@ -741,7 +830,7 @@ export default {
 
       // 点击节点信息展示。
       let nodeType = node.data.nodeType // 被点击节点的 nodeType
-			let detailInfos = node.data.detailInfo
+      let detailInfos = node.data.detailInfo
 
       if (
         nodeType === 101 ||
@@ -955,25 +1044,30 @@ export default {
             stroke: 'lightgray',
             strokeWidth: 1
           }),
-          this.$(window.go.Panel, 'Table', new window.go.Binding('itemArray', 'items'), {
-            margin: 4,
-            defaultAlignment: window.go.Spot.Left,
-            itemTemplate: this.$(
-              window.go.Panel,
-              'TableRow',
-              new window.go.Binding('background', 'back'),
-              this.$(
-                window.go.TextBlock,
-                new window.go.Binding('text', 'batch'), // 批次
-                { column: 0, margin: 5 }
-              ),
-              this.$(
-                window.go.TextBlock,
-                new window.go.Binding('text', 'sum'), // 数量
-                { column: 1, margin: 5 }
-              )
-            ) // end of itemTemplate
-          })
+          this.$(
+            window.go.Panel,
+            'Table',
+            new window.go.Binding('itemArray', 'items'),
+            {
+              margin: 4,
+              defaultAlignment: window.go.Spot.Left,
+              itemTemplate: this.$(
+                window.go.Panel,
+                'TableRow',
+                new window.go.Binding('background', 'back'),
+                this.$(
+                  window.go.TextBlock,
+                  new window.go.Binding('text', 'batch'), // 批次
+                  { column: 0, margin: 5 }
+                ),
+                this.$(
+                  window.go.TextBlock,
+                  new window.go.Binding('text', 'sum'), // 数量
+                  { column: 1, margin: 5 }
+                )
+              ) // end of itemTemplate
+            }
+          )
         )
       )
 
@@ -1034,7 +1128,10 @@ export default {
             ),
             // this.$(window.go.RowColumnDefinition,
             // { row: 0, background: "lightgray" }),
-            this.$(window.go.RowColumnDefinition, { row: 1, separatorStroke: 'white' })
+            this.$(window.go.RowColumnDefinition, {
+              row: 1,
+              separatorStroke: 'white'
+            })
           )
         )
       )
@@ -1089,7 +1186,9 @@ export default {
         hasHorizontalScrollbar: this.chrome,
         hasVerticalScrollbar: this.chrome,
         allowVerticalScroll: true,
-        autoScale: this.isDialogTree ? window.go.Diagram.Uniform : window.go.Diagram.None,
+        autoScale: this.isDialogTree
+          ? window.go.Diagram.Uniform
+          : window.go.Diagram.None,
         layout: this.$(window.go.LayeredDigraphLayout, {
           layerSpacing: 40,
           columnSpacing: 25
@@ -1129,7 +1228,7 @@ export default {
       if (this.treeData.node) {
         // 如果存在显示的key值，则定位到显示的数据，否则定位到第一个数据。
         let aoData = this.treeData.node.filter(
-          o => this.key ? o.key === this.key : o.parentKeys.includes(0)
+          o => (this.key ? o.key === this.key : o.parentKeys.includes(0))
         )
         if (aoData.length) {
           let node = this.tree.findNodeForKey(aoData[0].key)
@@ -1235,7 +1334,7 @@ export default {
 
       this.tree.commitTransaction('highlight')
     },
-	// 下载图片-- svg
+    // 下载图片-- svg
     onSaveImgHandler () {
       function myCallback (blob) {
         var url = window.URL.createObjectURL(blob)
@@ -1246,7 +1345,7 @@ export default {
         a.href = url
         a.download = filename
 
-    // IE 11
+        // IE 11
         if (window.navigator.msSaveBlob !== undefined) {
           window.navigator.msSaveBlob(blob, filename)
           return
@@ -1260,19 +1359,19 @@ export default {
         })
       }
 
-	  var svg = this.tree.makeSvg({ scale: 1, background: 'white' })
-	  var svgstr = new XMLSerializer().serializeToString(svg)
-	  var blob = new Blob([svgstr], { type: 'image/svg+xml' })
-	  myCallback(blob)
+      var svg = this.tree.makeSvg({ scale: 1, background: 'white' })
+      var svgstr = new XMLSerializer().serializeToString(svg)
+      var blob = new Blob([svgstr], { type: 'image/svg+xml' })
+      myCallback(blob)
     },
-	// 浏览器缩放时，下载背景不全
+    // 浏览器缩放时，下载背景不全
     onSaveImgHandler1 (event) {
       let oImage = this.tree.makeImage({
         scale: 1,
         maxSize: new window.go.Size(Infinity, Infinity),
         background: 'rgb(248,248,240)'
       })
-        // 图片地址。
+      // 图片地址。
       let sImage = oImage.src
       let aLink = this.$refs.downloadImage
 
@@ -1317,7 +1416,7 @@ export default {
         maxSize: new window.go.Size(Infinity, Infinity),
         background: 'rgb(248,248,240)'
       })
-        // 图片地址。
+      // 图片地址。
       let sImage = oImage.src
       let w = window.open('about:blank', 'image from canvas')
 
@@ -1355,13 +1454,13 @@ export default {
     recoverSize () {
       this.$emit('recoverSize')
     },
-  // 设置物料的换行显示。
+    // 设置物料的换行显示。
     setMaterialLineLength (node) {
-		// 如果超过两行，用...
+      // 如果超过两行，用...
       let str = node.name
 
       if (node.nodeType === 10003 || node.nodeType === 10004) {
-			// 获取截取字段
+        // 获取截取字段
         let sSub = ''
         let nLenWidth = 0
         let isMoreTwo = false
@@ -1370,17 +1469,17 @@ export default {
           let charCode = str.charCodeAt(i)
           if (charCode >= 0 && charCode <= 128) {
             if (charCode >= 48 && charCode <= 57) {
-				// 数字
+              // 数字
               nLenWidth += 10
             } else {
-				// 英文字母
+              // 英文字母
               nLenWidth += 12
             }
           } else {
             nLenWidth += 20
           }
 
-				// 是否多于两行
+          // 是否多于两行
           if (nLenWidth <= MATERIAL_NODE_WIDTH * 2) {
             sSub += str.charAt(i)
           } else {
@@ -1397,47 +1496,48 @@ export default {
         return str
       }
     },
-		// 是否下道工序为物料，
-		isToMaterialNode(node) {
-			let nodes = this.data.node
-			let key = this.pageType === 'track' ? node.to : node.from
+    // 是否下道工序为物料，
+    isToMaterialNode (node) {
+      let nodes = this.data.node
+      let key = this.pageType === 'track' ? node.to : node.from
 
-			let aoIs = nodes.filter(o => o.key === key)
+      let aoIs = nodes.filter(o => o.key === key)
 
-			let oFrom = nodes.find(o => o.key === node.from)
-			let oTo = nodes.find(o => o.key === node.to)
+      let oFrom = nodes.find(o => o.key === node.from)
+      let oTo = nodes.find(o => o.key === node.to)
 
-			if(this.isOpDbBeforeRefact) {
-				return false
-			}else if(aoIs.length && (aoIs[0].nodeType === 10003 || aoIs[0].nodeType === 10004)) {
-				return false
-			}else if(oFrom.groupCode && oTo.groupCode && isNaN(node.num)){
-				// 组直接的工序节点不显示-- 插入的节点之间的连线（其中没有num数据）
-				return false
-			}else{
-				return true
-			}
+      if (this.isOpDbBeforeRefact) {
+        return false
+      } else if (
+        aoIs.length &&
+        (aoIs[0].nodeType === 10003 || aoIs[0].nodeType === 10004)
+      ) {
+        return false
+      } else if (oFrom.groupCode && oTo.groupCode && isNaN(node.num)) {
+        // 组直接的工序节点不显示-- 插入的节点之间的连线（其中没有num数据）
+        return false
+      } else {
+        return true
+      }
+    },
+    // 显示连线上数量的提示文字-追踪：下道动作的name 溯源：上道动作name。 工序显示投料
+    linkLineTooltipText (node) {
+      let nodes = this.data.node
+      let key = this.pageType === 'track' ? node.to : node.from
 
-		},
-		// 显示连线上数量的提示文字-追踪：下道动作的name 溯源：上道动作name。 工序显示投料
-		linkLineTooltipText (node) {
-			let nodes = this.data.node
-			let key = this.pageType === 'track' ? node.to : node.from
+      let aoIs = nodes.filter(o => o.key === key)
+      let isShow = this.isToMaterialNode(node)
 
-			let aoIs = nodes.filter(o => o.key === key)
-			let isShow = this.isToMaterialNode(node)
-
-			if(isShow) {
-				if(aoIs[0].nodeType === 10001) {
-					return '投料'
-				}else {
-					return aoIs[0].name
-				}
-			}else {
-				return ''
-			}
-
-		}
+      if (isShow) {
+        if (aoIs[0].nodeType === 10001) {
+          return '投料'
+        } else {
+          return aoIs[0].name
+        }
+      } else {
+        return ''
+      }
+    }
   }
 }
 </script>

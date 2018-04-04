@@ -200,7 +200,7 @@
           }
         }
         /* 为了将获取到的barcode等转换为对应的中文 */
-        let b = window.Rt.utils.getObjectEntries(filters)//Object.entries(filters)
+        let b = window.Rt.utils.getObjectEntries(filters)// Object.entries(filters)
         let a = this.dataName
         b.forEach(o =>
           a.forEach(function (x) {

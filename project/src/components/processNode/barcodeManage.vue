@@ -270,14 +270,14 @@ export default {
     nodeType () {
       return this.$store.state.nodeType
     },
-    nodeKey() {
+    nodeKey () {
       return this.$store.state.key
     },
     // 点击次数
     clickNum () {
       return this.$store.state.clickNum
     },
-    rawData() {
+    rawData () {
       return this.$store.state.rawData
     },
     // op_id 传给后端的参数
