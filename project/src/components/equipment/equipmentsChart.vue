@@ -1302,11 +1302,7 @@ export default {
       this.panelHeight =
         jContent.height() -
         (jSetting.outerHeight(true) || 0) -
-<<<<<<< HEAD
-        (!this.trace && this.isOpDbBeforeRefact ? CHART_MARGIN_BOTTOM : (jButtons.outerHeight(true) || 0) ) // 老业务库追踪
-=======
         (!this.trace && this.isOpDbBeforeRefact ? CHART_MARGIN_BOTTOM : (jButtons.outerHeight(true) || 0)) // 老业务库追踪
->>>>>>> dev
       $('#equipments').height(this.panelHeight || 100)
     },
     // 获取当前数据列表。
