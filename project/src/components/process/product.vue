@@ -1784,7 +1784,7 @@ export default {
         }
       })
       this.filters = this.getFilters()
-      if (window.location.pathname === '/restrain.html') {
+      if (window.location.pathname.includes('/restrain.html')) {
         let oQuery = {
           'endTime': this.$route.query.shiftEndTime,
           'equipmentId': this.$route.query.equipmentId,
