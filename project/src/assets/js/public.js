@@ -138,6 +138,8 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
       // 获取该group新插入的数据
       let aAddToGroup = productionLineInfo[o.groupCode]
 
+      aAddToGroup = (sPageType === 'trace' ? aAddToGroup.reverse() : aAddToGroup)
+      
       if (aAddToGroup && aAddToGroup.length && aAddToGroup.length !== aSub.length) {
         // 存在且有插入的节点。
         aAddToGroup = aAddToGroup.map((oa, nIn) => {
