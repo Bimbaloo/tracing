@@ -9,7 +9,7 @@
         <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表。</span>
       </h2>
       <div class="moldInfo">
-				<span>模具名称：{{moldInfo.moldName}}</span><span>规格：{{moldInfo.moldCode}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
+				<span>模具名称：{{moldInfo.moldName}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
 			</div>
       <div class="mold-table">
         <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-show="isRestrained">
@@ -346,7 +346,7 @@ export default {
           } else {
             this.$message({
               showClose: true,
-              message: '开始时间不能小于结束时间',
+              message: '结束时间不能小于开始时间',
               type: 'error'
             })
           }
@@ -388,9 +388,14 @@ export default {
               { doDescription: self.doDescription },
               this.moldQuery
             )
-            console.log(oConditions)
-            this.$post(this.url, oConditions)
-              .then(oData => {
+
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              this.url,
+              'post',
+              oConditions,
+              oData => {
                 console.log(oData)
                 this.isRestrained = false
                 const handle = oData.data.data.handle
@@ -405,7 +410,7 @@ export default {
                     suppressTime: new Date().Format('yyyy-MM-dd hh:mm:ss')
                   }
                 }
-                self.doDescription = ''
+                // self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
                 window.open(
                   '/restrainReport.html?' +
@@ -417,16 +422,18 @@ export default {
                 )
 
                 done()
-              })
-              .catch(err => {
+              },
+              err => {
                 instance.confirmButtonLoading = false
                 this.$message.error('遏制失败')
-                self.doDescription = ''
+                // self.doDescription = ''
                 console.log(err)
                 done()
-              })
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
+            // self.doDescription = ''
             done()
           }
         }
