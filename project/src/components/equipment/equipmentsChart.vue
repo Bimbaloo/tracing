@@ -2027,7 +2027,7 @@ export default {
         .showState
         ? this.getStatusData()
         : this.getVisualStateData()
-
+      
       // 获取各事件维度数据。
       this.dimension.forEach(item => {
         let oFilter = this.option.series.filter(o => o.name === item.name)[0]
@@ -2520,7 +2520,7 @@ export default {
               +new Date(this.getRealTimeLineDateTime().start),
               +new Date(this.getRealTimeLineDateTime().end),
               +new Date(this.getRealTimeLineDateTime().end) -
-                +new Date(this.getRealTimeLineDateTime().start),
+              +new Date(this.getRealTimeLineDateTime().start),
               this.getRealTimeLineDateTime().start,
               this.getRealTimeLineDateTime().end
             ],
@@ -2746,7 +2746,7 @@ export default {
         // 若已存在提示面板。
         return
       }
-
+      
       // 保存提示框数据。
       this.axisTooltipData = params
 
@@ -2841,6 +2841,7 @@ export default {
       let hour = 0
       let munite = 0
       let second = 0
+      let name = params.name.split('+')[0]
 
       if (time / 3600 >= 1) {
         hour = Math.floor(time / 3600)
@@ -2860,7 +2861,7 @@ export default {
         time = second + "''"
       }
 
-      return `${params.marker}${params.name}：${time}<br/>
+      return `${params.marker}${name}：${time}<br/>
                     ${params.value[4]}<br/>
                     ${params.value[5]}`
     },
