@@ -4,7 +4,7 @@
 		<div class="innner-content" >
       <h2 class="content-title path-title" >
         <span :class="{ 'suspicious-list': !needRestrain }" @click="needRestrain = true,isRestrained = true">质检记录</span>
-        <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表。</span>
+        <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表</span>
       </h2>
       <div class="suspicious-table">
         <v-table :table-data="tableData" :loading="tableLoading" :heights='tableHeight'></v-table>

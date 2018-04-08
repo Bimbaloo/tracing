@@ -3002,13 +3002,13 @@ export default {
         end: new Date(oDate.endValue).Format()
       }
     },
-    // 可疑品列表。
+    // 可疑品列表
     showSuspiciousList () {
       // 跳转之前保存数据。
       this.setSessionStorage()
       let oDate = this.getRealTime()
 
-      // 根据设备+开始时间+结束时间，查询可疑品列表。
+      // 根据设备+开始时间+结束时间，查询可疑品列表
       this.$router.replace({
         path: '/process/restrain',
         query: {

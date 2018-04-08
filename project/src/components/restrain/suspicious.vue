@@ -78,7 +78,7 @@ export default {
     }
   },
   methods: {
-    // 可疑品列表。
+    // 可疑品列表
     suppress () {
       const h = this.$createElement
       let self = this
@@ -241,7 +241,7 @@ export default {
     span {
       display: inline-block;
       & + span {
-        margin-left: 60px;
+        margin-left: 30px;
       }
     }
   }

@@ -4,7 +4,7 @@
 		<div class="innner-content" >
       <h2 class="content-title path-title" >
         <span :class="{ 'suspicious-list': !needRestrain }" @click="needRestrain = true,isRestrained = true">工单</span>
-        <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表。</span>
+        <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表</span>
       </h2>
       <div class="suspicious-table">
         <el-table :data="tableData.data" border style="width: 100%" :height='tableHeight' ref="table" v-if="isRestrained" @cell-click="cellClick">
