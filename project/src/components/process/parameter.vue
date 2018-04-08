@@ -22,12 +22,8 @@
             <h2 class="content-title" id='content-title'>
                 <span>工艺参数</span>
             </h2>
-            <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
-                <div v-if="!barcodeTableData.show && !chartShow" class="error">
-                    {{ empty }}
-                </div>
+            <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }" v-loading="loading" element-loading-text="拼命加载中">
                 <el-switch
-                  v-else
                   style="display: block"
                   v-model="activeName"
                   active-value="table"
@@ -39,7 +35,10 @@
                   @change = "tabChange">
                 </el-switch>
                 <div v-show="activeName === `table`" class="table" >
-                  <div class="barcode-input">
+                  <div v-if="!barcodeTableData.show" class="error">
+                    {{ empty }}
+                  </div>
+                  <div v-if="barcodeTableData.show" class="barcode-input">
                       <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
                           <el-form-item label="条码：" style="width: 400px">
                               <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
@@ -50,7 +49,7 @@
                           <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('barcodeTable', $event)"></i>
                       </span>
                   </div>
-                  <div class="content-table" ref="barcodeTable">
+                  <div v-if="barcodeTableData.show" class="content-table" ref="barcodeTable">
                       <el-table
                       :data="datas"
                       stripe
@@ -95,9 +94,13 @@
                           </el-table-column>
                       </el-table>
                   </div>
+                  
                 </div>
                 <div v-show="activeName === `charts`" class="chart" v-loading="loading" element-loading-text="拼命加载中">
-                  <el-tabs  v-model="activeChart" @tab-click="chartTabChange">
+                  <div v-if="!chartShow" class="error">
+                    {{ empty }}
+                  </div>
+                  <el-tabs v-else v-model="activeChart" @tab-click="chartTabChange">
                       <el-tab-pane :name="`chart${index}`" v-for="(chartData,index) in tableDatas" :key="index">
                         <span slot="label" :style="{ color: chartData.isWarn }"> {{chartData.filename}}</span>
                           <!-- 没有图表时，不显示图表开关 -->
@@ -257,7 +260,8 @@ export default {
           }
         ],
         data: [],
-        height: 400
+        height: 400,
+        show: true
       },
       ruleForm: {
         input: ''
@@ -439,7 +443,6 @@ export default {
         // 若无数据，影藏tab。
         this.barcodeTableData.show = false
         // 激活曲线图。
-        this.activeName = 'chart'
         this.fetchChartData()
 
         this.detailTip = '暂无数据。'
@@ -451,7 +454,6 @@ export default {
       this.barcodeTableData.show = false
       this.detailTip = '暂无数据。'
       // 激活曲线图。
-      this.activeName = 'chart'
       this.fetchChartData()
     },
     // 获取条码数据错误。
@@ -460,7 +462,6 @@ export default {
       this.barcodeTableData.show = false
       this.detailTip = '暂无数据。'
       // 激活曲线图。
-      this.activeName = 'chart'
       this.fetchChartData()
     },
     getFilters () {
@@ -563,18 +564,14 @@ export default {
     // 选中修改。
     tabChange (oTab) {
       if (oTab === 'charts') {      // 若为曲线图。
-        this.barcodeTableData.show = true
-        this.chartShow = false
         if (!this.chartFetched) {   // 若曲线图未获取数据。
           this.fetchChartData()
-        } else {
+        } else if (this.chartShow) {
           this.$nextTick(() => {
             this.nowEchart.resize()
           })
         }
       } else {                      // 若为条码表。
-        this.barcodeTableData.show = false
-        this.chartShow = true
         if (!this.tableFetched) {   // 若条码表未获取数据。
           this.fetchBarcodeTableData()
         }
@@ -1295,6 +1292,9 @@ export default {
     }
   }
   .chart {
+    .error {
+      margin-top: 20px;
+    }
     .el-tabs {
       .el-tabs__header {
         border-bottom-color: #ccc;
@@ -1419,6 +1419,9 @@ export default {
 }
 
 #parameter .table {
+  .error {
+    margin-top: 20px;
+  }
   .isWarn {
     color: red
   }
