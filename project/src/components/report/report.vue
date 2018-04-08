@@ -654,7 +654,8 @@ export default {
         }
       },
       progressId: new Date().getTime().toString().substr(-5),
-      cancelProgressUrl: window.HOST + '/api/v1/request/kill/'
+      cancelProgressUrl: window.HOST + '/api/v1/request/kill/',
+			timer: null
     }
   },
   watch: {
@@ -663,6 +664,12 @@ export default {
       // 页面重新查询时，设置新进程
       this.progressId = new Date().getTime().toString().substr(-5)
       this.loading = false
+
+			if(this.timer) {
+					clearTimeout(this.timer)
+					this.timer = null
+			}
+
       this.fetchData()
     },
     killProgress () {
@@ -692,7 +699,7 @@ export default {
     },
 // 关闭进度进程
     closeProgressDialog () {
-      setTimeout(() => {
+      this.timer = setTimeout(() => {
         this.loading = false
       }, 2000)
     },
