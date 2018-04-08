@@ -749,6 +749,8 @@ export default {
         if (!oResult[p].length) {
           // 若无数据。
           oData[p].show = false
+        } else {
+          oData[p].show = true
         }
 
         if (oResult[p].length && !bSetWidth) {
