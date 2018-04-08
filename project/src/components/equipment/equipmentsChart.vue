@@ -1066,30 +1066,6 @@ export default {
     },
     // 获取配置数据。
     getConfigData () {
-      // 获取配置数据。
-
-      // 设置维度数据。
-      // if(this.currentModule.submodules) {
-      //     // 维度分析数据。
-      //     let oDimensionData = this.currentModule.submodules.find(o => o.key === "dimension");
-      //     if(oDimensionData) {
-      //         // 根据配置数据修改维度分析开关。
-      //         this.dimension = this.dimension.filter(o => {
-      //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
-      //             if(oData) {
-      //                 return !!oData.switch
-      //             }else {
-      //                 return true
-      //             }
-      //         })
-      //         this.dimension.map(o => {
-      //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
-      //             o.show = oData.show
-      //             o.name = oData.name
-      //             return o
-      //         })
-      //     }
-      // }
       // 根据配置数据修改维度分析开关。
       let unSuport = []
       if (!this.toolManagement) {
@@ -2027,7 +2003,7 @@ export default {
         .showState
         ? this.getStatusData()
         : this.getVisualStateData()
-      
+
       // 获取各事件维度数据。
       this.dimension.forEach(item => {
         let oFilter = this.option.series.filter(o => o.name === item.name)[0]
@@ -2074,6 +2050,7 @@ export default {
       }
 
       this.chart.setOption(this.option, true)
+
       // 设置提示框的最大高度。
       this.setTooltipHeight()
 
@@ -2746,14 +2723,14 @@ export default {
         // 若已存在提示面板。
         return
       }
-      
+
       // 保存提示框数据。
       this.axisTooltipData = params
 
       let sHtml = ''
       let oGroupId = {}
 
-      params.forEach(param => {
+      params.forEach((param, i) => {
         let aoValue = param.value
         let sList = ''
         let yAxisIndex = aoValue[1]
@@ -2761,6 +2738,10 @@ export default {
         let nIndex = 0
         // sColor = (this.dimension.filter(o => o.name === param.seriesName)[0]).color;
 
+        if (!param.name) {
+          // 若设备名称不存在，设置设备名称。
+          param.name = this.categories[yAxisIndex].value
+        }
         // 第一级设备。
         oGroupId[yAxisIndex] = {}
 
