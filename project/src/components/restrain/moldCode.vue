@@ -203,6 +203,7 @@ export default {
           message: '查询结果为空，请选择合适的查询条件',
           type: 'error'
         })
+        this.tableData.data = []
       } else {
         /* 获取模具信息 */
         let {moldCode, moldName, moldLife} = myData.moldInfo
