@@ -414,6 +414,7 @@ export default {
       }
     }
     .report {
+      overflow: auto;
       .report-content {
         padding: 0 !important;
       }

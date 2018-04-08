@@ -319,7 +319,7 @@ export default {
             }
             sSerializion = sSerializion.substring(1)
             // 遏制成功，打开到遏制报告。
-            window.open('/restrain/report.html?' + sSerializion)
+            window.open('restrain/report.html?' + sSerializion)
           } else {
             done()
           }

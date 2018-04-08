@@ -148,7 +148,7 @@ export default {
                   let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
                   // self.doDescription = ''
                   sessionStorage.setItem('restrain', JSON.stringify(restrain))
-                  window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+                  window.open('restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
 
                   done()
                 }

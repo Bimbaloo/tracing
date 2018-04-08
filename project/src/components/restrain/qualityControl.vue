@@ -241,7 +241,7 @@ export default {
                 // self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
                 window.open(
-                  '/restrainReport.html?' +
+                  'restrainReport.html?' +
                     '_tag=' +
                     new Date()
                       .getTime()
