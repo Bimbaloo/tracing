@@ -148,7 +148,7 @@
                               </div>
                           </div>
                           <div class="btn-box">
-                            <el-button class="btn btn-plain" @click="showSuspiciousList">可疑品</el-button>
+                            <el-button v-if="supression" class="btn btn-plain" @click="showSuspiciousList">可疑品</el-button>
                             <el-button v-if="showCamera" class="btn btn-plain" @click="showVideoDialog">视频查看</el-button>
                           </div>
                       </el-tab-pane>
@@ -320,6 +320,13 @@ export default {
     // 是否开启视频监控
     showCamera () {
       return this.$store.state.factoryModule.cameraFetched
+    },
+    // 是否支持遏制。
+    supression () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.supression
+      )
     }
   },
   mounted () {
