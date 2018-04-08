@@ -139,7 +139,7 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
       let aAddToGroup = productionLineInfo[o.groupCode]
 
       aAddToGroup = (sPageType === 'trace' ? aAddToGroup.reverse() : aAddToGroup)
-      
+
       if (aAddToGroup && aAddToGroup.length && aAddToGroup.length !== aSub.length) {
         // 存在且有插入的节点。
         aAddToGroup = aAddToGroup.map((oa, nIn) => {
@@ -181,12 +181,18 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
           }
         })
 
+        // 断开aSub中的连线
+        aSub.forEach((os, nIn) => {
+          if (nIn !== aSub.length - 1) {
+            _removeLine(os.key, aSub[nIn + 1].key)
+          }
+        })
+
         // 修改parentKeys
         aAddToGroup.forEach((oa, nIn) => {
           nIn === 0 ? oa.parentKeys = aSub[0].parentKeys : oa.parentKeys = [aAddToGroup[nIn - 1].key]
 
           // 将点加入到数据中，并创建连线
-
           if (!aSub.find(os => os.key === oa.key)) {
             nodeList.push(oa)
           } else {
@@ -195,6 +201,11 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
 
           if (nIn !== aAddToGroup.length - 1) {
             _addLine(oa.key, aAddToGroup[nIn + 1].key)
+          }
+
+          // 修改连线，组内的工序到 组外的节点之间连线(第一个及最后一个除外)
+          if (!nIn || nIn !== aAddToGroup.length - 1) {
+            _setFromNodeLineSport(oa.key, aAddToGroup)
           }
         })
 
@@ -210,13 +221,6 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
             }
           })
         }
-
-        // 断开aSub中的连线
-        aSub.forEach((os, nIn) => {
-          if (nIn !== aSub.length - 1) {
-            _removeLine(os.key, aSub[nIn + 1].key)
-          }
-        })
       }
 
       // 节点之间增加连线。
@@ -250,6 +254,19 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
   return {
     nodeList,
     linkList
+  }
+
+  /**
+  * 修改连线的位置，修改fromKey为sKey的线
+  */
+  function _setFromNodeLineSport (sKey, aoData) {
+    linkList.forEach(o => {
+      // 中间节点到组外节点的连线
+      if (o.from === sKey && !aoData.some(og => og.key === o.to)) {
+        o.fromPort = 'FROMTOP'
+        o.toPort = 'TO'
+      }
+    })
   }
 
   /**
@@ -414,8 +431,10 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
   let {nodeList: aoDiagramData, linkList: aoDiagramLinkData} = oRowData
 
   aoDiagramLinkData = aoDiagramLinkData.map(o => {
-    o.fromPort = 'FROM'
-    o.toPort = 'TO'
+    if (!o.fromPort) {
+      o.fromPort = 'FROM'
+      o.toPort = 'TO'
+    }
 
     // 修改数据的小数位数。
     if (Number(o.num) === parseInt(o.num)) {
@@ -426,6 +445,7 @@ var getTreeData = function (oRowData, sPageType, bIsOld) {
 
     return o
   })
+
   return {
     node: aoDiagramData,
     link: aoDiagramLinkData

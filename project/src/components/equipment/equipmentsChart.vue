@@ -1066,30 +1066,6 @@ export default {
     },
     // 获取配置数据。
     getConfigData () {
-      // 获取配置数据。
-
-      // 设置维度数据。
-      // if(this.currentModule.submodules) {
-      //     // 维度分析数据。
-      //     let oDimensionData = this.currentModule.submodules.find(o => o.key === "dimension");
-      //     if(oDimensionData) {
-      //         // 根据配置数据修改维度分析开关。
-      //         this.dimension = this.dimension.filter(o => {
-      //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
-      //             if(oData) {
-      //                 return !!oData.switch
-      //             }else {
-      //                 return true
-      //             }
-      //         })
-      //         this.dimension.map(o => {
-      //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
-      //             o.show = oData.show
-      //             o.name = oData.name
-      //             return o
-      //         })
-      //     }
-      // }
       // 根据配置数据修改维度分析开关。
       let unSuport = []
       if (!this.toolManagement) {
@@ -2074,6 +2050,7 @@ export default {
       }
 
       this.chart.setOption(this.option, true)
+
       // 设置提示框的最大高度。
       this.setTooltipHeight()
 
@@ -2520,7 +2497,7 @@ export default {
               +new Date(this.getRealTimeLineDateTime().start),
               +new Date(this.getRealTimeLineDateTime().end),
               +new Date(this.getRealTimeLineDateTime().end) -
-                +new Date(this.getRealTimeLineDateTime().start),
+              +new Date(this.getRealTimeLineDateTime().start),
               this.getRealTimeLineDateTime().start,
               this.getRealTimeLineDateTime().end
             ],
@@ -2753,7 +2730,7 @@ export default {
       let sHtml = ''
       let oGroupId = {}
 
-      params.forEach(param => {
+      params.forEach((param, i) => {
         let aoValue = param.value
         let sList = ''
         let yAxisIndex = aoValue[1]
@@ -2761,6 +2738,10 @@ export default {
         let nIndex = 0
         // sColor = (this.dimension.filter(o => o.name === param.seriesName)[0]).color;
 
+        if (!param.name) {
+          // 若设备名称不存在，设置设备名称。
+          param.name = this.categories[yAxisIndex].value
+        }
         // 第一级设备。
         oGroupId[yAxisIndex] = {}
 
@@ -2841,6 +2822,7 @@ export default {
       let hour = 0
       let munite = 0
       let second = 0
+      let name = params.name.split('+')[0]
 
       if (time / 3600 >= 1) {
         hour = Math.floor(time / 3600)
@@ -2860,7 +2842,7 @@ export default {
         time = second + "''"
       }
 
-      return `${params.marker}${params.name}：${time}<br/>
+      return `${params.marker}${name}：${time}<br/>
                     ${params.value[4]}<br/>
                     ${params.value[5]}`
     },
