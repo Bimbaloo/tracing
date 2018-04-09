@@ -11,7 +11,7 @@
             </el-tab-pane>
             <el-tab-pane label="设备分析" name="equipment">
                 <div class="path-btn">
-                    <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
+                    <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf && hasSupressionList">遏制</el-button>
                 </div>
                 <div class="router-path">
                     <router-link 
@@ -82,6 +82,13 @@ export default {
     },
     activeTabChange () {
       return this.$store && this.$store.state.activeTabChange
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {

@@ -655,7 +655,7 @@ export default {
       },
       progressId: new Date().getTime().toString().substr(-5),
       cancelProgressUrl: window.HOST + '/api/v1/request/kill/',
-			timer: null
+      timer: null
     }
   },
   watch: {
@@ -665,10 +665,10 @@ export default {
       this.progressId = new Date().getTime().toString().substr(-5)
       this.loading = false
 
-			if(this.timer) {
-					clearTimeout(this.timer)
-					this.timer = null
-			}
+      if (this.timer) {
+        clearTimeout(this.timer)
+        this.timer = null
+      }
 
       this.fetchData()
     },
@@ -784,6 +784,8 @@ export default {
         // this.$emit('noData')
         // this.error = "查无数据。"
         console.log('查无数据。')
+        // 标注可疑品类表为空
+        this.changeSupressionList()
       }
     },
     // 请求失败。
@@ -797,6 +799,8 @@ export default {
       this.$emit('noData')
       // this.error = "查无数据。"
       console.log(this.sErrorMessage)
+      // 标注可疑品类表为空
+      this.changeSupressionList()
     },
     // 请求错误。
     requestError (err) {
@@ -806,6 +810,8 @@ export default {
       this.sErrorMessage = err
       this.$emit('noData')
       console.log('查询出错。')
+      // 标注可疑品类表为空
+      this.changeSupressionList()
     },
     fetchData () {
       // 进入页面时设置页面的进程标记(created,watch)
@@ -871,6 +877,11 @@ export default {
           sUrl = this.oUrl['restrainBatch']
         }
       }
+
+      // 标注可疑品列表不为空
+      this.$store.commit('setSupressionList', {
+        value: true
+      })
 
       this.$register.sendRequest(
         this.$store,
@@ -1099,6 +1110,12 @@ export default {
          `
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
+    },
+    // 可疑品列表为空
+    changeSupressionList () {
+      this.$store.commit('setSupressionList', {
+        value: false
+      })
     }
   }
 }

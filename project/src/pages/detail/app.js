@@ -22,6 +22,8 @@ import { loginModule } from 'assets/js/loginStore.js'
 import { versionModule } from 'assets/js/versionStore.js'
 // 引入选项设置模块。
 import { optionsModule } from 'assets/js/optionsStore.js'
+// 引入选项设置模块。
+import { supressionModule } from 'assets/js/supression.js'
 
 Vue.use(VueRouter)
 Vue.use(ElementUI)
@@ -93,7 +95,8 @@ const store = new Vuex.Store({
     loginModule,
     // customModule
     versionModule,
-    optionsModule
+    optionsModule,
+    supressionModule
   }
 })
 

@@ -1,6 +1,6 @@
 <template>
 	<div class="router-content suspicious moldCode" ref='moldCode' v-loading="loading" element-loading-text="拼命加载中">
-		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain">遏制</el-button>
+		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain && hasSupressionList">遏制</el-button>
 		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain && !isOpDbBeforeRefact">可疑品</el-button>
 		<div class="innner-content" >
       <!-- <h2 class="title">模具记录</h2> -->
@@ -203,6 +203,13 @@ export default {
     moldQuerys () {
       let {equipmentId, moldCode, processCode, startTime, endTime} = this.moldQuery
       return {equipmentId, moldCode, processCode, startTime, endTime}
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {

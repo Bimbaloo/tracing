@@ -7,7 +7,7 @@
         </div>
         <div class="path-btn">
         	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf && !isOpDbBeforeRefact">可疑品</el-button>
-            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained">遏制</el-button>
+            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained && hasSupressionList">遏制</el-button>
         </div>
         <div class="router-path">
             <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":`物料明细${isWasteMaterial ? '(废品)':''}` }}</span>
@@ -66,6 +66,13 @@ export default {
     // 新版本物料判断是否为废品。
     isWasteMaterial () {
       return this.nodeType === 10004
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {

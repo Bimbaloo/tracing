@@ -34,6 +34,9 @@ import {
   versionModule
 } from 'assets/js/versionStore.js'
 
+// 引入选项设置模块。
+import { supressionModule } from 'assets/js/supression.js'
+
 Vue.use(ElementUI)
 
 Vue.prototype.$ = go.GraphObject.make
@@ -251,7 +254,8 @@ const store = new Vuex.Store({
     loginModule,
     // customModule,
     factoryModule,
-    versionModule
+    versionModule,
+    supressionModule
   },
   state: {
     key: '',

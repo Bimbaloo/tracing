@@ -7,7 +7,7 @@
         </div>
         <div class="path-btn">
         	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
-            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
+            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && hasSupressionList">遏制</el-button>
         </div>
         <div class="router-path">
             <span class="path-item" @click="checkStock">检验明细</span>
@@ -52,6 +52,13 @@ export default {
     },
     nodeType () {
       return this.$store && this.$store.state.nodeType
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {

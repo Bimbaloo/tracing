@@ -2,7 +2,7 @@
 <template>
     <div class="material-stock" ref="stock">
         <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-show="supression && restrainIf">遏制</el-button>
+        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-show="supression && restrainIf && hasSupressionList">遏制</el-button>
         </div>
         <div class="router-path">
           <router-link 
@@ -53,6 +53,13 @@ export default {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.supression
+      )
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
       )
     }
   },

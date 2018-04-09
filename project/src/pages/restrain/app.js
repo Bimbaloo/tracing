@@ -30,6 +30,9 @@ import {
   factoryModule
 } from 'assets/js/factoryStore.js'
 
+// 引入选项设置模块。
+import { supressionModule } from 'assets/js/supression.js'
+
 Vue.use(VueRouter)
 Vue.use(ElementUI)
 Vue.prototype.$ajax = axios
@@ -227,7 +230,8 @@ const store = new Vuex.Store({
     loginModule,
     // customModule
     factoryModule,
-    versionModule
+    versionModule,
+    supressionModule
   }
 })
 

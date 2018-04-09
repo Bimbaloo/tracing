@@ -9,7 +9,7 @@
         	</div>
             <div class="path-btn">
             	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf && !isOpDbBeforeRefact">可疑品</el-button>
-            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained">遏制</el-button>
+            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained && hasSupressionList">遏制</el-button>
             </div>
         </div>
         <!-- 遏制数据不需缓存 -->
@@ -51,6 +51,13 @@ export default {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isOpDbBeforeRefact
+      )
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
       )
     }
   },

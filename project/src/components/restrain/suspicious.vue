@@ -4,7 +4,7 @@
 			暂时不支持遏制
 		</div>
 		<div class="suspicious-content" v-else>
-			<el-button class="btn btn-plain btn-restrain" @click="suppressDialogVisible = true" v-show="isRestrained">遏制</el-button>
+			<el-button class="btn btn-plain btn-restrain" @click="suppressDialogVisible = true" v-show="isRestrained && hasSupressionList">遏制</el-button>
 			<div class="inner-content">
         <div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
           <span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span>
@@ -59,6 +59,13 @@ export default {
     },
     type () {
       return this.$route.meta.type || window.sessionStorage.getItem('type') || null
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {
@@ -253,9 +260,11 @@ export default {
   .suspicious-content {
     display: flex;
     flex-direction: column;
+    flex: 1;
     .inner-content {
       display: flex;
       flex-direction: column;
+      flex: 1;
       .report-box {
         flex: 1;
         overflow: auto;

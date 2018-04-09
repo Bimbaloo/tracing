@@ -1,6 +1,6 @@
 <template>
 	<div class="router-content suspicious" ref='workOrders'>
-		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain">遏制</el-button>
+		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain && hasSupressionList">遏制</el-button>
 		<div class="innner-content" >
       <h2 class="content-title path-title" >
         <span :class="{ 'suspicious-list': !needRestrain }" @click="needRestrain = true,isRestrained = true">工单</span>
@@ -181,8 +181,14 @@ export default {
         }
       })
       return arr
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
-
   },
   created () {
     this.init()
