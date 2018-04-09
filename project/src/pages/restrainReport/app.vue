@@ -70,7 +70,7 @@ export default {
         },
         {
           prop: 'cancelTime',
-          name: '取消遏制时间'
+          name: '解除遏制时间'
         },
         {
           prop: 'doOperator',
@@ -78,11 +78,11 @@ export default {
         },
         {
           prop: 'endDescription',
-          name: '结束遏制详情'
+          name: '解除遏制详情'
         },
         {
           prop: 'endOperator',
-          name: '结束遏制人员'
+          name: '解除遏制人员'
         }
       ]
       let informationArr = Object.assign({}, this.listInfor) || {}

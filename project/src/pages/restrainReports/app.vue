@@ -17,7 +17,7 @@
                 <div class="report-item report-question-describe">
                     <h2 class="item-title">问题描述</h2>
                     <ul class="item-content">
-                        <li  class="descripe-item" v-for="(question,key) in pageData.describe">
+                        <li  class="descripe-item" v-for="(question,key) in pageData.describe" :key="key">
                             <el-row>
                                 <el-col :span="4"><span class="descripe-item-title">{{ getDescripeDisplay(key).title }}</span></el-col>
                                 <el-col :span="4"><span class="descripe-item-name">{{ getDescripeDisplay(key).name }}</span></el-col>
@@ -164,7 +164,7 @@
 <script>
 import report from 'components/report/report.vue'
 import rasterizeHTML from 'rasterizehtml'
-import fnP from 'assets/js/public.js'
+// import fnP from 'assets/js/public.js'
 
 export default {
   components: {
@@ -277,7 +277,7 @@ export default {
         },
         {
           prop: 'cancelTime',
-          name: '取消遏制时间'
+          name: '解除遏制时间'
         },
         {
           prop: 'doOperator',
@@ -285,11 +285,11 @@ export default {
         },
         {
           prop: 'endDescription',
-          name: '结束遏制详情'
+          name: '解除遏制详情'
         },
         {
           prop: 'endOperator',
-          name: '结束遏制人员'
+          name: '解除遏制人员'
         }
       ]
       let informationArr =
@@ -429,16 +429,16 @@ export default {
     beforeUploadImage (index, $event) {},
     // 上传文件
     uploadImage (response, file, fileList, $event) {
-      var jUpload = $event.parentElement,
-        nIndex = Number(jUpload.getAttribute('data-index'))
+      let jUpload = $event.parentElement
+      let nIndex = Number(jUpload.getAttribute('data-index'))
 
       fileList[fileList.length - 1].url = response
           // 修改地址。
       this.pageData.analysis[nIndex].imgs = fileList
     },
     beforeRemoveImage (file, fileList, $event) {
-      var jUpload = $event.parentElement,
-        nIndex = Number(jUpload.getAttribute('data-index'))
+      let jUpload = $event.parentElement
+      let nIndex = Number(jUpload.getAttribute('data-index'))
 
       // 删除图片。
       let anImg = this.pageData.analysis[nIndex].imgs
