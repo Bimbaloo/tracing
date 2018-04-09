@@ -73,7 +73,7 @@ export default {
       if (this.$route.meta.title === 'restrain') {
         this.equipmentName = this.oQuery.equipmentName
       }
-      this.isRestrained = window.location.hash.includes('/suppress/1')
+      this.isRestrained = window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4') || window.location.hash.includes('/process/restrain')
       this.killProgress = false
     }
   },
