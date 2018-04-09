@@ -176,12 +176,6 @@ export default {
           show: true,
           columns: [
             {
-              prop: 'batchNo',
-              name: '批次',
-              // width: "250",
-              sortable: true
-            },
-            {
               prop: 'materialCode',
               name: '物料编码',
               width: '200',
@@ -190,6 +184,12 @@ export default {
             {
               prop: 'materialName',
               name: '物料名称',
+              sortable: true
+            },
+            {
+              prop: 'batchNo',
+              name: '批次',
+              // width: "250",
               sortable: true
             },
             {
@@ -396,8 +396,14 @@ export default {
           },
           columns: [
             {
-              prop: 'barcode',
-              name: '条码',
+              prop: 'materialCode',
+              name: '物料编码',
+              sortable: true
+            },
+            {
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
@@ -407,14 +413,8 @@ export default {
               sortable: true
             },
             {
-              prop: 'materialCode',
-              name: '物料编码',
-              sortable: true
-            },
-            {
-              prop: 'materialName',
-              name: '物料名称',
-              width: '300',
+              prop: 'barcode',
+              name: '条码',
               sortable: true
             },
             {
@@ -474,12 +474,6 @@ export default {
           show: true,
           columns: [
             {
-              prop: 'batchNo',
-              name: '批次',
-              // width: "200",
-              sortable: true
-            },
-            {
               prop: 'materialCode',
               name: '物料编码',
               sortable: true
@@ -488,6 +482,12 @@ export default {
               prop: 'materialName',
               name: '物料名称',
               width: '300',
+              sortable: true
+            },
+            {
+              prop: 'batchNo',
+              name: '批次',
+              // width: "200",
               sortable: true
             },
             {
@@ -540,12 +540,6 @@ export default {
           show: true,
           columns: [
             {
-              prop: 'batchNo',
-              name: '批次',
-              // width: "200",
-              sortable: true
-            },
-            {
               prop: 'materialCode',
               name: '物料编码',
               sortable: true
@@ -554,6 +548,12 @@ export default {
               prop: 'materialName',
               name: '物料名称',
               width: '300',
+              sortable: true
+            },
+            {
+              prop: 'batchNo',
+              name: '批次',
+              // width: "200",
               sortable: true
             },
             {
