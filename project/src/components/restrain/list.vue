@@ -339,7 +339,6 @@ export default {
                 // 请求成功。
                 instance.confirmButtonLoading = false
                 this.$message.success('取消遏制成功')
-                // self.doDescription = ''
                 this.isDetails = false
                 this.getListhData(this.restrainList)
                 done()
@@ -347,14 +346,12 @@ export default {
               err => {
                 instance.confirmButtonLoading = false
                 this.$message.error('取消遏制失败')
-                // self.doDescription = ''
                 console.log(err)
                 done()
               },
               this.requestError
             )
           } else {
-            // self.doDescription = ''
             done()
           }
         }

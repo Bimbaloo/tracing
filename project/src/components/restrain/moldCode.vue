@@ -465,7 +465,6 @@ export default {
                     suppressTime: new Date().Format('yyyy-MM-dd hh:mm:ss')
                   }
                 }
-                // self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
                 window.open(
                   'restrainReport.html?' +
@@ -481,14 +480,12 @@ export default {
               err => {
                 instance.confirmButtonLoading = false
                 this.$message.error('遏制失败')
-                // self.doDescription = ''
                 console.log(err)
                 done()
               },
               this.requestError
             )
           } else {
-            // self.doDescription = ''
             done()
           }
         }
