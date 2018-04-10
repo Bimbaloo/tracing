@@ -321,7 +321,7 @@ export default {
           endTime: [{ validator: validateEndTime, trigger: 'change' }]
         },
         // 溯源。
-        trace_down: {
+        trace_up: {
           barcode: [{ validator: validateParam, trigger: 'change' }],
           traceCode: [{ validator: validateTraceCode, trigger: 'change' }],
           materialCode: [{ validator: validateParam, trigger: 'change' }],
@@ -333,7 +333,7 @@ export default {
           endTime: [{ validator: validateTime, trigger: 'change' }]
         },
         // 追踪。
-        trace_up: {
+        trace_down: {
           barcode: [{ validator: validateParam, trigger: 'change' }],
           materialCode: [{ validator: validateParam, trigger: 'change' }],
           equipmentCode: [{ validator: validateParam, trigger: 'change' }],
