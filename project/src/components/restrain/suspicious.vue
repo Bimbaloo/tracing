@@ -155,7 +155,7 @@ export default {
               // 失败
               (err) => {
                 instance.confirmButtonLoading = false
-                this.$message.error('遏制失败')
+                this.$message.error(err)
                 console.log(err)
                 done()
               },
