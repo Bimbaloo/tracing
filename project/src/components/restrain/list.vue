@@ -6,7 +6,7 @@
         </div>
 			<h2 class="content-title path-title" >
         <span :class="{ 'list': isDetails }" @click="isDetails = false">遏制列表</span>
-        <span class="details" v-if="isDetails"  @click="isDetails = true">>遏制详情</span>
+        <span class="details" v-if="isDetails"  @click="isDetails = true">>遏制原因</span>
       </h2>
 			<h2 class="content-title" v-show="!isDetails">遏制列表</h2>
       <h2 class="content-title" v-show="isDetails">操作信息</h2>
@@ -36,7 +36,7 @@ import table from 'components/basic/table.vue'
 import report from 'components/report/report.vue'
 
 const URL = window.HOST + '/api/v1/suppress/list' // 遏制列表
-// const verboseURL = window.HOST + '/api/v1/suppress/verbose' // 遏制详情
+// const verboseURL = window.HOST + '/api/v1/suppress/verbose' // 遏制原因
 const cancelURL = window.HOST + '/api/v1/suppress/cancel' //   解除遏制
 
 export default {
@@ -71,7 +71,7 @@ export default {
           },
           {
             prop: 'doDescription',
-            name: '遏制详情',
+            name: '遏制原因',
             sortable: true
           },
           {
@@ -85,13 +85,7 @@ export default {
             name: '遏制状态',
             sortable: true,
             width: 100,
-            filters: [
-              { text: '成功', value: '成功' },
-              { text: '失败', value: '失败' },
-              { text: '进行中', value: '进行中' },
-              { text: '警告', value: '警告' },
-              { text: '取消', value: '取消' }
-            ],
+            filters: {},
             placement: 'bottom-end',
             method: this.filterState
           },
@@ -103,7 +97,7 @@ export default {
           },
           {
             prop: 'cancelDescription',
-            name: '解除遏制详情',
+            name: '解除遏制原因',
             sortable: true,
             width: 120
           },
@@ -150,12 +144,12 @@ export default {
     window.removeEventListener('resize', this.setTableHeight)
   },
   computed: {
-    /* 遏制详情--操作信息 */
+    /* 遏制原因--操作信息 */
     information () {
       const arr = [
         {
           prop: 'doDescription',
-          name: '遏制详情'
+          name: '遏制原因'
         },
         {
           prop: 'condition',
@@ -175,7 +169,7 @@ export default {
         },
         {
           prop: 'endDescription',
-          name: '解除遏制详情'
+          name: '解除遏制原因'
         },
         {
           prop: 'endOperator',
@@ -218,11 +212,26 @@ export default {
     },
     /* 表格列 */
     columns () {
-      return this.tableDate.columns.filter(el => !!el.prop && el.prop !== 'handle')
+      return this.tableDate.columns.filter(el => !!el.prop && el.prop !== 'handle').map(el => {
+        if (el.prop === 'stateName') {
+          el.filters = this.filters
+        }
+        return el
+      })
     },
     /* 表格高度 */
     tableHeight () {
       return this.tableDate.height
+    },
+    // 状态的筛选
+    filters () {
+      let set = new Set(this.tableDate.data.map(el => {
+        return el.stateName
+      }))
+      let arr = [...set]
+      return arr.map(el => {
+        return { text: el, value: el }
+      })
     }
   },
   watch: {

@@ -207,7 +207,7 @@ export default {
                 // 请求成功。
                 console.log(oData)
                 this.restrainIf = false
-                const handle = oData.data.data.handle
+                const handle = oData.handle
                 sessionStorage.setItem('handleID', handle)
                 instance.confirmButtonLoading = false
                 this.$message.success('遏制成功')

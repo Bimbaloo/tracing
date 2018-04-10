@@ -53,12 +53,12 @@ export default {
       }
       return oRequest
     },
-    /* 遏制详情--操作信息 */
+    /* 遏制原因--操作信息 */
     information () {
       const arr = [
         {
           prop: 'doDescription',
-          name: '遏制详情'
+          name: '遏制原因'
         },
         {
           prop: 'condition',
@@ -78,7 +78,7 @@ export default {
         },
         {
           prop: 'endDescription',
-          name: '解除遏制详情'
+          name: '解除遏制原因'
         },
         {
           prop: 'endOperator',

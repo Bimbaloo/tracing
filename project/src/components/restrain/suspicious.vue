@@ -4,7 +4,7 @@
 			暂时不支持遏制
 		</div>
 		<div class="suspicious-content" v-else>
-			<el-button class="btn btn-plain btn-restrain" @click="suppressDialogVisible = true" v-show="isRestrained && hasSupressionList">遏制</el-button>
+			<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained && hasSupressionList">遏制</el-button>
 			<div class="inner-content">
         <div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
           <span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span>
@@ -86,7 +86,7 @@ export default {
   },
   methods: {
     // 可疑品列表
-    suppress () {
+    suppres () {
       const h = this.$createElement
       let self = this
       this.$msgbox({
@@ -141,22 +141,16 @@ export default {
               oConditions,
               oData => {
                 console.log(oData)
-                if (oData.data.errorCode === 1) { // 接口出错
-                  this.$message.error('接口出错')
-                  console.log(oData.data.errorMsg.message)
-                  done()
-                } else if (oData.data.errorCode === 0) {
-                  this.isRestrained = false
-                  const handle = oData.data.data.handle
-                  sessionStorage.setItem('handleID', handle)
-                  instance.confirmButtonLoading = false
-                  this.$message.success('遏制成功')
-                  let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
-                  sessionStorage.setItem('restrain', JSON.stringify(restrain))
-                  window.open('restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+                this.isRestrained = false
+                const handle = oData.handle
+                sessionStorage.setItem('handleID', handle)
+                instance.confirmButtonLoading = false
+                this.$message.success('遏制成功')
+                let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
+                sessionStorage.setItem('restrain', JSON.stringify(restrain))
+                window.open('restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
 
-                  done()
-                }
+                done()
               },
               // 失败
               (err) => {

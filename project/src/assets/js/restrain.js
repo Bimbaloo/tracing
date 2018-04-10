@@ -141,11 +141,6 @@ const categories = [{
     'title': '遏制列表',
     'key': '1',
     'items': [{
-      'name': '人员',
-      'key': 'personCode',
-      'type': 'select',
-      'placeholder': '请选择人员'
-    }, {
       'name': '开始时间',
       'key': 'startTime',
       'type': 'datetime',

@@ -846,7 +846,7 @@ export default {
           oParam = oQuery
         }
       } else if (this.type === 'restrainDetails') {
-        // 遏制详情
+        // 遏制原因
         oParam = this.query
         // console.log(oParam)
         sUrl = this.oUrl[this.type]
