@@ -379,7 +379,6 @@ export default {
         },
         // 遏制列表
         suppressList: {
-          personCode: [{ validator: validateNull, trigger: 'change' }],
           startTime: [{ validator: validateNull, trigger: 'change' }],
           // 结束时间。
           endTime: [{ validator: validateNull, trigger: 'change' }]
