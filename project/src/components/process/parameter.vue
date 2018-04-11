@@ -761,7 +761,12 @@ export default {
     /* 处理每个option */
     initOption (data, index) {
       /* 定义option模板 */
-      let barcode = data.list[0].barcode
+      let barcodes = data.list.map(el => {
+        return {
+          barcode: el.barcode,
+          axisValue: el.pickTime
+        }
+      })
       let optionModal = {
         title: {
           // text: 'XX 参数图表',
@@ -775,6 +780,9 @@ export default {
         tooltip: {
           trigger: 'axis',
           formatter: function (params) {
+            let barcode = barcodes.find((el, index) => {
+              return el.axisValue === params[0].axisValue
+            }).barcode
             if (barcode === null) {
               return `
                 ${params[0].name}
