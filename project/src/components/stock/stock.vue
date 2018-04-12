@@ -64,7 +64,11 @@ export default {
   created () {
     this.setRouteQuery()
   },
-  watch: {},
+  watch: {
+    $route: function () {
+      this.isRestrained = true
+    }
+  },
   methods: {
     // 查出库
     checkStock (event) {
