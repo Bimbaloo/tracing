@@ -34,6 +34,7 @@
 							<span class='table-title'>起点明细信息
 								<i class="el-icon-d-arrow-right icon"></i>
 							</span>
+              <span class="table-tip">已选中{{gridData.selected.length}}项</span>
 						</h2>
 						<transition name="el-zoom-in-top">
 							<div class="content-table inner" ref="startedTable">
@@ -500,7 +501,16 @@ export default {
   }
   .content-title {
     color: #42af8f;
+    position: relative;
 
+    .table-tip {
+      position: absolute;
+      top: 0;
+      left: 140px;
+      color: #999;
+      font-size: 12px;
+      font-weight: bold;
+    }
     &:hover {
       color: #42af8f;
       cursor: pointer;
