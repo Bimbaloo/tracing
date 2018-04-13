@@ -288,8 +288,9 @@ export default {
         let sPath = this.isOpDbBeforeRefact
           ? '/stock/batch'
           : '/stock/restrain'
-
+        window.sessionStorage.setItem('type', 'restrainBatch')
         this.$router.replace({
+          type: 'restrainBatch',
           path: sPath,
           query: { materialCode: this.node.materialCode, batchNo: row.batchNo }
         })

@@ -127,7 +127,12 @@ export default {
       height: 200,
       handleId: '', // 点击行的 handleId
       index: 0, // 点击行的 index
-      doDescription: '' // 解除遏制的描述信息
+      doDescription: '', // 解除遏制的描述信息
+      stateOfname: {
+        1: '成功',
+        3: '进行中',
+        5: '已解除'
+      }
     }
   },
   created () {
@@ -271,6 +276,7 @@ export default {
         el.handleId = el.handle
         el.handle = '查看详情'
         el.index = index
+        el.stateName = this.stateOfname[`${el.state}`]
       })
       this.tableDate.data = []
       this.tableDate.data.push(...oData)
