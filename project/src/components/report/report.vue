@@ -603,7 +603,8 @@ export default {
               sortable: true
             }
           ],
-          data: []
+          data: [],
+          filteredData: []
         },
         // 库存损益
         loss: {
@@ -734,18 +735,21 @@ export default {
       let oData = this.reportData
       for (let p in oData) {
         oData[p].data = oResult[p]
-
+        oData[p].data.forEach(a => {
+          if (!a.materialCode) {
+            a.materialCode = ''
+          }
+          if (!a.batchNo) {
+            a.batchNo = ''
+          }
+        })
         oData[p].data.sort(function (a, b) {
           if (a.materialCode > b.materialCode) {
-            return 1
-          }
-          if (a.materialCode < b.materialCode) {
             return -1
-          }
-          if ((a.materialCode = b.materialCode)) {
-            if (a.batchNo > b.batchNo) {
-              return 1
-            }
+          } else if (a.materialCode < b.materialCode) {
+            return 1
+          } else if (a.batchNo > b.batchNo) {
+            return -1
           }
           // a 必须等于 b
           return 0
