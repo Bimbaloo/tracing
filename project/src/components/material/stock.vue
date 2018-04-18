@@ -39,6 +39,7 @@ export default {
       // btnShowRestrain: false, // 临时屏蔽遏制
       description: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
+      barcodeUrl: window.HOST + '/api/v1/suppress/do-by-barcode', // 根据模号
       isRestrained: true
     }
   },
@@ -138,15 +139,27 @@ export default {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '遏制中...'
-            let oConditions = Object.assign(
-              { doDescription: self.doDescription },
-              this.$route.query
-            )
+            let oUrl = ''
+            let oConditions = {}
+            let oQuery = this.$route.query
+            if ('materialCode' in oQuery) {
+              oUrl = this.url
+              oConditions = Object.assign(
+                { doDescription: self.doDescription },
+                oQuery
+              )
+            } else if ('barcode' in oQuery) {
+              oUrl = this.barcodeUrl
+              oConditions = Object.assign(
+                { doDescription: self.doDescription },
+                oQuery
+              )
+            }
 
             this.$register.sendRequest(
               this.$store,
               this.$ajax,
-              this.url,
+              oUrl,
               'post',
               oConditions,
               oData => {
