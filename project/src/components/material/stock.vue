@@ -258,7 +258,7 @@ export default {
     //          console.log(from);
     //          console.log("next:");
     //          console.log(next);
-
+    this.isRestrained = true // 恢复为未遏制
     this.key = this.$route.params.key
     this.setRouteQuery()
     // 设置path可见性。
