@@ -64,7 +64,7 @@ export default {
       }
 
       this.equipments = {
-        equipmentCode: oQuery.equipmentCode.split(':')[0],
+        equipmentCode: oQuery.equipmentCode && oQuery.equipmentCode.split(':')[0],
         shiftStartTime: start,
         shiftEndTime: end
       }

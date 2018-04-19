@@ -6,7 +6,7 @@
         </div>
 			<h2 class="content-title path-title" >
         <span :class="{ 'list': isDetails }" @click="isDetails = false">遏制列表</span>
-        <span class="details" v-if="isDetails"  @click="isDetails = true">>遏制原因</span>
+        <span class="details" v-if="isDetails"  @click="isDetails = true">>遏制清单</span>
       </h2>
 			<h2 class="content-title" v-show="!isDetails">遏制列表</h2>
       <h2 class="content-title" v-show="isDetails">操作信息</h2>

@@ -3,7 +3,7 @@
 		v-loading="loading"
 		element-loading-text="拼命加载中"
     	class="ag-table ag-fresh"
-		:style="{height: heights+'px'}"
+		  :style="{height: heights+'px'}"
     	:rowData="dataArray"
     	:columnDefs="columns"
     	:selectionChanged="selectionChanged"

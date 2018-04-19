@@ -89,43 +89,50 @@ const routes = [
       path: '',
       component: Chart, // List
       meta: {
-        title: 'chart'
+        title: 'chart',
+        keepAlive: true
       }
     }, {
       path: 'detail',
       component: Detail,
       meta: {
-        title: 'detail'
+        title: 'detail',
+        keepAlive: false
       }
     }, {
       path: 'product',
       component: Product,
       meta: {
-        title: 'product'
+        title: 'product',
+        keepAlive: true
       }
     }, { // 质检
       path: 'qtReport',
       component: QtReport,
       meta: {
-        title: 'qtReport'
+        title: 'qtReport',
+        keepAlive: false
       }
     }, { // 送检
       path: 'qcReport',
       component: QcReport,
       meta: {
-        title: 'qcReport'
+        title: 'qcReport',
+        keepAlive: false
       }
     }, { // fgb
       path: 'fgbReport',
       component: FgbReport,
       meta: {
-        title: 'fgbReport'
+        title: 'fgbReport',
+        keepAlive: false
       }
     }, { // 工具
       path: 'tool',
       component: Tool,
       meta: {
-        title: 'tool'
+        title: 'tool',
+        keepAlive: false
       }
     }, { // 事件
       path: 'event',
@@ -137,25 +144,29 @@ const routes = [
       path: 'repair',
       component: Repair,
       meta: {
-        title: 'repair'
+        title: 'repair',
+        keepAlive: false
       }
     }, { // 点检记录
       path: 'spotReport',
       component: SpotReport,
       meta: {
-        title: 'spotReport'
+        title: 'spotReport',
+        keepAlive: false
       }
     }, { // 工艺参数
       path: 'parameter',
       component: Parameter,
       meta: {
-        title: 'parameter'
+        title: 'parameter',
+        keepAlive: false
       }
     }, { // 遏制
       path: 'restrain',
       component: Suspicious,
       meta: {
-        title: 'restrain'
+        title: 'restrain',
+        keepAlive: false
       }
     }]
   },

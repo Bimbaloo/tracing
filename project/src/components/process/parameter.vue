@@ -24,7 +24,7 @@
             </h2>
             <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }" v-loading="loading" element-loading-text="拼命加载中">
                 <el-switch
-                  style="display: block"
+                  style="display: inline-block;max-width: 150px"
                   v-model="activeName"
                   active-value="table"
                   inactive-value="charts"
@@ -55,8 +55,6 @@
                       stripe
                       class="table"
                       :row-key="barcodeTableData.data.barcode"
-                      v-loading="barcodeTableData.loading"
-                      element-loading-text="拼命加载中"
                       style="width: 100%"
                       ref="multipleTable"
                       @expand-change="expandRow"
@@ -82,7 +80,14 @@
                                         v-for="prop in props.row.list"
                                         :key="prop.varStdId"
                                         class="expand-lable">
-                                            <span class="expand-span" v-for="(item,index) in prop.params" :key="index" :style="{ color: item.isWarn}">{{item.value}}({{item.pickTime}})</span>
+                                            <span class="expand-span" v-for="(item,index) in prop.params" :key="index" :style="{ color: item.isWarn}">{{item.value}}({{item.pickTime}})
+                                              <i
+                                                v-if="showCamera"
+                                                class="icon icon-12 icon-camera"
+                                                title="视频监控"
+                                                @click="showVideoDialog(item.pickTime, props.row)">
+                                              </i>
+                                            </span>
                                         </el-form-item>
                                     </div>
                                     <div v-else>{{detailTip}}</div>
@@ -96,7 +101,7 @@
                   </div>
                   
                 </div>
-                <div v-show="activeName === `charts`" class="chart" v-loading="loading" element-loading-text="拼命加载中">
+                <div v-show="activeName === `charts`" class="chart">
                   <div v-if="!chartShow" class="error">
                     {{ empty }}
                   </div>
@@ -1232,31 +1237,39 @@ export default {
       this.videoForm.visible = false
     },
     // 打开监控视频。
-    showVideoDialog () {
-      const value = this.tableDatas[this.tabPaneNum].value
+    showVideoDialog (time, row) {
       let myVideoForm = {
         visible: true,
         equipmentId: this.oQuery.equipmentId,         // 设备ID
         equipmentName: this.condition.equipmentName,  // 设备名称
         shiftStartTime: this.condition.startTime     // 开始时间
       }
-      if (value === '表格') {
-        let oData = this.tableDatas[this.tabPaneNum].data
-        let arr = oData.filter(el => {
-          return el.checked
-        })
-        if (arr.length !== 2) {
-          this.$message({
-            showClose: true,
-            message: '请选择起始时间',
-            type: 'error'
+      if (this.activeName === 'charts') {
+        const value = this.tableDatas[this.tabPaneNum].value
+        if (value === '表格') {
+          let oData = this.tableDatas[this.tabPaneNum].data
+          let arr = oData.filter(el => {
+            return el.checked
           })
+          if (arr.length !== 2) {
+            this.$message({
+              showClose: true,
+              message: '请选择起始时间',
+              type: 'error'
+            })
+          } else {
+            this.videoForm = Object.assign({}, {startDate: arr[0].pickTime, endDate: arr[1].pickTime}, myVideoForm)
+          }
         } else {
-          this.videoForm = Object.assign({}, {startDate: arr[0].pickTime, endDate: arr[1].pickTime}, myVideoForm)
+          let oDate = this.getChartTime()
+          this.videoForm = Object.assign({}, {startDate: oDate.newStratTime, endDate: oDate.newEndTime}, myVideoForm)
         }
-      } else {
-        let oDate = this.getChartTime()
-        this.videoForm = Object.assign({}, {startDate: oDate.newStratTime, endDate: oDate.newEndTime}, myVideoForm)
+      } else if (this.activeName === 'table') {
+        let dateTime = row['maxPickTime'].split(' ')[0] + ' ' + time
+        let _time = new Date(dateTime).getTime()  // 点击的时间
+        let startDate = new Date(_time - 1000 * 60 * 10).Format()
+        let endDate = new Date(_time + 1000 * 60 * 10).Format()
+        this.videoForm = Object.assign({}, {startDate, endDate}, myVideoForm)
       }
     }
   }
@@ -1398,6 +1411,13 @@ export default {
       span {
         float: right;
       }
+      .table-handle {
+        .icon {
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
     }
 
     .content-table {
@@ -1434,6 +1454,9 @@ export default {
 }
 
 #parameter .table {
+  .el-table__body-wrapper {
+    overflow-x: hidden;
+  }
   .error {
     margin-top: 20px;
   }

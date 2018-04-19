@@ -14,7 +14,11 @@
             <span v-if="index">></span>{{oRoute.name}}
           </router-link>
         </div>
-	    <router-view></router-view>  
+	    <!-- 遏制数据不需要缓存 -->
+      <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
 </template>
 
@@ -113,7 +117,6 @@ export default {
 
       // 保存查询条件。
       this.oQuery[sToType] = to.query // this.$route.query
-
       if (sToType === 'process' && to.query.key && !to.query.startTime) {
         // 树节点跳转。
         this.oQuery = {}
@@ -157,6 +160,16 @@ export default {
         })
       } else if (sToType === 'product') {
         // 从其他页面跳到投产表
+        this.aoRoute.pop()
+      } else if (sFromType === 'parameter') {
+        // 从工艺参数跳到其他页面。
+        this.aoRoute.push({
+          name: this.operations[sToType],
+          path: sToRoute,
+          query: this.oQuery[sToType]
+        })
+      } else if (sToType === 'parameter') {
+        // 从其他页面跳到工艺参数
         this.aoRoute.pop()
       }
     },

@@ -1,36 +1,41 @@
 <template>
 	<div class="router-content suspicious moldCode" ref='moldCode' v-loading="loading" element-loading-text="拼命加载中">
 		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain && hasSupressionList">遏制</el-button>
-		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain && !isOpDbBeforeRefact">可疑品</el-button>
-		<div class="innner-content" >
+		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain && !isOpDbBeforeRefact && !sErrorMessage">可疑品</el-button>
+    <div class="innner-content">
       <!-- <h2 class="title">模具记录</h2> -->
       <h2 class="content-title path-title" >
         <span :class="{ 'mold-list': !needRestrain }" @click="needRestrain = true,isRestrained = true">模具记录</span>
         <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表</span>
       </h2>
-      <div class="moldInfo" v-show="needRestrain" >
-				<span>模具名称：{{moldInfo.moldName}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
-			</div>
-      <div class="condition" ref='condition' v-if="!needRestrain">
-        <div class='condition-messsage'>
-          <span v-for="(filter,index) in filters" :key="index">
-            {{filter[0]}} : {{filter[1]}}
-          </span>
-        </div>
+      <div v-if="sErrorMessage" class="error">
+        {{ sErrorMessage }}
       </div>
-      <div class="mold-table">
-        <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-show="isRestrained">
-          <el-table-column :prop="column.prop" :label="column.name" :width="column.width" :align="column.align?column.align:'center'" header-align='center' v-for="column in tableData.columns" :key="column.prop" >
-            <template slot-scope="scope">
-              <div v-if="column.prop === 'select' && scope.row[column.prop] !== null">
-                <el-checkbox v-model="scope.row.value" @change="handleCheckChange(scope.row)"></el-checkbox>
-              </div>
-              <!-- 如果改行产出质量不是合格，那么改行的`动作`和`数量`标红 -->
-              <div :class="[(scope.row['qualityType'] !== '合格') && (column.prop === 'eventName' || column.prop === 'quantity') ? 'ng' : '', 'td-cell']" v-else>{{scope.row[column.prop]}}</div>
-            </template>
-          </el-table-column>
-        </el-table>
-        <v-report v-if="!needRestrain" :hasData="setWidth" :noData="removeWidth" type='mold' :query='moldQuerys'></v-report>
+      <div v-else>
+        <div class="moldInfo" v-show="needRestrain" >
+          <span>模具名称：{{moldInfo.moldName}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
+        </div>
+        <div class="condition" ref='condition' v-if="!needRestrain">
+          <div class='condition-messsage'>
+            <span v-for="(filter,index) in filters" :key="index">
+              {{filter[0]}} : {{filter[1]}}
+            </span>
+          </div>
+        </div>
+        <div class="mold-table">
+          <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-show="isRestrained">
+            <el-table-column :prop="column.prop" :label="column.name" :width="column.width" :align="column.align?column.align:'center'" header-align='center' v-for="column in tableData.columns" :key="column.prop" >
+              <template slot-scope="scope">
+                <div v-if="column.prop === 'select' && scope.row[column.prop] !== null">
+                  <el-checkbox v-model="scope.row.value" @change="handleCheckChange(scope.row)"></el-checkbox>
+                </div>
+                <!-- 如果改行产出质量不是合格，那么改行的`动作`和`数量`标红 -->
+                <div :class="[(scope.row['qualityType'] !== '合格') && (column.prop === 'eventName' || column.prop === 'quantity') ? 'ng' : '', 'td-cell']" v-else>{{scope.row[column.prop]}}</div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <v-report v-if="!needRestrain" :hasData="setWidth" :noData="removeWidth" type='mold' :query='moldQuerys'></v-report>
+        </div>
       </div>
 		</div>
 	</div>
@@ -50,6 +55,7 @@ export default {
   },
   data () {
     return {
+      sErrorMessage: '',
       loading: true,
       isRestrained: true,
       needRestrain: true,
@@ -240,6 +246,7 @@ export default {
   methods: {
     // 根据添加渲染页面
     init () {
+      this.sErrorMessage = ''
       this.loading = true
       let {endTime, moldCode, processCode, startTime} = this.moldQuery = fnP.parseQueryParam(this.oQuery)
       const oCondition = {endTime, moldCode, processCode, startTime}
@@ -258,11 +265,12 @@ export default {
       let myData = {...oData}
       this.tableData.data = []
       if (myData.moldDoOutList.length === 0 && myData.moldInfo === null) {
-        this.$message({
-          showClose: true,
-          message: '查询结果为空，请选择合适的查询条件',
-          type: 'error'
-        })
+        this.requestFail('查询结果为空，请选择合适的查询条件')
+        this.moldInfo = {
+          moldCode: '',
+          moldName: '',
+          moldLife: ''
+        }
       } else {
         /* 获取模具信息 */
         let {moldCode, moldName, moldLife} = myData.moldInfo
@@ -354,12 +362,14 @@ export default {
     },
     // 请求失败。
     requestFail (sErrorMessage) {
+      this.sErrorMessage = sErrorMessage
       this.loading = false
       console.log(sErrorMessage)
     },
     // 请求错误。
     requestError (err) {
       console.log(err)
+      this.sErrorMessage = err
       this.loading = false
       console.log('数据库查询出错。')
     },
