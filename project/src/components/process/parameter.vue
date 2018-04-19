@@ -55,8 +55,6 @@
                       stripe
                       class="table"
                       :row-key="barcodeTableData.data.barcode"
-                      v-loading="barcodeTableData.loading"
-                      element-loading-text="拼命加载中"
                       style="width: 100%"
                       ref="multipleTable"
                       @expand-change="expandRow"
@@ -103,7 +101,7 @@
                   </div>
                   
                 </div>
-                <div v-show="activeName === `charts`" class="chart" v-loading="loading" element-loading-text="拼命加载中">
+                <div v-show="activeName === `charts`" class="chart">
                   <div v-if="!chartShow" class="error">
                     {{ empty }}
                   </div>
@@ -1456,6 +1454,9 @@ export default {
 }
 
 #parameter .table {
+  .el-table__body-wrapper {
+    overflow-x: hidden;
+  }
   .error {
     margin-top: 20px;
   }

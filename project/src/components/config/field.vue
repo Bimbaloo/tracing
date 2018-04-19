@@ -1,9 +1,9 @@
 <!--自定义字段名称脚本-->
 <template>
     <div class="content-wraps content-inner">
-        <span class="title">条件列表</span>
+        <span class="title">字段列表</span>
         <el-table
-                class="table-wrapper"
+            class="table-wrapper"
             :data="tableData"
             style="width: 100%"
             stripe
@@ -14,24 +14,20 @@
                 type="index">
             </el-table-column>
             <el-table-column
-                prop="itemCode"
-                label="条件字段">
+                property="itemCode"
+                label="字段">
             </el-table-column>
             <el-table-column
-                slot-scope="scope"
-                prop="itemName"
+                property="itemName"
                 label="显示名称">
-                <div>
-                	<el-input :disabled="true" :value="scope.row.itemName" :placeholder="scope.row.itemName" @change="labelChangeHandler"></el-input>
-                </div>
+                <template slot-scope="scope"><el-input :disabled="true" :value="scope.row.itemName" :placeholder="scope.row.itemName" @change="labelChangeHandler"></el-input></template>
                 <!--<el-form :model="row" :rules="rules" ref="ruleForm">
                 	<el-form-item prop="itemName">
                 		<el-input :value="row.itemName" :placeholder="row.itemName" @change="labelChangeHandler"></el-input>
-					</el-form-item>
+					        </el-form-item>
                 </el-form>-->
             </el-table-column>
         </el-table>
-
         <el-button v-show="false" class="save-btn" type="primary" @click="saveClickHandler('ruleForm')">保存</el-button>
     </div>
 </template>
