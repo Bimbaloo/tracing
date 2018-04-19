@@ -22,13 +22,9 @@
             <h2 class="content-title" id='content-title'>
                 <span>工艺参数</span>
             </h2>
-            <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }">
-                <div v-if="!barcodeTableData.show && !chartShow" class="error">
-                    {{ empty }}
-                </div>
+            <div class='contentBox' :style="{ flexBasis: flexbase + 'px' }" v-loading="loading" element-loading-text="拼命加载中">
                 <el-switch
-                  v-else
-                  style="display: block"
+                  style="display: inline-block;max-width: 150px"
                   v-model="activeName"
                   active-value="table"
                   inactive-value="charts"
@@ -39,7 +35,10 @@
                   @change = "tabChange">
                 </el-switch>
                 <div v-show="activeName === `table`" class="table" >
-                  <div class="barcode-input">
+                  <div v-if="!barcodeTableData.show" class="error">
+                    {{ empty }}
+                  </div>
+                  <div v-if="barcodeTableData.show" class="barcode-input">
                       <el-form :model="ruleForm"  ref="ruleForm" class='el-form-input'>
                           <el-form-item label="条码：" style="width: 400px">
                               <el-input v-model="ruleForm.input" placeholder="请输入条码"  @change="updateRow" ></el-input>
@@ -50,14 +49,12 @@
                           <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle('barcodeTable', $event)"></i>
                       </span>
                   </div>
-                  <div class="content-table" ref="barcodeTable">
+                  <div v-if="barcodeTableData.show" class="content-table" ref="barcodeTable">
                       <el-table
                       :data="datas"
                       stripe
                       class="table"
                       :row-key="barcodeTableData.data.barcode"
-                      v-loading="barcodeTableData.loading"
-                      element-loading-text="拼命加载中"
                       style="width: 100%"
                       ref="multipleTable"
                       @expand-change="expandRow"
@@ -83,7 +80,14 @@
                                         v-for="prop in props.row.list"
                                         :key="prop.varStdId"
                                         class="expand-lable">
-                                            <span class="expand-span" v-for="(item,index) in prop.params" :key="index" :style="{ color: item.isWarn}">{{item.value}}({{item.pickTime}})</span>
+                                            <span class="expand-span" v-for="(item,index) in prop.params" :key="index" :style="{ color: item.isWarn}">{{item.value}}({{item.pickTime}})
+                                              <i
+                                                v-if="showCamera"
+                                                class="icon icon-12 icon-camera"
+                                                title="视频监控"
+                                                @click="showVideoDialog(item.pickTime, props.row)">
+                                              </i>
+                                            </span>
                                         </el-form-item>
                                     </div>
                                     <div v-else>{{detailTip}}</div>
@@ -95,9 +99,13 @@
                           </el-table-column>
                       </el-table>
                   </div>
+                  
                 </div>
-                <div v-show="activeName === `charts`" class="chart" v-loading="loading" element-loading-text="拼命加载中">
-                  <el-tabs  v-model="activeChart" @tab-click="chartTabChange">
+                <div v-show="activeName === `charts`" class="chart">
+                  <div v-if="!chartShow" class="error">
+                    {{ empty }}
+                  </div>
+                  <el-tabs v-else v-model="activeChart" @tab-click="chartTabChange">
                       <el-tab-pane :name="`chart${index}`" v-for="(chartData,index) in tableDatas" :key="index">
                         <span slot="label" :style="{ color: chartData.isWarn }"> {{chartData.filename}}</span>
                           <!-- 没有图表时，不显示图表开关 -->
@@ -145,7 +153,7 @@
                               </div>
                           </div>
                           <div class="btn-box">
-                            <el-button class="btn btn-plain" @click="showSuspiciousList">可疑品</el-button>
+                            <el-button v-if="supression" class="btn btn-plain" @click="showSuspiciousList">可疑品</el-button>
                             <el-button v-if="showCamera" class="btn btn-plain" @click="showVideoDialog">视频查看</el-button>
                           </div>
                       </el-tab-pane>
@@ -257,7 +265,8 @@ export default {
           }
         ],
         data: [],
-        height: 400
+        height: 400,
+        show: true
       },
       ruleForm: {
         input: ''
@@ -316,6 +325,13 @@ export default {
     // 是否开启视频监控
     showCamera () {
       return this.$store.state.factoryModule.cameraFetched
+    },
+    // 是否支持遏制。
+    supression () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.supression
+      )
     }
   },
   mounted () {
@@ -439,7 +455,6 @@ export default {
         // 若无数据，影藏tab。
         this.barcodeTableData.show = false
         // 激活曲线图。
-        this.activeName = 'chart'
         this.fetchChartData()
 
         this.detailTip = '暂无数据。'
@@ -451,7 +466,6 @@ export default {
       this.barcodeTableData.show = false
       this.detailTip = '暂无数据。'
       // 激活曲线图。
-      this.activeName = 'chart'
       this.fetchChartData()
     },
     // 获取条码数据错误。
@@ -460,7 +474,6 @@ export default {
       this.barcodeTableData.show = false
       this.detailTip = '暂无数据。'
       // 激活曲线图。
-      this.activeName = 'chart'
       this.fetchChartData()
     },
     getFilters () {
@@ -563,18 +576,14 @@ export default {
     // 选中修改。
     tabChange (oTab) {
       if (oTab === 'charts') {      // 若为曲线图。
-        this.barcodeTableData.show = true
-        this.chartShow = false
         if (!this.chartFetched) {   // 若曲线图未获取数据。
           this.fetchChartData()
-        } else {
+        } else if (this.chartShow) {
           this.$nextTick(() => {
             this.nowEchart.resize()
           })
         }
       } else {                      // 若为条码表。
-        this.barcodeTableData.show = false
-        this.chartShow = true
         if (!this.tableFetched) {   // 若条码表未获取数据。
           this.fetchBarcodeTableData()
         }
@@ -757,7 +766,12 @@ export default {
     /* 处理每个option */
     initOption (data, index) {
       /* 定义option模板 */
-      let barcode = data.list[0].barcode
+      let barcodes = data.list.map(el => {
+        return {
+          barcode: el.barcode,
+          axisValue: el.pickTime
+        }
+      })
       let optionModal = {
         title: {
           // text: 'XX 参数图表',
@@ -771,6 +785,9 @@ export default {
         tooltip: {
           trigger: 'axis',
           formatter: function (params) {
+            let barcode = barcodes.find((el, index) => {
+              return el.axisValue === params[0].axisValue
+            }).barcode
             if (barcode === null) {
               return `
                 ${params[0].name}
@@ -1220,31 +1237,39 @@ export default {
       this.videoForm.visible = false
     },
     // 打开监控视频。
-    showVideoDialog () {
-      const value = this.tableDatas[this.tabPaneNum].value
+    showVideoDialog (time, row) {
       let myVideoForm = {
         visible: true,
         equipmentId: this.oQuery.equipmentId,         // 设备ID
         equipmentName: this.condition.equipmentName,  // 设备名称
         shiftStartTime: this.condition.startTime     // 开始时间
       }
-      if (value === '表格') {
-        let oData = this.tableDatas[this.tabPaneNum].data
-        let arr = oData.filter(el => {
-          return el.checked
-        })
-        if (arr.length !== 2) {
-          this.$message({
-            showClose: true,
-            message: '请选择起始时间',
-            type: 'error'
+      if (this.activeName === 'charts') {
+        const value = this.tableDatas[this.tabPaneNum].value
+        if (value === '表格') {
+          let oData = this.tableDatas[this.tabPaneNum].data
+          let arr = oData.filter(el => {
+            return el.checked
           })
+          if (arr.length !== 2) {
+            this.$message({
+              showClose: true,
+              message: '请选择起始时间',
+              type: 'error'
+            })
+          } else {
+            this.videoForm = Object.assign({}, {startDate: arr[0].pickTime, endDate: arr[1].pickTime}, myVideoForm)
+          }
         } else {
-          this.videoForm = Object.assign({}, {startDate: arr[0].pickTime, endDate: arr[1].pickTime}, myVideoForm)
+          let oDate = this.getChartTime()
+          this.videoForm = Object.assign({}, {startDate: oDate.newStratTime, endDate: oDate.newEndTime}, myVideoForm)
         }
-      } else {
-        let oDate = this.getChartTime()
-        this.videoForm = Object.assign({}, {startDate: oDate.newStratTime, endDate: oDate.newEndTime}, myVideoForm)
+      } else if (this.activeName === 'table') {
+        let dateTime = row['maxPickTime'].split(' ')[0] + ' ' + time
+        let _time = new Date(dateTime).getTime()  // 点击的时间
+        let startDate = new Date(_time - 1000 * 60 * 10).Format()
+        let endDate = new Date(_time + 1000 * 60 * 10).Format()
+        this.videoForm = Object.assign({}, {startDate, endDate}, myVideoForm)
       }
     }
   }
@@ -1295,6 +1320,9 @@ export default {
     }
   }
   .chart {
+    .error {
+      margin-top: 20px;
+    }
     .el-tabs {
       .el-tabs__header {
         border-bottom-color: #ccc;
@@ -1383,6 +1411,13 @@ export default {
       span {
         float: right;
       }
+      .table-handle {
+        .icon {
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
     }
 
     .content-table {
@@ -1419,6 +1454,12 @@ export default {
 }
 
 #parameter .table {
+  .el-table__body-wrapper {
+    overflow-x: hidden;
+  }
+  .error {
+    margin-top: 20px;
+  }
   .isWarn {
     color: red
   }

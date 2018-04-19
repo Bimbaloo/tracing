@@ -229,8 +229,9 @@ export default {
      *  恢复数据。
      */
     treeDataInit () {
+      let oParsedData = fnP.parseTreeData(this.rawData, 'track', this.isOpDbBeforeRefact)
       this.treeData = fnP.getTreeData(
-        this.rawData,
+        oParsedData,
         'track',
         this.isOpDbBeforeRefact
       ) // this.parseTreeData()this.parseTreeData();
@@ -295,12 +296,13 @@ export default {
         }
 
         // 格式化数据。
+        let oParsedData = fnP.parseTreeData(this.rawData, 'track', this.isOpDbBeforeRefact)
         this.treeData = fnP.getTreeData(
-          this.rawData,
+          oParsedData,
           'track',
           this.isOpDbBeforeRefact
-        ) // this.parseTreeData();
-        this.catalogData = fnP.getCatalogData(this.rawData, 'track', this.isOpDbBeforeRefact) // fnP.getTrackCatalogData(this.rawData)
+        )
+        this.catalogData = fnP.getCatalogData(oParsedData, 'track', this.isOpDbBeforeRefact) // fnP.getTrackCatalogData(this.rawData)
 
         // 展开左侧导航树
         this.$nextTick(() => {

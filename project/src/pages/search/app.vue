@@ -20,7 +20,7 @@
           :handle-submit="handleSubmit"></v-panel>
         </el-tab-pane>
       </el-tabs>
-      <div class="link-suppress-list" v-if="supression" @click="linkSuppressList">遏制列表</div>
+      <div class="link-suppress-list" v-show="activeKey === 'suppress'" v-if="supression" @click="linkSuppressList">遏制列表</div>
     </div>
     <footer>
       <img class="version" :src="version" />

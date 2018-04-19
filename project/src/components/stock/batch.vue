@@ -256,7 +256,7 @@ export default {
         }
       )
     },
-    // 可疑品列表。
+    // 可疑品列表
     showSuspiciousList () {
       if (!this.btnShow) {
         let sKey = this.$route.params.key

@@ -81,8 +81,9 @@ export default {
         null,
         data => {
           // 成功处理。更新loading加载文字
+					let oParsedData = fnP.parseTreeData(data.data, 'track', this.isOpDbBeforeRefact)
           this.treeData = fnP.getTreeData(
-            data.data,
+            oParsedData,
             'track',
             this.isOpDbBeforeRefact
           )

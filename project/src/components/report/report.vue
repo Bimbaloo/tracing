@@ -176,12 +176,6 @@ export default {
           show: true,
           columns: [
             {
-              prop: 'batchNo',
-              name: '批次',
-              // width: "250",
-              sortable: true
-            },
-            {
               prop: 'materialCode',
               name: '物料编码',
               width: '200',
@@ -190,6 +184,12 @@ export default {
             {
               prop: 'materialName',
               name: '物料名称',
+              sortable: true
+            },
+            {
+              prop: 'batchNo',
+              name: '批次',
+              // width: "250",
               sortable: true
             },
             {
@@ -396,8 +396,14 @@ export default {
           },
           columns: [
             {
-              prop: 'barcode',
-              name: '条码',
+              prop: 'materialCode',
+              name: '物料编码',
+              sortable: true
+            },
+            {
+              prop: 'materialName',
+              name: '物料名称',
+              width: '300',
               sortable: true
             },
             {
@@ -407,14 +413,8 @@ export default {
               sortable: true
             },
             {
-              prop: 'materialCode',
-              name: '物料编码',
-              sortable: true
-            },
-            {
-              prop: 'materialName',
-              name: '物料名称',
-              width: '300',
+              prop: 'barcode',
+              name: '条码',
               sortable: true
             },
             {
@@ -474,12 +474,6 @@ export default {
           show: true,
           columns: [
             {
-              prop: 'batchNo',
-              name: '批次',
-              // width: "200",
-              sortable: true
-            },
-            {
               prop: 'materialCode',
               name: '物料编码',
               sortable: true
@@ -488,6 +482,12 @@ export default {
               prop: 'materialName',
               name: '物料名称',
               width: '300',
+              sortable: true
+            },
+            {
+              prop: 'batchNo',
+              name: '批次',
+              // width: "200",
               sortable: true
             },
             {
@@ -540,12 +540,6 @@ export default {
           show: true,
           columns: [
             {
-              prop: 'batchNo',
-              name: '批次',
-              // width: "200",
-              sortable: true
-            },
-            {
               prop: 'materialCode',
               name: '物料编码',
               sortable: true
@@ -554,6 +548,12 @@ export default {
               prop: 'materialName',
               name: '物料名称',
               width: '300',
+              sortable: true
+            },
+            {
+              prop: 'batchNo',
+              name: '批次',
+              // width: "200",
               sortable: true
             },
             {
@@ -603,7 +603,8 @@ export default {
               sortable: true
             }
           ],
-          data: []
+          data: [],
+          filteredData: []
         },
         // 库存损益
         loss: {
@@ -654,7 +655,8 @@ export default {
         }
       },
       progressId: new Date().getTime().toString().substr(-5),
-      cancelProgressUrl: window.HOST + '/api/v1/request/kill/'
+      cancelProgressUrl: window.HOST + '/api/v1/request/kill/',
+      timer: null
     }
   },
   watch: {
@@ -663,6 +665,12 @@ export default {
       // 页面重新查询时，设置新进程
       this.progressId = new Date().getTime().toString().substr(-5)
       this.loading = false
+
+      if (this.timer) {
+        clearTimeout(this.timer)
+        this.timer = null
+      }
+
       this.fetchData()
     },
     killProgress () {
@@ -692,7 +700,7 @@ export default {
     },
 // 关闭进度进程
     closeProgressDialog () {
-      setTimeout(() => {
+      this.timer = setTimeout(() => {
         this.loading = false
       }, 2000)
     },
@@ -727,18 +735,21 @@ export default {
       let oData = this.reportData
       for (let p in oData) {
         oData[p].data = oResult[p]
-
+        oData[p].data.forEach(a => {
+          if (!a.materialCode) {
+            a.materialCode = ''
+          }
+          if (!a.batchNo) {
+            a.batchNo = ''
+          }
+        })
         oData[p].data.sort(function (a, b) {
           if (a.materialCode > b.materialCode) {
-            return 1
-          }
-          if (a.materialCode < b.materialCode) {
             return -1
-          }
-          if ((a.materialCode = b.materialCode)) {
-            if (a.batchNo > b.batchNo) {
-              return 1
-            }
+          } else if (a.materialCode < b.materialCode) {
+            return 1
+          } else if (a.batchNo > b.batchNo) {
+            return -1
           }
           // a 必须等于 b
           return 0
@@ -749,6 +760,8 @@ export default {
         if (!oResult[p].length) {
           // 若无数据。
           oData[p].show = false
+        } else {
+          oData[p].show = true
         }
 
         if (oResult[p].length && !bSetWidth) {
@@ -775,6 +788,8 @@ export default {
         // this.$emit('noData')
         // this.error = "查无数据。"
         console.log('查无数据。')
+        // 标注可疑品类表为空
+        this.changeSupressionList()
       }
     },
     // 请求失败。
@@ -788,6 +803,8 @@ export default {
       this.$emit('noData')
       // this.error = "查无数据。"
       console.log(this.sErrorMessage)
+      // 标注可疑品类表为空
+      this.changeSupressionList()
     },
     // 请求错误。
     requestError (err) {
@@ -797,6 +814,8 @@ export default {
       this.sErrorMessage = err
       this.$emit('noData')
       console.log('查询出错。')
+      // 标注可疑品类表为空
+      this.changeSupressionList()
     },
     fetchData () {
       // 进入页面时设置页面的进程标记(created,watch)
@@ -831,7 +850,7 @@ export default {
           oParam = oQuery
         }
       } else if (this.type === 'restrainDetails') {
-        // 遏制详情
+        // 遏制原因
         oParam = this.query
         // console.log(oParam)
         sUrl = this.oUrl[this.type]
@@ -862,6 +881,11 @@ export default {
           sUrl = this.oUrl['restrainBatch']
         }
       }
+
+      // 标注可疑品列表不为空
+      this.$store.commit('setSupressionList', {
+        value: true
+      })
 
       this.$register.sendRequest(
         this.$store,
@@ -926,10 +950,10 @@ export default {
     setSequence () {
       if (this.type === 'trace') {
         // 若为快速报告，改变显示顺序：汇总-出库-在制-在库
-        this.$refs.content.insertBefore(
-          this.$refs.outStocks,
-          this.$refs.inMakings
-        )
+        // this.$refs.content.insertBefore(
+        //   this.$refs.outStocks,
+        //   this.$refs.inMakings
+        // )
         this.$refs.content.append(this.$refs.inStocks)
         this.$refs.content.append(this.$refs.loss)
       }
@@ -1090,6 +1114,12 @@ export default {
          `
 
       window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
+    },
+    // 可疑品列表为空
+    changeSupressionList () {
+      this.$store.commit('setSupressionList', {
+        value: false
+      })
     }
   }
 }

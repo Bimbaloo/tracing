@@ -2,11 +2,11 @@
 	<div class="router-content" ref="suspiciousList">
 		<div class="innner-content" >
       <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" v-show="isDetails&&state" @click="cancelSuppres">取消遏制</el-button>
+        	<el-button class="btn btn-plain btn-restrain" v-show="isDetails&&state" @click="cancelSuppres">解除遏制</el-button>
         </div>
 			<h2 class="content-title path-title" >
         <span :class="{ 'list': isDetails }" @click="isDetails = false">遏制列表</span>
-        <span class="details" v-if="isDetails"  @click="isDetails = true">>遏制详情</span>
+        <span class="details" v-if="isDetails"  @click="isDetails = true">>遏制清单</span>
       </h2>
 			<h2 class="content-title" v-show="!isDetails">遏制列表</h2>
       <h2 class="content-title" v-show="isDetails">操作信息</h2>
@@ -16,11 +16,11 @@
 			<!-- <v-table v-show="!isDetails"  :heights="tableDate.height" :table-data="tableDate" :loading="loading" :resize="resize" class="raw-table"></v-table> -->
       <el-table v-show="!isDetails" :height="tableHeight" :loading="loading" :resize="resize"  :data="tableDate.data" border style="width: 100%">
         <el-table-column type="index" label="序号" width="50" align='center'></el-table-column>
-        <el-table-column v-for="col in columns" :sortable='col.sortable' :key="col.prop" :prop="col.prop" :label="col.name" :width="col.width" align='center'></el-table-column>
+        <el-table-column v-for="col in columns" :sortable='col.sortable' :key="col.prop" :prop="col.prop" :label="col.name" :width="col.width" align='center' :filters='col.filters' :filter-placement='col.placement' :filter-method="col.method"></el-table-column>
         <el-table-column label="操作" width="200" align='center'>
           <template slot-scope="scope">
             <el-button @click="viewDetails(scope)" type="text" size="small">遏制清单</el-button>
-            <el-button @click="viewReport(scope)" type="text" size="small">遏制报告</el-button>
+            <el-button @click="viewReport(scope)" :type="scope.row.reportId ? 'primary': 'text'" size="small">{{ `${scope.row.reportId ? '查看' : '创建'}遏制报告` }}</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -36,8 +36,8 @@ import table from 'components/basic/table.vue'
 import report from 'components/report/report.vue'
 
 const URL = window.HOST + '/api/v1/suppress/list' // 遏制列表
-// const verboseURL = window.HOST + '/api/v1/suppress/verbose' // 遏制详情
-const cancelURL = window.HOST + '/api/v1/suppress/cancel' //   取消遏制
+// const verboseURL = window.HOST + '/api/v1/suppress/verbose' // 遏制原因
+const cancelURL = window.HOST + '/api/v1/suppress/cancel' //   解除遏制
 
 export default {
   components: {
@@ -58,8 +58,10 @@ export default {
             width: 50
           },
           {
-            prop: 'doDescription',
-            name: '遏制详情'
+            prop: 'handleId',
+            name: '遏制编号',
+            sortable: true,
+            width: 180
           },
           {
             prop: 'doTime',
@@ -68,32 +70,44 @@ export default {
             width: 180
           },
           {
-            prop: 'cancelTime',
-            name: '取消遏制时间',
-            sortable: true,
-            width: 180
+            prop: 'doDescription',
+            name: '遏制原因',
+            sortable: true
           },
           {
             prop: 'doOperator',
             name: '开始遏制人员',
-            width: 120
-          },
-          {
-            prop: 'cancelDescription',
-            name: '结束遏制详情',
-            width: 120
-          },
-          {
-            prop: 'cancelOperator',
-            name: '结束遏制人员',
+            sortable: true,
             width: 120
           },
           {
             prop: 'stateName',
             name: '遏制状态',
             sortable: true,
-            width: 100
+            width: 100,
+            filters: {},
+            placement: 'bottom-end',
+            method: this.filterState
           },
+          {
+            prop: 'cancelTime',
+            name: '解除遏制时间',
+            sortable: true,
+            width: 180
+          },
+          {
+            prop: 'cancelDescription',
+            name: '解除遏制原因',
+            sortable: true,
+            width: 120
+          },
+          {
+            prop: 'cancelOperator',
+            name: '解除遏制人员',
+            sortable: true,
+            width: 120
+          },
+
           {
             prop: 'handle',
             name: '操作',
@@ -113,7 +127,12 @@ export default {
       height: 200,
       handleId: '', // 点击行的 handleId
       index: 0, // 点击行的 index
-      doDescription: '' // 取消遏制的描述信息
+      doDescription: '', // 解除遏制的描述信息
+      stateOfname: {
+        1: '成功',
+        3: '进行中',
+        5: '已解除'
+      }
     }
   },
   created () {
@@ -130,12 +149,12 @@ export default {
     window.removeEventListener('resize', this.setTableHeight)
   },
   computed: {
-    /* 遏制详情--操作信息 */
+    /* 遏制原因--操作信息 */
     information () {
       const arr = [
         {
           prop: 'doDescription',
-          name: '遏制详情'
+          name: '遏制原因'
         },
         {
           prop: 'condition',
@@ -147,7 +166,7 @@ export default {
         },
         {
           prop: 'cancelTime',
-          name: '取消遏制时间'
+          name: '解除遏制时间'
         },
         {
           prop: 'doOperator',
@@ -155,11 +174,11 @@ export default {
         },
         {
           prop: 'endDescription',
-          name: '结束遏制详情'
+          name: '解除遏制原因'
         },
         {
           prop: 'endOperator',
-          name: '结束遏制人员'
+          name: '解除遏制人员'
         }
       ]
       let informationArr =
@@ -198,11 +217,26 @@ export default {
     },
     /* 表格列 */
     columns () {
-      return this.tableDate.columns.filter(el => !!el.prop && el.prop !== 'handle')
+      return this.tableDate.columns.filter(el => !!el.prop && el.prop !== 'handle').map(el => {
+        if (el.prop === 'stateName') {
+          el.filters = this.filters
+        }
+        return el
+      })
     },
     /* 表格高度 */
     tableHeight () {
       return this.tableDate.height
+    },
+    // 状态的筛选
+    filters () {
+      let set = new Set(this.tableDate.data.map(el => {
+        return el.stateName
+      }))
+      let arr = [...set]
+      return arr.map(el => {
+        return { text: el, value: el }
+      })
     }
   },
   watch: {
@@ -242,6 +276,7 @@ export default {
         el.handleId = el.handle
         el.handle = '查看详情'
         el.index = index
+        el.stateName = this.stateOfname[`${el.state}`]
       })
       this.tableDate.data = []
       this.tableDate.data.push(...oData)
@@ -291,7 +326,7 @@ export default {
     setTableHeight () {
       this.tableDate.height = this.outerHeight(this.$refs.suspiciousList) - 130
     },
-    /* 取消遏制 */
+    /* 解除遏制 */
     cancelSuppres () {
       const handleId = this.tableDate.data[this.index].handleId
       const h = this.$createElement
@@ -303,7 +338,7 @@ export default {
           attrs: {
             type: 'textarea',
             rows: 4,
-            placeholder: '请输入取消遏制描述信息'
+            placeholder: '请输入解除遏制描述信息'
           },
           class: {
             message: true
@@ -323,33 +358,43 @@ export default {
         beforeClose: (action, instance, done) => {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
-            instance.confirmButtonText = '取消遏制中...'
+            instance.confirmButtonText = '解除遏制中...'
             let oConditions = {
               description: self.doDescription,
               handle: handleId
             }
-            this.$post(cancelURL, oConditions)
-              .then(oData => {
+
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              cancelURL,
+              'post',
+              oConditions,
+              oData => {
+                // 请求成功。
                 instance.confirmButtonLoading = false
-                this.$message.success('取消遏制成功')
-                self.doDescription = ''
+                this.$message.success('解除遏制成功')
                 this.isDetails = false
                 this.getListhData(this.restrainList)
                 done()
-              })
-              .catch(err => {
+              },
+              err => {
                 instance.confirmButtonLoading = false
-                this.$message.error('取消遏制失败')
-                self.doDescription = ''
+                this.$message.error('解除遏制失败')
                 console.log(err)
                 done()
-              })
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
             done()
           }
         }
       })
+    },
+    // 状态遏制
+    filterState (value, row) {
+      return row.stateName === value
     }
   }
 }
@@ -374,6 +419,19 @@ export default {
     }
     .content-table {
       flex: 1;
+    }
+    /deep/.el-table {
+      .el-table__header-wrapper {
+        th {
+          .cell {
+            .el-table__column-filter-trigger {
+              .el-icon-arrow-down {
+                color: #c0c4cc
+              }
+            }
+          }
+        }
+      }
     }
     .path-title {
       border-left: 0;
@@ -405,6 +463,7 @@ export default {
       }
     }
     .report {
+      overflow: auto;
       .report-content {
         padding: 0 !important;
       }

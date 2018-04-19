@@ -3,21 +3,24 @@
 		<div class="error" v-if="isOpDbBeforeRefact" style="margin:20px;">
 			暂时不支持遏制
 		</div>
-		<div v-else>
-			<el-button class="btn btn-plain btn-restrain" @click="suppress" v-show="isRestrained">遏制</el-button>
+		<div class="suspicious-content" v-else>
+			<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="isRestrained && hasSupressionList">遏制</el-button>
 			<div class="inner-content">
-			<!--h2 class="title">遏制详情</h2-->
-			<!-- <h2 class="content-title" v-if="!isrestrainHtml">查询条件</h2> -->
-			<div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
-				<span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span>
-			</div>
-			<div class="condition" v-if="'equipmentId' in oQuery">
-				<span>设备名称：{{equipmentName}}</span><span>开始时间：{{oQuery.startTime}}</span><span>结束时间：{{oQuery.endTime}}</span>
-			</div>
-			<h2 class="title">可疑品列表</h2>
-			<!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
-			<v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'" :type='type'></v-report>
-		</div>
+        <div class="condition" v-if="'materialCode' in oQuery && !isrestrainHtml">
+          <span>物料编码：{{oQuery.materialCode}}</span><span>批次：{{oQuery.batchNo}}</span>
+        </div>
+        <div class="condition" v-if="'barcode' in oQuery && !isrestrainHtml">
+          <span>条码：{{oQuery.barcode}}</span>
+        </div>
+        <div class="condition" v-if="'equipmentId' in oQuery">
+          <span>条码：{{equipmentName}}</span><span>开始时间：{{oQuery.startTime}}</span><span>结束时间：{{oQuery.endTime}}</span>
+        </div>
+        <h2 class="title">可疑品列表</h2>
+        <!-- 遏制中，只当显示的是可疑品列表，才会在监听路由时调用接口 -->
+        <div class="report-box">
+          <v-report :kill-progress="killProgress" v-if="$route.meta.title=='restrain'" :type='type'></v-report>
+        </div>
+      </div>
 		</div>
 	</div>
 
@@ -59,6 +62,13 @@ export default {
     },
     type () {
       return this.$route.meta.type || window.sessionStorage.getItem('type') || null
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {
@@ -73,13 +83,13 @@ export default {
       if (this.$route.meta.title === 'restrain') {
         this.equipmentName = this.oQuery.equipmentName
       }
-      this.isRestrained = window.location.hash.includes('/suppress/1')
+      this.isRestrained = window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4') || window.location.hash.includes('/process/restrain')
       this.killProgress = false
     }
   },
   methods: {
-    // 可疑品列表。
-    suppress () {
+    // 可疑品列表
+    suppres () {
       const h = this.$createElement
       let self = this
       this.$msgbox({
@@ -125,41 +135,44 @@ export default {
                 this.$route.query
               )
             }
-            this.$post(oUrl, oConditions)
-            .then((oData) => {
-              console.log(oData)
-              if (oData.data.errorCode === 1) { // 接口出错
-                this.$message.error('接口出错')
-                console.log(oData.data.errorMsg.message)
-                self.doDescription = ''
-                done()
-              } else if (oData.data.errorCode === 0) {
+
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              oUrl,
+              'post',
+              oConditions,
+              oData => {
+                console.log(oData)
                 this.isRestrained = false
-                const handle = oData.data.data.handle
+                const handle = oData.handle
                 sessionStorage.setItem('handleID', handle)
                 instance.confirmButtonLoading = false
                 this.$message.success('遏制成功')
                 let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
-                self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
-                window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+                window.open('restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
 
                 done()
-              }
-            })
-            .catch(err => {
-              instance.confirmButtonLoading = false
-              this.$message.error('遏制失败')
-              self.doDescription = ''
-              console.log(err)
-              done()
-            })
+              },
+              // 失败
+              (err) => {
+                instance.confirmButtonLoading = false
+                this.$message.error(err)
+                console.log(err)
+                done()
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
             done()
           }
         }
       })
+    },
+    // 请求错误。
+    requestError (err) {
+      console.log(err)
     }
     // setWidth () {
     //   this.styleObject.minWidth = '1000px'
@@ -223,12 +236,11 @@ export default {
   .condition {
     border: 2px solid #42af8f;
     padding: 20px 12px;
-    margin-bottom: 30px;
 
     span {
       display: inline-block;
       & + span {
-        margin-left: 60px;
+        margin-left: 30px;
       }
     }
   }
@@ -239,4 +251,23 @@ export default {
     font-family: "微软雅黑";
   }
 }
+.suspicious {
+  display: flex;
+  flex-direction: column;
+  .suspicious-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    .inner-content {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      .report-box {
+        flex: 1;
+        overflow: auto;
+      }
+    }
+  }
+}
+
 </style>

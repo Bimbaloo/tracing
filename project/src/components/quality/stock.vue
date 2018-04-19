@@ -7,7 +7,7 @@
         </div>
         <div class="path-btn">
         	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf">可疑品</el-button>
-            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf">遏制</el-button>
+            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && hasSupressionList">遏制</el-button>
         </div>
         <div class="router-path">
             <span class="path-item" @click="checkStock">检验明细</span>
@@ -52,6 +52,13 @@ export default {
     },
     nodeType () {
       return this.$store && this.$store.state.nodeType
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {
@@ -115,12 +122,8 @@ export default {
               { description: self.description },
               this.$route.query
             )
-
-            // this.$post(this.url, oConditions)
-            // .then((res) => {
             done()
             instance.confirmButtonLoading = false
-            // if(!res.errorCode) {
             bSucess = true
             // 隐藏遏制按钮。
             self.restrainIf = false
@@ -130,7 +133,7 @@ export default {
             }
             sSerializion = sSerializion.substring(1)
             // 遏制成功，打开到遏制报告。
-            window.open('/restrain/report.html?' + sSerializion)
+            window.open('restrain/report.html?' + sSerializion)
           } else {
             done()
           }

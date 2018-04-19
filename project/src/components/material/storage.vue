@@ -146,6 +146,10 @@ export default {
         this.$nextTick(() => {
           this.setHeight()
         })
+      } else if (toTitle === 'storage') {
+        this.$nextTick(() => {
+          this.setHeight()
+        })
       }
     },
     resizeY: function () {
@@ -288,8 +292,9 @@ export default {
         let sPath = this.isOpDbBeforeRefact
           ? '/stock/batch'
           : '/stock/restrain'
-
+        window.sessionStorage.setItem('type', 'restrainBatch')
         this.$router.replace({
+          type: 'restrainBatch',
           path: sPath,
           query: { materialCode: this.node.materialCode, batchNo: row.batchNo }
         })
@@ -646,11 +651,14 @@ export default {
       // })
       let content = document.querySelector('.router-content')
       let tableData = document.querySelector('.tableData')
-      this.tableHeight = this.outerHeight(content) - this.outerHeight(tableData) - 40
 
-      this.$nextTick(() => {
-        this.$refs.table && this.$refs.table.doLayout()
-      })
+      if (tableData) {
+        this.tableHeight = this.outerHeight(content) - this.outerHeight(tableData) - 40
+
+        this.$nextTick(() => {
+          this.$refs.table && this.$refs.table.doLayout()
+        })
+      }
     }
   }
 }

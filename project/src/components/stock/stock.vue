@@ -9,7 +9,7 @@
         	</div>
             <div class="path-btn">
             	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf && !isOpDbBeforeRefact">可疑品</el-button>
-            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained">遏制</el-button>
+            	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained && hasSupressionList">遏制</el-button>
             </div>
         </div>
         <!-- 遏制数据不需缓存 -->
@@ -52,12 +52,23 @@ export default {
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isOpDbBeforeRefact
       )
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {
     this.setRouteQuery()
   },
-  watch: {},
+  watch: {
+    $route: function () {
+      this.isRestrained = true
+    }
+  },
   methods: {
     // 查出库
     checkStock (event) {
@@ -125,41 +136,42 @@ export default {
               this.$route.query
             )
 
-            this.$post(this.url, oConditions)
-            .then((oData) => {
-              console.log(oData)
-              if (oData.data.errorCode === 1) { // 接口出错
-                this.$message.error('接口出错')
-                console.log(oData.data.errorMsg.message)
-                self.doDescription = ''
-                done()
-              } else if (oData.data.errorCode === 0) {
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              this.url,
+              'post',
+              oConditions,
+              oData => {
+                console.log(oData)
                 this.isRestrained = false
-                const handle = oData.data.data.handle
+                const handle = oData.handle
                 sessionStorage.setItem('handleID', handle)
                 instance.confirmButtonLoading = false
                 this.$message.success('遏制成功')
                 let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
-                self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
-                window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+                window.open('restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
 
                 done()
-              }
-            })
-            .catch(err => {
-              instance.confirmButtonLoading = false
-              this.$message.error('遏制失败')
-              self.doDescription = ''
-              console.log(err)
-              done()
-            })
+              },
+              err => {
+                instance.confirmButtonLoading = false
+                this.$message.error(err)
+                console.log(err)
+                done()
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
             done()
           }
         }
       })
+    },
+    // 请求错误。
+    requestError (err) {
+      console.log(err)
     },
     setRouteQuery () {
       let aHref = this.$route.path.split('/')

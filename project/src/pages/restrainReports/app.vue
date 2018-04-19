@@ -17,7 +17,7 @@
                 <div class="report-item report-question-describe">
                     <h2 class="item-title">问题描述</h2>
                     <ul class="item-content">
-                        <li  class="descripe-item" v-for="(question,key) in pageData.describe">
+                        <li  class="descripe-item" v-for="(question,key) in pageData.describe" :key="key">
                             <el-row>
                                 <el-col :span="4"><span class="descripe-item-title">{{ getDescripeDisplay(key).title }}</span></el-col>
                                 <el-col :span="4"><span class="descripe-item-name">{{ getDescripeDisplay(key).name }}</span></el-col>
@@ -145,7 +145,7 @@
         <el-dialog title="报告内容" center :visible.sync="dialogFormVisible" width="440px">
             <el-form :model="dialogConfigForm">
                 <el-form-item>
-                    <el-col :span="8" v-for="(config,key) in dialogConfigForm">
+                    <el-col :span="8" v-for="(config,key) in dialogConfigForm" :key="key">
                         <el-checkbox :label="config.name" v-model="dialogConfigForm[key].value">{{config.name}}</el-checkbox>
                     </el-col>
                 </el-form-item>
@@ -164,7 +164,7 @@
 <script>
 import report from 'components/report/report.vue'
 import rasterizeHTML from 'rasterizehtml'
-import fnP from 'assets/js/public.js'
+// import fnP from 'assets/js/public.js'
 
 export default {
   components: {
@@ -242,7 +242,7 @@ export default {
     }
   },
   computed: {
-    loginName() {
+    loginName () {
       return this.$store.state.loginModule.nickname !== null
         ? this.$store.state.loginModule.nickname
         : ''
@@ -265,7 +265,7 @@ export default {
       const arr = [
         {
           prop: 'doDescription',
-          name: '遏制详情'
+          name: '遏制原因'
         },
         {
           prop: 'condition',
@@ -277,7 +277,7 @@ export default {
         },
         {
           prop: 'cancelTime',
-          name: '取消遏制时间'
+          name: '解除遏制时间'
         },
         {
           prop: 'doOperator',
@@ -285,11 +285,11 @@ export default {
         },
         {
           prop: 'endDescription',
-          name: '结束遏制详情'
+          name: '解除遏制原因'
         },
         {
           prop: 'endOperator',
-          name: '结束遏制人员'
+          name: '解除遏制人员'
         }
       ]
       let informationArr =
@@ -315,11 +315,11 @@ export default {
 
     let oConditions = sessionStorage.getItem('restrainReports_' + this.query.tag)
 
-    if(oConditions) {
+    if (oConditions) {
       oConditions = JSON.parse(oConditions)
 
       this.filters = oConditions
-    }else {
+    } else {
       this.filters = {}
     }
 
@@ -360,9 +360,9 @@ export default {
               this.$ajax,
               this.oUrl.getList,
               'get',
-              {
-                handle: this.filters.handleId
-              },
+        {
+          handle: this.filters.handleId
+        },
               this.requestSucess,
               this.requestFail,
               this.requestError
@@ -377,7 +377,7 @@ export default {
     },
         // 查询成功
     requestSucess (oData) {
-      if(oData !== undefined) {
+      if (oData !== undefined) {
         // 设置数据。
         this.pageData = JSON.parse(oData.suppressContent)
       }
@@ -426,19 +426,19 @@ export default {
       this.oBeforeData = JSON.parse(JSON.stringify(this.pageData))
     },
     // 上传文件之前
-    beforeUploadImage(index, $event) {},
+    beforeUploadImage (index, $event) {},
     // 上传文件
-    uploadImage(response, file, fileList, $event) {
-      var jUpload = $event.parentElement,
-          nIndex = Number(jUpload.getAttribute('data-index'));
+    uploadImage (response, file, fileList, $event) {
+      let jUpload = $event.parentElement
+      let nIndex = Number(jUpload.getAttribute('data-index'))
 
-      fileList[fileList.length-1].url = response
+      fileList[fileList.length - 1].url = response
           // 修改地址。
       this.pageData.analysis[nIndex].imgs = fileList
     },
-    beforeRemoveImage(file, fileList, $event) {
-      var jUpload = $event.parentElement,
-          nIndex = Number(jUpload.getAttribute('data-index'));
+    beforeRemoveImage (file, fileList, $event) {
+      let jUpload = $event.parentElement
+      let nIndex = Number(jUpload.getAttribute('data-index'))
 
       // 删除图片。
       let anImg = this.pageData.analysis[nIndex].imgs
@@ -448,9 +448,9 @@ export default {
       this.pageData.analysis[nIndex].imgs = anImg
     },
     // 预览
-    previewImage(file) {
-      this.dialog.imageVisible = true;
-      this.dialog.imageUrl = file.url;
+    previewImage (file) {
+      this.dialog.imageVisible = true
+      this.dialog.imageUrl = file.url
     },
         // 保存修改内容
     submitChange () {
@@ -465,10 +465,10 @@ export default {
               this.$ajax,
               this.oUrl.save,
               'put',
-              {
-                handle: this.filters.handleId,
-                suppressContent: JSON.stringify(this.pageData)
-              },
+        {
+          handle: this.filters.handleId,
+          suppressContent: JSON.stringify(this.pageData)
+        },
               () => {
                 this.$message({
                   type: 'success',
@@ -481,7 +481,7 @@ export default {
                 console.log(this.pageData)
               },
               (sError) => {
-                console.warn(sError);
+                console.warn(sError)
                 this.$message('保存失败！')
               },
               (err) => {
@@ -495,8 +495,8 @@ export default {
       this.$refs.analysisTable.clearSelection()
       this.analysisSelectedIndex = []
           // 恢复数据
-        this.pageData = JSON.parse(JSON.stringify(this.oBeforeData))
-        this.$nextTick(() => this.setHeight())
+      this.pageData = JSON.parse(JSON.stringify(this.oBeforeData))
+      this.$nextTick(() => this.setHeight())
     },
     // 新增
     addNewAnalysisItem () {
@@ -504,7 +504,7 @@ export default {
       this.pageData.analysis.push({
         imgs: [],
         content: '',
-        index: this.pageData.analysis.length ? (this.pageData.analysis[this.pageData.analysis.length-1].index + 1) : 0
+        index: this.pageData.analysis.length ? (this.pageData.analysis[this.pageData.analysis.length - 1].index + 1) : 0
       })
     },
     // 删除
@@ -621,7 +621,7 @@ export default {
         }
         .report-container .report-question-analysis .upload-demo .el-upload-list {
           display: inline-block;
-          vertical-align: top;
+          // vertical-align: top;
           padding: 0;
         }
         .report-container .report-question-analysis .upload-demo .el-upload-list li {

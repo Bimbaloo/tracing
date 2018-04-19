@@ -109,7 +109,7 @@ export default {
       let oForm = this.ruleForm
       let oKeys = this.keys
         // 溯源及追踪的参数。
-      let aParams = ['barcode', 'materialCode', 'equipmentCode', 'doCode', 'personCode'] // 增加人员可追溯项。
+      let aParams = ['barcode', 'traceCode', 'materialCode', 'equipmentCode', 'doCode', 'personCode'] // 增加人员可追溯项。
         // 验证条码
       let validateBarcode = (rule, value, callback) => {
         if (!value.trim()) {
@@ -297,14 +297,6 @@ export default {
           callback()
         }
       }
-        // 物流码判断。
-      let validateTraceCode = (rule, value, callback) => {
-        if (!value.trim()) {
-          callback(new Error('请输入物流码'))
-        } else {
-          callback()
-        }
-      }
 
       // 所有规则。
       let oAllRules = {
@@ -321,9 +313,9 @@ export default {
           endTime: [{ validator: validateEndTime, trigger: 'change' }]
         },
         // 溯源。
-        trace_down: {
+        trace_up: {
           barcode: [{ validator: validateParam, trigger: 'change' }],
-          traceCode: [{ validator: validateTraceCode, trigger: 'change' }],
+          traceCode: [{ validator: validateParam, trigger: 'change' }],
           materialCode: [{ validator: validateParam, trigger: 'change' }],
           equipmentCode: [{ validator: validateParam, trigger: 'change' }],
           doCode: [{ validator: validateParam, trigger: 'change' }],
@@ -333,7 +325,7 @@ export default {
           endTime: [{ validator: validateTime, trigger: 'change' }]
         },
         // 追踪。
-        trace_up: {
+        trace_down: {
           barcode: [{ validator: validateParam, trigger: 'change' }],
           materialCode: [{ validator: validateParam, trigger: 'change' }],
           equipmentCode: [{ validator: validateParam, trigger: 'change' }],
@@ -379,7 +371,6 @@ export default {
         },
         // 遏制列表
         suppressList: {
-          personCode: [{ validator: validateNull, trigger: 'change' }],
           startTime: [{ validator: validateNull, trigger: 'change' }],
           // 结束时间。
           endTime: [{ validator: validateNull, trigger: 'change' }]

@@ -53,12 +53,12 @@ export default {
       }
       return oRequest
     },
-    /* 遏制详情--操作信息 */
+    /* 遏制原因--操作信息 */
     information () {
       const arr = [
         {
           prop: 'doDescription',
-          name: '遏制详情'
+          name: '遏制原因'
         },
         {
           prop: 'condition',
@@ -70,7 +70,7 @@ export default {
         },
         {
           prop: 'cancelTime',
-          name: '取消遏制时间'
+          name: '解除遏制时间'
         },
         {
           prop: 'doOperator',
@@ -78,11 +78,11 @@ export default {
         },
         {
           prop: 'endDescription',
-          name: '结束遏制详情'
+          name: '解除遏制原因'
         },
         {
           prop: 'endOperator',
-          name: '结束遏制人员'
+          name: '解除遏制人员'
         }
       ]
       let informationArr = Object.assign({}, this.listInfor) || {}

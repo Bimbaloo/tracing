@@ -122,7 +122,7 @@ export default {
     },
     // 系列名称。
     serieName () {
-      return decodeURIComponent(this.series)
+      return decodeURIComponent(this.series) || '视频'
     },
     // 验证规则。
     rules () {
@@ -144,7 +144,7 @@ export default {
         if (sEnd instanceof Date) {
           sEnd = sEnd.Format()
         }
-        let sTime = value && value.trim() || null
+        let sTime = (value && value.trim()) || null
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let bIsEndFormat = window.Rt.utils.isDateTime(sEnd)
         let nNow = +new Date()
@@ -193,7 +193,7 @@ export default {
         if (sStart instanceof Date) {
           sStart = sStart.Format()
         }
-        let sTime = value && value.trim() || null
+        let sTime = (value && value.trim()) || null
         let bIsFormat = window.Rt.utils.isDateTime(sTime)
         let bIsStartFormat = window.Rt.utils.isDateTime(sStart)
         let nNow = +new Date()
@@ -252,6 +252,24 @@ export default {
     this.$nextTick(() => {
       this.setHeight()
     })
+  },
+  watch: {
+    startDate () {
+      if (this.startDate !== '' && this.endDate !== '') {
+        this.monitorForm.startDate = this.startDate
+        this.monitorForm.endDate = this.endDate
+      } else {
+        this.setTime()
+      }
+    },
+    endDate () {
+      if (this.startDate !== '' && this.endDate !== '') {
+        this.monitorForm.startDate = this.startDate
+        this.monitorForm.endDate = this.endDate
+      } else {
+        this.setTime()
+      }
+    }
   },
   methods: {
     // 设置高度。

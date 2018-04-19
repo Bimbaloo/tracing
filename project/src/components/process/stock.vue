@@ -2,7 +2,7 @@
 <template>
     <div class="material-stock" ref="stock">
         <div class="path-btn">
-        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-show="supression && restrainIf">遏制</el-button>
+        	<el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-show="supression && restrainIf && hasSupressionList">遏制</el-button>
         </div>
         <div class="router-path">
           <router-link 
@@ -14,7 +14,11 @@
             <span v-if="index">></span>{{oRoute.name}}
           </router-link>
         </div>
-	    <router-view></router-view>  
+	    <!-- 遏制数据不需要缓存 -->
+      <keep-alive>
+        <router-view v-if="$route.meta.keepAlive"></router-view>
+      </keep-alive>
+      <router-view v-if="!$route.meta.keepAlive"></router-view>
     </div>
 </template>
 
@@ -53,6 +57,13 @@ export default {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.supression
+      )
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
       )
     }
   },
@@ -106,7 +117,6 @@ export default {
 
       // 保存查询条件。
       this.oQuery[sToType] = to.query // this.$route.query
-
       if (sToType === 'process' && to.query.key && !to.query.startTime) {
         // 树节点跳转。
         this.oQuery = {}
@@ -151,6 +161,16 @@ export default {
       } else if (sToType === 'product') {
         // 从其他页面跳到投产表
         this.aoRoute.pop()
+      } else if (sFromType === 'parameter') {
+        // 从工艺参数跳到其他页面。
+        this.aoRoute.push({
+          name: this.operations[sToType],
+          path: sToRoute,
+          query: this.oQuery[sToType]
+        })
+      } else if (sToType === 'parameter') {
+        // 从其他页面跳到工艺参数
+        this.aoRoute.pop()
       }
     },
     // 遏制
@@ -190,11 +210,17 @@ export default {
               this.$route.query
             )
 
-            this.$post(this.url, oConditions)
-              .then(oData => {
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              this.url,
+              'post',
+              oConditions,
+              oData => {
+                // 请求成功。
                 console.log(oData)
                 this.restrainIf = false
-                const handle = oData.data.data.handle
+                const handle = oData.handle
                 sessionStorage.setItem('handleID', handle)
                 instance.confirmButtonLoading = false
                 this.$message.success('遏制成功')
@@ -206,32 +232,34 @@ export default {
                     suppressTime: new Date().Format('yyyy-MM-dd hh:mm:ss')
                   }
                 }
-                self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
                 window.open(
-                  '/restrainReport.html?' +
+                  'restrainReport.html?' +
                     '_tag=' +
                     new Date()
                       .getTime()
                       .toString()
                       .substr(-5)
                 )
-
                 done()
-              })
-              .catch(err => {
+              },
+              err => {
                 instance.confirmButtonLoading = false
-                this.$message.error('遏制失败')
-                self.doDescription = ''
+                this.$message.error(err)
                 console.log(err)
                 done()
-              })
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
             done()
           }
         }
       })
+    },
+    // 请求错误。
+    requestError (err) {
+      console.log(err)
     }
   },
   // beforeRouteEnter (to, from, next) {

@@ -1,29 +1,41 @@
 <template>
 	<div class="router-content suspicious moldCode" ref='moldCode' v-loading="loading" element-loading-text="拼命加载中">
-		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain">遏制</el-button>
-		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain && !isOpDbBeforeRefact">可疑品</el-button>
-		<div class="innner-content" >
+		<el-button class="btn btn-plain btn-restrain" @click="suppres" v-show="!isRestrained && !needRestrain && hasSupressionList">遏制</el-button>
+		<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-show="needRestrain && !isOpDbBeforeRefact && !sErrorMessage">可疑品</el-button>
+    <div class="innner-content">
       <!-- <h2 class="title">模具记录</h2> -->
       <h2 class="content-title path-title" >
         <span :class="{ 'mold-list': !needRestrain }" @click="needRestrain = true,isRestrained = true">模具记录</span>
-        <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表。</span>
+        <span class="suspected-list" v-if="!needRestrain"  @click="needRestrain = false">>可疑品列表</span>
       </h2>
-      <div class="moldInfo">
-				<span>模具名称：{{moldInfo.moldName}}</span><span>规格：{{moldInfo.moldCode}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
-			</div>
-      <div class="mold-table">
-        <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-show="isRestrained">
-          <el-table-column :prop="column.prop" :label="column.name" :width="column.width" :align="column.align?column.align:'center'" header-align='center' v-for="column in tableData.columns" :key="column.prop" >
-            <template slot-scope="scope">
-              <div v-if="column.prop === 'select' && scope.row[column.prop] !== null">
-                <el-checkbox v-model="scope.row.value" @change="handleCheckChange(scope.row)"></el-checkbox>
-              </div>
-              <!-- 如果改行产出质量不是合格，那么改行的`动作`和`数量`标红 -->
-              <div :class="[(scope.row['qualityType'] !== '合格') && (column.prop === 'eventName' || column.prop === 'quantity') ? 'ng' : '', 'td-cell']" v-else>{{scope.row[column.prop]}}</div>
-            </template>
-          </el-table-column>
-        </el-table>
-        <v-report v-if="!needRestrain" :hasData="setWidth" :noData="removeWidth" type='mold' :query='moldQuery'></v-report>
+      <div v-if="sErrorMessage" class="error">
+        {{ sErrorMessage }}
+      </div>
+      <div v-else>
+        <div class="moldInfo" v-show="needRestrain" >
+          <span>模具名称：{{moldInfo.moldName}}</span><span>模具额定寿命：{{moldInfo.moldLife}}</span>
+        </div>
+        <div class="condition" ref='condition' v-if="!needRestrain">
+          <div class='condition-messsage'>
+            <span v-for="(filter,index) in filters" :key="index">
+              {{filter[0]}} : {{filter[1]}}
+            </span>
+          </div>
+        </div>
+        <div class="mold-table">
+          <el-table :data="tableData.data" :span-method="objectSpanMethod" border style="width: 100%" :height='tableHeight' ref="table" v-show="isRestrained">
+            <el-table-column :prop="column.prop" :label="column.name" :width="column.width" :align="column.align?column.align:'center'" header-align='center' v-for="column in tableData.columns" :key="column.prop" >
+              <template slot-scope="scope">
+                <div v-if="column.prop === 'select' && scope.row[column.prop] !== null">
+                  <el-checkbox v-model="scope.row.value" @change="handleCheckChange(scope.row)"></el-checkbox>
+                </div>
+                <!-- 如果改行产出质量不是合格，那么改行的`动作`和`数量`标红 -->
+                <div :class="[(scope.row['qualityType'] !== '合格') && (column.prop === 'eventName' || column.prop === 'quantity') ? 'ng' : '', 'td-cell']" v-else>{{scope.row[column.prop]}}</div>
+              </template>
+            </el-table-column>
+          </el-table>
+          <v-report v-if="!needRestrain" :hasData="setWidth" :noData="removeWidth" type='mold' :query='moldQuerys'></v-report>
+        </div>
       </div>
 		</div>
 	</div>
@@ -43,6 +55,7 @@ export default {
   },
   data () {
     return {
+      sErrorMessage: '',
       loading: true,
       isRestrained: true,
       needRestrain: true,
@@ -59,12 +72,32 @@ export default {
       },
       // 可疑品列表的查询条件
       moldQuery: {
+        'equipmentName': '',
         'endTime': '',
         'moldCode': '',
         'processCode': '',
         'startTime': '',
         'equipmentId': ''
       },
+      // 条件对应中文名
+      dataName: [
+        {
+          itemCode: 'equipmentName',
+          itemName: '设备'
+        },
+        {
+          itemCode: 'moldCode',
+          itemName: '模号'
+        },
+        {
+          itemCode: 'startTime',
+          itemName: '开始时间'
+        },
+        {
+          itemCode: 'endTime',
+          itemName: '结束时间'
+        }
+      ],
       tableData: {
         columns: [
           {
@@ -151,6 +184,38 @@ export default {
         }
       })
       return arr
+    },
+    filters () {
+      let filters = JSON.parse(JSON.stringify(this.moldQuery))
+      for (let i in filters) {
+        if (filters[i] === '' || i === '_tag' || i === 'equipmentId' || i === 'processCode') {
+          delete filters[i]
+        }
+      }
+      /* 为了将获取到的 barcode等转换为对应的中文 */
+      let b = window.Rt.utils.getObjectEntries(filters) // Object.entries(filters)
+      let a = this.dataName
+
+      b.forEach(o =>
+        a.forEach(function (x) {
+          if (o[0] === x.itemCode) {
+            o[0] = x.itemName
+          }
+        })
+      )
+      return b
+    },
+    // 查询可疑品的
+    moldQuerys () {
+      let {equipmentId, moldCode, processCode, startTime, endTime} = this.moldQuery
+      return {equipmentId, moldCode, processCode, startTime, endTime}
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {
@@ -181,6 +246,7 @@ export default {
   methods: {
     // 根据添加渲染页面
     init () {
+      this.sErrorMessage = ''
       this.loading = true
       let {endTime, moldCode, processCode, startTime} = this.moldQuery = fnP.parseQueryParam(this.oQuery)
       const oCondition = {endTime, moldCode, processCode, startTime}
@@ -197,12 +263,14 @@ export default {
     },
     requestSucess (oData) {
       let myData = {...oData}
+      this.tableData.data = []
       if (myData.moldDoOutList.length === 0 && myData.moldInfo === null) {
-        this.$message({
-          showClose: true,
-          message: '查询结果为空，请选择合适的查询条件',
-          type: 'error'
-        })
+        this.requestFail('查询结果为空，请选择合适的查询条件')
+        this.moldInfo = {
+          moldCode: '',
+          moldName: '',
+          moldLife: ''
+        }
       } else {
         /* 获取模具信息 */
         let {moldCode, moldName, moldLife} = myData.moldInfo
@@ -294,12 +362,14 @@ export default {
     },
     // 请求失败。
     requestFail (sErrorMessage) {
+      this.sErrorMessage = sErrorMessage
       this.loading = false
       console.log(sErrorMessage)
     },
     // 请求错误。
     requestError (err) {
       console.log(err)
+      this.sErrorMessage = err
       this.loading = false
       console.log('数据库查询出错。')
     },
@@ -319,6 +389,7 @@ export default {
             this.moldQuery.startTime = this.selected[0].el.happenTime
             this.moldQuery.endTime = new Date().Format()   // 将当期时间当做结束时间
             this.moldQuery.equipmentId = this.selected[0].el.equipmentId
+            this.moldQuery.equipmentName = this.selected[0].el.equipmentName
             this.needRestrain = false
             this.isRestrained = false
           } else {  // 如果选中的是`最后一次`产出的话
@@ -330,11 +401,12 @@ export default {
           }
 
           break
-        case 2:     // 选中了领条
+        case 2:     // 选中了两条
           if (this.selected[0].el.select === 'first' && this.selected[0].el.equipmentId === this.selected[1].el.equipmentId) {  // 以选项中开始时间大于结束时间 && 设备ID相同
             this.moldQuery.startTime = this.selected[0].el.happenTime
             this.moldQuery.endTime = this.selected[1].el.happenTime
             this.moldQuery.equipmentId = this.selected[0].el.equipmentId
+            this.moldQuery.equipmentName = this.selected[0].el.equipmentName
             this.needRestrain = false
             this.isRestrained = false
           } else if (this.selected[0].el.equipmentId !== this.selected[1].el.equipmentId) {  // 以选项中设备ID不同
@@ -346,7 +418,7 @@ export default {
           } else {
             this.$message({
               showClose: true,
-              message: '开始时间不能小于结束时间',
+              message: '结束时间不能小于开始时间',
               type: 'error'
             })
           }
@@ -388,12 +460,17 @@ export default {
               { doDescription: self.doDescription },
               this.moldQuery
             )
-            console.log(oConditions)
-            this.$post(this.url, oConditions)
-              .then(oData => {
+
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              this.url,
+              'post',
+              oConditions,
+              oData => {
                 console.log(oData)
                 this.isRestrained = false
-                const handle = oData.data.data.handle
+                const handle = oData.handle
                 sessionStorage.setItem('handleID', handle)
                 instance.confirmButtonLoading = false
                 this.$message.success('遏制成功')
@@ -405,10 +482,9 @@ export default {
                     suppressTime: new Date().Format('yyyy-MM-dd hh:mm:ss')
                   }
                 }
-                self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
                 window.open(
-                  '/restrainReport.html?' +
+                  'restrainReport.html?' +
                     '_tag=' +
                     new Date()
                       .getTime()
@@ -417,16 +493,16 @@ export default {
                 )
 
                 done()
-              })
-              .catch(err => {
+              },
+              err => {
                 instance.confirmButtonLoading = false
-                this.$message.error('遏制失败')
-                self.doDescription = ''
+                this.$message.error(err)
                 console.log(err)
                 done()
-              })
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
             done()
           }
         }
@@ -493,6 +569,18 @@ export default {
     right: 40px !important;
   }
   .innner-content {
+    .condition {
+      border: 2px solid #42af8f;
+      padding: 20px 12px;
+      margin-bottom: 30px;
+
+      span {
+        display: inline-block;
+        & + span {
+          margin-left: 30px;
+        }
+      }
+    }
     .content-title {
       .mold-list {
         &:hover {

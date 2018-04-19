@@ -20,6 +20,7 @@
 						<transition name="el-zoom-in-top">
 							<div class="content-table inner" ref="summaryTable">
 								<v-table
+									ref="table"
 									v-show="active.summary"
 									:max-height="tableHeight"
 									:table-data="summaryData"
@@ -33,6 +34,7 @@
 							<span class='table-title'>起点明细信息
 								<i class="el-icon-d-arrow-right icon"></i>
 							</span>
+              <span class="table-tip">已选中{{gridData.selected.length}}项</span>
 						</h2>
 						<transition name="el-zoom-in-top">
 							<div class="content-table inner" ref="startedTable">
@@ -65,7 +67,7 @@ export default {
     return {
       tdResize: true, // 是否允许拖动table大小
       dataFilter: true, // 是否启用过滤功能
-			tableHeight: 200,
+      tableHeight: 200,
       gridData: {
         url: window.HOST + '/api/v1/trace/down/start-points',
         loading: false,
@@ -118,23 +120,29 @@ export default {
     // 组件创建完后获取数据，
     // 此时 data 已经被 observed 了
     this.fetchPage()
-		window.addEventListener('resize', this.adjustHeight)
+    window.addEventListener('resize', this.adjustHeight)
     this.$nextTick(() => {
       this.adjustHeight()
     })
   },
-	computed: {
-		// 版本信息数据。
+  computed: {
+    // 版本信息数据。
     isOpDbBeforeRefact () {
       return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isOpDbBeforeRefact
       )
     }
-	},
+  },
   watch: {
     // 如果路由有变化，会再次执行该方法
-    $route: 'fetchPage',
+    $route: function () {
+      this.active = {
+        summary: false,
+        started: true
+      }
+      this.fetchPage()
+    },
     'gridData.selected': function (params) {
       // 有选中的行时，表头全选checkbox会显示
       let aoColumns = this.getColumns()
@@ -146,6 +154,14 @@ export default {
       }
 
       this.gridData.columns = aoColumns
+    },
+    'active.summary': function (isShow) {
+      if (isShow) {
+        this.$nextTick(() => {
+          let oTable = this.$refs.table.$children[0]
+          oTable && oTable.doLayout()
+        })
+      }
     }
   },
   methods: {
@@ -287,12 +303,12 @@ export default {
     },
     // 获取高度。
     adjustHeight () {
-			this.tableHeight = 200
-			this.$nextTick(() => {
-				this.tableHeight = this.$refs.routerContent.clientHeight -
-									        this.outerHeight(document.querySelector('.content-title')) * 2 -
-									        20
-			})
+      this.tableHeight = 200
+      this.$nextTick(() => {
+        this.tableHeight = this.$refs.routerContent.clientHeight -
+                          this.outerHeight(document.querySelector('.content-title')) * 2 -
+                          20
+      })
     },
     // 根据时间排序。
     sortByTime (a, b) {
@@ -485,7 +501,16 @@ export default {
   }
   .content-title {
     color: #42af8f;
+    position: relative;
 
+    .table-tip {
+      position: absolute;
+      top: 0;
+      left: 140px;
+      color: #999;
+      font-size: 12px;
+      font-weight: bold;
+    }
     &:hover {
       color: #42af8f;
       cursor: pointer;

@@ -7,7 +7,7 @@
         </div>
         <div class="path-btn">
         	<el-button class="btn btn-plain btn-restrain" @click="showSuspiciousList" v-if="batchIf && !restrainIf && !isOpDbBeforeRefact">可疑品</el-button>
-            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained">遏制</el-button>
+            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="supression && restrainIf && isRestrained && hasSupressionList">遏制</el-button>
         </div>
         <div class="router-path">
             <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":`物料明细${isWasteMaterial ? '(废品)':''}` }}</span>
@@ -39,6 +39,7 @@ export default {
       // btnShowRestrain: false, // 临时屏蔽遏制
       description: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
+      barcodeUrl: window.HOST + '/api/v1/suppress/do-by-barcode', // 根据模号
       isRestrained: true
     }
   },
@@ -66,6 +67,13 @@ export default {
     // 新版本物料判断是否为废品。
     isWasteMaterial () {
       return this.nodeType === 10004
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {
@@ -131,42 +139,51 @@ export default {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '遏制中...'
-            let oConditions = Object.assign(
-              { doDescription: self.doDescription },
-              this.$route.query
-            )
+            let oUrl = ''
+            let oConditions = {}
+            let oQuery = this.$route.query
+            if ('materialCode' in oQuery) {
+              oUrl = this.url
+              oConditions = Object.assign(
+                { doDescription: self.doDescription },
+                oQuery
+              )
+            } else if ('barcode' in oQuery) {
+              oUrl = this.barcodeUrl
+              oConditions = Object.assign(
+                { doDescription: self.doDescription },
+                oQuery
+              )
+            }
 
-            this.$post(this.url, oConditions)
-            .then((oData) => {
-              console.log(oData)
-              if (oData.data.errorCode === 1) { // 接口出错
-                this.$message.error('接口出错')
-                console.log(oData.data.errorMsg.message)
-                self.doDescription = ''
-                done()
-              } else if (oData.data.errorCode === 0) {
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              oUrl,
+              'post',
+              oConditions,
+              oData => {
+                console.log(oData)
                 this.isRestrained = false
-                const handle = oData.data.data.handle
+                const handle = oData.handle
                 sessionStorage.setItem('handleID', handle)
                 instance.confirmButtonLoading = false
                 this.$message.success('遏制成功')
                 let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
-                self.doDescription = ''
                 sessionStorage.setItem('restrain', JSON.stringify(restrain))
-                window.open('/restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
+                window.open('restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
 
                 done()
-              }
-            })
-            .catch(err => {
-              instance.confirmButtonLoading = false
-              this.$message.error('遏制失败')
-              self.doDescription = ''
-              console.log(err)
-              done()
-            })
+              },
+              err => {
+                instance.confirmButtonLoading = false
+                this.$message.error(err)
+                console.log(err)
+                done()
+              },
+              this.requestError
+            )
           } else {
-            self.doDescription = ''
             done()
           }
         }
@@ -241,7 +258,7 @@ export default {
     //          console.log(from);
     //          console.log("next:");
     //          console.log(next);
-
+    this.isRestrained = true // 恢复为未遏制
     this.key = this.$route.params.key
     this.setRouteQuery()
     // 设置path可见性。

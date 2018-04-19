@@ -142,7 +142,7 @@ import $ from 'jquery'
 // 设备状态。
 const CHART_STATE_NAME = '状态'
 // 图形下margin。
-// const CHART_MARGIN_BOTTOM = 40
+const CHART_MARGIN_BOTTOM = 40
 // tooltip距离鼠标的水平位置。
 const TOOLTIP_X_DISTANCE = 10
 // tooltip距离鼠标的水平位置。
@@ -534,8 +534,8 @@ export default {
   },
   computed: {
     // 是否开启视频监控。
-    camera () { debugger
-      return ( 
+    camera () {
+      return (
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isVideoMonitorEnabled
       )
@@ -606,7 +606,7 @@ export default {
     },
     // 选中的设备名称。
     selectedEquipmentName () {
-      let equipmentName = this.categories.filter(o => o.id === this.selectedEquipmentId)[0].value.split("+")[0];
+      let equipmentName = this.categories.filter(o => o.id === this.selectedEquipmentId)[0].value.split('+')[0]
       return this.equipments.filter(
         o => (o.equipmentId + '') === this.selectedEquipmentId + ''
       )[0].equipmentName || equipmentName
@@ -1066,30 +1066,6 @@ export default {
     },
     // 获取配置数据。
     getConfigData () {
-      // 获取配置数据。
-
-      // 设置维度数据。
-      // if(this.currentModule.submodules) {
-      //     // 维度分析数据。
-      //     let oDimensionData = this.currentModule.submodules.find(o => o.key === "dimension");
-      //     if(oDimensionData) {
-      //         // 根据配置数据修改维度分析开关。
-      //         this.dimension = this.dimension.filter(o => {
-      //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
-      //             if(oData) {
-      //                 return !!oData.switch
-      //             }else {
-      //                 return true
-      //             }
-      //         })
-      //         this.dimension.map(o => {
-      //             let oData = oDimensionData.dimension.find(item => o.key === item.key)
-      //             o.show = oData.show
-      //             o.name = oData.name
-      //             return o
-      //         })
-      //     }
-      // }
       // 根据配置数据修改维度分析开关。
       let unSuport = []
       if (!this.toolManagement) {
@@ -1302,7 +1278,7 @@ export default {
       this.panelHeight =
         jContent.height() -
         (jSetting.outerHeight(true) || 0) -
-        (jButtons.outerHeight(true) || 0) // CHART_MARGIN_BOTTOM;
+        (!this.trace && this.isOpDbBeforeRefact ? CHART_MARGIN_BOTTOM : (jButtons.outerHeight(true) || 0)) // 老业务库追踪
       $('#equipments').height(this.panelHeight || 100)
     },
     // 获取当前数据列表。
@@ -2074,6 +2050,7 @@ export default {
       }
 
       this.chart.setOption(this.option, true)
+
       // 设置提示框的最大高度。
       this.setTooltipHeight()
 
@@ -2520,7 +2497,7 @@ export default {
               +new Date(this.getRealTimeLineDateTime().start),
               +new Date(this.getRealTimeLineDateTime().end),
               +new Date(this.getRealTimeLineDateTime().end) -
-                +new Date(this.getRealTimeLineDateTime().start),
+              +new Date(this.getRealTimeLineDateTime().start),
               this.getRealTimeLineDateTime().start,
               this.getRealTimeLineDateTime().end
             ],
@@ -2698,7 +2675,7 @@ export default {
       this.setIsDateTimeChange()
     },
     // 时间是否改变
-    setIsDateTimeChange() {
+    setIsDateTimeChange () {
       // 是否显示查询按钮（开始或结束时间被编辑，则会显示）
       let { start, end, initStart, initEnd, beforeSavedStart, beforeSavedEnd } = this.datetime
 
@@ -2753,7 +2730,7 @@ export default {
       let sHtml = ''
       let oGroupId = {}
 
-      params.forEach(param => {
+      params.forEach((param, i) => {
         let aoValue = param.value
         let sList = ''
         let yAxisIndex = aoValue[1]
@@ -2761,6 +2738,10 @@ export default {
         let nIndex = 0
         // sColor = (this.dimension.filter(o => o.name === param.seriesName)[0]).color;
 
+        if (!param.name) {
+          // 若设备名称不存在，设置设备名称。
+          param.name = this.categories[yAxisIndex].value
+        }
         // 第一级设备。
         oGroupId[yAxisIndex] = {}
 
@@ -2841,6 +2822,7 @@ export default {
       let hour = 0
       let munite = 0
       let second = 0
+      let name = params.name.split('+')[0]
 
       if (time / 3600 >= 1) {
         hour = Math.floor(time / 3600)
@@ -2860,7 +2842,7 @@ export default {
         time = second + "''"
       }
 
-      return `${params.marker}${params.name}：${time}<br/>
+      return `${params.marker}${name}：${time}<br/>
                     ${params.value[4]}<br/>
                     ${params.value[5]}`
     },
@@ -3002,13 +2984,13 @@ export default {
         end: new Date(oDate.endValue).Format()
       }
     },
-    // 可疑品列表。
+    // 可疑品列表
     showSuspiciousList () {
       // 跳转之前保存数据。
       this.setSessionStorage()
       let oDate = this.getRealTime()
 
-      // 根据设备+开始时间+结束时间，查询可疑品列表。
+      // 根据设备+开始时间+结束时间，查询可疑品列表
       this.$router.replace({
         path: '/process/restrain',
         query: {

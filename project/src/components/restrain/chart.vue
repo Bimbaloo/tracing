@@ -42,7 +42,7 @@ export default {
   mounted () {},
   watch: {
     // 如果路由有变化，会再次执行该方法
-    // '$route': 'setData'  //不知道这句加了有什么用，去掉不报错
+    '$route': 'setData'  // 按设备遏制的时候需要：路由变化重新设置查询条件
   },
   methods: {
     /**
@@ -64,7 +64,7 @@ export default {
       }
 
       this.equipments = {
-        equipmentCode: oQuery.equipmentCode.split(':')[0],
+        equipmentCode: oQuery.equipmentCode && oQuery.equipmentCode.split(':')[0],
         shiftStartTime: start,
         shiftEndTime: end
       }

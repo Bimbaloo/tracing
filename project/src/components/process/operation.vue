@@ -11,7 +11,7 @@
             </el-tab-pane>
             <el-tab-pane label="设备分析" name="equipment">
                 <div class="path-btn">
-                    <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf">遏制</el-button>
+                    <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf && hasSupressionList">遏制</el-button>
                 </div>
                 <div class="router-path">
                     <router-link 
@@ -82,6 +82,13 @@ export default {
     },
     activeTabChange () {
       return this.$store && this.$store.state.activeTabChange
+    },
+    // 版本信息数据。
+    hasSupressionList () {
+      return (
+        this.$store.state.supressionModule &&
+        this.$store.state.supressionModule.hasSupressionList
+      )
     }
   },
   created () {
@@ -308,12 +315,8 @@ export default {
               { description: self.description },
               this.$route.query
             )
-
-            // this.$post(this.url, oConditions)
-            // .then((res) => {
             done()
             instance.confirmButtonLoading = false
-            // if(!res.errorCode) {
             bSucess = true
             // 隐藏遏制按钮。
             self.restrainIf = false
@@ -323,17 +326,9 @@ export default {
             }
             sSerializion = sSerializion.substring(1)
             // 遏制成功，打开到遏制报告。
-            window.open('/restrain/report.html?' + sSerializion)
-
-            // }
-            // })
-            // .catch((err) => {
-            // done();
-            // instance.confirmButtonLoading = false;
-            // });
+            window.open('restrain/report.html?' + sSerializion)
           } else {
             done()
-            // instance.$slots.default[0].elm.children[0].value = "";
           }
         }
       }).then(action => {
