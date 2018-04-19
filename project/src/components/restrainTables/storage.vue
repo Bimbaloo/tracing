@@ -1,10 +1,10 @@
-<!---->
+<!--出入库-->
 <template>
   <div class="router-content">
     <div class="innner-content" >
       <div class="content-message tableData">
         <span class='table-title'>
-          <span>物料编码：{{node.code}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.name}}</span>
+          <span>物料编码：{{node.materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.materialName}}</span>
         </span>
         <span class='table-handle'>
           <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
@@ -15,38 +15,7 @@
         <div v-if="error" class="error">
           {{ error }}
         </div>
-
         <el-table
-          v-else
-          ref="table"
-          border
-          v-loading="loading"
-          element-loading-text="拼命加载中"
-          class="raw-table"
-          :data="qualityData.data"
-          :height="tableHeight">
-
-          <el-table-column
-            align="center"
-            :resizable="true"
-            v-for="(column,index) in qualityData.columns"
-            :prop="column.prop"
-            v-if="!column.hide"
-            :label="column.name"
-            :class-name="column.class"
-            :width="column.width"
-            :key="index">
-            <template slot-scope="scope">
-              <div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
-                {{scope.row[column.prop]}}
-              </div>
-            </template>
-          </el-table-column>
-
-        </el-table>
-
-        
-        <!-- <el-table
           ref="table"
           v-else
           border
@@ -59,28 +28,27 @@
           <el-table-column
             align="center"
             :resizable="true"
-            v-for="(column,index) in materialData.columns"
+            v-for="(column,index) in columns"
             :prop="column.prop"
-            v-if="!column.hide"
             :label="column.name"
             :class-name="column.class"
             :width="column.width"
             :key="index">
             <template slot-scope="scope">
-              <div :class="{merges: column.merge}" :value="scope.row.hide?0:scope.row.rowspan||1">                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              
+              <div :class="[{merges: column.merge}, {'batch': scope.row['barcodeType'] === MATERIALCODE && column.prop === 'barcode'}]" :value="scope.row.hide?0:scope.row.rowspan||1">
                 {{scope.row[column.prop]}}
               </div>
             </template>
           </el-table-column>
-        </el-table> -->
-        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->  
+        </el-table>
+        <!--<v-table v-else :table-data="materialData" :loading="loading"></v-table>-->
       </div>
     </div>
   </div>
 </template>
 
 <script>
-// import table from 'components/basic/table.vue'
+import table from "components/basic/table.vue";
 import XLSX from "xlsx";
 import Blob from "blob";
 import FileSaver from "file-saver";
@@ -88,9 +56,9 @@ import FileSaver from "file-saver";
 import rasterizeHTML from "rasterizehtml";
 
 export default {
-  // components: {
-  //   'v-table': table
-  // },
+  components: {
+    "v-table": table
+  },
   data() {
     return {
       excel: true,
@@ -105,16 +73,15 @@ export default {
       bTrace: location.pathname.indexOf("traceIndex") > -1,
       // 点击的物料节点信息。
       node: {},
+      restrainRegisterUrl:
+        window.HOST + "/api/v1/trace/operation-detail/registration/by-id",
+      restrainDeterUrl:
+        window.HOST + "/api/v1/trace/operation-detail/determination/by-id",
       loading: false,
       error: "",
       // sErrorMessage: "",
       materialData: {
-        filename: "质检表",
-        columns: [],
-        data: []
-      },
-      qualityData: {
-        filename: "质检表",
+        filename: "仓储表",
         columns: [],
         data: []
       },
@@ -128,15 +95,33 @@ export default {
     resizeY: function() {
       return this.$store && this.$store.state.resizeY;
     },
+    //判断节点类型是  可疑品判定 或 可疑品登记
+    isRestrainRegister() {
+      return 0;
+    },
     fullscreen: function() {
       return this.$store && this.$store.state.fullscreen;
     },
     treeFullscreen: function() {
       return this.$store && this.$store.state.treeFullscreen;
     },
+    // 版本信息数据。
+    isOpDbBeforeRefact() {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isOpDbBeforeRefact
+      );
+    },
     // 当前传入的值。
     detailInfos() {
       return this.$store && this.$store.state.detailInfos;
+    },
+    columns() {
+      return this.materialData.columns.filter(el => !el.hide);
+    },
+    // 12代表原料码
+    MATERIALCODE() {
+      return 12;
     }
   },
   created() {
@@ -157,10 +142,10 @@ export default {
       let fromTitle = from.meta.title;
 
       // 如果从tree上直接点击，需要更新数据. tag不同
-      // 质检信息: 从可疑品(restrain)进入，则不会重新请求 .tag是一样的
+      // 仓储信息: 从可疑品(restrain)或同批次入库(batch)中进入，则不会重新请求 .tag是一样的
       if (
-        toTitle === "quality" &&
-        (fromTitle === "quality" ||
+        toTitle === "storage" &&
+        (fromTitle === "storage" ||
           (to.query._tag !== undefined && this.tag !== to.query._tag))
       ) {
         this.tag = to.query._tag;
@@ -186,47 +171,19 @@ export default {
   methods: {
     // 获取业务库的表格显示列。
     getTableColumns() {
-      let wareHouseColumns = [//仓库显示列
-          // {
-          //   prop: "reservoir",
-          //   name: "库位"
-          // },
-          // {
-          //   prop: "warehouse",
-          //   name: "仓库"
-          // }
-        ],
-        workShopColumns = [//车间显示列
-          {
-            prop: 'srcbarcode',
-            name: '来源条码',
-            click: this.barCodeClick
-          }
-          // {
-          //   prop: "",
-          //   name: "工序"
-          // },
-          // {
-          //   prop: "doCode",
-          //   name: "工单"
-          // },
-          // {
-          //   prop: "",
-          //   name: "设备"
-          // }
-        ],
-        publicColumns = [
-          //公共显示列
+      let publicColumns = [
           {
             prop: "index",
-            name: "质检单id",
-            width: "50"
+            name: "序号",
+            width: "50px",
+            merge: true
           },
-          // {
-          //   prop: 'srcbarcode',
-          //   name: '来源条码',
-          //   click: this.barCodeClick
-          // },
+          {
+            prop: "barcode",
+            name: "条码",
+            click: this.batchClick,
+            merge: true
+          },
           {
             prop: "materialName",
             name: "物料名称"
@@ -235,123 +192,115 @@ export default {
             prop: "batchNo",
             name: "批次",
             class: "batch",
+            width: 200,
             click: this.batchClick
           },
           {
-            prop: "sumNum",
-            name: "数量"
+            prop: "quantity",
+            name: "数量",
+            width: "50px"
+          }
+        ],
+        //可疑品登记显示列
+        registerColumns = [
+          {
+            prop: "opTime",
+            name: "登记时间"
           },
           {
-            prop: "sampleNum",
-            name: "样本数"
+            prop: "personName",
+            name: "登记人"
+          }
+        ],
+        //可疑品判定显示列
+        deterColumns = [
+          {
+            prop: "qualityTypeName",
+            name: "判定结果"
           },
           {
-            prop: "destbarcode",
-            name: "取样框条码"
+            prop: "failReasonName",
+            name: "原因"
           },
           {
-            prop: "qaDate",
-            name: "检验时间"
+            prop: "opTime",
+            name: "判定时间"
           },
           {
-            prop: "",
-            name: "检验结果",
-            width: 200
-          },
-          {
-            prop: "",
-            name: "处置方式"
-          },
-          // {
-          //   prop: '',
-          //   name: '返还时间'
-          // },
-          {
-            prop: "",
-            name: "检验人"
-          },
-          // {
-          //   prop: '',
-          //   name: '检验项目'
-          // },
-          {
-            prop: "",
-            name: "检验报告",
-            click: this.reportClick
+            prop: "personName",
+            name: "判定人"
           }
         ];
 
-      let cacheColumns = this.isQbMethodId()
-        ? workShopColumns
-        : wareHouseColumns;
-
-      //车间或者仓库的显示列区分显示
-      cacheColumns.forEach(function(column, index) {
-        publicColumns.splice(1, 0, column);
-      });
-
-      return publicColumns;
+      let cacheColumns = this.isRestrainRegister
+        ? registerColumns
+        : deterColumns;
+      return publicColumns.concat(cacheColumns);
     },
-
-    //判断检验是仓库还是车间  0:仓库  1:车间
-    isQbMethodId() {
-      return 0;
-    },
-
     // 判断调用接口是否成功。
-    /*judgeLoaderHandler (param, fnSu, fnFail) {
-      let bRight = param.data.errorCode
+    judgeLoaderHandler(param, fnSu, fnFail) {
+      let bRight = param.data.errorCode;
 
       // 判断是否调用成功。
       if (!bRight) {
         // 调用成功后的回调函数。
-        fnSu && fnSu(param.data.data)
+        fnSu && fnSu(param.data.data);
       } else {
         // 提示信息。
-        this.error = '查无数据'
-        console.warn(param.data.errorMsg.message)
+        this.error = "查无数据";
+        console.warn(param.data.errorMsg.message);
         // 失败后的回调函。
-        fnFail && fnFail()
+        fnFail && fnFail();
       }
-    },*/
+    },
     cellClick(row, column, cell, event) {
       let oColumn = this.materialData.columns.filter(
         o => o.prop === column.property
       )[0];
-      oColumn.click && oColumn.click(row);
+      oColumn.click && oColumn.click(row, column);
     },
-
     // 点击批次
-    batchClick(row) {
-      if (row.batchNo) {
+    batchClick(row, column) {
+      if (column.property === "batchNo" && row.batchNo) {
         // 批次存在可点击  新版本跳转到可疑品。
         let sPath = this.isOpDbBeforeRefact
           ? "/stock/batch"
           : "/stock/restrain";
+
         this.$router.replace({
           path: sPath,
-          query: { materialCode: this.node.code, batchNo: row.batchNo }
+          query: { materialCode: this.node.materialCode, batchNo: row.batchNo }
+        });
+        // 点击的是条码且该条码为原料码
+      } else if (
+        column.property === "barcode" &&
+        row.barcodeType === this.MATERIALCODE
+      ) {
+        let sPath = "/stock/restrain";
+        window.sessionStorage.setItem("type", "suspiciouByBarcode");
+        this.$router.replace({
+          path: sPath,
+          query: { barcode: row.barcode }
         });
       }
     },
-
-    //点击来源条码
-    barCodeClick(row) {
-      if (row.srcbarcode) {
+    // 点击条码
+    barcodeClick(row) {
+      if (row.barcode) {
         // 条码点击，新版本跳转到可疑品
         let sPath = "/stock/restrain";
         this.$router.replace({
           path: sPath,
-          query: { barcode: row.srcbarcode }
+          query: { barcode: row.barcode }
         });
       }
     },
-
-    //检验报告点击
-    reportClick(row) {
-      // window.open()
+    //判断点击节点是 可疑品判定  或  可疑品登记
+    getDetailUrl() {
+      return this.isRestrainRegister
+        ? this.restrainRegisterUrl
+        : this.restrainDeterUrl;
     },
-
     // 请求成功。
     requestSucess(aoData) {
       this.loading = false;
@@ -365,16 +314,15 @@ export default {
         this.error = "查无数据。";
         console.log("查无数据。");
       } else {
-        oData.data = this.isOpDbBeforeRefact
-          ? this.formatData(aoData)
-          : this.newFormatData(aoData);
-
-        // this.materialData.data = oData.data
-        this.qualityData.data = oData.data;
+        // oData.data = this.isOpDbBeforeRefact
+        //   ? this.formatData(aoData)
+        //   : this.newFormatData(aoData);
+        oData.data = this.formatData(aoData);
+        this.materialData.data = oData.data;
         this.styleObject.minWidth = "1200px";
 
         this.$nextTick(function() {
-          // 先设置所有的列都显示。
+          // 先设置说有的列都显示。
           var aMerge = document.querySelectorAll(".merges");
           for (var i = 0; i < aMerge.length; i++) {
             let num = Number(aMerge[i].attributes["value"].nodeValue);
@@ -420,16 +368,15 @@ export default {
     },
     fetchData() {
       // 获取表格显示列。
-      //this.materialData.columns = this.getTableColumns()
-      this.qualityData.colnmns = this.getTableColumns();
+      this.materialData.columns = this.getTableColumns();
 
       let sKey = this.$route.query && this.$route.query.key;
       // 提取选中的物料节点数据。
       let oNode = this.rawData.nodeList.filter(o => o.key === sKey)[0] || {};
 
       this.node = {
-        code: oNode.code || "",
-        name: oNode.name || "",
+        materialCode: oNode.code || "",
+        materialName: oNode.name || "",
         materialInfoList: oNode.detailInfo.materialInfoList.map(o => {
           return {
             batchNo: o.batchNo,
@@ -438,39 +385,64 @@ export default {
         })
       };
 
-      if (this.isOpDbBeforeRefact) {
-        // 老业务版本。
-        let oData = {};
-        oData.data = [];
-        this.loading = true;
+      this.loading = true;
 
-        this.$register.sendRequest(
-          this.$store,
-          this.$ajax,
-          this.url,
-          "post",
-          {
-            materialCode: this.node.code,
-            materialInfoList: this.node.materialInfoList
-          },
-          this.requestSucess,
-          this.requestFail,
-          this.requestError
-        );
-      } else {
-        // 新业务版本。
+      this.$register.sendRequest(
+        this.$store,
+        this.$ajax,
+        this.getDetailUrl(),
+        "post",
+        {
+          //可疑品判定测试参数
+          operationIdList: [
+            "3ba40f82-428e-4d9b-b559-59d72f4809c0",
+            "2821091b-fd0d-42d5-81a2-dfb56bcc1a05",
+            "19b214b8-9f52-4c9e-9456-175c94c39b43",
+            "0928123a-d732-4089-bfb4-72138b151ad5",
+            "ba298f3d-01e3-44b2-b952-047d951bdab6"
+          ],
+          //可疑品登记测试参数
+          operationIdList1: [
+            "3f182283-0093-425f-a973-b1788aa9eac4",
+            "b651f352-3c4c-4e8e-8f35-1e86d9367132",
+            "85a1e3c6-7d1e-4ac4-8c02-51e5bfdf9cfa",
+            "e49bd9b0-4448-4d9b-b9d8-7fcaa3c42050",
+            "1abe9ff3-728d-4e46-9d0d-e151f6f2d64f"
+          ]
+        },
+        this.requestSucess,
+        this.requestFail,
+        this.requestError
+      );
+      // if (this.isOpDbBeforeRefact) {
+      //   // 老业务版本。
+      //   let oData = {};
+      //   oData.data = [];
+      //   this.loading = true;
 
-        // 判断是否为溯源，不显示滞留数列。
-        // if (this.bTrace) {
-        //   this.materialData.columns = this.materialData.columns.filter(
-        //     o => o.prop !== 'remainQuantity'
-        //   )
-        // }
-
-        this.requestSucess(
-          JSON.parse(JSON.stringify(this.detailInfos.materialInfoList || []))
-        );
-      }
+      //   this.$register.sendRequest(
+      //     this.$store,
+      //     this.$ajax,
+      //     this.url,
+      //     "post",
+      //     {
+      //       materialCode: this.node.materialCode,
+      //       materialInfoList: this.node.materialInfoList
+      //     },
+      //     this.requestSucess,
+      //     this.requestFail,
+      //     this.requestError
+      //   );
+      // } else {
+      // 新业务版本。
+      // 判断是否为溯源，不显示滞留数列。
+      // if (this.bTrace) {
+      //   this.materialData.columns = this.materialData.columns.filter(
+      //     o => o.prop !== 'remainQuantity'
+      //   )
+      // }
+      // this.requestSucess(JSON.parse(JSON.stringify(this.detailInfos.materialInfoList || [])))
+      //}
     },
     // 表格单元格数据合并处理。
     arraySpanMethod({ row, column, rowIndex, columnIndex }) {
@@ -486,6 +458,9 @@ export default {
       let nIndex = 1;
 
       aoData.forEach((o, index) => {
+        o.materialCode = this.node.materialCode;
+        o.materialName = this.node.materialName;
+
         if (oBatchNo[o.batchNo]) {
           oBatchNo[o.batchNo]++;
           aoData[nRow].rowspan = oBatchNo[o.batchNo];
@@ -689,7 +664,7 @@ export default {
         this.outerHeight(content) - this.outerHeight(tableData) - 40;
 
       this.$nextTick(() => {
-        this.$refs.table.doLayout();
+        this.$refs.table && this.$refs.table.doLayout();
       });
     }
   }
@@ -722,6 +697,7 @@ export default {
         vertical-align: middle;
         border: 1px solid #dfece9;
         box-sizing: border-box;
+        padding: 0;
       }
 
       th {
@@ -748,10 +724,16 @@ export default {
           .cell {
             cursor: pointer;
             color: #f90;
-
             & > div {
               font-weight: 600;
             }
+          }
+        }
+        .cell {
+          .batch {
+            cursor: pointer;
+            color: #f90;
+            font-weight: 600;
           }
         }
       }
