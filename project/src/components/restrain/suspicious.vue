@@ -35,10 +35,9 @@ export default {
   },
   data () {
     return {
-      isRestrained: window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4') || window.location.hash.includes('/process/restrain'),
+      isRestrained: window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4'),
       doDescription: '',
       url: window.HOST + '/api/v1/suppress/do-by-batch', // 根据物料和批次遏制
-      equipmentUrl: window.HOST + '/api/v1/suppress/do-by-equipment', // 根据设备+时间
       styleObject: {
         'min-width': '1000px'
       },
@@ -63,7 +62,7 @@ export default {
     type () {
       return this.$route.meta.type || window.sessionStorage.getItem('type') || null
     },
-    // 版本信息数据。
+    // 是否有可疑品信息
     hasSupressionList () {
       return (
         this.$store.state.supressionModule &&
@@ -83,7 +82,7 @@ export default {
       if (this.$route.meta.title === 'restrain') {
         this.equipmentName = this.oQuery.equipmentName
       }
-      this.isRestrained = window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4') || window.location.hash.includes('/process/restrain')
+      this.isRestrained = window.location.hash.includes('/suppress/1') || window.location.hash.includes('/suppress/4')
       this.killProgress = false
     }
   },
@@ -121,20 +120,12 @@ export default {
             instance.confirmButtonText = '遏制中...'
             let oConditions = {}
             let oUrl = ''
-            if (window.location.hash.includes('/process/restrain')) {  // 如果是通过设备分析遏制
-              oUrl = this.equipmentUrl
-              let { startTime, endTime, equipmentId } = this.$route.query
-              oConditions = Object.assign(
-                { startTime, endTime, equipmentId },
-                { doDescription: self.doDescription }
-              )
-            } else {
-              oUrl = this.url
-              oConditions = Object.assign(
+
+            oUrl = this.url
+            oConditions = Object.assign(
                 { doDescription: self.doDescription },
                 this.$route.query
               )
-            }
 
             this.$register.sendRequest(
               this.$store,

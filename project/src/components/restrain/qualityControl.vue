@@ -134,7 +134,7 @@ export default {
     oQuery () {
       return this.$route.query
     },
-    // 版本信息数据。
+    // 是否有可疑品信息
     hasSupressionList () {
       return (
         this.$store.state.supressionModule &&

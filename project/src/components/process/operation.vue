@@ -1,7 +1,8 @@
 <!--设备分析路由--><!--投产表/设备分析-->
 <template>
     <div class="material-stock" ref="stock">
-        <div class="view-icon" v-if="!bRestrain">
+        <div class="view-icon" v-if="!bRestrain" :style="{ top: equipmentButton ? 5 + 'px' : 15 + 'px'}">
+            <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="isRestrained && equipmentButton && restrainIf && hasSupressionList">遏制</el-button>
             <i class="icon icon-20 icon-fullScreen" v-if="!fullscreen" @click="fullScreenClick"  title="放大"></i>
             <i class="icon icon-20 icon-restoreScreen" v-else @click="restoreScreenClick"  title="缩小"></i>
         </div>
@@ -10,9 +11,6 @@
                 <v-product :is-in-chart="false"></v-product>           
             </el-tab-pane>
             <el-tab-pane label="设备分析" name="equipment">
-                <div class="path-btn">
-                    <el-button class="btn btn-plain btn-restrain" @click="showRestrain" v-if="btnShowRestrain && restrainIf && hasSupressionList">遏制</el-button>
-                </div>
                 <div class="router-path">
                     <router-link 
                         class="path-item" 
@@ -65,9 +63,9 @@ export default {
       },
       aoRoute: [],
       restrainIf: false,
-      btnShowRestrain: false, // 临时屏蔽遏制
-      description: '',
-      url: '/trace/v1/materialbatchsuppress'
+      doDescription: '',
+      isRestrained: window.location.hash.includes('/process/restrain'),
+      equipmentUrl: window.HOST + '/api/v1/suppress/do-by-equipment' // 根据设备+时间
     }
   },
   computed: {
@@ -83,11 +81,17 @@ export default {
     activeTabChange () {
       return this.$store && this.$store.state.activeTabChange
     },
-    // 版本信息数据。
+    // 是否有可疑品信息
     hasSupressionList () {
       return (
         this.$store.state.supressionModule &&
         this.$store.state.supressionModule.hasSupressionList
+      )
+    },
+    // 如果是通过设备分析遏制
+    equipmentButton () {
+      return (
+        this.$route.path.includes('/process/restrain')
       )
     }
   },
@@ -113,6 +117,9 @@ export default {
 
         oTabHeadActive.style.width = oTabHeadItem.offsetWidth + 'px'
       }
+    },
+    $route: function () {
+      this.isRestrained = window.location.hash.includes('/process/restrain')
     }
   },
   methods: {
@@ -281,7 +288,6 @@ export default {
     },
     showRestrain () {
       const h = this.$createElement
-      let bSucess = false
       let self = this
       this.$msgbox({
         title: '提示',
@@ -295,11 +301,11 @@ export default {
             message: true
           },
           domProps: {
-            value: self.description
+            value: self.doDescription
           },
           on: {
             blur: function (event) {
-              self.description = event.target.value
+              self.doDescription = event.target.value
             }
           }
         }),
@@ -310,37 +316,50 @@ export default {
           if (action === 'confirm') {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '执行中...'
+            let oConditions = {}
+            let oUrl = this.equipmentUrl
+            let { startTime, endTime, equipmentId } = this.$route.query
+            oConditions = Object.assign(
+                { startTime, endTime, equipmentId },
+                { doDescription: self.doDescription }
+              )
+            this.$register.sendRequest(
+              this.$store,
+              this.$ajax,
+              oUrl,
+              'post',
+              oConditions,
+              oData => {
+                console.log(oData)
+                this.isRestrained = false
+                const handle = oData.handle
+                sessionStorage.setItem('handleID', handle)
+                instance.confirmButtonLoading = false
+                this.$message.success('遏制成功')
+                let restrain = {...this.$route.query, ...{'handleID': handle, 'description': this.doDescription, 'suppressTime': new Date().Format('yyyy-MM-dd hh:mm:ss')}}
+                sessionStorage.setItem('restrain', JSON.stringify(restrain))
+                window.open('restrainReport.html?' + '_tag=' + new Date().getTime().toString().substr(-5))
 
-            let oConditions = Object.assign(
-              { description: self.description },
-              this.$route.query
+                done()
+              },
+              // 失败
+              (err) => {
+                instance.confirmButtonLoading = false
+                this.$message.error(err)
+                console.log(err)
+                done()
+              },
+              this.requestError
             )
-            done()
-            instance.confirmButtonLoading = false
-            bSucess = true
-            // 隐藏遏制按钮。
-            self.restrainIf = false
-            let sSerializion = ''
-            for (let p in oConditions) {
-              sSerializion += `&${p}=${oConditions[p]}`
-            }
-            sSerializion = sSerializion.substring(1)
-            // 遏制成功，打开到遏制报告。
-            window.open('restrain/report.html?' + sSerializion)
           } else {
             done()
           }
         }
-      }).then(action => {
-        if (action === 'confirm') {
-          if (bSucess) {
-            this.$message.success('提交成功！')
-          } else {
-            this.$message.error('提交失败！')
-          }
-        }
-        // self.description = "";
       })
+    },
+    // 请求错误。
+    requestError (err) {
+      console.log(err)
     },
     fullScreenClick () {
       // 详情全屏按钮点击事件。
