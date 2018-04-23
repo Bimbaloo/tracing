@@ -20,6 +20,7 @@ import workshop from 'assets/img/workshop.png'
 import rework from 'assets/img/rework.png'
 import barcodeManage from 'assets/img/barcodeManage.png'
 import {
+	onLinkSelectionChange,
   onNodeSelectionChange,
   // onClickNode,
   onContextClickNode,
@@ -36,6 +37,8 @@ const NORMAL_TEXT_COLOR = '#333' // "#333";
 // const TABLE_COLOR = '#42af8f'
 const ERROR_TEXT_COLOR = 'red'
 const MATERIAL_NODE_WIDTH = 100
+
+const NORMAL_LINK_STROKE = '#999'
 
 export default {
   props: {
@@ -150,6 +153,26 @@ export default {
         this.$store.state.versionModule.isOpDbBeforeRefact
       )
     },
+		// link selectionAdornmentTemplate
+		linkSelectionTemplate () {
+			return this.$(
+				window.go.Adornment,
+				'Link',
+				{
+					isShadowed: true
+				},
+				this.$(
+          window.go.TextBlock,
+          {
+            background: '#ffffff',
+            font: 'bold 10pt sans-serif',
+						scale: 2
+          },
+          new window.go.Binding('text', 'num'),
+          new window.go.Binding('visible', '', this.isToMaterialNode)
+        )
+			)
+		},
     // tooltip样式
     tooltipTemplate () {
       return this.$(
@@ -677,13 +700,14 @@ export default {
         {
           routing: this.isDialogTree
             ? window.go.Link.Orthogonal
-            : window.go.Link.AvoidsNodes
+            : window.go.Link.AvoidsNodes,
+					selectionChanged: onLinkSelectionChange
         },
         new window.go.Binding('points').makeTwoWay(),
         {
           // curve: window.go.Link.Bezier,
           toShortLength: 0,
-          selectable: false,
+          // selectable: false,
           corner: 10
           // adjusting: window.go.Link.Stretch
         },
@@ -691,17 +715,19 @@ export default {
         this.$(
           window.go.Shape, // the link shape
           {
-            stroke: '#999',
-            strokeWidth: 3
+            stroke: NORMAL_LINK_STROKE,
+            strokeWidth: 3,
+						name: 'linkShape'
           }
         ),
         this.$(
           window.go.Shape,
           {
             fromArrow: 'BackwardOpenTriangle',
-            stroke: '#999',
+            stroke: NORMAL_LINK_STROKE,
             strokeWidth: 2,
-            fill: null
+            fill: null,
+						name: 'linkShapeArrowBack'
           },
           new window.go.Binding('visible', '', () => this.pageType === 'trace')
         ),
@@ -709,9 +735,10 @@ export default {
           window.go.Shape,
           {
             toArrow: 'OpenTriangle',
-            stroke: '#999',
+            stroke: NORMAL_LINK_STROKE,
             strokeWidth: 2,
-            fill: null
+            fill: null,
+						name: 'linkShapeArrowForward'
           },
           new window.go.Binding('visible', '', () => this.pageType === 'track')
         ),
@@ -1020,6 +1047,7 @@ export default {
     setTreeTemplate () {
       // 连线样式。
       this.tree.linkTemplate = this.linkTemplate
+			this.tree.linkTemplate.selectionAdornmentTemplate = this.linkSelectionTemplate
       // 节点样式组。
       this.tree.nodeTemplate = this.simpleNodeTemplate
       // 群组样式组。

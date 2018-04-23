@@ -1,4 +1,27 @@
 /**
+* 选中线样式事件。
+* @param {Object} oLink
+* @return {void}
+*/
+function onLinkSelectionChange (oLink) {
+  let NORMAL_LINK_STROKE = '#999'
+  let HIGHLIGHT_LINK_STROKE = '#DDAD51'
+
+  let linkShape = oLink.findObject('linkShape')
+  let linkShapeArrowBack = oLink.findObject('linkShapeArrowBack')
+  let linkShapeArrowForward = oLink.findObject('linkShapeArrowForward')
+
+  if (oLink.isSelected) {
+    linkShape.stroke = HIGHLIGHT_LINK_STROKE
+    linkShapeArrowBack.stroke = HIGHLIGHT_LINK_STROKE
+    linkShapeArrowForward.stroke = HIGHLIGHT_LINK_STROKE
+  } else {
+    linkShape.stroke = NORMAL_LINK_STROKE
+    linkShapeArrowBack.stroke = NORMAL_LINK_STROKE
+    linkShapeArrowForward.stroke = NORMAL_LINK_STROKE
+  }
+}
+/**
  * 选中节点事件。
  * @param {Object} oNode
  * @return {void}
@@ -112,6 +135,7 @@ function zoomDiagram (oTree, bFlag, treeId) {
 }
 
 export {
+  onLinkSelectionChange,
   onNodeSelectionChange,
   // onClickCatalogNode,
   onClickNode,
