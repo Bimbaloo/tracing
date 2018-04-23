@@ -809,6 +809,15 @@ export default {
         case 11:
         case 14:
         case 15:
+				case 16:
+				case 17:
+				case 18:
+				case 19:
+				case 20:
+				case 21:
+				case 22:
+				case 23:
+				case 24:
           sDefault = 'green'
           break
         // 条码管理
@@ -1051,6 +1060,26 @@ export default {
                   </div>`
 
           break
+				// 可疑品 检验 到货
+				case 16:
+				case 17:
+				case 18:
+				case 19:
+				case 20:
+				case 21:
+				case 22:
+				case 23:
+				case 24:
+					sDom = `<div class="item-type">${o.opTypeName}:</div>
+									<div class="item-info">
+										<span class="tips">${o.personName || '-'}</span>将
+										条码<span class="tips">${o.barcode || '-'}</span>
+										,批次<span class="tips">${o.batchNo || '-'}</span>的物料
+										<span class="tips">${o.materialName || '-'}</span>
+										<span class="tips">${o.quantity || '-'}</span>件
+										,进行<span class="tips">${o.opTypeName || '-'}</span>
+									</div>`
+					break
         default:
           break
       }
