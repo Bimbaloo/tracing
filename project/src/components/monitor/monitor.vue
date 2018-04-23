@@ -9,13 +9,13 @@
         <el-form-item label="监控时间：" required class="parameter" label-width="20%" style="width:80%">
             <el-col :span="11">
               <el-form-item prop="startDate" >
-                <el-date-picker  type="datetime" @change.native="dateChange('startDate', $event)" @change="startClick" placeholder="选择开始时间" v-model="monitorForm.startDate" style="width: 100%;"></el-date-picker>
+                <el-date-picker value-format="yyyy-MM-dd HH:mm:ss"  type="datetime" @change.native="dateChange('startDate', $event)" @change="startClick" placeholder="选择开始时间" v-model="monitorForm.startDate" style="width: 100%;"></el-date-picker>
               </el-form-item>
             </el-col>
             <el-col class="split" :span="2">-</el-col>
             <el-col :span="11">
               <el-form-item prop="endDate" >
-                <el-date-picker type="datetime" @change.native="dateChange('endDate', $event)" @change="endClick" placeholder="选择结束时间" v-model="monitorForm.endDate" style="width: 100%;"></el-date-picker>
+                <el-date-picker value-format="yyyy-MM-dd HH:mm:ss" type="datetime" @change.native="dateChange('endDate', $event)" @change="endClick" placeholder="选择结束时间" v-model="monitorForm.endDate" style="width: 100%;"></el-date-picker>
               </el-form-item>
             </el-col>
         </el-form-item>
