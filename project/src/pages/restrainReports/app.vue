@@ -517,6 +517,12 @@ export default {
     // 获取页面中的html
     getPageHtml (refHtml) {
       let oPage = this.$refs[refHtml]
+      
+      let aoText = oPage.querySelectorAll('.el-textarea__inner')
+
+      aoText.forEach(o => {
+				o.innerHTML = o.value
+			})
 
       let sMain = ''
       // 根据打印配置获取所需显示的内容
@@ -565,6 +571,12 @@ export default {
             }
             .el-col-16 {
                 width: 66.66667%;
+            }
+            .el-col-24 {
+                width: 100%;
+            }
+            .el-textarea textarea {
+              width: 100%;
             }
             .report-wrapper {
               padding: 20px;
