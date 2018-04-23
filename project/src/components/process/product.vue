@@ -224,8 +224,6 @@ import VideoDialog from 'components/monitor/dialog.vue'
 import agTable from 'components/basic/ag-table.vue'
 // import $ from 'jquery'
 
-// 是否开启视频监控。
-const CAMERA = 0
 // const url = "http://192.168.220.182:8088/api/v1/trace/operation-detail/inout/by-id";
 const url = window.HOST + '/api/v1/trace/operation-detail/inout/by-id'
 const restrainUrl = window.HOST + '/api/v1/trace/operation-detail/inout/by-equipment'
@@ -293,8 +291,6 @@ export default {
         ],
         data: []
       },
-      // 是否开启视频监控。
-      showCamera: !!CAMERA,
       videoForm: {
         visible: false,
         equipmentId: '',
@@ -1186,6 +1182,15 @@ export default {
     this.fetchData()
   },
   computed: {
+    // 是否开启视频监控 && 投产页面也开启
+    showCamera () {
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isVideoMonitorEnabled &&
+        this.$store.state.factoryCameraConfig &&
+        this.$store.state.factoryCameraConfig.dimensions.includes('pool')
+      )
+    },
     viewHeight: function () {
       return this.routerContent
     },

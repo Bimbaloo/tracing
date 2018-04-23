@@ -324,7 +324,12 @@ export default {
     },
     // 是否开启视频监控
     showCamera () {
-      return this.$store.state.factoryModule.cameraFetched
+      return (
+        this.$store.state.versionModule &&
+        this.$store.state.versionModule.isVideoMonitorEnabled &&
+        this.$store.state.factoryCameraConfig &&
+        this.$store.state.factoryCameraConfig.dimensions.includes('parameter')
+      )
     },
     // 是否支持遏制。
     supression () {
