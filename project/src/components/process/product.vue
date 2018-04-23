@@ -1557,7 +1557,7 @@ export default {
 
       // 根据产出数据->找到改产出对应的投入数据。 === 投产数据
       aoOutData.forEach(o => {
-        // 设置每条记录的合格书、报废数、不合格数
+        // 设置每条记录的合格数、报废数、不合格数
         let sType = o.qualityType
 
         // 操作id值，对应投入记录中
@@ -1629,7 +1629,7 @@ export default {
           if (o1.hasInLen !== undefined) {
             // 产出- 从过滤后的投入中获取个数
             // o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputOpIdList.includes(o1.operationId)).length
-            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputInfoList.find(o2 => o.opId === o1.operationId)).length
+            o.hasInLen = oAll['in'].dataFilter.filter(oIn => oIn.outputInfoList.find(o2 => o2.opId === o1.operationId)).length
           }
 
           return o
@@ -2438,6 +2438,8 @@ body {
 
 .icon-down {
   transition: transfrom 1s linear;
+  cursor: pointer;
+
   &.actived {
     transform: rotate(-90deg);
   }
