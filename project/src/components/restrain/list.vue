@@ -360,7 +360,7 @@ export default {
             instance.confirmButtonLoading = true
             instance.confirmButtonText = '解除遏制中...'
             let oConditions = {
-              description: self.doDescription,
+              suppressDeleteDescription: self.doDescription,
               handle: handleId
             }
 
