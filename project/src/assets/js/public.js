@@ -83,22 +83,6 @@ var parseTreeData = function (oTreeData, sPageType, bIsOld) {
   let {nodeList, linkList, productionLineInfo} = oCopyTreeData
   let nGroupIndex = nodeList.length
 
-  // productionLineInfo = {
-  //   "135": [{
-  //     processCode: '140',
-  //     processName: 'FGB检验',
-  //     equipmentIdList: [12, 13]
-  //   }, {
-  //     processCode: '120',
-  //     processName: 'FGB检验2',
-  //     equipmentIdList: [12, 13]
-  //   }, {
-  //     processCode: '136',
-  //     processName: '机加工上料',
-  //     equipmentIdList: [12, 13]
-  //   }]
-  // }
-
   // 修改数据，添加group的数据，并将子工序增加group字段。
   nodeList.forEach(o => {
       // 修改节点的类型。
@@ -366,6 +350,10 @@ var getNodeIconAndTemp = function (sType) {
     case 103:
     // 库存损益
     case 111:
+    // 到货登记
+    case 23:
+    // 退货
+    case 24:
       oIcon.icon = 'warehouse'
       break
     case 1:
@@ -407,6 +395,22 @@ var getNodeIconAndTemp = function (sType) {
     // 废品
     case 10004:
       oIcon.icon = 'material'
+      break
+    // 可疑品登记
+    case 16:
+    // 可疑品判定
+    case 17:
+    // 检验取样
+    case 18:
+    // 检验返还
+    case 19:
+    // 检验结束
+    case 20:
+    // 检验报废
+    case 21:
+    // 检验封样
+    case 22:
+      oIcon.icon = 'inspect'
       break
     default:
       break

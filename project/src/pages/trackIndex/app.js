@@ -54,6 +54,10 @@ const BarcodeManage = r => require.ensure([], () => r(require('components/proces
 const Warehouse = r => require.ensure([], () => r(require('components/processNode/warehouse.vue')), 'group-detail') // 仓库操作
 const Workshop = r => require.ensure([], () => r(require('components/processNode/workshop.vue')), 'group-detail') // 车间操作
 
+// 可疑品判定。
+const restrainStock = r => require.ensure([], () => r(require('components/restrainTables/stock.vue')), 'group-detail')
+const restrainStorage = r => require.ensure([], () => r(require('components/restrainTables/storage.vue')), 'group-detail')
+
 const Stock = r => require.ensure([], () => r(require('components/material/stock.vue')), 'group-detail')
 const Storage = r => require.ensure([], () => r(require('components/material/storage.vue')), 'group-detail')
 const Batch = r => require.ensure([], () => r(require('components/stock/batch.vue')), 'group-detail')
@@ -102,6 +106,31 @@ const routes = [{ // 仓库操作
     title: 'barcodeManage',
     keepAlive: false
   }
+}, {  // 可疑品判定
+  path: '/restrainTable',
+  component: restrainStock,
+  children: [{
+    path: '',
+    component: restrainStorage,
+    meta: {
+      title: 'restrainStorage',
+      keepAlive: true
+    }
+  }, {
+    path: 'batch',
+    component: Batch,
+    meta: {
+      title: 'batch',
+      keepAlive: true
+    }
+  }, {
+    path: 'restrain',
+    component: Suspicious,
+    meta: {
+      title: 'restrain',
+      keepAlive: false
+    }
+  }]
 }, { // 物料
   path: '/stock',
   component: Stock,
