@@ -164,8 +164,14 @@ var logout = function (oStore, oAjax) {
   })
 }
 
-var getBeforeDispatchData = function (sDispatchType, oStore, oAxio, fnCallBack, sUrl) {
-  beforeRequest(oStore, oAxio).get(sUrl).then((res) => {
+var getBeforeDispatchData = function (sDispatchType, oStore, oAxio, fnCallBack, sUrl, type = 'get', oQuery = undefined) {
+  let result = beforeRequest(oStore, oAxio)
+  if (type === 'get') {
+    result = result.get(sUrl, oQuery)
+  } else if ((type === 'put')) {
+    result = result.put(sUrl, oQuery)
+  }
+  result.then((res) => {
     const oResult = res.data
     const bRight = oResult.errorCode
 

@@ -13,6 +13,10 @@ export const factoryModule = {
       interfaceParameters: [],
       dimensions: []
       // dimensions_config: []
+    },
+    // 自定义字段
+    customized: {
+      items: []
     }
   },
   mutations: {
@@ -27,6 +31,10 @@ export const factoryModule = {
     },
     updateCameraData (state, payload) {
       state.factoryCameraConfig = payload.config
+    },
+    // 获取最新的 Items
+    updateCustomizedItems (state, payload) {
+      state.customized['items'] = [...payload.data]
     }
   },
   actions: {
@@ -65,7 +73,33 @@ export const factoryModule = {
         type: 'updateCameraData',
         config: oData
       })
+    },
+    /**
+     * 获取Items数据。
+     */
+    getCustomizedItems ({ commit }, oData) {
+      // 更新Items
+      commit({
+        type: 'updateCustomizedItems',
+        data: oData
+      })
     }
   },
-  getters: {}
+  getters: {
+    // 默认字段
+    defaultItems: state => {
+      return state.customized['items'].filter(item => item.isUserDefined !== 1)
+    },
+    // 自定义字段
+    userDefinedItems: state => {
+      return state.customized['items'].filter(item => item.isUserDefined === 1 && !!item.itemName).map((el, index) => {
+        el.index = index + 1
+        return el
+      })
+    },
+    // 可以新增的自定义字段
+    canUserDefinedItems: state => {
+      return state.customized['items'].filter(item => item.isUserDefined === 1 && !item.itemName)
+    }
+  }
 }

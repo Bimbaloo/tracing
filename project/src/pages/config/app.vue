@@ -37,14 +37,14 @@ export default {
           text: '自定义查询入口',
           img: '',
           src: '/query'
-        // }, {
-        //   text: '自定义字段',
-        //   img: 'field',
-        //   src: '/field'
-        // }, {
-        //   text: '自定义表格显示列',
-        //   img: 'field',
-        //   src: '/field'
+        }, {
+          text: '自定义字段',
+          img: 'field',
+          src: '/field'
+        }, {
+          text: '自定义表格显示列',
+          img: 'field',
+          src: '/field'
         }, {
           text: '工厂定制',
           img: 'factory',

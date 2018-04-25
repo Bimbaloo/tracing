@@ -26,6 +26,8 @@ import loginFn from 'assets/js/loginFn.js'
 import { loginModule } from 'assets/js/loginStore.js'
 // 引用工厂定制模块
 import { versionModule } from 'assets/js/versionStore.js'
+// 引用工厂定制模块
+import { factoryModule } from 'assets/js/factoryStore.js'
 Vue.use(VueDND)
 
 Vue.use(VueRouter)
@@ -64,7 +66,8 @@ Vue.prototype.$register = loginFn
 const store = new Vuex.Store({
   modules: {
     loginModule,
-    versionModule
+    versionModule,
+    factoryModule
   },
   state: {
     edit: false,
