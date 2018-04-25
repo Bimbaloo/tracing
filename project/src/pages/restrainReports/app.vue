@@ -42,7 +42,7 @@
             </div>
             <el-table :data="pageData.analysis" :max-height="800" border ref="analysisTable" @selection-change="selectionChange" style="width: 100%">
               <el-table-column v-if="isPageEdited" align="center" type="selection" width="50"></el-table-column>
-              <el-table-column align="center" label="图片">
+              <el-table-column align="left" label="图片">
                 <template slot-scope="scope">
                   <el-upload :data-index="scope.$index" :class="['upload-demo', {'hideUpload': !isPageEdited}]" :action="oUrl.upload" :on-success="uploadImage" :before-upload="beforeUploadImage" :on-preview="previewImage" :before-remove="beforeRemoveImage" :file-list="scope.row.imgs" :disabled="!isPageEdited" list-type="picture-card">
                     <div v-if="isPageEdited">
@@ -51,10 +51,10 @@
                   </el-upload>
                 </template>
               </el-table-column>
-              <el-table-column align="center" label="描述">
+              <el-table-column align="left" label="描述">
                 <template slot-scope="scope">
                   <el-input v-if="isPageEdited" type="textarea" v-model="scope.row.content"></el-input>
-                  <span v-else>{{ scope.row.content }}</span>
+                  <el-input v-else type="textarea" :value="scope.row.content" :readonly="true"></el-input>
                 </template>
               </el-table-column>
             </el-table>
@@ -65,7 +65,7 @@
           <div class="item-content">
             <el-row>
               <el-col :span="24">
-                <span v-if="!isPageEdited">{{ pageData.reason }}</span>
+                <el-input v-if="!isPageEdited" type="textarea" :value="pageData.reason" :readonly="true"></el-input>
                 <el-input v-else type="textarea" :rows="3" v-model="pageData.reason"></el-input>
               </el-col>
             </el-row>
@@ -76,7 +76,7 @@
           <div class="item-content">
             <el-row>
               <el-col :span="24">
-                <span v-if="!isPageEdited">{{ pageData.suggest }}</span>
+                <el-input v-if="!isPageEdited" type="textarea" :value="pageData.suggest" :readonly="true"></el-input>
                 <el-input v-else type="textarea" :rows="3" v-model="pageData.suggest"></el-input>
               </el-col>
             </el-row>
@@ -87,7 +87,7 @@
           <div class="item-content">
             <el-row>
               <el-col :span="24">
-                <span v-if="!isPageEdited">{{ pageData.summary }}</span>
+                <el-input v-if="!isPageEdited" type="textarea" :value="pageData.summary" :readonly="true"></el-input>
                 <el-input v-else type="textarea" :rows="3" v-model="pageData.summary"></el-input>
               </el-col>
             </el-row>
@@ -98,7 +98,7 @@
           <div class="item-content">
             <el-row>
               <el-col :span="24">
-                <span v-if="!isPageEdited">{{ pageData.readme }}</span>
+                <el-input v-if="!isPageEdited" type="textarea" :value="pageData.readme" :readonly="true"></el-input>
                 <el-input v-else type="textarea" :rows="3" v-model="pageData.readme"></el-input>
               </el-col>
             </el-row>
@@ -517,6 +517,12 @@ export default {
     // 获取页面中的html
     getPageHtml (refHtml) {
       let oPage = this.$refs[refHtml]
+      
+      let aoText = oPage.querySelectorAll('.el-textarea__inner')
+
+      aoText.forEach(o => {
+				o.innerHTML = o.value
+			})
 
       let sMain = ''
       // 根据打印配置获取所需显示的内容
@@ -565,6 +571,12 @@ export default {
             }
             .el-col-16 {
                 width: 66.66667%;
+            }
+            .el-col-24 {
+                width: 100%;
+            }
+            .el-textarea textarea {
+              width: 100%;
             }
             .report-wrapper {
               padding: 20px;

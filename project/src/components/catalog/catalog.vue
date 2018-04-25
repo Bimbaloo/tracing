@@ -9,6 +9,8 @@ import warehouse from 'assets/img/warehouse.png'
 import workshop from 'assets/img/workshop.png'
 import rework from 'assets/img/rework.png'
 import barcodeManage from 'assets/img/barcodeManage.png'
+import inspect from 'assets/img/inspect.png'
+
 import { onDoubleClickNode } from 'assets/js/go-util'
 
 const HIGHLIGHT_BG_COLOR = '#f5efdc' // "#fff";
@@ -93,6 +95,9 @@ export default {
         // 仓库操作
         case 'warehouse':
           return warehouse
+				// 检验
+				case 'inspect':
+					return inspect
         default:
           break
       }
@@ -343,7 +348,26 @@ export default {
                     .substr(-5)
                 }
               })
-            }
+            } else if (nodeType === 16 || nodeType === 17) {
+							// 可疑品登记 可疑品判定
+							this.$store.commit('updateNodeType', {
+								nodeType: nodeType
+							})
+							this.$store.commit('updateDetailInfos', {
+								detailInfos: detailInfos
+							})
+
+							this.$router.replace({
+								path: '/restrainTable',
+								query: {
+									key: node.data.key,
+									_tag: new Date()
+										.getTime()
+										.toString()
+										.substr(-5)
+								}
+							})
+						}
           },
           doubleClick: onDoubleClickNode
         },

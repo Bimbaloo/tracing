@@ -19,6 +19,8 @@ import warehouse from 'assets/img/warehouse.png'
 import workshop from 'assets/img/workshop.png'
 import rework from 'assets/img/rework.png'
 import barcodeManage from 'assets/img/barcodeManage.png'
+import inspect from 'assets/img/inspect.png'
+
 import {
 	onLinkSelectionChange,
   onNodeSelectionChange,
@@ -348,7 +350,7 @@ export default {
           this.$(
             window.go.Panel,
             'Horizontal',
-            // 加工中数
+            // 加工中数 追踪：工序（产线型不显示） 溯源：没
             this.$(
               window.go.TextBlock,
               {
@@ -385,7 +387,7 @@ export default {
                   node.isShowRemain
               )
             ),
-            // 滞留数
+            // 滞留数 追踪：非物料及容器清空，产线型工序不显示 溯源：没
             this.$(
               window.go.TextBlock,
               {
@@ -436,7 +438,7 @@ export default {
                   )
               )
             ),
-            // 总数
+            // 总数 所有，除了产线型工序
             this.$(
               window.go.TextBlock,
               {
@@ -806,6 +808,9 @@ export default {
         // 仓库操作
         case 'warehouse':
           return warehouse
+				// 检验
+				case 'inspect':
+					return inspect
         default:
           break
       }
@@ -993,7 +998,26 @@ export default {
               .substr(-5)
           }
         })
-      }
+      } else if (nodeType === 16 || nodeType === 17) {
+				// 可疑品登记 可疑品判定
+				this.$store.commit('updateNodeType', {
+					nodeType: nodeType
+				})
+				this.$store.commit('updateDetailInfos', {
+					detailInfos: detailInfos
+				})
+
+				this.$router.replace({
+					path: '/restrainTable',
+					query: {
+						key: node.data.key,
+						_tag: new Date()
+							.getTime()
+							.toString()
+							.substr(-5)
+					}
+				})
+			}
     },
 
     // 展开/收起按钮点击事件。
