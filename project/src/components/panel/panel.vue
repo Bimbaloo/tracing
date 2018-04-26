@@ -157,7 +157,7 @@ export default {
   // padding-right: 28px;
 }
 .panel-content {
-  /*overflow: auto;*/
+ overflow: auto;
 
   .panel-content-wrap {
     padding: 0 28px;

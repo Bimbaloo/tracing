@@ -34,8 +34,11 @@ import header from 'components/header/header.vue'
 import panel from 'components/panel/panel.vue'
 import dialog from 'components/basic/dialogBarcode.vue'
 import fnP from 'assets/js/public.js'
+import {mapGetters} from 'vuex'
 
 const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
+const TABLE_COLUMNS_GET = window.HOST + '/api/v1/customized/tables'
+const TABLE_DATA_URL = window.HOST + '/api/v1/customized/items'
 
 export default {
   components: {
@@ -61,38 +64,21 @@ export default {
       handleSubmit: this._submitForm,
       sErrorMessage: '',
       tag: '',
-      myLocalStorage: [] // 查询记录
-      // modulesConfig: [{
-      //   "name": "查出库",
-      //   "key": "stock",
-      //   "switch": 1,
-      //   "select": 0
-      // }, {
-      //   "name": "溯源",
-      //   "key": "trace",
-      //   "switch": 1,
-      //   "select": 1,
-      // }, {
-      //   "name": "追踪",
-      //   "key": "track",
-      //   "switch": 1,
-      //   "select": 0,
-      // }]
+      myLocalStorage: [], // 查询记录
+      message: ''
     }
   },
   computed: {
-    // 工厂配置数据。
-    // configData() {
-    //   return this.$store.state.customModule.config
-    // },
-    // 配置模块。
-    // modulesConfig() {
-    //   return this.configData.modules
-    // },
     reversedMessage () {
       let _width = this.LayoutLeftWidth + this.changeWidth
       return _width
-    }
+    },
+    ...mapGetters(
+      {
+        // 行信息
+        dataName: 'userDefinedItems'
+      }
+    )
   },
   created () {
     // 登录判断。
@@ -100,10 +86,8 @@ export default {
 
     // 获取配置数据。
     this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
-    // this.$store.dispatch('getVersion').then(() => {//getConfig
-    //   // 获取数据。
-    //   this.fetchData();
-    // })
+    this.getCustomizedTablesColumns()
+    this.getCustomizedItems()
 
     // 保存查询记录
     let history = localStorage.getItem('history')
@@ -164,6 +148,30 @@ export default {
         this.requestError
       )
     },
+    // 获取 Items
+    getCustomizedItems () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedItems',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_DATA_URL
+        ))
+      })
+    },
+    // 获取 tablesColumns
+    getCustomizedTablesColumns () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedTablesColumns',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_COLUMNS_GET
+        ))
+      })
+    },
     // 设置tab数据。
     setCategories (oData, oResult) {
       this.categories = fnP
@@ -215,22 +223,6 @@ export default {
       // 返回参数。
       return oData
     },
-    // // 判断调用接口是否成功。
-// judgeLoaderHandler(param,fnSu,fnFail) {
-//   let bRight = param.data.errorCode;
-
-//     // 判断是否调用成功。
-//     if(!bRight) {
-//       // 调用成功后的回调函数。
-//       fnSu && fnSu();
-//     }else {
-//       // 提示信息。
-//       this.sErrorMessage = param.data.errorMsg.message;
-//       this.showMessage();
-//       // 失败后的回调函。
-//       fnFail && fnFail();
-//     }
-// },
     // 显示提示信息。
     showMessage () {
       this.$message({
@@ -268,26 +260,81 @@ export default {
     // 数据提交
     _submitForm (oConditions) {
       this.tip = false
-
-      let sPath = '/' + this.activeKey
-      oConditions.tab = this.activeKey
-      this.updateRecord(oConditions)
-      // console.log(oConditions);
-      sessionStorage.setItem(
-        'searchConditions-' + this.tag,
-        JSON.stringify(oConditions)
-      )
-
-      //        if(this.activeKey == "stock") {
-      // 若为查出库。
-      sPath = sPath + '/' + oConditions.radio
-      //        }
-
-      // 修改下拉参数值。
-      this.$router.replace({
-        path: sPath,
-        query: this.getKeys(this.activeKey)
+      oConditions = this.itemCodeToSearchCode(oConditions)
+      if (!oConditions) {
+        this.$message({
+          message: this.message,
+          type: 'error'
+        })
+      } else {
+        let sPath = '/' + this.activeKey
+        oConditions.tab = this.activeKey
+        this.updateRecord(oConditions)
+        sessionStorage.setItem(
+          'searchConditions-' + this.tag,
+          JSON.stringify(oConditions)
+        )
+        // 若为查出库。
+        sPath = sPath + '/' + oConditions.radio
+        // 修改下拉参数值。
+        this.$router.replace({
+          path: sPath,
+          query: this.getKeys(this.activeKey)
+        })
+      }
+    },
+    // itemCode和SearchCode 转换
+    itemCodeToSearchCode (oConditions) {
+      let data = [...this.dataName]
+      let keys = oConditions.keys
+      let keysArr = []
+      for (let i in keys) {
+        if (!keys[i]) {
+          delete keys[i]
+        } else {
+          keysArr.push(i)
+        }
+      }
+      // 自定义的searchCode
+      let isUser = []
+      // opType 种类
+      let opType = []
+      // 输出的错误
+      this.message = '不能存在多个操作类型的选项：'
+      keysArr.forEach(key => {
+        data.forEach(el => {
+          if (key === el.itemCode && !!el.opType) {
+            isUser.push(el)
+          }
+        })
       })
+      isUser.forEach(el => {
+        if (!opType.includes(el.opType)) {
+          opType.push(el.opType)
+        }
+        this.message += `${el.itemName}为${el.opTypeName}类型；`
+      })
+      this.message = this.message.substr(0, this.message.length - 1) + '。'
+      if (opType.length > 1) {
+        return false
+      } else {
+        this.message = ''
+        // console.log(isUser)
+        // console.log(opType)
+        keysArr.forEach(key => {
+          isUser.forEach(el => {
+            if (el.itemCode === key) {
+              keys[`${el.searchCode}`] = keys[key]
+              delete keys[key]
+            }
+          })
+        })
+        keys['opType'] = opType[0]
+        // console.log(keys)
+        oConditions.keys = keys
+        // console.log(oConditions)
+        return oConditions
+      }
     },
     dragstar (e) {
       // 鼠标按下，开始拖动
@@ -305,16 +352,12 @@ export default {
     },
     dragend (e) {
       // 鼠标松开，结束拖动
-
-      // console.log('结束')
       this.dragging = false
       e.stopPropagation = true
     },
     onMouseMove (e) {
       // 拖动过程
-
       if (this.dragging) {
-        // console.log('开始动了')
         this.changeWidth = e.pageX - this._pageX
       }
     },
@@ -323,24 +366,10 @@ export default {
       function S4 () {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
       }
-      return (
-        S4() +
-        S4() +
-        '-' +
-        S4() +
-        '-' +
-        S4() +
-        '-' +
-        S4() +
-        '-' +
-        S4() +
-        S4() +
-        S4()
-      )
+      return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
     },
     // 保存查询记录
     updateRecord (oConditions) {
-      // debugger
       delete oConditions.keys._tag
       let oData = oConditions
       let isRepetition = true // 默认不重复
@@ -367,7 +396,7 @@ export default {
         })
         localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
       } else {
-        // debugger
+      
         let olddata = this.myLocalStorage.splice(n, 1)[0]
         olddata.id = this.guid()
         let newTime = new Date().Format()
@@ -384,7 +413,6 @@ export default {
   watch: {
     // 如果 左边小于260px 直接收缩
     reversedMessage: function () {
-      // console.log('走你')
       if (this.reversedMessage <= 275 && !this.collapse) {
         this.collapse = true
       }

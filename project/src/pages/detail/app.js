@@ -18,7 +18,7 @@ import 'assets/js/global.js'
 import loginFn from 'assets/js/loginFn.js'
 import { loginModule } from 'assets/js/loginStore.js'
 // 引用工厂定制模块
-// import { customModule } from 'assets/js/customStore.js'
+import { factoryModule } from 'assets/js/factoryStore.js'
 import { versionModule } from 'assets/js/versionStore.js'
 // 引入选项设置模块。
 import { optionsModule } from 'assets/js/optionsStore.js'
@@ -37,6 +37,7 @@ Vue.prototype.$post = axios.post
 // import Stock from 'components/stock/stock.vue'
 // import Trace from 'components/trace/trace.vue'
 // import Track from 'components/track/track.vue'
+
 const Stock = r => require.ensure([], () => r(require('components/stock/stock.vue')), 'group-datail')
 const Storage = r => require.ensure([], () => r(require('components/stock/storage.vue')), 'group-datail')
 const Batch = r => require.ensure([], () => r(require('components/stock/batch.vue')), 'group-datail')
@@ -93,7 +94,7 @@ Vue.prototype.$register = loginFn
 const store = new Vuex.Store({
   modules: {
     loginModule,
-    // customModule
+    factoryModule,
     versionModule,
     optionsModule,
     supressionModule

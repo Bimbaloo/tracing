@@ -1,6 +1,6 @@
 <template>
     <el-form :model="ruleForm" :rules="rules" ref="ruleForm" :label-width="labelWidth" @keyup.enter.native="submitForm('ruleForm')" >
-		<div class='form-conditions' :style="{maxHeight: conditionHeight}">
+		<div class='form-conditions' >
 			<el-form-item :label="item.name" :prop="item.key" v-for="item in items" :key="item.key" :class="[Object.keys(keys).includes(item.key) ? '': 'hide']">
         <component :is="`v-${item.type}`" :form-data="ruleForm" :placeholder-data="item.placeholder" :key-data="item.key" :tab="tab" :sub-tab="subTab"></component>
 				<input id="hiddenText" type="text" style="display:none" />    <!-- 为了阻止form里面只有一个input时回车会自动触发submit事件  -->

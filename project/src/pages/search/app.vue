@@ -128,7 +128,8 @@ export default {
         }
       ],
       myLocalStorage: [],
-      historyZindex: 0
+      historyZindex: 0,
+      message: ''
     }
   },
   computed: {
@@ -171,11 +172,6 @@ export default {
     this.$register.login(this.$store)
     // 获取配置数据。
     this.$register.getVersion(this.$store, this.$ajax, this.fetchData)
-
-    // this.$store.dispatch('getVersion').then(() => {//getConfig
-    //   // 获取数据。
-    //   this.fetchData();
-    // })
 
     this.fetchDataName() // 获取名称
   },
@@ -240,20 +236,81 @@ export default {
     },
 
     _submitForm (oConditions) {
-      oConditions.tab = this.activeKey
-      this.updateRecord(oConditions)
-      let sTage = (+new Date()).toString().substr(-5)
+      oConditions = this.itemCodeToSearchCode(oConditions)
+      if (!oConditions) {
+        this.$message({
+          message: this.message,
+          type: 'error'
+        })
+      } else {
+        oConditions.tab = this.activeKey
+        this.updateRecord(oConditions)
+        let sTage = (+new Date()).toString().substr(-5)
 
-      sessionStorage.setItem(
-        'searchConditions-' + sTage,
-        JSON.stringify(oConditions)
-      )
-      // 跳转。
-      location.assign(
-        this.categories.filter(o => o.key === this.activeKey)[0].url +
-          '.html?tag=' +
-          sTage
-      )
+        sessionStorage.setItem(
+          'searchConditions-' + sTage,
+          JSON.stringify(oConditions)
+        )
+        // 跳转。
+        location.assign(
+          this.categories.filter(o => o.key === this.activeKey)[0].url +
+            '.html?tag=' +
+            sTage
+        )
+      }
+    },
+    // itemCode和SearchCode 转换
+    itemCodeToSearchCode (oConditions) {
+      let data = [...this.dataName]
+      let keys = oConditions.keys
+      let keysArr = []
+      for (let i in keys) {
+        if (!keys[i]) {
+          delete keys[i]
+        } else {
+          keysArr.push(i)
+        }
+      }
+      // 自定义的searchCode
+      let isUser = []
+      // opType 种类
+      let opType = []
+      // 输出的错误
+      this.message = '不能存在多个操作类型的选项：'
+      keysArr.forEach(key => {
+        data.forEach(el => {
+          if (key === el.itemCode && !!el.opType) {
+            isUser.push(el)
+          }
+        })
+      })
+      isUser.forEach(el => {
+        if (!opType.includes(el.opType)) {
+          opType.push(el.opType)
+        }
+        this.message += `${el.itemName}为${el.opTypeName}类型；`
+      })
+      this.message = this.message.substr(0, this.message.length - 1) + '。'
+      if (opType.length > 1) {
+        return false
+      } else {
+        this.message = ''
+        // console.log(isUser)
+        // console.log(opType)
+        keysArr.forEach(key => {
+          isUser.forEach(el => {
+            if (el.itemCode === key) {
+              keys[`${el.searchCode}`] = keys[key]
+              delete keys[key]
+            }
+          })
+        })
+        keys['opType'] = opType[0]
+        // console.log(keys)
+        oConditions.keys = keys
+        // console.log(oConditions)
+        return oConditions
+      }
     },
     switchData (oldData) {
       let newData = []
@@ -304,11 +361,26 @@ export default {
     // 获取名称成功。
     requestNameSucess (oData) {
       // 获取对应的名称。
+      oData = oData.filter(el => {
+        return !!el.itemName
+      })
       let dataName = localStorage.getItem('dataName')
       if (!dataName || dataName !== JSON.stringify(oData)) {
         localStorage.setItem('dataName', JSON.stringify(oData))
         this.dataName = oData.concat(this.dataName)
       }
+    },
+    // 获取 Items
+    getCustomizedItems () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedItems',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_DATA_URL
+        ))
+      })
     },
     // 获取查询条件的key:value
     fetchDataName () {
@@ -337,20 +409,7 @@ export default {
       function S4 () {
         return (((1 + Math.random()) * 0x10000) | 0).toString(16).substring(1)
       }
-      return (
-        S4() +
-        S4() +
-        '-' +
-        S4() +
-        '-' +
-        S4() +
-        '-' +
-        S4() +
-        '-' +
-        S4() +
-        S4() +
-        S4()
-      )
+      return (S4() + S4() + '-' + S4() + '-' + S4() + '-' + S4() + '-' + S4() + S4() + S4())
     },
     // 点击历史记录后，填充
     findId (listId) {
@@ -675,6 +734,20 @@ footer {
     }
   }
 }
+.el-tab-pane {
+    .panel {
+      .panel-content {
+        .panel-content-wrap {
+          .el-form {
+            .form-conditions {
+              max-height: 520px;
+              overflow: auto;
+            }
+          }
+        }
+      }
+    }
+  }
 .el-message-box__headerbtn {
   border: none;
   outline: 0;
