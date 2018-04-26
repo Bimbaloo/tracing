@@ -54,6 +54,7 @@
 import agTable from 'components/basic/ag-table.vue'
 import table from 'components/basic/table.vue'
 import fnP from 'assets/js/public.js'
+import {mapGetters} from 'vuex'
 
 export default {
   components: {
@@ -122,6 +123,18 @@ export default {
       this.adjustHeight()
     })
   },
+  computed: {
+    ...mapGetters(
+      {
+        // tablesColumn
+        tablesColumns: 'tablesColumns'
+      }
+    ),
+    // 起点明细表已定义的
+    startPointsTableColumns () {
+      return this.tablesColumns['startPointsTable'] || []
+    }
+  },
   watch: {
     // 如果路由有变化，会再次执行该方法
     $route: function () {
@@ -155,7 +168,7 @@ export default {
     // 获取显示列
     getColumns () {
       // 基本显示列。
-      return [
+      let arr = [
         {
           width: 30,
           checkboxSelection: true,
@@ -275,6 +288,13 @@ export default {
           headerName: '质量'
         }
       ]
+      this.startPointsTableColumns.forEach(el => {
+        arr.push({
+          field: el.searchCode,
+          headerName: el.itemName
+        })
+      })
+      return arr
     },
     // 查询。
     fetchPage () {
