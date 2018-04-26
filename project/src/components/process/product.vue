@@ -222,7 +222,7 @@ import table from 'components/basic/table.vue'
 import rasterizeHTML from 'rasterizehtml'
 import VideoDialog from 'components/monitor/dialog.vue'
 import agTable from 'components/basic/ag-table.vue'
-// import $ from 'jquery'
+import {mapGetters} from 'vuex'
 
 // const url = "http://192.168.220.182:8088/api/v1/trace/operation-detail/inout/by-id";
 const url = window.HOST + '/api/v1/trace/operation-detail/inout/by-id'
@@ -1216,6 +1216,20 @@ export default {
         this.$store.state.versionModule &&
         this.$store.state.versionModule.isOpDbBeforeRefact
       )
+    },
+    ...mapGetters(
+      {
+        // tablesColumn
+        tablesColumns: 'tablesColumns'
+      }
+    ),
+    // 投入明细表已定义的
+    doInTableColumns () {
+      return this.tablesColumns['doInTable'] || []
+    },
+    // 产出明细表已定义的
+    doOutTableColumns () {
+      return this.tablesColumns['doOutTable'] || []
     }
   },
   mounted () {
@@ -1351,10 +1365,24 @@ export default {
       // 存在需隐藏的列，则处理。
       if (aoHide && aoHide.length) {
         this.inItems.columns = this.setColumnHide(this.inItems.columns, aoHide)
+        // 投入表添加自定义列
+        this.doInTableColumns.forEach(el => {
+          this.inItems.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
         this.outItems.columns = this.setColumnHide(
           this.outItems.columns,
           aoHide
         )
+        // 产出表添加自定义列
+        this.doOutTableColumns.forEach(el => {
+          this.outItems.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
         this.uniteItems.columns = this.setColumnHide(
           this.uniteItems.columns,
           aoHide

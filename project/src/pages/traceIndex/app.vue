@@ -31,6 +31,7 @@ import catalog from 'components/catalog/catalog.vue'
 
 import $ from 'jquery'
 import fnP from 'assets/js/public.js'
+const TABLE_COLUMNS_GET = window.HOST + '/api/v1/customized/tables'
 
 export default {
   components: {
@@ -123,7 +124,7 @@ export default {
   created () {
     // 登录验证。
     this.$register.login(this.$store)
-
+    this.getCustomizedTablesColumns()
     // 组件创建完后获取数据
     // 此时 data 已经被 observed 了
     // 重置路由。
@@ -204,7 +205,18 @@ export default {
       console.warn('查询出错！')
       this.showMessage()
     },
-
+    // 获取 tablesColumns
+    getCustomizedTablesColumns () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedTablesColumns',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_COLUMNS_GET
+        ))
+      })
+    },
     fetchData () {
       this.fullscreenLoading = true
 

@@ -56,6 +56,7 @@ import dialogTree from 'components/basic/dialogProgressTree.vue'
 
 import fnP from 'assets/js/public.js'
 import $ from 'jquery'
+const TABLE_COLUMNS_GET = window.HOST + '/api/v1/customized/tables'
 
 export default {
   components: {
@@ -166,6 +167,7 @@ export default {
     window.Rt.utils.cookie('progressId', this.progressId)
     // 登录验证。
     this.$register.login(this.$store)
+    this.getCustomizedTablesColumns()
 
     // 组件创建完后获取数据
     // 此时 data 已经被 observed 了
@@ -322,6 +324,18 @@ export default {
       this.closeProgressDialog()
       console.warn(err)
       this.showMessage('查询出错！')
+    },
+    // 获取 tablesColumns
+    getCustomizedTablesColumns () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedTablesColumns',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_COLUMNS_GET
+        ))
+      })
     },
     fetchData () {
       let sType = this.urlType[this.points.type] || ''
