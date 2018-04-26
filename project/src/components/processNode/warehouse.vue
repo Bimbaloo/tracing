@@ -314,10 +314,6 @@ export default {
         // 到货登记。
         1113: [
           {
-            field: 'registration',
-            headerName: '登记单号'
-          },
-          {
             field: 'barcode',
             headerName: '条码'
           },
@@ -340,10 +336,6 @@ export default {
           {
             field: 'materialSpec',
             headerName: '物料规格'
-          },
-          {
-            field: 'materialUnit',
-            headerName: '单位'
           },
           {
             field: 'quantity',
