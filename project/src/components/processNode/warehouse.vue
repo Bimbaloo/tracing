@@ -70,7 +70,7 @@ export default {
         103: '出库',
         111: '库存损益',
         112: '库存调整',
-        11113: '到货登记'
+        23: '到货登记'
       },
       materialData: {
         // filename: '',
@@ -314,7 +314,7 @@ export default {
           }
         ],
         // 到货登记。
-        1113: [
+        23: [
           {
             field: 'barcode',
             headerName: '条码'

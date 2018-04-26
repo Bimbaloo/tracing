@@ -16,7 +16,7 @@
             <!-- <span class="path-item" v-if="restrainIf">>可疑品</span> -->
         <!-- </div> -->
          <div class="router-path">
-            <span class="path-item" @click="checkStock">{{isRestrainRegister ? "可疑品登记":"可疑品判定"}}</span>
+            <span class="path-item" @click="checkStock">{{nodeType === 16 ? "可疑品登记":"可疑品判定"}}</span>
             <!-- <span class="path-item" @click="checkStock">{{ isOpDbBeforeRefact ? "仓储信息":`物料明细${isWasteMaterial ? '(废品)':''}` }}</span> -->
             <!-- 新版本中没有同批次入库 -->
             <span class="path-item" @click="checkBatch" v-if="batchIf && isOpDbBeforeRefact">>同批出入库</span>
@@ -52,10 +52,6 @@ export default {
   computed: {
     fullscreen() {
       return this.$store.state.fullscreen;
-    },
-    //判断节点类型是  可疑品判定 或 可疑品登记
-    isRestrainRegister() {
-      return 0
     },
     // 版本信息数据。
     isOpDbBeforeRefact() {

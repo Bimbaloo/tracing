@@ -4,7 +4,7 @@
     <div class="innner-content" >
       <div class="content-message tableData">
         <span class='table-title'>
-          <span>物料编码：{{node.materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.materialName}}</span>
+          <!-- <span>物料编码：{{node.materialCode}}</span>&nbsp;&nbsp;&nbsp;&nbsp;<span>物料名称：{{node.materialName}}</span> -->
         </span>
         <span class='table-handle'>
           <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle('rawTable', materialData, $event)"></i>
@@ -95,9 +95,9 @@ export default {
     resizeY: function() {
       return this.$store && this.$store.state.resizeY;
     },
-    //判断节点类型是  可疑品判定 或 可疑品登记
+    //判断节点类型是  可疑品判定(17) 或 可疑品登记(16)
     isRestrainRegister() {
-      return 0;
+      return this.$store.state.nodeType === 16 ? true : false
     },
     fullscreen: function() {
       return this.$store && this.$store.state.fullscreen;
@@ -143,9 +143,9 @@ export default {
 
       // 如果从tree上直接点击，需要更新数据. tag不同
       // 仓储信息: 从可疑品(restrain)或同批次入库(batch)中进入，则不会重新请求 .tag是一样的
-      if (
-        toTitle === "storage" &&
-        (fromTitle === "storage" ||
+      if (    
+        toTitle === "restrainStorage" &&
+        (fromTitle === "restrainStorage" ||
           (to.query._tag !== undefined && this.tag !== to.query._tag))
       ) {
         this.tag = to.query._tag;
@@ -181,7 +181,6 @@ export default {
           {
             prop: "barcode",
             name: "条码",
-            click: this.batchClick,
             merge: true
           },
           {
@@ -191,9 +190,9 @@ export default {
           {
             prop: "batchNo",
             name: "批次",
-            class: "batch",
-            width: 200,
-            click: this.batchClick
+            // class: "batch",
+            width: 200
+            //,click: this.batchClick
           },
           {
             prop: "quantity",
@@ -393,22 +392,7 @@ export default {
         this.getDetailUrl(),
         "post",
         {
-          //可疑品判定测试参数
-          operationIdList: [
-            "3ba40f82-428e-4d9b-b559-59d72f4809c0",
-            "2821091b-fd0d-42d5-81a2-dfb56bcc1a05",
-            "19b214b8-9f52-4c9e-9456-175c94c39b43",
-            "0928123a-d732-4089-bfb4-72138b151ad5",
-            "ba298f3d-01e3-44b2-b952-047d951bdab6"
-          ],
-          //可疑品登记测试参数
-          operationIdList1: [
-            "3f182283-0093-425f-a973-b1788aa9eac4",
-            "b651f352-3c4c-4e8e-8f35-1e86d9367132",
-            "85a1e3c6-7d1e-4ac4-8c02-51e5bfdf9cfa",
-            "e49bd9b0-4448-4d9b-b9d8-7fcaa3c42050",
-            "1abe9ff3-728d-4e46-9d0d-e151f6f2d64f"
-          ]
+          operationIdList: this.$store.state.detailInfos.opIdList
         },
         this.requestSucess,
         this.requestFail,
