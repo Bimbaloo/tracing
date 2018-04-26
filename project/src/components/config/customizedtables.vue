@@ -94,7 +94,7 @@ export default {
         userDefinedItems: 'userDefinedItems',
         // tableCode对应表
         tableCodeNames: 'tableCodeNames',
-        // ablesColumn
+        // tablesColumn
         tablesColumns: 'tablesColumns'
       }
     ),
@@ -252,7 +252,7 @@ export default {
     flex: 1;
     display: flex;
     flex-wrap: wrap;
-    justify-content: space-between;
+    justify-content: space-around;
     padding: 30px 50px 20px 50px;
     overflow: auto;
     .query-item {

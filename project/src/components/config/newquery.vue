@@ -267,7 +267,7 @@ export default {
         null,
         oData => {
           // 成功后的回调函数。
-          this.aoTable = oData
+          this.aoTable = oData.filter(el => !!el.itemName)
           // 调用接口数据。
           this.$nextTick(() => {
             this.$register.sendRequest(
@@ -325,15 +325,22 @@ export default {
     getAllFilter () {
       let aData = []
       aData = this.aoTable.map(o => {
-        return {
-          key: o.itemCode,
-          label: o.itemName
+        if (o.isUserDefined === 1) {
+          return {
+            key: o.itemCode,
+            label: o.itemName,
+            opType: o.opType
+          }
+        } else {
+          return {
+            key: o.itemCode,
+            label: o.itemName
+          }
         }
       })
       if (this.getTransferData().title !== '物流码') {
         aData = aData.filter(e => e.key !== 'traceCode')
       }
-
       // 返回数据。
       return aData
     },
@@ -530,25 +537,6 @@ export default {
           })
         }
       )
-
-      //    const stateChange = await this.sendResult().then(e => e.status);
-      //    if (stateChange) {
-      //      this.$store.commit({
-      //        type: "updateModuleOrderListEdit",
-      //        key: true
-      //      });
-      //      this.categoryCopy = [].concat(this.category);
-      //      this.$message({
-      //        message: stateChange,
-      //        duration: 1000
-      //      });
-      //    } else {
-      //      this.category = [].concat(this.categoryCopy);
-      //      this.$message({
-      //        message: `保存失败，请重试`,
-      //        duration: 1000
-      //      });
-      //    }
     },
     // 发送改变顺序请求
     sendResult () {
