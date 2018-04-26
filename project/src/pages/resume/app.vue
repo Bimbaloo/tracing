@@ -225,7 +225,7 @@ export default {
           {
             prop: 'materialName',
             name: '',
-            width: 300
+            width: 350
           },
           {
             prop: 'opTypeName',
@@ -268,7 +268,7 @@ export default {
           {
             prop: 'equipmentName',
             name: '地点',
-            width: 160,
+            width: 180,
             formatter: function (row) {
               if (row.srcWarehouse) {
                 return `源仓库:${row.srcWarehouse +
