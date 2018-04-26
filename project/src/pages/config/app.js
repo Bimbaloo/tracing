@@ -18,6 +18,7 @@ import 'assets/css/icon.less'
 import VueDND from 'awe-dnd'
 import query from '../../components/config/newquery.vue'
 import field from '../../components/config/field.vue'
+import customizedtables from '../../components/config/customizedtables.vue'
 import factory from '../../components/config/factory.vue'
 import link from '../../components/config/customLink.vue'
 import camera from '../../components/config/customCamera.vue'
@@ -38,6 +39,7 @@ Vue.prototype.$ajax = axios
 // 定义路由
 const routes = [
   { path: '/query', component: query },
+  { path: '/customizedtables', component: customizedtables },
   { path: '/field', component: field },
   {
     path: '/factory',

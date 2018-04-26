@@ -24,6 +24,8 @@
 
 <script>
 import header from 'components/header/header.vue'
+const TABLE_DATA_URL = window.HOST + '/api/v1/customized/items'
+const TABLE_COLUMNS_GET = window.HOST + '/api/v1/customized/tables'
 
 export default {
   components: {
@@ -44,7 +46,7 @@ export default {
         }, {
           text: '自定义表格显示列',
           img: 'field',
-          src: '/field'
+          src: '/customizedtables'
         }, {
           text: '工厂定制',
           img: 'factory',
@@ -56,6 +58,8 @@ export default {
   created () {
     // 登录验证。
     this.$register.login(this.$store)
+    this.getCustomizedItems()
+    this.getCustomizedTablesColumns()
     this.$router.replace('/query')
   },
   computed: {
@@ -106,6 +110,30 @@ export default {
         self.isActive = index
         self.$router.replace({ path: routerLink })
       }
+    },
+    // 获取 Items
+    getCustomizedItems () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedItems',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_DATA_URL
+        ))
+      })
+    },
+    // 获取 tablesColumns
+    getCustomizedTablesColumns () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedTablesColumns',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_COLUMNS_GET
+        ))
+      })
     }
   }
 }
