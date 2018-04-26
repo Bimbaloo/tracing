@@ -18,18 +18,12 @@ import 'assets/css/icon.less'
 
 // 引用登录模块。
 import loginFn from 'assets/js/loginFn.js'
-import {
-  loginModule
-} from 'assets/js/loginStore.js'
+import { loginModule } from 'assets/js/loginStore.js'
 
 // 引用工厂定制模块
-import {
-  factoryModule
-} from 'assets/js/factoryStore.js'
+import { factoryModule } from 'assets/js/factoryStore.js'
 // 应用版本信息模块
-import {
-  versionModule
-} from 'assets/js/versionStore.js'
+import { versionModule } from 'assets/js/versionStore.js'
 
 // 引入选项设置模块。
 import { supressionModule } from 'assets/js/supression.js'

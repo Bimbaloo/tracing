@@ -42,7 +42,9 @@ import FileSaver from 'file-saver'
 // import html2canvas from 'html2canvas'
 import rasterizeHTML from 'rasterizehtml'
 import { needTableDatas } from 'assets/js/public.js'
+import {mapGetters} from 'vuex'
 
+const TABLE_COLUMNS_GET = window.HOST + '/api/v1/customized/tables'
 export default {
   components: {
     'v-agtable': agTable,
@@ -417,10 +419,25 @@ export default {
     routerName () {
       let name = this.pathMapping[this.nodeType]
       return name
+    },
+    ...mapGetters(
+      {
+        // tablesColumn
+        tablesColumns: 'tablesColumns'
+      }
+    ),
+    // 出库明细表中自定义的列
+    outboundTableColumns () {
+      return this.tablesColumns['outboundTable'] || []
+    },
+    // 入库明细表中自定义的列
+    storageTableColumns () {
+      return this.tablesColumns['storageTable'] || []
     }
   },
   created () {
     this.fetchData()
+    this.getCustomizedTablesColumns()
   },
   mounted () {
     this.tableHeight = this.setHeight()
@@ -481,8 +498,20 @@ export default {
         this.allColumns
       )
 
-      if (this.nodeType === 103) {
-        // 若为出库
+      if (this.nodeType === 102) {  // 如果是入库，添加自定义列
+        this.storageTableColumns.forEach(el => {
+          oTableData.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
+      } else if (this.nodeType === 103) {  // 如果是出库，添加自定义列
+        this.outboundTableColumns.forEach(el => {
+          oTableData.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
         if (!oData.stockOperationDetailList.some(o => o.traceCode)) {
           // 若物流码列为空，则隐藏该列。
           oTableData.columns = oTableData.columns.filter(o => o.field !== 'traceCode')
@@ -499,6 +528,22 @@ export default {
         this.nodeType,
         this.allColumns
       )
+      // 如果是入库，添加自定义列
+      if (this.nodeType === 102) {
+        this.storageTableColumns.forEach(el => {
+          this.materialData.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
+      } else if (this.nodeType === 103) {  // 如果是出库，添加自定义列
+        this.outboundTableColumns.forEach(el => {
+          this.materialData.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
+      }
       this.loading = false
       // 提示信息。
       this.error = '查无数据'
@@ -511,10 +556,38 @@ export default {
         this.nodeType,
         this.allColumns
       )
+      // 如果是入库，添加自定义列
+      if (this.nodeType === 102) {
+        this.storageTableColumns.forEach(el => {
+          this.materialData.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
+      } else if (this.nodeType === 103) {  // 如果是出库，添加自定义列
+        this.outboundTableColumns.forEach(el => {
+          this.materialData.columns.push({
+            field: el.searchCode,
+            headerName: el.itemName
+          })
+        })
+      }
       this.loading = false
       this.error = '查无数据。'
       this.styleObject.minWidth = 0
       console.log(err)
+    },
+    // 获取 tablesColumns
+    getCustomizedTablesColumns () {
+      return new Promise((resolve, reject) => {
+        resolve(this.$register.getBeforeDispatchData(
+          'getCustomizedTablesColumns',
+          this.$store,
+          this.$ajax,
+          null,
+          TABLE_COLUMNS_GET
+        ))
+      })
     },
     // 表格导出。
     exportExcelHandle (sTable, oTableData, event) {
