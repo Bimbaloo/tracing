@@ -236,7 +236,6 @@ export default {
     },
 
     _submitForm (oConditions) {
-      oConditions = this.itemCodeToSearchCode(oConditions)
       if (!oConditions) {
         this.$message({
           message: this.message,

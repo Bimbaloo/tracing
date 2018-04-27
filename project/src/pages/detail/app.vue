@@ -123,7 +123,6 @@ export default {
         oData = this.getSearchData()
         // this.activeKey = oData.tab;
       }
-
       this.$register.sendRequest(
         this.$store,
         this.$ajax,
@@ -260,7 +259,10 @@ export default {
     // 数据提交
     _submitForm (oConditions) {
       this.tip = false
-      oConditions = this.itemCodeToSearchCode(oConditions)
+
+      let _oConditions = JSON.parse(JSON.stringify(oConditions)) // 本地未转换过的查询条件
+      oConditions = this.itemCodeToSearchCode(oConditions)   // 转换的查询条件
+
       if (!oConditions) {
         this.$message({
           message: this.message,
@@ -269,7 +271,8 @@ export default {
       } else {
         let sPath = '/' + this.activeKey
         oConditions.tab = this.activeKey
-        this.updateRecord(oConditions)
+        _oConditions.tab = this.activeKey
+        this.updateRecord(_oConditions)  // 保存查询记录
         sessionStorage.setItem(
           'searchConditions-' + this.tag,
           JSON.stringify(oConditions)
@@ -396,7 +399,6 @@ export default {
         })
         localStorage.setItem('history', JSON.stringify(this.myLocalStorage))
       } else {
-      
         let olddata = this.myLocalStorage.splice(n, 1)[0]
         olddata.id = this.guid()
         let newTime = new Date().Format()

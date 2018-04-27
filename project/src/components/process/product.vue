@@ -1362,27 +1362,38 @@ export default {
         aoHide = aoHide.concat(['equipmentName', 'moldCode'])
       }
 
+      // 投入表添加自定义列
+      this.doInTableColumns.forEach(el => {
+        this.inItems.columns.push({
+          field: el.searchCode,
+          headerName: el.itemName
+        })
+        this.inItems.columns1.push({
+          field: el.searchCode,
+          headerName: el.itemName,
+          width: '100'
+        })
+      })
+      // 产出表添加自定义列
+      this.doOutTableColumns.forEach(el => {
+        this.outItems.columns.push({
+          field: el.searchCode,
+          headerName: el.itemName
+        })
+        this.outItems.columns1.push({
+          field: el.searchCode,
+          headerName: el.itemName,
+          width: '100'
+        })
+      })
       // 存在需隐藏的列，则处理。
       if (aoHide && aoHide.length) {
         this.inItems.columns = this.setColumnHide(this.inItems.columns, aoHide)
-        // 投入表添加自定义列
-        this.doInTableColumns.forEach(el => {
-          this.inItems.columns.push({
-            field: el.searchCode,
-            headerName: el.itemName
-          })
-        })
+
         this.outItems.columns = this.setColumnHide(
           this.outItems.columns,
           aoHide
         )
-        // 产出表添加自定义列
-        this.doOutTableColumns.forEach(el => {
-          this.outItems.columns.push({
-            field: el.searchCode,
-            headerName: el.itemName
-          })
-        })
         this.uniteItems.columns = this.setColumnHide(
           this.uniteItems.columns,
           aoHide
