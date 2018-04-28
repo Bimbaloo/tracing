@@ -254,7 +254,13 @@ export default {
             width: 240,
             formatter: function (row) {
               if (row.srcBarcode) {
-                return `源条码:${row.srcBarcode}\n目标条码:${row.barcode}`
+								if (row.opType === 18 || row.opType === 19 || row.opType === 20) {
+									// 检验取样 检验返还 检验结束
+									return `取样标识:${row.srcBarcode}\n条码:${row.barcode}`
+								} else {
+									return `源条码:${row.srcBarcode}\n目标条码:${row.barcode}`
+								}
+
               } else {
                 return row.barcode
               }
@@ -329,7 +335,7 @@ export default {
           },
           {
             prop: 'checkResult',
-            name: '检验结果',
+            name: '结果',
             width: 80
           // }, {
           //   prop: 'expiryTime',
@@ -888,16 +894,11 @@ export default {
                   <div class="item-info">
                     <span class="tips">${o.personName || '-'}</span>在
                     <span class="tips">${o.equipmentName || '-'}</span> 设备上
-                    将条码 <span class="tips">${o.srcBarcode || '-'}</span>
+                    将条码 <span class="tips">${o.barcode || '-'}</span>
                     ,批次 <span class="tips">${o.batchNo || '-'}</span>
                     的 <span class="tips">${o.materialName || '-'}</span> 物料,
                     <span class="tips">${o.opTypeName}</span>
                     ${o.quantity || '-'}件
-                    ${
-                      o.srcBarcode !== o.barcode
-                      ? ` 到新条码<span class="tips">${o.barcode || '-'}</span> `
-                      : ''
-                    }
                   </div>`
 
           break
@@ -1060,25 +1061,89 @@ export default {
                   </div>`
 
           break
-				// 可疑品 检验 到货
+				// 可疑品登记
 				case 16:
+				// 可疑品判定
 				case 17:
+					sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName || '-'}</span>将
+									条码<span class="tips">${o.barcode || '-'}</span>
+									,批次<span class="tips">${o.batchNo || '-'}</span>的物料
+									<span class="tips">${o.materialName || '-'}</span>
+									<span class="tips">${o.quantity || '-'}</span>件
+									,进行<span class="tips">${o.opTypeName || '-'}</span>,
+									${o.opTypeName.substr(4)}为<span class="tips">${o.qualityType || '-'}</span>
+								</div>`
+					break
+				// 检验取样
 				case 18:
+				// 检验返还
 				case 19:
+					sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName || '-'}</span>将
+									取样标识<span class="tips">${o.srcBarcode || '-'}</span>,
+									条码<span class="tips">${o.barcode || '-'}</span>
+									,批次<span class="tips">${o.batchNo || '-'}</span>的物料
+									<span class="tips">${o.materialName || '-'}</span>
+									<span class="tips">${o.quantity || '-'}</span>件
+									,进行<span class="tips">${o.opTypeName || '-'}</span>
+								</div>`
+					break
+				// 检验结束
 				case 20:
+					sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName || '-'}</span>将
+									条码<span class="tips">${o.barcode || '-'}</span>
+									,批次<span class="tips">${o.batchNo || '-'}</span>的物料
+									<span class="tips">${o.materialName || '-'}</span>
+									<span class="tips">${o.quantity || '-'}</span>件
+									,${o.opTypeName},结果为<span class="tips">${o.checkResult || '-'}</span>
+								</div>`
+					break
+				// 检验报废
 				case 21:
+				// 检验封样
 				case 22:
+					sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName || '-'}</span>将
+									条码<span class="tips">${o.barcode || '-'}</span>
+									,批次<span class="tips">${o.batchNo || '-'}</span>的物料
+									<span class="tips">${o.materialName || '-'}</span>
+									<span class="tips">${o.quantity || '-'}</span>件
+									,进行<span class="tips">${o.opTypeName || '-'}</span>
+								</div>`
+					break
+				// 到货登记
 				case 23:
+					sDom = `<div class="item-type">${o.opTypeName}:</div>
+								<div class="item-info">
+									<span class="tips">${o.personName || '-'}</span>将
+									条码<span class="tips">${o.barcode || '-'}</span>
+									,原料批次<span class="tips">${o.srcBatchNo || '-'}</span>
+									,到货批次<span class="tips">${o.batchNo || '-'}</span>
+									,供应商<span class="tips">${o.contactName || '-'}</span>
+									的物料<span class="tips">${o.materialName || '-'}</span>
+									<span class="tips">${o.quantity || '-'}</span>件
+									,进行<span class="tips">${o.opTypeName || '-'}</span>
+								</div>`
+					break
+				// 退货
 				case 24:
 					sDom = `<div class="item-type">${o.opTypeName}:</div>
-									<div class="item-info">
-										<span class="tips">${o.personName || '-'}</span>将
-										条码<span class="tips">${o.barcode || '-'}</span>
-										,批次<span class="tips">${o.batchNo || '-'}</span>的物料
-										<span class="tips">${o.materialName || '-'}</span>
-										<span class="tips">${o.quantity || '-'}</span>件
-										,进行<span class="tips">${o.opTypeName || '-'}</span>
-									</div>`
+								<div class="item-info">
+									<span class="tips">${o.personName || '-'}</span>将
+									条码<span class="tips">${o.barcode || '-'}</span>
+									,原料批次<span class="tips">${o.srcBatchNo || '-'}</span>
+									,到货批次<span class="tips">${o.batchNo || '-'}</span>
+									的物料<span class="tips">${o.materialName || '-'}</span>
+									<span class="tips">${o.quantity || '-'}</span>件
+									,进行<span class="tips">${o.opTypeName || '-'}</span>
+									到供应商<span class="tips">${o.contactName || '-'}</span>
+								</div>`
 					break
         default:
           break
