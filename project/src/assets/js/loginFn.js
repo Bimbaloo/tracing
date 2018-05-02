@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 // 登录。
 // const LOGIN_URL = window.HOST + '/api/v1/sso/get-login-info'
 // 退出。
@@ -195,6 +197,63 @@ var getVersion = function (oStore, oAxio, fnCallBack) {
   getBeforeDispatchData('getVersion', oStore, oAxio, fnCallBack, VERSION_URL)
 }
 
+/**
+ * get接口请求方式。
+ * @param {Object} oStore 数据存储对象(vuex)。
+ * @param {String} url 接口请求地址。
+ * @param {Object} data 传递的参数
+ * @return {Object} Promise
+ * */
+let $get = function (oStore, url, data = undefined) {
+  const instance = beforeRequest(oStore, axios)
+  return new Promise((resolve, reject) => {
+    instance.get(url, {
+      params: data
+    })
+    .then((res) => {
+      let oResult = res.data
+      let resultCode = res.data.errorCode
+      if (!resultCode) { // resultCode = 0 的时候代表成功
+        resolve(oResult.data)
+      } else if (resultCode === 10) {  // 代表未登录或登录过期
+        // 清cookie，跳转到登录页面。
+        loginFail(oResult.errorMsg.subMsg)
+      } else {
+        reject(oResult.errorMsg.message)
+      }
+    }, (res) => {
+      reject(res)
+    })
+  })
+}
+
+/**
+ * post接口请求方式。
+ * @param {Object} oStore 数据存储对象(vuex)。
+ * @param {String} url 接口请求地址。
+ * @param {Object} data 传递的参数
+ * @return {Object} Promise
+ */
+let $post = function (oStore, url, data = undefined) {
+  const instance = beforeRequest(oStore, axios)
+  return new Promise((resolve, reject) => {
+    instance.post(url, data).then((res) => {
+      let oResult = res.data
+      let resultCode = res.data.errorCode
+      if (!resultCode) { // resultCode = 0 的时候代表成功
+        resolve(oResult.data)
+      } else if (resultCode === 10) {  // 代表未登录或登录过期
+        // 清cookie，跳转到登录页面。
+        loginFail(oResult.errorMsg.subMsg)
+      } else {
+        reject(oResult.errorMsg.message)
+      }
+    }, (res) => {
+      reject(res)
+    })
+  })
+}
+
 export default {
   login,
   loginFail,
@@ -204,5 +263,11 @@ export default {
   judgeLoaderHandler,
   sendRequest,
   getVersion,
-  getBeforeDispatchData
+  getBeforeDispatchData,
+  $get,
+  $post
+}
+export {
+  $get,
+  $post
 }
