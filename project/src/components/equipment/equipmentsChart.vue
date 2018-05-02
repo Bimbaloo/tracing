@@ -606,11 +606,11 @@ export default {
     },
     // 选中的设备名称。
     selectedEquipmentName () {
-      let doEquipment = this.categories.filter(o => o.id + '' === this.selectedEquipmentId)[0]  
-      let doEquipmentName = doEquipment?doEquipment.value.split('+')[0] + '':''   //避免目标不存在报错
+      let doEquipment = this.categories.filter(o => o.id + '' === this.selectedEquipmentId)[0]
+      let doEquipmentName = doEquipment ? doEquipment.value.split('+')[0] + '' : ''   // 避免目标不存在报错
       let equipment = this.equipments.filter(o => (o.equipmentId + '') === this.selectedEquipmentId + '')[0]
-      let equipmentName = equipment?equipment.equipmentName:''   //避免目标不存在报错
-      return doEquipmentName || equipmentName    
+      let equipmentName = equipment ? equipment.equipmentName : ''   // 避免目标不存在报错
+      return doEquipmentName || equipmentName
 
       // let equipmentName = this.categories.filter(o => o.id + '' === this.selectedEquipmentId)[0].value.split('+')[0] + ''
       // return this.equipments.filter(
@@ -1818,7 +1818,7 @@ export default {
     },
     // 请求成功。
     requestSucess (oData) {
-      this.loading = false  
+      this.loading = false
       this.categories = []
       // 保存数据。
       let aoData = oData
@@ -1826,8 +1826,8 @@ export default {
       if (!aoData.length) {
         return
       }
-      this.equipmentsId.forEach((item,index) => {//把id能对应上的设备名补齐
-        item.equipmentName = aoData.filter(o => {return o.equipmentId + '' === item.equipmentId + ''})[0].equipmentName || ""
+      this.equipmentsId.forEach((item, index) => { // 把id能对应上的设备名补齐
+        item.equipmentName = aoData.filter(o => { return o.equipmentId + '' === item.equipmentId + '' })[0].equipmentName || ''
       })
       // 初始化图形数据。
       this.initChartData(aoData)

@@ -18,7 +18,7 @@
             style="text-align: left; display: inline-block"
             v-model="option.columns"
             filterable
-            :titles="['可选项', '以选项']"
+            :titles="['可选项', '已选项']"
             @change="handleChange"
             :props="{
               key: 'itemCode',

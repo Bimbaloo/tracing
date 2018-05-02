@@ -73,6 +73,7 @@ import version from 'assets/img/version.png'
 import panel from 'components/panel/panel.vue'
 import fnP from 'assets/js/public.js'
 import { bus } from 'assets/js/bus.js'
+import * as Fetch from 'assets/js/loginFn.js'
 
 const MODULE_ITEM_URL = window.HOST + '/api/v1/customized/modules'
 // const MODULE_ITEM_URL = './static/modules.json'
@@ -383,16 +384,23 @@ export default {
     },
     // 获取查询条件的key:value
     fetchDataName () {
-      this.$register.sendRequest(
-        this.$store,
-        this.$ajax,
-        TABLE_DATA_URL,
-        'get',
-        null,
-        this.requestNameSucess,
-        this.requestFail,
-        this.requestError
-      )
+      // this.$register.sendRequest(
+      //   this.$store,
+      //   this.$ajax,
+      //   TABLE_DATA_URL,
+      //   'get',
+      //   null,
+      //   this.requestNameSucess,
+      //   this.requestFail,
+      //   this.requestError
+      // )
+      Fetch.$get(this.$store, TABLE_DATA_URL)
+      .then(oData => {
+        this.requestNameSucess(oData)
+      })
+      .catch(err => {
+        console.warn(err)
+      })
     },
     // 请求失败。
     requestFail (sErrorMessage) {
@@ -873,6 +881,7 @@ footer {
             .detail-record-box {
               display: flex;
               flex-wrap: wrap;
+              flex-direction: column;
               .detail-record {
                 //margin-right: 10px;
                 word-break: break-all;

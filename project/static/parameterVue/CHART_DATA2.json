@@ -1,0 +1,61 @@
+{
+  "errorCode": 0,
+  "errorMsg": "",
+  "data": [
+    {
+      "varStdId": 47,
+      "description": "条码",
+      "varUnit": null,
+      "maxValue": 0.0,
+      "minValue": 0.0,
+      "valueType": -1,
+      "list": [
+        {
+          "pickTime": "2017-08-29 07:01:27",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:01:32",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:01:38",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:01:44",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:01:49",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:01:54",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:01:59",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:02:08",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        },
+        {
+          "pickTime": "2017-08-29 07:02:13",
+          "value": "5CK3512667054170828132024",
+          "barcode": null
+        }
+      ]
+    }
+  ]
+}

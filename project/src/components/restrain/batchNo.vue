@@ -172,7 +172,7 @@ export default {
     oQuery () {
       return this.$route.query
     },
-    // 以选项
+    // 已选项
     selected () {
       let arr = []
       this.tableData.data.forEach((el, index) => {

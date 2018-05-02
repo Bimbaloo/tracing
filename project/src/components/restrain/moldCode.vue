@@ -175,7 +175,7 @@ export default {
     oQuery () {
       return this.$route.query
     },
-    // 以选项
+    // 已选项
     selected () {
       let arr = []
       this.tableData.data.forEach((el, $index) => {
@@ -402,14 +402,14 @@ export default {
 
           break
         case 2:     // 选中了两条
-          if (this.selected[0].el.select === 'first' && this.selected[0].el.equipmentId === this.selected[1].el.equipmentId) {  // 以选项中开始时间大于结束时间 && 设备ID相同
+          if (this.selected[0].el.select === 'first' && this.selected[0].el.equipmentId === this.selected[1].el.equipmentId) {  // 已选项中开始时间大于结束时间 && 设备ID相同
             this.moldQuery.startTime = this.selected[0].el.happenTime
             this.moldQuery.endTime = this.selected[1].el.happenTime
             this.moldQuery.equipmentId = this.selected[0].el.equipmentId
             this.moldQuery.equipmentName = this.selected[0].el.equipmentName
             this.needRestrain = false
             this.isRestrained = false
-          } else if (this.selected[0].el.equipmentId !== this.selected[1].el.equipmentId) {  // 以选项中设备ID不同
+          } else if (this.selected[0].el.equipmentId !== this.selected[1].el.equipmentId) {  // 已选项中设备ID不同
             this.$message({
               showClose: true,
               message: '请选择相同设备',

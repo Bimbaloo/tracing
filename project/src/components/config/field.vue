@@ -68,7 +68,7 @@ export default {
           },
           {
             label: '操作类型',
-            prop: 'opType',
+            prop: 'opTypeName',
             align: 'center'
           },
           {

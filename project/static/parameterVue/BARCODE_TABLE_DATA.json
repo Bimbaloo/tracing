@@ -1,20 +1,22 @@
 {
   "errorCode": 0,
   "errorMsg": "",
-  "data": [{
-    "barcode": "0741665CK160105000",
-    "maxPickTime": "2017-07-29 19:19:36",
-    "minPickTime": "2017-07-29 19:01:36",
-    "total": 10
-  }, {
-    "barcode": "0741665CK160105001",
-    "maxPickTime": "2017-07-29 19:39:36",
-    "minPickTime": "2017-07-29 19:21:36",
-    "total": 10
-  }, {
-    "barcode": "0741665CK160105002",
-    "maxPickTime": "2017-07-29 19:59:36",
-    "minPickTime": "2017-07-29 19:41:36",
-    "total": 10
-  }]
+  "data": [
+    {
+      "barcode": "0741665CK160105000",
+      "maxPickTime": "2017-07-29 19:19:36",
+      "minPickTime": "2017-07-29 19:01:36",
+      "total": 10
+    }, {
+      "barcode": "0741665CK160105001",
+      "maxPickTime": "2017-07-29 19:39:36",
+      "minPickTime": "2017-07-29 19:21:36",
+      "total": 10
+    }, {
+      "barcode": "0741665CK160105002",
+      "maxPickTime": "2017-07-29 19:59:36",
+      "minPickTime": "2017-07-29 19:41:36",
+      "total": 10
+    }
+  ]
 }
