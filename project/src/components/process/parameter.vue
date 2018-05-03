@@ -92,27 +92,28 @@
               <div class="content-echarts" v-for="option in options" :key="option.index" v-if="option.optionModal && option.optionModal.series[0].name === chartData.filename" v-show="chartData.value === '图形'">
                 <div class="charts" :id="`charts${index}`"></div>
               </div>
-              <div class="content-tables" v-show="chartData.value === '表格' && index == tabPaneNum">
+              <div class="content-tables" v-if="chartData.value === '表格' && index === tabPaneNum">
                 <h2 class="content-title tableData">
                   <span class='table-title'>
                     <span>检验参数：{{chartData.varStdId}}</span>&nbsp;&nbsp;
                     <span>单位：{{chartData.unit}}</span>
                   </span>
                   <span class='table-handle'>
-                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(chartData, $event)"></i>
-                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printHandle(`tableData${index}`, $event)"></i>
+                    <i class="icon icon-20 icon-excel" title="导出excle" v-if="excel" @click="exportExcelHandle(chartData, 'ag-table')"></i>
+                    <i class="icon icon-20 icon-print" title="打印" v-if="print" @click="printAgTableHandle(`tableData${index}`,chartData ,$event)"></i>
                   </span>
                 </h2>
                 <div class="content-table" :ref="`tableData${index}`">
-                  <!-- <v-table :table-data="chartData" :heights="chartTableHeight" :resize="tdResize"></v-table> -->
-                  <el-table :data="chartData.data" :height="chartTableHeight" border class="table" ref="multipleTable">
-                    <el-table-column v-for='column in chartData.columns' :key="column.prop" :prop="column.prop" :label="column.name" :width="column.width" align='center'>
-                      <template slot-scope="scope">
-                        <el-checkbox @change="chooseTime(scope.row.checked,chartData.data, scope.$index)" v-model="scope.row.checked" v-if="column.name === '采集时间' && (showCamera || !supression) ">{{scope.row[column.prop]}}</el-checkbox>
-                        <div v-else :class="[{ 'isWarn': column.name === '检测值' && scope.row['isWarn'] }, 'cell']">{{scope.row[column.prop]}}</div>
-                      </template>
-                    </el-table-column>
-                  </el-table>
+                  <ag-grid-vue
+                    ref="multipleTable"
+                    class="ag-table ag-fresh"
+                    :style="{height: chartTableHeight+'px'}"
+                    :gridOptions="gridOptions"
+                    :columnDefs="chartData.columns"
+                    :rowData="chartData.data"
+                    :gridReady="onGridReady"
+                    rowSelection="multiple">
+                  </ag-grid-vue>
                 </div>
               </div>
               <div class="btn-box">
@@ -133,10 +134,14 @@ import Blob from 'blob'
 import FileSaver from 'file-saver'
 // import html2canvas from 'html2canvas'
 import table from 'components/basic/table.vue'
+import {AgGridVue} from 'ag-grid-vue'
 import rasterizeHTML from 'rasterizehtml'
 import _ from 'lodash'
 import VideoDialog from 'components/monitor/dialog.vue'
 import * as Fetch from 'assets/js/loginFn.js'
+import 'ag-grid/dist/styles/ag-grid.css'
+import 'ag-grid/dist/styles/theme-fresh.css'
+import 'assets/css/ag-table.less'
 
 // 条码表接口
 const BARCODE_TABLE_DATA = window.HOST + '/api/v1/processparameter/barcode-list'
@@ -152,7 +157,8 @@ const BARCODE_DETAIL_DATA = window.HOST + '/api/v1/processparameter/by-equipment
 export default {
   components: {
     'v-dialog': VideoDialog,
-    'v-table': table
+    'v-table': table,
+    'ag-grid-vue': AgGridVue
   },
   data () {
     return {
@@ -244,6 +250,25 @@ export default {
       ChartAndBarcodeData: {
         Chart: [],
         Barcod: []
+      },
+      // ag-grid的配置
+      gridOptions: {
+        enableColResize: true,
+        enableSorting: true,
+        rowSelection: 'multiple',
+        onRowSelected: this.onRowSelected,
+        rowMultiSelectWithClick: true,
+        enableRangeSelection: true,
+        suppressRowClickSelection: true,
+        rowClass: 'row-style',
+        rowHeight: 40,
+        headerHeight: 40,
+        suppressMovableColumns: true,
+        overlayNoRowsTemplate: '暂无数据',
+        getContextMenuItems: function (params) {
+          if (params.node == null) return null
+          return ['copy', 'copyWithHeaders', 'paste']
+        }
       }
     }
   },
@@ -325,7 +350,10 @@ export default {
         this.fetchData()
       }
     },
-    resize: 'updateEcharts',
+    resize: function () {
+      this.updateEcharts()
+      this.sizeToFit()
+    },
     /* 上下拖动时，重新设置flexBase大小变化 */
     resizeY: function () {
       if (this.$route.meta.title === 'parameter') {
@@ -529,7 +557,6 @@ export default {
     // 选中修改。
     tabChange (oTab) {
       if (oTab === 'charts') {
-        console.log('charts')
         if (this.chartShow) {
           this.$nextTick(() => {
             if (this.nowEchart) {
@@ -683,19 +710,34 @@ export default {
         varStdId: '',
         columns: [
           {
-            name: '条码',
-            prop: 'barcode',
-            width: ''
+            headerName: '条码',
+            field: 'barcode',
+            width: 200
           },
           {
-            name: '检测值',
-            prop: 'value',
-            width: ''
+            headerName: '检测值',
+            field: 'value',
+            width: 400
           },
           {
-            name: '采集时间',
-            prop: 'pickTime',
-            width: ''
+            headerName: '采集时间',
+            field: 'pickTime',
+            width: 300,
+            cellStyle: function (params) {
+              if (params.isWarn) {
+                return {
+                  color: '#ff0000'
+                }
+              }
+            },
+            checkboxSelection: function (rowNode) {
+              // 可以查看可疑品或视频监控才存在勾选
+              if (!this.supression || this.showCamera) {
+                return true
+              } else {
+                return false
+              }
+            }.bind(this)
           }
         ],
         id: 0,
@@ -1047,6 +1089,7 @@ export default {
     addEvent () {
       window.addEventListener('resize', this.updateEcharts)
       window.addEventListener('resize', this.setFlexBase)
+      window.addEventListener('resize', this.sizeToFit)
     },
     // 表格导出。
     exportExcelHandle (oData, event) {
@@ -1054,7 +1097,90 @@ export default {
         return
       }
       // 下载表格。
-      window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData)
+      window.Rt.utils.exportJson2Excel(XLSX, Blob, FileSaver, oData, event)
+    },
+    // ag-table打印
+    printAgTableHandle (refTable, oData, event) {
+      let oTable = this.$refs[refTable]
+
+      if (!oTable) {
+        return false
+      }
+
+      let nWidth = document.body.clientWidth
+
+      let sHeaderHtml = '<thead><tr>'
+
+      oData.columns.forEach(o => {
+        sHeaderHtml += `<th class="is-center"><div class="cell">${o.headerName}</div></th>`
+      })
+
+      sHeaderHtml += '</tr></thead>'
+
+      // 表格内容
+      let sBodyHtml = '<tbody>'
+      oData.data.forEach(oRow => {
+        sBodyHtml += `<tr class="el-table__row table-item">`
+
+        oData.columns.forEach(oCol => {
+          sBodyHtml += `<td class="is-center"><div class="cell"><div class="cell-content">${oCol.valueFormatter ? oCol.valueFormatter({data: oRow}) : oRow[oCol.field]}</div></div></td>`
+        })
+        sBodyHtml += '</tr>'
+      })
+      sBodyHtml += '</tbody>'
+
+      // 不存在数据时
+      let sEmpty = ''
+
+      if (!oData.data.length) {
+        sEmpty = `<div class="el-table__empty-block" width=${nWidth}><span class="el-table__empty-text">暂无数据</span></div>`
+      }
+
+      let sHtml = `
+                <div class="table el-table">
+                    <table cellspacing="0" cellpadding="0" border="0" width=${nWidth}>
+                        ${sHeaderHtml}
+                        ${sBodyHtml}
+                    </table>
+                    ${sEmpty}
+                </div>
+                <style>
+                    .el-table td.is-center, .el-table th.is-center {
+                        text-align: center;
+                    }
+                    .el-table td.is-left, .el-table th.is-left {
+                        text-align: left;
+                    }
+                    .table thead th {
+                        height: 36px;
+                        background-color: #42af8f;
+                    }
+                    .table thead th .cell {
+                        color: #fff;
+                    }
+                    .table tbody tr:nth-child(even) {
+                        background-color: #fafafa;
+                    }
+                    .table tbody tr:nth-child(odd) {
+                        background-color: #fff;
+                    }
+                    .table tbody td {
+                        white-space: normal;
+                        word-break: break-all;
+                    }
+                    .table tbody .cell {
+                        min-height: 30px;
+                        line-height: 30px;
+                        // 边框设置，会导致时间列换行，如果使用复制的元素，则不会换行
+                        //border: 1px solid #e4efec;
+                        box-sizing: border-box;
+                    }
+                    .el-table__empty-block {
+                        text-align: center;
+                    }
+                </style>
+            `
+      window.Rt.utils.rasterizeHTML(rasterizeHTML, sHtml)
     },
     // 表格打印。
     printHandle (refTable, event) {
@@ -1147,22 +1273,6 @@ export default {
         })
       }
     },
-    // 表格内选择时间
-    chooseTime (value, objArr, index) {
-      let arr = objArr.filter((el, index) => {
-        if (el.checked) {
-          el.index = index
-          return el
-        }
-      })
-      if (arr.length > 2) {
-        if (arr[0].index !== index) {
-          objArr[arr[0].index].checked = false
-        } else {
-          objArr[arr[1].index].checked = false
-        }
-      }
-    },
     // 显示可疑品列表
     showSuspiciousList () {
       const value = this.tableDatas[this.tabPaneNum].value
@@ -1253,6 +1363,38 @@ export default {
         let endDate = new Date(_time + 1000 * 60 * 10).Format()
         this.videoForm = Object.assign({}, { startDate, endDate }, myVideoForm)
       }
+    },
+    /* ag-grid 默认 */
+    onGridReady (params) {
+      this.gridApi = params.api
+      this.columnApi = params.columnApi
+      params.api.sizeColumnsToFit()
+    },
+    /* ag-grid的点击选中事件 */
+    onRowSelected (e) {
+      // console.log(e.node)
+      e.data.checked = e.node.selected
+      let a = this.gridApi.getSelectedNodes()
+
+      // this.myarr = a
+      if (a.length > 2) {
+        if (a[0].rowIndex === e.rowIndex) {
+          a[a.length - 1].setSelected(false)
+          a[a.length - 1].data.checked = false
+        } else {
+          a[0].setSelected(false)
+          a[0].data.checked = false
+        }
+      }
+    },
+    // ag-grid 宽度自适应
+    sizeToFit () {
+      this.$nextTick(() => {
+        this.gridApi.sizeColumnsToFit()
+      })
+      setTimeout(function () {
+        this.gridApi.sizeColumnsToFit()
+      }.bind(this), 500)
     }
   }
 }
